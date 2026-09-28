@@ -10,7 +10,8 @@ resource "aws_ssm_parameter" "jdp_pipeline_smoke_test" {
 
   name        = "/jdp/pipeline-smoke-test"
   description = "Justice Data Platform: first change deployed via modernisation-platform-environments"
-  type        = "SecureString" # Checkov CKV2_AWS_34; default aws/ssm key, no new resources
+  type        = "SecureString"                        # CKV2_AWS_34
+  key_id      = data.aws_kms_key.general_shared.arn # CKV_AWS_337, Modernisation Platform shared CMK
   value       = "ok"
   tier        = "Standard"
 }
