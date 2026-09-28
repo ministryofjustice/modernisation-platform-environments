@@ -897,6 +897,7 @@ updates:
     directories:
       - "terraform/environments/integration-hub-api"
       - "terraform/environments/integration-hub-api/benefit-checker-api"
+      - "terraform/environments/integration-hub-api/file-transfer-api"
       - "terraform/environments/integration-hub-api/modules/integration-hub-file-transfer-api"
     schedule:
       interval: "daily"
