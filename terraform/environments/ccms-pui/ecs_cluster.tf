@@ -163,7 +163,9 @@ resource "aws_appautoscaling_target" "pui" {
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 
-  tags = local.tags
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-appautoscaling_target", local.application_name, local.environment)) }
+  )
 }
 
 resource "aws_appautoscaling_policy" "pui" {
