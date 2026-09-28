@@ -181,6 +181,4 @@ resource "aws_appautoscaling_policy" "pui" {
     scale_in_cooldown  = 300
     scale_out_cooldown = 300
   }
-
-  tags = local.tags
 }
