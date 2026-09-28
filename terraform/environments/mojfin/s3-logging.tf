@@ -84,7 +84,7 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         }
       },
       {
-        Sid    = "AllowS3Logging Shared Bucket",
+        Sid    = "AllowS3Logging Access Logs",
         Effect = "Allow",
         Principal = {
           Service = "logging.s3.amazonaws.com"
@@ -96,24 +96,7 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         ],
         Condition = {
           ArnLike = {
-            "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
-          }
-        }
-      },
-      {
-        Sid    = "AllowS3Logging Oracle RDS Bucket",
-        Effect = "Allow",
-        Principal = {
-          Service = "logging.s3.amazonaws.com"
-        },
-        Action = "s3:PutObject",
-        Resource = [
-          module.s3-bucket-logging.bucket.arn,
-          "${module.s3-bucket-logging.bucket.arn}/*"
-        ],
-        Condition = {
-          ArnLike = {
-            "aws:SourceArn" = aws_s3_bucket.mojfin_rds_oracle.arn
+            "aws:SourceArn" = local.s3_access_logs_source_arns
           }
         }
       }
