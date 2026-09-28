@@ -1,0 +1,29 @@
+resource "aws_lambda_function" "github_workflow_trigger" {
+  function_name = "${var.project_name}-trigger"
+  handler       = "handler.lambda_handler"
+  memory_size   = var.lambda_memory_size
+  role          = aws_iam_role.lambda.arn
+  runtime       = var.lambda_runtime
+  timeout       = var.lambda_timeout
+
+  filename = "${path.module}/build/github-workflow-trigger.zip"
+  source_code_hash = sha256(join("", [
+    filesha256("${path.module}/lambda/handler.py"),
+    filesha256("${path.module}/lambda/requirements.txt"),
+  ]))
+
+  environment {
+    variables = {
+      GITHUB_ORG                     = var.github_org
+      WEB_IDENTITY_AUDIENCE          = var.web_identity_audience
+      WEB_IDENTITY_DURATION_SECONDS  = var.web_identity_duration_seconds
+      WEB_IDENTITY_SIGNING_ALGORITHM = var.web_identity_signing_algorithm
+    }
+  }
+
+  depends_on = [
+    terraform_data.lambda_build,
+    aws_iam_role_policy.lambda_web_identity,
+    aws_iam_role_policy_attachment.lambda_basic_execution,
+  ]
+}
