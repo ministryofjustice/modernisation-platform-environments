@@ -165,7 +165,7 @@ resource "aws_appautoscaling_target" "pui" {
 
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-appautoscaling_target", local.application_name, local.environment)) },
-    { "slack-channel" = "#ask-laa-sre" }
+    { "slack-channel" = "ask-laa-sre" }
   )
 }
 
