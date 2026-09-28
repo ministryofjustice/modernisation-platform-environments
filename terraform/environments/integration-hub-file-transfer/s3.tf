@@ -57,6 +57,8 @@ module "s3_bucket" {
   allowed_kms_key_arn                   = module.kms_s3_bucket[each.key].key_arn
   attach_deny_insecure_transport_policy = true
   bucket                                = each.value.bucket
+  attach_policy                         = each.key == "incoming"
+  policy                                = each.key == "incoming" ? data.aws_iam_policy_document.api_incoming_upload.json : null
 
   cors_rule = each.key == "incoming" ? [
     {
