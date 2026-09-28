@@ -1,4 +1,6 @@
 data "aws_iam_policy_document" "glue_catalog_delete_table_versions" {
+  count = local.is-test ? 0 : 1
+
   statement {
     effect = "Allow"
     actions = [
@@ -37,9 +39,11 @@ data "aws_iam_policy_document" "glue_catalog_delete_table_versions" {
 
 # Athena API Policy
 resource "aws_iam_policy" "glue_catalog_delete_table_versions" {
+  count = local.is-test ? 0 : 1
+
   name        = "${local.short_name}-glue-catalog-delete-table-versions"
   description = "Glue Catalog Delete Table Versions Policy"
-  policy      = data.aws_iam_policy_document.glue_catalog_delete_table_versions.json
+  policy      = data.aws_iam_policy_document.glue_catalog_delete_table_versions[0].json
 }
 # Glue Catalog Delete Table Versions attachment
 resource "aws_iam_role_policy_attachment" "glue_catalog_delete_table_versions" {
