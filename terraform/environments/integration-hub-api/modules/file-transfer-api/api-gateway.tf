@@ -104,6 +104,9 @@ resource "aws_apigatewayv2_stage" "default" {
 
   default_route_settings {
     detailed_metrics_enabled = true
+    # Omitted limits in this block are sent as zero by the provider, blocking requests.
+    throttling_rate_limit  = 10
+    throttling_burst_limit = 20
   }
 
   access_log_settings {
