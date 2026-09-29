@@ -925,6 +925,18 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
+      - "terraform/environments/justice-eng-ai"
+    schedule:
+      interval: "daily"
+    groups:
+      justice-eng-ai:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
       - "terraform/environments/laa-ai-enablement"
     schedule:
       interval: "daily"
