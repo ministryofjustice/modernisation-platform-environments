@@ -6,7 +6,7 @@ module "waf_web_app" {
 
   name           = "${local.application_name}-${local.environment}-web"
   scope          = "CLOUDFRONT"
-  default_action = "allow"
+  default_action = "block"
 
   rules = merge({
     rate-limit = {
@@ -25,9 +25,36 @@ module "waf_web_app" {
         sampled_requests_enabled   = false
       }
     }
+    allow-service-hostname = {
+      priority = max(values(local.transfer_web_app_managed_rules)...) + 1
+      action   = "allow"
+      statement = {
+        byte_match_statement = {
+          positional_constraint = "EXACTLY"
+          search_string         = lower(aws_acm_certificate.web_app.domain_name)
+          field_to_match = {
+            single_header = {
+              name = "host"
+            }
+          }
+          text_transformations = [
+            {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          ]
+        }
+      }
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "${local.application_name}-${local.environment}-web-allow-service-hostname"
+        sampled_requests_enabled   = false
+      }
+    }
     }, {
     for name, priority in local.transfer_web_app_managed_rules : name => {
       priority        = priority
+      override_action = "none"
       statement = {
         managed_rule_group_statement = {
           name        = name
