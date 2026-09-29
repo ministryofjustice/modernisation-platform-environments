@@ -31,17 +31,10 @@ def get_secret(secret_name: str) -> str:
 
 
 def _extract_workspace_message(log_message: str, log_group: str = "") -> dict:
-    if "/aws/directoryservice/" in log_group:
-        event_type = "AD failed sign-in or account-lockout event"
-    elif "linotp3" in log_group:
-        event_type = "RADIUS/MFA authentication rejection"
-    else:
-        event_type = None
-
-    if event_type:
+    if "linotp3" in log_group:
         return {
             "text": (
-                f"{event_type}\n"
+                "RADIUS/MFA authentication rejection\n"
                 f"Log group: {log_group}\n"
                 f"Details: {log_message[:3000]}"
             )
