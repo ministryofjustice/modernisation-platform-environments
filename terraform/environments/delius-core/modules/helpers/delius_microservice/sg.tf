@@ -61,17 +61,6 @@ resource "aws_security_group_rule" "all_cluster_to_ecs_service_tcp" {
   source_security_group_id = var.cluster_security_group_id
 }
 
-resource "aws_security_group_rule" "bastion_to_ecs_service_tcp" {
-  for_each                 = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
-  description              = "In from Bastion"
-  security_group_id        = aws_security_group.ecs_service.id
-  type                     = "ingress"
-  from_port                = each.value
-  to_port                  = each.value
-  protocol                 = "tcp"
-  source_security_group_id = var.bastion_sg_id
-}
-
 resource "aws_vpc_security_group_ingress_rule" "nlb_to_ecs_service" {
   count                        = length(var.container_port_config) == 0 ? 0 : 1
   security_group_id            = aws_security_group.ecs_service.id

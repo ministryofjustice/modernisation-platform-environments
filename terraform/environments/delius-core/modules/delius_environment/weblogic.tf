@@ -39,8 +39,6 @@ module "weblogic" {
 
   microservice_lb = aws_lb.delius_core_frontend
 
-  bastion_sg_id = module.bastion_linux.bastion_security_group
-
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 100
 

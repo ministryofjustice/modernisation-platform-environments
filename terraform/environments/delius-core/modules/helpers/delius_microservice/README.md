@@ -98,7 +98,6 @@ In addition, this module deploys the baseline monitoring stack for all component
 | <a name="input_alb_security_group_id"></a> [alb\_security\_group\_id](#input\_alb\_security\_group\_id) | The security group ID of the ALB | `string` | n/a | yes |
 | <a name="input_alb_stickiness_enabled"></a> [alb\_stickiness\_enabled](#input\_alb\_stickiness\_enabled) | Enable or disable stickiness | `string` | `true` | no |
 | <a name="input_alb_stickiness_type"></a> [alb\_stickiness\_type](#input\_alb\_stickiness\_type) | Type of stickiness for the alb target group | `string` | `"lb_cookie"` | no |
-| <a name="input_bastion_sg_id"></a> [bastion\_sg\_id](#input\_bastion\_sg\_id) | Security group id of the bastion | `string` | n/a | yes |
 | <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | The ARN of the certificate to use for the target group | `string` | n/a | yes |
 | <a name="input_cloudwatch_error_pattern"></a> [cloudwatch\_error\_pattern](#input\_cloudwatch\_error\_pattern) | The cloudwatch error pattern to use for the alarm | `string` | `"/error/"` | no |
 | <a name="input_cluster_security_group_id"></a> [cluster\_security\_group\_id](#input\_cluster\_security\_group\_id) | Security group id for the cluster | `string` | n/a | yes |

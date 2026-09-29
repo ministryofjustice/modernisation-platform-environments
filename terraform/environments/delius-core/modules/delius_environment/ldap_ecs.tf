@@ -44,7 +44,6 @@ module "ldap_ecs" {
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
   cluster_security_group_id = aws_security_group.cluster.id
 
-  bastion_sg_id = module.bastion_linux.bastion_security_group
   tags          = var.tags
 
   platform_vars   = var.platform_vars
@@ -136,7 +135,6 @@ module "ldap_ecs" {
     {
       port        = var.ldap_config.port
       ip_protocol = "udp"
-      # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
       cidr_ipv4   = "127.0.0.1/32"
       description = "Allow inbound traffic from bastion"
     },
@@ -186,7 +184,6 @@ module "ldap_ecs" {
     {
       port        = var.ldap_config.tls_port
       ip_protocol = "udp"
-      # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
       cidr_ipv4   = "127.0.0.1/32"
       description = "Allow inbound traffic from bastion"
     },
@@ -233,7 +230,6 @@ module "ldap_ecs" {
     {
       port        = var.ldap_config.port
       ip_protocol = "udp"
-      # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
       cidr_ipv4   = "127.0.0.1/32"
       description = "Allow inbound traffic from bastion"
     },

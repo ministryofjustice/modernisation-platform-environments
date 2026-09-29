@@ -41,8 +41,6 @@ module "weblogic_eis" {
   microservice_lb                    = aws_lb.delius_core_frontend
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
-  bastion_sg_id = module.bastion_linux.bastion_security_group
-
   ecs_service_ingress_security_group_ids = []
   ecs_service_egress_security_group_ids = [
     {

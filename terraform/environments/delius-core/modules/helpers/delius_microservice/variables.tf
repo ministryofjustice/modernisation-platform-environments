@@ -465,12 +465,6 @@ variable "container_cpu" {
   default     = 512
 }
 
-variable "bastion_sg_id" {
-  description = "Security group id of the bastion"
-  type        = string
-}
-
-
 variable "create_service_nlb" {
   description = "Whether to create a service NLB"
   type        = bool

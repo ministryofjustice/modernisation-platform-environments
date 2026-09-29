@@ -49,8 +49,6 @@ module "oracle_observer" {
   log_error_pattern = "FATAL"
   sns_topic_arn     = var.sns_topic_arn
 
-  bastion_sg_id = null
-
   container_vars_default = {}
 
   container_vars_env_specific = {

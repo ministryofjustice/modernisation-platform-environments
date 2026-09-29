@@ -25,7 +25,6 @@ module "oracle_db_shared" {
   database_port                  = var.db_config.database_port
   sns_topic_arn                  = aws_sns_topic.delius_core_alarms.arn
   oracle_db_server_names         = local.oracle_db_server_names
-  bastion_sg_id                  = module.bastion_linux.bastion_security_group
   cluster_security_group_id      = aws_security_group.cluster.id
   delius_microservice_configs    = var.delius_microservice_configs
   ecs_cluster_arn                = module.ecs.ecs_cluster_arn

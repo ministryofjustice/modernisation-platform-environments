@@ -35,16 +35,6 @@ resource "aws_vpc_security_group_ingress_rule" "rds_from_custom" {
   description                  = "Allow RDS traffic from ${each.value}"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "rds_from_bastion" {
-  count                        = var.create_rds ? 1 : 0
-  security_group_id            = aws_security_group.db[0].id
-  from_port                    = var.rds_port
-  to_port                      = var.rds_port
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = var.bastion_sg_id
-  description                  = "Allow RDS traffic from service"
-}
-
 resource "aws_vpc_security_group_ingress_rule" "rds_from_service" {
   count                        = var.create_rds ? 1 : 0
   security_group_id            = aws_security_group.db[0].id
