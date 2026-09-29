@@ -6,7 +6,7 @@ resource "aws_security_group" "allow_s3" {
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name        = "allow-s3-egress-from-flink"
   description = "Allow HTTPS egress traffic to s3 from flink applications"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared[0].id
 
   tags = merge(local.extended_tags, {
     Name = "allow-s3-egress-from-flink"
@@ -36,7 +36,7 @@ resource "aws_security_group" "allow_msk" {
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name        = "allow-msk-egress-from-flink"
   description = "Allow egress to MSK Serverless cluster - VPC only access"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared[0].id
 
   tags = merge(local.extended_tags, {
     Name = "allow-msk-egress-from-flink"
@@ -51,7 +51,7 @@ resource "aws_vpc_security_group_ingress_rule" "msk_iam_auth" {
   from_port   = 9098
   to_port     = 9098
   ip_protocol = "tcp"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
+  cidr_ipv4   = data.aws_vpc.shared[0].cidr_block
 
   tags = merge(local.extended_tags, {
     Name = "msk-iam-auth"
@@ -64,7 +64,7 @@ resource "aws_vpc_security_group_egress_rule" "msk_outbound_vpc" {
   description       = "Allow outbound within VPC only"
 
   ip_protocol = "-1"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
+  cidr_ipv4   = data.aws_vpc.shared[0].cidr_block
 
   tags = merge(local.extended_tags, {
     Name = "msk-outbound-vpc"

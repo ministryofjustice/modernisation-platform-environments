@@ -34,7 +34,7 @@ module "ecs_service_opahub" {
   name               = "${local.opahub_name}-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
   execution_role_arn = aws_iam_role.ecs_task_execution.arn
-  desired_count      = local.application_data.accounts[local.environment].ec2_desired_capacity
+  desired_count      = local.application_data.accounts[local.environment].opa_app_count
   cpu                = local.application_data.accounts[local.environment].opa_container_cpu
   memory             = local.application_data.accounts[local.environment].opa_container_memory
   tags               = local.tags

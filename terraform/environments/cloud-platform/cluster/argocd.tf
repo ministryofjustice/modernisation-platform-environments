@@ -221,6 +221,13 @@ resource "kubernetes_cluster_role_v1" "argocd_hub_deploy" {
     verbs      = ["create", "update", "patch", "delete", "deletecollection"]
   }
 
+  # Envoy Gateway extension policies used by product workloads.
+  rule {
+    api_groups = ["gateway.envoyproxy.io"]
+    resources  = ["envoyextensionpolicies"]
+    verbs      = ["create", "update", "patch", "delete", "deletecollection"]
+  }
+
   # Namespace-scoped RBAC only — the baseline grants team access per namespace.
   # ClusterRole/ClusterRoleBinding writes are deliberately excluded.
   rule {
