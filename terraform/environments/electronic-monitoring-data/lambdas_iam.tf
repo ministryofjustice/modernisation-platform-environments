@@ -1308,6 +1308,8 @@ data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document
     resources = [
       module.s3-create-a-derived-table-bucket.bucket.arn,
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
     ]
   }
 
