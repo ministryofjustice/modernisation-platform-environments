@@ -17,6 +17,11 @@ locals {
     "data_insights${local.dbt_suffix}"
   ]
 
+  clean_after_dlt_load_databases = [
+    "allied_mdss${local.db_suffix}",
+    "serco_fms${local.db_suffix}"
+  ]
+
 }
 
 # ------------------------------------------
@@ -1339,6 +1344,19 @@ resource "aws_iam_policy" "clean_after_dlt_load_lambda_role_policy" {
 resource "aws_iam_role_policy_attachment" "clean_after_dlt_load_lambda_policy_attachment" {
   role       = aws_iam_role.clean_after_dlt_load.name
   policy_arn = aws_iam_policy.clean_after_dlt_load_lambda_role_policy.arn
+}
+
+# Lake Formation admin status grants authority to grant, not data access.
+resource "aws_lakeformation_permissions" "clean_after_dlt_load_table_access" {
+  for_each = toset(local.clean_after_dlt_load_databases)
+
+  principal   = aws_iam_role.clean_after_dlt_load.arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = each.value
+    name          = "_dlt_loads"
+  }
 }
 
 #-----------------------------------------------------------------------------------
