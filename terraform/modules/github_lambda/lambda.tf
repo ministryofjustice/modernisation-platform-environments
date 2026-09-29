@@ -6,11 +6,18 @@ resource "aws_lambda_function" "github_workflow_trigger" {
   runtime       = var.lambda_runtime
   timeout       = var.lambda_timeout
 
-  filename = "${path.module}/build/github-workflow-trigger.zip"
+  filename    = "${path.module}/build/github-workflow-trigger.zip"
+  kms_key_arn = aws_kms_key.lambda.arn
   source_code_hash = sha256(join("", [
     filesha256("${path.module}/lambda/handler.py"),
     filesha256("${path.module}/lambda/requirements.txt"),
   ]))
+
+  reserved_concurrent_executions = 1
+
+  tracing_config {
+    mode = "Active"
+  }
 
   environment {
     variables = {
@@ -23,6 +30,7 @@ resource "aws_lambda_function" "github_workflow_trigger" {
 
   depends_on = [
     terraform_data.lambda_build,
+    aws_iam_role_policy.lambda_kms,
     aws_iam_role_policy.lambda_web_identity,
     aws_iam_role_policy_attachment.lambda_basic_execution,
   ]
