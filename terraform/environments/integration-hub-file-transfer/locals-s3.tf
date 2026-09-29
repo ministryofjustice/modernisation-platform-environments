@@ -32,6 +32,22 @@ locals {
         },
       ]
     }
+    test = {
+      default = [
+        {
+          id     = "expire-objects-after-1-day"
+          status = "Enabled"
+          filter = {}
+          expiration = {
+            days = 1
+          }
+          abort_incomplete_multipart_upload_days = 1
+          noncurrent_version_expiration = {
+            noncurrent_days = 1
+          }
+        },
+      ]
+    }
 
     production = {
       default = [
@@ -54,6 +70,11 @@ locals {
   s3_bucket_lifecycle_per_prefix = {
     development = {
       default = local.s3_bucket_lifecycle_defaults.development.default
+      buckets = {}
+    }
+
+    test = {
+      default = local.s3_bucket_lifecycle_defaults.test.default
       buckets = {}
     }
 
