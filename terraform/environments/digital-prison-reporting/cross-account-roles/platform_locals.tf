@@ -2,7 +2,6 @@ locals {
 
   application_name = "digital-prison-reporting"
   component_name   = "cross-account-roles"
-  short_name = "dpr"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
