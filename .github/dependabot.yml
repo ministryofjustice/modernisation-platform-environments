@@ -561,6 +561,18 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
+      - "terraform/environments/data-platform-factory-two"
+    schedule:
+      interval: "daily"
+    groups:
+      data-platform-factory-two:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
       - "terraform/environments/data-platform-governance"
       - "terraform/environments/data-platform-governance/lakeformation"
     schedule:
