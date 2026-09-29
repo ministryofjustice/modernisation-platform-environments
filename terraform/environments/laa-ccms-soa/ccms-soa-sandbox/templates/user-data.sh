@@ -1,6 +1,8 @@
 #!/bin/bash
 EC2_USER_HOME_FOLDER=/home/ec2-user
 EFS_MOUNT_POINT=$EC2_USER_HOME_FOLDER/efs
+INBOUND_S3_MOUNT_POINT=$EC2_USER_HOME_FOLDER/inbound
+OUTBOUND_S3_MOUNT_POINT=$EC2_USER_HOME_FOLDER/outbound
 
 echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
 echo 'ECS_VOLUME_PLUGIN_CAPABILITIES=["efsAuth"]' >> /etc/ecs/ecs.config
@@ -43,11 +45,13 @@ su ec2-user bash -c "git clone ssh://git@ssh.github.com:443/ministryofjustice/la
 #--Populate custom monitoring files
 su ec2-user bash -c "cp $EFS_MOUNT_POINT/laa-ccms-app-soa/monitoring/* $EFS_MOUNT_POINT/"
 
-#--Install s3fs and pre-reqs
-yum install fuse -y
-yum install fuse-libs -y
-yum install s3fs-fuse -y
-
+#--Make S3 integration dirs and mount S3
+mkdir -p $INBOUND_S3_MOUNT_POINT
+mkdir -p $OUTBOUND_S3_MOUNT_POINT
+chmod 777 $INBOUND_S3_MOUNT_POINT
+chmod 777 $OUTBOUND_S3_MOUNT_POINT
+mount-s3 ${inbound_bucket} $INBOUND_S3_MOUNT_POINT --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0750
+mount-s3 ${outbound_bucket} $OUTBOUND_S3_MOUNT_POINT --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0750
 
 #--Clears all admin files and entries from config.xml on admin host only
 reset_admin() {
