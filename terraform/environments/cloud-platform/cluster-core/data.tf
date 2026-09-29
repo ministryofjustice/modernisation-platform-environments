@@ -55,3 +55,26 @@ data "aws_eks_cluster" "cluster" {
 data "aws_eks_cluster_auth" "cluster" {
   name = local.cluster_name
 }
+
+# BU parent group IDs for the per-BU AppProject read-only `roles` grant (layer 2
+# of the BU-user ArgoCD access model — ADR-002, cloud-platform#8548).
+#
+# Resolved from group NAMES via the plural aws_identitystore_groups (ListGroups)
+# data source. ListGroups works under ModernisationPlatformSSOReadOnly, unlike
+# the singular GetGroupId path, which returns ResourceNotFoundException for this
+# role — same working pattern as the root component's grafana-objects.tf
+# (cloud-platform#8509) and the cluster component's layer-1 VIEWER mapping.
+#
+# Hub-only: AppProjects (and therefore their roles) are created only on hub
+# clusters, so spokes never need this lookup.
+data "aws_ssoadmin_instances" "this" {
+  count    = local.is_argocd_hub ? 1 : 0
+  provider = aws.sso-readonly
+}
+
+data "aws_identitystore_groups" "all" {
+  count    = local.is_argocd_hub ? 1 : 0
+  provider = aws.sso-readonly
+
+  identity_store_id = tolist(data.aws_ssoadmin_instances.this[0].identity_store_ids)[0]
+}

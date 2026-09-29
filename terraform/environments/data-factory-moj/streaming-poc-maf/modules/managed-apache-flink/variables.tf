@@ -8,7 +8,7 @@ variable "config_property_group" {
 
   type = object({
     app_name                      = string
-    log_retention_days            = optional(number, 7)
+    log_retention_days            = optional(number, 365)
     runtime_environment           = optional(string, "FLINK-1_20")
     parallelism                   = optional(number, 2)
     parallelism_per_kpu           = optional(number, 1)

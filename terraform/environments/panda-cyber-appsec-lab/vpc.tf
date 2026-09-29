@@ -71,15 +71,6 @@ module "vpc_endpoints" {
         local.tags,
         { Name = format("%s-ssmmessages-vpc-endpoint", local.application_name) }
       )
-    },
-    ec2messages = {
-      service             = "ec2messages"
-      service_type        = "Interface"
-      private_dns_enabled = true
-      tags = merge(
-        local.tags,
-        { Name = format("%s-ec2messages-vpc-endpoint", local.application_name) }
-      )
     }
   }
 }

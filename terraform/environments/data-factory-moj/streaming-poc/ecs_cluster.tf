@@ -15,7 +15,7 @@ resource "aws_security_group" "cluster" {
   count = contains(local.deploy_to, local.environment) ? 1 : 0
 
   name_prefix = "${local.ecs_prefix}-cluster"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared[0].id
   description = "${local.ecs_prefix}-cluster SG"
 
   tags = merge(local.extended_tags, {
