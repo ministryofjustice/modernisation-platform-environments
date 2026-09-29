@@ -549,6 +549,18 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
+      - "terraform/environments/data-platform-factory-one"
+    schedule:
+      interval: "daily"
+    groups:
+      data-platform-factory-one:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
       - "terraform/environments/data-platform-governance"
       - "terraform/environments/data-platform-governance/lakeformation"
     schedule:
@@ -898,6 +910,7 @@ updates:
       - "terraform/environments/integration-hub-api"
       - "terraform/environments/integration-hub-api/benefit-checker-api"
       - "terraform/environments/integration-hub-api/file-transfer-api"
+      - "terraform/environments/integration-hub-api/modules/file-transfer-api"
       - "terraform/environments/integration-hub-api/modules/integration-hub-file-transfer-api"
     schedule:
       interval: "daily"
