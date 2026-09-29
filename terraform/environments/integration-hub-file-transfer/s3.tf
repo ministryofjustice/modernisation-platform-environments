@@ -57,12 +57,14 @@ module "s3_bucket" {
   allowed_kms_key_arn                   = module.kms_s3_bucket[each.key].key_arn
   attach_deny_insecure_transport_policy = true
   bucket                                = each.value.bucket
+  attach_policy                         = each.key == "incoming" && local.api_upload_enabled
+  policy                                = each.key == "incoming" && local.api_upload_enabled ? data.aws_iam_policy_document.api_incoming_upload[0].json : null
 
   cors_rule = each.key == "incoming" ? [
     {
       allowed_headers = ["*"]
       allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
-      allowed_origins = [aws_transfer_web_app.this.access_endpoint]
+      allowed_origins = [local.is-production ? "https://web.file-transfer.service.justice.gov.uk" : "https://web.${local.environment}.file-transfer.service.justice.gov.uk"]
       expose_headers = [
         "last-modified",
         "content-length",
