@@ -46,6 +46,7 @@ su ec2-user bash -c "git clone ssh://git@ssh.github.com:443/ministryofjustice/la
 su ec2-user bash -c "cp $EFS_MOUNT_POINT/laa-ccms-app-soa/monitoring/* $EFS_MOUNT_POINT/"
 
 #--Make S3 integration dirs and mount S3
+dnf install -y mount-s3
 mkdir -p $INBOUND_S3_MOUNT_POINT
 mkdir -p $OUTBOUND_S3_MOUNT_POINT
 chmod 777 $INBOUND_S3_MOUNT_POINT
