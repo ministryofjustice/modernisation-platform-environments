@@ -3578,3 +3578,250 @@ resource "aws_lakeformation_permissions" "specials_remediation_table_access" {
     name          = "position"
   }
 }
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation IAM
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "merge_redrive_planner" {
+  name               = "merge_redrive_planner_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
+  statement {
+    sid    = "AthenaReconciliationQueries"
+    effect = "Allow"
+
+    actions = [
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution",
+    ]
+
+    resources = [
+      aws_athena_workgroup.downstream_reconciliation.arn,
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:datacatalog/AwsDataCatalog",
+    ]
+  }
+
+  statement {
+    sid    = "GlueReconciliationMetadata"
+    effect = "Allow"
+
+    actions = [
+      "glue:GetCatalog",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetTable",
+      "glue:GetTables",
+    ]
+
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_mdss${local.dbt_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/acquisitive_crime${local.dbt_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights${local.dbt_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_mdss${local.dbt_suffix}/position",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquisitive_crime${local.dbt_suffix}/position",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquisitive_crime${local.dbt_suffix}/device_activations",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights${local.dbt_suffix}/position",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights${local.dbt_suffix}/device_activations",
+    ]
+  }
+
+  statement {
+    sid       = "LakeFormationReconciliationRead"
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AthenaReconciliationBucket"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+    ]
+
+    resources = [
+      module.s3-athena-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AthenaReconciliationResults"
+    effect = "Allow"
+
+    actions = [
+      "s3:AbortMultipartUpload",
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:ListMultipartUploadParts",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-athena-bucket.bucket.arn}/output/downstream_reconciliation/*",
+    ]
+  }
+
+  statement {
+    sid    = "ReconciliationStateAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*",
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation-approval-tokens/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid     = "PublishReconciliationNotifications"
+    effect  = "Allow"
+    actions = ["sns:Publish"]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+    ]
+  }
+
+  statement {
+    sid    = "UseReconciliationNotificationKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
+    ]
+
+    resources = [
+      aws_kms_key.emds_alerts.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "merge_redrive_planner" {
+  name   = "merge_redrive_planner_lambda_policy"
+  policy = data.aws_iam_policy_document.merge_redrive_planner_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "merge_redrive_planner" {
+  role       = aws_iam_role.merge_redrive_planner.name
+  policy_arn = aws_iam_policy.merge_redrive_planner.arn
+}
+
+resource "aws_lakeformation_permissions" "merge_redrive_planner_database_access" {
+  for_each = toset([
+    "staged_mdss${local.dbt_suffix}",
+    "acquisitive_crime${local.dbt_suffix}",
+    "data_insights${local.dbt_suffix}",
+  ])
+
+  principal   = aws_iam_role.merge_redrive_planner.arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_redrive_planner_table_access" {
+  for_each = {
+    staged_position = {
+      database = "staged_mdss${local.dbt_suffix}"
+      table    = "position"
+    }
+    ac_position = {
+      database = "acquisitive_crime${local.dbt_suffix}"
+      table    = "position"
+    }
+    ac_device_activations = {
+      database = "acquisitive_crime${local.dbt_suffix}"
+      table    = "device_activations"
+    }
+    emdi_position = {
+      database = "data_insights${local.dbt_suffix}"
+      table    = "position"
+    }
+    emdi_device_activations = {
+      database = "data_insights${local.dbt_suffix}"
+      table    = "device_activations"
+    }
+  }
+
+  principal   = aws_iam_role.merge_redrive_planner.arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = each.value.database
+    name          = each.value.table
+  }
+}
+
+resource "aws_iam_role" "merge_redrive_approval" {
+  name               = "merge_redrive_approval_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "merge_redrive_approval_policy_document" {
+  statement {
+    sid    = "ReadWriteReconciliationApprovalState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid    = "ConsumeReconciliationApprovalToken"
+    effect = "Allow"
+
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation-approval-tokens/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid       = "CompleteReconciliationApprovalCallback"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "merge_redrive_approval" {
+  name   = "merge_redrive_approval_lambda_policy"
+  policy = data.aws_iam_policy_document.merge_redrive_approval_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "merge_redrive_approval" {
+  role       = aws_iam_role.merge_redrive_approval.name
+  policy_arn = aws_iam_policy.merge_redrive_approval.arn
+}

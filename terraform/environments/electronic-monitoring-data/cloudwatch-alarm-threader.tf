@@ -61,20 +61,8 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
             alarm.alarm_name
           ],
           [
-            for _, alarm in aws_cloudwatch_metric_alarm.specials_guard_detected :
-            alarm.alarm_name
-          ],
-          [
-            for _, alarm in aws_cloudwatch_metric_alarm.specials_guard_cleanup_failed :
-            alarm.alarm_name
-          ],
-          [
-            for _, alarm in aws_cloudwatch_metric_alarm.specials_guard_heartbeat_missing :
-            alarm.alarm_name
-          ],
-          [
-            for alarm in aws_cloudwatch_metric_alarm.specials_guard_lambda_errors :
-            alarm.alarm_name
+            { prefix = "downstream_reconciliation_" },
+            { prefix = "specials_remediation_" },
           ],
         )
       }
@@ -94,3 +82,4 @@ resource "aws_lambda_permission" "alarm_state_change_threader_allow_eventbridge"
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.alarm_state_change_threader.arn
 }
+
