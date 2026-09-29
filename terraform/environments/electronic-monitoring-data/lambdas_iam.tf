@@ -1260,12 +1260,29 @@ resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
 
 data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document" {
   statement {
+    sid    = "AthenaQueryPermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetDataCatalog",
+      "athena:GetWorkGroup"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:workgroup/*",
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:datacatalog/*"
+    ]
+  }
+
+  statement {
     sid    = "GluePermissionsForCleanup"
     effect = "Allow"
     actions = [
       "glue:GetTables",
       "glue:GetTable",
       "glue:GetDatabase",
+      "glue:UpdateTable",
       "glue:DeleteTable",
       "glue:DeleteDatabase",
     ]
@@ -1282,6 +1299,8 @@ data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document
     effect = "Allow"
     actions = [
       "s3:ListBucket",
+      "s3:GetObject",
+      "s3:PutObject",
       "s3:DeleteObject",
       "s3:DeleteObjectVersion",
       "s3:GetBucketLocation",
