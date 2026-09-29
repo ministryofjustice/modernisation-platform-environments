@@ -88,7 +88,7 @@ locals {
       role_key     = "get_cloudwatch"
       environments = ["development", "production"]
       layers       = ["numpy", "pillow", "matplotlib"]
-      vpc_config   = { prod = true }
+      vpc_config   = { production = true }
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
@@ -117,7 +117,7 @@ locals {
       role_key     = "get_cloudwatch"
       environments = ["development", "preproduction", "production"]
       layers       = ["numpy", "pillow", "matplotlib"]
-      vpc_config   = { prod = true }
+      vpc_config   = { production = true }
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
@@ -476,7 +476,8 @@ resource "aws_lambda_function" "lambda_functions" {
     for_each = each.value.env == "production" ? [1] : []
     content {
       subnet_ids         = [data.aws_subnet.private_subnets_b.id]
-      security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
+      # security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id] 
+      security_group_ids = [aws_security_group.conditional["Internal-Mail-Relay-Security-Group"].id]
     }
   }
 

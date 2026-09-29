@@ -10,12 +10,18 @@ resource "aws_ssm_patch_group" "lin_patch_group" {
   patch_group = local.application_data.accounts[local.environment].lin_patch_group
 }
 
+resource "aws_ssm_patch_group" "lin_patch_group_al2023" {
+  count       = local.is-production == true ? 1 : 0
+  baseline_id = aws_ssm_patch_baseline.linux_os_baseline_al2023[0].id
+  patch_group = "${local.application_data.accounts[local.environment].lin_patch_group}-al2023"
+}
+
 # Amazon Linux 2 Patch Baseline
 
 resource "aws_ssm_patch_baseline" "linux_os_baseline" {
   count            = local.is-production == true ? 1 : 0
-  name             = "LinuxOS"
-  description      = "Patch Linux OS"
+  name             = "LinuxOS-AmazonLinux2"
+  description      = "Patch Amazon Linux 2"
   operating_system = "AMAZON_LINUX_2"
 
   approval_rule {
@@ -30,7 +36,33 @@ resource "aws_ssm_patch_baseline" "linux_os_baseline" {
       key    = "CLASSIFICATION"
       values = ["Security", "Bugfix"]
     }
+    patch_filter {
+      key    = "SEVERITY"
+      values = ["Critical", "Important", "Medium"]
+    }
+  }
+}
 
+# Amazon Linux 2023 Patch Baseline
+
+resource "aws_ssm_patch_baseline" "linux_os_baseline_al2023" {
+  count            = local.is-production == true ? 1 : 0
+  name             = "LinuxOS-AmazonLinux2023"
+  description      = "Patch Amazon Linux 2023"
+  operating_system = "AMAZON_LINUX_2023"
+
+  approval_rule {
+    approve_after_days  = 5
+    enable_non_security = false
+
+    patch_filter {
+      key    = "PRODUCT"
+      values = ["AmazonLinux2023"]
+    }
+    patch_filter {
+      key    = "CLASSIFICATION"
+      values = ["Security", "Bugfix"]
+    }
     patch_filter {
       key    = "SEVERITY"
       values = ["Critical", "Important", "Medium"]
