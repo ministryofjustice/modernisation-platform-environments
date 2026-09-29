@@ -215,7 +215,8 @@ locals {
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     aws_iam_policy.redshift_dataapi_cross_policy.arn,
-    aws_iam_policy.dpd_table_read_policy.arn
+    aws_iam_policy.dpd_table_read_policy.arn,
+    aws_iam_policy.dpr_event_bus_write_events_policy.arn
   ]
   lambda_scheduled_dataset_secret_arn          = module.datamart.credential_secret_arn
   lambda_scheduled_dataset_cluster_id          = module.datamart.cluster_id
@@ -244,6 +245,7 @@ locals {
   lambda_generate_dataset_cluster_id        = module.datamart.cluster_id
   lambda_generate_dataset_database_name     = module.datamart.cluster_database_name
   lambda_generate_dataset_dpd_ddb_table_arn = module.dynamo_table_dpd.dynamodb_table_arn
+  lambda_generate_dataset_s3_rep_location   = module.s3_working_bucket.bucket_id
   lambda_generate_dataset_timeout_seconds   = 900
   lambda_generate_dataset_memory_size       = 1024
 
