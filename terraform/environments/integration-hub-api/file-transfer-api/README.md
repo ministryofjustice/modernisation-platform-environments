@@ -5,21 +5,6 @@ component layout. This is new infrastructure in `integration-hub-api-development
 with isolated state at `environments/members/integration-hub-api/file-transfer-api`.
 The old root and legacy state remain untouched. No production accounts are added.
 
-## Test before merge after a conflicting deployment
-
-Run the `integration-hub-api` workflow on the recovery branch with action `deploy`
-and `test_upload_recovery=true`. This uses the normal development approval gates:
-
-1. Target only the incoming KMS key and incoming bucket policy to restore API access.
-   Inspect the plan: it must not change dispatcher Lambdas, dispatch secrets or delivery
-   components. Terraform includes target dependencies, so verify the actual plan.
-2. After that apply succeeds, plan/apply the isolated file-transfer API component.
-3. Deploy the application packages if needed, then test the authenticated upload API.
-
-This exceptional targeted recovery enables testing without applying unrelated MFT
-branch differences. It does not reconcile those differences; agree a combined source
-of truth before subsequent full MFT deployments, which could remove these grants again.
-
 ## Deployment order
 
 1. Merge the Modernisation Platform component registration. Wait for generated
@@ -29,9 +14,9 @@ of truth before subsequent full MFT deployments, which could remove these grants
    upload role S3 upload/multipart access to enabled client prefixes. Its key grants
    GenerateDataKey/Decrypt through S3 for those prefixes and DescribeKey to API
    deployment roles. Full key ARN discovery uses the cross-account alias ARN.
-3. Plan this component in workspace `integration-hub-api-development`. Expect only
-   creates in the new API account; stop if the plan proposes legacy or Benefit
-   Checker destruction. Apply after the MFT grants exist.
+3. Plan this component in workspace `integration-hub-api-development`. It is already
+   deployed in development, so inspect updates against that state. Stop if the plan
+   proposes legacy or Benefit Checker destruction. Apply after the MFT grants exist.
 4. Create companion repository environment
    `integration-hub-api-file-transfer-api-development`, restricted to main. Merge
    the companion workflow change and run `deploy-development` to install handlers.
@@ -54,3 +39,9 @@ work. Alarm resources exist but no SNS actions are wired to retired cross-accoun
 The module is copied from the legacy module so its changes cannot trigger the old
 root deployment through shared-module change detection. Consolidate only after the
 legacy state has been audited and deliberately retired.
+
+Always update deployment branches from current `main` before planning. The MFT
+root shares state with the dispatcher: applying stale code can revert resources
+created by another branch. Review the full plan before approving an apply.
+Environments without enabled API clients receive no API grants and do not require
+an API account. Enabling a client requires its API account to exist first.
