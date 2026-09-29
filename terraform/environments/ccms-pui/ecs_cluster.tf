@@ -105,7 +105,7 @@ resource "aws_ecs_service" "pui" {
   name            = local.application_name
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.pui.arn
-  desired_count   = local.application_data.accounts[local.environment].app_count
+  desired_count   = local.application_data.accounts[local.environment].app_count + 2
 
   
   # Required by the AWS provider whenever capacity_provider_strategy is
