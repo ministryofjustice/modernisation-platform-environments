@@ -162,6 +162,11 @@ resource "aws_appautoscaling_target" "pui" {
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.pui.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-appautoscaling_target", local.application_name, local.environment)) },
+    { "slack-channel" = "ask-laa-sre" }
+  )
 }
 
 resource "aws_appautoscaling_policy" "pui" {
@@ -175,7 +180,7 @@ resource "aws_appautoscaling_policy" "pui" {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
-    target_value       = 0.05
+    target_value       = 85
     scale_in_cooldown  = 300
     scale_out_cooldown = 300
   }
