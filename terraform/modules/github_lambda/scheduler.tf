@@ -5,6 +5,7 @@ resource "aws_scheduler_schedule" "github_workflow" {
 
   schedule_expression          = each.value.schedule
   schedule_expression_timezone = each.value.timezone
+  kms_key_arn                  = aws_kms_key.scheduler.arn
 
   flexible_time_window {
     mode = "OFF"
