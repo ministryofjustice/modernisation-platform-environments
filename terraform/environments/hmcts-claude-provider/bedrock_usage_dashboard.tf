@@ -1,22 +1,26 @@
 locals {
   # USD per million tokens, Anthropic list price x1.1 for the EU regional endpoint premium.
   # Bedrock is partner-priced, so treat the dashboard totals as an estimate, not an invoice.
-  # Rates are matched against modelId by substring: "opus-5" also matches "opus-5-5", so the
-  # 5.5 hit is subtracted back out. Models sharing a rate (opus-5/4.8, sonnet-5/5.5) share a match.
+  #
+  # Rates are matched against modelId by substring, one match per group of models sharing a rate:
+  # sonnet-5 covers 5 and 5.5, sonnet-4 covers 4/4.5/4.6, opus-4 covers 4.5/4.6/4.8. Opus 5.5 is
+  # cheaper than Opus 5 and "opus-5" also matches "opus-5-5", so the 5.5 hit is subtracted back out.
+  # A model with no match here costs 0, so check the by-model widget for rows with calls but no cost.
   bedrock_cost_fields = <<-QUERY
     | fields coalesce(requestMetadata.user, identity.arn) as user
     | fields strcontains(modelId, "opus-5-5") as m_opus55,
              strcontains(modelId, "opus-5") as m_opus5_any,
-             strcontains(modelId, "opus-4-8") as m_opus48,
+             strcontains(modelId, "opus-4") as m_opus4,
              strcontains(modelId, "sonnet-5") as m_sonnet5,
-             strcontains(modelId, "sonnet-4-6") as m_sonnet46,
+             strcontains(modelId, "sonnet-4") as m_sonnet4,
              strcontains(modelId, "haiku-4-5") as m_haiku45,
+             strcontains(modelId, "haiku-3-5") as m_haiku35,
              strcontains(modelId, "fable-5") as m_fable5
     | fields m_opus5_any - m_opus55 as m_opus5
-    | fields m_opus55 * 4.4 + m_opus5 * 5.5 + m_opus48 * 5.5 + m_sonnet5 * 2.2 + m_sonnet46 * 3.3 + m_haiku45 * 1.1 + m_fable5 * 11 as r_in,
-             m_opus55 * 5.5 + m_opus5 * 6.875 + m_opus48 * 6.875 + m_sonnet5 * 2.75 + m_sonnet46 * 4.125 + m_haiku45 * 1.375 + m_fable5 * 13.75 as r_cw,
-             m_opus55 * 0.22 + m_opus5 * 0.55 + m_opus48 * 0.55 + m_sonnet5 * 0.22 + m_sonnet46 * 0.33 + m_haiku45 * 0.11 + m_fable5 * 1.1 as r_cr,
-             m_opus55 * 22 + m_opus5 * 27.5 + m_opus48 * 27.5 + m_sonnet5 * 11 + m_sonnet46 * 16.5 + m_haiku45 * 5.5 + m_fable5 * 55 as r_out
+    | fields m_opus55 * 4.4 + (m_opus5 + m_opus4) * 5.5 + m_sonnet5 * 2.2 + m_sonnet4 * 3.3 + m_haiku45 * 1.1 + m_haiku35 * 0.88 + m_fable5 * 11 as r_in,
+             m_opus55 * 5.5 + (m_opus5 + m_opus4) * 6.875 + m_sonnet5 * 2.75 + m_sonnet4 * 4.125 + m_haiku45 * 1.375 + m_haiku35 * 1.1 + m_fable5 * 13.75 as r_cw,
+             m_opus55 * 0.22 + (m_opus5 + m_opus4) * 0.55 + m_sonnet5 * 0.22 + m_sonnet4 * 0.33 + m_haiku45 * 0.11 + m_haiku35 * 0.088 + m_fable5 * 1.1 as r_cr,
+             m_opus55 * 22 + (m_opus5 + m_opus4) * 27.5 + m_sonnet5 * 11 + m_sonnet4 * 16.5 + m_haiku45 * 5.5 + m_haiku35 * 4.4 + m_fable5 * 55 as r_out
     | fields input.inputTokenCount * r_in as c_in,
              input.cacheWriteInputTokenCount * r_cw as c_cw,
              input.cacheReadInputTokenCount * r_cr as c_cr,
@@ -45,6 +49,7 @@ resource "aws_cloudwatch_dashboard" "bedrock_usage" {
             **User** is the `user` field Claude Code sends in request metadata, falling back to the IAM principal for keys that send none —
             those rows are shared `BedrockAPIKey-*` pool keys, so they attribute to a key rather than a person.
             **Costs are estimates**: Anthropic list prices plus the 10% EU regional endpoint premium, not Bedrock's own rate card. Reconcile against the bill before charging anyone.
+            A model with no rate configured costs $0 — if the by-model table shows calls with no cost, its rate is missing from `bedrock_usage_dashboard.tf`.
           MD
         }
       },
