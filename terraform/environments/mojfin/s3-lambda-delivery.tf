@@ -11,29 +11,7 @@ module "s3-bucket-shared" {
   replication_region  = "eu-west-2"
   sse_algorithm       = "AES256"
   custom_kms_key      = ""
-  bucket_policy       = [aws_s3_bucket_policy.shared_bucket_policy.policy]
-
-  manage_log_bucket_policy = false
-  log_buckets = {
-    log_bucket_name = module.s3-bucket-logging.bucket.id
-    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-  }
-
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
-
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  tags = merge(local.tags,
-    { Name = "${local.application_name}-${local.environment}-shared" }
-  )
-}
-
-resource "aws_s3_bucket_policy" "shared_bucket_policy" {
-  bucket = module.s3-bucket-shared.bucket.id
-
-  policy = jsonencode({
+  bucket_policy = [jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
@@ -63,7 +41,23 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         }
       }
     ]
-  })
+  })]
+
+  manage_log_bucket_policy = false
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  }
+
+  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  tags = merge(local.tags,
+    { Name = "${local.application_name}-${local.environment}-shared" }
+  )
 }
 
 resource "aws_s3_object" "folder" {
