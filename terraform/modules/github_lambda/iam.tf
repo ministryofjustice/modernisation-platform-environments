@@ -30,6 +30,19 @@ data "aws_iam_policy_document" "eventbridge_scheduler_lambda" {
   }
 }
 
+data "aws_iam_policy_document" "lambda_kms" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey",
+    ]
+    resources = [aws_kms_key.lambda.arn]
+  }
+}
+
 data "aws_iam_policy_document" "lambda_web_identity" {
   statement {
     effect = "Allow"
@@ -58,6 +71,19 @@ data "aws_iam_policy_document" "lambda_web_identity" {
   }
 }
 
+data "aws_iam_policy_document" "scheduler_kms" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey",
+    ]
+    resources = [aws_kms_key.scheduler.arn]
+  }
+}
+
 resource "aws_iam_role" "eventbridge_scheduler" {
   name               = "${var.project_name}-eventbridge-scheduler"
   assume_role_policy = data.aws_iam_policy_document.eventbridge_scheduler_assume_role.json
@@ -74,10 +100,22 @@ resource "aws_iam_role_policy" "eventbridge_scheduler_lambda" {
   role   = aws_iam_role.eventbridge_scheduler.id
 }
 
+resource "aws_iam_role_policy" "lambda_kms" {
+  name   = "${var.project_name}-lambda-kms"
+  policy = data.aws_iam_policy_document.lambda_kms.json
+  role   = aws_iam_role.lambda.id
+}
+
 resource "aws_iam_role_policy" "lambda_web_identity" {
   name   = "${var.project_name}-web-identity"
   policy = data.aws_iam_policy_document.lambda_web_identity.json
   role   = aws_iam_role.lambda.id
+}
+
+resource "aws_iam_role_policy" "scheduler_kms" {
+  name   = "${var.project_name}-scheduler-kms"
+  policy = data.aws_iam_policy_document.scheduler_kms.json
+  role   = aws_iam_role.eventbridge_scheduler.id
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
