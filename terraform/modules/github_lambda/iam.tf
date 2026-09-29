@@ -20,6 +20,16 @@ data "aws_iam_policy_document" "lambda_assume_role" {
   }
 }
 
+data "aws_iam_policy_document" "lambda_dlq" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [aws_sqs_queue.github_workflow_dlq.arn]
+  }
+}
+
 data "aws_iam_policy_document" "eventbridge_scheduler_lambda" {
   statement {
     effect = "Allow"
@@ -39,6 +49,36 @@ data "aws_iam_policy_document" "lambda_kms" {
       "kms:Encrypt",
       "kms:GenerateDataKey",
     ]
+    resources = [aws_kms_key.lambda.arn]
+  }
+}
+
+data "aws_iam_policy_document" "lambda_kms_key_policy" {
+  statement {
+    sid    = "AllowRootAccountKeyAdministration"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${var.aws_account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["arn:aws:kms:${var.aws_region}:${var.aws_account_id}:key/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:CallerAccount"
+      values   = [var.aws_account_id]
+    }
+  }
+
+  statement {
+    sid    = "AllowLambdaExecutionRoleToUseKey"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.lambda.arn]
+    }
+    actions = ["kms:*"]
     resources = [aws_kms_key.lambda.arn]
   }
 }
@@ -84,6 +124,36 @@ data "aws_iam_policy_document" "scheduler_kms" {
   }
 }
 
+data "aws_iam_policy_document" "scheduler_kms_key_policy" {
+  statement {
+    sid    = "AllowRootAccountKeyAdministration"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${var.aws_account_id}:root"]
+    }
+    actions = ["kms:*"]
+    resources = ["arn:aws:kms:${var.aws_region}:${var.aws_account_id}:key/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:CallerAccount"
+      values   = [var.aws_account_id]
+    }
+  }
+
+  statement {
+    sid    = "AllowSchedulerExecutionRoleToUseKey"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.eventbridge_scheduler.arn]
+    }
+    actions = ["kms:*"]
+    resources = [aws_kms_key.scheduler.arn]
+  }
+}
+
 resource "aws_iam_role" "eventbridge_scheduler" {
   name               = "${var.project_name}-eventbridge-scheduler"
   assume_role_policy = data.aws_iam_policy_document.eventbridge_scheduler_assume_role.json
@@ -103,6 +173,12 @@ resource "aws_iam_role_policy" "eventbridge_scheduler_lambda" {
 resource "aws_iam_role_policy" "lambda_kms" {
   name   = "${var.project_name}-lambda-kms"
   policy = data.aws_iam_policy_document.lambda_kms.json
+  role   = aws_iam_role.lambda.id
+}
+
+resource "aws_iam_role_policy" "lambda_dlq" {
+  name   = "${var.project_name}-lambda-dlq"
+  policy = data.aws_iam_policy_document.lambda_dlq.json
   role   = aws_iam_role.lambda.id
 }
 
