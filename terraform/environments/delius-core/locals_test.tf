@@ -102,8 +102,8 @@ locals {
     pwm = {
       image_tag        = "8250538047-1"
       container_port   = 8080
-      container_cpu    = 1024
-      container_memory = 2048
+      container_cpu    = 2048
+      container_memory = 4096
     }
 
     ldap = {

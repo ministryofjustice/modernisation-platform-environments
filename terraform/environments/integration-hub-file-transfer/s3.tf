@@ -62,7 +62,7 @@ module "s3_bucket" {
     {
       allowed_headers = ["*"]
       allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
-      allowed_origins = [aws_transfer_web_app.this.access_endpoint]
+      allowed_origins = [local.is-production ? "https://web.file-transfer.service.justice.gov.uk" : "https://web.${local.environment}.file-transfer.service.justice.gov.uk"]
       expose_headers = [
         "last-modified",
         "content-length",

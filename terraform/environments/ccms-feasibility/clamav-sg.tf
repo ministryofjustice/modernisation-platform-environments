@@ -11,13 +11,34 @@ resource "aws_security_group" "clamav" {
 
 # INGRESS Rules
 
-resource "aws_vpc_security_group_ingress_rule" "clamav_3310" {
-  security_group_id = aws_security_group.clamav.id
-  description       = "Allow ClamAV from the shared VPC"
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
-  ip_protocol       = "tcp"
-  from_port         = 3310
-  to_port           = 3310
+# PUI ECS task SG, managed in the ccms-feasibility/ccms-pui stack
+data "aws_security_group" "pui_ecs_tasks" {
+  vpc_id = data.aws_vpc.shared.id
+  name   = "ccms-pui-${local.env_label}-ecs-tasks-sg"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "clamav_from_pui_ecs_tasks" {
+  security_group_id            = aws_security_group.clamav.id
+  description                  = "Allow ClamAV from the ccms-pui ECS tasks"
+  ip_protocol                  = "tcp"
+  from_port                    = 3310
+  to_port                      = 3310
+  referenced_security_group_id = data.aws_security_group.pui_ecs_tasks.id
+}
+
+# EBS DB SG, managed in the ccms-feasibility/ccms-ebs stack
+data "aws_security_group" "ebsdb" {
+  vpc_id = data.aws_vpc.shared.id
+  name   = "ccms-ebs-${local.env_label}-ebsdb-sg"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "clamav_from_ebsdb" {
+  security_group_id            = aws_security_group.clamav.id
+  description                  = "Allow ClamAV from the ccms-ebs database tier"
+  ip_protocol                  = "tcp"
+  from_port                    = 3310
+  to_port                      = 3310
+  referenced_security_group_id = data.aws_security_group.ebsdb.id
 }
 
 # EGRESS Rules

@@ -51,6 +51,62 @@ resource "kubernetes_service_account_v1" "adot_collector" {
   depends_on = [aws_eks_addon.adot]
 }
 
+#------------------------------------------------------------------------------
+# RBAC for the collector's Prometheus service discovery.
+#
+# The Prometheus receiver's kubernetes_sd_configs (roles node/pod/endpoints)
+# list and watch cluster-scoped resources to discover scrape targets, and the
+# cadvisor job scrapes each node via the API server proxy (nodes/proxy). The
+# collector ServiceAccount has none of this by default, so without this
+# ClusterRole discovery returns zero targets: nothing is scraped, nothing is
+# remote-written, and the AMP workspace stays empty. Pod Identity (amp.tf)
+# only covers AWS auth to AMP; it does not grant Kubernetes API access.
+#------------------------------------------------------------------------------
+
+resource "kubernetes_cluster_role_v1" "adot_collector" {
+  count = local.enable_amp_adot ? 1 : 0
+
+  metadata {
+    name = "adot-collector-prometheus-discovery"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["nodes", "nodes/metrics", "nodes/proxy", "services", "endpoints", "pods"]
+    verbs      = ["get", "list", "watch"]
+  }
+
+  rule {
+    non_resource_urls = ["/metrics", "/metrics/cadvisor"]
+    verbs             = ["get"]
+  }
+
+  depends_on = [aws_eks_addon.adot]
+}
+
+resource "kubernetes_cluster_role_binding_v1" "adot_collector" {
+  count = local.enable_amp_adot ? 1 : 0
+
+  metadata {
+    name = "adot-collector-prometheus-discovery"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "adot-collector-prometheus-discovery"
+  }
+
+  # Ensure the ClusterRole exists before the binding references it.
+  depends_on = [kubernetes_cluster_role_v1.adot_collector]
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.adot_collector[0].metadata[0].name
+    namespace = kubernetes_service_account_v1.adot_collector[0].metadata[0].namespace
+  }
+}
+
 resource "kubectl_manifest" "adot_collector" {
   count = local.enable_amp_adot ? 1 : 0
 
@@ -224,6 +280,7 @@ resource "kubectl_manifest" "adot_collector" {
   depends_on = [
     aws_eks_addon.adot,
     kubernetes_service_account_v1.adot_collector,
+    kubernetes_cluster_role_binding_v1.adot_collector,
     aws_eks_pod_identity_association.adot_amp
   ]
 }
