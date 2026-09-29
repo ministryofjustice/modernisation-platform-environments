@@ -1,3 +1,83 @@
+module "kms_cloudwatch_logs_us_east_1" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.2.1"
+
+  region                  = "us-east-1"
+  aliases                 = ["logs/${local.application_name}-${local.environment}-web"]
+  description             = "KMS CMK for Transfer web app edge logs"
+  enable_default_policy   = true
+  enable_key_rotation     = true
+  deletion_window_in_days = 30
+  key_usage               = "ENCRYPT_DECRYPT"
+  is_enabled              = true
+
+  key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+
+  key_statements = [
+    {
+      sid = "AllowCloudWatchLogsService"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*",
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["logs.us-east-1.amazonaws.com"]
+        }
+      ]
+
+      condition = [
+        {
+          test     = "ArnEquals"
+          variable = "kms:EncryptionContext:aws:logs:arn"
+          values = [
+            for name in values(local.transfer_web_app_log_groups) :
+            "arn:aws:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:${name}"
+          ]
+        }
+      ]
+    },
+    {
+      sid       = "AllowPlatformUsersToReadEncryptedLogs"
+      actions   = ["kms:Decrypt"]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+      ]
+
+      condition = [
+        {
+          test     = "ArnLike"
+          variable = "aws:PrincipalArn"
+          values = [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.collaborator_access}",
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/AWSReservedSSO_*",
+          ]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["logs.us-east-1.amazonaws.com"]
+        }
+      ]
+    }
+  ]
+
+  tags = local.tags
+}
+
 module "kms_cloudwatch_logs" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
