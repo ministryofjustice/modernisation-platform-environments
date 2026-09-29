@@ -130,7 +130,7 @@ module "iceberg_table_maintenance_step_function" {
 # ------------------------------------------
 
 module "merge_into_mdss_staged_position" {
-  source       = "./modules/merge_into_reconciler"
+  source              = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_mdss_staged_position[0]
 }
 
@@ -139,7 +139,7 @@ module "merge_into_mdss_staged_position" {
 # ------------------------------------------
 
 module "merge_into_mdss_staged_event" {
-  source       = "./modules/merge_into_reconciler"
+  source              = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_mdss_staged_event[0]
 }
 
@@ -148,7 +148,7 @@ module "merge_into_mdss_staged_event" {
 # ------------------------------------------
 
 module "merge_into_emdi_position" {
-  source       = "./modules/merge_into_reconciler"
+  source              = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_emdi_position[0]
 }
 
@@ -157,7 +157,7 @@ module "merge_into_emdi_position" {
 # ------------------------------------------
 
 module "merge_into_mdss_ac_position" {
-  source       = "./modules/merge_into_reconciler"
+  source              = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_ac_position[0]
 }
 
@@ -401,10 +401,482 @@ module "trigger_cadt_step_function" {
   iam_policies = tomap({ "trigger_cadt_step_function_policy" = aws_iam_policy.trigger_cadt_step_function_policy })
   variable_dictionary = tomap(
     {
-      "trigger_cadt"  = module.trigger_cadt.lambda_function_name,
-      "environment"   = local.environment,
-      "poll_cadt"     = module.poll_cadt.lambda_function_name,
+      "trigger_cadt" = module.trigger_cadt.lambda_function_name,
+      "environment"  = local.environment,
+      "poll_cadt"    = module.poll_cadt.lambda_function_name,
     }
   )
   type = "STANDARD"
+}
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation Step Function
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_lambda_retry = [
+    {
+      ErrorEquals = [
+        "Lambda.ServiceException",
+        "Lambda.AWSLambdaException",
+        "Lambda.SdkClientException",
+        "Lambda.TooManyRequestsException",
+      ]
+
+      IntervalSeconds = 2
+      BackoffRate     = 2
+      MaxAttempts     = 3
+    },
+  ]
+}
+
+resource "aws_sfn_state_machine" "downstream_reconciliation" {
+  name     = "downstream_position_reconciliation"
+  role_arn = aws_iam_role.downstream_reconciliation_state_machine.arn
+
+  definition = jsonencode({
+    Comment = (
+      "Reconciles staged MDSS, AC and EMDI positions in pipeline order."
+    )
+
+    StartAt = "DiscoverStaged"
+
+    States = {
+      DiscoverStaged = {
+        Type     = "Task"
+        Resource = "arn:aws:states:::lambda:invoke"
+
+        Parameters = {
+          FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+          Payload = {
+            action   = "discover_rolling"
+            consumer = "STAGED"
+          }
+        }
+
+        ResultPath = "$.staged_discovery"
+        Retry      = local.downstream_reconciliation_lambda_retry
+        Next       = "CheckStagedDiscovery"
+      }
+
+      CheckStagedDiscovery = {
+        Type = "Choice"
+
+        Choices = [
+          {
+            Variable     = "$.staged_discovery.Payload.status"
+            StringEquals = "replay_ready"
+            Next         = "ReplayStagedDates"
+          },
+          {
+            Variable     = "$.staged_discovery.Payload.status"
+            StringEquals = "clean"
+            Next         = "DiscoverAc"
+          },
+          {
+            Variable     = "$.staged_discovery.Payload.status"
+            StringEquals = "manual_review_required"
+            Next         = "DiscoverAc"
+          },
+        ]
+
+        Default = "UnexpectedStagedDiscovery"
+      }
+
+      ReplayStagedDates = {
+        Type           = "Map"
+        ItemsPath      = "$.staged_discovery.Payload.candidates"
+        MaxConcurrency = 1
+        ResultPath     = "$.staged_replay_results"
+
+        ItemProcessor = {
+          ProcessorConfig = {
+            Mode = "INLINE"
+          }
+
+          StartAt = "ReplayStagedPosition"
+
+          States = {
+            ReplayStagedPosition = {
+              Type     = "Task"
+              Resource = "arn:aws:states:::lambda:invoke"
+
+              Parameters = {
+                FunctionName = (
+                  module.merge_mdss_staged_position[0].lambda_function_arn
+                )
+
+                "Payload.$" = "$.replay_input"
+              }
+
+              ResultPath = "$.merge"
+              Retry      = local.downstream_reconciliation_lambda_retry
+              Next       = "CheckStagedMerge"
+            }
+
+            CheckStagedMerge = {
+              Type = "Choice"
+
+              Choices = [
+                {
+                  Variable     = "$.merge.Payload.status"
+                  StringEquals = "query_succeeded"
+                  Next         = "VerifyStagedReplay"
+                },
+              ]
+
+              Default = "StagedMergeFailed"
+            }
+
+            VerifyStagedReplay = {
+              Type     = "Task"
+              Resource = "arn:aws:states:::lambda:invoke"
+
+              Parameters = {
+                FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+                Payload = {
+                  action        = "verify_rolling"
+                  "candidate.$" = "$"
+                }
+              }
+
+              ResultPath = "$.verification"
+              Retry      = local.downstream_reconciliation_lambda_retry
+              Next       = "CheckStagedVerification"
+            }
+
+            CheckStagedVerification = {
+              Type = "Choice"
+
+              Choices = [
+                {
+                  Variable     = "$.verification.Payload.status"
+                  StringEquals = "verified"
+                  Next         = "StagedReplayComplete"
+                },
+              ]
+
+              Default = "StagedVerificationFailed"
+            }
+
+            StagedReplayComplete = {
+              Type = "Succeed"
+            }
+
+            StagedMergeFailed = {
+              Type  = "Fail"
+              Error = "StagedPositionMergeFailed"
+              Cause = "The staged position replay did not complete successfully."
+            }
+
+            StagedVerificationFailed = {
+              Type  = "Fail"
+              Error = "StagedPositionVerificationFailed"
+              Cause = "Stale positions remain missing from staged MDSS."
+            }
+          }
+        }
+
+        Next = "DiscoverAc"
+      }
+
+      DiscoverAc = {
+        Type     = "Task"
+        Resource = "arn:aws:states:::lambda:invoke"
+
+        Parameters = {
+          FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+          Payload = {
+            action   = "discover_rolling"
+            consumer = "AC"
+          }
+        }
+
+        ResultPath = "$.ac_discovery"
+        Retry      = local.downstream_reconciliation_lambda_retry
+        Next       = "CheckAcDiscovery"
+      }
+
+      CheckAcDiscovery = {
+        Type = "Choice"
+
+        Choices = [
+          {
+            Variable     = "$.ac_discovery.Payload.status"
+            StringEquals = "replay_ready"
+            Next         = "ReplayAcDates"
+          },
+          {
+            Variable     = "$.ac_discovery.Payload.status"
+            StringEquals = "clean"
+            Next         = "DiscoverEmdi"
+          },
+          {
+            Variable     = "$.ac_discovery.Payload.status"
+            StringEquals = "manual_review_required"
+            Next         = "DiscoverEmdi"
+          },
+        ]
+
+        Default = "UnexpectedAcDiscovery"
+      }
+
+      ReplayAcDates = {
+        Type           = "Map"
+        ItemsPath      = "$.ac_discovery.Payload.candidates"
+        MaxConcurrency = 1
+        ResultPath     = "$.ac_replay_results"
+
+        ItemProcessor = {
+          ProcessorConfig = {
+            Mode = "INLINE"
+          }
+
+          StartAt = "ReplayAcPosition"
+
+          States = {
+            ReplayAcPosition = {
+              Type     = "Task"
+              Resource = "arn:aws:states:::lambda:invoke"
+
+              Parameters = {
+                FunctionName = module.merge_ac_position[0].lambda_function_arn
+                "Payload.$"  = "$.replay_input"
+              }
+
+              ResultPath = "$.merge"
+              Retry      = local.downstream_reconciliation_lambda_retry
+              Next       = "CheckAcMerge"
+            }
+
+            CheckAcMerge = {
+              Type = "Choice"
+
+              Choices = [
+                {
+                  Variable     = "$.merge.Payload.status"
+                  StringEquals = "query_succeeded"
+                  Next         = "VerifyAcReplay"
+                },
+              ]
+
+              Default = "AcMergeFailed"
+            }
+
+            VerifyAcReplay = {
+              Type     = "Task"
+              Resource = "arn:aws:states:::lambda:invoke"
+
+              Parameters = {
+                FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+                Payload = {
+                  action        = "verify_rolling"
+                  "candidate.$" = "$"
+                }
+              }
+
+              ResultPath = "$.verification"
+              Retry      = local.downstream_reconciliation_lambda_retry
+              Next       = "CheckAcVerification"
+            }
+
+            CheckAcVerification = {
+              Type = "Choice"
+
+              Choices = [
+                {
+                  Variable     = "$.verification.Payload.status"
+                  StringEquals = "verified"
+                  Next         = "AcReplayComplete"
+                },
+              ]
+
+              Default = "AcVerificationFailed"
+            }
+
+            AcReplayComplete = {
+              Type = "Succeed"
+            }
+
+            AcMergeFailed = {
+              Type  = "Fail"
+              Error = "AcPositionMergeFailed"
+              Cause = "The AC position replay did not complete successfully."
+            }
+
+            AcVerificationFailed = {
+              Type  = "Fail"
+              Error = "AcPositionVerificationFailed"
+              Cause = "Stale eligible positions remain missing from AC."
+            }
+          }
+        }
+
+        Next = "DiscoverEmdi"
+      }
+
+      DiscoverEmdi = {
+        Type     = "Task"
+        Resource = "arn:aws:states:::lambda:invoke"
+
+        Parameters = {
+          FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+          Payload = {
+            action   = "discover_rolling"
+            consumer = "EMDI"
+          }
+        }
+
+        ResultPath = "$.emdi_discovery"
+        Retry      = local.downstream_reconciliation_lambda_retry
+        Next       = "CheckEmdiDiscovery"
+      }
+
+      CheckEmdiDiscovery = {
+        Type = "Choice"
+
+        Choices = [
+          {
+            Variable     = "$.emdi_discovery.Payload.status"
+            StringEquals = "replay_ready"
+            Next         = "ReplayEmdiDates"
+          },
+          {
+            Variable     = "$.emdi_discovery.Payload.status"
+            StringEquals = "clean"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.emdi_discovery.Payload.status"
+            StringEquals = "manual_review_required"
+            Next         = "Complete"
+          },
+        ]
+
+        Default = "UnexpectedEmdiDiscovery"
+      }
+
+      ReplayEmdiDates = {
+        Type           = "Map"
+        ItemsPath      = "$.emdi_discovery.Payload.candidates"
+        MaxConcurrency = 1
+        ResultPath     = "$.emdi_replay_results"
+
+        ItemProcessor = {
+          ProcessorConfig = {
+            Mode = "INLINE"
+          }
+
+          StartAt = "ReplayEmdiPosition"
+
+          States = {
+            ReplayEmdiPosition = {
+              Type     = "Task"
+              Resource = "arn:aws:states:::lambda:invoke"
+
+              Parameters = {
+                FunctionName = module.merge_emdi_position[0].lambda_function_arn
+                "Payload.$"  = "$.replay_input"
+              }
+
+              ResultPath = "$.merge"
+              Retry      = local.downstream_reconciliation_lambda_retry
+              Next       = "CheckEmdiMerge"
+            }
+
+            CheckEmdiMerge = {
+              Type = "Choice"
+
+              Choices = [
+                {
+                  Variable     = "$.merge.Payload.status"
+                  StringEquals = "query_succeeded"
+                  Next         = "VerifyEmdiReplay"
+                },
+              ]
+
+              Default = "EmdiMergeFailed"
+            }
+
+            VerifyEmdiReplay = {
+              Type     = "Task"
+              Resource = "arn:aws:states:::lambda:invoke"
+
+              Parameters = {
+                FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+                Payload = {
+                  action        = "verify_rolling"
+                  "candidate.$" = "$"
+                }
+              }
+
+              ResultPath = "$.verification"
+              Retry      = local.downstream_reconciliation_lambda_retry
+              Next       = "CheckEmdiVerification"
+            }
+
+            CheckEmdiVerification = {
+              Type = "Choice"
+
+              Choices = [
+                {
+                  Variable     = "$.verification.Payload.status"
+                  StringEquals = "verified"
+                  Next         = "EmdiReplayComplete"
+                },
+              ]
+
+              Default = "EmdiVerificationFailed"
+            }
+
+            EmdiReplayComplete = {
+              Type = "Succeed"
+            }
+
+            EmdiMergeFailed = {
+              Type  = "Fail"
+              Error = "EmdiPositionMergeFailed"
+              Cause = "The EMDI position replay did not complete successfully."
+            }
+
+            EmdiVerificationFailed = {
+              Type  = "Fail"
+              Error = "EmdiPositionVerificationFailed"
+              Cause = "Stale eligible positions remain missing from EMDI."
+            }
+          }
+        }
+
+        Next = "Complete"
+      }
+
+      Complete = {
+        Type = "Succeed"
+      }
+
+      UnexpectedStagedDiscovery = {
+        Type  = "Fail"
+        Error = "UnexpectedStagedReconciliationResult"
+        Cause = "The planner returned an unexpected STAGED discovery status."
+      }
+
+      UnexpectedAcDiscovery = {
+        Type  = "Fail"
+        Error = "UnexpectedAcReconciliationResult"
+        Cause = "The planner returned an unexpected AC discovery status."
+      }
+
+      UnexpectedEmdiDiscovery = {
+        Type  = "Fail"
+        Error = "UnexpectedEmdiReconciliationResult"
+        Cause = "The planner returned an unexpected EMDI discovery status."
+      }
+    }
+  })
 }
