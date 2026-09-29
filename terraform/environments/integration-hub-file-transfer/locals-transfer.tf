@@ -23,6 +23,15 @@ locals {
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPE6XyQIDh5gt+7HOrUQymtsfl3+NZqUM5p7BQqi9uso"
       ]
     }
+
+    jelilat = {
+      environments         = ["development"]
+      server_id_allow_list = []
+      cidr_blocks          = ["35.176.93.186/22"]
+      ssh_public_keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGYaZakUZqOqDdMi9TeLzm5E7uD8UExhlbwf9D/UAv4K"
+      ]
+    }
   }
 
   environment_transfer_server_users = {
