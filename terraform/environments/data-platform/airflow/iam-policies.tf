@@ -4,8 +4,8 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
     effect  = "Deny"
     actions = ["s3:ListAllMyBuckets"]
     resources = [
-      "arn:aws:s3:::mojap-compute-${local.environment}-mwaa",
-      "arn:aws:s3:::mojap-compute-${local.environment}-mwaa/*"
+      "arn:aws:s3:::mojdp-${local.environment}-mwaa",
+      "arn:aws:s3:::mojdp-${local.environment}-mwaa/*"
     ]
   }
   statement {
@@ -16,8 +16,8 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
       "s3:List*"
     ]
     resources = [
-      "arn:aws:s3:::mojap-compute-${local.environment}-mwaa",
-      "arn:aws:s3:::mojap-compute-${local.environment}-mwaa/*"
+      "arn:aws:s3:::mojdp-${local.environment}-mwaa",
+      "arn:aws:s3:::mojdp-${local.environment}-mwaa/*"
     ]
   }
   statement {
