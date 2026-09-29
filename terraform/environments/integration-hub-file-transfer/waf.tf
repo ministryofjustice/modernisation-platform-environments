@@ -28,7 +28,6 @@ module "waf_web_app" {
     }, {
     for name, priority in local.transfer_web_app_managed_rules : name => {
       priority        = priority
-      override_action = "count"
       statement = {
         managed_rule_group_statement = {
           name        = name
