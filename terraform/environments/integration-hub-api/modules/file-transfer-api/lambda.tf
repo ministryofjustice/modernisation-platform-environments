@@ -49,7 +49,7 @@ module "lambda_upload_ticket" {
         "s3:ListMultipartUploadParts",
         "s3:PutObject",
       ]
-      resources = [for client in values(local.transfer_clients) : "${var.upload_bucket.arn}/${trim(client.key_prefix, "/")}/*" if client.enabled]
+      resources = [for client_id, client in local.transfer_clients : "${var.upload_bucket.arn}/${trim(coalesce(client.key_prefix, client_id), "/")}/*" if client.enabled]
     }
     upload_bucket_kms_access = {
       effect = "Allow"
