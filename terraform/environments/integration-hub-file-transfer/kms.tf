@@ -237,6 +237,7 @@ module "kms_s3_bucket" {
   source  = "terraform-aws-modules/kms/aws"
   version = "4.2.1"
 
+  key_statements          = each.key == "incoming" ? local.api_incoming_key_statements : []
   aliases                 = ["s3/${each.key}"]
   description             = "Key for cryptographic functions on ${each.value.bucket} S3 bucket"
   enable_default_policy   = true
