@@ -1,7 +1,7 @@
 module "secrets_custom_idp_user" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.1.0"
+  version = "2.1.1"
 
   for_each = local.environment_transfer_server_users
 
