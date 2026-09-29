@@ -1,3 +1,14 @@
+variable "aws_account_id" {
+  description = "The AWS account ID where the Lambda function will be deployed"
+  type        = string
+}
+
+variable "aws_region" {
+  description = "The AWS region where the Lambda and KMS resources are deployed"
+  type        = string
+  default     = "eu-west-2"
+}
+
 variable "github_org" {
   description = "The name of the github organization"
   type        = string

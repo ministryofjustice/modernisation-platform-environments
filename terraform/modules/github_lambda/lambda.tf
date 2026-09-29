@@ -1,4 +1,6 @@
 resource "aws_lambda_function" "github_workflow_trigger" {
+  #checkov:skip=CKV_AWS_272:code signing not required
+  #checkov:skip=CKV_AWS_117:lambda only calls public HTTPS endpoints
   function_name = "${var.project_name}-trigger"
   handler       = "handler.lambda_handler"
   memory_size   = var.lambda_memory_size
@@ -12,6 +14,10 @@ resource "aws_lambda_function" "github_workflow_trigger" {
     filesha256("${path.module}/lambda/handler.py"),
     filesha256("${path.module}/lambda/requirements.txt"),
   ]))
+
+  dead_letter_config {
+    target_arn = aws_sqs_queue.github_workflow_dlq.arn
+  }
 
   reserved_concurrent_executions = 1
 
@@ -30,6 +36,7 @@ resource "aws_lambda_function" "github_workflow_trigger" {
 
   depends_on = [
     terraform_data.lambda_build,
+    aws_iam_role_policy.lambda_dlq,
     aws_iam_role_policy.lambda_kms,
     aws_iam_role_policy.lambda_web_identity,
     aws_iam_role_policy_attachment.lambda_basic_execution,
