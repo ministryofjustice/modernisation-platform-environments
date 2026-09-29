@@ -43,6 +43,11 @@ output "bootstrap_lambda_function_name" {
   value       = aws_lambda_function.bootstrap.function_name
 }
 
+output "seed_lambda_function_name" {
+  description = "Name of the Lambda function used to reset, seed, mutate and read the PostgreSQL integration-test source."
+  value       = aws_lambda_function.seed.function_name
+}
+
 output "credential_sync_lambda_function_arn" {
   description = "ARN of the Lambda function that synchronises the RDS-managed credential into the DMS source secret."
   value       = aws_lambda_function.bootstrap.arn

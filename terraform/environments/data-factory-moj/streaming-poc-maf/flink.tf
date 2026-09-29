@@ -7,7 +7,7 @@ module "flink_geofence" {
 
   depends_on = [module.flink_artifacts_bucket]
 
-  private_subnets        = data.aws_subnets.shared-private.ids
+  private_subnets        = data.aws_subnets.shared-private[0].ids
   s3_source_bucket       = module.flink_artifacts_bucket.s3_bucket_id
   s3_source_key          = local.geofence_app.jar_filename
   s3_kms_key_arn         = aws_kms_key.s3[0].arn
@@ -24,7 +24,7 @@ module "flink_geofence" {
     parallelism           = 2
     parallelism_per_kpu   = 1
     auto_scaling_enabled  = true
-    log_retention_days    = 7
+    log_retention_days    = 365
     snapshots_enabled     = true
     checkpointing_enabled = true
     custom_property_group = {
@@ -93,7 +93,7 @@ module "flink_rules" {
 
   depends_on = [module.flink_artifacts_bucket]
 
-  private_subnets        = data.aws_subnets.shared-private.ids
+  private_subnets        = data.aws_subnets.shared-private[0].ids
   s3_source_bucket       = module.flink_artifacts_bucket.s3_bucket_id
   s3_source_key          = local.rules_app.jar_filename
   s3_kms_key_arn         = aws_kms_key.s3[0].arn
@@ -110,7 +110,7 @@ module "flink_rules" {
     parallelism           = 2
     parallelism_per_kpu   = 1
     auto_scaling_enabled  = true
-    log_retention_days    = 7
+    log_retention_days    = 365
     snapshots_enabled     = true
     checkpointing_enabled = true
     custom_property_group = {

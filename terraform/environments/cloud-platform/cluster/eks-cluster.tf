@@ -88,6 +88,14 @@ module "eks" {
     }
   }
 
+  # Hardcode the KMS principals otherwise they fall back to current identity
+  kms_key_administrators = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
+  ]
+  kms_key_users = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
+  ]
+
   tags = merge(
     local.tags,
     null_resource.created_by_tag.triggers.created_by == "__unset__" ? {} : { "created-by" = null_resource.created_by_tag.triggers.created_by },

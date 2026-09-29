@@ -37,28 +37,26 @@ def _extract_workspace_message(log_message: str) -> dict:
         return {"text": log_message}
 
     detail = payload.get("detail", {})
-    event_name = detail.get("eventName")
+    event_name = detail.get("eventName") or "unknown"
+    event_source = detail.get("eventSource") or "unknown"
     user_identity = detail.get("userIdentity", {})
     username = user_identity.get("arn") or user_identity.get("userName") or "unknown"
     request_params = detail.get("requestParameters") or {}
-    workspace_id = request_params.get("WorkSpaceIds") or request_params.get("workspaceIds") or "unknown"
+    workspace_ids = request_params.get("WorkSpaceIds") or request_params.get("workspaceIds")
+    group_id = request_params.get("groupId") or request_params.get("groupName")
+    policy_arn = request_params.get("policyArn") or request_params.get("policyName")
 
-    if isinstance(workspace_id, list):
-        workspace_id = ", ".join(workspace_id)
+    if isinstance(workspace_ids, list):
+        workspace_ids = ", ".join(workspace_ids)
 
-    if event_name == "CreateWorkspaces":
-        action = "created"
-    elif event_name == "TerminateWorkspaces":
-        action = "terminated"
-    else:
-        action = "updated"
+    resource = workspace_ids or group_id or policy_arn or "unknown"
 
     return {
         "text": (
-            f"WorkSpaces event: {event_name or 'unknown'}\n"
-            f"Action: {action}\n"
-            f"User: {username}\n"
-            f"WorkSpace: {workspace_id}\n"
+            f"AWS change: {event_name}\n"
+            f"Service: {event_source}\n"
+            f"Actor: {username}\n"
+            f"Resource: {resource}\n"
             f"Account: {payload.get('account', 'unknown')}"
         )
     }
@@ -86,7 +84,7 @@ def lambda_handler(event, context):
         messages.append(message)
 
     if not messages:
-        return {"statusCode": 200, "body": "No WorkSpaces events found"}
+        return {"statusCode": 200, "body": "No tracked AWS events found"}
 
     for message in messages:
         post_body = json.dumps(message).encode("utf-8")
