@@ -2,7 +2,7 @@ locals {
   # Match the server-managed API client configuration; never accept caller prefixes.
   api_clients = try(jsondecode(file("${path.module}/../integration-hub-api/modules/file-transfer-api/application_variables.json")).accounts[local.environment].transfer_clients, {})
   api_upload_resources = [
-    for client in values(local.api_clients) : "arn:aws:s3:::${local.application_name}-${local.environment}-incoming/${trim(client.key_prefix, "/")}/*"
+    for client_id, client in local.api_clients : "arn:aws:s3:::${local.application_name}-${local.environment}-incoming/${trim(coalesce(try(client.key_prefix, null), client_id), "/")}/*"
     if try(client.enabled, true)
   ]
   # Environments without API clients do not require an API account or grants.
