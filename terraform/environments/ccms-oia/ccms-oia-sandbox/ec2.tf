@@ -10,7 +10,7 @@
 data "template_file" "launch-template-main-updated" {
   template = file("${path.module}/templates/user-data-mainone.sh")
   vars = {
-    cluster_name       = "${local.first_cluster_name}"
+    cluster_name       = local.first_cluster_name
     deploy_environment = local.environment
   }
 }
@@ -19,7 +19,7 @@ data "template_file" "launch-template-main-updated" {
 data "template_file" "launch-template-additional" {
   template = file("${path.module}/templates/user-data-additional.sh")
   vars = {
-    cluster_name       = "${local.second_cluster_name}"
+    cluster_name       = local.second_cluster_name
     deploy_environment = local.environment
   }
 }

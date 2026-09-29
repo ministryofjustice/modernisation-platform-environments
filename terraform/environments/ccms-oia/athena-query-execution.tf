@@ -1,8 +1,8 @@
 resource "null_resource" "execute_create_table_queries" {
   triggers = {
-    query_ids = join(",", ["${aws_athena_named_query.main_table_connector_internal.id}", "${aws_athena_named_query.http_requests_connector_internal.id}",
-      "${aws_athena_named_query.main_table_opa.id}", "${aws_athena_named_query.http_requests_opa.id}",
-      "${aws_athena_named_query.main_table_adaptor_internal.id}", "${aws_athena_named_query.http_requests_adaptor_internal.id}"
+    query_ids = join(",", [aws_athena_named_query.main_table_connector_internal.id, aws_athena_named_query.http_requests_connector_internal.id,
+      aws_athena_named_query.main_table_opa.id, aws_athena_named_query.http_requests_opa.id,
+      aws_athena_named_query.main_table_adaptor_internal.id, aws_athena_named_query.http_requests_adaptor_internal.id
     ])
   }
 
@@ -16,32 +16,32 @@ aws athena start-query-execution \
   --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.main_table_connector_internal.id} --query 'NamedQuery.QueryString' --output text)" \
   --work-group ${aws_athena_workgroup.lb-access-logs.name} \
   --query-execution-context Database=${aws_athena_database.lb-access-logs.name} \
-  --region ${data.aws_region.current.name}
+  --region ${data.aws_region.current.region}
 aws athena start-query-execution \
   --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.http_requests_connector_internal.id} --query 'NamedQuery.QueryString' --output text)" \
   --work-group ${aws_athena_workgroup.lb-access-logs.name} \
   --query-execution-context Database=${aws_athena_database.lb-access-logs.name} \
-  --region ${data.aws_region.current.name}
+  --region ${data.aws_region.current.region}
 aws athena start-query-execution \
   --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.main_table_opa.id} --query 'NamedQuery.QueryString' --output text)" \
   --work-group ${aws_athena_workgroup.lb-access-logs.name} \
   --query-execution-context Database=${aws_athena_database.lb-access-logs.name} \
-  --region ${data.aws_region.current.name}
+  --region ${data.aws_region.current.region}
 aws athena start-query-execution \
   --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.http_requests_opa.id} --query 'NamedQuery.QueryString' --output text)" \
   --work-group ${aws_athena_workgroup.lb-access-logs.name} \
   --query-execution-context Database=${aws_athena_database.lb-access-logs.name} \
-  --region ${data.aws_region.current.name}
+  --region ${data.aws_region.current.region}
 aws athena start-query-execution \
   --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.main_table_adaptor_internal.id} --query 'NamedQuery.QueryString' --output text)" \
   --work-group ${aws_athena_workgroup.lb-access-logs.name} \
   --query-execution-context Database=${aws_athena_database.lb-access-logs.name} \
-  --region ${data.aws_region.current.name}
+  --region ${data.aws_region.current.region}
 aws athena start-query-execution \
   --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.http_requests_adaptor_internal.id} --query 'NamedQuery.QueryString' --output text)" \
   --work-group ${aws_athena_workgroup.lb-access-logs.name} \
   --query-execution-context Database=${aws_athena_database.lb-access-logs.name} \
-  --region ${data.aws_region.current.name}
+  --region ${data.aws_region.current.region}
 EOF
   }
 
