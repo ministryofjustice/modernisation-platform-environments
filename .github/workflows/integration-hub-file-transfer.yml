@@ -36,7 +36,46 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
+  python-tests:
+    if: inputs.action != 'destroy'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Run Unit Tests
+        working-directory: terraform/environments/integration-hub-file-transfer
+        run: |
+          set -euo pipefail
+
+          while IFS= read -r requirements; do
+            if ! output=$(python -m pip install -r "$requirements" 2>&1); then
+              printf '%s\n' "$output"
+              exit 1
+            fi
+          done < <(find lambda -type f -name '*requirements.txt' | sort)
+
+          for test_directory in lambda/*; do
+            if find "$test_directory" -maxdepth 1 -type f -name 'test_*.py' -print -quit | grep -q .; then
+              if output=$(python -m unittest discover -s "$test_directory" -p 'test_*.py' -v 2>&1); then
+                summary=$(printf '%s\n' "$output" | sed -n '/^Ran /p')
+                printf '%s: %s\n' "${test_directory#lambda/}" "$summary"
+              else
+                printf '%s\n' "$output"
+                exit 1
+              fi
+            fi
+          done
+
+          printf '%s\n' 'All Lambda unit tests passed.'
+
   strategy:
+    needs: python-tests
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
     with:
