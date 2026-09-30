@@ -91,6 +91,7 @@ resource "aws_iam_policy" "ec2_automation" {
 
 locals {
   legacy_nextcloud_allowed_resource = lookup(var.environment_config, "legacy_nextcloud_efs_id", "none")
+  rclone_s3_bucket_arns             = lookup(var.environment_config, "rclone_s3_bucket_arns", [])
 }
 
 data "aws_iam_policy_document" "ec2_nextcloud" {
@@ -195,6 +196,26 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
       "elasticfilesystem:ClientWrite",
     ]
     resources = ["arn:aws:elasticfilesystem:eu-west-2:*:file-system/${local.legacy_nextcloud_allowed_resource}"]
+  }
+
+  dynamic "statement" {
+    for_each = local.rclone_s3_bucket_arns
+
+    content {
+      sid    = "CrossAccountS3Rclone"
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+        "s3:DeleteObject",
+      ]
+      resources = [
+        statement.value,
+        "${statement.value}/*"
+      ]
+    }
   }
 }
 
