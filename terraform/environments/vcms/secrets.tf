@@ -1,7 +1,7 @@
 resource "aws_ssm_parameter" "db_user" {
   name  = "db-user"
   type  = "String"
-  value = "vcms"
+  value = "CHANGE_ME"
 
   tags = merge(
     local.tags,
@@ -35,7 +35,7 @@ resource "aws_ssm_parameter" "db_hostname" {
 resource "aws_ssm_parameter" "database_name" {
   name  = "database-name"
   type  = "String"
-  value = "vcms"
+  value = "CHANGE_ME"
 
   tags = merge(
     local.tags,
