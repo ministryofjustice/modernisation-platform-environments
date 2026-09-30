@@ -83,12 +83,4 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     version = "$Latest"
   }
 
-  # ECS adds this tag automatically once the capacity provider is attached;
-  # declaring it here stops Terraform from stripping it back out on every apply.
-  tag {
-    key                 = "AmazonECSManaged"
-    value               = ""
-    propagate_at_launch = true
-  }
-
 }
