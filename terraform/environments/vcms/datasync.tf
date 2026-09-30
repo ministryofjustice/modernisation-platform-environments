@@ -78,7 +78,8 @@ resource "aws_datasync_task" "import_s3_to_efs" {
     uid                    = "INT_VALUE"
     gid                    = "INT_VALUE"
     preserve_deleted_files = "PRESERVE"
-    verify_mode = "POINT_IN_TIME_CONSISTENT"
+    verify_mode            = "POINT_IN_TIME_CONSISTENT"
+    log_level              = "BASIC"
   }
 }
 
