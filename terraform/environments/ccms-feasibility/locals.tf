@@ -19,7 +19,4 @@ locals {
     "ccms-soa-admin-${local.env_label}",   # ccms-soa/nlb.tf
     "ccms-soa-managed-${local.env_label}", # ccms-soa/nlb.tf
   ]
-
-  # ELB writes objects under <prefix>/AWSLogs/<account>/elasticloadbalancing/<region>/yyyy/MM/dd/
-  lb_access_logs_location_template = "s3://${local.lb_access_logs_bucket_name}/$${lb}/AWSLogs/${data.aws_caller_identity.current.account_id}/elasticloadbalancing/${data.aws_region.current.region}/$${day}"
 }
