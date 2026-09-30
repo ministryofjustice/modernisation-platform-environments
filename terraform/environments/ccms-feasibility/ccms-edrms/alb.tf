@@ -1,6 +1,6 @@
 # Shared load balancer access log bucket, managed in ccms-feasibility root
 data "aws_s3_bucket" "lb_access_logs" {
-  bucket = "${local.application_name}-${local.environment}-lb-access-logs"
+  bucket = "${local.application_name}-lb-access-logs"
 }
 
 module "alb" {
@@ -22,7 +22,7 @@ module "alb" {
 
   access_logs = {
     bucket = data.aws_s3_bucket.lb_access_logs.id
-    prefix = "${local.component_name}-${local.env_label}"
+    prefix = local.component_name
   }
 
   tags = local.tags

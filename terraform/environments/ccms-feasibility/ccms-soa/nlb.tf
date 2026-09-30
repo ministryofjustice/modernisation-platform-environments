@@ -1,6 +1,6 @@
 # Shared load balancer access log bucket, managed in ccms-feasibility root
 data "aws_s3_bucket" "lb_access_logs" {
-  bucket = "${local.application_name}-${local.environment}-lb-access-logs"
+  bucket = "${local.application_name}-lb-access-logs"
 }
 
 module "nlb_admin" {
@@ -26,7 +26,7 @@ module "nlb_admin" {
 
   access_logs = {
     bucket = data.aws_s3_bucket.lb_access_logs.id
-    prefix = "${local.component_name}-admin-${local.env_label}"
+    prefix = "${local.component_name}-admin"
   }
 
   tags = local.tags
@@ -55,7 +55,7 @@ module "nlb_managed" {
 
   access_logs = {
     bucket = data.aws_s3_bucket.lb_access_logs.id
-    prefix = "${local.component_name}-managed-${local.env_label}"
+    prefix = "${local.component_name}-managed"
   }
 
   tags = local.tags

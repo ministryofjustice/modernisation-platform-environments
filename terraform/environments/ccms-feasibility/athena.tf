@@ -1,7 +1,7 @@
 # Athena over the shared load balancer access logs bucket (s3.tf).
 #
 # Tables alb_access_logs and nlb_access_logs are partitioned by lb (the load balancer's directory) and day (yyyy/MM/dd):
-#   SELECT * FROM alb_access_logs WHERE lb = 'ccms-pui-feasibility' AND day = '2026/09/29' LIMIT 100;
+#   SELECT * FROM alb_access_logs WHERE lb = 'ccms-pui' AND day = '2026/09/29' LIMIT 100;
 
 module "athena" {
   # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/7ecf91e

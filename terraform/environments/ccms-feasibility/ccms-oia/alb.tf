@@ -1,6 +1,6 @@
 # Shared load balancer access log bucket, managed in ccms-feasibility root
 data "aws_s3_bucket" "lb_access_logs" {
-  bucket = "${local.application_name}-${local.environment}-lb-access-logs"
+  bucket = "${local.application_name}-lb-access-logs"
 }
 
 module "alb_opahub" {
@@ -22,7 +22,7 @@ module "alb_opahub" {
 
   access_logs = {
     bucket = data.aws_s3_bucket.lb_access_logs.id
-    prefix = "${local.opahub_name}-${local.env_label}"
+    prefix = local.opahub_name
   }
 
   tags = local.tags
@@ -47,7 +47,7 @@ module "alb_connector" {
 
   access_logs = {
     bucket = data.aws_s3_bucket.lb_access_logs.id
-    prefix = "${local.connector_name}-${local.env_label}"
+    prefix = local.connector_name
   }
 
   tags = local.tags
@@ -72,7 +72,7 @@ module "alb_adaptor" {
 
   access_logs = {
     bucket = data.aws_s3_bucket.lb_access_logs.id
-    prefix = "${local.adaptor_name}-${local.env_label}"
+    prefix = local.adaptor_name
   }
 
   tags = local.tags
