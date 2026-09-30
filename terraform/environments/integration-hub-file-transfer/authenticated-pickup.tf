@@ -135,7 +135,7 @@ data "aws_iam_policy_document" "clean_pickup_no_presign" {
     condition {
       test     = "ArnEquals"
       variable = "aws:PrincipalArn"
-      values   = [module.iam_role_clean_pickup[0].arn]
+      values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/transfer-clean-pickup"]
     }
     condition {
       test     = "StringEquals"

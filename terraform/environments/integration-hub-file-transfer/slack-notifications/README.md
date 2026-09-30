@@ -93,7 +93,10 @@ populate its value with `{"url":"https://hooks.slack.com/services/..."}` outside
 Terraform. Use a webhook installed for the approved Slack channel; that channel
 may receive file names/paths and must be suitable for that metadata. Webhook values
 are neither configuration-file fields nor Terraform outputs. No placeholder
-credentials are installed.
+credentials are installed. Rotate a webhook by issuing a replacement in Slack,
+updating this secret, and revoking the old webhook in Slack. The worker fetches the
+current webhook on each attempt, so rotation needs no redeployment. Secrets Manager
+cannot automatically rotate an externally issued Slack incoming webhook.
 
 ## Deployment and verification
 
