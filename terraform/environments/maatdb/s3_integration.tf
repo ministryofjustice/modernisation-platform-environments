@@ -76,7 +76,8 @@ module "s3_bucket" {
     log_bucket_arn  = module.s3-bucket-logging.bucket.arn
   }
 
-  log_prefix = "s3access/${local.application_name}-${local.environment}-ftp-${each.key}"
+  log_prefix = "s3access/${local.application_name}-${local.environment}-ftp-${each.key}/${local.application_name}-${local.environment}-ftp-${each.key}"
+  log_partition_date_source = "EventTime"
 
   bucket_policy_v2 = [
     for stmt in [
