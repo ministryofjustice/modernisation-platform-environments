@@ -76,11 +76,11 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   min_size                = local.ecs_asg_min_size
   protect_from_scale_in   = true
   default_instance_warmup = 0
-  # validate desired capacity >= min size
+  # validate min_size <= desired_capacity <= max_size
   lifecycle {
     precondition {
-      condition     = local.ecs_asg_desired_capacity >= local.ecs_asg_min_size
-      error_message = "Desired capacity must be greater than or equal to the minimum size."
+      condition     = local.ecs_asg_desired_capacity >= local.ecs_asg_min_size && local.ecs_asg_desired_capacity <= local.ecs_asg_max_size
+      error_message = "Desired capacity must be greater than or equal to the minimum size and less than or equal to the maximum size."
     }
   }
 
