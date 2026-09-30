@@ -83,7 +83,10 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         "Effect" : "Deny",
         "Principal" : "*",
         "Action" : "s3:*",
-        "Resource" : ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        "Resource" : [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ],
         "Condition" : {
           "Bool" : {
             "aws:SecureTransport" : "false"
@@ -97,7 +100,10 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
           AWS = "*"
         },
         Action   = "s3:*",
-        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        Resource = [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ],
         Condition = {
           Bool = {
             "aws:SecureTransport" = "false"
@@ -205,7 +211,10 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         "Effect" : "Deny",
         "Principal" : "*",
         "Action" : "s3:*",
-        "Resource" : ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        "Resource" : [
+          "${module.s3-bucket-shared.bucket.arn}/*",
+          module.s3-bucket-shared.bucket.arn
+        ],
         "Condition" : {
           "Bool" : {
             "aws:SecureTransport" : "false"
@@ -219,7 +228,10 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
           AWS = "*"
         },
         Action   = "s3:*",
-        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        Resource = [
+          "${module.s3-bucket-shared.bucket.arn}/*",
+          module.s3-bucket-shared.bucket.arn
+        ],
         Condition = {
           Bool = {
             "aws:SecureTransport" = "false"
