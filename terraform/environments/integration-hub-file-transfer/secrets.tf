@@ -1,7 +1,7 @@
 module "secrets_file_dispatch_prefix" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.1.0"
+  version = "2.2.0"
 
   for_each = merge(local.environment_file_dispatch_prefixes...)
 
