@@ -73,7 +73,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   # Desired count = 2 for production, 1 for non-production envs
   desired_capacity        = local.environment == "production" ? 2 : 1
   max_size                = 3
-  min_size                = 2
+  min_size                = local.environment == "production" ? 2 : 1
   protect_from_scale_in   = true
   default_instance_warmup = 0
 
