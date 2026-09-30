@@ -71,16 +71,22 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   name                    = "${local.application_name}-auto-scaling-group"
   vpc_zone_identifier     = data.aws_subnets.shared-private.ids
   # Desired count = 2 for production, 1 for non-production envs
-  desired_capacity        = local.environment == "production" ? 2 : 1
-  max_size                = 3
-  min_size                = local.environment == "production" ? 2 : 1
+  desired_capacity        = local.ecs_asg_desired_capacity
+  max_size                = local.ecs_asg_max_size
+  min_size                = local.ecs_asg_min_size
   protect_from_scale_in   = true
   default_instance_warmup = 0
-
+  # validate desired capacity >= min size
+  lifecycle {
+    precondition {
+      condition     = local.ecs_asg_desired_capacity >= local.ecs_asg_min_size
+      error_message = "Desired capacity must be greater than or equal to the minimum size."
+    }
+  }
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
-    version = "$Latest"
+    version = "$Latest" # Always use the latest version of the launch template
   }
   # ECS adds this tag automatically once the capacity provider is attached;
   # declaring it here stops Terraform from stripping it back out on every apply.
