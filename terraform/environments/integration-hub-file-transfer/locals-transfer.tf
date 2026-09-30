@@ -27,7 +27,7 @@ locals {
     jelilat = {
       environments         = ["development"]
       server_id_allow_list = []
-      cidr_blocks          = ["35.176.92.0/22"]
+      cidr_blocks          = ["0.0.0.0/0"]
       ssh_public_keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGYaZakUZqOqDdMi9TeLzm5E7uD8UExhlbwf9D/UAv4K"
       ]
