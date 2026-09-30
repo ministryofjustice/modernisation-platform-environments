@@ -58,3 +58,9 @@ data "aws_ssm_parameter" "network_monitor_scope_arn" {
 data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
 }
+
+# Created account-wide by data-platform/cluster (service-linked-roles.tf).
+# Looked up here rather than created, as only one can exist per account.
+data "aws_iam_role" "autoscaling" {
+  name = "AWSServiceRoleForAutoScaling"
+}

@@ -46,6 +46,7 @@ module "eks_ebs_kms_key" {
   enable_default_policy = true
 
   key_service_roles_for_autoscaling = [
+    data.aws_iam_role.autoscaling.arn,
     module.eks.cluster_iam_role_arn
   ]
 
