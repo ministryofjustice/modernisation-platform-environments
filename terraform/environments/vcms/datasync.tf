@@ -157,3 +157,25 @@ resource "aws_cloudwatch_log_group" "datasync_import" {
   retention_in_days = 30
   tags              = local.tags
 }
+
+resource "aws_cloudwatch_log_resource_policy" "datasync_import_cw_policy" {
+  policy_name     = "vcms-datasync-import-cw-policy-${local.environment}"
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "DataSyncLogsToCloudWatch"
+        Effect = "Allow"
+        Principal = {
+          Service = "datasync.amazonaws.com"
+        }
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:PutLogEventsBatch"
+        ]
+        Resource = "${aws_cloudwatch_log_group.datasync_import.arn}:*"
+      }
+    ]
+  })
+}
