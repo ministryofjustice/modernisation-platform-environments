@@ -50,9 +50,6 @@ with Diagram(
         waf = WAF("WAFv2 Web ACL\nCRS + SQLi + KnownBad\n(COUNT mode)")
         ssm = SystemsManager("SSM\nSession Manager")
 
-        with Cluster("Public subnet"):
-            bastion = EC2("Bastion host\n(bastion-linux module)")
-
         with Cluster("Private subnet A"):
             alb = ElbApplicationLoadBalancer(
                 "ALB oas-lb\ninternal\n:80/443/9500-9503"
@@ -85,9 +82,7 @@ with Diagram(
     alb >> Edge(style="dashed", label="access logs") >> s3logs
     waf >> Edge(style="dashed", label="logs") >> s3waf
 
-    admins >> Edge(label="SSH 22") >> bastion >> Edge(label="SSH 22") >> ec2
     admins >> Edge(label="SSM session") >> ssm >> Edge(style="dashed") >> ec2
-    bastion >> Edge(style="dashed", label="1521") >> rds
 
     ec2 >> Edge(label="Oracle 1521") >> rds
     workspaces >> Edge(label="SQL Developer 1521", style="dashed") >> rds
@@ -130,9 +125,6 @@ with Diagram(
         kms = KMS("KMS\nshared keys")
 
         with Cluster("oas"):
-            with Cluster("Public subnet"):
-                bastion = EC2("Bastion host")
-
             with Cluster("Private subnet A"):
                 alb = ElbApplicationLoadBalancer("ALB oas-lb\n:80/443/9500-9503")
                 ec2 = EC2("EC2 r5a.large\nWebLogic + Analytics")
@@ -163,7 +155,6 @@ with Diagram(
     alb >> Edge(label="9500-9503") >> ec2
     alb >> Edge(style="dashed", label="logs") >> s3logs
 
-    admins >> Edge(label="SSH 22") >> bastion >> Edge(label="SSH 22") >> ec2
     admins >> Edge(label="SSM session") >> ssm >> Edge(style="dashed") >> ec2
 
     ec2 >> Edge(label="Oracle 1521") >> rds_oas

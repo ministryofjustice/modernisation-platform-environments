@@ -1,3 +1,17 @@
+module "cloudwatch_web_app" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  for_each  = local.transfer_web_app_log_groups
+  providers = { aws = aws.us-east-1 }
+  source    = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
+  version   = "5.7.3"
+
+  name              = each.value
+  kms_key_id        = module.kms_cloudwatch_logs_us_east_1.key_arn
+  retention_in_days = local.cloudwatch_retention_days
+
+  tags = local.tags
+}
+
 module "cloudwatch_eventbridge" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"

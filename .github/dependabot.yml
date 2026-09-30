@@ -527,6 +527,7 @@ updates:
       - "terraform/environments/data-platform"
       - "terraform/environments/data-platform/ai-gateway"
       - "terraform/environments/data-platform/airflow"
+      - "terraform/environments/data-platform/airflow-cluster"
       - "terraform/environments/data-platform/app"
       - "terraform/environments/data-platform/cluster"
       - "terraform/environments/data-platform/cluster/modules/kubernetes/namespace"
@@ -542,6 +543,30 @@ updates:
       interval: "daily"
     groups:
       data-platform:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/data-platform-factory-one"
+    schedule:
+      interval: "daily"
+    groups:
+      data-platform-factory-one:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/data-platform-factory-two"
+    schedule:
+      interval: "daily"
+    groups:
+      data-platform-factory-two:
         patterns:
           - "*"
     open-pull-requests-limit: 50
@@ -897,6 +922,8 @@ updates:
     directories:
       - "terraform/environments/integration-hub-api"
       - "terraform/environments/integration-hub-api/benefit-checker-api"
+      - "terraform/environments/integration-hub-api/file-transfer-api"
+      - "terraform/environments/integration-hub-api/modules/file-transfer-api"
       - "terraform/environments/integration-hub-api/modules/integration-hub-file-transfer-api"
     schedule:
       interval: "daily"
@@ -910,12 +937,25 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/integration-hub-file-transfer"
+      - "terraform/environments/integration-hub-file-transfer/modules/file-dispatch-configuration"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup"
     schedule:
       interval: "daily"
     groups:
       integration-hub-file-transfer:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/justice-eng-ai"
+    schedule:
+      interval: "daily"
+    groups:
+      justice-eng-ai:
         patterns:
           - "*"
     open-pull-requests-limit: 50

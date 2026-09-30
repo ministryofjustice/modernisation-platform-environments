@@ -41,7 +41,7 @@ resource "aws_iam_policy" "cclf_provider_load_policy" {
           "s3:ListBucketVersions"
         ],
         Resource = [
-          "${aws_s3_bucket.data.arn}",
+          aws_s3_bucket.data.arn,
           "${aws_s3_bucket.data.arn}/*"
         ]
       },

@@ -1,7 +1,7 @@
 module "s3_audit_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.15.4"
+  version = "5.16.1"
 
   allowed_kms_key_arn                   = module.kms_s3_audit.key_arn
   attach_deny_insecure_transport_policy = true
@@ -52,17 +52,19 @@ module "s3_bucket" {
     for key, value in local.s3_bucket_configuration : key => value
   }
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.15.4"
+  version = "5.16.1"
 
   allowed_kms_key_arn                   = module.kms_s3_bucket[each.key].key_arn
   attach_deny_insecure_transport_policy = true
   bucket                                = each.value.bucket
+  attach_policy                         = each.key == "incoming" && local.api_upload_enabled
+  policy                                = each.key == "incoming" && local.api_upload_enabled ? data.aws_iam_policy_document.api_incoming_upload[0].json : null
 
   cors_rule = each.key == "incoming" ? [
     {
       allowed_headers = ["*"]
       allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
-      allowed_origins = [aws_transfer_web_app.this.access_endpoint]
+      allowed_origins = [local.is-production ? "https://web.file-transfer.service.justice.gov.uk" : "https://web.${local.environment}.file-transfer.service.justice.gov.uk"]
       expose_headers = [
         "last-modified",
         "content-length",
