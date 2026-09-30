@@ -40,7 +40,7 @@ resource "helm_release" "fluent_bit" {
     # opensearch_app_host               = var.opensearch_app_host
     # elasticsearch_host                = var.elasticsearch_host
     # s3_bucket_application_logs        = module.s3_bucket_application_logs.bucket_name
-    s3_bucket_application_logs       = "${local.cluster_name}-${each.value}-s3"
+    s3_bucket_application_logs       = "${terraform.workspace}-fluentbit"
     cluster                           = terraform.workspace
   })]
 
