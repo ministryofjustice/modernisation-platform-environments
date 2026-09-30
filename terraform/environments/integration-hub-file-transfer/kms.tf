@@ -1,7 +1,7 @@
 module "kms_cloudwatch_logs" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   aliases                 = ["logs/${local.application_name}-${local.environment}"]
   description             = "KMS CMK for CloudWatch Logs encryption"
@@ -110,7 +110,7 @@ module "kms_cloudwatch_logs" {
 module "kms_dynamodb" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   aliases                 = ["dynamodb/idempotency"]
   description             = "Key for cryptographic functions on DynamoDB tables"
@@ -181,7 +181,7 @@ module "kms_dynamodb" {
 module "kms_s3_audit" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   aliases                 = ["s3/audit"]
   description             = "Key for cryptographic functions on ${local.application_name}-${local.environment}-cloudtrail-logs S3 bucket"
@@ -235,7 +235,7 @@ module "kms_s3_bucket" {
     for key, value in local.s3_bucket_configuration : key => value
   }
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   key_statements          = each.key == "incoming" ? local.api_incoming_key_statements : []
   aliases                 = ["s3/${each.key}"]
@@ -256,7 +256,7 @@ module "kms_s3_bucket" {
 module "kms_secrets" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   aliases                 = ["secrets/${local.application_name}-${local.environment}"]
   description             = "KMS CMK for Secrets Manager encryption"
@@ -299,7 +299,7 @@ module "kms_secrets" {
 module "kms_sqs" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   aliases                 = ["sqs/${local.application_name}-${local.environment}"]
   description             = "KMS CMK for SQS encryption"
@@ -391,7 +391,7 @@ module "kms_sqs" {
 module "kms_sns" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   aliases                 = ["sns/${local.application_name}-${local.environment}"]
   description             = "KMS CMK for SNS encryption"
