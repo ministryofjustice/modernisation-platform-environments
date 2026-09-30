@@ -936,6 +936,18 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
+      - "terraform/environments/integration-hub-events"
+    schedule:
+      interval: "daily"
+    groups:
+      integration-hub-events:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
       - "terraform/environments/integration-hub-file-transfer"
       - "terraform/environments/integration-hub-file-transfer/modules/file-dispatch-configuration"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3"
@@ -1529,6 +1541,7 @@ updates:
       - "terraform/modules/efs"
       - "terraform/modules/environment"
       - "terraform/modules/fsx_windows"
+      - "terraform/modules/github_lambda"
       - "terraform/modules/ip_addresses"
       - "terraform/modules/lb_listener"
       - "terraform/modules/ncsc-aws-config-conformance-packs"
