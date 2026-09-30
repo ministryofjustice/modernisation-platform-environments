@@ -33,6 +33,7 @@ module "environment_dev" {
   create_ecs_lambda            = true
 
   delius_microservice_configs = local.delius_microservices_configs_dev
+  enable_autoscaling_schedule = true
 
   tags = local.tags
 

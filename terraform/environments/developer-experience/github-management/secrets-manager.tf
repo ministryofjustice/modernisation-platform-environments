@@ -22,7 +22,7 @@ module "github_app_secret" {
   )
 }
 
-module "entra_id_secret" {
+module "octo_access_entra_id_secret" {
   count = local.is-production ? 1 : 0
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
@@ -41,5 +41,27 @@ module "entra_id_secret" {
   tags = merge(
     local.tags,
     { "credential-expiration" = "2026-10-22" }
+  )
+}
+
+moved {
+  from = module.entra_id_secret[0]
+  to   = module.octo_access_entra_id_secret[0]
+}
+
+module "octo_access_slack_secret" {
+  count = local.is-production ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name        = "${local.component_name}/slack/octo-access-token"
+  description = "https://api.slack.com/apps/A09N2LW1F44"
+
+  secret_string         = "CHANGEME"
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "none" }
   )
 }

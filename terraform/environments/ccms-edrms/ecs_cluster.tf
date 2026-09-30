@@ -1,4 +1,4 @@
-# # Capacity Providers
+# Capacity Providers
 
 resource "aws_ecs_capacity_provider" "capacity-provider" {
   name = "${local.application_name}-capacity-provider"

@@ -1183,6 +1183,8 @@ locals {
     PSYDXO9 = "kraihanmoj"
     PLV2QS6 = "lucy-astley-jones"
     PREPU2L = "mrixson-moj"
+    PSXFTII = "gwionap"
+    PO9DYMA = "georgewk92"    
   }
 }
 
@@ -1328,5 +1330,82 @@ module "rota_personal_digest" {
     )
 
     SLACK_SECRET_ARN = module.rota_personal_digest_slack.secret_arn
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# FMS validation reporter
+#-----------------------------------------------------------------------------------
+
+module "fms_validation_reporter" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "fms_validation_reporter"
+  role_name                      = aws_iam_role.fms_validation_reporter.name
+  role_arn                       = aws_iam_role.fms_validation_reporter.arn
+  handler                        = "fms_validation_reporter.handler"
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  cloudwatch_retention_days = 7
+
+  environment_variables = {
+    ATHENA_DATABASE             = "serco_fms"
+    ATHENA_RESULT_BUCKET_NAME   = "athena-query-results"
+    ATHENA_WORKGROUP            = "${local.env_account_id}-default"
+    FAILURE_AUDIT_TABLE         = "fms_validation_failure_audit"
+    RELOAD_AUDIT_TABLE          = "fms_validation_reload_audit"
+    SNS_TOPIC_ARN               = aws_sns_topic.emds_alerts.arn
+    MOD_PLAT_ACCOUNT_ALIAS      = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER     = local.env_account_id
+    POWERTOOLS_LOG_LEVEL        = "INFO"
+    POWERTOOLS_SERVICE_NAME     = "fms-validation-reporter"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Live feed specials remediator
+#-----------------------------------------------------------------------------------
+
+module "live_feed_specials_remediator" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "live_feed_specials_remediator"
+  role_name                      = aws_iam_role.specials_remediation.name
+  role_arn                       = aws_iam_role.specials_remediation.arn
+  handler                        = "live_feed_specials_remediator.handler"
+  memory_size                    = 2048
+  timeout                        = 900
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.env_name
+
+  security_group_ids = [
+    aws_security_group.lambda_generic.id,
+  ]
+
+  subnet_ids = data.aws_subnets.shared-private.ids
+
+  cloudwatch_retention_days = 7
+
+  environment_variables = {
+    ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
+    ATHENA_RESULTS_BUCKET  = module.s3-athena-bucket.bucket.id
+    ATHENA_WORKGROUP       = aws_athena_workgroup.default.name
+    ENVIRONMENT_NAME       = local.environment_shorthand
+    MAX_ARCHIVE_ROWS       = "100000"
+    POWERTOOLS_LOG_LEVEL   = "INFO"
+    REMEDIATION_BUCKET     = module.s3-logging-bucket.bucket.id
+    REMEDIATION_PREFIX     = local.specials_remediation_prefix
   }
 }

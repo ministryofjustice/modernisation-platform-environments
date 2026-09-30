@@ -110,6 +110,17 @@ variable "allocated_storage" {
   }
 }
 
+variable "max_allocated_storage" {
+  description = "Maximum storage in GiB to which the temporary PostgreSQL source can autoscale. Set to 0 to disable storage autoscaling."
+  type        = number
+  default     = 0
+
+  validation {
+    condition     = var.max_allocated_storage >= 0
+    error_message = "max_allocated_storage must be zero or greater."
+  }
+}
+
 variable "tags" {
   description = "Tags applied to resources created by the test harness."
   type        = map(string)

@@ -232,7 +232,7 @@ locals {
               "kms:Decrypt",
             ]
             resources = [
-              aws_kms_key.arns_integration[0].arn,
+              length(aws_kms_key.arns_integration) == 1 ? aws_kms_key.arns_integration[0].arn : null
             ]
             condition = {
               test     = "StringEquals"

@@ -1,5 +1,4 @@
 locals {
-  create_db_snapshots_script_prefix = "dbsnapshot"
   delete_db_snapshots_script_prefix = "deletesnapshots_v2"
   db_connect_script_prefix          = "dbconnect"
   hash_value                        = "Y/4+i1hcHvLBzOaCHJ/m9bQLuVtQwr8gnF//AJ2j+S4="
@@ -100,14 +99,14 @@ resource "aws_s3_bucket" "backup_lambda" {
 
 resource "aws_s3_object" "provision_files" {
   bucket       = aws_s3_bucket.backup_lambda.id
-  for_each     = toset(["${local.create_db_snapshots_script_prefix}.zip", "${local.delete_db_snapshots_script_prefix}.zip", "${local.db_connect_script_prefix}.zip"])
+  for_each     = toset(["${local.delete_db_snapshots_script_prefix}.zip", "${local.db_connect_script_prefix}.zip"])
   key          = each.value
   source       = "./scripts/${each.value}"
   content_type = "application/zip"
   source_hash  = filemd5("./scripts/${each.value}")
 }
 
-# This delays the creation of resource 
+# This delays the creation of resource
 resource "time_sleep" "wait_for_provision_files" {
   create_duration = "1m"
   depends_on      = [aws_s3_object.provision_files]
@@ -176,12 +175,6 @@ resource "aws_s3_bucket_policy" "backup_lambda_secure_transport" {
 ## When Terraform Init and Plan is ran as part of the pipeline, the zip files will be created, which will be picked up by aws_s3_object.provision_files in the Terraform Apply to send to the S3 bucket
 ## Thus no need to add the zip files manually to the zipfiles directory except for nodejs.zip
 
-data "archive_file" "create_db_snapshots" {
-  type        = "zip"
-  source_file = "scripts/${local.create_db_snapshots_script_prefix}.js"
-  output_path = "scripts/${local.create_db_snapshots_script_prefix}.zip"
-}
-
 data "archive_file" "delete_db_snapshots" {
   type        = "zip"
   source_file = "scripts/${local.delete_db_snapshots_script_prefix}.py"
@@ -225,40 +218,9 @@ resource "aws_lambda_layer_version" "backup_lambda" {
   s3_key           = "nodejs.zip"
   source_code_hash = local.hash_value
   # Since the nodejs.zip file has been added manually to the s3 bucket the source_code_hash would have to be computed and added manually as well anytime there's a change to nodejs.zip
-  # This command allows you to retrieve the hash - openssl dgst -sha256 -binary nodejs.zip | base64  
+  # This command allows you to retrieve the hash - openssl dgst -sha256 -binary nodejs.zip | base64
   compatible_runtimes = ["nodejs18.x"]
   depends_on          = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
-}
-
-resource "aws_lambda_function" "create_db_snapshots" {
-  description      = "Snapshot volumes for Oracle EC2"
-  function_name    = "snapshotDBFunction"
-  role             = aws_iam_role.backup_lambda.arn
-  handler          = "snapshot/dbsnapshot.handler"
-  source_code_hash = data.archive_file.create_db_snapshots.output_base64sha256
-  runtime          = "nodejs18.x"
-  layers           = [aws_lambda_layer_version.backup_lambda.arn]
-  s3_bucket        = aws_s3_bucket.backup_lambda.id
-  s3_key           = "${local.create_db_snapshots_script_prefix}.zip"
-  memory_size      = 128
-  timeout          = 900
-  depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
-
-  environment {
-    variables = {
-      LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
-    }
-  }
-
-  vpc_config {
-    security_group_ids = [aws_security_group.backup_lambda.id]
-    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
-  }
-
-  tags = merge(
-    local.tags,
-    { Name = "${local.application_name}-${local.environment}-lambda-create-snapshot" }
-  )
 }
 
 resource "aws_lambda_function" "delete_db_snapshots" {

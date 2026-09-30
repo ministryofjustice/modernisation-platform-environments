@@ -121,7 +121,7 @@
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-edrms",
       "container_version": "latest",
       "ec2_instance_type": "m5.xlarge",
-      "app_count": "2",
+      "app_count": "3",
       "edrms_server_port": "8080",
       "container_cpu": "2048",
       "container_memory": "6144",

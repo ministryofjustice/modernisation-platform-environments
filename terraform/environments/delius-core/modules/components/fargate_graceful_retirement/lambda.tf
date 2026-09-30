@@ -45,6 +45,8 @@ resource "aws_iam_role_policy_attachment" "lambda_ssm" {
 }
 
 data "aws_iam_policy_document" "lambda_elb_policy_document" {
+  #checkov:skip=CKV_AWS_356:Lambda requires access to target groups managed across multiple repositories
+  #checkov:skip=CKV_AWS_111:Lambda requires ELB target registration permissions across multiple target groups
   statement {
     actions = [
       "elasticloadbalancing:DescribeTargetHealth",

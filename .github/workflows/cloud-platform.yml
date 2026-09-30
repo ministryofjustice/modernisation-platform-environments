@@ -26,7 +26,7 @@ jobs:
 
   # Fetched once here and passed down to avoid hitting rate limits from repeated calls in the reusable workflows below
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@2988728879704953e739f82ac926d37931c6d01b # v6.1.9
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@2caea529829b1a7959afd2c16da632b0ea7308dc # v6.2.6
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -40,6 +40,11 @@ jobs:
       action: "plan_apply"
       component: "root"
       secrets_prefetched: true
+      # Root manages the centralised AMG workspace and its Grafana-internal
+      # objects (teams, data sources, permissions), so the Grafana provider needs
+      # a short-lived service account token. No-op on workspaces without AMG.
+      # Matches the root-terraform job in cloud-platform-reusable.yml.
+      mint_grafana_token: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}

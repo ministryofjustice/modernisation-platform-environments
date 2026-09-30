@@ -102,7 +102,8 @@ resource "aws_autoscaling_group" "weblogic_eis" {
 
   max_size              = 1
   min_size              = 1
-  protect_from_scale_in = true
+  protect_from_scale_in = var.enable_autoscaling_schedule ? false : true
+
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
 
@@ -122,6 +123,28 @@ resource "aws_autoscaling_group" "weblogic_eis" {
   }
 }
 
+resource "aws_autoscaling_schedule" "weblogic_eis_scale_down" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-eis-${var.env_name}-scaledown"
+  min_size               = 0
+  max_size               = 0
+  desired_capacity       = 0
+  recurrence             = "0 5 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic_eis.name
+}
+
+resource "aws_autoscaling_schedule" "weblogic_eis_scale_up" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-eis-${var.env_name}-scaleup"
+  min_size               = var.delius_microservice_configs.weblogic_eis.asg_min_size
+  max_size               = var.delius_microservice_configs.weblogic_eis.asg_max_size
+  desired_capacity       = var.delius_microservice_configs.weblogic_eis.asg_min_size
+  recurrence             = "0 19 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic_eis.name
+}
+
 resource "aws_ecs_capacity_provider" "weblogic_eis" {
   name = "weblogic-eis-${var.env_name}-ec2-cp"
 
@@ -134,33 +157,6 @@ resource "aws_ecs_capacity_provider" "weblogic_eis" {
     }
 
     managed_termination_protection = "ENABLED"
-  }
-}
-
-resource "aws_lb_listener_rule" "blocked_paths_listener_rule_weblogic_eis" {
-  listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 21 # must be before ndelius_allowed_paths_rule
-  condition {
-    host_header {
-      values = [
-        "interface.${var.env_name}.${var.account_config.dns_suffix}",
-        "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
-      ]
-    }
-  }
-  condition {
-    path_pattern {
-      values = [
-        "/NDelius*/delius/a4j/g/3_3_3.Final*DATA*", # mitigates CVE-2018-12533
-      ]
-    }
-  }
-  action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "404"
-    }
   }
 }
 
@@ -187,5 +183,5 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
     type             = "forward"
     target_group_arn = module.weblogic_eis.target_group_arn
   }
-  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }
+

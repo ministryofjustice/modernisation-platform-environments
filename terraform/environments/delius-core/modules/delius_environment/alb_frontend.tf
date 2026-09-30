@@ -192,5 +192,4 @@ resource "aws_lb_listener_rule" "homepage_listener_rule" {
       path        = var.environment_config.homepage_path
     }
   }
-  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }

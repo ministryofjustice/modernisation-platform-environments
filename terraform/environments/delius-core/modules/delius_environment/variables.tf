@@ -128,3 +128,9 @@ variable "create_ecs_lambda" {
   type        = bool
   default     = false
 }
+
+variable "enable_autoscaling_schedule" {
+  description = "Enable/disable the autoscaling schedule for the Weblogic capacity providers"
+  type        = bool
+  default     = false
+}

@@ -20,4 +20,12 @@ locals {
   ]
   enable_amg         = contains(local.amg_host_workspaces, terraform.workspace)
   amg_workspace_name = "${terraform.workspace}-observability"
+
+  # Phase-2 gate for Grafana-internal objects, per workspace. False on a fresh
+  # AMG host workspace (phase 1 creates the service account); flipped to true
+  # once the service account exists so the pipeline can mint a token. Declared
+  # in the per-workspace environment_configurations map (not an .auto.tfvars
+  # file, which would apply to every workspace). Defaults false for any
+  # workspace that omits it. See grafana-objects.tf (local.manage_grafana_objects).
+  grafana_objects_enabled = lookup(local.environment_configuration, "grafana_objects_enabled", false)
 }

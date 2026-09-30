@@ -22,7 +22,10 @@ module "oracle_ebs_db" {
 # EBS Volumes
 
 resource "aws_ebs_volume" "ebsdb_swap" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_swap
   type              = "gp3"
@@ -39,7 +42,10 @@ resource "aws_volume_attachment" "ebsdb_swap" {
 }
 
 resource "aws_ebs_volume" "ebsdb_export_home" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_exhome
   type              = "gp3"
@@ -56,7 +62,10 @@ resource "aws_volume_attachment" "ebsdb_export_home" {
 }
 
 resource "aws_ebs_volume" "ebsdb_u01" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_u01
   type              = "gp3"
@@ -73,7 +82,10 @@ resource "aws_volume_attachment" "ebsdb_u01" {
 }
 
 resource "aws_ebs_volume" "ebsdb_arch" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_arch
   type              = "gp3"
@@ -89,76 +101,71 @@ resource "aws_volume_attachment" "ebsdb_arch" {
   instance_id = module.oracle_ebs_db.instance_id
 }
 
-resource "aws_ebs_volume" "ebsdb_dbf" {
-  lifecycle { ignore_changes = [kms_key_id] }
-  availability_zone = module.oracle_ebs_db.availability_zone
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf
-  type              = "gp3"
-  iops              = local.application_data.accounts[local.environment].ebs_default_iops
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf", device-name = "/dev/sdk" })
-}
-
-resource "aws_volume_attachment" "ebsdb_dbf" {
-  device_name = "/dev/sdk"
-  volume_id   = aws_ebs_volume.ebsdb_dbf.id
-  instance_id = module.oracle_ebs_db.instance_id
-}
-
 resource "aws_ebs_volume" "ebsdb_dbf01" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf01
   type              = "gp3"
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf01
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf01", device-name = "/dev/sde" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf01", device-name = "/dev/sdq" })
 }
 
 resource "aws_volume_attachment" "ebsdb_dbf01" {
-  device_name = "/dev/sde"
+  device_name = "/dev/sdq"
   volume_id   = aws_ebs_volume.ebsdb_dbf01.id
   instance_id = module.oracle_ebs_db.instance_id
 }
 
 resource "aws_ebs_volume" "ebsdb_dbf02" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf02
   type              = "gp3"
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf02
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf02", device-name = "/dev/sdf" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf02", device-name = "/dev/sdr" })
 }
 
 resource "aws_volume_attachment" "ebsdb_dbf02" {
-  device_name = "/dev/sdf"
+  device_name = "/dev/sdr"
   volume_id   = aws_ebs_volume.ebsdb_dbf02.id
   instance_id = module.oracle_ebs_db.instance_id
 }
 
 resource "aws_ebs_volume" "ebsdb_dbf03" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf03
   type              = "gp3"
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf03
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf03", device-name = "/dev/sdg" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf03", device-name = "/dev/sds" })
 }
 
 resource "aws_volume_attachment" "ebsdb_dbf03" {
-  device_name = "/dev/sdg"
+  device_name = "/dev/sds"
   volume_id   = aws_ebs_volume.ebsdb_dbf03.id
   instance_id = module.oracle_ebs_db.instance_id
 }
 
 resource "aws_ebs_volume" "ebsdb_dbf04" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf04
   type              = "gp3"
@@ -175,7 +182,10 @@ resource "aws_volume_attachment" "ebsdb_dbf04" {
 }
 
 resource "aws_ebs_volume" "ebsdb_redoA" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoA
   type              = "gp3"
@@ -192,7 +202,10 @@ resource "aws_volume_attachment" "ebsdb_redoA" {
 }
 
 resource "aws_ebs_volume" "ebsdb_techst" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_techst
   type              = "gp3"
@@ -209,7 +222,10 @@ resource "aws_volume_attachment" "ebsdb_techst" {
 }
 
 resource "aws_ebs_volume" "ebsdb_backup" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup
   type              = "gp3"
@@ -226,7 +242,10 @@ resource "aws_volume_attachment" "ebsdb_backup" {
 }
 
 resource "aws_ebs_volume" "ebsdb_redoB" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoB
   type              = "gp3"
@@ -243,7 +262,10 @@ resource "aws_volume_attachment" "ebsdb_redoB" {
 }
 
 resource "aws_ebs_volume" "ebsdb_diag" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_diag
   type              = "gp3"
@@ -259,53 +281,42 @@ resource "aws_volume_attachment" "ebsdb_diag" {
   instance_id = module.oracle_ebs_db.instance_id
 }
 
-resource "aws_ebs_volume" "ebsdb_appshare" {
-  lifecycle { ignore_changes = [kms_key_id] }
-  availability_zone = module.oracle_ebs_db.availability_zone
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_appshare
-  type              = "gp3"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-appshare", device-name = "/dev/sdq" })
-}
-
-resource "aws_volume_attachment" "ebsdb_appshare" {
-  device_name = "/dev/sdq"
-  volume_id   = aws_ebs_volume.ebsdb_appshare.id
-  instance_id = module.oracle_ebs_db.instance_id
-}
-
 resource "aws_ebs_volume" "ebsdb_home" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_home
   type              = "gp3"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-home", device-name = "/dev/sdr" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-home", device-name = "/dev/sdd" })
 }
 
 resource "aws_volume_attachment" "ebsdb_home" {
-  device_name = "/dev/sdr"
+  device_name = "/dev/sdd"
   volume_id   = aws_ebs_volume.ebsdb_home.id
   instance_id = module.oracle_ebs_db.instance_id
 }
 
 resource "aws_ebs_volume" "ebsdb_temp" {
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle {
+    ignore_changes  = [kms_key_id]
+    prevent_destroy = true
+  }
   availability_zone = module.oracle_ebs_db.availability_zone
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_temp
   type              = "gp3"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-temp", device-name = "/dev/sds" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-temp", device-name = "/dev/sdc" })
 }
 
 resource "aws_volume_attachment" "ebsdb_temp" {
-  device_name = "/dev/sds"
+  device_name = "/dev/sdc"
   volume_id   = aws_ebs_volume.ebsdb_temp.id
   instance_id = module.oracle_ebs_db.instance_id
 }

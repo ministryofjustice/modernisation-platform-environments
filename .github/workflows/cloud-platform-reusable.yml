@@ -53,6 +53,10 @@ jobs:
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
       runner: "octo-production"
+      # Root manages the centralised AMG workspace and its Grafana-internal
+      # objects (teams, data sources, permissions), so the Grafana provider needs
+      # a short-lived service account token. No-op on workspaces without AMG.
+      mint_grafana_token: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}

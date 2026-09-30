@@ -56,6 +56,11 @@
             required: false
             default: false
             description: "Optional: set to true when the caller already fetched secrets and is passing them in via ENVIRONMENT_MANAGEMENT/GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT secrets, to skip fetching them again here."
+          mint_grafana_token:
+            type: boolean
+            required: false
+            default: false
+            description: "Optional: set to true when the component manages Amazon Managed Grafana objects with the Grafana provider. Mints a short-lived AMG service account token into GRAFANA_AUTH and sets TF_VAR_grafana_url. No-op when the workspace has no AMG workspace."
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_ID:
             required: true
@@ -82,7 +87,7 @@
       # Skipped when a caller has already fetched secrets and passed them in (inputs.secrets_prefetched)
       fetch-secrets:
         if: ${{ inputs.secrets_prefetched != true }}
-        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@2988728879704953e739f82ac926d37931c6d01b # v6.1.9
+        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@2caea529829b1a7959afd2c16da632b0ea7308dc # v6.2.6
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -115,7 +120,7 @@
               echo "SKIP_PLAN_EVALUATOR=${SKIP_PLAN_EVALUATOR}" >> $GITHUB_ENV
 
           - name: Decrypt Secrets
-            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@2988728879704953e739f82ac926d37931c6d01b # v6.1.9
+            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@2caea529829b1a7959afd2c16da632b0ea7308dc # v6.2.6
             with:
               environment_management: ${{ needs.fetch-secrets.outputs.environment_management || secrets.ENVIRONMENT_MANAGEMENT }}
               github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat || secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
@@ -137,7 +142,7 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c  # v6.2.4
+            uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd  # v6.3.0
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-plan"
               role-session-name: "githubactionsplanrolesession"
@@ -166,6 +171,19 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform workspace select "${WORKSPACE_NAME}"
+
+          #
+          # Mint AMG Service Account Token (Optional)
+          #
+          # Components that manage Grafana-internal objects need the Grafana
+          # provider authenticated. AMG service account tokens are short-lived
+          # (max 30 days), so one is minted per run rather than stored. The AMG
+          # workspace is discovered by name, so no extra inputs are needed, and
+          # this no-ops where there is no AMG workspace or service account.
+          #
+          - name: Mint AMG Service Account Token (Optional)
+            if: inputs.mint_grafana_token == true
+            run: bash "${GITHUB_WORKSPACE}/scripts/mint-grafana-token.sh"
 
           #
           # Optional State Refresh
@@ -309,6 +327,13 @@
                 Guidance on approving these PRs is available at https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/reviewing-mp-environments-prs.html#process-for-approving-prs`
                 });
 
+          # Runs even when earlier steps failed: AMG counts expired-but-undeleted
+          # tokens against the per-service-account quota, so a leaked token on a
+          # failed run still consumes quota. Never fails the job.
+          - name: Delete AMG Service Account Token (Optional)
+            if: always() && inputs.mint_grafana_token == true
+            run: bash "${GITHUB_WORKSPACE}/scripts/delete-grafana-token.sh"
+
       #
       # The "apply" job (only runs if plan_exitcode == 2 => changes present)
       #
@@ -324,7 +349,7 @@
             uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
           
           - name: Decrypt Secrets
-            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@2988728879704953e739f82ac926d37931c6d01b # v6.1.9
+            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@2caea529829b1a7959afd2c16da632b0ea7308dc # v6.2.6
             with:
               environment_management: ${{ needs.fetch-secrets.outputs.environment_management || secrets.ENVIRONMENT_MANAGEMENT }}
               PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -342,7 +367,7 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c  # v6.2.4
+            uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd  # v6.3.0
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-apply"
               role-session-name: "githubactionsrolesession"
@@ -366,6 +391,13 @@
             run: |
               terraform workspace select "${WORKSPACE_NAME}"
 
+          # See the equivalent step in the plan job for rationale. Runs before
+          # Terraform Plan so GRAFANA_AUTH/TF_VAR_grafana_url are set when the
+          # Grafana provider is evaluated.
+          - name: Mint AMG Service Account Token (Optional)
+            if: inputs.mint_grafana_token == true
+            run: bash "${GITHUB_WORKSPACE}/scripts/mint-grafana-token.sh"
+
           - name: Terraform Plan
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
@@ -381,3 +413,8 @@
               tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
               echo "terraform apply ${tf_args}"
               terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+          # See the equivalent step in the plan job for rationale.
+          - name: Delete AMG Service Account Token (Optional)
+            if: always() && inputs.mint_grafana_token == true
+            run: bash "${GITHUB_WORKSPACE}/scripts/delete-grafana-token.sh"
