@@ -626,3 +626,32 @@ resource "aws_lambda_permission" "allow_eventbridge_specials_remediation" {
     each.key
   ].arn
 }
+
+# ------------------------------------------------------------------------------
+# Rolling downstream position reconciliation
+# ------------------------------------------------------------------------------
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_rolling"
+
+  description = (
+    "Runs staged MDSS, AC and EMDI position reconciliation every 30 minutes"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = "rate(30 minutes)"
+
+  target {
+    arn      = aws_sfn_state_machine.downstream_reconciliation.arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({})
+  }
+}
