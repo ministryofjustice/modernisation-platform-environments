@@ -4,8 +4,8 @@
 #   SELECT * FROM alb_access_logs WHERE lb = 'ccms-pui' AND day = '2026/09/29' LIMIT 100;
 
 module "athena" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/7ecf91e
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/athena?ref=7ecf91e"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/774b87b
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/athena?ref=774b87b"
 
   name             = local.application_name
   bucket_name      = module.s3_lb_access_logs.bucket.id
