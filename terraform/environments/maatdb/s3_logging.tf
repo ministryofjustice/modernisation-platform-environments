@@ -32,24 +32,46 @@ module "s3-bucket-logging" {
           }
         }
       },
-      {
-          Sid    = "AllowS3Logging Access Logs",
-          Effect = "Allow",
-          Principal = {
-            Service = "logging.s3.amazonaws.com"
-          },
-          Action = "s3:PutObject",
-          Resource = [
-            module.s3-bucket-logging.bucket.arn,
-            "${module.s3-bucket-logging.bucket.arn}/*"
-          ],
-          Condition = {
-            ArnLike = {
-              "aws:SourceArn" = local.s3_access_logs_source_arns
-            }
-          }
+    {
+      Sid     = "AllowS3Logging Shared Bucket"
+      Effect  = "Allow"
+      Actions = ["s3:PutObject"]
+      Principal = {
+        AWS = "*"
       }
-    ]
+      Resource = [
+        "${module.s3-bucket-logging.bucket.arn}/*",
+        module.s3-bucket-logging.bucket.arn
+      ]
+      Condition = {
+        StringLike = {
+          "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+        }
+      }
+    },
+    {
+      Sid     = "AllowS3Logging FTP Buckets"
+      Effect  = "Allow"
+      Actions = ["s3:PutObject"]
+      Principal = {
+        AWS = "*"
+      }
+      Resource = [
+        "${module.s3-bucket-logging.bucket.arn}/*",
+        module.s3-bucket-logging.bucket.arn
+      ]
+
+      Condition = {
+        StringLike = {
+          "aws:SourceArn" = flatten([
+            for ftp_bucket in values(module.s3_bucket) : [
+              ftp_bucket.bucket.arn
+            ]
+          ])
+        }
+      }
+    }
+  ]
   })]
 
   sse_algorithm  = "AES256"
