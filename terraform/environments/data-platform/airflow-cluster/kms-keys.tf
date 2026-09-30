@@ -46,7 +46,6 @@ module "eks_ebs_kms_key" {
   enable_default_policy = true
 
   key_service_roles_for_autoscaling = [
-    aws_iam_service_linked_role.autoscaling.arn,
     module.eks.cluster_iam_role_arn
   ]
 
@@ -85,8 +84,6 @@ module "eks_ebs_kms_key" {
   ]
 
   deletion_window_in_days = 7
-
-  depends_on = [aws_iam_service_linked_role.autoscaling]
 }
 
 module "karpenter_sqs_kms_key" {
