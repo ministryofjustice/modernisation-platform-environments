@@ -45,6 +45,7 @@ su ec2-user bash -c "cp $EFS_MOUNT_POINT/laa-ccms-app-soa/monitoring/* $EFS_MOUN
 
 #--Make S3 integration dirs and mount S3
 sudo sed -i '/^#.*user_allow_other/s/^#//' /etc/fuse.conf
+dnf install -y mount-s3
 mkdir -p $INBOUND_S3_MOUNT_POINT
 mkdir -p $OUTBOUND_S3_MOUNT_POINT
 chmod 777 $INBOUND_S3_MOUNT_POINT
