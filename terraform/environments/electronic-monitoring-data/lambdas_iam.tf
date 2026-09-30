@@ -17,6 +17,11 @@ locals {
     "data_insights${local.dbt_suffix}"
   ]
 
+  clean_after_dlt_load_databases = [
+    "allied_mdss${local.db_suffix}",
+    "serco_fms${local.db_suffix}"
+  ]
+
 }
 
 # ------------------------------------------
@@ -1282,6 +1287,8 @@ data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document
       "glue:GetTables",
       "glue:GetTable",
       "glue:GetDatabase",
+      "glue:GetPartition",
+      "glue:GetPartitions",
       "glue:UpdateTable",
       "glue:DeleteTable",
       "glue:DeleteDatabase",
@@ -1299,6 +1306,9 @@ data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document
     effect = "Allow"
     actions = [
       "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload",
       "s3:GetObject",
       "s3:PutObject",
       "s3:DeleteObject",
@@ -1339,6 +1349,30 @@ resource "aws_iam_policy" "clean_after_dlt_load_lambda_role_policy" {
 resource "aws_iam_role_policy_attachment" "clean_after_dlt_load_lambda_policy_attachment" {
   role       = aws_iam_role.clean_after_dlt_load.name
   policy_arn = aws_iam_policy.clean_after_dlt_load_lambda_role_policy.arn
+}
+
+# Lake Formation admin status grants authority to grant, not data access.
+# ALTER, INSERT and DELETE are required for Athena OPTIMIZE / VACUUM on the Iceberg _dlt_loads table.
+resource "aws_lakeformation_permissions" "clean_after_dlt_load_table_access" {
+  for_each = toset(local.clean_after_dlt_load_databases)
+
+  principal   = aws_iam_role.clean_after_dlt_load.arn
+  permissions = ["SELECT", "DESCRIBE", "ALTER", "INSERT", "DELETE"]
+
+  table {
+    database_name = each.value
+    name          = "_dlt_loads"
+  }
+}
+
+# OPTIMIZE / VACUUM rewrite and delete data files, so the role needs data-location access.
+resource "aws_lakeformation_permissions" "clean_after_dlt_load_data_location" {
+  principal   = aws_iam_role.clean_after_dlt_load.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
 }
 
 #-----------------------------------------------------------------------------------
