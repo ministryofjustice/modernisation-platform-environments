@@ -10,10 +10,13 @@ from threading import Barrier
 import boto3
 import pytest
 import runtime
+from aws_lambda_powertools import Metrics
+from aws_lambda_powertools.metrics import MetricUnit
 from boto3.dynamodb.types import TypeSerializer
 from botocore.exceptions import ClientError
 from botocore.stub import Stubber
 from mft_writer import copy as copy_module
+from mft_writer import worker as worker_module
 from runtime import (
     ActionStore,
     InvalidMessage,
@@ -291,8 +294,8 @@ class FakeServices:
         return self.s3
 
 
-def writer_config(monkeypatch, *, reporter=False):
-    values = environment(reporter=reporter)
+def writer_config(monkeypatch, *, reporter=False, action_name="push-to-s3"):
+    values = environment(action_name=action_name, reporter=reporter)
     for key, value in values.items():
         monkeypatch.setenv(key, value)
     return runtime.WriterConfig.from_environment(os.environ, reporter=reporter)
@@ -898,6 +901,56 @@ def test_reporter_retries_failed_completion_without_changing_terminal_state(monk
     assert process_reporter_record(record(queue_arn=DLQ_ARN), config, services, Context()) == "failed-republished"
     assert services.eventbridge.calls[1]["Entries"][0]["Detail"] == first_detail
     assert services.table.items[action_id]["state"] == "FAILED"
+
+
+@pytest.mark.parametrize("action_name", ["push-to-s3", "push-to-s3-with-hosted-pickup"])
+@pytest.mark.parametrize("fail_publish_first", [False, True], ids=["first-publication", "retry"])
+def test_reporter_emits_delivery_failed_only_after_publishing(monkeypatch, action_name, fail_publish_first):
+    writer_config(monkeypatch, reporter=True, action_name=action_name)
+    services = FakeServices(fail_publish_first=fail_publish_first)
+    event = requested_event()
+    event["detail"]["data"]["action"]["name"] = action_name
+    dlq_event = {"Records": [record(event, queue_arn=DLQ_ARN)]}
+    emitted = []
+    dimensions = []
+    metrics = Metrics(namespace="ManagedFileTransfer")
+    metrics.clear_metrics()
+    monkeypatch.setattr(worker_module, "metrics", metrics)
+    monkeypatch.setattr(metrics, "add_metric", lambda **metric: emitted.append(metric))
+    monkeypatch.setattr(metrics, "add_dimension", lambda **dimension: dimensions.append(dimension))
+
+    first_result = runtime.process_reporter_event(dlq_event, Context(), services)
+    delivery_failures = [metric for metric in emitted if metric["name"] == "DeliveryFailed"]
+    if fail_publish_first:
+        assert first_result == {"batchItemFailures": [{"itemIdentifier": "sqs-message-id"}]}
+        assert delivery_failures == []
+        assert runtime.process_reporter_event(dlq_event, Context(), services) == {"batchItemFailures": []}
+        delivery_failures = [metric for metric in emitted if metric["name"] == "DeliveryFailed"]
+    else:
+        assert first_result == {"batchItemFailures": []}
+
+    assert delivery_failures == [{"name": "DeliveryFailed", "unit": MetricUnit.Count, "value": 1}]
+    assert dimensions == [{"name": "ActionName", "value": action_name}] * (2 if fail_publish_first else 1)
+    assert json.loads(services.eventbridge.calls[-1]["Entries"][0]["Detail"])["data"]["status"] == "failed"
+    metrics.clear_metrics()
+
+
+@pytest.mark.parametrize("terminal_state", ["COPIED", "SUCCEEDED"])
+def test_reporter_does_not_emit_delivery_failed_for_success(monkeypatch, terminal_state):
+    config = writer_config(monkeypatch, reporter=True)
+    services = FakeServices()
+    seed_state(config, services.table, terminal_state, lease_until=0)
+    emitted = []
+    metrics = Metrics(namespace="ManagedFileTransfer")
+    metrics.clear_metrics()
+    monkeypatch.setattr(worker_module, "metrics", metrics)
+    monkeypatch.setattr(metrics, "add_metric", lambda **metric: emitted.append(metric))
+
+    assert runtime.process_reporter_event(
+        {"Records": [record(queue_arn=DLQ_ARN)]}, Context(), services
+    ) == {"batchItemFailures": []}
+    assert not [metric for metric in emitted if metric["name"] == "DeliveryFailed"]
+    metrics.clear_metrics()
 
 
 def test_writer_returns_partial_batch_failures(monkeypatch):
