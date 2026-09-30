@@ -86,6 +86,6 @@ resource "aws_lambda_permission" "allow_ad_lockout_log_invoke" {
 resource "aws_cloudwatch_log_subscription_filter" "ad_account_lockouts_slack" {
   name            = "${local.application_name}-${local.environment}-ad-account-lockouts-slack"
   log_group_name  = aws_cloudwatch_log_group.ad_logs.name
-  filter_pattern  = "4740"
+  filter_pattern  = "\"<EventID>4740</EventID>\""
   destination_arn = aws_lambda_function.workspace_event_slack.arn
 }

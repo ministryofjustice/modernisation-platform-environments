@@ -2,6 +2,7 @@ import base64
 import gzip
 import json
 import os
+import xml.etree.ElementTree as ET
 import urllib.request
 
 import boto3
@@ -30,15 +31,27 @@ def get_secret(secret_name: str) -> str:
         return secret_value
 
 
-def _extract_workspace_message(log_message: str, log_group: str = "") -> dict:
+def _extract_workspace_message(log_message: str, log_group: str = "") -> dict | None:
     if "/aws/directoryservice/" in log_group:
-        return {
-            "text": (
-                "WorkSpaces account locked out (AD event 4740)\n"
-                f"Log group: {log_group}\n"
-                f"Details: {log_message[:3000]}"
-            )
+        try:
+            event = ET.fromstring(log_message)
+        except ET.ParseError:
+            return None
+
+        event_id = next(
+            (node.text for node in event.iter() if node.tag.endswith("EventID")),
+            None,
+        )
+        if event_id != "4740":
+            return None
+
+        event_data = {
+            node.get("Name"): node.text
+            for node in event.iter()
+            if node.tag.endswith("Data") and node.get("Name")
         }
+        username = event_data.get("TargetUserName") or "unknown user"
+        return {"text": f"WorkSpaces account locked: {username}"}
 
     try:
         payload = json.loads(log_message)
@@ -94,7 +107,8 @@ def lambda_handler(event, context):
         message = _extract_workspace_message(
             log_event.get("message", ""), log_data.get("logGroup", "")
         )
-        messages.append(message)
+        if message:
+            messages.append(message)
 
     if not messages:
         return {"statusCode": 200, "body": "No tracked AWS events found"}
