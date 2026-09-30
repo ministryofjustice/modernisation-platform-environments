@@ -527,6 +527,7 @@ updates:
       - "terraform/environments/data-platform"
       - "terraform/environments/data-platform/ai-gateway"
       - "terraform/environments/data-platform/airflow"
+      - "terraform/environments/data-platform/airflow-cluster"
       - "terraform/environments/data-platform/app"
       - "terraform/environments/data-platform/cluster"
       - "terraform/environments/data-platform/cluster/modules/kubernetes/namespace"
