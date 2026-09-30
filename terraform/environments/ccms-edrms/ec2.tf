@@ -70,13 +70,19 @@ resource "aws_launch_template" "ec2-launch-template" {
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   name                = "${local.application_name}-auto-scaling-group"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
-  desired_capacity    = 2
-  max_size            = 3
-  min_size            = 2
+  desired_capacity    = local.ecs_asg_desired_capacity
+  max_size            = local.ecs_asg_max_size
+  min_size            = local.ecs_asg_min_size
 
+  # validate min_size <= desired_capacity <= max_size
+  lifecycle {
+    precondition {
+      condition     = local.ecs_asg_desired_capacity >= local.ecs_asg_min_size && local.ecs_asg_desired_capacity <= local.ecs_asg_max_size
+      error_message = "Desired capacity must be greater than or equal to the minimum size and less than or equal to the maximum size."
+    }
+  }
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
     version = "$Latest"
   }
-
 }
