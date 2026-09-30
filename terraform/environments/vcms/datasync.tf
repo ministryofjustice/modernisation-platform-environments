@@ -14,6 +14,7 @@ module "s3_bucket_efs_migration" {
         "s3:PutObject",
         "s3:GetObject",
         "s3:ListBucket",
+        "s3:DeleteObject",
         "s3:GetBucketLocation",
         "s3:ListBucketMultipartUploads",
         "s3:ListMultipartUploadParts"
