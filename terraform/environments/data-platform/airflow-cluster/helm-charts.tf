@@ -394,27 +394,6 @@ resource "helm_release" "external_secrets_secret_stores" {
   depends_on = [helm_release.external_secrets]
 }
 
-resource "helm_release" "shared_services_gateway" {
-  name      = "shared-services-gateway"
-  chart     = "./src/helm/charts/shared-services-gateway"
-  namespace = module.shared_services_namespace.name
-  timeout    = local.helm_timeout
-
-  values = [
-    templatefile(
-      "${path.module}/configuration/helm/shared-services-gateway/values.yml.tftpl",
-      {
-        gateway_hostname = local.cluster_configuration.shared_services_gateway_hostname
-      }
-    )
-  ]
-  depends_on = [
-    helm_release.cert_manager,
-    helm_release.external_dns,
-    helm_release.gateway_configuration
-  ]
-}
-
 resource "helm_release" "keda" {
   /* https://artifacthub.io/packages/helm/kedacore/keda */
 
