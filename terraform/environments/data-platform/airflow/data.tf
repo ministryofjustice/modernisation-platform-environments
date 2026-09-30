@@ -60,7 +60,7 @@ data "aws_eks_cluster_auth" "dp_cluster" {
 
 # KMS
 data "aws_kms_key" "common_secrets_manager_kms" {
-  key_id = "alias/secretsmanager/data-platform-test/common"
+  key_id = "alias/secretsmanager/data-platform-${local.environment}/common"
 }
 
 
