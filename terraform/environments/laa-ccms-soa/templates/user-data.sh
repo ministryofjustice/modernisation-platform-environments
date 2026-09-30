@@ -54,13 +54,6 @@ chown -R 1000:1000 $OUTBOUND_S3_MOUNT_POINT
 mount-s3 ${inbound_bucket} $INBOUND_S3_MOUNT_POINT --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
 mount-s3 ${outbound_bucket} $OUTBOUND_S3_MOUNT_POINT --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
 
-# s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o allow_other -o multireq_max=5 -o use_cache=/tmp -o uid=1000 -o gid=1000 ${inbound_bucket} $INBOUND_S3_MOUNT_POINT
-# s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o allow_other -o multireq_max=5 -o use_cache=/tmp -o uid=1000 -o gid=1000 ${outbound_bucket} $OUTBOUND_S3_MOUNT_POINT
-
-#--Add S3 mounts to fstab (incase of reboot)
-# echo s3fs#${inbound_bucket} $EC2_USER_HOME_FOLDER/inbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
-# echo s3fs#${outbound_bucket} $EC2_USER_HOME_FOLDER/outbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
-
 #--Create essential subdirs in S3 Bucket
 mkdir -p \
   $INBOUND_S3_MOUNT_POINT/archive \
