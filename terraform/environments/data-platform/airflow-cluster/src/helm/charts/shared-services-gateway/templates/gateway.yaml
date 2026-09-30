@@ -1,0 +1,31 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: shared-gateway
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+spec:
+  gatewayClassName: cilium
+  infrastructure:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-name: shared-gateway
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+      service.beta.kubernetes.io/aws-load-balancer-attributes: load_balancing.cross_zone.enabled=true
+      external-dns.alpha.kubernetes.io/hostname: "{{ .Values.gatewayHostname }}"
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "{{ .Values.gatewayHostname }}"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: shared-gateway-tls
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              compute.data-platform.service.justice.gov.uk/shared-gateway-enabled: "true"
