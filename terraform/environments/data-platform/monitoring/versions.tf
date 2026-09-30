@@ -9,7 +9,7 @@ terraform {
       source  = "hashicorp/dns"
     }
     external = {
-      version = "~> 2.0"
+      version = "~> 3.2"
       source  = "hashicorp/external"
     }
     grafana = {
@@ -25,7 +25,7 @@ terraform {
       source  = "hashicorp/helm"
     }
     kubernetes = {
-      version = "~> 2.0"
+      version = "~> 3.2"
       source  = "hashicorp/kubernetes"
     }
   }
