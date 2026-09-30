@@ -31,10 +31,10 @@ def get_secret(secret_name: str) -> str:
 
 
 def _extract_workspace_message(log_message: str, log_group: str = "") -> dict:
-    if "linotp3" in log_group:
+    if "/aws/directoryservice/" in log_group:
         return {
             "text": (
-                "RADIUS/MFA authentication rejection\n"
+                "WorkSpaces account locked out (AD event 4740)\n"
                 f"Log group: {log_group}\n"
                 f"Details: {log_message[:3000]}"
             )
@@ -44,7 +44,7 @@ def _extract_workspace_message(log_message: str, log_group: str = "") -> dict:
         payload = json.loads(log_message)
     except json.JSONDecodeError:
         return {
-            "text": f"Failed authentication/MFA event\nLog group: {log_group}\nDetails: {log_message}"
+            "text": f"CloudWatch log event\nLog group: {log_group}\nDetails: {log_message[:3000]}"
         }
 
     detail = payload.get("detail", {})

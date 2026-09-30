@@ -74,3 +74,18 @@ resource "aws_directory_service_log_subscription" "ad_logs" {
   directory_id   = aws_directory_service_directory.workspaces_ad.id
   log_group_name = aws_cloudwatch_log_group.ad_logs.name
 }
+
+resource "aws_lambda_permission" "allow_ad_lockout_log_invoke" {
+  statement_id  = "AllowExecutionFromDirectoryServiceLockoutLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.workspace_event_slack.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "${aws_cloudwatch_log_group.ad_logs.arn}:*"
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "ad_account_lockouts_slack" {
+  name            = "${local.application_name}-${local.environment}-ad-account-lockouts-slack"
+  log_group_name  = aws_cloudwatch_log_group.ad_logs.name
+  filter_pattern  = "4740"
+  destination_arn = aws_lambda_function.workspace_event_slack.arn
+}

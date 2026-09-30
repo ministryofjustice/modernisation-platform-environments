@@ -189,18 +189,3 @@ resource "aws_ecs_service" "linotp3" {
     { "Name" = "${local.application_name}-${local.environment}-linotp3-service" }
   )
 }
-
-resource "aws_lambda_permission" "allow_radius_auth_log_invoke" {
-  statement_id  = "AllowExecutionFromRadiusLogs"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.workspace_event_slack.function_name
-  principal     = "logs.amazonaws.com"
-  source_arn    = "arn:aws:logs:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:log-group:${data.terraform_remote_state.workspace_components.outputs.ecs_cloudwatch_log_group_name}:*"
-}
-
-resource "aws_cloudwatch_log_subscription_filter" "radius_mfa_failures_slack" {
-  name            = "${local.application_name}-${local.environment}-radius-mfa-failures-slack"
-  log_group_name  = data.terraform_remote_state.workspace_components.outputs.ecs_cloudwatch_log_group_name
-  filter_pattern  = "?Access-Reject ?incorrect"
-  destination_arn = aws_lambda_function.workspace_event_slack.arn
-}
