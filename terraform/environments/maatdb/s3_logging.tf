@@ -3,43 +3,36 @@ module "s3-bucket-logging" {
 
   bucket_name        = "${local.application_name}-${local.environment}-logging"
   versioning_enabled = true
-  bucket_policy = [
-    jsonencode({
-      Version = "2012-10-17",
-      Statement = [
-        {
-          Sid       = "DenyInsecureTransport",
-          Effect    = "Deny",
-          Principal = "*",
-          Action    = "s3:*",
-          Resource = [
-            "${module.s3-bucket-logging.bucket.arn}/*",
-            module.s3-bucket-logging.bucket.arn
-          ],
-          Condition = {
-            Bool = {
-              "aws:SecureTransport" = "false"
-            }
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport",
+        Effect    = "Deny",
+        Principal = "*",
+        Action    = "s3:*",
+        Resource  = ["${module.s3-bucket-shared.bucket.arn}/*", module.s3-bucket-shared.bucket.arn],
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
           }
+        }
+      },
+      {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
         },
-        {
-          Sid    = "EnforceTLSv12orHigher",
-          Effect = "Deny",
-          Principal = {
-            AWS = "*"
-          },
-          Action = "s3:*",
-          Resource = [
-            "${module.s3-bucket-logging.bucket.arn}/*",
-            module.s3-bucket-logging.bucket.arn
-          ],
-          Condition = {
-            NumericLessThan = {
-              "s3:TlsVersion" = "1.2"
-            }
+        Action   = "s3:*",
+        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", module.s3-bucket-shared.bucket.arn],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
           }
-        },
-        {
+        }
+      },
+      {
           Sid    = "AllowS3Logging Access Logs",
           Effect = "Allow",
           Principal = {
@@ -55,8 +48,8 @@ module "s3-bucket-logging" {
               "aws:SourceArn" = local.s3_access_logs_source_arns
             }
           }
-        }
-      ]
+      }
+    ]
   })]
 
   sse_algorithm  = "AES256"
