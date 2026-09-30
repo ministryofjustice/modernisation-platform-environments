@@ -505,6 +505,25 @@ locals {
               }
             }
           }
+        },
+        "eucs" = {
+          "identity_centre_team" = "eucs-modern-workplace-admins",
+          "aws_accounts" = {
+            "eucs-appstream-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "eucs-appstream-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            }
+          }
         }
       }
       grafana_version                 = "10.4"
