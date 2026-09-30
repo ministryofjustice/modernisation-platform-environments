@@ -199,7 +199,6 @@ resource "kubernetes_cluster_role_binding" "this" {
 }
 
 # Get account information #
-data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}
 
 # Get EKS cluster #
