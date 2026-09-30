@@ -31,8 +31,8 @@ locals {
   lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
 
   # Source ARNs for S3 access logs, used in bucket policies to allow logging
-  s3_access_logs_source_arns = concat([
-    [module.s3-bucket-shared.bucket.arn],
-    [for ftp_bucket in values(module.s3_bucket) : ftp_bucket.bucket.arn]
-  ])
+  # s3_access_logs_source_arns = concat([
+  #   [module.s3-bucket-shared.bucket.arn],
+  #   [for ftp_bucket in values(module.s3_bucket) : ftp_bucket.bucket.arn]
+  # ])
 }
