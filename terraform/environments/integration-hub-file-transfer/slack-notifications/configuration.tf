@@ -36,6 +36,7 @@ data "aws_secretsmanager_secret" "dispatch" {
 
 # Populate {"url":"https://hooks.slack.com/services/..."} outside Terraform.
 resource "aws_secretsmanager_secret" "webhook" {
+  #checkov:skip=CKV2_AWS_57:Externally issued Slack webhook; revoke/reissue in Slack and replace this secret. No AWS-managed rotation is available.
   for_each                = local.recipients
   name                    = "${local.application_name}/slack-pickup/${each.key}"
   description             = "Slack incoming webhook for authenticated pickup notifications"
