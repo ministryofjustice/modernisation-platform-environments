@@ -1,7 +1,7 @@
 module "lambda_file_mover" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   architectures                     = ["arm64"]
   attach_tracing_policy             = true
@@ -130,7 +130,7 @@ resource "aws_lambda_event_source_mapping" "push_to_s3" {
 module "lambda_dlq_reporter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   architectures                     = ["arm64"]
   attach_tracing_policy             = true
