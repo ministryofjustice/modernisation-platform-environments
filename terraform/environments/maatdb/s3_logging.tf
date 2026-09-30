@@ -1,12 +1,64 @@
 module "s3-bucket-logging" {
-  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_name        = "${local.application_name}-${local.environment}-logging"
   versioning_enabled = true
   bucket_policy = [
-    aws_s3_bucket_policy.lb_access_logs.policy
-  ]
+    jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Sid       = "DenyInsecureTransport",
+          Effect    = "Deny",
+          Principal = "*",
+          Action    = "s3:*",
+          Resource = [
+            "${module.s3-bucket-logging.bucket.arn}/*",
+            module.s3-bucket-logging.bucket.arn
+          ],
+          Condition = {
+            Bool = {
+              "aws:SecureTransport" = "false"
+            }
+          }
+        },
+        {
+          Sid    = "EnforceTLSv12orHigher",
+          Effect = "Deny",
+          Principal = {
+            AWS = "*"
+          },
+          Action = "s3:*",
+          Resource = [
+            "${module.s3-bucket-logging.bucket.arn}/*",
+            module.s3-bucket-logging.bucket.arn
+          ],
+          Condition = {
+            NumericLessThan = {
+              "s3:TlsVersion" = "1.2"
+            }
+          }
+        },
+        {
+          Sid    = "AllowS3Logging Access Logs",
+          Effect = "Allow",
+          Principal = {
+            Service = "logging.s3.amazonaws.com"
+          },
+          Action = "s3:PutObject",
+          Resource = [
+            module.s3-bucket-logging.bucket.arn,
+            "${module.s3-bucket-logging.bucket.arn}/*"
+          ],
+          Condition = {
+            ArnLike = {
+              "aws:SourceArn" = local.s3_access_logs_source_arns
+            }
+          }
+        }
+      ]
+  })]
+
   sse_algorithm  = "AES256"
   custom_kms_key = ""
   # Refer to the below section "Replication" before enabling replication
@@ -49,93 +101,7 @@ module "s3-bucket-logging" {
   )
 }
 
-data "aws_iam_policy_document" "lb_access_logs_policy" {
-  # default statements - deny insecure transport and tls < 1.2
-  statement {
-    sid     = "DenyInsecureTransport"
-    effect  = "Deny"
-    actions = ["s3:*"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
-  }
-  statement {
-    sid     = "EnforceTLSv12orHigher"
-    effect  = "Deny"
-    actions = ["s3:*"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-    condition {
-      test     = "NumericLessThan"
-      variable = "aws:TLSVersion"
-      values   = ["1.2"]
-    }
-  }
-
-  # Per-Bucket Statements
-  ## Shared Bucket
-  statement {
-    sid     = "AllowS3Logging Shared Bucket"
-    effect  = "Allow"
-    actions = ["s3:PutObject"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-    condition {
-      test = "StringLike"
-      variable = "aws:SourceArn"
-      values   = [module.s3-bucket-shared.bucket.arn]
-    }
-  }
-
-  ## FTP Buckets
-  statement {
-    sid     = "AllowS3Logging FTP Buckets"
-    effect  = "Allow"
-    actions = ["s3:PutObject"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-
-    condition {
-      test     = "StringLike"
-      variable = "aws:SourceArn"
-      values   = flatten([
-        for ftp_bucket in values(module.s3_bucket) : [
-          ftp_bucket.bucket.arn
-        ]
-      ])
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "lb_access_logs" {
-    bucket = module.s3-bucket-logging.bucket.id
-    policy = data.aws_iam_policy_document.lb_access_logs_policy.json
+moved {
+  from = aws_s3_bucket_policy.lb_access_logs
+  to   = module.s3-bucket-logging.bucket_policy
 }
