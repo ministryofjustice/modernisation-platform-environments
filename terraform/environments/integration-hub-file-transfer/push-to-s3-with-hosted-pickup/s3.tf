@@ -1,7 +1,7 @@
 module "s3_hosted_pickup" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.15.4"
+  version = "5.16.1"
 
   for_each = local.hosted_pickup_entries
 
