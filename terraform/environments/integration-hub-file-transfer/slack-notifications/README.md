@@ -5,6 +5,22 @@ reports a clean file. The link opens the existing MFT Transfer Family web app; i
 is not a presigned S3 URL or a direct download capability. Users select the file at
 the location shown in the notification. No undocumented file deep-link is assumed.
 
+## Confirmed blocker: managed portal download path
+
+On 30 September 2026, inspection of the deployed development portal's public
+JavaScript (`1.0.2614.0/main.js`) showed that its single-file download handler calls
+the storage GetUrl operation and opens the returned expiring URL in a new browser
+window. It therefore exposes a bearer S3 URL after sign-in. This does not satisfy
+the agreed recipient-only requirement.
+
+**This PR is an inactive notification foundation, not a completed download service.**
+The shared configuration rejects all nonempty recipient maps at Terraform plan time.
+No root Access Grants, IAM pickup role or clean-bucket policy/CORS changes are included.
+Do not remove the activation precondition until an approved organisation-SSO streaming
+endpoint is integrated and tested. The endpoint must authorise the user and file on
+each download/range request without returning a presigned redirect. The identity
+provider/application registration and recipient mappings are outstanding inputs.
+
 ## Status and activation gates
 
 Implementation is prepared with **no configured recipients**. It does not currently
@@ -16,17 +32,10 @@ clean prefix, and Slack destination. Agency names or Slack membership alone neve
 grant access. LAA, HMPPS and HMCTS users must be provisioned/federated into the
 existing Identity Center directory and assigned to the web app.
 
-A browser security test is required before enabling production: an authorised user
-must be able to download, an unauthorised user receiving the forwarded portal link
-must be denied, and a pickup-role presigned URL must be denied. The root bucket
-policy rejects query-string authenticated reads made with the pickup role. If the
-managed Transfer web app requires presigned URLs to download, **do not remove that
-guard to make the test pass**. Stop activation and implement an authenticated
-streaming download service instead. That service is not implemented here.
-
-This policy prevents bearer URL downloads with the new pickup role; it is not a
-claim that authorised users cannot export credentials or redistribute downloaded
-bytes. Existing privileged service roles are outside this new grant boundary.
+A live browser test of the replacement endpoint must verify authorised download,
+unauthorised forwarded-link denial, large-file streaming/resume and revocation.
+No claim of protection against an authorised recipient redistributing downloaded
+bytes is made.
 
 ## Architecture and state ownership
 
@@ -38,12 +47,9 @@ bucket, authorised prefix, object version and immutable dispatch secret version.
 The secret must explicitly select the configured recipient. Credentials remain in
 a separate Secrets Manager secret and are never placed in messages or logs.
 
-Root owns the existing web app, clean bucket and Access Grants instance. New root
-resources give explicitly configured recipients read-only access to their clean
-prefixes, through a separate Access Grants role. Clean-bucket CORS allows only the
-existing web app origin and GET/HEAD. Existing upload grants remain unchanged.
-The shared `authenticated-pickup-configuration` module binds notification routing
-and read grants to the same approved prefixes.
+The existing root remains unchanged. The shared configuration reserves the recipient
+mapping contract for the future authenticated service; it currently rejects activation.
+No code in this component authorises browser downloads.
 
 This child state owns encrypted SNS/SQS, three transport DLQs, Lambda, notification
 idempotency, webhook secret metadata and CloudWatch alarms. It looks up parent AWS
@@ -102,11 +108,10 @@ cannot automatically rotate an externally issued Slack incoming webhook.
 
 1. Register `slack-notifications` in the platform environment definition. Wait for
    state provisioning/generated files and reconcile the scaffold in this directory.
-2. Review the root plan and apply approved clean-prefix grants, web-app assignments,
-   CORS and the presigned-query denial. Do not add broad agency-wide grants by default.
-3. Verify the authorised and unauthorised browser paths, forwarded links, signed
-   query denial and a large file download/resume. No unauthenticated link preview
-   should obtain bytes. Investigate compatibility failures before notifying anyone.
+2. Integrate the approved SSO identity provider with a streaming download endpoint,
+   implement recipient-to-file authorisation, and replace the managed portal URL.
+3. Verify authorised/unauthorised browser paths, forwarding, expiry, revocation and
+   large-file interruption/resume. Only then remove the activation precondition.
 4. Populate the dispatch and webhook secrets, then review/apply this component.
    Root and child configuration changes can be selected by the same workflow, so
    approve root first and rerun the child plan if its metadata lookups run too early.
@@ -116,16 +121,14 @@ cannot automatically rotate an externally issued Slack incoming webhook.
    destination before production; alarms currently have no actions, matching the
    existing delivery components.
 
-No live Slack message or grant is part of the local test suite. Removing recipients
-requires applying the root revocation as well as the child change. Already issued
-short-lived AWS sessions can outlive assignment removal; test revocation behaviour
-and agree the session policy during onboarding.
+No live Slack message or grant is part of the local test suite. Recipient removal must revoke download-service authorisation as well as notification
+routing. Test and document session revocation behaviour before enabling recipients.
 
 ## Retry, retention and failure behaviour
 
-The notification URL is the stable SSO portal URL. An authorised recipient can
-reopen it and retry without asking an operator to mint another link. Access and
-file availability are checked by the portal/AWS services. Link reuse does not extend
+The intended notification URL is a stable SSO download-service URL. An authorised recipient can
+reopen it and retry without asking an operator to mint another link. The download service must check access and
+file availability; that service is not part of this foundation. Link reuse does not extend
 retention. The current clean bucket expires current and noncurrent versions after
 one day, with asynchronous lifecycle removal. The worker skips dispatch events
 older than 12 hours rather than sending old DLQ notifications; this is an age guard,

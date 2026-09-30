@@ -1,6 +1,6 @@
 # Secure clean-file download notifications
 
-Status: organisation SSO selected on 30 September 2026. The [Slack pickup component](../slack-notifications/README.md) is implemented with no recipient mappings enabled. Component registration and live browser security validation remain deployment gates. The assessment below records the original options and constraints.
+Status: organisation SSO selected on 30 September 2026. The [Slack pickup component](../slack-notifications/README.md) is implemented with no recipient mappings enabled. The deployed managed portal was found to use expiring S3 URLs for single-file downloads. Activation is blocked by a Terraform precondition until a separate SSO streaming endpoint is implemented; no new root download grants are included. Component registration and live browser security validation remain deployment gates. The assessment below records the original options and constraints.
 
 ## Decision required
 
