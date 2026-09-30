@@ -20,7 +20,7 @@ resource "helm_release" "cilium" {
   ]
 
   depends_on = [
-    module.eks,
+    terraform_data.cluster_api_ready,
     helm_release.gateway_api_crds
   ]
 }

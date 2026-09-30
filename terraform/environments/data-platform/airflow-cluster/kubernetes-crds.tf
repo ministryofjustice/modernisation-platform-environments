@@ -81,6 +81,13 @@ data "http" "aws_load_balancer_controller_gateway_crd" {
   url = "https://raw.githubusercontent.com/aws/eks-charts/${local.cluster_configuration.crd_versions.aws_load_balancer_controller}/stable/aws-load-balancer-controller/crds/gateway-crds.yaml"
 }
 
+resource "terraform_data" "cluster_api_ready" {
+  input  = {
+   endpoint = module.eks.cluster_endpoint
+   access = module.eks.access_policy_associations
+  }
+}
+
 resource "helm_release" "gateway_api_crds" {
   name      = "gateway-api-crds"
   chart     = "./src/helm/charts/manifests"
@@ -88,7 +95,7 @@ resource "helm_release" "gateway_api_crds" {
 
   values = [yamlencode({ keep = true, manifests = local.gateway_api_manifests })]
 
-  depends_on = [module.eks]
+  depends_on = [terraform_data.cluster_api_ready]
 }
 
 resource "helm_release" "aws_load_balancer_controller_crds" {
@@ -104,7 +111,7 @@ resource "helm_release" "aws_load_balancer_controller_crds" {
     )
   })]
 
-  depends_on = [module.eks]
+  depends_on = [terraform_data.cluster_api_ready]
 }
 
 resource "helm_release" "prometheus_operator_crd" {
@@ -116,5 +123,5 @@ resource "helm_release" "prometheus_operator_crd" {
 
   values = [yamlencode({ keep = true, manifests = { (each.key) = each.value } })]
 
-  depends_on = [module.eks]
+  depends_on = [terraform_data.cluster_api_ready]
 }
