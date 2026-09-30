@@ -89,7 +89,7 @@ module "eks_ebs_kms_key" {
 module "karpenter_sqs_kms_key" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
 
-  aliases               = ["sqs/karpenter"]
+  aliases               = ["sqs/karpenter/${local.eks_cluster_name}"]
   enable_default_policy = true
 
   key_statements = [
