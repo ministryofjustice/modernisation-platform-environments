@@ -8,6 +8,7 @@ resource "helm_release" "cilium" {
   namespace  = "kube-system"
 
   wait = false
+  timeout    = local.helm_timeout
 
   values = [
     templatefile(
@@ -20,7 +21,7 @@ resource "helm_release" "cilium" {
   ]
 
   depends_on = [
-    module.eks,
+    terraform_data.cluster_api_ready,
     helm_release.gateway_api_crds
   ]
 }
@@ -35,6 +36,7 @@ resource "helm_release" "coredns" {
   namespace  = "kube-system"
 
   wait = false
+  timeout    = local.helm_timeout
 
   values = [
     templatefile(
@@ -52,6 +54,9 @@ resource "helm_release" "kyverno" {
   chart      = "kyverno"
   version    = local.cluster_configuration.helm_chart_versions.kyverno
   namespace  = module.kyverno_namespace.name
+
+  wait = false
+  timeout    = local.helm_timeout
 
   values = [
     templatefile(
@@ -138,7 +143,7 @@ resource "helm_release" "karpenter" {
   chart      = "karpenter"
   version    = local.cluster_configuration.helm_chart_versions.karpenter
   namespace  = module.karpenter_namespace.name
-
+  timeout    = local.helm_timeout
   values = [
     templatefile(
       "${path.module}/configuration/helm/karpenter/values.yml.tftpl",
@@ -200,6 +205,7 @@ resource "helm_release" "aws_load_balancer_controller" {
   chart      = "aws-load-balancer-controller"
   version    = local.cluster_configuration.helm_chart_versions.aws_load_balancer_controller
   namespace  = "kube-system"
+  timeout    = local.helm_timeout
   values = [
     templatefile(
       "${path.module}/configuration/helm/aws-load-balancer-controller/values.yml.tftpl",
@@ -240,6 +246,7 @@ resource "helm_release" "aws_cloudwatch_observability" {
   chart      = "amazon-cloudwatch-observability"
   version    = local.cluster_configuration.helm_chart_versions.aws_cloudwatch_observability
   namespace  = module.aws_cloudwatch_observability_namespace.name
+  timeout    = local.helm_timeout
   values = [
     templatefile(
       "${path.module}/configuration/helm/aws-cloudwatch-observability/values.yml.tftpl",
@@ -265,6 +272,7 @@ resource "helm_release" "prometheus" {
   chart      = "kube-prometheus-stack"
   version    = local.cluster_configuration.helm_chart_versions.kube_prometheus_stack
   namespace  = module.prometheus_namespace.name
+  timeout    = local.helm_timeout
   values = [
     templatefile(
       "${path.module}/configuration/helm/prometheus/values.yml.tftpl",
@@ -287,6 +295,7 @@ resource "helm_release" "fluent_bit" {
   chart      = "aws-for-fluent-bit"
   version    = local.cluster_configuration.helm_chart_versions.fluent_bit
   namespace  = module.fluent_bit_namespace.name
+  timeout    = local.helm_timeout
   values = [
     templatefile(
       "${path.module}/configuration/helm/fluent-bit/values.yml.tftpl",
@@ -308,6 +317,7 @@ resource "helm_release" "cert_manager" {
   chart      = "cert-manager"
   version    = local.cluster_configuration.helm_chart_versions.cert_manager
   namespace  = module.cert_manager_namespace.name
+  timeout    = local.helm_timeout
   values = [
     templatefile(
       "${path.module}/configuration/helm/cert-manager/values.yml.tftpl",
@@ -343,6 +353,7 @@ resource "helm_release" "external_dns" {
   chart      = "external-dns"
   version    = local.cluster_configuration.helm_chart_versions.external_dns
   namespace  = module.external_dns_namespace.name
+  timeout    = local.helm_timeout
   values = [
     templatefile(
       "${path.module}/configuration/helm/external-dns/values.yml.tftpl",
@@ -363,6 +374,7 @@ resource "helm_release" "external_secrets" {
   chart      = "external-secrets"
   version    = local.cluster_configuration.helm_chart_versions.external_secrets
   namespace  = module.external_secrets_namespace.name
+  timeout    = local.helm_timeout
   values = [
     templatefile(
       "${path.module}/configuration/helm/external-secrets/values.yml.tftpl",
@@ -377,28 +389,9 @@ resource "helm_release" "external_secrets_secret_stores" {
   name      = "external-secrets-secret-stores"
   chart     = "./src/helm/charts/external-secrets-secret-stores"
   namespace = module.external_secrets_namespace.name
+  timeout    = local.helm_timeout
 
   depends_on = [helm_release.external_secrets]
-}
-
-resource "helm_release" "shared_services_gateway" {
-  name      = "shared-services-gateway"
-  chart     = "./src/helm/charts/shared-services-gateway"
-  namespace = module.shared_services_namespace.name
-
-  values = [
-    templatefile(
-      "${path.module}/configuration/helm/shared-services-gateway/values.yml.tftpl",
-      {
-        gateway_hostname = local.cluster_configuration.shared_services_gateway_hostname
-      }
-    )
-  ]
-  depends_on = [
-    helm_release.cert_manager,
-    helm_release.external_dns,
-    helm_release.gateway_configuration
-  ]
 }
 
 resource "helm_release" "keda" {
@@ -409,6 +402,7 @@ resource "helm_release" "keda" {
   chart      = "keda"
   version    = local.cluster_configuration.helm_chart_versions.keda
   namespace  = module.keda_namespace.name
+  timeout    = local.helm_timeout
   values = [
     templatefile(
       "${path.module}/configuration/helm/keda/values.yml.tftpl", {}
@@ -424,6 +418,7 @@ resource "helm_release" "metrics_server" {
   chart      = "metrics-server"
   version    = local.cluster_configuration.helm_chart_versions.metrics_server
   namespace  = module.metrics_server_namespace.name
+  timeout    = local.helm_timeout
 
   values = [
     templatefile(

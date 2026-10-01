@@ -10,6 +10,8 @@ locals {
 
   container_insights_log_group_name = "/aws/containerinsights/${local.eks_cluster_name}/performance"
 
+  helm_timeout = 900
+
   kyverno_privileged_policies = [
     {
       name        = "cloudwatch-agent"

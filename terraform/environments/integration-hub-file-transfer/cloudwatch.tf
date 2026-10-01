@@ -58,6 +58,7 @@ module "cloudwatch_metric_alarms" {
   threshold           = each.value.threshold
   treat_missing_data  = "notBreaching"
   alarm_actions       = local.cloudwatch_alarm_actions[each.key]
+  ok_actions          = local.cloudwatch_alarm_actions[each.key]
 
   tags = local.tags
 }

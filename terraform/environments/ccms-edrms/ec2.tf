@@ -73,6 +73,9 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   desired_capacity    = local.ecs_asg_desired_capacity
   max_size            = local.ecs_asg_max_size
   min_size            = local.ecs_asg_min_size
+  protect_from_scale_in   = true
+  default_instance_warmup = 0
+
 
   # validate min_size <= desired_capacity <= max_size
   lifecycle {
@@ -85,4 +88,13 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     id      = aws_launch_template.ec2-launch-template.id
     version = "$Latest"
   }
+
+  # ECS adds this tag automatically once the capacity provider is attached;
+  # declaring it here stops Terraform from stripping it back out on every apply.
+  tag {
+    key                 = "AmazonECSManaged"
+    value               = ""
+    propagate_at_launch = true
+  }
+
 }

@@ -154,6 +154,10 @@ data "aws_iam_policy_document" "scheduler_kms_key_policy" {
   }
 }
 
+resource "aws_iam_outbound_web_identity_federation" "outbound_identity_federation" {
+  count = var.enable_outbound_federation ? 1 : 0
+}
+
 resource "aws_iam_role" "eventbridge_scheduler" {
   name               = "${var.project_name}-eventbridge-scheduler"
   assume_role_policy = data.aws_iam_policy_document.eventbridge_scheduler_assume_role.json
