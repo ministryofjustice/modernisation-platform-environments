@@ -11,8 +11,8 @@ module "eventbridge_notifications" {
   create_role                = false
 
   rules = {
-    "slack-notifications" = {
-      description = "Route slack-notifications file action requests"
+    "pull-from-presigned-url" = {
+      description = "Route pull-from-presigned-url file action requests"
       event_pattern = jsonencode({
         account       = [data.aws_caller_identity.current.account_id]
         source        = ["uk.gov.justice.service.managed-file-transfer"]
@@ -30,8 +30,8 @@ module "eventbridge_notifications" {
   }
 
   targets = {
-    "slack-notifications" = [{
-      name            = "slack-notifications"
+    "pull-from-presigned-url" = [{
+      name            = "pull-from-presigned-url"
       arn             = module.sns_notifications.topic_arn
       dead_letter_arn = module.sqs_notifications_eventbridge_dlq.queue_arn
       retry_policy = {

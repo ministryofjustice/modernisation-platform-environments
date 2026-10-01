@@ -1,25 +1,42 @@
 # Authenticated pickup notifications in Slack
 
-This component sends an organisation-SSO pickup link when the existing dispatcher
-reports a clean file. The link opens the existing MFT Transfer Family web app; it
-is not a presigned S3 URL or a direct download capability. Users select the file at
-the location shown in the notification. No undocumented file deep-link is assumed.
+This draft contains the notification foundation for customer-initiated pickup.
+The intended Slack message links to an organisation-SSO entry point, not a long-lived
+S3 URL. The current placeholder is the existing Transfer web app; recipient
+activation remains blocked until the selected download design is integrated and tested.
 
-## Confirmed blocker: managed portal download path
+## Security direction following design feedback
 
-On 30 September 2026, inspection of the deployed development portal's public
-JavaScript (`1.0.2614.0/main.js`) showed that its single-file download handler calls
-the storage GetUrl operation and opens the returned expiring URL in a new browser
-window. It therefore exposes a bearer S3 URL after sign-in. This does not satisfy
-the agreed recipient-only requirement.
+On 1 October 2026 David confirmed the intended SSO experience and clarified that
+preventing inappropriate sharing or use of long-lived presigned URLs is the goal.
+The proposed component name is `pull-from-presigned-url`, aligned with the existing
+`push-to-*` patterns. Slack is a notification transport, not the access-control boundary.
+
+The Slack message must contain an authenticated entry link, never a long-lived
+S3 download capability. After sign-in, authorise the user/team for the requested
+file before enabling a download. Two designs remain to be agreed:
+
+- An authenticated broker issues a short-lived, file/version-specific presigned
+  URL on demand. This limits exposure but the resulting URL remains shareable and
+  reusable during its validity. Agree that residual risk and the maximum lifetime
+  explicitly; the component name alone is not acceptance of that risk.
+- An authenticated streaming endpoint does not expose an S3 presigned URL. Use
+  this if recipient checks must apply to every download/range request.
+
+Inspection of the deployed Transfer web app bundle `1.0.2614.0/main.js` showed that
+its single-file download path opens an expiring S3 URL. That rules it out as proof
+of strict non-transferability; it does not by itself rule out an agreed short-lived
+URL design. Its actual lifetime and recipient-to-file grants must be verified.
 
 **This PR is an inactive notification foundation, not a completed download service.**
-The shared configuration rejects all nonempty recipient maps at Terraform plan time.
-No root Access Grants, IAM pickup role or clean-bucket policy/CORS changes are included.
-Do not remove the activation precondition until an approved organisation-SSO streaming
-endpoint is integrated and tested. The endpoint must authorise the user and file on
-each download/range request without returning a presigned redirect. The identity
-provider/application registration and recipient mappings are outstanding inputs.
+Terraform rejects nonempty recipient maps until the download flow, lifetime and
+access tests are agreed and integrated. No root grants or bucket changes are included.
+
+The clean bucket is a short-lived processing location, with one-day current and
+noncurrent version expiry. A link cannot extend object retention. If customers need
+a longer collection window, use an explicitly retained pickup copy (potentially the
+existing hosted-pickup component) and notify only after successful copy completion.
+Do not silently increase clean-bucket retention to match a link lifetime.
 
 ## Status and activation gates
 
@@ -32,7 +49,7 @@ clean prefix, and Slack destination. Agency names or Slack membership alone neve
 grant access. LAA, HMPPS and HMCTS users must be provisioned/federated into the
 existing Identity Center directory and assigned to the web app.
 
-A live browser test of the replacement endpoint must verify authorised download,
+A live browser test of the selected download flow must verify authorised download,
 unauthorised forwarded-link denial, large-file streaming/resume and revocation.
 No claim of protection against an authorised recipient redistributing downloaded
 bytes is made.
@@ -106,10 +123,10 @@ cannot automatically rotate an externally issued Slack incoming webhook.
 
 ## Deployment and verification
 
-1. Register `slack-notifications` in the platform environment definition. Wait for
+1. Register `pull-from-presigned-url` in the platform environment definition. Wait for
    state provisioning/generated files and reconcile the scaffold in this directory.
-2. Integrate the approved SSO identity provider with a streaming download endpoint,
-   implement recipient-to-file authorisation, and replace the managed portal URL.
+2. Agree the SSO download design, URL lifetime/residual sharing risk and collection
+   window. Integrate recipient-to-file authorisation and the authenticated entry URL.
 3. Verify authorised/unauthorised browser paths, forwarding, expiry, revocation and
    large-file interruption/resume. Only then remove the activation precondition.
 4. Populate the dispatch and webhook secrets, then review/apply this component.
@@ -146,11 +163,17 @@ Slack delivery is not claimed. Dead-letter messages never contain webhook values
 ## Local checks
 
 ```sh
-terraform fmt -check -recursive terraform/environments/integration-hub-file-transfer/slack-notifications
-PYTHONPATH=terraform/environments/integration-hub-file-transfer/slack-notifications/lambda/notifier \
+terraform fmt -check -recursive terraform/environments/integration-hub-file-transfer/pull-from-presigned-url
+PYTHONPATH=terraform/environments/integration-hub-file-transfer/pull-from-presigned-url/lambda/notifier \
   python3 -m unittest discover \
-  -s terraform/environments/integration-hub-file-transfer/slack-notifications/lambda/notifier/tests -v
+  -s terraform/environments/integration-hub-file-transfer/pull-from-presigned-url/lambda/notifier/tests -v
 ```
+
+The platform-owned `.github/workflows/integration-hub-file-transfer.yml` is unchanged.
+Unit tests and credential-free Terraform validation live in the separate
+`.github/workflows/mft-pull-from-presigned-url-checks.yml`. These checks do not become
+deployment dependencies automatically; required-check policy must be agreed with
+the platform team.
 
 Follow the existing component convention: local checks are formatting and unit
 tests. Run Terraform validation/plans through the repository workflow after the

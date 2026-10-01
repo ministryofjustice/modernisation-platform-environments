@@ -118,7 +118,7 @@ data "aws_iam_policy_document" "sqs_notifications_dlq" {
     condition {
       test     = "ArnEquals"
       variable = "aws:SourceArn"
-      values   = [module.eventbridge_notifications.eventbridge_rule_arns["slack-notifications"]]
+      values   = [module.eventbridge_notifications.eventbridge_rule_arns["pull-from-presigned-url"]]
     }
 
     condition {

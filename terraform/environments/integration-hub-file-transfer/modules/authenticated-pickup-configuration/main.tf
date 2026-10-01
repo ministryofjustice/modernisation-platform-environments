@@ -15,7 +15,7 @@ output "recipients" {
   value = local.recipients_by_environment[var.environment]
   precondition {
     condition     = length(local.recipients_by_environment[var.environment]) == 0
-    error_message = "Activation blocked: the managed portal uses presigned downloads. Integrate and test an organisation-SSO streaming download endpoint before enabling recipients."
+    error_message = "Activation blocked: agree and test the SSO download flow, URL lifetime and recipient access before enabling recipients."
   }
   precondition {
     condition = alltrue([for id, recipient in local.recipients_by_environment[var.environment] :
