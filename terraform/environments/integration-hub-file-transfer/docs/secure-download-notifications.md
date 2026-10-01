@@ -1,7 +1,7 @@
 # Secure clean-file download notifications
 
-Status: updated following David's feedback on 1 October 2026. Organisation SSO is
-selected; the proposed component is now `pull-from-presigned-url`. The draft is an
+Organisation SSO is the selected identity control for the proposed
+`pull-from-presigned-url` component. The draft is an
 inactive notification foundation. The goal is to prevent inappropriate sharing/use
 of long-lived presigned URLs. An SSO broker issuing a short-lived URL may be suitable
 if its residual sharing risk and lifetime are explicitly accepted; strict
