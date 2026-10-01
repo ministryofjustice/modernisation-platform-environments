@@ -92,7 +92,7 @@ locals {
 module "sherlock_landing_bucket_mp" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
-  bucket_prefix      = "landing-sherlock-${local.environment}-mp"
+  bucket_prefix      = "landing-sherlock-${local.environment}-"
   bucket_namespace   = "account-regional"
   versioning_enabled = true
   force_destroy      = true
@@ -128,7 +128,7 @@ module "sherlock_landing_bucket_mp" {
 module "sherlock_quarantine_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
-  bucket_prefix      = "landing-sherlock-quarantine-${local.environment}-mp"
+  bucket_prefix      = "sherlock-quarantine-${local.environment}"
   bucket_namespace   = "account-regional"
   versioning_enabled = false
   force_destroy      = true
