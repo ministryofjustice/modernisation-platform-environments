@@ -4,7 +4,7 @@ module "kms_notifications_pipeline" {
   version = "4.2.2"
 
   aliases                 = [local.pattern_name]
-  description             = "KMS CMK for the slack-notifications SNS and SQS pipeline"
+  description             = "KMS CMK for the pull-from-presigned-url SNS and SQS pipeline"
   enable_default_policy   = true
   enable_key_rotation     = true
   deletion_window_in_days = 30
