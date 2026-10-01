@@ -3808,3 +3808,55 @@ resource "aws_iam_role_policy_attachment" "merge_redrive_approval" {
   role       = aws_iam_role.merge_redrive_approval.name
   policy_arn = aws_iam_policy.merge_redrive_approval.arn
 }
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation approval access
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "downstream_reconciliation_chatbot_approval" {
+  statement {
+    sid    = "InvokeReconciliationApprovalLambda"
+    effect = "Allow"
+
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+
+    resources = [
+      module.merge_redrive_approval.lambda_function_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "downstream_reconciliation_chatbot_approval" {
+  name = "downstream_reconciliation_chatbot_approval"
+
+  policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_chatbot_approval.json
+  )
+}
+
+data "aws_iam_policy_document" "downstream_reconciliation_approver_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["chatbot.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "downstream_reconciliation_approver" {
+  name = "downstream_reconciliation_approver"
+
+  assume_role_policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_approver_assume.json
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "downstream_reconciliation_approver" {
+  role       = aws_iam_role.downstream_reconciliation_approver.name
+  policy_arn = aws_iam_policy.downstream_reconciliation_chatbot_approval.arn
+}
