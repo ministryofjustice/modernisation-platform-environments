@@ -1,5 +1,6 @@
 locals {
-  cloudtrail_arn = var.cloudtrail_name != null ? "arn:aws:cloudtrail:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:trail/${var.cloudtrail_name}" : null
+  cloudtrail_arn            = var.cloudtrail_name != null ? "arn:aws:cloudtrail:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:trail/${var.cloudtrail_name}" : null
+  eventbridge_sns_topic_arn = var.eventbridge_sns_topic_name != null ? "arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${var.eventbridge_sns_topic_name}" : null
 }
 
 data "aws_iam_policy_document" "key" {
@@ -92,6 +93,32 @@ data "aws_iam_policy_document" "key" {
         test     = "StringLike"
         variable = "kms:EncryptionContext:aws:sns:topicArn"
         values   = ["arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
+      }
+    }
+  }
+
+  dynamic "statement" {
+    for_each = var.eventbridge_sns_topic_name != null ? [1] : []
+    content {
+      sid    = "AllowEventBridgePublishToEncryptedSns"
+      effect = "Allow"
+
+      principals {
+        type        = "Service"
+        identifiers = ["events.amazonaws.com"]
+      }
+
+      actions = [
+        "kms:GenerateDataKey*",
+        "kms:Decrypt"
+      ]
+
+      resources = ["*"]
+
+      condition {
+        test     = "StringEquals"
+        variable = "kms:EncryptionContext:aws:sns:topicArn"
+        values   = [local.eventbridge_sns_topic_arn]
       }
     }
   }

@@ -9,6 +9,12 @@ variable "cloudtrail_name" {
   default     = null
 }
 
+variable "eventbridge_sns_topic_name" {
+  description = "Name of the SNS topic EventBridge is permitted to encrypt messages for. Leave null to omit the EventBridge key policy statement."
+  type        = string
+  default     = null
+}
+
 variable "enable_cloudwatch_logs" {
   description = "Whether to allow CloudWatch Logs to use this key for log group encryption."
   type        = bool

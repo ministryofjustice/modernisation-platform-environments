@@ -1,8 +1,9 @@
 #split out
 locals {
-  aliases     = ["sherlock-landing"]
-  application = "data-factory-corporate"
-  component   = "people"
+  aliases                = ["sherlock-landing"]
+  application            = "data-factory-corporate"
+  component              = "people"
+  eventbridge_rule_name  = "eventbridge-malware-rule"
 }
 
 resource "aws_secretsmanager_secret" "external_account" {
@@ -60,10 +61,11 @@ module "sherlock_quarantine_kms_key" {
 module "sherlock_logging_kms_key" {
   source = "./modules/kms-key"
 
-  alias                   = "sherlock-logging"
-  cloudtrail_name         = "sherlock-cloudtrail"
-  enable_cloudwatch_logs  = true
-  rotation_period_in_days = 365
+  alias                      = "sherlock-logging"
+  cloudtrail_name            = "sherlock-cloudtrail"
+  eventbridge_sns_topic_name = "${local.eventbridge_rule_name}-alerts"
+  enable_cloudwatch_logs     = true
+  rotation_period_in_days    = 365
 
   providers = {
     aws = aws
@@ -250,7 +252,7 @@ module "assume_iam_role" {
 module "data_factory_guardduty_eventbridge" {
   source = "./modules/guardduty-eventbridge"
 
-  name = "eventbridge_malware_rule"
+  name = local.eventbridge_rule_name
 
   bucket_names = [module.sherlock_landing_bucket_mp.bucket.bucket]
 
@@ -259,6 +261,7 @@ module "data_factory_guardduty_eventbridge" {
   target_lambda_name = module.data_factory_guardduty_lambda.name
 
   target_lambda_arn = module.data_factory_guardduty_lambda.arn
+  kms_key_arn       = module.sherlock_logging_kms_key.key_arn
 
   tags = {
     Environment    = local.environment

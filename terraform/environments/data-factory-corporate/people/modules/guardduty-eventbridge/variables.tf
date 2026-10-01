@@ -4,6 +4,11 @@ variable "name" {
   default     = "eventbridge-guardduty-quarantine"
 }
 
+variable "kms_key_arn" {
+  description = "ARN of the KMS key used to encrypt the scan alerts SNS topic."
+  type        = string
+}
+
 variable "bucket_names" {
   description = "Names of the S3 buckets to apply rule to."
   type        = list(string)

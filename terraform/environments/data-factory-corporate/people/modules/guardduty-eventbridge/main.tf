@@ -61,8 +61,9 @@ resource "aws_lambda_permission" "allow_eventbridge_quarantine" {
 
 # Create an SNS topic for scan alerts.
 resource "aws_sns_topic" "scan_alerts" {
-  name = "${var.name}-alerts"
-  tags = local.common_tags
+  name              = "${var.name}-alerts"
+  kms_master_key_id = var.kms_key_arn
+  tags              = local.common_tags
 }
 
 # Give the account owner topic access and allow only the alert rules to publish.
