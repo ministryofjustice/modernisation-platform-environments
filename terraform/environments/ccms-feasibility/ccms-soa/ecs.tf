@@ -59,8 +59,8 @@ module "ecs_cluster" {
 }
 
 module "ecs_service_admin" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/bf7ac1c
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=bf7ac1c"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=b832178"
 
   name               = "${local.component_name}-admin-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -116,6 +116,10 @@ module "ecs_service_admin" {
     container_port   = local.application_data.accounts[local.environment].admin_ssl_port
   }
 
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
+
   depends_on = [
     module.nlb_admin,
     aws_iam_role_policy_attachment.ecs_task_execution,
@@ -126,8 +130,8 @@ module "ecs_service_admin" {
 }
 
 module "ecs_service_managed" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/bf7ac1c
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=bf7ac1c"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=b832178"
 
   name               = "${local.component_name}-managed-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -184,6 +188,11 @@ module "ecs_service_managed" {
     target_group_arn = module.nlb_managed.target_group_arn
     container_name   = "${local.component_name}-managed"
     container_port   = local.application_data.accounts[local.environment].managed_ssl_port
+  }
+
+  alarms = {
+    topic_arn             = data.aws_sns_topic.alerts.arn
+    cpu_threshold_percent = 75 # as the original laa-ccms-soa managed service
   }
 
   depends_on = [

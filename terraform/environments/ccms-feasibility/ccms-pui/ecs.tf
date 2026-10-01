@@ -25,8 +25,8 @@ module "ecs_cluster" {
 }
 
 module "ecs_service" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/546ba54
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=546ba54"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=b832178"
 
   name               = "${local.component_name}-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -78,6 +78,10 @@ module "ecs_service" {
     target_group_arn = module.alb.target_group_arn
     container_name   = local.component_name
     container_port   = local.application_data.accounts[local.environment].pui_server_port
+  }
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
   }
 
   depends_on = [

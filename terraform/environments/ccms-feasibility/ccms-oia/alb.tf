@@ -4,8 +4,8 @@ data "aws_s3_bucket" "lb_access_logs" {
 }
 
 module "alb_opahub" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/8800d60
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=8800d60"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=b832178"
 
   name               = "${local.opahub_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -25,12 +25,16 @@ module "alb_opahub" {
     prefix = local.opahub_name
   }
 
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
+
   tags = local.tags
 }
 
 module "alb_connector" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/8800d60
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=8800d60"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=b832178"
 
   name               = "${local.connector_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -50,12 +54,16 @@ module "alb_connector" {
     prefix = local.connector_name
   }
 
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
+
   tags = local.tags
 }
 
 module "alb_adaptor" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/8800d60
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=8800d60"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=b832178"
 
   name               = "${local.adaptor_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -73,6 +81,10 @@ module "alb_adaptor" {
   access_logs = {
     bucket = data.aws_s3_bucket.lb_access_logs.id
     prefix = local.adaptor_name
+  }
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
   }
 
   tags = local.tags

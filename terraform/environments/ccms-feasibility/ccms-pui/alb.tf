@@ -4,8 +4,8 @@ data "aws_s3_bucket" "lb_access_logs" {
 }
 
 module "alb" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/8800d60
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=8800d60"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=b832178"
 
   name               = "${local.component_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -29,6 +29,10 @@ module "alb" {
   access_logs = {
     bucket = data.aws_s3_bucket.lb_access_logs.id
     prefix = local.component_name
+  }
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
   }
 
   tags = local.tags
