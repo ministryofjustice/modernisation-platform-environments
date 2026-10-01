@@ -11,7 +11,6 @@ import boto3
 import pytest
 import runtime
 from aws_lambda_powertools import Metrics
-from aws_lambda_powertools.metrics import MetricUnit
 from boto3.dynamodb.types import TypeSerializer
 from botocore.exceptions import ClientError
 from botocore.stub import Stubber
@@ -911,26 +910,31 @@ def test_reporter_emits_delivery_failed_only_after_publishing(monkeypatch, actio
     event = requested_event()
     event["detail"]["data"]["action"]["name"] = action_name
     dlq_event = {"Records": [record(event, queue_arn=DLQ_ARN)]}
-    emitted = []
-    dimensions = []
-    metrics = Metrics(namespace="ManagedFileTransfer")
+    service_name = f"integration-hub-file-transfer-{action_name}-dlq-reporter"
+    metrics = Metrics(namespace="ManagedFileTransfer", service=service_name)
     metrics.clear_metrics()
     monkeypatch.setattr(worker_module, "metrics", metrics)
-    monkeypatch.setattr(metrics, "add_metric", lambda **metric: emitted.append(metric))
-    monkeypatch.setattr(metrics, "add_dimension", lambda **dimension: dimensions.append(dimension))
 
     first_result = runtime.process_reporter_event(dlq_event, Context(), services)
-    delivery_failures = [metric for metric in emitted if metric["name"] == "DeliveryFailed"]
     if fail_publish_first:
         assert first_result == {"batchItemFailures": [{"itemIdentifier": "sqs-message-id"}]}
-        assert delivery_failures == []
+        retry_metric_set = metrics.serialize_metric_set()
+        assert retry_metric_set["_aws"]["CloudWatchMetrics"][0]["Dimensions"] == [["ActionName", "service"]]
+        assert retry_metric_set["service"] == service_name
+        assert retry_metric_set["ReporterRecordFailed"] == [1.0]
+        assert "DeliveryFailed" not in retry_metric_set
+        metrics.clear_metrics()
         assert runtime.process_reporter_event(dlq_event, Context(), services) == {"batchItemFailures": []}
-        delivery_failures = [metric for metric in emitted if metric["name"] == "DeliveryFailed"]
     else:
         assert first_result == {"batchItemFailures": []}
 
-    assert delivery_failures == [{"name": "DeliveryFailed", "unit": MetricUnit.Count, "value": 1}]
-    assert dimensions == [{"name": "ActionName", "value": action_name}] * (2 if fail_publish_first else 1)
+    metric_set = metrics.serialize_metric_set()
+    assert metric_set["_aws"]["CloudWatchMetrics"][0]["Namespace"] == "ManagedFileTransfer"
+    assert metric_set["_aws"]["CloudWatchMetrics"][0]["Dimensions"] == [["ActionName", "service"]]
+    assert {"Name": "DeliveryFailed", "Unit": "Count"} in metric_set["_aws"]["CloudWatchMetrics"][0]["Metrics"]
+    assert metric_set["ActionName"] == action_name
+    assert metric_set["service"] == service_name
+    assert metric_set["DeliveryFailed"] == [1.0]
     assert json.loads(services.eventbridge.calls[-1]["Entries"][0]["Detail"])["data"]["status"] == "failed"
     metrics.clear_metrics()
 
@@ -950,6 +954,28 @@ def test_reporter_does_not_emit_delivery_failed_for_success(monkeypatch, termina
         {"Records": [record(queue_arn=DLQ_ARN)]}, Context(), services
     ) == {"batchItemFailures": []}
     assert not [metric for metric in emitted if metric["name"] == "DeliveryFailed"]
+    metrics.clear_metrics()
+
+
+@pytest.mark.parametrize("action_name", ["push-to-s3", "push-to-s3-with-hosted-pickup"])
+def test_writer_failure_metric_has_service_dimension(monkeypatch, action_name):
+    writer_config(monkeypatch, action_name=action_name)
+    services = FakeServices()
+    malformed = record()
+    malformed["body"] = "not-json"
+    service_name = f"integration-hub-file-transfer-{action_name}"
+    metrics = Metrics(namespace="ManagedFileTransfer", service=service_name)
+    metrics.clear_metrics()
+    monkeypatch.setattr(worker_module, "metrics", metrics)
+
+    assert runtime.process_writer_event({"Records": [malformed]}, Context(), services) == {
+        "batchItemFailures": [{"itemIdentifier": "sqs-message-id"}]
+    }
+    metric_set = metrics.serialize_metric_set()
+    assert metric_set["_aws"]["CloudWatchMetrics"][0]["Dimensions"] == [["ActionName", "service"]]
+    assert metric_set["ActionName"] == action_name
+    assert metric_set["service"] == service_name
+    assert metric_set["WriterRecordFailed"] == [1.0]
     metrics.clear_metrics()
 
 

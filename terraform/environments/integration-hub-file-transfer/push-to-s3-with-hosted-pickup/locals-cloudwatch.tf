@@ -28,24 +28,30 @@ locals {
     "writer-record-failures" = {
       alarm_description   = "The hosted pickup writer returned one or more failed SQS records"
       comparison_operator = "GreaterThanThreshold"
-      dimensions          = { ActionName = "push-to-s3-with-hosted-pickup" }
-      evaluation_periods  = 1
-      metric_name         = "WriterRecordFailed"
-      namespace           = "ManagedFileTransfer"
-      period              = 300
-      statistic           = "Sum"
-      threshold           = 0
+      dimensions = {
+        ActionName = "push-to-s3-with-hosted-pickup"
+        service    = local.pattern_name
+      }
+      evaluation_periods = 1
+      metric_name        = "WriterRecordFailed"
+      namespace          = "ManagedFileTransfer"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
     }
     "delivery-failed" = {
       alarm_description   = "The hosted pickup reporter published a failed delivery completion"
       comparison_operator = "GreaterThanThreshold"
-      dimensions          = { ActionName = "push-to-s3-with-hosted-pickup" }
-      evaluation_periods  = 1
-      metric_name         = "DeliveryFailed"
-      namespace           = "ManagedFileTransfer"
-      period              = 300
-      statistic           = "Sum"
-      threshold           = 0
+      dimensions = {
+        ActionName = "push-to-s3-with-hosted-pickup"
+        service    = "${local.pattern_name}-dlq-reporter"
+      }
+      evaluation_periods = 1
+      metric_name        = "DeliveryFailed"
+      namespace          = "ManagedFileTransfer"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
     }
     "file-mover-throttles" = {
       alarm_description   = "The hosted pickup mover has been throttled"
@@ -84,13 +90,16 @@ locals {
     "reporter-record-failures" = {
       alarm_description   = "The hosted pickup DLQ reporter returned one or more failed SQS records"
       comparison_operator = "GreaterThanThreshold"
-      dimensions          = { ActionName = "push-to-s3-with-hosted-pickup" }
-      evaluation_periods  = 1
-      metric_name         = "ReporterRecordFailed"
-      namespace           = "ManagedFileTransfer"
-      period              = 300
-      statistic           = "Sum"
-      threshold           = 0
+      dimensions = {
+        ActionName = "push-to-s3-with-hosted-pickup"
+        service    = "${local.pattern_name}-dlq-reporter"
+      }
+      evaluation_periods = 1
+      metric_name        = "ReporterRecordFailed"
+      namespace          = "ManagedFileTransfer"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
     }
     "dlq-reporter-throttles" = {
       alarm_description   = "The hosted pickup DLQ reporter has been throttled"
