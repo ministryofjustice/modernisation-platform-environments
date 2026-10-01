@@ -65,7 +65,7 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
         Resource = ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:*"]
        },
       { Effect = "Allow",
-        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+        Action = ["logs:CreateLogStream", "logs:PutLogEvents"],
       Resource = ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/waf-maintenance-${local.environment}:*"]
        }
     ]
