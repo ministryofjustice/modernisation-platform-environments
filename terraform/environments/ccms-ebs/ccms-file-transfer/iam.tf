@@ -153,14 +153,26 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ecs:StartTelemetrySession",
                 "ecs:UpdateContainerInstancesState",
                 "ecs:Submit*",
-                "ecr:GetAuthorizationToken",
+                "ecr:GetAuthorizationToken"
+            ],
+            "Resource": "*"
+        },
+         {
+            "Effect": "Allow",
+            "Action": [
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
+                "ecr:BatchGetImage"
+            ],
+            "Resource": ["arn:aws:ecr:{data.aws_region.current.id}:374269020027:repository/ccms-financial-transfers"]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
-            "Resource": "*"
+            "Resource": ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/ecs/containerinsights/${local.application_name}-sftp-cluster/performance:*"]
         },
         {
             "Effect": "Allow",
