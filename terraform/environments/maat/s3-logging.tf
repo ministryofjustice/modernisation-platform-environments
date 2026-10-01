@@ -55,11 +55,7 @@ module "s3-bucket-logging" {
             "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
           }
         }
-      },
-      {
-
-      },
-
+      }
     ]
     })
 
