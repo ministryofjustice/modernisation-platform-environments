@@ -19,8 +19,8 @@ module "s3-bucket-shared" {
     log_bucket_arn  = module.s3-bucket-logging.bucket.arn
   }
 
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
-
+  log_prefix = "s3access/${local.application_name}-${local.environment}-shared/${local.application_name}-${local.environment}-shared"
+  log_partition_date_source = "EventTime"
   providers = {
     aws.bucket-replication = aws
   }
