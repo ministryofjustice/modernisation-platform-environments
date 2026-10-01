@@ -26,14 +26,6 @@ module "s3-bucket-athena-queries-output" {
     aws.bucket-replication = aws
   }
 
-  manage_log_bucket_policy = false
-  log_buckets = {
-    log_bucket_name = module.s3-bucket-logging.bucket.id
-    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-  }
-
-  log_prefix = "s3access/athena-query-s3-bucket"
-
   lifecycle_rule = [
     {
       id      = "main"
