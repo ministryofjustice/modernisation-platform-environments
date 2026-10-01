@@ -75,34 +75,34 @@ resource "aws_iam_role_policy" "ecs_execution_secret_access" {
   })
 }
 
-resource "aws_iam_policy" "soa_s3_policy" {
-  name        = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-s3-policy"
-  description = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name} s3-policy"
+# resource "aws_iam_policy" "soa_s3_policy" {
+#   name        = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-s3-policy"
+#   description = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name} s3-policy"
 
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListBucket",
-                "s3:DeleteObject",
-                "s3:GetObject",
-                "s3:PutObject",
-                "s3:RestoreObject"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${local.application_data.accounts[local.environment].inbound_s3_bucket_name}/*",
-                "arn:aws:s3:::${local.application_data.accounts[local.environment].inbound_s3_bucket_name}",
-                "arn:aws:s3:::${local.application_data.accounts[local.environment].outbound_s3_bucket_name}/*",
-                "arn:aws:s3:::${local.application_data.accounts[local.environment].outbound_s3_bucket_name}"
-            ]
-        }
-    ]
-}
-EOF
-}
+#   policy = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Action": [
+#                 "s3:ListBucket",
+#                 "s3:DeleteObject",
+#                 "s3:GetObject",
+#                 "s3:PutObject",
+#                 "s3:RestoreObject"
+#             ],
+#             "Resource": [
+#                 "arn:aws:s3:::${local.application_data.accounts[local.environment].inbound_s3_bucket_name}/*",
+#                 "arn:aws:s3:::${local.application_data.accounts[local.environment].inbound_s3_bucket_name}",
+#                 "arn:aws:s3:::${local.application_data.accounts[local.environment].outbound_s3_bucket_name}/*",
+#                 "arn:aws:s3:::${local.application_data.accounts[local.environment].outbound_s3_bucket_name}"
+#             ]
+#         }
+#     ]
+# }
+# EOF
+# }
 
 # resource "aws_iam_policy" "soa_s3_policy_cortex_deps" {
 #   # count       = local.is-production ? 1 : 0
