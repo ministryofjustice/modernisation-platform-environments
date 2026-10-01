@@ -133,3 +133,20 @@ resource "aws_ssm_parameter" "admin_password" {
     ignore_changes = [value]
   }
 }
+
+resource "aws_ssm_parameter" "legacy_account_id" {
+  name  = "legacy-account-id"
+  type  = "SecureString"
+  value = "CHANGE_ME"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "legacy-account-id"
+    },
+  )
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
