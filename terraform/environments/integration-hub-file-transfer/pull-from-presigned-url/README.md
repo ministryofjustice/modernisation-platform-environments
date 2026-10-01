@@ -5,10 +5,10 @@ The intended Slack message links to an organisation-SSO entry point, not a long-
 S3 URL. The current placeholder is the existing Transfer web app; recipient
 activation remains blocked until the selected download design is integrated and tested.
 
-## Security direction following design feedback
+## Security requirements
 
-On 1 October 2026 David confirmed the intended SSO experience and clarified that
-preventing inappropriate sharing or use of long-lived presigned URLs is the goal.
+The intended experience uses organisation SSO to prevent inappropriate sharing
+or use of long-lived presigned URLs.
 The proposed component name is `pull-from-presigned-url`, aligned with the existing
 `push-to-*` patterns. Slack is a notification transport, not the access-control boundary.
 
