@@ -145,6 +145,12 @@ module "eks" {
         }
       }
     }
+    # MWAA access to MWAA role in MWAA namespace
+    dp-mwaa = {
+      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/mwaa-execution"
+      username          = "dp-mwaa"
+      kubernetes_groups = ["mwaa"]
+    }
   }
 }
 
