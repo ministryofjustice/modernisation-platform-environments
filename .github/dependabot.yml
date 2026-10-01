@@ -528,6 +528,7 @@ updates:
       - "terraform/environments/data-platform/ai-gateway"
       - "terraform/environments/data-platform/airflow"
       - "terraform/environments/data-platform/airflow-cluster"
+      - "terraform/environments/data-platform/airflow-cluster/modules/kubernetes/namespace"
       - "terraform/environments/data-platform/app"
       - "terraform/environments/data-platform/cluster"
       - "terraform/environments/data-platform/cluster/modules/kubernetes/namespace"
@@ -1328,6 +1329,18 @@ updates:
       interval: "daily"
     groups:
       planetfm:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/platform-operations"
+    schedule:
+      interval: "daily"
+    groups:
+      platform-operations:
         patterns:
           - "*"
     open-pull-requests-limit: 50
