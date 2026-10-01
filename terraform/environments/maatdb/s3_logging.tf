@@ -41,7 +41,7 @@ module "s3-bucket-logging" {
     {
       Sid     = "AllowS3Logging Shared Bucket"
       Effect  = "Allow"
-      Actions = ["s3:PutObject"]
+      Action = "s3:PutObject",
       Principal = {
         AWS = "*"
       }
@@ -58,7 +58,7 @@ module "s3-bucket-logging" {
     {
       Sid     = "AllowS3Logging FTP Buckets"
       Effect  = "Allow"
-      Actions = ["s3:PutObject"]
+      Action = "s3:PutObject",
       Principal = {
         AWS = "*"
       }
