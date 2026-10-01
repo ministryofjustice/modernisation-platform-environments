@@ -11,7 +11,10 @@ module "s3-bucket-logging" {
         Effect    = "Deny",
         Principal = "*",
         Action    = "s3:*",
-        Resource  = ["${module.s3-bucket-shared.bucket.arn}/*", module.s3-bucket-shared.bucket.arn],
+        Resource  = [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ],
         Condition = {
           Bool = {
             "aws:SecureTransport" = "false"
@@ -25,7 +28,10 @@ module "s3-bucket-logging" {
           AWS = "*"
         },
         Action   = "s3:*",
-        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", module.s3-bucket-shared.bucket.arn],
+        Resource = [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ],
         Condition = {
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
