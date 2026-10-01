@@ -4,8 +4,65 @@ module "s3-bucket-logging" {
 
   bucket_name        = "${local.application_name}-${local.environment}-logging"
   versioning_enabled = true
-  bucket_policy = [
-    aws_s3_bucket_policy.s3_access_logs.policy
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport",
+        Effect    = "Deny",
+        Principal = "*",
+        Action    = "s3:*",
+        Resource = [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ],
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      },
+      {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action = "s3:*",
+        Resource = [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
+      },
+      {
+        Sid    = "AllowS3Logging Shared Bucket"
+        Effect = "Allow"
+        Action = "s3:PutObject",
+        Principal = {
+          AWS = "*"
+        }
+        Resource = [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ]
+        Condition = {
+          StringLike = {
+            "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+          }
+        }
+      },
+      {
+
+      },
+
+    ]
+    })
+
   ]
   sse_algorithm  = "AES256"
   custom_kms_key = ""
@@ -47,152 +104,4 @@ module "s3-bucket-logging" {
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-logging" }
   )
-}
-
-data "aws_iam_policy_document" "s3_access_logs_policy" {
-  # default statements - deny insecure transport and tls < 1.2
-  statement {
-    sid     = "DenyInsecureTransport"
-    effect  = "Deny"
-    actions = ["s3:*"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
-  }
-  statement {
-    sid     = "EnforceTLSv12orHigher"
-    effect  = "Deny"
-    actions = ["s3:*"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-    condition {
-      test     = "NumericLessThan"
-      variable = "aws:TLSVersion"
-      values   = ["1.2"]
-    }
-  }
-
-  # Per-Bucket Statements
-  ## Shared Bucket
-  statement {
-    sid     = "AllowS3Logging Shared Bucket"
-    effect  = "Allow"
-    actions = ["s3:PutObject"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-    condition {
-      test = "StringLike"
-      variable = "aws:SourceArn"
-      values   = [module.s3-bucket-shared.bucket.arn]
-    }
-  }
-  # Athena Queries Bucket
-  statement {
-    sid     = "AllowS3Logging Athena Queries Bucket"
-    effect  = "Allow"
-    actions = ["s3:PutObject"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-    condition {
-      test = "StringLike"
-      variable = "aws:SourceArn"
-      values   = [module.s3-bucket-athena-queries-output.bucket.arn]
-    }
-  }
-  # Artifacts Bucket
-  statement {
-    sid     = "AllowS3Logging Artifacts Bucket"
-    effect  = "Allow"
-    actions = ["s3:PutObject"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-    condition {
-      test = "StringLike"
-      variable = "aws:SourceArn"
-      values   = [module.artifacts-s3.bucket.arn]
-    }
-  }
-  ## Cloudfront Logging Bucket
-  statement {
-    sid     = "AllowS3Logging Cloudfront Logging Bucket"
-    effect  = "Allow"
-    actions = ["s3:PutObject"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-    condition {
-      test = "StringLike"
-      variable = "aws:SourceArn"
-      values   = [aws_s3_bucket.cloudfront.arn]
-    }
-  }
-  ## Loadbalancer Logging Bucket - dynamic statement due to `local.existing_bucket_name` condition
-  dynamic "statement" {
-    for_each = local.existing_bucket_name == "" ? [1] : []
-    content {
-      sid = "AllowS3Logging Loadbalancer Logging Bucket"
-      effect = "Allow"
-      principals {
-        type        = "AWS"
-        identifiers = ["*"]
-      }
-      actions = ["s3:PutObject"]
-      resources = [
-        "${module.s3-bucket-logging.bucket.arn}/*",
-        module.s3-bucket-logging.bucket.arn
-      ]
-      condition {
-        test = "StringLike"
-        variable = "aws:SourceArn"
-        values   = [
-          module.lb-s3-access-logs[0].bucket.arn
-        ]
-      }
-    }
-  }
-
-}
-
-resource "aws_s3_bucket_policy" "s3_access_logs" {
-    bucket = module.s3-bucket-logging.bucket.id
-    policy = data.aws_iam_policy_document.s3_access_logs_policy.json
 }
