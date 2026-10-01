@@ -256,6 +256,7 @@ locals {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
+      ebs_optimized                = false
       instance_type                = "t3.xlarge" # no capacity for t2
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
