@@ -9,59 +9,14 @@ The data factory allows for:
 - allowing the user to catalogue the data with AWS Glue
 - scanning new S3 objects for malware with GuardDuty Malware Protection
 - moving selected scan results to a quarantine bucket
-- encrypting data and supporting services with a customer-managed KMS key
+- sending GuardDuty scan and protection plan alerts to Slack
+- encrypting data and supporting services with customer-managed KMS keys
 - recording AWS management activity with CloudTrail
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    external["External AWS account"]
+![Sherlock people account architecture](architecture.excalidraw.svg)
 
-    subgraph account["data-factory-corporate / people AWS account"]
-        secret["Secrets Manager<br/>external-aws-account"]
-        role["IAM role<br/>datafactory_dev_assume_role"]
-
-        landing["S3 landing bucket<br/>landing-sherlock-test-mp<br/>prefix: avature-sherlock"]
-        quarantine["S3 quarantine bucket<br/>landing-sherlock-quarantine-test-mp"]
-        glue["AWS Glue database<br/>sherlock_glue_database"]
-
-        guardduty["GuardDuty Malware Protection<br/>S3 object scan"]
-        eventbridge["EventBridge rule<br/>eventbridge_malware_rule"]
-        lambda["Lambda<br/>guardduty_lambda"]
-        dlq["SQS dead-letter queue<br/>guardduty_lambda-dlq"]
-
-        kms["Customer-managed KMS key<br/>alias/sherlock-landing"]
-
-        cloudtrail["CloudTrail trail<br/>sherlock-cloudtrail"]
-        logbucket["S3 logging bucket<br/>logging-sherlock-test-mp"]
-        cloudwatch["CloudWatch Logs<br/>365-day retention"]
-        sns["SNS topic<br/>sherlock-cloudtrail-notifications"]
-    end
-
-    secret -. "provides trusted account ID" .-> role
-    external -->|"AssumeRole<br/>temporary credentials"| role
-    role -->|"List, upload and download<br/>avature-sherlock prefix"| landing
-    role -->|"Manage permitted Glue tables"| glue
-    glue -. "catalogues data in the prefix" .-> landing
-
-    landing -->|"new object"| guardduty
-    guardduty -->|"scan result"| eventbridge
-    eventbridge -->|"matching result"| lambda
-    lambda -->|"copy selected object"| quarantine
-    lambda -->|"delete source object"| landing
-    lambda -. "failed invocation" .-> dlq
-
-    kms -. "encrypts and decrypts" .-> landing
-    kms -. "encrypts" .-> quarantine
-    kms -. "encrypts" .-> logbucket
-    kms -. "encrypts" .-> cloudwatch
-    kms -. "encrypts" .-> sns
-
-    cloudtrail -->|"log files"| logbucket
-    cloudtrail -->|"event records"| cloudwatch
-    cloudtrail -->|"delivery notifications"| sns
-```
 
 ## Process
 
@@ -118,6 +73,23 @@ UNSUPPORTED
 NO_THREATS_FOUND
 ```
 
+The same scan results and protection plan warnings/errors are published to the
+GuardDuty alerts SNS topic. To receive them in Slack:
+
+1. Authorise the MoJ Slack workspace in Amazon Q Developer in chat applications
+    for this AWS account.
+2. Plan and apply with `enable_guardduty_slack_notifications` left at
+    its default of `false`. Terraform creates the KMS-encrypted Secrets Manager
+    secret `guardduty-slack` as an empty secret.
+3. Add a value to the new secret in this AWS account and region containing the
+    authorised Slack workspace ID and destination channel ID:
+    ```json
+    {"slack_team_id":"T...","slack_channel_id":"C..."}
+    ```
+4. Set `TF_VAR_enable_guardduty_slack_notifications=true`
+
+See https://github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot/
+
 ### 5. Lambda quarantines selected objects
 
 The Lambda reads the bucket, object key, and scan status from the EventBridge event.
@@ -155,14 +127,15 @@ The configuration is in [modules/logging-bucket-cloudtrail/main.tf](modules/logg
 
 | Terraform module | AWS resources or purpose |
 | --- | --- |
-| `sherlock_kms_key` | Customer-managed KMS key and alias `sherlock-landing` |
+| [sherlock_kms_key](modules/kms-key/README.md) | Customer-managed KMS key and alias `sherlock-landing` |
 | `sherlock_landing_bucket_mp` | Encrypted, versioned S3 landing bucket |
 | `sherlock_quarantine_bucket` | Encrypted S3 quarantine bucket |
-| `sherlock_logging_bucket_cloudtrail` | CloudTrail, logging S3 bucket, CloudWatch log group, SNS topic |
+| [corp_people_logging_bucket](modules/logging-bucket-cloudtrail/README.md) | CloudTrail, logging S3 bucket, CloudWatch log group, SNS topic |
 | `sherlock_glue_database` | Glue database for the landing prefix |
-| `assume_iam_role` | Trusted external role and scoped S3, KMS, and Glue permissions |
-| `data_factory_guardduty_scan` | GuardDuty Malware Protection plan |
-| `data_factory_guardduty_eventbridge` | EventBridge rule and Lambda target |
-| `data_factory_guardduty_lambda` | Quarantine Lambda and SQS dead-letter queue |
+| [assume_iam_role](modules/external-iam-role/README.md) | Trusted external role and scoped S3, KMS, and Glue permissions |
+| [data_factory_guardduty_scan](modules/guardduty-malware-scan/README.md) | GuardDuty Malware Protection plan |
+| [data_factory_guardduty_eventbridge](modules/guardduty-eventbridge/README.md) | Quarantine and alert EventBridge rules, Lambda target, and SNS topic |
+| [data_factory_guardduty_lambda](modules/guardduty-lambda/README.md) | Quarantine Lambda and SQS dead-letter queue |
+| `guardduty_chatbot` | Optional Amazon Q Developer Slack channel configuration using Secrets Manager IDs |
 
 

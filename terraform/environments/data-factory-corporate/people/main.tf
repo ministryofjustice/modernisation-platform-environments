@@ -12,7 +12,7 @@ resource "aws_secretsmanager_secret" "external_account" {
   kms_key_id  = module.sherlock_kms_key.key_arn
 
   tags = {
-    Environment    = terraform.workspace
+    Environment    = local.environment
     Application    = local.application
     Component      = local.component
     Infrastructure = "sherlock-secret-id"
@@ -23,18 +23,57 @@ resource "aws_secretsmanager_secret" "external_account" {
 module "sherlock_kms_key" {
   source = "./modules/kms-key"
 
-  alias           = "sherlock-landing"
-  cloudtrail_name = "sherlock-cloudtrail"
+  alias                   = "sherlock-landing"
+  rotation_period_in_days = 365
 
   providers = {
     aws = aws
   }
 
   tags = {
-    Environment    = terraform.workspace
+    Environment    = local.environment
     Application    = local.application
     Component      = local.component
     Infrastructure = "sherlock-kms-key"
+  }
+}
+
+module "sherlock_quarantine_kms_key" {
+  source = "./modules/kms-key"
+
+  alias                   = "sherlock-quarantine"
+  rotation_period_in_days = 365
+
+  providers = {
+    aws = aws
+  }
+
+  tags = {
+    Environment    = local.environment
+    Application    = local.application
+    Component      = local.component
+    Infrastructure = "sherlock-quarantine-kms-key"
+  }
+}
+
+# Shared by the CloudTrail bucket and the CloudWatch log group it delivers to.
+module "sherlock_logging_kms_key" {
+  source = "./modules/kms-key"
+
+  alias                   = "sherlock-logging"
+  cloudtrail_name         = "sherlock-cloudtrail"
+  enable_cloudwatch_logs  = true
+  rotation_period_in_days = 365
+
+  providers = {
+    aws = aws
+  }
+
+  tags = {
+    Environment    = local.environment
+    Application    = local.application
+    Component      = local.component
+    Infrastructure = "sherlock-logging-kms-key"
   }
 }
 
@@ -53,7 +92,7 @@ locals {
 module "sherlock_landing_bucket_mp" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
-  bucket_prefix      = "landing-sherlock-test-mp"
+  bucket_prefix      = "landing-sherlock-${local.environment}-mp"
   bucket_namespace   = "account-regional"
   versioning_enabled = true
   force_destroy      = true
@@ -79,17 +118,17 @@ module "sherlock_landing_bucket_mp" {
   # sse_algorithm = "AES256"
 
   tags = {
-    Environment    = terraform.workspace
+    Environment    = local.environment
     Application    = local.application
     Component      = local.component
-    Infrastructure = "sherlock-landing-bucket-test"
+    Infrastructure = "sherlock-landing-bucket-${local.environment}"
   }
 }
 
 module "sherlock_quarantine_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
-  bucket_prefix      = "landing-sherlock-quarantine-test-mp"
+  bucket_prefix      = "landing-sherlock-quarantine-${local.environment}-mp"
   bucket_namespace   = "account-regional"
   versioning_enabled = false
   force_destroy      = true
@@ -105,7 +144,7 @@ module "sherlock_quarantine_bucket" {
 
   # Default/recommended encryption mode
   sse_algorithm  = "aws:kms"
-  custom_kms_key = module.sherlock_kms_key.key_arn
+  custom_kms_key = module.sherlock_quarantine_kms_key.key_arn
 
   # Optional compatibility mode for uploaders that rely on bucket default
   # SSE-KMS encryption and do not send explicit SSE-KMS request headers.
@@ -115,19 +154,21 @@ module "sherlock_quarantine_bucket" {
   # sse_algorithm = "AES256"
 
   tags = {
-    Environment    = terraform.workspace
+    Environment    = local.environment
     Application    = local.application
     Component      = local.component
-    Infrastructure = "sherlock-quarantine-bucket-test"
+    Infrastructure = "sherlock-quarantine-bucket-${local.environment}"
   }
 }
 
-module "sherlock_logging_bucket_cloudtrail" {
+# cloudtrail logging bucket
+
+module "corp_people_logging_bucket" {
   source = "./modules/logging-bucket-cloudtrail"
 
-  bucket_prefix                    = "logging-sherlock-test-mp"
+  bucket_prefix                    = "logging-sherlock-${local.environment}-mp"
   cloudtrail_name                  = "sherlock-cloudtrail"
-  kms_key_arn                      = module.sherlock_kms_key.key_arn
+  kms_key_arn                      = module.sherlock_logging_kms_key.key_arn
   cloudwatch_log_retention_in_days = 365
 
   providers = {
@@ -135,10 +176,10 @@ module "sherlock_logging_bucket_cloudtrail" {
   }
 
   tags = {
-    Environment    = terraform.workspace
+    Environment    = local.environment
     Application    = local.application
     Component      = local.component
-    Infrastructure = "sherlock-logging-bucket-test"
+    Infrastructure = "sherlock-logging-bucket-${local.environment}"
   }
 }
 
@@ -146,22 +187,22 @@ module "sherlock_logging_bucket_cloudtrail" {
 module "sherlock_glue_database" {
   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/data-factory-glue-database?ref=75a5fd1ccb6c1858508b98651030cc4c919b9d03"
 
-  database_name = "sherlock_glue_database"
+  database_name = "sherlock_glue_database_${local.environment}"
 
   storage = {
     bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
 
     #currently the prefix is not optional
-    prefix      = "avature-sherlock"
+    prefix      = "avature-sherlock-${local.environment}"
     kms_key_arn = module.sherlock_kms_key.key_arn
   }
 
 }
 
 module "assume_iam_role" {
-  source = "./modules/external-i-am-role"
+  source = "./modules/external-iam-role"
 
-  role_name = "datafactory_dev_assume_role"
+  role_name = "datafactory_${local.environment}_assume_role"
 
   trusted_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
 
@@ -213,18 +254,23 @@ module "data_factory_guardduty_eventbridge" {
 
   bucket_names = [module.sherlock_landing_bucket_mp.bucket.bucket]
 
-  scan_result_statuses = ["THREATS_FOUND","FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
+  scan_result_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
 
   target_lambda_name = module.data_factory_guardduty_lambda.name
 
   target_lambda_arn = module.data_factory_guardduty_lambda.arn
 
   tags = {
-    Environment    = terraform.workspace
+    Environment    = local.environment
     Application    = local.application
     Component      = local.component
     Infrastructure = "sherlock-eventbridge-rule"
   }
+}
+
+output "guardduty_scan_alerts_topic_arn" {
+  description = "SNS topic to connect to a Slack channel in Amazon Q Developer in chat applications."
+  value       = module.data_factory_guardduty_eventbridge.scan_alerts_topic_arn
 }
 
 # guardduty malware scan
@@ -235,20 +281,20 @@ module "data_factory_guardduty_scan" {
   source = "./modules/guardduty-malware-scan"
 
 
-    bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
-    bucket_arn = module.sherlock_landing_bucket_mp.bucket.arn
-    #object_prefixes = []
+  bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
+  bucket_arn  = module.sherlock_landing_bucket_mp.bucket.arn
+  #object_prefixes = []
 
-    kms_key_arn = module.sherlock_kms_key.key_arn
+  kms_key_arn = module.sherlock_kms_key.key_arn
 
 
   tags = {
-    Environment    = terraform.workspace
+    Environment    = local.environment
     Application    = local.application
     Component      = local.component
     Infrastructure = "sherlock-guardduty-malware-scan"
   }
-  }
+}
 
 # lambda function for guardduty malware scan
 
@@ -256,27 +302,27 @@ module "data_factory_guardduty_lambda" {
 
   source = "./modules/guardduty-lambda"
 
-    name = "guardduty_lambda"
+  name = "guardduty_lambda"
 
-    lambda_kms_key_arn = module.sherlock_kms_key.key_arn
+  lambda_kms_key_arn = module.sherlock_kms_key.key_arn
 
   tags = {
-    Environment    = terraform.workspace
+    Environment    = local.environment
     Application    = local.application
     Component      = local.component
     Infrastructure = "sherlock-guardduty-malware-scan"
   }
 
-    quarantine_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
+  quarantine_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
 
-    eventbridge_rule_arn = module.data_factory_guardduty_eventbridge.rule_arn
+  eventbridge_rule_arn = module.data_factory_guardduty_eventbridge.rule_arn
 
-    quarantine_bucket_name = module.sherlock_quarantine_bucket.bucket.bucket
-    quarantine_bucket_arn = module.sherlock_quarantine_bucket.bucket.arn
-    quarantine_kms_key_arn = module.sherlock_kms_key.key_arn
+  quarantine_bucket_name = module.sherlock_quarantine_bucket.bucket.bucket
+  quarantine_bucket_arn  = module.sherlock_quarantine_bucket.bucket.arn
+  quarantine_kms_key_arn = module.sherlock_quarantine_kms_key.key_arn
 
-    s3_bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
-    s3_bucket_arn = module.sherlock_landing_bucket_mp.bucket.arn
-    s3_bucket_kms_key_arn = module.sherlock_kms_key.key_arn
+  s3_bucket_name        = module.sherlock_landing_bucket_mp.bucket.bucket
+  s3_bucket_arn         = module.sherlock_landing_bucket_mp.bucket.arn
+  s3_bucket_kms_key_arn = module.sherlock_kms_key.key_arn
 
 }

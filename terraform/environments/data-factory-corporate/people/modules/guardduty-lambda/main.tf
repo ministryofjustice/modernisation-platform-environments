@@ -12,15 +12,15 @@
 
 # Create Dead Letter Queue
 resource "aws_sqs_queue" "quarantine_dlq" {
-  name                  = "${var.name}-dlq"
-  kms_master_key_id     = var.lambda_kms_key_arn
-  tags                  = local.common_tags
+  name              = "${var.name}-dlq"
+  kms_master_key_id = var.lambda_kms_key_arn
+  tags              = local.common_tags
 }
 
 # Create deployment package for the Lambda function.
 data "archive_file" "quarantine_lambda" {
   type        = "zip"
-  source_dir = "${path.module}/src"
+  source_dir  = "${path.module}/src"
   output_path = "${path.module}/lambda.zip"
 }
 
@@ -34,7 +34,7 @@ resource "aws_lambda_function" "quarantine" {
   function_name = var.name
 
   # Lambda assumes the IAM role created in iam.tf
-  role    = aws_iam_role.quarantine_lambda.arn
+  role = aws_iam_role.quarantine_lambda.arn
 
   reserved_concurrent_executions = var.reserved_concurrent_executions
 
@@ -57,7 +57,7 @@ resource "aws_lambda_function" "quarantine" {
     variables = {
       QUARANTINE_BUCKET_NAME = var.quarantine_bucket_name
       QUARANTINE_KMS_KEY_ARN = var.quarantine_kms_key_arn
-      QUARANTINE_STATUSES = jsonencode(var.quarantine_statuses)
+      QUARANTINE_STATUSES    = jsonencode(var.quarantine_statuses)
     }
   }
 
