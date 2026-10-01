@@ -18,18 +18,30 @@ module "grafana_api_key_rotator" {
   timeout       = 120
   image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/observability-platform-grafana-api-key-rotator:${local.environment_configuration.grafana_api_key_rotator_version}"
 
-  environment_variables = {
-    WORKSPACE_API_KEY_NAME = "observability-platform-automation" #checkov:skip=CKV_SECRET_6:This a reference to a secret, not a secret itself
-    WORKSPACE_ID           = module.managed_grafana.workspace_id
-    SECRET_ID              = aws_secretsmanager_secret.grafana_api_key.id
-  }
+  environment_variables = merge(
+    {
+      WORKSPACE_ID = module.managed_grafana.workspace_id
+      SECRET_ID    = aws_secretsmanager_secret.grafana_api_key.id
+    },
+    # Development uses service-account tokens; production still runs 1.0.10.
+    local.environment == "development" ? {
+      WORKSPACE_SERVICE_ACCOUNT_NAME = aws_grafana_workspace_service_account.automation.name
+      } : {
+      WORKSPACE_API_KEY_NAME = "observability-platform-automation" #checkov:skip=CKV_SECRET_6:This a reference to a secret, not a secret itself
+    }
+  )
 
   attach_policy_statements = true
   policy_statements = {
     "grafana" = {
       sid    = "Grafana"
       effect = "Allow"
-      actions = [
+      actions = local.environment == "development" ? [
+        "grafana:ListWorkspaceServiceAccounts",
+        "grafana:ListWorkspaceServiceAccountTokens",
+        "grafana:CreateWorkspaceServiceAccountToken",
+        "grafana:DeleteWorkspaceServiceAccountToken"
+        ] : [
         "grafana:CreateWorkspaceApiKey",
         "grafana:DeleteWorkspaceApiKey"
       ]
