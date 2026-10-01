@@ -99,7 +99,9 @@
         "dps-acc-pro-custody",
         "dps-offences",
         "dps-visits",
-        "dps-body-scans"
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -335,7 +337,9 @@
         "dps-acc-pro-custody",
         "dps-offences",
         "dps-visits",
-        "dps-body-scans"
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -554,7 +558,9 @@
         "dps-acc-pro-custody",
         "dps-offences",
         "dps-visits",
-        "dps-body-scans"
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -786,7 +792,9 @@
         "dps-acc-pro-custody",
         "dps-offences",
         "dps-visits",
-        "dps-body-scans"
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
