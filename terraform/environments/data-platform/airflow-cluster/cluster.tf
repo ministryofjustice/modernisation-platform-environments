@@ -11,7 +11,16 @@ module "eks" {
   vpc_id                   = data.aws_vpc.main.id
   control_plane_subnet_ids = data.aws_subnets.private.ids
   subnet_ids               = data.aws_subnets.private.ids
-
+  security_group_additional_rules = {
+    vpc = {
+      description = "Allow traffic from the VPC"
+      from_port   = 0
+      to_port     = 65535
+      protocol    = "tcp"
+      type        = "ingress"
+      cidr_blocks = [data.aws_vpc.main.cidr_block]
+    }
+  }
   deletion_protection = true
 
   create_node_security_group = false
