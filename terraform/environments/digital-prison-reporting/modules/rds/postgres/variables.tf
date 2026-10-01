@@ -131,7 +131,7 @@ variable "allow_major_version_upgrade" {
 variable "auto_minor_version_upgrade" {
   type        = bool
   description = "Allow automatic minor version upgrades"
-  default     = true
+  default     = false
 }
 
 variable "performance_insights_enabled" {
