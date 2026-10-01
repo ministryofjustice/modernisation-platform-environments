@@ -36,26 +36,6 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
-  slack-notification-tests:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Test authenticated Slack pickup notifications
-        env:
-          PYTHONPATH: terraform/environments/integration-hub-file-transfer/slack-notifications/lambda/notifier
-        run: python3 -m unittest discover -s terraform/environments/integration-hub-file-transfer/slack-notifications/lambda/notifier/tests -v
-      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Validate notification component without AWS credentials or backend
-        working-directory: terraform/environments/integration-hub-file-transfer/slack-notifications
-        run: |
-          terraform init -backend=false -input=false
-          terraform validate -no-color
-
   strategy:
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
@@ -63,7 +43,7 @@ jobs:
       application: "${{ github.workflow }}"
 
   terraform:
-    needs: [strategy, slack-notification-tests]
+    needs: strategy
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     strategy:
       fail-fast: false

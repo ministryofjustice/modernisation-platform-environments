@@ -1,6 +1,14 @@
 # Secure clean-file download notifications
 
-Status: organisation SSO selected on 30 September 2026. The [Slack pickup component](../slack-notifications/README.md) is implemented with no recipient mappings enabled. The deployed managed portal was found to use expiring S3 URLs for single-file downloads. Activation is blocked by a Terraform precondition until a separate SSO streaming endpoint is implemented; no new root download grants are included. Component registration and live browser security validation remain deployment gates. The assessment below records the original options and constraints.
+Status: updated following David's feedback on 1 October 2026. Organisation SSO is
+selected; the proposed component is now `pull-from-presigned-url`. The draft is an
+inactive notification foundation. The goal is to prevent inappropriate sharing/use
+of long-lived presigned URLs. An SSO broker issuing a short-lived URL may be suitable
+if its residual sharing risk and lifetime are explicitly accepted; strict
+recipient-only retrieval still requires authenticated streaming. The component
+README records these options and the clean-bucket retention constraint. The original
+assessment below explains the stronger recipient-only interpretation and must not
+be read as a final decision to require streaming.
 
 ## Decision required
 

@@ -1,7 +1,7 @@
 locals {
 
   application_name = "integration-hub-file-transfer"
-  component_name   = "slack-notifications"
+  component_name   = "pull-from-presigned-url"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
