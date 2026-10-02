@@ -1,5 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
+  account_config = local.application_data.accounts[local.environment]
+
   baseline_presets_all_environments = {
     options = {
       enable_business_unit_kms_cmks               = true
@@ -33,5 +35,9 @@ locals {
   }
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
 
-  account_config = local.application_data.accounts[local.environment]
+  github_actions_lambda_environments_specific = {
+    development = local.github_actions_lambda_development
+    production  = local.github_actions_lambda_production
+  }
+  github_actions_lambda_environment_specific = local.github_actions_lambda_environments_specific[local.environment]
 }
