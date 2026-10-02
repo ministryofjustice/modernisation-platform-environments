@@ -13,8 +13,8 @@ locals {
 
   github_workflows = {
     hosting-migrations-platops-concierge-to-slack = {
-      identity  = "platops"
-      inputs    = {}
+      identity = "platops"
+      inputs   = {}
 
       ref      = "main"
       repo     = "hosting-migrations"
@@ -23,8 +23,8 @@ locals {
       workflow = "platops-concierge-to-slack.yml"
     }
     hosting-migrations-laa-concierge-to-slack = {
-      identity  = "platops"
-      inputs    = {}
+      identity = "platops"
+      inputs   = {}
 
       ref      = "main"
       repo     = "hosting-migrations"

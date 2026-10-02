@@ -16,8 +16,8 @@ locals {
     }
   }
   baseline_presets_environments_specific = {
-    development   = local.baseline_presets_development
-    production    = local.baseline_presets_production
+    development = local.baseline_presets_development
+    production  = local.baseline_presets_production
   }
   baseline_presets_environment_specific = local.baseline_presets_environments_specific[local.environment]
 
@@ -28,8 +28,8 @@ locals {
   }
 
   baseline_environments_specific = {
-    development   = local.baseline_development
-    production    = local.baseline_production
+    development = local.baseline_development
+    production  = local.baseline_production
   }
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
 
