@@ -157,7 +157,7 @@ resource "aws_ecs_service" "pui" {
 
 # Scale on CPU usage
 resource "aws_appautoscaling_target" "pui" {
-  max_capacity       = local.application_data.accounts[local.environment].app_count + 2
+  max_capacity       = local.application_data.accounts[local.environment].ecs_tasks_max_count
   min_capacity       = local.application_data.accounts[local.environment].app_count
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.pui.name}"
   scalable_dimension = "ecs:service:DesiredCount"
