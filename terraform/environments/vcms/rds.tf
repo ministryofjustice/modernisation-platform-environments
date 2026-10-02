@@ -82,11 +82,12 @@ resource "aws_security_group" "mariadb" {
 }
 
 # allow incoming traffic from the bastion host to the RDS instance
-resource "aws_security_group_ingress_rule" "bastion_to_rds" {
-  security_group_id            = aws_security_group.mariadb.id
-  from_port                    = 3306
-  to_port                      = 3306
-  protocol                     = "tcp"
-  referenced_security_group_id = module.bastion_linux.bastion_security_group
-  description                  = "Allow RDS traffic from bastion host"
+resource "aws_security_group_rule" "allow_bastion_to_rds" {
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.mariadb.id
+  source_security_group_id = module.bastion_linux.bastion_security_group
+  description              = "Allow incoming traffic from the bastion to RDS"
 }
