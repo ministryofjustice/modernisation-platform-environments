@@ -527,7 +527,7 @@ locals {
         }
       }
       grafana_version                 = "10.4"
-      grafana_api_key_rotator_version = "1.2.3"
+      grafana_api_key_rotator_version = "1.0.10"
     }
   }
 }
