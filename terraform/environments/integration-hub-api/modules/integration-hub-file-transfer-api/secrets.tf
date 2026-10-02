@@ -2,7 +2,7 @@ module "api_user_credentials_secret" {
   for_each = local.auth_users
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.1.0"
+  version = "2.1.1"
 
   name                    = "${local.resource_name_prefix}-${var.environment}-user-${each.key}"
   description             = "HTTPS upload credentials for ${each.key}"
@@ -25,7 +25,7 @@ module "api_system_bearer_token_secret" {
   for_each = local.auth_system_principals
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.1.0"
+  version = "2.1.1"
 
   name                    = "${local.resource_name_prefix}-${var.environment}-system-${each.key}"
   description             = "Bearer token secret for ${each.key}"
@@ -46,7 +46,7 @@ module "api_system_bearer_token_secret" {
 
 module "api_docs_basic_auth_secret" {
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.1.0"
+  version = "2.1.1"
 
   name                    = "${local.resource_name_prefix}-${var.environment}-docs-basic-auth"
   description             = "Basic auth credentials for the protected Swagger UI"
