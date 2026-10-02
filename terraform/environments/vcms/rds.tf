@@ -1,17 +1,13 @@
-locals {
-  db_name      = "vcms"
-  db_root_user = "vcms"
-}
 
 resource "aws_db_instance" "mariadb" {
   identifier             = "vcms-${local.environment}"
   snapshot_identifier    = local.app_config.db_snapshot_identifier
-  allocated_storage      = 200
-  db_name                = local.db_name
+  allocated_storage      = local.app_config.db_allocated_storage
+  db_name                = local.app_config.db_name
   engine                 = "mariadb"
-  engine_version         = "10.5.29"
-  instance_class         = "db.t4g.medium"
-  username               = local.db_root_user
+  engine_version         = local.app_config.db_engine_version
+  instance_class         = local.app_config.db_instance_class
+  username               = local.app_config.db_root_user
   password               = random_id.db_password.b64_url
   parameter_group_name   = aws_db_parameter_group.vcms-10-5.name
   db_subnet_group_name   = aws_db_subnet_group.mariadb.name
@@ -28,7 +24,7 @@ resource "random_id" "db_password" {
 }
 
 resource "aws_ssm_parameter" "db_password" {
-  name        = "${local.db_name}-db-root-password"
+  name        = "${local.app_config.db_name}-db-root-password"
   description = "The parameter description"
   type        = "SecureString"
   value       = random_id.db_password.b64_url
@@ -37,7 +33,7 @@ resource "aws_ssm_parameter" "db_password" {
 }
 
 resource "aws_db_parameter_group" "vcms-10-5" {
-  name   = "${local.db_name}-10-5"
+  name   = "${local.app_config.db_name}-10-5"
   family = "mariadb10.5"
   parameter {
     name  = "slow_query_log"
@@ -83,4 +79,14 @@ resource "aws_security_group" "mariadb" {
   }
 
   tags = local.tags
+}
+
+# allow incoming traffic from the bastion host to the RDS instance
+resource "aws_security_group_ingress_rule" "bastion_to_rds" {
+  security_group_id            = aws_security_group.mariadb.id
+  from_port                    = 3306
+  to_port                      = 3306
+  protocol                     = "tcp"
+  referenced_security_group_id = module.bastion_linux.bastion_security_group
+  description                  = "Allow RDS traffic from bastion host"
 }
