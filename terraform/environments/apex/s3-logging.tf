@@ -1,7 +1,7 @@
 module "s3-bucket-logging" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
-  bucket_name         = "${local.application_name}-${local.environment}-logging"
+  bucket_name        = "${local.application_name}-${local.environment}-logging"
   versioning_enabled = true
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
@@ -37,9 +37,9 @@ module "s3-bucket-logging" {
 }
 
 resource "aws_s3_bucket_policy" "logging_bucket_policy" {
-    bucket = module.s3-bucket-logging.bucket.id
-    policy = jsonencode({
-        Version = "2012-10-17",
+  bucket = module.s3-bucket-logging.bucket.id
+  policy = jsonencode({
+    Version = "2012-10-17",
     Statement = [
       {
         "Sid" : "DenyInsecureTransport",
@@ -74,5 +74,5 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         }
       }
     ]
-    })
+  })
 }
