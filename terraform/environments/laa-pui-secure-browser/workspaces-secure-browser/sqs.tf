@@ -2,7 +2,7 @@ module "sqs_xsiam_notifications" {
   source = "terraform-aws-modules/sqs/aws"
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  version = "5.1.0"
+  version = "5.2.2"
 
   count               = local.create_resources ? 1 : 0
   create_queue_policy = true
@@ -25,7 +25,7 @@ module "sqs_lambda_consumer" {
   source = "terraform-aws-modules/sqs/aws"
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  version             = "5.1.0"
+  version             = "5.2.2"
   count               = local.create_resources ? 1 : 0
   create_dlq          = true
   create_queue_policy = true
