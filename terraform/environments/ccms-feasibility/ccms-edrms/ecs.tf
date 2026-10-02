@@ -1,6 +1,6 @@
 module "ecs_cluster" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/1f66e8a0c8e5dca542c5b649451025236b04149c
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=1f66e8a0c8e5dca542c5b649451025236b04149c"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=10d2292"
 
   cluster_name = "${local.component_name}-${local.env_label}-cluster"
   tags         = local.tags
@@ -20,11 +20,15 @@ module "ecs_cluster" {
       kms_key_id            = data.aws_kms_key.ebs_shared.arn
     }
   }
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }
 
 module "ecs_service" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=b832178"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.component_name}-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id

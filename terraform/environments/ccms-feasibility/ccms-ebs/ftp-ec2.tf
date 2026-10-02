@@ -1,6 +1,6 @@
 module "ftp" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/646ef03
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=646ef03"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=10d2292"
 
   name                  = "${local.component_name}-${local.env_label}-ftp"
   instance_profile_name = aws_iam_instance_profile.ftp.name
@@ -23,6 +23,10 @@ module "ftp" {
     backup              = "true"
     instance-scheduling = "skip-scheduling"
   })
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }
 
 # EBS Volumes

@@ -1,6 +1,6 @@
 module "clamav" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/f3ab28c
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=f3ab28c"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=10d2292"
 
   name                  = "${local.application_name}-clamav"
   instance_profile_name = aws_iam_instance_profile.clamav.name
@@ -21,6 +21,10 @@ module "clamav" {
     instance-scheduling = "skip-scheduling"
     backup              = "true"
   })
+
+  alarms = {
+    topic_arn = module.alerting.alerts_topic_arn
+  }
 }
 
 # EBS Volumes

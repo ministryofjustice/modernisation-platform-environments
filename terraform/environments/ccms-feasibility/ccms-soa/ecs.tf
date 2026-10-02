@@ -8,8 +8,8 @@ data "aws_s3_bucket" "outbound" {
 }
 
 module "ecs_cluster" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/c20a9496c059d1302b3bb7c3bd0dcd6792a0c8e0
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=c20a9496c059d1302b3bb7c3bd0dcd6792a0c8e0"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=10d2292"
 
   cluster_name = "${local.component_name}-${local.env_label}-cluster"
   tags         = local.tags
@@ -56,11 +56,15 @@ module "ecs_cluster" {
       }))
     }
   }
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }
 
 module "ecs_service_admin" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=b832178"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.component_name}-admin-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -130,8 +134,8 @@ module "ecs_service_admin" {
 }
 
 module "ecs_service_managed" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=b832178"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.component_name}-managed-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id

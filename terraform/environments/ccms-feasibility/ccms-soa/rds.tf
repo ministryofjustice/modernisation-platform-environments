@@ -4,8 +4,8 @@ data "aws_db_instance" "edrms_tds" {
 }
 
 module "rds" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b832178
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/rds?ref=b832178"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/rds?ref=10d2292"
 
   name                 = "${local.component_name}-${local.env_label}-soa"
   engine               = "oracle-ee"

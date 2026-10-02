@@ -1,7 +1,7 @@
 module "oracle_ebs_apps" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/646ef03
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=646ef03"
-  count  = 2
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=10d2292"
+  count  = local.ebsapps_count
 
   name                  = "${local.component_name}-${local.env_label}-ebsapps-${count.index + 1}"
   instance_profile_name = aws_iam_instance_profile.ebsapps.name
@@ -18,11 +18,15 @@ module "oracle_ebs_apps" {
     backup              = "true"
     instance-scheduling = "skip-scheduling"
   })
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }
 
 # EBS Volumes
 resource "aws_ebs_volume" "ebsapps_swap" {
-  count = 2
+  count = local.ebsapps_count
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_apps[count.index].availability_zone
   size              = local.application_data.accounts[local.environment].ebsapps_swap_size
@@ -34,14 +38,14 @@ resource "aws_ebs_volume" "ebsapps_swap" {
 }
 
 resource "aws_volume_attachment" "ebsapps_swap" {
-  count       = 2
+  count       = local.ebsapps_count
   device_name = "/dev/sdb"
   volume_id   = aws_ebs_volume.ebsapps_swap[count.index].id
   instance_id = module.oracle_ebs_apps[count.index].instance_id
 }
 
 resource "aws_ebs_volume" "ebsapps_temp" {
-  count = 2
+  count = local.ebsapps_count
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_apps[count.index].availability_zone
   size              = local.application_data.accounts[local.environment].ebsapps_temp_size
@@ -53,14 +57,14 @@ resource "aws_ebs_volume" "ebsapps_temp" {
 }
 
 resource "aws_volume_attachment" "ebsapps_temp" {
-  count       = 2
+  count       = local.ebsapps_count
   device_name = "/dev/sdc"
   volume_id   = aws_ebs_volume.ebsapps_temp[count.index].id
   instance_id = module.oracle_ebs_apps[count.index].instance_id
 }
 
 resource "aws_ebs_volume" "ebsapps_home" {
-  count = 2
+  count = local.ebsapps_count
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_apps[count.index].availability_zone
   size              = 100
@@ -72,7 +76,7 @@ resource "aws_ebs_volume" "ebsapps_home" {
 }
 
 resource "aws_volume_attachment" "ebsapps_home" {
-  count       = 2
+  count       = local.ebsapps_count
   depends_on  = [aws_ebs_volume.ebsapps_home]
   device_name = "/dev/sdd"
   volume_id   = aws_ebs_volume.ebsapps_home[count.index].id
@@ -80,7 +84,7 @@ resource "aws_volume_attachment" "ebsapps_home" {
 }
 
 resource "aws_ebs_volume" "ebsapps_export_home" {
-  count = 2
+  count = local.ebsapps_count
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_apps[count.index].availability_zone
   size              = local.application_data.accounts[local.environment].ebsapps_exhome_size
@@ -92,7 +96,7 @@ resource "aws_ebs_volume" "ebsapps_export_home" {
 }
 
 resource "aws_volume_attachment" "ebsapps_export_home" {
-  count       = 2
+  count       = local.ebsapps_count
   depends_on  = [aws_ebs_volume.ebsapps_export_home]
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.ebsapps_export_home[count.index].id
@@ -100,7 +104,7 @@ resource "aws_volume_attachment" "ebsapps_export_home" {
 }
 
 resource "aws_ebs_volume" "ebsapps_u01" {
-  count = 2
+  count = local.ebsapps_count
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_apps[count.index].availability_zone
   size              = local.application_data.accounts[local.environment].ebsapps_u01_size
@@ -112,7 +116,7 @@ resource "aws_ebs_volume" "ebsapps_u01" {
 }
 
 resource "aws_volume_attachment" "ebsapps_u01" {
-  count       = 2
+  count       = local.ebsapps_count
   depends_on  = [aws_ebs_volume.ebsapps_u01]
   device_name = "/dev/sdi"
   volume_id   = aws_ebs_volume.ebsapps_u01[count.index].id
@@ -120,7 +124,7 @@ resource "aws_volume_attachment" "ebsapps_u01" {
 }
 
 resource "aws_ebs_volume" "ebsapps_u03" {
-  count = 2
+  count = local.ebsapps_count
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_apps[count.index].availability_zone
   size              = local.application_data.accounts[local.environment].ebsapps_u03_size
@@ -132,7 +136,7 @@ resource "aws_ebs_volume" "ebsapps_u03" {
 }
 
 resource "aws_volume_attachment" "ebsapps_u03" {
-  count       = 2
+  count       = local.ebsapps_count
   depends_on  = [aws_ebs_volume.ebsapps_u03]
   device_name = "/dev/sdj"
   volume_id   = aws_ebs_volume.ebsapps_u03[count.index].id
@@ -140,7 +144,7 @@ resource "aws_volume_attachment" "ebsapps_u03" {
 }
 
 resource "aws_ebs_volume" "ebsapps_stage" {
-  count = 2
+  count = local.ebsapps_count
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_apps[count.index].availability_zone
   size              = local.application_data.accounts[local.environment].ebsapps_stage_size
@@ -152,7 +156,7 @@ resource "aws_ebs_volume" "ebsapps_stage" {
 }
 
 resource "aws_volume_attachment" "ebsapps_stage" {
-  count       = 2
+  count       = local.ebsapps_count
   depends_on  = [aws_ebs_volume.ebsapps_stage]
   device_name = "/dev/sdk"
   volume_id   = aws_ebs_volume.ebsapps_stage[count.index].id
@@ -162,7 +166,7 @@ resource "aws_volume_attachment" "ebsapps_stage" {
 # ALB Target Group Attachments
 
 resource "aws_lb_target_group_attachment" "ebsapps" {
-  count            = 2
+  count            = local.ebsapps_count
   target_group_arn = module.alb.target_group_arn
   target_id        = module.oracle_ebs_apps[count.index].instance_id
   port             = local.application_data.accounts[local.environment].tg_apps_port

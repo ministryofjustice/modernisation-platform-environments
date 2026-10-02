@@ -4,8 +4,8 @@ data "aws_s3_bucket" "lb_access_logs" {
 }
 
 module "nlb_admin" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/8800d60
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=8800d60"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=10d2292"
 
   name               = "${local.component_name}-admin-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -30,11 +30,15 @@ module "nlb_admin" {
   }
 
   tags = local.tags
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }
 
 module "nlb_managed" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/8800d60
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=8800d60"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=10d2292"
 
   name               = "${local.component_name}-managed-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -59,4 +63,8 @@ module "nlb_managed" {
   }
 
   tags = local.tags
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }
