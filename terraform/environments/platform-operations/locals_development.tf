@@ -13,6 +13,6 @@ locals {
 
   github_actions_lambda_development = {
     enable_outbound_federation = false
-    github_workflows = {}
+    github_workflows           = {}
   }
 }

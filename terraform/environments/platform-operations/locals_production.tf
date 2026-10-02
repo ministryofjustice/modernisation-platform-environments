@@ -11,12 +11,12 @@ locals {
     }
   }
 
-  github_actions_lambda_production = {
+  github_actions_lambda_development = {
     enable_outbound_federation = true
     github_workflows = {
       hosting-migrations-platops-concierge-to-slack = {
         identity = "platops"
-        inputs = {}
+        inputs   = {}
 
         ref      = "main"
         repo     = "hosting-migrations"
@@ -26,7 +26,7 @@ locals {
       }
       hosting-migrations-laa-concierge-to-slack = {
         identity = "platops"
-        inputs = {}
+        inputs   = {}
 
         ref      = "main"
         repo     = "hosting-migrations"
