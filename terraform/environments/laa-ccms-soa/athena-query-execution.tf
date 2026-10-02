@@ -1,7 +1,7 @@
 # Execute the create table queries automatically after creation
 resource "null_resource" "execute_create_table_queries" {
   triggers = {
-    query_ids = join(",", ["${aws_athena_named_query.main_table_admin.id}", "${aws_athena_named_query.main_table_managed.id}", "${aws_athena_named_query.tls_requests_admin.id}", "${aws_athena_named_query.tls_requests_managed.id}"
+    query_ids = join(",", [aws_athena_named_query.main_table_admin.id, aws_athena_named_query.main_table_managed.id, aws_athena_named_query.tls_requests_admin.id, aws_athena_named_query.tls_requests_managed.id
     ])
   }
 
