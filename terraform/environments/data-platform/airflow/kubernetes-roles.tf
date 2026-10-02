@@ -84,6 +84,12 @@ resource "kubernetes_role_v1" "mwaa_execution" {
       "update"
     ]
   }
+  # Needed by cncf-kubernetes 10.x: KubernetesPodOperator reads pod events while waiting
+  rule {
+    api_groups = [""]
+    resources  = ["events"]
+    verbs      = ["get", "list", "watch"]
+  }
 }
 
 resource "kubernetes_role_v1" "mwaa_serviceaccount_management" {
