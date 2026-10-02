@@ -16,10 +16,13 @@ resource "aws_ssm_parameter" "script_runner_container_image_tag" {
 }
 
 data "aws_ssm_parameter" "script_runner_container_image_tag" {
-  # Read the live value written by the image build workflow. Do not derive the
-  # lookup through the Terraform-managed resource, whose value is deliberately
-  # ignored so the workflow can update it independently.
+  # Wait for initial creation, then read the live workflow-written value rather
+  # than the managed resource's value, whose changes Terraform ignores.
   name = local.script_runner_container_image_tag_parameter_name
+
+  depends_on = [
+    aws_ssm_parameter.script_runner_container_image_tag
+  ]
 }
 
 data "aws_iam_role" "modernisation_platform_oidc_cicd" {
