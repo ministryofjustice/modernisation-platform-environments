@@ -12,7 +12,7 @@ resource "aws_vpc_security_group_egress_rule" "auto_all_outbound" {
 }
 
 module "auto_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.2"
 
   count = var.auto_config != null ? var.auto_config.instance_count : 0
 
