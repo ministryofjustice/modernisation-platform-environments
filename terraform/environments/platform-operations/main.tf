@@ -48,8 +48,9 @@ module "baseline" {
 }
 
 module "github_workflow_scheduler" {
-  source           = "../../modules/github_lambda"
-  aws_account_id   = data.aws_caller_identity.current.id
-  project_name     = "github-actions"
-  github_workflows = local.github_workflows
+  source                      = "../../modules/github_lambda"
+  aws_account_id              = data.aws_caller_identity.current.id
+  enable_outbound_federation  = local.enable_outbound_federation
+  project_name                = "github-actions"
+  github_workflows            = local.github_workflows
 }

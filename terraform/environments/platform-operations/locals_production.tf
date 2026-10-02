@@ -11,6 +11,8 @@ locals {
     }
   }
 
+  enable_outbound_federation = true
+
   github_workflows = {
     hosting-migrations-platops-concierge-to-slack = {
       identity = "platops"
