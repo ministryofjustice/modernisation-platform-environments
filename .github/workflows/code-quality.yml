@@ -24,6 +24,7 @@ jobs:
     uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/reusable-code-quality.yml@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
     with:
       validate_all_codebase: ${{ github.event_name != 'pull_request' && 'true' || 'false' }}
+      codeql_languages: '["actions","go","javascript-typescript","python"]'
       checkov_arguments: >-
         --skip-check CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
       tflint_arguments: >-
