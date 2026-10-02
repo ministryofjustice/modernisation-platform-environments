@@ -1,0 +1,29 @@
+---
+name: Code Quality
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, edited, reopened, synchronize]
+  schedule:
+    - cron: "0 7 * * 1-5"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  code-quality:
+    permissions:
+      actions: read
+      contents: write
+      issues: write
+      pull-requests: write
+      security-events: write
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/reusable-code-quality.yml@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
+    with:
+      validate_all_codebase: ${{ github.event_name != 'pull_request' && 'true' || 'false' }}
+        --skip-check CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
+      tflint_arguments: >-
+        --disable-rule=terraform_unused_declarations
