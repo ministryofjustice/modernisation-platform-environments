@@ -151,7 +151,7 @@ module "rag_lambda" {
   #checkov:skip=CKV_AWS_272:Doesn't need code signing
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   function_name = "RAGLambdaFunction"
   description   = "Recieve NL request from user, use Bedrock to create SQL from NL, and use query to extract data from Athena"
