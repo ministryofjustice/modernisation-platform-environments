@@ -1,5 +1,5 @@
 module "artifacts-s3" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=c8889e65f4d8a3d53d2cbd93b7be714e990020b7" # v10.2.1
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=494aa4438cec612e45387109caa832aff4cac1ce" # v9.0.1
 
   providers = {
     aws.bucket-replication = aws
