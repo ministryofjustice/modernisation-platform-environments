@@ -1,6 +1,6 @@
 module "ftp" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/f3bee34
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=f3bee34"
 
   name                  = "${local.component_name}-${local.env_label}-ftp"
   instance_profile_name = aws_iam_instance_profile.ftp.name
@@ -25,7 +25,8 @@ module "ftp" {
   })
 
   alarms = {
-    topic_arn = data.aws_sns_topic.alerts.arn
+    topic_arn  = data.aws_sns_topic.alerts.arn
+    disk_paths = ["/"]
   }
 }
 

@@ -1,6 +1,6 @@
 module "clamav" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/f3bee34
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=f3bee34"
 
   name                  = "${local.application_name}-clamav"
   instance_profile_name = aws_iam_instance_profile.clamav.name
@@ -23,7 +23,8 @@ module "clamav" {
   })
 
   alarms = {
-    topic_arn = module.alerting.alerts_topic_arn
+    topic_arn  = module.alerting.alerts_topic_arn
+    disk_paths = ["/"]
   }
 }
 

@@ -1,6 +1,6 @@
 module "oracle_ebs_apps" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/f3bee34
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=f3bee34"
   count  = local.ebsapps_count
 
   name                  = "${local.component_name}-${local.env_label}-ebsapps-${count.index + 1}"
@@ -20,7 +20,8 @@ module "oracle_ebs_apps" {
   })
 
   alarms = {
-    topic_arn = data.aws_sns_topic.alerts.arn
+    topic_arn  = data.aws_sns_topic.alerts.arn
+    disk_paths = local.ebsapps_disk_paths
   }
 }
 
