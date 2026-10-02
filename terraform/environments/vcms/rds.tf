@@ -14,6 +14,9 @@ resource "aws_db_instance" "mariadb" {
   vpc_security_group_ids = [aws_security_group.mariadb.id]
   skip_final_snapshot    = true
   storage_encrypted      = true
+
+  apply_immediately = local.app_config.db_apply_immediately
+
   lifecycle {
     prevent_destroy = true
   }
