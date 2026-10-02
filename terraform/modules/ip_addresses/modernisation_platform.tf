@@ -43,6 +43,9 @@ locals {
     hmpps-preproduction = "10.27.0.0/21"
     hmpps-production    = "10.27.8.0/21"
 
+    platforms-development = "10.26.16.0/21"
+    platforms-production  = "10.27.96.0/21"
+
     core-shared-services-live-data            = "10.20.64.0/19"
     core-shared-services-live-data-additional = "10.27.136.0/21"
     core-shared-services-non-live-data        = "10.20.96.0/19"
