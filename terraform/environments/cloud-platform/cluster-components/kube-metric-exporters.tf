@@ -78,6 +78,19 @@ resource "helm_release" "node_exporter" {
       fsGroup      = 65534
     }
 
+    # The cluster's lockprivcapabilities Gatekeeper constraint (deny) requires
+    # every container to drop ALL capabilities (or at least NET_RAW).
+    # node-exporter needs no capabilities to read /proc, /sys, and the host
+    # root mount, so drop ALL. Without this the DaemonSet admission is denied,
+    # no pods are created, and the Helm release times out.
+    containerSecurityContext = {
+      readOnlyRootFilesystem   = true
+      allowPrivilegeEscalation = false
+      capabilities = {
+        drop = ["ALL"]
+      }
+    }
+
     resources = {
       requests = { cpu = "20m", memory = "32Mi" }
       limits   = { memory = "64Mi" }
