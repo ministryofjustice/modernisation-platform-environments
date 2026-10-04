@@ -35,7 +35,7 @@ module "script_runner_process" {
   execution_role_arn = aws_iam_role.step_functions_common.arn
   script_runner = {
     cluster_arn         = aws_ecs_cluster.script_runner.arn
-    task_definition_arn = aws_ecs_task_definition.script_runner.arn
+    task_definition_family = local.script_runner_task_definition_family
     container_name      = "script-runner"
     subnets             = module.vpc.private_subnets
     security_groups     = [aws_security_group.script_runner_task.id]

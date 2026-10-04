@@ -44,14 +44,14 @@ variable "steps" {
 variable "script_runner" {
   description = "ECS task and network configuration; required when steps include script_runner tasks."
   type = object({
-    cluster_arn         = string
-    task_definition_arn = string
-    container_name      = string
-    subnets             = list(string)
-    security_groups     = list(string)
-    assign_public_ip    = string
-    execution_role_arn  = string
-    task_role_arn       = string
+    cluster_arn            = string
+    task_definition_family = string
+    container_name         = string
+    subnets                = list(string)
+    security_groups        = list(string)
+    assign_public_ip       = string
+    execution_role_arn     = string
+    task_role_arn          = string
   })
   default = null
 

@@ -22,7 +22,7 @@ locals {
         Parameters = {
           LaunchType     = "FARGATE"
           Cluster        = var.script_runner.cluster_arn
-          TaskDefinition = var.script_runner.task_definition_arn
+          TaskDefinition = var.script_runner.task_definition_family
           NetworkConfiguration = {
             AwsvpcConfiguration = {
               Subnets        = var.script_runner.subnets

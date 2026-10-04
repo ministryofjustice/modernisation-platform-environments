@@ -41,6 +41,22 @@ resource "aws_iam_role_policy" "script_runner_container_image_tag" {
           "ssm:PutParameter"
         ]
         Resource = aws_ssm_parameter.script_runner_container_image_tag.arn
+      },
+      {
+        Sid    = "RegisterScriptRunnerTaskDefinition"
+        Effect = "Allow"
+        Action = [
+          "ecs:DescribeTaskDefinition",
+          "ecs:RegisterTaskDefinition",
+          "ecs:TagResource",
+        ]
+        Resource = "arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${local.script_runner_task_definition_family}:*"
+      },
+      {
+        Sid      = "PassScriptRunnerTaskRoles"
+        Effect   = "Allow"
+        Action   = ["iam:PassRole"]
+        Resource = [aws_iam_role.script_runner_ecs_execution.arn, aws_iam_role.script_runner_ecs_task.arn]
       }
     ]
   })

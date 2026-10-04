@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "step_functions_common" {
     sid       = "RunScriptRunnerTasks"
     effect    = "Allow"
     actions   = ["ecs:RunTask"]
-    resources = [aws_ecs_task_definition.script_runner.arn]
+    resources = ["arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${local.script_runner_task_definition_family}:*"]
 
     condition {
       test     = "ArnEquals"
