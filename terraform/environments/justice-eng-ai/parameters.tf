@@ -1,5 +1,5 @@
 locals {
-  script_runner_container_image_tag_parameter_name = "/${local.application_name}/${local.environment}/script-runner-container-image-tag"
+  script_runner_container_image_tag_parameter_name = "/modernisation-platform-ai-builder-core/script-runner/container-image-tag"
 }
 
 resource "aws_ssm_parameter" "script_runner_container_image_tag" {
