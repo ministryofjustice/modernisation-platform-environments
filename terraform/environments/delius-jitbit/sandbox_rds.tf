@@ -37,6 +37,8 @@ resource "aws_db_instance" "jitbit_sandbox" {
   identifier     = "${local.application_name}-sandbox-database"
   username       = local.application_data.accounts["sandbox"].db_user
 
+  apply_immediately = true
+  
   manage_master_user_password = true
 
   snapshot_identifier = try(local.application_data.accounts["sandbox"].db_snapshot_identifier, null)
