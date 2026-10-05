@@ -33,26 +33,14 @@ locals {
   # data.aws_identitystore_groups below. product.yaml carries names, and AMG
   # team sync needs IDs, so resolving here avoids hardcoding IDs.
   #
-  # cloud-platform-development currently holds the #8509 isolation PoC: two
-  # simulated BUs backed by two ephemeral clusters' AMP workspaces. Production
-  # (cloud-platform-live) is populated once per-BU-account AMP exists (#8517).
-  bus_by_workspace = {
-    cloud-platform-development = {
-      bu1 = {
-        amp_workspace_alias = "cp-1609-0059-bu1-metrics"
-        idc_group_names     = ["cloud-platform-engineers"] # simulated BU A
-      }
-      bu2 = {
-        amp_workspace_alias = "cp-1609-0059-bu2-metrics"
-        # simulated BU B. Uses container-platform-user-testing, a Viewer group
-        # deliberately NOT granted workspace ADMIN (cf. amg.tf), so the isolation
-        # control can actually be tested: data-source permissions are default-deny
-        # for Viewers but bypassed for Admins. A member of this group (team
-        # bu-bu2) must be able to query amp-bu2 but denied amp-bu1.
-        idc_group_names = ["container-platform-user-testing"]
-      }
-    }
-  }
+  # No BUs are defined yet. The #8509 isolation PoC previously hardcoded two
+  # simulated BUs here, backed by an ephemeral cluster's AMP workspaces
+  # (cp-1609-0059). That cluster has been torn down, so those aliases resolved
+  # to no workspace and the aws_prometheus_workspace lookup failed the plan.
+  # BU onboarding — populating this map from real per-BU-account AMP workspaces
+  # — is handled by a later ticket (#8517). Until then this is empty, so the
+  # per-BU Grafana resources below create nothing.
+  bus_by_workspace = {}
 
   # Phase-2 gate. The Grafana provider authenticates with a token minted from
   # the iac-grafana-objects service account (amg.tf). On the first apply of a
