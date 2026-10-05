@@ -41,7 +41,7 @@ resource "aws_lb_target_group" "radius_ecs" {
     path                = "/"
     interval            = 30
     healthy_threshold   = 2
-    unhealthy_threshold = 6  # Allow 180s for LinOTP startup (startPeriod = 120s + buffer)
+    unhealthy_threshold = 6 # Allow 180s for LinOTP startup (startPeriod = 120s + buffer)
     matcher             = "200-399"
   }
 

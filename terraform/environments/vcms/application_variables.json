@@ -70,7 +70,7 @@
       "legacy_validation_record": "_1f5950bad5290cf57d332b6d1a3a12fc.www.preprod.victim-case-management.service.justice.gov.uk"
     },
     "vcms-production": {
-      "APP_DEBUG": "false", 
+      "APP_DEBUG": "false",
       "container_port": 80,
       "container_cpu": "512",
       "task_memory": "1024",

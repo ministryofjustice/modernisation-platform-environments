@@ -166,7 +166,7 @@ module "rag_lambda" {
       ":zip",
     ]
   }]
-  artifacts_dir                = "${abspath(path.root)}/builds"
+  artifacts_dir = "${abspath(path.root)}/builds"
   # CI workspaces have no builds/ zip; ignore hash drift and allow missing packages to rebuild
   ignore_source_code_hash      = true
   recreate_missing_package     = true

@@ -18,7 +18,7 @@ module "ecs_cluster" {
       subnet_ids            = data.aws_subnets.shared-private.ids
       ebs_encrypted         = true
       kms_key_id            = data.aws_kms_key.ebs_shared.arn
-      user_data             = base64encode(templatefile("${path.module}/templates/user-data.sh", {
+      user_data = base64encode(templatefile("${path.module}/templates/user-data.sh", {
         cluster_name       = "${local.component_name}-${local.env_label}-cluster"
         efs_id             = module.efs.file_system_id
         deploy_environment = local.environment

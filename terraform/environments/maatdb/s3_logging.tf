@@ -11,7 +11,7 @@ module "s3-bucket-logging" {
         Effect    = "Deny",
         Principal = "*",
         Action    = "s3:*",
-        Resource  = [
+        Resource = [
           "${module.s3-bucket-logging.bucket.arn}/*",
           module.s3-bucket-logging.bucket.arn
         ],
@@ -27,7 +27,7 @@ module "s3-bucket-logging" {
         Principal = {
           AWS = "*"
         },
-        Action   = "s3:*",
+        Action = "s3:*",
         Resource = [
           "${module.s3-bucket-logging.bucket.arn}/*",
           module.s3-bucket-logging.bucket.arn
@@ -38,46 +38,46 @@ module "s3-bucket-logging" {
           }
         }
       },
-    {
-      Sid     = "AllowS3Logging Shared Bucket"
-      Effect  = "Allow"
-      Action = "s3:PutObject",
-      Principal = {
-        AWS = "*"
-      }
-      Resource = [
-        "${module.s3-bucket-logging.bucket.arn}/*",
-        module.s3-bucket-logging.bucket.arn
-      ]
-      Condition = {
-        StringLike = {
-          "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+      {
+        Sid    = "AllowS3Logging Shared Bucket"
+        Effect = "Allow"
+        Action = "s3:PutObject",
+        Principal = {
+          AWS = "*"
         }
-      }
-    },
-    {
-      Sid     = "AllowS3Logging FTP Buckets"
-      Effect  = "Allow"
-      Action = "s3:PutObject",
-      Principal = {
-        AWS = "*"
-      }
-      Resource = [
-        "${module.s3-bucket-logging.bucket.arn}/*",
-        module.s3-bucket-logging.bucket.arn
-      ]
+        Resource = [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ]
+        Condition = {
+          StringLike = {
+            "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+          }
+        }
+      },
+      {
+        Sid    = "AllowS3Logging FTP Buckets"
+        Effect = "Allow"
+        Action = "s3:PutObject",
+        Principal = {
+          AWS = "*"
+        }
+        Resource = [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ]
 
-      Condition = {
-        StringLike = {
-          "aws:SourceArn" = flatten([
-            for ftp_bucket in values(module.s3_bucket) : [
-              ftp_bucket.bucket.arn
-            ]
-          ])
+        Condition = {
+          StringLike = {
+            "aws:SourceArn" = flatten([
+              for ftp_bucket in values(module.s3_bucket) : [
+                ftp_bucket.bucket.arn
+              ]
+            ])
+          }
         }
       }
-    }
-  ]
+    ]
   })]
 
   sse_algorithm  = "AES256"
