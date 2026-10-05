@@ -107,7 +107,7 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_health_che
 # }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_vpce" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.vpce_subnets_a.cidr_block,
     data.aws_subnet.vpce_subnets_b.cidr_block,
     data.aws_subnet.vpce_subnets_c.cidr_block,
@@ -130,7 +130,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_s3" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_443" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.private_subnets_a.cidr_block,
     data.aws_subnet.private_subnets_b.cidr_block,
     data.aws_subnet.private_subnets_c.cidr_block,
@@ -144,7 +144,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_443" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_mysql" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.data_subnets_a.cidr_block,
     data.aws_subnet.data_subnets_b.cidr_block,
     data.aws_subnet.data_subnets_c.cidr_block,
@@ -158,7 +158,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_mysql" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_1521" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.data_subnets_a.cidr_block,
     data.aws_subnet.data_subnets_b.cidr_block,
     data.aws_subnet.data_subnets_c.cidr_block,
@@ -172,7 +172,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_1521" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_1522" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.data_subnets_a.cidr_block,
     data.aws_subnet.data_subnets_b.cidr_block,
     data.aws_subnet.data_subnets_c.cidr_block,

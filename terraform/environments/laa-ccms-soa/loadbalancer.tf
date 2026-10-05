@@ -138,7 +138,7 @@ resource "aws_lb_listener" "managed443" {
   default_action {
     target_group_arn = aws_lb_target_group.managed_https.id
     type             = "forward"
-  }  
+  }
   lifecycle {
     create_before_destroy = true
   }

@@ -107,7 +107,7 @@ resource "aws_ecs_service" "pui" {
   task_definition = aws_ecs_task_definition.pui.arn
   desired_count   = local.application_data.accounts[local.environment].app_count
 
-  
+
   # Required by the AWS provider whenever capacity_provider_strategy is
   # added/changed on an existing service (here: switching from launch_type
   # to capacity_provider_strategy), so the change is applied via a fresh
