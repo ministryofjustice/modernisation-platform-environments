@@ -66,3 +66,7 @@ resource "aws_iam_role_policy_attachment" "attach" {
   role       = aws_iam_role.eks_access.name
   policy_arn = aws_iam_policy.eks_access.arn
 }
+
+# Enable Outbound Web Identity Federation to allow roles to allow roles to connect to Azure via Federated Identity Credential (FIC)
+# https://user-guide.staff-identity.service.justice.gov.uk/documentation/guidance/aws-entra-federated-credentials.html#setup-aws-federated-identity-credentials-for-application-registrations
+resource "aws_iam_outbound_web_identity_federation" "default" {}
