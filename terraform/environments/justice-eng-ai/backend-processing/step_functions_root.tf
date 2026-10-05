@@ -13,28 +13,28 @@ locals {
       name               = "build_deploy_app_image"
       type               = "step_function"
       state_machine_name = "${local.application_name}-build-app-image"
-      input_path         = "$"
+      input_path         = "$.get_app_id"
       result_path        = "$.build_app_image"
     },
     {
       name               = "test_app_image"
       type               = "step_function"
       state_machine_name = "${local.application_name}-test-app-image"
-      input_path         = "$"
+      input_path         = "$.build_app_image"
       result_path        = "$.test_app_image"
     },
     {
       name               = "build_app_infra"
       type               = "step_function"
       state_machine_name = "${local.application_name}-build-app-infra"
-      input_path         = "$"
+      input_path         = "$.build_app_image"
       result_path        = "$.build_app_infra"
     },
     {
       name               = "deploy_to_infra"
       type               = "step_function"
       state_machine_name = "${local.application_name}-deploy-to-infra"
-      input_path         = "$"
+      input_path         = "$.build_app_infra"
       result_path        = "$.deploy_to_infra"
     },
   ]
