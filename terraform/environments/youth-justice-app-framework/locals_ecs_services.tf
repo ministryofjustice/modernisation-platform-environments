@@ -605,6 +605,108 @@ locals {
         ]
         enable_postgres_secret = false
       }
-    } : {}
+    } : {},
+    # Legacy yjsm apps moving off the EC2 host. Keys must match the
+    # "<key>-target-group-1" names in locals_target_groups.tf. Sizing is a
+    # first guess (no ECS baseline exists yet), and hub/hubadmin run a single
+    # task to match the single-host legacy setup (scheduled work, sessions)
+    # until it's confirmed they're safe to scale out. Like every other service
+    # they listen on 8080 (default container_port); the Java apps get there via
+    # SERVER_PORT, which overrides the server.port in their packaged properties
+    # (still used as-is by the legacy EC2 host).
+    {
+      yjsm-hub = {
+        name                              = "yjsm-hub"
+        additional_security_group_ids     = [aws_security_group.yjsm_ecs_sg.id]
+        image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:yjsm-hub-preprod"
+        task_cpu                          = 1024
+        task_memory                       = 3584
+        desired_count                     = 1
+        autoscaling_min_capacity          = 1
+        autoscaling_max_capacity          = 1
+        health_check_grace_period_seconds = 420
+        additional_port_mappings = [{
+          name          = "yjsm-hub-management"
+          containerPort = 9092
+          hostPort      = 9092
+          protocol      = "tcp"
+        }]
+        health_check = {
+          command      = ["CMD-SHELL", "curl -f http://localhost:9092/actuator/health || exit 1"]
+          interval     = 30
+          timeout      = 5
+          retries      = 10
+          start_period = 60
+        }
+        additional_environment_variables = [
+          {
+            "name" : "GATEWAY_SERVICE_URI"
+            "value" : "http://private-lb.${local.environment}.yjaf:8080"
+          },
+          {
+            "name" : "SERVER_PORT"
+            "value" : "8080"
+          },
+          {
+            "name" : "JAVA_OPTS",
+            "value" : "-Xmx2048m -Xms512m -Ddd.jmxfetch.enabled=true -Ddd.profiling.enabled=true -XX:FlightRecorderOptions=stackdepth=256 -Ddd.logs.injection=true -Ddd.trace.sample.rate=1 -Ddd.service=yjsm-hub -XX:-HeapDumpOnOutOfMemoryError"
+          }
+        ]
+        enable_postgres_secret = false
+      },
+      yjsm-hubadmin = {
+        name                              = "yjsm-hubadmin"
+        additional_security_group_ids     = [aws_security_group.yjsm_ecs_sg.id]
+        image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:yjsm-hubadmin-preprod"
+        task_cpu                          = 1024
+        task_memory                       = 3072
+        desired_count                     = 1
+        autoscaling_min_capacity          = 1
+        autoscaling_max_capacity          = 1
+        health_check_grace_period_seconds = 420
+        additional_environment_variables = [
+          {
+            "name" : "GATEWAY_SERVICE_URI"
+            "value" : "http://private-lb.${local.environment}.yjaf:8080"
+          },
+          {
+            "name" : "SERVER_PORT"
+            "value" : "8080"
+          },
+          {
+            "name" : "JAVA_OPTS",
+            "value" : "-Xmx2048m -Xms1024m -Ddd.jmxfetch.enabled=true -Ddd.profiling.enabled=true -XX:FlightRecorderOptions=stackdepth=256 -Ddd.logs.injection=true -Ddd.trace.sample.rate=1 -Ddd.service=yjsm-hubadmin -XX:-HeapDumpOnOutOfMemoryError"
+          }
+        ]
+        enable_postgres_secret = false
+      },
+      yjsm-ui = {
+        name                              = "yjsm-ui"
+        image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:yjsm-ui-preprod"
+        task_cpu                          = 256
+        task_memory                       = 512
+        health_check_grace_period_seconds = 60
+        readonly_root_filesystem          = false # nginx needs to write its cache/pid dirs
+        health_check = {
+          command      = ["CMD-SHELL", "wget -q --spider http://localhost:8080/ || exit 1"]
+          interval     = 30
+          timeout      = 5
+          retries      = 3
+          start_period = 10
+        }
+        # nginx.conf.template is envsubst'd on container start (see yjsm-ui's
+        # Dockerfile) to build the private-lb/yjsm-apps-lb hostnames, since it
+        # can't read Spring profile files like the Java apps do. The resolver
+        # nginx uses is the fixed, VPC-agnostic 169.254.169.253 address, not
+        # derived from the VPC CIDR, so it doesn't need passing in here.
+        additional_environment_variables = [
+          {
+            "name" : "YJAF_ENVIRONMENT"
+            "value" : local.environment
+          }
+        ]
+        enable_postgres_secret = false
+      }
+    }
   )
 }
