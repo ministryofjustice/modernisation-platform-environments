@@ -5,7 +5,7 @@ locals {
 
 ### Setup S3 Bucket for Athena Queries ###
 module "s3-bucket-athena-queries-output" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=494aa4438cec612e45387109caa832aff4cac1ce" # v9.0.1
 
   bucket_prefix      = "athena-query-s3-bucket"
   versioning_enabled = false

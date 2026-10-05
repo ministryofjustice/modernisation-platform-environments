@@ -38,7 +38,7 @@ locals {
         }
       }
       grafana_version                 = "12.4"
-      grafana_api_key_rotator_version = "1.2.2"
+      grafana_api_key_rotator_version = "1.2.3"
     }
     production = {
       tenant_configuration = {
@@ -503,6 +503,25 @@ locals {
                   workgroup = "coat_cur_report"
                 }
               }
+            }
+          }
+        },
+        "eucs" = {
+          "identity_centre_team" = "eucs-modern-workplace-admins",
+          "aws_accounts" = {
+            "eucs-appstream-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "eucs-appstream-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
             }
           }
         }

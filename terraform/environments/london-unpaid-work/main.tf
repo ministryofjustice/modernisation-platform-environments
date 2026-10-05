@@ -92,3 +92,10 @@ module "baseline" {
   )
 }
 
+module "github_workflow_scheduler" {
+  source                     = "../../modules/github_lambda"
+  aws_account_id             = data.aws_caller_identity.current.id
+  project_name               = "london-unpaid-work-github-trigger"
+  enable_outbound_federation = false # Already set in this account
+  github_workflows           = local.github_workflows
+}

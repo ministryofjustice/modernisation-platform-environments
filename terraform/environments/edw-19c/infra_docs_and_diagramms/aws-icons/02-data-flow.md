@@ -17,7 +17,7 @@ flowchart LR
 ## Key facts
 
 | | |
-|---|---|
+| --- | --- |
 | **No application tier** | Unlike `oas`, this is a database-only workload — step 1 is a direct, troubleshooting-only path, not a production integration |
 | **Data Pump path** | RDS's `S3_INTEGRATION` option assumes `rds-s3-access-role` to read/write the replica bucket for export/import |
 | **Cross-account replication** | One-directional: account `258180561819` (the `edw-upgrade` migration project) replicates objects **into** the bucket; edw-19c does not write to any bucket it doesn't own |

@@ -51,6 +51,8 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
           "system:serviceaccount:actions-runners:actions-runner-mojas-create-a-derived-table-dpr${local.environment_configuration.analytical_platform_runner_suffix}",
           "system:serviceaccount:mwaa:hmpps-cadet-deployer-dpr${local.environment_configuration.analytical_platform_runner_suffix}",
           "system:serviceaccount:mwaa:hmpps-data-hub-dpr-daily${local.environment_configuration.analytical_platform_runner_suffix}",
+          "system:serviceaccount:mwaa:probation-ppud${local.environment_configuration.analytical_platform_runner_suffix}",
+          "system:serviceaccount:mwaa:probation-ppud-derived${local.environment_configuration.analytical_platform_runner_suffix}"
         ],
         local.environment == "production" ? [
           "system:serviceaccount:mwaa:hmpps-data-hub-dpr-daily-prod-dev",

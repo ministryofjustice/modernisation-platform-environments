@@ -4,7 +4,7 @@
 
 Successfully moved ECS task definition and service from `workspace-components` to root `laa-workspaces` module to enable direct AD references.
 
-### Architecture Before:
+### Architecture Before
 ```
 workspace-components/
   ├── VPC, subnets, security groups
@@ -14,7 +14,7 @@ workspace-components/
   └── ECS task definition & service ❌ (couldn't reference AD)
 ```
 
-### Architecture After:
+### Architecture After
 ```
 laa-workspaces/ (root)
   ├── Active Directory
@@ -59,7 +59,7 @@ output "linotp_ad_bind_password_secret_arn" { ... }
 
 ## Deployment Order
 
-### First Time Setup:
+### First Time Setup
 1. **Deploy workspace-components** (creates infrastructure + new outputs):
    ```bash
    cd workspace-components
@@ -72,7 +72,7 @@ output "linotp_ad_bind_password_secret_arn" { ... }
    terraform apply
    ```
 
-### Future Updates:
+### Future Updates
 - Infrastructure changes → apply workspace-components
 - AD or ECS service changes → apply root
 - Both modules can be applied independently
@@ -91,7 +91,7 @@ After deployment:
 1. Check ECS service: `aws ecs describe-services --cluster laa-workspaces-development --services laa-workspaces-development-linotp3`
 2. Verify task is running and healthy
 3. Check logs for "✅ LinOTP configuration completed successfully"
-4. Access portal: https://workspace-mfa-ecs.laa-development.modernisation-platform.service.justice.gov.uk/
+4. Access portal: <https://workspace-mfa-ecs.laa-development.modernisation-platform.service.justice.gov.uk/>
 5. Verify resolver, realm, and policies exist in LinOTP
 
 ## Rollback Plan

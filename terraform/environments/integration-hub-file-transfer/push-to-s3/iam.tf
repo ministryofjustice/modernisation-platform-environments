@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "delivery" {
 module "iam_policy_delivery" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.8.0"
+  version = "6.8.2"
 
   for_each = local.push_to_s3_entries
 
@@ -87,7 +87,7 @@ module "iam_policy_delivery" {
 module "iam_role_delivery" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.0"
+  version = "6.8.2"
 
   for_each = local.push_to_s3_entries
 

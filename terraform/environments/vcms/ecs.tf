@@ -65,8 +65,8 @@ module "container_definition" {
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v6.0.0"
   name                     = "vcms"
   image                    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.app_config.image_tag}"
-  memory                   = 512
-  cpu                      = 256
+  memory                   = local.app_config.task_memory
+  cpu                      = local.app_config.container_cpu
   essential                = true
   readonly_root_filesystem = false
 

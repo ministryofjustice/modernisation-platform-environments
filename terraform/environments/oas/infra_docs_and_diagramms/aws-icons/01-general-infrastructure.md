@@ -9,7 +9,7 @@ security/automation services.
 ## Key facts
 
 | | |
-|---|---|
+| --- | --- |
 | **VPC** | Shared Modernisation Platform VPC (`10.26.0.0/16` dev · `10.27.0.0/16` preprod) |
 | **Compute** | EC2 r5a.large, Oracle Linux 8.10, WebLogic + Analytics/DV, private subnet A only |
 | **Storage** | 2x 300GB gp3 EBS volumes (`/oracle/software`, `/stage`), both KMS-encrypted |

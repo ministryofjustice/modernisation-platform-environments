@@ -76,7 +76,7 @@ flowchart TB
 ## Key facts
 
 | | |
-|---|---|
+| --- | --- |
 | **VPC CIDR** | `10.26.130.0/23` (dev) · `10.27.130.0/23` (prod) |
 | **WorkSpaces access** | IP group restricted to 4 Global Protect gateway IPs; only Windows, macOS and Web clients allowed |
 | **MFA compute** | ECS Fargate, 1024 CPU / 2048 MB — `linotp` :5000 + `freeradius` :1812/1813 UDP |

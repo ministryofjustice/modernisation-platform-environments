@@ -154,7 +154,7 @@ resource "aws_iam_role" "scheduler_invoke_lambda_role" {
           "aws:SourceAccount" = data.aws_caller_identity.current.account_id
         }
       },
-      Action    = "sts:AssumeRole"
+      Action = "sts:AssumeRole"
     }]
   })
 

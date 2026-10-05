@@ -1,0 +1,11 @@
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumGatewayClassConfig
+metadata:
+  name: cilium-config
+  namespace: {{ .Release.Namespace }}
+spec:
+  service:
+    type: LoadBalancer
+    loadBalancerClass: service.k8s.aws/nlb
+    externalTrafficPolicy: Cluster

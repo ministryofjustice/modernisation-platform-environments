@@ -1,0 +1,56 @@
+---
+crds:
+  enabled: true
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node: system
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node
+    operator: Equal
+    value: system
+    effect: NoSchedule
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+webhook:
+  # Required on custom CNI EKS clusters so the control plane can reach this endpoint.
+  hostNetwork: true
+  # Avoid conflict with kubelet's 10250 when hostNetwork is enabled.
+  securePort: 10251
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+cainjector:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+startupapicheck:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+prometheus:
+  servicemonitor:
+    enabled: true
+
+config:
+  apiVersion: controller.config.cert-manager.io/v1alpha1
+  kind: ControllerConfiguration
+  enableGatewayAPI: true
