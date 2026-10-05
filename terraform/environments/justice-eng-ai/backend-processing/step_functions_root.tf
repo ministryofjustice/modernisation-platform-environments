@@ -41,7 +41,7 @@ locals {
 }
 
 module "step_functions_root" {
-  source = "./modules/step_function_builder"
+  source = "../modules/step_function_builder"
 
   name               = local.root_state_machine_name
   steps              = local.root_process_steps
