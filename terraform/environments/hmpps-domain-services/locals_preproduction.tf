@@ -128,7 +128,7 @@ locals {
           availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 200 }
+          "/dev/sda1" = { type = "gp3", size = 400 }
         }
         instance = merge(local.ec2_instances.jumpserver.instance, {
           instance_type = "r6i.xlarge"
