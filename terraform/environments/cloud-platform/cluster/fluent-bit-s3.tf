@@ -94,7 +94,7 @@ data "aws_iam_policy_document" "log_archive" {
       variable = "aws:SourceAccount"
       values   = [data.aws_caller_identity.current.account_id]
     }
-    
+
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"

@@ -2,9 +2,9 @@
 
 resource "aws_ecs_capacity_provider" "capacity-provider" {
   name = "${local.application_name}-capacity-provider"
-  
-   auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
     managed_termination_protection = "ENABLED"
 
     # Lets ECS automatically scale the ASG out (up to ec2_max_capacity) when
@@ -21,7 +21,7 @@ resource "aws_ecs_capacity_provider" "capacity-provider" {
       maximum_scaling_step_size = 1
     }
   }
-  
+
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-cp", local.application_name, local.environment)) }
   )

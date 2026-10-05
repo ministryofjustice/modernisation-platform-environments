@@ -19,17 +19,17 @@ module "rds_export" {
     aws = aws
   }
 
-  kms_key_arn              = aws_kms_key.shared_kms_key.arn
-  name                     = "planetfm"
-  db_name                  = "planetfm"
-  database_refresh_mode    = "full"
-  output_parquet_file_size = 200
+  kms_key_arn                           = aws_kms_key.shared_kms_key.arn
+  name                                  = "planetfm"
+  db_name                               = "planetfm"
+  database_refresh_mode                 = "full"
+  output_parquet_file_size              = 200
   database_export_processor_memory_size = 8192
-  max_concurrency          = 5
-  environment              = local.environment_shorthand
-  vpc_id                   = module.vpc.vpc_id
-  database_subnet_ids      = module.vpc.private_subnets
-  master_user_secret_id    = aws_secretsmanager_secret.db_master_user_secret.arn
+  max_concurrency                       = 5
+  environment                           = local.environment_shorthand
+  vpc_id                                = module.vpc.vpc_id
+  database_subnet_ids                   = module.vpc.private_subnets
+  master_user_secret_id                 = aws_secretsmanager_secret.db_master_user_secret.arn
 
   tags = local.tags
 }

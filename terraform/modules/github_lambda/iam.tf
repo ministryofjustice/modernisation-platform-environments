@@ -78,7 +78,7 @@ data "aws_iam_policy_document" "lambda_kms_key_policy" {
       type        = "AWS"
       identifiers = [aws_iam_role.lambda.arn]
     }
-    actions = ["kms:*"]
+    actions   = ["kms:*"]
     resources = [aws_kms_key.lambda.arn]
   }
 }
@@ -132,7 +132,7 @@ data "aws_iam_policy_document" "scheduler_kms_key_policy" {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${var.aws_account_id}:root"]
     }
-    actions = ["kms:*"]
+    actions   = ["kms:*"]
     resources = ["arn:aws:kms:${var.aws_region}:${var.aws_account_id}:key/*"]
 
     condition {
@@ -149,7 +149,7 @@ data "aws_iam_policy_document" "scheduler_kms_key_policy" {
       type        = "AWS"
       identifiers = [aws_iam_role.eventbridge_scheduler.arn]
     }
-    actions = ["kms:*"]
+    actions   = ["kms:*"]
     resources = [aws_kms_key.scheduler.arn]
   }
 }

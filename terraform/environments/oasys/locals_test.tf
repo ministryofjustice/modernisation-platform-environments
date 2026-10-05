@@ -83,7 +83,7 @@ locals {
 
       t2-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
-          scale_up = { recurrence = "0 5 * * Mon-Fri" }
+          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
           scale_down = { recurrence = "30 22 * * Mon-Fri", desired_capacity = 0 }
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
