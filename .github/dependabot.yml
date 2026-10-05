@@ -965,6 +965,9 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/justice-eng-ai"
+      - "terraform/environments/justice-eng-ai/backend-processing"
+      - "terraform/environments/justice-eng-ai/prototypes-infra"
+      - "terraform/environments/justice-eng-ai/web-ui"
     schedule:
       interval: "daily"
     groups:
