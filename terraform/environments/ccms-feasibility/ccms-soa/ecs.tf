@@ -112,6 +112,7 @@ module "ecs_service_admin" {
     apply_user           = local.application_data.accounts[local.environment].admin_apply_user
     keystore_secret_id   = aws_secretsmanager_secret.soa.name
     soa_secret_arn       = aws_secretsmanager_secret.soa.arn
+    slack_secret_arn     = data.aws_secretsmanager_secret.slack_webhooks.arn
   })
 
   load_balancer = {
@@ -186,6 +187,7 @@ module "ecs_service_managed" {
     ms_hostname       = aws_route53_record.managed.fqdn
     wl_mem_args       = local.application_data.accounts[local.environment].managed_wl_mem_args
     soa_secret_arn    = aws_secretsmanager_secret.soa.arn
+    slack_secret_arn  = data.aws_secretsmanager_secret.slack_webhooks.arn
   })
 
   load_balancer = {
