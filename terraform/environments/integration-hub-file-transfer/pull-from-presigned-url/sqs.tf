@@ -60,7 +60,7 @@ module "sqs_notifications" {
   create_queue_policy        = false
   kms_master_key_id          = module.kms_notifications_pipeline.key_arn
   message_retention_seconds  = 345600
-  visibility_timeout_seconds = 360
+  visibility_timeout_seconds = 5400
   receive_wait_time_seconds  = 20
   redrive_policy = {
     deadLetterTargetArn = module.sqs_notifications_dlq.queue_arn

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MFT file pickup</title></head>
+<body><main><h1>MFT file pickup</h1><p id="status">Sign in with your organisation account to collect your file.</p><button id="action" type="button">Sign in</button><p>Files are available for seven days. If a download link expires, reopen the Slack link and try again.</p></main>
+<script nonce="__NONCE__">
+'use strict';
+const config = JSON.parse(atob('__SETTINGS__'));
+const status = document.getElementById('status');
+const action = document.getElementById('action');
+let accessToken;
+let pickupId;
+const encode = bytes => btoa(String.fromCharCode(...bytes)).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
+const random = () => encode(crypto.getRandomValues(new Uint8Array(32)));
+const validId = id => typeof id === 'string' && /^[a-f0-9]{64}$/.test(id);
+async function login() {
+  action.disabled = true;
+  const verifier = random();
+  const state = random();
+  const challenge = encode(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))));
+  sessionStorage.setItem('mft-login', JSON.stringify({verifier, state, pickupId, created: Date.now()}));
+  const url = new URL(config.authorization_endpoint);
+  url.search = new URLSearchParams({response_type: 'code', client_id: config.client_id,
+    redirect_uri: config.redirect_uri, scope: 'openid ' + config.download_scope,
+    code_challenge: challenge, code_challenge_method: 'S256', state}).toString();
+  location.assign(url);
+}
+async function download() {
+  action.disabled = true;
+  try {
+    const response = await fetch('/pickups/' + pickupId + '/download', {
+      method: 'POST', headers: {Authorization: 'Bearer ' + accessToken}, cache: 'no-store', credentials: 'omit'});
+    if (response.status === 401) { accessToken = undefined; await login(); return; }
+    if (!response.ok) throw new Error('File unavailable or you do not have permission to download it.');
+    const result = await response.json();
+    const url = new URL(result.url);
+    if (url.protocol !== 'https:' || !url.hostname.endsWith('.s3.eu-west-2.amazonaws.com')) throw new Error('Unexpected download response.');
+    status.textContent = 'Your download is starting. You can retry while the file is available.';
+    // S3 responds as an attachment; do not persist the URL or access token.
+    location.assign(url.href);
+  } finally { action.disabled = false; }
+}
+function fail(error) { status.textContent = error.message || 'Unable to sign in. Reopen the Slack link and try again.'; action.disabled = true; }
+async function start() {
+  if (location.pathname === '/callback') {
+    const params = new URLSearchParams(location.search);
+    history.replaceState(null, '', '/callback');
+    const saved = JSON.parse(sessionStorage.getItem('mft-login') || 'null');
+    sessionStorage.removeItem('mft-login');
+    if (!saved || params.get('state') !== saved.state || !params.get('code') || !validId(saved.pickupId)
+        || Date.now() - saved.created > 600000 || Date.now() < saved.created) throw new Error('Sign-in expired. Reopen the Slack link.');
+    pickupId = saved.pickupId;
+    const response = await fetch(config.token_endpoint, {method: 'POST', credentials: 'omit', cache: 'no-store',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams({grant_type: 'authorization_code',
+        client_id: config.client_id, redirect_uri: config.redirect_uri, code: params.get('code'), code_verifier: saved.verifier})});
+    if (!response.ok) throw new Error('Sign-in failed. Reopen the Slack link.');
+    const tokens = await response.json();
+    if (!tokens.access_token || tokens.token_type.toLowerCase() !== 'bearer') throw new Error('Unsupported sign-in response.');
+    accessToken = tokens.access_token;
+    history.replaceState(null, '', '/pickups/' + pickupId);
+    status.textContent = 'Signed in. Select Download file to check access and start your download.';
+    action.textContent = 'Download file';
+    action.onclick = () => download().catch(fail);
+  } else {
+    pickupId = location.pathname.split('/')[2];
+    if (!validId(pickupId)) throw new Error('Invalid pickup link.');
+    action.onclick = () => login().catch(fail);
+  }
+}
+start().catch(fail);
+</script></body></html>
