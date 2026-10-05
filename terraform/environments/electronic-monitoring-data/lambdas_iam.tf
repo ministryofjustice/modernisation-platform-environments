@@ -3720,6 +3720,32 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
       aws_kms_key.emds_alerts.arn,
     ]
   }
+  statement {
+    sid    = "ReconciliationStateAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid    = "StoreReconciliationApprovalToken"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation-approval-tokens/${local.environment_shorthand}/*",
+    ]
+  }
 }
 
 resource "aws_iam_policy" "merge_redrive_planner" {
@@ -3730,4 +3756,107 @@ resource "aws_iam_policy" "merge_redrive_planner" {
 resource "aws_iam_role_policy_attachment" "merge_redrive_planner" {
   role       = aws_iam_role.merge_redrive_planner.name
   policy_arn = aws_iam_policy.merge_redrive_planner.arn
+}
+
+resource "aws_iam_role" "merge_redrive_approval" {
+  name               = "merge_redrive_approval_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "merge_redrive_approval_policy_document" {
+  statement {
+    sid    = "ReadReconciliationApprovalState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid    = "ConsumeReconciliationApprovalToken"
+    effect = "Allow"
+
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation-approval-tokens/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid       = "CompleteReconciliationApprovalCallback"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "merge_redrive_approval" {
+  name   = "merge_redrive_approval_lambda_policy"
+  policy = data.aws_iam_policy_document.merge_redrive_approval_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "merge_redrive_approval" {
+  role       = aws_iam_role.merge_redrive_approval.name
+  policy_arn = aws_iam_policy.merge_redrive_approval.arn
+}
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation approval access
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "downstream_reconciliation_chatbot_approval" {
+  statement {
+    sid    = "InvokeReconciliationApprovalLambda"
+    effect = "Allow"
+
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+
+    resources = [
+      module.merge_redrive_approval.lambda_function_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "downstream_reconciliation_chatbot_approval" {
+  name = "downstream_reconciliation_chatbot_approval"
+
+  policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_chatbot_approval.json
+  )
+}
+
+data "aws_iam_policy_document" "downstream_reconciliation_approver_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["chatbot.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "downstream_reconciliation_approver" {
+  name = "downstream_reconciliation_approver"
+
+  assume_role_policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_approver_assume.json
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "downstream_reconciliation_approver" {
+  role       = aws_iam_role.downstream_reconciliation_approver.name
+  policy_arn = aws_iam_policy.downstream_reconciliation_chatbot_approval.arn
 }

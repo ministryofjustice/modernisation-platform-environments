@@ -176,7 +176,7 @@ alerts_configured_accounts = [
 Every key inside `alerting_golden_signals` (in `alerting-golden-signals.tf`) is one of the fields below.
 
 | Field | Required | Description |
-|---|---|---|
+| --- | --- | --- |
 | `group` | yes | Alert group name. Must match a key in `group_folders`. |
 | `namespace` | CloudWatch only | CloudWatch namespace (e.g. `AWS/RDS`). Omit for Prometheus signals. |
 | `metric` | yes | CloudWatch metric name, or a short label used as the `metric` alert label for Prometheus signals. |
@@ -207,7 +207,7 @@ Every key inside `alerting_golden_signals` (in `alerting-golden-signals.tf`) is 
 ### Supported `dim_key` values
 
 | `dim_key` | Resolves against (per account, in `environment-configuration.tf`) |
-|---|---|
+| --- | --- |
 | `""` | No dimension filter — a single global aggregate rule. |
 | `BucketName` | `cfg.s3_buckets` — list of bucket names |
 | `DBInstanceIdentifier` | `cfg.rds_instances` — list of RDS instance IDs |
@@ -235,7 +235,7 @@ One Grafana alert rule is created per value in the resolved list, and that value
 Each entry in `alerts_configured_accounts` (in `environment-configuration.tf`) configures alerting for one monitored AWS account. `name` must match an entry in that environment's `grafana_monitored_accounts`; every other field is optional.
 
 | Field | Required | Default | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `name` | yes | — | AWS account name, e.g. `"data-platform-development"`. Must exist in `grafana_monitored_accounts` for the environment. The `data-platform-` prefix is stripped to form `uid` (used in datasource UIDs and folder names) and the key of `grafana_monitored_accounts_by_uid`. |
 | `enabled_groups` | no | `[]` (no alerts) | List of group names (keys from `group_folders`) to generate alert rule groups for in this account. A group with no account enabling it produces no rules anywhere. |
 | `s3_buckets` | with `BucketName`-dimensioned rules | `[]` | List of S3 bucket names. One rule is generated per bucket for any golden signal with `dim_key = "BucketName"`. |

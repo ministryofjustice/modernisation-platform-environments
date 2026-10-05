@@ -9,7 +9,7 @@ module "s3_bucket_efs_migration" {
 
   bucket_policy_v2 = [
     {
-      effect  = "Allow"
+      effect = "Allow"
       actions = [
         "s3:PutObject",
         "s3:GetObject",
@@ -143,8 +143,8 @@ resource "aws_iam_role_policy" "datasync_import_permissions" {
         Resource = ["*"]
       },
       {
-        Effect = "Allow"
-        Action = ["logs:CreateLogStream", "logs:PutLogEvents"]
+        Effect   = "Allow"
+        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
         Resource = ["${aws_cloudwatch_log_group.datasync_import.arn}:*"]
       }
     ]
@@ -159,7 +159,7 @@ resource "aws_cloudwatch_log_group" "datasync_import" {
 }
 
 resource "aws_cloudwatch_log_resource_policy" "datasync_import_cw_policy" {
-  policy_name     = "vcms-datasync-import-cw-policy-${local.environment}"
+  policy_name = "vcms-datasync-import-cw-policy-${local.environment}"
   policy_document = jsonencode({
     Version = "2012-10-17"
     Statement = [

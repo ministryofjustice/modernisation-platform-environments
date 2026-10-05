@@ -103,9 +103,7 @@
             "orientation": "auto",
             "percentChangeColorMode": "standard",
             "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "fields": "",
               "values": false
             },
@@ -171,9 +169,7 @@
             "orientation": "auto",
             "percentChangeColorMode": "standard",
             "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "fields": "",
               "values": false
             },
@@ -231,9 +227,7 @@
             "orientation": "auto",
             "percentChangeColorMode": "standard",
             "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "fields": "",
               "values": false
             },
@@ -291,9 +285,7 @@
             "orientation": "auto",
             "percentChangeColorMode": "standard",
             "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "fields": "",
               "values": false
             },
@@ -358,9 +350,7 @@
             "orientation": "auto",
             "percentChangeColorMode": "standard",
             "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "fields": "",
               "values": false
             },
@@ -527,9 +517,7 @@
             "orientation": "auto",
             "percentChangeColorMode": "standard",
             "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "fields": "",
               "values": false
             },
@@ -588,9 +576,7 @@
             "orientation": "auto",
             "percentChangeColorMode": "standard",
             "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "fields": "",
               "values": false
             },
@@ -685,10 +671,7 @@
               "multiLane": false
             },
             "legend": {
-              "calcs": [
-                "mean",
-                "max"
-              ],
+              "calcs": ["mean", "max"],
               "displayMode": "table",
               "placement": "bottom",
               "showLegend": true
@@ -787,10 +770,7 @@
               "multiLane": false
             },
             "legend": {
-              "calcs": [
-                "mean",
-                "max"
-              ],
+              "calcs": ["mean", "max"],
               "displayMode": "table",
               "placement": "bottom",
               "showLegend": true
@@ -1535,9 +1515,7 @@
             "namePlacement": "auto",
             "orientation": "horizontal",
             "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "fields": "",
               "values": false
             },
@@ -1606,9 +1584,7 @@
             "namePlacement": "auto",
             "orientation": "horizontal",
             "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "fields": "",
               "values": false
             },
@@ -3325,10 +3301,7 @@
               "multiLane": false
             },
             "legend": {
-              "calcs": [
-                "mean",
-                "max"
-              ],
+              "calcs": ["mean", "max"],
               "displayMode": "table",
               "placement": "bottom",
               "showLegend": true
@@ -3445,10 +3418,7 @@
               "multiLane": false
             },
             "legend": {
-              "calcs": [
-                "mean",
-                "max"
-              ],
+              "calcs": ["mean", "max"],
               "displayMode": "table",
               "placement": "bottom",
               "showLegend": true
@@ -3547,10 +3517,7 @@
               "multiLane": false
             },
             "legend": {
-              "calcs": [
-                "mean",
-                "max"
-              ],
+              "calcs": ["mean", "max"],
               "displayMode": "table",
               "placement": "bottom",
               "showLegend": true
@@ -3649,10 +3616,7 @@
               "multiLane": false
             },
             "legend": {
-              "calcs": [
-                "mean",
-                "max"
-              ],
+              "calcs": ["mean", "max"],
               "displayMode": "table",
               "placement": "bottom",
               "showLegend": true
@@ -3751,10 +3715,7 @@
               "multiLane": false
             },
             "legend": {
-              "calcs": [
-                "mean",
-                "max"
-              ],
+              "calcs": ["mean", "max"],
               "displayMode": "table",
               "placement": "bottom",
               "showLegend": true
@@ -5874,9 +5835,7 @@
                 "crossSeriesReducer": "REDUCE_SUM",
                 "perSeriesAligner": "ALIGN_RATE",
                 "alignmentPeriod": "cloud-monitoring-auto",
-                "groupBys": [
-                  "resource.label.model_user_id"
-                ],
+                "groupBys": ["resource.label.model_user_id"],
                 "filters": [
                   "metric.type",
                   "=",
@@ -5985,9 +5944,7 @@
                 "crossSeriesReducer": "REDUCE_PERCENTILE_99",
                 "perSeriesAligner": "ALIGN_DELTA",
                 "alignmentPeriod": "cloud-monitoring-auto",
-                "groupBys": [
-                  "resource.label.model_user_id"
-                ],
+                "groupBys": ["resource.label.model_user_id"],
                 "filters": [
                   "metric.type",
                   "=",
@@ -6436,9 +6393,7 @@
                 "crossSeriesReducer": "REDUCE_MEAN",
                 "perSeriesAligner": "ALIGN_MEAN",
                 "alignmentPeriod": "cloud-monitoring-auto",
-                "groupBys": [
-                  "resource.label.model_user_id"
-                ],
+                "groupBys": ["resource.label.model_user_id"],
                 "filters": [
                   "metric.type",
                   "=",
@@ -7063,9 +7018,7 @@
                   {
                     "dimension": "StatusCode",
                     "operator": "ne",
-                    "filters": [
-                      "200"
-                    ]
+                    "filters": ["200"]
                   }
                 ],
                 "alias": "{{ResourceName}} - {{ModelDeploymentName}} ({{StatusCode}})"

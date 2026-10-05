@@ -158,11 +158,11 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.tags, {
-          nomis-environment       = "dev"
-          oracle-db-name          = "qa11g"
-          oracle-db-hostname-a    = "dev-nomis-db19c-1-a"
-          oracle-db-hostname-b    = "none"
-          weblogic-config-target  = "qa11g"
+          nomis-environment      = "dev"
+          oracle-db-name         = "qa11g"
+          oracle-db-hostname-a   = "dev-nomis-db19c-1-a"
+          oracle-db-hostname-b   = "none"
+          weblogic-config-target = "qa11g"
         })
       })
 
@@ -181,11 +181,11 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.tags, {
-          nomis-environment       = "dev"
-          oracle-db-name          = "qa19c"
-          oracle-db-hostname-a    = "dev-nomis-db19c-1-b"
-          oracle-db-hostname-b    = "none"
-          weblogic-config-target  = "qa19c"
+          nomis-environment      = "dev"
+          oracle-db-name         = "qa19c"
+          oracle-db-hostname-a   = "dev-nomis-db19c-1-b"
+          oracle-db-hostname-b   = "none"
+          weblogic-config-target = "qa19c"
         })
       })
     }
@@ -403,11 +403,11 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.qa11g-nomis-web12.tags, {
-          nomis-environment       = "dev"
-          oracle-db-name          = "qa11g"
-          oracle-db-hostname-a    = "dev-nomis-db19c-1-a"
-          oracle-db-hostname-b    = "none"
-          weblogic-config-target  = "qa11g"
+          nomis-environment      = "dev"
+          oracle-db-name         = "qa11g"
+          oracle-db-hostname-a   = "dev-nomis-db19c-1-a"
+          oracle-db-hostname-b   = "none"
+          weblogic-config-target = "qa11g"
         })
       })
 
@@ -424,12 +424,12 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.web_12.tags, {
-          instance-scheduling     = "skip-scheduling"
-          nomis-environment       = "qa"
-          oracle-db-hostname-a    = "nomis-db19c-1-a"
-          oracle-db-hostname-b    = "none"
-          oracle-db-name          = "qa19c"
-          weblogic-config-target  = "qa"
+          instance-scheduling    = "skip-scheduling"
+          nomis-environment      = "qa"
+          oracle-db-hostname-a   = "nomis-db19c-1-a"
+          oracle-db-hostname-b   = "none"
+          oracle-db-name         = "qa19c"
+          weblogic-config-target = "qa"
         })
       })
 
@@ -447,12 +447,12 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.web_12.tags, {
-          instance-scheduling     = "skip-scheduling"
-          nomis-environment       = "rel"
-          oracle-db-hostname-a    = "nomis-db19c-1-a"
-          oracle-db-hostname-b    = "none"
-          oracle-db-name          = "rel19c"
-          weblogic-config-target  = "rel"
+          instance-scheduling    = "skip-scheduling"
+          nomis-environment      = "rel"
+          oracle-db-hostname-a   = "nomis-db19c-1-a"
+          oracle-db-hostname-b   = "none"
+          oracle-db-name         = "rel19c"
+          weblogic-config-target = "rel"
         })
       })
 
@@ -470,12 +470,12 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.web_12.tags, {
-          instance-scheduling     = "skip-scheduling"
-          nomis-environment       = "dev"
-          oracle-db-hostname-a    = "nomis-db19c-1-a"
-          oracle-db-hostname-b    = "none"
-          oracle-db-name          = "dev19c"
-          weblogic-config-target  = "dev"
+          instance-scheduling    = "skip-scheduling"
+          nomis-environment      = "dev"
+          oracle-db-hostname-a   = "nomis-db19c-1-a"
+          oracle-db-hostname-b   = "none"
+          oracle-db-name         = "dev19c"
+          weblogic-config-target = "dev"
         })
       })
 
@@ -829,22 +829,22 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/oracle/weblogic/dev"      = local.secretsmanager_secrets.web
-      "/oracle/database/dev"      = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa"       = local.secretsmanager_secrets.web
-      "/oracle/weblogic/rel"      = local.secretsmanager_secrets.web
-      "/oracle/weblogic/qa11g"    = local.secretsmanager_secrets.web
-      "/oracle/database/qa11g"    = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa11g2"   = local.secretsmanager_secrets.web
-      "/oracle/database/qa11g2"   = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa11r"    = local.secretsmanager_secrets.web
-      "/oracle/database/qa11r"    = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa19c"    = local.secretsmanager_secrets.web
-      "/oracle/database/qa19c"    = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/rel19c"   = local.secretsmanager_secrets.web
-      "/oracle/database/rel19c"   = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/dev19c"   = local.secretsmanager_secrets.web
-      "/oracle/database/dev19c"   = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/dev"    = local.secretsmanager_secrets.web
+      "/oracle/database/dev"    = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa"     = local.secretsmanager_secrets.web
+      "/oracle/weblogic/rel"    = local.secretsmanager_secrets.web
+      "/oracle/weblogic/qa11g"  = local.secretsmanager_secrets.web
+      "/oracle/database/qa11g"  = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa11g2" = local.secretsmanager_secrets.web
+      "/oracle/database/qa11g2" = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa11r"  = local.secretsmanager_secrets.web
+      "/oracle/database/qa11r"  = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa19c"  = local.secretsmanager_secrets.web
+      "/oracle/database/qa19c"  = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/rel19c" = local.secretsmanager_secrets.web
+      "/oracle/database/rel19c" = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/dev19c" = local.secretsmanager_secrets.web
+      "/oracle/database/dev19c" = local.secretsmanager_secrets.db_cnom
     }
   }
 }

@@ -1,6 +1,6 @@
 module "rds" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b63bde8
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/rds?ref=b63bde8"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/rds?ref=10d2292"
 
   name           = "${local.component_name}-${local.env_label}-db"
   engine         = "mysql"
@@ -22,6 +22,10 @@ module "rds" {
   skip_final_snapshot    = true
   log_retention_days     = local.application_data.accounts[local.environment].db_log_retention_days
   cloudwatch_log_exports = ["error", "slowquery"]
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 
   tags = local.tags
 }

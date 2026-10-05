@@ -4,7 +4,7 @@
 This module provisions the components required in order to trigger Github Actions workflows in a target ministryofjustice repository
 on a schedule.
 
-Github Actions scheduled workflows can occasionally fail to trigger on time, and Github explicitly documents this as a known limitation - there are also 
+Github Actions scheduled workflows can occasionally fail to trigger on time, and Github explicitly documents this as a known limitation - there are also
 cases where the schedule can appear to be completely ignored.  This module provides a workaround for this issue by using a Lambda function to trigger the workflow on a schedule. This module provisions:
 - An EventBridge Scheduler, which can be leveraged in order to set the time(s) at which the workflow should be triggered
 - A Lambda function (written in Python) which is responsible for triggering the workflow in the target repository
@@ -27,7 +27,7 @@ module "github_workflow_scheduler" {
 }
 ```
 
-Then in the relevant `locals_environment.tf` file, create a github_workflows locals configuration similar to the following: 
+Then in the relevant `locals_environment.tf` file, create a github_workflows locals configuration similar to the following:
 
 ```
 github_workflows = {

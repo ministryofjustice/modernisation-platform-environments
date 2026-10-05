@@ -1,6 +1,6 @@
 module "oracle_ebs_db" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/646ef03
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=646ef03"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/f3bee34
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=f3bee34"
 
   name                  = "${local.component_name}-${local.env_label}-ebsdb"
   instance_profile_name = aws_iam_instance_profile.ebsdb.name
@@ -17,6 +17,11 @@ module "oracle_ebs_db" {
     backup              = "true"
     instance-scheduling = "skip-scheduling"
   })
+
+  alarms = {
+    topic_arn  = data.aws_sns_topic.alerts.arn
+    disk_paths = local.ebsdb_disk_paths
+  }
 }
 
 # EBS Volumes
