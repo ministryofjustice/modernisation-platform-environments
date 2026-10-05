@@ -146,13 +146,13 @@ resource "aws_vpc_security_group_egress_rule" "nlb_to_ecs_service" {
 resource "aws_lb_target_group" "service" {
   for_each = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
 
-  name        = "${var.name}-${var.env_name}-at-${each.value}"
-  target_type = "ip"
-  port        = each.value
-  protocol    = "TCP"
-  vpc_id      = var.account_info.vpc_id
+  name                 = "${var.name}-${var.env_name}-at-${each.value}"
+  target_type          = "ip"
+  port                 = each.value
+  protocol             = "TCP"
+  vpc_id               = var.account_info.vpc_id
   deregistration_delay = var.deregistration_delay
-  tags        = var.tags
+  tags                 = var.tags
 }
 
 resource "aws_lb_listener" "services" {
