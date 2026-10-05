@@ -214,13 +214,28 @@ resource "aws_iam_policy" "ec2_instance_policy" {
         },
         {
             "Effect": "Allow",
-            "Action": "iam:CreateServiceLinkedRole",
-            "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*",
-            "Condition": {
-                "StringLike": {
-                    "iam:AWSServiceName": "ssm.amazonaws.com"
-                }
-            }
+            "Action": [
+                "ssm:GetDocument",
+                "ssm:DescribeDocument",
+                "ssm:GetParameter",
+                "ssm:GetParameters"
+            ],
+            "Resource": [
+                         "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:document/*",
+                         "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/*"
+                         ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+            ],
+            "Resource": [
+                         "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws-waf-logs-${local.application_name}-sftp/${local.application_name}-sftp-waf-logs:*",
+                         "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:${local.application_name}-sftp-container-ecs:*"
+                         ]
         },
         {
             "Effect": "Allow",
