@@ -20,7 +20,7 @@ resource "aws_lb_target_group" "frontend" {
   protocol_version              = random_id.suffix[0].keepers.protocol_version
   vpc_id                        = var.account_config.shared_vpc_id
   target_type                   = "ip"
-  deregistration_delay          = 60
+  deregistration_delay          = 30
   load_balancing_algorithm_type = var.name == "weblogic" ? "least_outstanding_requests" : null
   tags                          = var.tags
 
@@ -151,6 +151,7 @@ resource "aws_lb_target_group" "service" {
   port        = each.value
   protocol    = "TCP"
   vpc_id      = var.account_info.vpc_id
+  deregistration_delay = var.deregistration_delay
   tags        = var.tags
 }
 
