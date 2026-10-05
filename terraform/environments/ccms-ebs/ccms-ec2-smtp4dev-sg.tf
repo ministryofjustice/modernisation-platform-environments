@@ -10,7 +10,7 @@ resource "aws_security_group" "smtp4dev_mock_server_sg" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "smtp4dev_workspace_80_ingress_rule" {
-  count             = local.is_production ? 0 : 1
+  count             = local.is-production ? 0 : 1
   security_group_id = aws_security_group.smtp4dev_mock_server_sg[count.index].id
   description       = "This rule is used for AWS Workspace vm"
   ip_protocol       = "tcp"
@@ -40,7 +40,6 @@ resource "aws_vpc_security_group_ingress_rule" "smtp4dev_ccmsebs_110_ingress_rul
   to_port     = 110
   cidr_ipv4   = data.aws_subnet.data_subnets_a.cidr_block
 }
-
 
 resource "aws_vpc_security_group_egress_rule" "smtp4dev_http_egress_rule" {
   count             = local.is-production ? 0 : 1
