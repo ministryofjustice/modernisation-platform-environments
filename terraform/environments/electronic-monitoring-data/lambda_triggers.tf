@@ -626,3 +626,30 @@ resource "aws_lambda_permission" "allow_eventbridge_specials_remediation" {
     each.key
   ].arn
 }
+
+#-----------------------------------------------------------------------------------
+# Trigger DLT Iceberg Maintenance
+# Runs sequential OPTIMIZE and VACUUM on dlt Iceberg load tables.
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "dlt_iceberg_maintenance" {
+  name        = "dlt-iceberg-maintenance"
+  description = "Run sequential OPTIMIZE and VACUUM on dlt Iceberg load tables."
+  # Keep scheduled starts further apart than the state machine's 3000-second timeout.
+  schedule_expression = "rate(1 hour)"
+}
+
+resource "aws_cloudwatch_event_target" "dlt_iceberg_maintenance" {
+  rule      = aws_cloudwatch_event_rule.dlt_iceberg_maintenance.name
+  target_id = "dlt-iceberg-maintenance"
+  arn       = module.dlt_iceberg_maintenance.arn
+  role_arn  = aws_iam_role.dlt_iceberg_maintenance_events.arn
+  input     = jsonencode({})
+
+  retry_policy {
+    maximum_event_age_in_seconds = 300
+    maximum_retry_attempts       = 2
+  }
+
+  depends_on = [aws_iam_role_policy.dlt_iceberg_maintenance_start]
+}
