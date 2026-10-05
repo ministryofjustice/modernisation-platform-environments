@@ -11,7 +11,7 @@ locals {
     }
   }
 
-  github_actions_lambda_development = {
+  github_actions_lambda_production = {
     enable_outbound_federation = true
     github_workflows = {
       hosting-migrations-platops-concierge-to-slack = {
