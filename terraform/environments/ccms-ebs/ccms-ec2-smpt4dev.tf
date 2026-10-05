@@ -36,7 +36,7 @@ resource "aws_instance" "smtp4dev_mock_server" {
   count                       = local.is-production ? 0 : 1
   instance_type               = "t3.medium"
   ami                         = "ami-07eb36e50da2fcccd"
-  vpc_security_group_ids      = [aws_security_group.smtp4dev_mock_server_sg[count.index].id, aws_security_group.smtp4dev_sg_kpmg[count.index].id]
+  vpc_security_group_ids      = [aws_security_group.smtp4dev_mock_server_sg[count.index].id, aws_security_group.smtp4dev_sg_kpmg.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
