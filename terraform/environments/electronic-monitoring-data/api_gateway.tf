@@ -331,6 +331,18 @@ resource "aws_api_gateway_deployment" "update_p1_export" {
   ]
 
   rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+
+  triggers = {
+    redeployment = sha1(jsonencode(compact([
+      aws_api_gateway_integration.update_p1_export_add_lambda_post[0].id,
+      aws_api_gateway_integration.update_p1_export_remove_lambda_post[0].id,
+      try(aws_api_gateway_rest_api_policy.update_p1_export_vpc[0].policy, null),
+    ])))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_api_gateway_stage" "update_p1_export_stage" {
