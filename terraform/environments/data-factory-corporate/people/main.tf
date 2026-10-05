@@ -1,9 +1,9 @@
 #split out
 locals {
-  aliases                = ["sherlock-landing"]
-  application            = "data-factory-corporate"
-  component              = "people"
-  eventbridge_rule_name  = "eventbridge-malware-rule"
+  aliases               = ["sherlock-landing"]
+  application           = "data-factory-corporate"
+  component             = "people"
+  eventbridge_rule_name = "eventbridge-malware-rule"
 }
 
 resource "aws_secretsmanager_secret" "external_account" {

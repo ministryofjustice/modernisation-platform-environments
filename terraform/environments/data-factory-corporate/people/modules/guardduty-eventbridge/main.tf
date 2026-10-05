@@ -112,7 +112,7 @@ data "aws_iam_policy_document" "scan_alerts" {
       identifiers = ["chatbot.amazonaws.com"]
     }
 
-    actions   = ["sns:Subscribe", "sns:Receive"]
+    actions   = ["sns:Subscribe"]
     resources = [aws_sns_topic.scan_alerts.arn]
   }
 }
