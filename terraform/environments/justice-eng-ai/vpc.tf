@@ -246,3 +246,8 @@ resource "aws_vpc_security_group_ingress_rule" "vpc_endpoints_https" {
   from_port         = 443
   to_port           = 443
 }
+
+output "vpc_id" {
+  description = "ID of the VPC used by the justice-eng-ai environment."
+  value       = module.vpc.vpc_id
+}
