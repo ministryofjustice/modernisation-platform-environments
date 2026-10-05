@@ -50,7 +50,7 @@ resource "aws_security_group" "script_runner_task" {
   #checkov:skip=CKV2_AWS_5:Attached at runtime by the Step Functions ecs:runTask network configuration, not by a Terraform-managed resource.
   name        = "${local.application_name}-script-runner-ecs"
   description = "Controls egress for AI prototype script runner ECS/Fargate tasks"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = data.terraform_remote_state.justice_eng_ai.outputs.vpc_id
   tags        = merge(local.tags, { Name = "${local.application_name}-script-runner-ecs" })
 }
 
