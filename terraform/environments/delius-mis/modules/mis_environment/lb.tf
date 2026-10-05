@@ -473,7 +473,7 @@ resource "aws_lb_listener" "mis_https" {
   load_balancer_arn = aws_lb.mis[0].arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = module.acm_certificate[0].arn
 
   default_action {
