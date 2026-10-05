@@ -1,0 +1,45 @@
+---
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node: system
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node
+    operator: Equal
+    value: system
+    effect: NoSchedule
+  
+prometheus:
+  metricServer:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  operator:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  webhooks:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+metricsServer:
+  # Required on custom CNI EKS clusters so the control plane can reach this endpoint.
+  useHostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+
+webhooks:
+  # Required on custom CNI EKS clusters so the control plane can reach this endpoint.
+  useHostNetwork: true
+  port: 10262
+
+service:
+  portHttpsTarget: 10263
+
+# Setting GOMAXPROCS explicitly prevents automaxprocs from reading cgroup files at startup.
+# This is required on Bottlerocket arm64 nodes where /sys/fs/cgroup/cpu.max is not accessible.
+env:
+  - name: GOMAXPROCS
+    valueFrom:
+      resourceFieldRef:
+        resource: limits.cpu
+        divisor: "1"

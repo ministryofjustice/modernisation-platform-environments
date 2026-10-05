@@ -1,7 +1,7 @@
 module "dynamodb_idempotency" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.1"
+  version = "5.5.2"
 
   name         = "${local.pattern_name}-idempotency"
   billing_mode = "PAY_PER_REQUEST"

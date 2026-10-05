@@ -5,7 +5,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group-managed" {
   name                = "${local.component_name}-${local.environment}-auto-scaling-group-managed"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].managed_ec2_desired_capacity
-  max_size            = 4
+  max_size            = 1
   min_size            = 1
 
   launch_template {
@@ -171,6 +171,8 @@ data "template_file" "launch-template-managed" {
     cluster_name       = "${local.component_name}-${local.environment}-cluster"
     efs_id             = aws_efs_file_system.storage.id
     server             = "managed"
+    inbound_bucket     = local.application_data.accounts[local.environment].inbound_s3_bucket_name
+    outbound_bucket    = local.application_data.accounts[local.environment].outbound_s3_bucket_name
     deploy_environment = local.environment
   }
 }
@@ -181,6 +183,8 @@ data "template_file" "launch-template-admin" {
     cluster_name       = "${local.component_name}-${local.environment}-cluster"
     efs_id             = aws_efs_file_system.storage.id
     server             = "admin"
+    inbound_bucket     = local.application_data.accounts[local.environment].inbound_s3_bucket_name
+    outbound_bucket    = local.application_data.accounts[local.environment].outbound_s3_bucket_name
     deploy_environment = local.environment
   }
 }
