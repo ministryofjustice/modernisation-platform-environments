@@ -28,7 +28,7 @@ locals {
     analytical-platform-compute-production = {
       hmpps-probation-search-preprod = {
         namespace                       = "hmpps-probation-search-preprod"
-        instance_type                   = "ml.g6.xlarge"
+        instance_type                   = "ml.g6.2xlarge"
         min_instance_count              = 1
         max_instance_count              = 4
         target_invocations_per_instance = 300
