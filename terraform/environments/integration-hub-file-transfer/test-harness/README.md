@@ -1,9 +1,79 @@
 # File-transfer test harness
 
+This component provisions test-only infrastructure for a direct-S3 Integration Hub smoke test. It owns the harness IAM role, destination bucket and KMS key; the parent file-transfer and `push-to-s3` components own routing and delivery.
+
 ## Status
 
-Terraform configuration passes local validation. AWS deployment and
-successful smoke-test execution have not yet been verified.
+Terraform configuration passes local validation. The test harness has been successfully deployed to the test environment. The direct-S3 dispatch route is included in this change, using the KMS key ARN copied from the deployed destination bucket's encryption configuration.
+
+## Architecture
+
+The harness uses the existing file-transfer pipeline rather than deploying a separate delivery pipeline:
+
+1. The harness role uploads a non-sensitive fixture beneath `test-harness/direct-s3/` in the test incoming bucket.
+2. The parent file-transfer pipeline scans the file and routes the clean object through the shared dispatch configuration.
+3. The `push-to-s3` component assumes its delivery role and copies the clean object to the harness-owned destination beneath `delivered/direct-s3/`.
+4. The harness role downloads the delivered object and compares it with the original fixture.
+
+The harness role does not deliver files itself. A successful test requires the
+parent pipeline and `push-to-s3` configuration to be deployed and authorised.
+
+## Configuration contract
+
+The route belongs in the shared
+[`file-dispatch-configuration` module](../modules/file-dispatch-configuration/locals-test.tf),
+under the test environment's `test-harness` identity and `/direct-s3/` source
+prefix. Its action is `push-to-s3`, with these destination settings:
+
+| Setting | Value |
+| --- | --- |
+| `bucket_id` | `integration-hub-file-transfer-test-test-harness` |
+| `bucket_region` | `eu-west-2` |
+| `destination_prefix` | `delivered/direct-s3/` |
+| `kms_key_arn` | The deployed harness destination's KMS key ARN |
+
+This component exposes `destination_bucket_name` and `destination_kms_key_arn`.
+Use the deployed outputs to verify the shared route, especially after replacing
+the destination key. Do not assume that a previously copied key ARN remains valid.
+
+New dispatch entries receive their initial non-sensitive action value when the
+parent state creates their secret. For an existing entry, update the secret
+value through the approved Secrets Manager process to match any changed action.
+See the [push-to-s3 configuration contract](../push-to-s3/README.md#configuration-contract).
+
+## Names and isolation
+
+Resources are created only in the test environment. The smoke test uses:
+
+| Resource | Name or prefix |
+| --- | --- |
+| Incoming bucket | `integration-hub-file-transfer-test-incoming` |
+| Upload prefix | `test-harness/direct-s3/` |
+| Destination bucket | `integration-hub-file-transfer-test-test-harness` |
+| Delivery prefix | `delivered/direct-s3/` |
+
+GitHub OIDC trust is restricted to `ministryofjustice/integration-hub` on
+`refs/heads/main`, with audience `sts.amazonaws.com`. Workflows using a different
+branch or a GitHub environment subject do not match this trust policy.
+
+The harness role can upload only beneath its incoming prefix, list and read only
+its destination prefix, and use the relevant KMS keys only through S3 with the
+configured encryption contexts. It has no destination-write, delete or
+administrative permissions. Delivery uses a separate role managed by `push-to-s3`.
+
+## Retention and costs
+
+The destination blocks public access, enforces TLS and bucket-owner-enforced
+ownership, and uses versioning and SSE-KMS with its dedicated key. Incorrect
+encryption headers or a different KMS key are rejected. S3 Bucket Keys are disabled.
+
+Lifecycle rules expire current and noncurrent objects after one day, abort
+incomplete multipart uploads after one day, and remove expired delete markers.
+Cleanup is asynchronous; it is not a guarantee that objects disappear exactly
+24 hours after upload. The harness role cannot delete test objects manually.
+
+Costs include the dedicated KMS key, S3 requests and stored versions, and use of
+the existing scanning and delivery pipeline. Use small, non-sensitive fixtures.
 
 ## Proposed first smoke test
 
@@ -15,16 +85,43 @@ Run only against integration-hub-file-transfer-test.
 
 Use a fresh run token for every execution to avoid matching stale files.
 
+Run the upload and download using the harness role to verify its permissions as
+well as delivery. A manual test using an operator's credentials verifies the
+pipeline path but does not establish that GitHub OIDC or harness access works.
+
+If delivery does not arrive within the test's timeout, inspect the parent
+pipeline and `push-to-s3` CloudWatch logs and dead-letter queues. Do not manually
+copy the fixture into the destination to make the test pass. Follow the
+[push-to-s3 dead-letter guidance](../push-to-s3/README.md#dead-letter-operations)
+before retrying failed deliveries.
+
 ## Coverage limits
 
 This tests direct-S3 staging, scanning, clean routing, dispatch and delivery.
 
 It does not test customer authentication, SFTP, FTPS, HTTP API or browser uploads; negative scan outcomes; retry or idempotency guarantees; or completion-event assertions. Notifications remain a later step.
 
-## Ownership and deployment dependencies
+## Deployment order
 
-This component owns the harness role, destination bucket and KMS key.
+1. Confirm the parent test file-transfer infrastructure exists, including the incoming and clean buckets and their KMS keys.
+2. Deploy this test-harness component and confirm its destination bucket and KMS key outputs. Destination creation must not depend on the delivery role.
+3. Configure the shared test dispatch route with those outputs and deploy the parent file-transfer state to create or update the dispatch secret.
+4. For an existing dispatch entry, ensure its secret value matches the configured action through the approved Secrets Manager process.
+5. Deploy the `push-to-s3` state and confirm its delivery role has the required destination bucket and KMS access.
+6. Run the smoke test using the harness role and confirm the delivered contents match the fixture.
 
-Provision the destination before configuring the shared delivery route. Use verified destination outputs for that route, then check delivery-role access before running tests. Destination creation must not depend on the delivery role.
+The harness has already been deployed and the shared route is configured. Confirm
+the parent and `push-to-s3` applies before running the test. Merging Terraform or
+passing a plan does not establish deployment or successful delivery.
 
-Shared dispatch and `push-to-s3` changes are managed separately. Merging Terraform does not prove it has been applied.
+## Local validation
+
+Run the formatting check from the repository root without contacting AWS:
+
+```shell
+terraform fmt -check -recursive terraform/environments/integration-hub-file-transfer/test-harness
+```
+
+Formatting and Terraform validation do not verify deployed permissions, GitHub
+OIDC access or file delivery. Review plans and applies separately through the
+deployment process, then use the smoke test for runtime verification.
