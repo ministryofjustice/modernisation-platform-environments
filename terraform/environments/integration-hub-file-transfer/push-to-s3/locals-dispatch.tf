@@ -1,7 +1,6 @@
 module "file_dispatch_configuration" {
   source = "../modules/file-dispatch-configuration"
 
-  account_id  = data.aws_caller_identity.current.account_id
   environment = local.environment
 }
 
