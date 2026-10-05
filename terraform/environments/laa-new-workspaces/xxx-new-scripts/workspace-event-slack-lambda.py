@@ -2,6 +2,7 @@ import base64
 import gzip
 import json
 import os
+import xml.etree.ElementTree as ET
 import urllib.request
 
 import boto3
@@ -30,11 +31,34 @@ def get_secret(secret_name: str) -> str:
         return secret_value
 
 
-def _extract_workspace_message(log_message: str) -> dict:
+def _extract_workspace_message(log_message: str, log_group: str = "") -> dict | None:
+    if "/aws/directoryservice/" in log_group:
+        try:
+            event = ET.fromstring(log_message)
+        except ET.ParseError:
+            return None
+
+        event_id = next(
+            (node.text for node in event.iter() if node.tag.endswith("EventID")),
+            None,
+        )
+        if event_id != "4740":
+            return None
+
+        event_data = {
+            node.get("Name"): node.text
+            for node in event.iter()
+            if node.tag.endswith("Data") and node.get("Name")
+        }
+        username = event_data.get("TargetUserName") or "unknown user"
+        return {"text": f"WorkSpaces account locked: {username}"}
+
     try:
         payload = json.loads(log_message)
     except json.JSONDecodeError:
-        return {"text": log_message}
+        return {
+            "text": f"CloudWatch log event\nLog group: {log_group}\nDetails: {log_message[:3000]}"
+        }
 
     detail = payload.get("detail", {})
     event_name = detail.get("eventName") or "unknown"
@@ -80,8 +104,11 @@ def lambda_handler(event, context):
     messages = []
 
     for log_event in log_data.get("logEvents", []):
-        message = _extract_workspace_message(log_event.get("message", ""))
-        messages.append(message)
+        message = _extract_workspace_message(
+            log_event.get("message", ""), log_data.get("logGroup", "")
+        )
+        if message:
+            messages.append(message)
 
     if not messages:
         return {"statusCode": 200, "body": "No tracked AWS events found"}

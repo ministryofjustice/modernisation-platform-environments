@@ -8,8 +8,8 @@ data "aws_s3_bucket" "outbound" {
 }
 
 module "ecs_cluster" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/c20a9496c059d1302b3bb7c3bd0dcd6792a0c8e0
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=c20a9496c059d1302b3bb7c3bd0dcd6792a0c8e0"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=10d2292"
 
   cluster_name = "${local.component_name}-${local.env_label}-cluster"
   tags         = local.tags
@@ -56,11 +56,15 @@ module "ecs_cluster" {
       }))
     }
   }
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }
 
 module "ecs_service_admin" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/bf7ac1c
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=bf7ac1c"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.component_name}-admin-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -108,12 +112,17 @@ module "ecs_service_admin" {
     apply_user           = local.application_data.accounts[local.environment].admin_apply_user
     keystore_secret_id   = aws_secretsmanager_secret.soa.name
     soa_secret_arn       = aws_secretsmanager_secret.soa.arn
+    slack_secret_arn     = data.aws_secretsmanager_secret.slack_webhooks.arn
   })
 
   load_balancer = {
     target_group_arn = module.nlb_admin.target_group_arn
     container_name   = "${local.component_name}-admin"
     container_port   = local.application_data.accounts[local.environment].admin_ssl_port
+  }
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
   }
 
   depends_on = [
@@ -126,8 +135,8 @@ module "ecs_service_admin" {
 }
 
 module "ecs_service_managed" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/bf7ac1c
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=bf7ac1c"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.component_name}-managed-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -178,12 +187,18 @@ module "ecs_service_managed" {
     ms_hostname       = aws_route53_record.managed.fqdn
     wl_mem_args       = local.application_data.accounts[local.environment].managed_wl_mem_args
     soa_secret_arn    = aws_secretsmanager_secret.soa.arn
+    slack_secret_arn  = data.aws_secretsmanager_secret.slack_webhooks.arn
   })
 
   load_balancer = {
     target_group_arn = module.nlb_managed.target_group_arn
     container_name   = "${local.component_name}-managed"
     container_port   = local.application_data.accounts[local.environment].managed_ssl_port
+  }
+
+  alarms = {
+    topic_arn             = data.aws_sns_topic.alerts.arn
+    cpu_threshold_percent = 75 # as the original laa-ccms-soa managed service
   }
 
   depends_on = [

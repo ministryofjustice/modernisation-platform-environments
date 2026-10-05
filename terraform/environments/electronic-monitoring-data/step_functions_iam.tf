@@ -321,3 +321,117 @@ resource "aws_iam_policy" "dlt_iceberg_maintenance_invoke" {
   name   = "dlt-iceberg-maintenance-invoke"
   policy = data.aws_iam_policy_document.dlt_iceberg_maintenance_invoke.json
 }
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation Step Function
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "downstream_reconciliation_sfn_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["states.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "downstream_reconciliation_state_machine" {
+  name = "downstream_reconciliation_state_machine_role"
+
+  assume_role_policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_sfn_assume.json
+  )
+}
+
+resource "aws_iam_role_policy" "downstream_reconciliation_state_machine" {
+  name = "downstream_reconciliation_state_machine_invoke_policy"
+  role = aws_iam_role.downstream_reconciliation_state_machine.id
+
+  policy = jsonencode(
+    {
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Sid    = "AllowInvokeReconciliationPlanner"
+          Effect = "Allow"
+          Action = [
+            "lambda:InvokeFunction"
+          ]
+          Resource = [
+            module.merge_redrive_planner.lambda_function_arn
+          ]
+        },
+        {
+          Sid    = "AllowInvokeReconciliationMergeLambdas"
+          Effect = "Allow"
+          Action = [
+            "lambda:InvokeFunction"
+          ]
+          Resource = [
+            module.merge_mdss_staged_position[0].lambda_function_arn,
+            module.merge_ac_position[0].lambda_function_arn,
+            module.merge_emdi_position[0].lambda_function_arn
+          ]
+        }
+      ]
+    }
+  )
+}
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation scheduler
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "downstream_reconciliation_scheduler" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_scheduler_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Principal = {
+          Service = "scheduler.amazonaws.com"
+        }
+
+        Action = "sts:AssumeRole"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_scheduler_start_policy"
+  role = aws_iam_role.downstream_reconciliation_scheduler[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "states:StartExecution",
+        ]
+
+        Resource = [
+          aws_sfn_state_machine.downstream_reconciliation.arn,
+        ]
+      },
+    ]
+  })
+}

@@ -1,7 +1,7 @@
 module "kms_push_to_s3" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   aliases                 = [local.pattern_name]
   description             = "KMS CMK for the push-to-s3 SNS and SQS pipeline"

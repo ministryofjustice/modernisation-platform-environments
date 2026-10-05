@@ -9,8 +9,14 @@ module "chatbot_alerts" {
     dev     = "C0A51K7L2QG"
   }[local.environment_shorthand]
 
-  slack_team_id    = "T02DYEB3A"
-  sns_topic_arns   = [aws_sns_topic.emds_alerts.arn]
+  slack_team_id  = "T02DYEB3A"
+  sns_topic_arns = [aws_sns_topic.emds_alerts.arn]
+
+  guardrail_policies = [
+    "arn:aws:iam::aws:policy/ReadOnlyAccess",
+    aws_iam_policy.downstream_reconciliation_chatbot_approval.arn,
+  ]
+
   tags             = local.tags
   application_name = local.application_name
 }

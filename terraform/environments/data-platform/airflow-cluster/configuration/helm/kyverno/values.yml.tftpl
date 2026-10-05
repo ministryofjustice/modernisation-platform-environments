@@ -1,0 +1,92 @@
+---
+admissionController:
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+  replicas: 3
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+backgroundController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+cleanupController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+reportsController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+crds:
+  migration:
+    nodeSelector:
+      compute.data-platform.service.justice.gov.uk/node: system
+    tolerations:
+      - key: compute.data-platform.service.justice.gov.uk/node
+        operator: Equal
+        value: system
+        effect: NoSchedule
+
+webhooksCleanup:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+config:
+  resourceFiltersIncludeNamespaces:
+    # System and platform namespaces excluded from Kyverno admission processing.
+    - ai-gateway
+    - amazon-guardduty
+    - amazon-network-flow-monitor
+    - app
+    - aws-cloudwatch-observability
+    - cert-manager
+    - cilium-secrets
+    - cluster-autoscaler
+    - external-dns
+    - external-secrets
+    - fluent-bit
+    - karpenter
+    - keda
+    - kyverno
+    - metrics-server
+    - prometheus
+    - shared-services
+
+features:
+  controllerRuntimeMetrics:
+    # -- Bind address for controller-runtime metrics (use "0" to disable it)
+    bindAddress: ":7070"

@@ -10,7 +10,7 @@ for a separate downstream account to consume.
 ## Key facts
 
 | | |
-|---|---|
+| --- | --- |
 | **VPC** | Shared Modernisation Platform VPC, data subnets A/B/C |
 | **RDS** | Oracle 19c Enterprise Edition, `db.m6i.2xlarge`, BYOL |
 | **Storage** | 3000GB gp3, 4000GB max autoscaling, 12000 provisioned IOPS, 500 MiB/s throughput |
