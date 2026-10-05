@@ -7,8 +7,8 @@ from worker import InvalidNotification, Store, message, post_slack, process
 NOW = 1790762400
 SECRET = "arn:aws:secretsmanager:eu-west-2:123456789012:secret:dispatch-abcdef"
 CONFIG = {"account": "123456789012", "queue_arn": "queue", "topic_arn": "topic",
-          "clean_bucket": "clean", "portal_url": "https://web.development.file-transfer.service.justice.gov.uk",
-          "routes": {SECRET: {"prefix": "products-poc/uploads/", "recipient_id": "products",
+          "clean_bucket": "clean", "portal_url": "https://abc123.execute-api.eu-west-2.amazonaws.com",
+          "pickup_bucket": "pickup", "pickup_kms_key": "key", "routes": {SECRET: {"prefix": "products-poc/uploads/", "recipient_id": "products",
                                "webhook_secret_arn": "webhook-secret"}}}
 DATA = {"actionExecutionId": "8f2f1df5-a54d-4852-be34-a75781f80418",
         "fileId": "8f2f1df5-a54d-4852-be34-a75781f80419", "requestedAt": "2026-09-30T10:00:00Z",
@@ -32,16 +32,18 @@ class WorkerTests(unittest.TestCase):
             {"SecretString": json.dumps({"notifications": {"slack": {"type": "authenticated-pickup", "recipient": "products"}}})},
             {"SecretString": json.dumps({"url": "https://hooks.slack.com/services/T/B/credential"})}]
         self.send = Mock()
+        self.retainer = Mock()
 
     def run_record(self, rec=None, config=None):
-        return process(rec or record(), config or CONFIG, self.store, self.secrets, self.send, lambda: NOW)
+        return process(rec or record(), config or CONFIG, self.store, self.secrets, self.send, lambda: NOW, self.retainer)
 
     def test_sends_only_portal_link_and_reads_exact_dispatch_version(self):
         self.assertEqual(self.run_record(), "sent")
         self.assertEqual(self.secrets.get_secret_value.call_args_list[0].kwargs,
                          {"SecretId": SECRET, "VersionId": "version1"})
         payload = self.send.call_args.args[1]
-        self.assertEqual(payload["blocks"][2]["elements"][0]["url"], CONFIG["portal_url"])
+        self.assertRegex(payload["blocks"][2]["elements"][0]["url"], "^" + CONFIG["portal_url"] + "/pickups/[a-f0-9]{64}$")
+        self.retainer.prepare.assert_called_once()
         self.assertNotIn("X-Amz", json.dumps(payload))
         self.assertNotIn("credential", json.dumps(payload))
         self.store.complete.assert_called_once()
@@ -54,6 +56,12 @@ class WorkerTests(unittest.TestCase):
                 with self.assertRaises(InvalidNotification): self.run_record(record(data))
         self.secrets.get_secret_value.assert_not_called()
         self.send.assert_not_called()
+
+    def test_failed_copy_does_not_notify(self):
+        self.retainer.prepare.side_effect = RuntimeError("Copy failed")
+        with self.assertRaises(RuntimeError): self.run_record()
+        self.send.assert_not_called()
+        self.store.complete.assert_not_called()
 
     def test_unknown_secret_rejected(self):
         data = copy.deepcopy(DATA); data["configurationReference"]["secretArn"] = SECRET + "-other"
@@ -141,6 +149,6 @@ class HandlerTests(unittest.TestCase):
             handler=importlib.util.module_from_spec(spec);spec.loader.exec_module(handler)
         output=io.StringIO()
         with patch.object(handler,"process",side_effect=["sent",RuntimeError("https://hooks.slack.com/services/SECRET")]), redirect_stdout(output):
-            result=handler.lambda_handler({"Records":[{"messageId":"ok"},{"messageId":"retry"}]},None)
+            result=handler.lambda_handler({"Records":[{"messageId":"ok"},{"messageId":"retry"}]},Mock())
         self.assertEqual(result,{"batchItemFailures":[{"itemIdentifier":"retry"}]})
         self.assertNotIn("SECRET",output.getvalue())
