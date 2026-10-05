@@ -7,7 +7,9 @@ const {webcrypto} = require('node:crypto');
 const ID = 'a'.repeat(64);
 const config = {client_id: 'public-client', authorization_endpoint: 'https://id.example/authorize',
   token_endpoint: 'https://id.example/token', download_scope: 'mft.download', redirect_uri: 'https://api.example/callback'};
-const script = readFileSync(join(__dirname, '../index.html'), 'utf8').match(/<script[^>]*>([\s\S]*?)<\/script>/)[1]
+// Extract the known inline script from our own fixture; this is not an HTML sanitizer.
+const script = readFileSync(join(__dirname, '../index.html'), 'utf8')
+  .split('<script nonce="__NONCE__">')[1].split('</script>')[0]
   .replace('__SETTINGS__', Buffer.from(JSON.stringify(config)).toString('base64'));
 const tick = () => new Promise(resolve => setImmediate(resolve));
 function browser({callback=false, saved, search='?state=state&code=code', fetcher}={}) {
