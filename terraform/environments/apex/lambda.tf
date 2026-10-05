@@ -174,7 +174,7 @@ resource "aws_s3_bucket_logging" "backup_lambda" {
   target_prefix = "s3access/${aws_s3_bucket.backup_lambda.id}"
   target_object_key_format {
     partitioned_prefix {
-      partititon_date_source = "EventTime"
+      partition_date_source = "EventTime"
     }
   }
 }
