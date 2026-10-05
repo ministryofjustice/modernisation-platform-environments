@@ -227,6 +227,21 @@ models:
       model_name: "OpenAI GPT OSS Safeguard 120B"
       region: eu-west-2
       generally_available: true
+    # Qwen
+    qwen3-coder-next:
+      model_id: "qwen.qwen3-coder-next"
+      model_family: "Qwen"
+      model_name: "Qwen Coder Next"
+      region: eu-west-2
+      generally_available: false
+      environments_available: ["development"]
+    qwen3-32b:
+      model_id: "qwen.qwen3-32b-v1:0"
+      model_family: "Qwen"
+      model_name: "Qwen 3 32B"
+      region: eu-west-2
+      generally_available: false
+      environments_available: ["development"]
     # Justice Engineering AI Enablement
     jeaie-claude-haiku-4-5:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
