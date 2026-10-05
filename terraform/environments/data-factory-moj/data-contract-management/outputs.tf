@@ -72,5 +72,6 @@ output "registration_alarm_arns" {
   description = "Registration operational alarms."
   value = local.registration_enabled ? (
     module.schema_registration[0].alarm_arns
-  ) : []
+  ) : null
 }
+
