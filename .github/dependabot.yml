@@ -501,6 +501,7 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/data-factory-moj"
+      - "terraform/environments/data-factory-moj/data-contract-management"
       - "terraform/environments/data-factory-moj/dms-core"
       - "terraform/environments/data-factory-moj/dms-core/modules/dms-test-harness"
       - "terraform/environments/data-factory-moj/dms-core/modules/oracle-test-harness"
