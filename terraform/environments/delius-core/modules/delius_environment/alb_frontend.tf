@@ -120,6 +120,8 @@ resource "aws_lb" "delius_core_frontend" {
     prefix  = "weblogic-${var.env_name}-alb"
     enabled = true
   }
+
+  tags = merge(local.tags, { Name = local.alb_name })
 }
 
 resource "aws_lb_listener" "listener_https" {
