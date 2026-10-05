@@ -1,3 +1,8 @@
+variable "account_id" {
+  description = "AWS account ID of the file-transfer deployment."
+  type        = string
+}
+
 variable "environment" {
   description = "Deployment environment whose file dispatch configuration should be returned."
   type        = string
