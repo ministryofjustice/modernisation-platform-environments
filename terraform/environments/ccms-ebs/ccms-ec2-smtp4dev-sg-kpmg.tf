@@ -1,5 +1,5 @@
 resource "aws_security_group" "smtp4dev_sg_kpmg" {
-  count       = local.is-production ? 0 : 1
+  count       = local.is-preproduction ? 1 : 0
   name        = "smtp4dev_sg_kpmg"
   description = "Additional rules to allow KPMG access SMTP4DEV"
   vpc_id      = data.aws_vpc.shared.id
