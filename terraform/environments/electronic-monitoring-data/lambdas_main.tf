@@ -1410,64 +1410,6 @@ module "live_feed_specials_remediator" {
   }
 }
 
-<<<<<<< HEAD
-#-----------------------------------------------------------------------------------
-# Trigger DLT Iceberg Maintenance
-#-----------------------------------------------------------------------------------
-
-module "trigger_dlt_iceberg_maintenance" {
-  source                         = "./modules/lambdas"
-  is_image                       = true
-  function_name                  = "trigger-dlt-iceberg-maintenance"
-  image_name                     = "trigger_dlt_iceberg_maintenance"
-  role_name                      = aws_iam_role.trigger_dlt_iceberg_maintenance.name
-  role_arn                       = aws_iam_role.trigger_dlt_iceberg_maintenance.arn
-  memory_size                    = 2048
-  timeout                        = 60
-  reserved_concurrent_executions = 1
-  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev                 = local.env_name
-  security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-private.ids
-
-  environment_variables = {
-    CATALOG_ID       = data.aws_caller_identity.current.account_id
-    ENVIRONMENT_NAME = local.env_name
-    ATHENA_WORKGROUP = aws_athena_workgroup.default.name
-  }
-
-  depends_on = [
-    aws_iam_role_policy.trigger_dlt_iceberg_maintenance,
-    aws_lakeformation_permissions.dlt_iceberg_maintenance_database_access,
-    aws_lakeformation_permissions.dlt_iceberg_maintenance_table_access,
-    aws_lakeformation_permissions.dlt_iceberg_maintenance_data_location,
-  ]
-}
-
-module "poll_dlt_iceberg_maintenance" {
-  source                         = "./modules/lambdas"
-  is_image                       = true
-  function_name                  = "poll-dlt-iceberg-maintenance"
-  image_name                     = "poll_dlt_iceberg_maintenance"
-  role_name                      = aws_iam_role.poll_dlt_iceberg_maintenance.name
-  role_arn                       = aws_iam_role.poll_dlt_iceberg_maintenance.arn
-  memory_size                    = 1024
-  timeout                        = 60
-  reserved_concurrent_executions = 1
-  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev                 = local.env_name
-  security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-private.ids
-
-  environment_variables = {
-    CATALOG_ID       = data.aws_caller_identity.current.account_id
-    ENVIRONMENT_NAME = local.env_name
-    ATHENA_WORKGROUP = aws_athena_workgroup.default.name
-    MAX_WAIT_SECONDS = "1200"
-  }
-
-  depends_on = [aws_iam_role_policy.poll_dlt_iceberg_maintenance]
-=======
 # ------------------------------------------------------------------------------
 # Downstream position reconciliation
 # ------------------------------------------------------------------------------
@@ -1548,5 +1490,62 @@ module "merge_redrive_approval" {
     RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
     RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
   }
->>>>>>> main
+}
+
+#-----------------------------------------------------------------------------------
+# Trigger DLT Iceberg Maintenance
+#-----------------------------------------------------------------------------------
+
+module "trigger_dlt_iceberg_maintenance" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "trigger-dlt-iceberg-maintenance"
+  image_name                     = "trigger_dlt_iceberg_maintenance"
+  role_name                      = aws_iam_role.trigger_dlt_iceberg_maintenance.name
+  role_arn                       = aws_iam_role.trigger_dlt_iceberg_maintenance.arn
+  memory_size                    = 2048
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    CATALOG_ID       = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME = local.env_name
+    ATHENA_WORKGROUP = aws_athena_workgroup.default.name
+  }
+
+  depends_on = [
+    aws_iam_role_policy.trigger_dlt_iceberg_maintenance,
+    aws_lakeformation_permissions.dlt_iceberg_maintenance_database_access,
+    aws_lakeformation_permissions.dlt_iceberg_maintenance_table_access,
+    aws_lakeformation_permissions.dlt_iceberg_maintenance_data_location,
+  ]
+}
+
+module "poll_dlt_iceberg_maintenance" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "poll-dlt-iceberg-maintenance"
+  image_name                     = "poll_dlt_iceberg_maintenance"
+  role_name                      = aws_iam_role.poll_dlt_iceberg_maintenance.name
+  role_arn                       = aws_iam_role.poll_dlt_iceberg_maintenance.arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    CATALOG_ID       = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME = local.env_name
+    ATHENA_WORKGROUP = aws_athena_workgroup.default.name
+    MAX_WAIT_SECONDS = "1200"
+  }
+
+  depends_on = [aws_iam_role_policy.poll_dlt_iceberg_maintenance]
 }
