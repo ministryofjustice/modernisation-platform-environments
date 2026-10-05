@@ -5,7 +5,8 @@ resource "aws_security_group" "sftp_cluster_ec2_kpmg" {
 
   tags = merge(local.tags,
     { Name = "${local.sftp_suffix}-cluster-ec2-security-group-KPMG" }
-  )}
+  )
+}
 
 resource "aws_vpc_security_group_ingress_rule" "clamav_workspaces_22_ingress_kpmg" {
   count             = local.is-preproduction ? 1 : 0
