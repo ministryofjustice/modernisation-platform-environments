@@ -50,5 +50,31 @@ locals {
   opensearch_is_live     = local.is_live[0] == "live"
   opensearch_instance    = local.opensearch_is_live ? "or1.large.search" : "or1.medium.search"
   opensearch_data_nodes  = local.opensearch_is_live ? 2 : 1
-  opensearch_ebs_gb      = local.opensearch_is_live ? 100 : 20
+
+  # Hot (gp3) disk per domain. Set PER BU, not one shared number — the cost
+  # breakdown (ADR-017) found the central cluster had 216 TB provisioned but only
+  # ~22% used, so a single global size over-provisions. Each BU can set
+  # opensearch_ebs_gb in its environment_configurations entry; the default is a
+  # small live/non-live starter. Size to measured use plus headroom, NOT to peak.
+  opensearch_ebs_gb = lookup(local.environment_configuration, "opensearch_ebs_gb", local.opensearch_is_live ? 100 : 20)
+
+  # Private access (architecture review): the domain is reached over the private
+  # network like the EKS clusters (VPN -> transit gateway -> VPC endpoints), not
+  # over a public endpoint. The VPC and its subnets live in the `network`
+  # component, a separate state, so we look them up by tag rather than reference
+  # the module (same approach as the SSM relay). One subnet while zone awareness
+  # is off; add subnets here when multi-AZ is turned on.
+  opensearch_vpc_name = terraform.workspace
+
+  # Audit logging (architecture review): on by default, published to a CloudWatch
+  # log group under /aws/vendedlogs/ so one broad resource policy covers every
+  # per-BU domain without hitting the 10-policies-per-Region cap. Verbosity
+  # tuning to control ingest cost is a separate follow-on ticket.
+  opensearch_audit_log_group = "/aws/vendedlogs/opensearch/${local.opensearch_domain_name}/audit"
+
+  # Log retention is set PER BU, not one global value (architecture review).
+  # Taken from the per-workspace environment_configurations map so each BU can
+  # pick its own duration; falls back to 30 days where unset. Values will firm up
+  # once regulatory retention guidance lands.
+  opensearch_audit_retention_days = lookup(local.environment_configuration, "opensearch_audit_retention_days", 30)
 }

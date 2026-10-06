@@ -11,6 +11,12 @@
 # local.opensearch_host_workspaces — the first build proves the config in the
 # development account before the per-BU rollout.
 #
+# Architecture-review decisions baked in here:
+#   - Private domain in the VPC's private subnets (not internet-facing), reached
+#     over VPN / transit gateway / VPC endpoints like the EKS clusters.
+#   - Audit logging on, published to a CloudWatch /aws/vendedlogs/ group.
+#   - Retention set per BU (local.opensearch_audit_retention_days), not global.
+#
 # Serverless is NOT used (ADR-017 D2): full managed OpenSearch everywhere.
 #------------------------------------------------------------------------------
 
@@ -22,7 +28,117 @@ locals {
   opensearch_master_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_platform-engineer-admin_5e1838a3c5d27fc3"
 }
 
+#------------------------------------------------------------------------------
+# VPC lookup — the domain goes in the private subnets of the workspace VPC.
+# The VPC lives in the `network` component (separate state), so look it up by
+# tag rather than reference the module. See locals.opensearch_vpc_name.
+#------------------------------------------------------------------------------
+data "aws_vpc" "opensearch" {
+  count = local.enable_opensearch ? 1 : 0
+
+  tags = {
+    Name = local.opensearch_vpc_name
+  }
+}
+
+data "aws_subnets" "opensearch_private" {
+  count = local.enable_opensearch ? 1 : 0
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.opensearch[0].id]
+  }
+
+  tags = {
+    SubnetType = "Private"
+  }
+}
+
+# Security group for the domain's VPC endpoints. HTTPS in from inside the VPC
+# only; the private network (VPN / transit gateway) is what reaches it.
+resource "aws_security_group" "opensearch" {
+  count = local.enable_opensearch ? 1 : 0
+
+  name        = "${local.opensearch_domain_name}-opensearch"
+  description = "OpenSearch domain ${local.opensearch_domain_name} - HTTPS from within the VPC"
+  vpc_id      = data.aws_vpc.opensearch[0].id
+
+  ingress {
+    description = "HTTPS from within the VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.opensearch[0].cidr_block]
+  }
+
+  tags = merge(local.tags, {
+    Name      = "${local.opensearch_domain_name}-opensearch"
+    component = "observability"
+  })
+}
+
+#------------------------------------------------------------------------------
+# Audit logging -> CloudWatch Logs.
+#
+# The log group sits under /aws/vendedlogs/ so a single broad resource policy
+# can cover every per-BU domain. CloudWatch Logs allows only 10 resource
+# policies per Region, so a per-domain policy would not scale to 22 clusters.
+# (AWS: "Monitoring OpenSearch logs with Amazon CloudWatch Logs".)
+#------------------------------------------------------------------------------
+resource "aws_cloudwatch_log_group" "opensearch_audit" {
+  #checkov:skip=CKV_AWS_158:Per ADR-017, CloudWatch is the short-retention operational tier (default AES-256); customer-managed KMS is reserved for the S3 archive. Matches the Auto Mode vended-logs group (cluster/eks-cluster.tf).
+  count = local.enable_opensearch ? 1 : 0
+
+  name              = local.opensearch_audit_log_group
+  retention_in_days = local.opensearch_audit_retention_days
+
+  tags = merge(local.tags, {
+    component = "observability"
+  })
+}
+
+# Let the OpenSearch service write to any OpenSearch vended-logs group in this
+# account/region. One policy, wildcard prefix, so it covers future domains too.
+# SourceAccount/SourceArn conditions guard against the confused-deputy problem.
+data "aws_iam_policy_document" "opensearch_audit" {
+  count = local.enable_opensearch ? 1 : 0
+
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["es.amazonaws.com"]
+    }
+    actions = [
+      "logs:PutLogEvents",
+      "logs:CreateLogStream",
+    ]
+    resources = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/vendedlogs/opensearch/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:es:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:domain/*"]
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_resource_policy" "opensearch_audit" {
+  count = local.enable_opensearch ? 1 : 0
+
+  policy_name     = "opensearch-vendedlogs"
+  policy_document = data.aws_iam_policy_document.opensearch_audit[0].json
+}
+
 resource "aws_opensearch_domain" "logs" {
+  #checkov:skip=CKV_AWS_247:Dev PoC uses the AWS-managed aws/es key. The per-BU shared KMS key (alias/general-<bu>) lives in core-shared-services-production, not the development account, so a customer-managed key comes with the per-BU rollout. See ADR-017.
+  #checkov:skip=CKV_AWS_318:Dedicated master nodes are a deliberate deferral for the dev PoC; HA sizing (3 masters, zone awareness) is the measured follow-up before per-BU rollout. See ADR-017.
+  #checkov:skip=CKV2_AWS_59:Same as CKV_AWS_318 — dedicated master is part of the deferred HA sizing, not the single-node dev PoC. See ADR-017.
   count = local.enable_opensearch ? 1 : 0
 
   domain_name    = local.opensearch_domain_name
@@ -41,6 +157,16 @@ resource "aws_opensearch_domain" "logs" {
     ebs_enabled = true
     volume_type = "gp3"
     volume_size = local.opensearch_ebs_gb
+  }
+
+  # Private domain: lives in the VPC's private subnets, reachable only over the
+  # private network (VPN / transit gateway / VPC endpoints), not the internet.
+  # Subnet count follows zone awareness, not node count: one subnet while zone
+  # awareness is off (AWS rejects multiple subnets otherwise). Widen this to the
+  # AZ count when multi-AZ is turned on (sizing follow-up, #8420).
+  vpc_options {
+    subnet_ids         = slice(data.aws_subnets.opensearch_private[0].ids, 0, 1)
+    security_group_ids = [aws_security_group.opensearch[0].id]
   }
 
   # FGAC prerequisites: encryption at rest, node-to-node encryption, HTTPS.
@@ -77,9 +203,19 @@ resource "aws_opensearch_domain" "logs" {
     }]
   })
 
+  # Audit logging on (architecture review). Needs FGAC, which is enabled above.
+  # The resource policy must exist before the domain can publish.
+  log_publishing_options {
+    log_type                 = "AUDIT_LOGS"
+    cloudwatch_log_group_arn = aws_cloudwatch_log_group.opensearch_audit[0].arn
+    enabled                  = true
+  }
+
   tags = merge(local.tags, {
     component = "observability"
   })
+
+  depends_on = [aws_cloudwatch_log_resource_policy.opensearch_audit]
 }
 
 output "opensearch_domain_endpoint" {
