@@ -212,6 +212,9 @@
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
       "enable_probation_discovery_node": true,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": true,
         "create_replica": true,
@@ -431,6 +434,9 @@
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
       "enable_probation_discovery_node": false,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": true,
         "create_replica": true,
@@ -667,6 +673,9 @@
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": false,
       "enable_probation_discovery_node": false,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": false,
         "create_replica": false,
@@ -909,6 +918,9 @@
       "enable_s3_data_migrate_lambda": false,
       "create_postgres_load_generator_job": false,
       "enable_probation_discovery_node": false,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": false,
         "create_replica": false,

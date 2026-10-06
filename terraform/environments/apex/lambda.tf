@@ -168,6 +168,17 @@ resource "aws_s3_bucket_policy" "backup_lambda_secure_transport" {
   policy = data.aws_iam_policy_document.backup_lambda_secure_transport.json
 }
 
+resource "aws_s3_bucket_logging" "backup_lambda" {
+  bucket        = aws_s3_bucket.backup_lambda.id
+  target_bucket = module.s3-bucket-logging.bucket.id
+  target_prefix = "s3access/"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
 #####################################
 ### Provision scripts to S3 bucket
 #####################################
