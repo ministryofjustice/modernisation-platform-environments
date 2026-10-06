@@ -13,6 +13,14 @@
     "portMappings": [
       {
         "containerPort": ${server_port}
+      },
+      {
+        "containerPort": ${ssl_port},
+        "hostPort": ${ssl_port}
+      },
+      {
+        "containerPort": ${health_check_port},
+        "hostPort": ${health_check_port}
       }
     ],
     "mountPoints": [
@@ -80,6 +88,14 @@
       {
         "name": "WL_USER",
         "valueFrom": "${wl_user}"
+      },
+      {
+        "name": "KEYSTORE_PASSWORD",
+        "valueFrom": "${keystore_password}"
+      },
+      {
+        "name": "TRUSTSTORE_PASSWORD",
+        "valueFrom": "${truststore_password}"
       }
     ]
   }
