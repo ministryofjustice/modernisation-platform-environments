@@ -1,228 +1,187 @@
-###################
-# K8S - Namespace #
-###################
-
-resource "kubernetes_namespace" "logging" {
-  metadata {
-    name = "logging"
-
-    labels = {
-      "component"                          = "logging"
-      "pod-security.kubernetes.io/enforce" = "privileged"
-    }
-
-    annotations = {
-      "cloud-platform.justice.gov.uk/application"                = "Logging"
-      "cloud-platform.justice.gov.uk/business-unit"              = "Platforms"
-      "cloud-platform.justice.gov.uk/owner"                      = "Cloud Platform: platforms@digital.justice.gov.uk"
-      "cloud-platform.justice.gov.uk/source-code"                = "https://github.com/ministryofjustice/cloud-platform-infrastructure"
-      "cloud-platform.justice.gov.uk/can-tolerate-master-taints" = "true"
-      "cloud-platform.justice.gov.uk/slack-channel"              = "cloud-platform"
-      "cloud-platform-out-of-hours-alert"                        = "true"
-    }
-  }
-}
-
-###############
-# fluent-bit #
-###############
-
-resource "helm_release" "fluent_bit" {
-
-  name       = "fluent-bit"
-  chart      = "fluent-bit"
-  repository = "https://fluent.github.io/helm-charts"
-  namespace  = kubernetes_namespace.logging.id
-  version    = "0.54.0"
-  timeout    = 1500
-
-  values = [templatefile("${path.module}/templates/fluent-bit.yaml.tpl", {
-    # opensearch_app_host               = var.opensearch_app_host
-    # elasticsearch_host                = var.elasticsearch_host
-    # s3_bucket_application_logs        = module.s3_bucket_application_logs.bucket_name
-    s3_bucket_application_logs       = "${terraform.workspace}-fluentbit"
-    cluster                           = terraform.workspace
-  })]
-
-  depends_on = [kubernetes_service_account.this]
-}
-
-
-####################
-# Network Policies #
-####################
-
-resource "kubernetes_network_policy" "default" {
-  metadata {
-    name      = "default"
-    namespace = kubernetes_namespace.logging.id
-  }
-
-  spec {
-    pod_selector {}
-    ingress {
-      from {
-        pod_selector {}
-      }
-    }
-
-    policy_types = ["Ingress"]
-  }
-}
-
-resource "kubernetes_network_policy" "allow_prometheus_scraping" {
-  metadata {
-    name      = "allow-prometheus-scraping"
-    namespace = kubernetes_namespace.logging.id
-  }
-
-  spec {
-    pod_selector {}
-    ingress {
-      from {
-        namespace_selector {
-          match_labels = {
-            component = "monitoring"
-          }
-        }
-      }
-    }
-
-    policy_types = ["Ingress"]
-  }
-}
-
-##################
-# Resource Quota #
-##################
-
-resource "kubernetes_resource_quota" "namespace_quota" {
-  metadata {
-    name      = "namespace-quota"
-    namespace = kubernetes_namespace.logging.id
-  }
-  spec {
-    hard = {
-      pods = 170
-    }
-  }
-}
-
-##############
-# LimitRange #
-##############
-
-resource "kubernetes_limit_range" "default" {
-  metadata {
-    name      = "limitrange"
-    namespace = kubernetes_namespace.logging.id
-  }
-  spec {
-    limit {
-      type = "Container"
-      default = {
-        cpu    = "4"
-        memory = "5500Mi"
-      }
-      default_request = {
-        cpu    = "100m"
-        memory = "300Mi"
-      }
-    }
-  }
+data "aws_s3_bucket" "fluent_bit" {
+  bucket = "${terraform.workspace}-fluentbit"
 }
 
 locals {
-  sa_name   = "fluent-bit-cp-managed"
-  namespace = "logging"
-  serviceaccount_rules = [
-    {
-      api_groups = [""]
-      resources = [
-        "namespaces",
-        "pods",
-        "events"
-      ]
-      verbs = [
-        "get",
-        "list",
-        "watch"
-      ]
-    },
-  ]
+  fluent_bit_namespace       = "logging"
+  fluent_bit_service_account = "fluent-bit"
+  fluent_bit_state_dir       = "/var/fluent-bit/state"
 }
 
-resource "kubernetes_service_account" "this" {
-  metadata {
-    name      = local.sa_name
-    namespace = local.namespace
-    annotations = {
-      "eks.amazonaws.com/role-arn" = module.iam_assumable_role.iam_role_arn
-    }    
-  }
+#------------------------------------------------------------------------------
+# IAM role for Fluent Bit (EKS Pod Identity) — write-only to logs/ prefix
+#------------------------------------------------------------------------------
 
-  depends_on = [
-    kubernetes_namespace.logging,
-    module.iam_assumable_role
-  ]
-}
+data "aws_iam_policy_document" "fluent_bit_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole", "sts:TagSession"]
 
-resource "kubernetes_cluster_role" "this" {
-  metadata {
-    name = local.sa_name
-  }
-
-  dynamic "rule" {
-    for_each = local.serviceaccount_rules
-    content {
-      api_groups = rule.value.api_groups
-      resources  = rule.value.resources
-      verbs      = rule.value.verbs
+    principals {
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
     }
   }
 }
 
-resource "kubernetes_cluster_role_binding" "this" {
+resource "aws_iam_role" "fluent_bit" {
+  name               = "${local.cluster_name}-fluent-bit"
+  assume_role_policy = data.aws_iam_policy_document.fluent_bit_assume.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "fluent_bit_s3" {
+  statement {
+    sid       = "WriteLogs"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["${data.aws_s3_bucket.fluent_bit.arn}/logs/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "fluent_bit_s3" {
+  name   = "fluent-bit-s3-write"
+  role   = aws_iam_role.fluent_bit.id
+  policy = data.aws_iam_policy_document.fluent_bit_s3.json
+}
+
+resource "aws_eks_pod_identity_association" "fluent_bit" {
+  cluster_name    = local.cluster_name
+  namespace       = local.fluent_bit_namespace
+  service_account = local.fluent_bit_service_account
+  role_arn        = aws_iam_role.fluent_bit.arn
+
+  tags = local.tags
+}
+
+#------------------------------------------------------------------------------
+# Namespace — privileged PSA is required for the hostPath mounts of /var/log
+#------------------------------------------------------------------------------
+
+resource "kubernetes_namespace_v1" "logging" {
   metadata {
-    name = local.sa_name
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.this.metadata[0].name
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = kubernetes_service_account.this.metadata[0].name
-    namespace = local.namespace
-  }
-}
+    name = local.fluent_bit_namespace
 
-# Get account information #
-data "aws_partition" "current" {}
-
-# Get EKS cluster #
-data "aws_eks_cluster" "eks_cluster" {
-  name = terraform.workspace
-}
-
-# Create assumable role #
-module "iam_assumable_role" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.59.0"
-
-  allow_self_assume_role     = false
-  assume_role_condition_test = "StringEquals"
-  create_role                = true
-  force_detach_policies      = true
-  role_name                  = "cloud-platform-fluentbit-irsa-${data.aws_eks_cluster.eks_cluster.name}"
-  role_policy_arns           = {
-    s3 = module.s3_bucket_application_logs.irsa_policy_arn
-  }
-  oidc_providers = {
-    (data.aws_eks_cluster.eks_cluster.name) : {
-      provider_arn               = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${replace(data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer, "https://", "")}"
-      namespace_service_accounts = ["logging:fluent-bit-cp-managed"]
+    labels = {
+      "pod-security.kubernetes.io/enforce" = "privileged"
     }
   }
-}    
+}
+
+#------------------------------------------------------------------------------
+# Fluent Bit DaemonSet — tails container logs and ships them to S3
+#------------------------------------------------------------------------------
+
+resource "helm_release" "fluent_bit" {
+  name       = "fluent-bit"
+  repository = "https://fluent.github.io/helm-charts"
+  chart      = "fluent-bit"
+  version    = "0.54.0"
+  namespace  = kubernetes_namespace_v1.logging.metadata[0].name
+
+  values = [yamlencode({
+    serviceAccount = {
+      create = true
+      name   = local.fluent_bit_service_account
+    }
+
+    # Required by the Gatekeeper lockprivcapabilities constraint
+    securityContext = {
+      capabilities = {
+        drop = ["ALL"]
+      }
+    }
+
+    tolerations = [{ operator = "Exists" }]
+
+    # Host-backed buffer so queued chunks and pending S3 uploads survive pod restarts
+    extraVolumes = [{
+      name = "fluent-bit-state"
+      hostPath = {
+        path = local.fluent_bit_state_dir
+        type = "DirectoryOrCreate"
+      }
+    }]
+
+    extraVolumeMounts = [{
+      name      = "fluent-bit-state"
+      mountPath = local.fluent_bit_state_dir
+    }]
+
+    config = {
+      service = <<-EOT
+        [SERVICE]
+            Daemon                    Off
+            Flush                     1
+            Log_Level                 info
+            Parsers_File              /fluent-bit/etc/parsers.conf
+            Parsers_File              /fluent-bit/etc/conf/custom_parsers.conf
+            HTTP_Server               On
+            HTTP_Listen               0.0.0.0
+            HTTP_Port                 2020
+            Health_Check              On
+            storage.path              ${local.fluent_bit_state_dir}/flb-storage/
+            storage.sync              normal
+            storage.checksum          off
+            storage.max_chunks_up     128
+            storage.backlog.mem_limit 50M
+      EOT
+
+      inputs = <<-EOT
+        [INPUT]
+            Name              tail
+            Tag               kube.*
+            Path              /var/log/containers/*.log
+            Exclude_Path      /var/log/containers/fluent-bit*
+            multiline.parser  cri, docker
+            DB                ${local.fluent_bit_state_dir}/flb_kube.db
+            storage.type      filesystem
+            Skip_Long_Lines   On
+            Refresh_Interval  10
+      EOT
+
+      filters = <<-EOT
+        [FILTER]
+            Name                kubernetes
+            Match               kube.*
+            Merge_Log           On
+            Keep_Log            Off
+            K8S-Logging.Parser  On
+            K8S-Logging.Exclude On
+
+        [FILTER]
+            Name    record_modifier
+            Match   kube.*
+            Record  cluster_name ${local.cluster_name}
+
+        # Re-tag as ns.<namespace> so the S3 key can be partitioned by namespace
+        [FILTER]
+            Name                    rewrite_tag
+            Match                   kube.*
+            Rule                    $kubernetes['namespace_name'] ^(.+)$ ns.$1 false
+            Emitter_Name            ns_emitter
+            Emitter_Storage.type    filesystem
+            Emitter_Mem_Buf_Limit   50M
+      EOT
+
+      outputs = <<-EOT
+        [OUTPUT]
+            Name                     s3
+            Match                    ns.*
+            bucket                   ${data.aws_s3_bucket.fluent_bit.id}
+            region                   ${data.aws_region.current.region}
+            s3_key_format            /logs/$TAG[1]/%Y/%m/%d/%H/%M%S-$UUID.gz
+            compression              gzip
+            use_put_object           On
+            total_file_size          50M
+            upload_timeout           5m
+            store_dir                ${local.fluent_bit_state_dir}/s3
+            store_dir_limit_size     2G
+            storage.total_limit_size 2G
+      EOT
+    }
+  })]
+
+  depends_on = [aws_eks_pod_identity_association.fluent_bit]
+}
