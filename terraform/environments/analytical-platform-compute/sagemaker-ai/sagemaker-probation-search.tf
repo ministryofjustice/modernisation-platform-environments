@@ -29,7 +29,7 @@ locals {
       hmpps-probation-search-preprod = {
         namespace                       = "hmpps-probation-search-preprod"
         instance_type                   = "ml.g6.xlarge"
-        min_instance_count              = 2
+        min_instance_count              = 1
         max_instance_count              = 4
         target_invocations_per_instance = 300
         repository_name                 = "tei"
