@@ -11,7 +11,11 @@ locals {
 
   # Private subnets for ECS/EFS, sourced from the shared-VPC lookups
   # defined in platform_data.tf (data.aws_vpc.shared et al).
-  private_subnet_ids = data.aws_subnets.shared-private.ids
+  private_subnet_ids = [
+    data.aws_subnet.private_subnets_a.id,
+    data.aws_subnet.private_subnets_b.id,
+    data.aws_subnet.private_subnets_c.id,
+  ]
 
   private_subnets_by_key = {
     a = data.aws_subnet.private_subnets_a.id
