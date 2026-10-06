@@ -13,7 +13,7 @@ data "aws_vpc" "shared" {
 data "aws_subnets" "shared-data" {
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
+    values = [module.networking.vpc_id]
   }
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
