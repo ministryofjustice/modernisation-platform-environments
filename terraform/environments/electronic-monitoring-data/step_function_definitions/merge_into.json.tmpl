@@ -1,6 +1,129 @@
 {
-  "StartAt": "ProcessDates",
+  "StartAt": "%{ if planner_function_name != "" && reconciliation_consumer != "" }SelectInputMode%{ else }ProcessDates%{ endif }",
   "States": {
+%{ if planner_function_name != "" && reconciliation_consumer != "" }
+    "SelectInputMode": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.filter_dates",
+          "IsPresent": true,
+          "Next": "ProcessDates"
+        }
+      ],
+      "Default": "DiscoverRolling"
+    },
+    "DiscoverRolling": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "discover_rolling",
+          "consumer": "${reconciliation_consumer}"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "CheckRollingDiscovery"
+    },
+    "CheckRollingDiscovery": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "clean",
+          "Next": "PlanningComplete"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "manual_review_required",
+          "Next": "PlanningComplete"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "replay_ready",
+          "Next": "ProcessPlannedDates"
+        }
+      ],
+      "Default": "UnexpectedPlanningResult"
+    },
+    "ProcessPlannedDates": {
+      "Type": "Map",
+      "ItemsPath": "$.candidates",
+      "MaxConcurrency": 1,
+      "ResultPath": "$.date_results",
+      "Iterator": {
+        "StartAt": "MergePlanned${table_name}",
+        "States": {
+          "MergePlanned${table_name}": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "ResultPath": "$.merge_result",
+            "Parameters": {
+              "FunctionName": "${merge_function_name}",
+              "Payload.$": "$.replay_input"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 2
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "ResultPath": "$.error",
+                "Next": "MarkPlannedFailed"
+              }
+            ],
+            "Next": "MarkPlannedSucceeded"
+          },
+          "MarkPlannedSucceeded": {
+            "Type": "Pass",
+            "Parameters": {
+              "filter_date.$": "$.date",
+              "status": "SUCCEEDED",
+              "result.$": "$.merge_result.Payload"
+            },
+            "End": true
+          },
+          "MarkPlannedFailed": {
+            "Type": "Pass",
+            "Parameters": {
+              "filter_date.$": "$.date",
+              "status": "FAILED",
+              "error.$": "$.error"
+            },
+            "End": true
+          }
+        }
+      },
+      "End": true
+    },
+    "PlanningComplete": {
+      "Type": "Succeed"
+    },
+    "UnexpectedPlanningResult": {
+      "Type": "Fail",
+      "Error": "UnexpectedReconciliationPlanningResult",
+      "Cause": "The planner returned an unexpected rolling reconciliation status."
+    },
+%{ endif }
     "ProcessDates": {
       "Type": "Map",
       "ItemsPath": "$.filter_dates",

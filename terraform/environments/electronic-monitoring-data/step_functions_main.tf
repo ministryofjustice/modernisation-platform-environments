@@ -130,8 +130,10 @@ module "iceberg_table_maintenance_step_function" {
 # ------------------------------------------
 
 module "merge_into_mdss_staged_position" {
-  source              = "./modules/merge_into_reconciler"
-  function_to_iterate = module.merge_mdss_staged_position[0]
+  source                  = "./modules/merge_into_reconciler"
+  function_to_iterate     = module.merge_mdss_staged_position[0]
+  planner_function_arn    = module.merge_redrive_planner.lambda_function_arn
+  reconciliation_consumer = "STAGED"
 }
 
 # ------------------------------------------
@@ -148,8 +150,10 @@ module "merge_into_mdss_staged_event" {
 # ------------------------------------------
 
 module "merge_into_emdi_position" {
-  source              = "./modules/merge_into_reconciler"
-  function_to_iterate = module.merge_emdi_position[0]
+  source                  = "./modules/merge_into_reconciler"
+  function_to_iterate     = module.merge_emdi_position[0]
+  planner_function_arn    = module.merge_redrive_planner.lambda_function_arn
+  reconciliation_consumer = "EMDI"
 }
 
 # ------------------------------------------
@@ -157,8 +161,10 @@ module "merge_into_emdi_position" {
 # ------------------------------------------
 
 module "merge_into_mdss_ac_position" {
-  source              = "./modules/merge_into_reconciler"
-  function_to_iterate = module.merge_ac_position[0]
+  source                  = "./modules/merge_into_reconciler"
+  function_to_iterate     = module.merge_ac_position[0]
+  planner_function_arn    = module.merge_redrive_planner.lambda_function_arn
+  reconciliation_consumer = "AC"
 }
 
 # ------------------------------------------------------------------------------
