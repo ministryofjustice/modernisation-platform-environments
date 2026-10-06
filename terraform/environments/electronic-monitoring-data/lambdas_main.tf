@@ -1555,6 +1555,10 @@ module "send_ear_sar_response" {
       local.is-test ? "test" : "dev"
     )
   )
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
   security_group_ids = [
     aws_security_group.lambda_generic.id,
   ]
