@@ -169,6 +169,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
         {
             "Effect": "Allow",
             "Action": [
+                "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
