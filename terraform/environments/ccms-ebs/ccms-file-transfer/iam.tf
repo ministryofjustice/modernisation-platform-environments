@@ -164,7 +164,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ecr:GetDownloadUrlForLayer",
                 "ecr:BatchGetImage"
             ],
-            "Resource": ["arn:aws:ecr:{data.aws_region.current.id}:374269020027:repository/ccms-financial-transfers"]
+            "Resource": ["arn:aws:ecr:${data.aws_region.current.id}:374269020027:repository/ccms-financial-transfers"]
         },
         {
             "Effect": "Allow",
@@ -181,18 +181,13 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ds:CreateComputer",
                 "ds:DescribeDirectories",
                 "ec2:DescribeInstanceStatus",
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
                 "logs:DescribeLogStreams",
                 "logs:DescribeLogGroups",
-                "logs:PutLogEvents",
                 "ssm:DescribeAssociation",
                 "ssm:GetDeployablePatchSnapshotForInstance",
+                "ssm:GetManifest",
                 "ssm:GetDocument",
                 "ssm:DescribeDocument",
-                "ssm:GetManifest",
-                "ssm:GetParameter",
-                "ssm:GetParameters",
                 "ssm:ListAssociations",
                 "ssm:ListInstanceAssociations",
                 "ssm:UpdateAssociationStatus",
@@ -215,22 +210,17 @@ resource "aws_iam_policy" "ec2_instance_policy" {
         {
             "Effect": "Allow",
             "Action": [
-                "ssm:GetDocument",
-                "ssm:DescribeDocument",
                 "ssm:GetParameter",
                 "ssm:GetParameters"
             ],
-            "Resource": [
-                         "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:document/*",
-                         "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/*"
-                         ]
+            "Resource": ["arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/*"]
         },
         {
             "Effect": "Allow",
             "Action": [
                 "logs:CreateLogGroup",
                 "logs:CreateLogStream",
-                "logs:PutLogEvents",
+                "logs:PutLogEvents"
             ],
             "Resource": [
                          "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws-waf-logs-${local.application_name}-sftp/${local.application_name}-sftp-waf-logs:*",
