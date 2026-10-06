@@ -166,10 +166,16 @@ resource "aws_iam_policy" "ec2_instance_policy" {
             ],
             "Resource": ["arn:aws:ecr:${data.aws_region.current.id}:374269020027:repository/ccms-financial-transfers"]
         },
+         {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup"
+            ],
+            "Resource": ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:*"]
+        },
         {
             "Effect": "Allow",
             "Action": [
-                "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
@@ -219,7 +225,6 @@ resource "aws_iam_policy" "ec2_instance_policy" {
         {
             "Effect": "Allow",
             "Action": [
-                "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
