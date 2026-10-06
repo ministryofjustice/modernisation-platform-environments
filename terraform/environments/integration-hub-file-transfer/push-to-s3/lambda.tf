@@ -21,6 +21,7 @@ module "lambda_file_mover" {
       "!(.*/)?[^/]+\\.pyc$",
     ]
   }]
+  hash_extra = "file-mover"
   timeout      = 900
   tracing_mode = "Active"
 
@@ -150,6 +151,7 @@ module "lambda_dlq_reporter" {
       "!(.*/)?[^/]+\\.pyc$",
     ]
   }]
+  hash_extra = "dlq-reporter"
   timeout      = 60
   tracing_mode = "Active"
 
