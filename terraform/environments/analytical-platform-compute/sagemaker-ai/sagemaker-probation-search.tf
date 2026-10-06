@@ -28,8 +28,8 @@ locals {
     analytical-platform-compute-production = {
       hmpps-probation-search-preprod = {
         namespace                       = "hmpps-probation-search-preprod"
-        instance_type                   = "ml.g7e.2xlarge"
-        min_instance_count              = 1
+        instance_type                   = "ml.g6.xlarge"
+        min_instance_count              = 2
         max_instance_count              = 4
         target_invocations_per_instance = 300
         repository_name                 = "tei"
@@ -45,7 +45,7 @@ locals {
       hmpps-probation-search-prod = {
         namespace                       = "hmpps-probation-search-prod"
         instance_type                   = "ml.g6.xlarge"
-        min_instance_count              = 1
+        min_instance_count              = 2
         max_instance_count              = 4
         target_invocations_per_instance = 300
         repository_name                 = "tei"
