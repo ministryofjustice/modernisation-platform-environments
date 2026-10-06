@@ -44,9 +44,15 @@ locals {
   opensearch_host_workspaces = [
     "cloud-platform-development",
   ]
-  enable_opensearch      = contains(local.opensearch_host_workspaces, terraform.workspace)
-  opensearch_engine      = "OpenSearch_3.7" # pinned (ADR-017 D5); do not rely on defaults
-  opensearch_domain_name = "${terraform.workspace}-logs"
+  enable_opensearch = contains(local.opensearch_host_workspaces, terraform.workspace)
+  opensearch_engine = "OpenSearch_3.7" # pinned (ADR-017 D5); do not rely on defaults
+
+  # Domain name has a hard AWS limit of 28 chars. "${terraform.workspace}-logs"
+  # overflows: cloud-platform-development-logs is 30, and container-platform BU
+  # workspaces are longer still. Shorten the long platform prefixes to "cp-" so
+  # every workspace stays unique and well under 28 (e.g. cp-development-logs,
+  # cp-hmpps-nonlive-logs).
+  opensearch_domain_name = "${replace(replace(terraform.workspace, "container-platform-", "cp-"), "cloud-platform-", "cp-")}-logs"
   opensearch_is_live     = local.is_live[0] == "live"
   opensearch_instance    = local.opensearch_is_live ? "or1.large.search" : "or1.medium.search"
   opensearch_data_nodes  = local.opensearch_is_live ? 2 : 1
