@@ -41,4 +41,6 @@ locals {
     production  = local.github_actions_lambda_production
   }
   github_actions_lambda_environment_specific = local.github_actions_lambda_environments_specific[local.environment]
+
+  github_actions_project_name = "github-actions"
 }

@@ -1,7 +1,6 @@
 locals {
 
-  application_name            = "platform-operations"
-  github_actions_project_name = "github-actions"
+  application_name = "platform-operations"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
