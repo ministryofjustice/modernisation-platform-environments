@@ -1539,6 +1539,7 @@ module "rota_channel_notifier" {
 # ------------------------------------------------------------------------------
 
 module "send_ear_sar_response" {
+  count                          = local.is-test ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "send_ear_sar_response"
