@@ -3896,3 +3896,38 @@ resource "aws_iam_role_policy_attachment" "rota_channel_notifier_attach" {
   role       = aws_iam_role.rota_channel_notifier.name
   policy_arn = aws_iam_policy.rota_channel_notifier.arn
 }
+
+# ------------------------------------------------------------------------------
+# send_ear_sar_response
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "send_ear_sar_response" {
+  name               = "send_ear_sar_response_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "send_ear_sar_response_policy_document" {
+  statement {
+    sid    = "ReadGovNotifySecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.gov_notify_details.secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "send_ear_sar_response" {
+  name   = "send_ear_sar_response_lambda_policy"
+  policy = data.aws_iam_policy_document.send_ear_sar_response_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "send_ear_sar_response_attach" {
+  role       = aws_iam_role.send_ear_sar_response.name
+  policy_arn = aws_iam_policy.send_ear_sar_response.arn
+}

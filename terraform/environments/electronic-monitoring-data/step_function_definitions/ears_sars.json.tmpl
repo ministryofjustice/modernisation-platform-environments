@@ -54,6 +54,26 @@
             "MaxAttempts": 2
           }
         ],
+      "Next": "SendEmail"
+    },
+    "SendEmail": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${send_email}",
+        "Payload.$": "$",
+        "body.$": "States.JsonToString($)"
+
+      },
+      "Retry": [
+          {
+            "ErrorEquals": ["Lambda.AWSLambdaException"],
+            "IntervalSeconds": 2,
+            "BackoffRate": 2,
+            "MaxAttempts": 2
+          }
+        ],
       "End": true
     }
   }
