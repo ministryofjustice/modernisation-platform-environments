@@ -631,28 +631,48 @@ resource "aws_lambda_permission" "allow_eventbridge_specials_remediation" {
 # Rolling downstream position reconciliation
 # ------------------------------------------------------------------------------
 
+locals {
+  downstream_reconciliation_rolling_schedules = tomap({
+    staged = {
+      consumer            = "STAGED"
+      schedule_expression = "cron(0,30 * * * ? *)"
+    }
+    ac = {
+      consumer            = "AC"
+      schedule_expression = "cron(10,40 * * * ? *)"
+    }
+    emdi = {
+      consumer            = "EMDI"
+      schedule_expression = "cron(20,50 * * * ? *)"
+    }
+  })
+}
+
 resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
-  count = (
-    local.is-preproduction || local.is-production ? 1 : 0
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_rolling_schedules
+    : tomap({})
   )
 
-  name = "downstream_reconciliation_rolling"
+  name = "downstream_reconciliation_${each.key}_rolling"
 
-  description = (
-    "Runs staged MDSS, AC and EMDI position reconciliation every 30 minutes"
-  )
+  description = "Runs ${each.value.consumer} downstream position reconciliation every 30 minutes"
 
   flexible_time_window {
     mode = "OFF"
   }
 
-  schedule_expression = "rate(30 minutes)"
+  schedule_expression = each.value.schedule_expression
 
   target {
     arn      = aws_sfn_state_machine.downstream_reconciliation.arn
     role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
 
-    input = jsonencode({})
+    input = jsonencode({
+      consumer = each.value.consumer
+      mode     = "rolling"
+    })
   }
 }
 
