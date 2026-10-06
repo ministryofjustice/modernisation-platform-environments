@@ -4,7 +4,7 @@ module "schema_registration" {
   source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-registration?ref=e36dc233e5939ab1d676feee32d6e14855d77a42"
 
   name         = local.registration_name
-  image_uri    = var.registration_image_uri
+  image_uri    = local.registration_image_uri
   architecture = var.registration_architecture
 
   contract_object_arns = [

@@ -1,16 +1,14 @@
-variable "registration_image_uri" {
-  description = "Published registration image URI, pinned to its SHA-256 digest. Leave null while provisioning the image repository."
-  type        = string
-  default     = null
+variable "registration_image_uris" {
+  description = "Registration image URI for each environment, pinned to a SHA-256 digest."
+  type        = map(string)
+  default     = {}
 
   validation {
-    condition = var.registration_image_uri == null ? true : can(
-      regex(
-        "^[^\\s]+@sha256:[a-f0-9]{64}$",
-        var.registration_image_uri
-      )
-    )
-    error_message = "Use an image URI ending in @sha256:<64 lowercase hexadecimal characters>."
+    condition = alltrue([
+      for image_uri in values(var.registration_image_uris) :
+      can(regex("^[^\\s]+@sha256:[a-f0-9]{64}$", image_uri))
+    ])
+    error_message = "Each image URI must end in @sha256:<64 lowercase hexadecimal characters>."
   }
 }
 

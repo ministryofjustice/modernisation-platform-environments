@@ -3,9 +3,15 @@ locals {
 
   registration_name = "${local.application_name}-${local.environment}-contracts"
 
+  registration_image_uri = lookup(
+    var.registration_image_uris,
+    local.environment,
+    null
+  )
+
   registration_enabled = (
     local.contract_management_enabled &&
-    var.registration_image_uri != null
+    local.registration_image_uri != null
   )
 
   contract_bucket_names = local.contract_management_enabled ? {
