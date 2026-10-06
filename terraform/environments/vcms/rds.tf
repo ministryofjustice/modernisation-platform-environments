@@ -18,7 +18,7 @@ resource "aws_db_instance" "mariadb" {
   apply_immediately = local.app_config.db_apply_immediately
 
   lifecycle {
-    prevent_destroy = false
+    prevent_destroy = true
   }
 }
 
