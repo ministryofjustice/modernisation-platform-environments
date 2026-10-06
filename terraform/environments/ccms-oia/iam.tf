@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
       test     = "StringEquals"
       variable = "AWS:SourceAccount"
       values   = ["${data.aws_caller_identity.current.account_id}"]
-     }
+    }
   }
 }
 
