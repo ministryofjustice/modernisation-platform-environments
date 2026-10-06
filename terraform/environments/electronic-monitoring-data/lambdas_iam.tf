@@ -3902,11 +3902,13 @@ resource "aws_iam_role_policy_attachment" "rota_channel_notifier_attach" {
 # ------------------------------------------------------------------------------
 
 resource "aws_iam_role" "send_ear_sar_response" {
+  count = local.is-test ? 0 : 1
   name               = "send_ear_sar_response_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 data "aws_iam_policy_document" "send_ear_sar_response_policy_document" {
+  count = local.is-test ? 0 : 1
   statement {
     sid    = "ReadGovNotifySecrets"
     effect = "Allow"
@@ -3917,17 +3919,19 @@ data "aws_iam_policy_document" "send_ear_sar_response_policy_document" {
     ]
 
     resources = [
-      module.gov_notify_details.secret_arn,
+      module.gov_notify_details[0].secret_arn,
     ]
   }
 }
 
 resource "aws_iam_policy" "send_ear_sar_response" {
+  count = local.is-test ? 0 : 1
   name   = "send_ear_sar_response_lambda_policy"
   policy = data.aws_iam_policy_document.send_ear_sar_response_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "send_ear_sar_response_attach" {
+  count = local.is-test ? 0 : 1
   role       = aws_iam_role.send_ear_sar_response.name
   policy_arn = aws_iam_policy.send_ear_sar_response.arn
 }
