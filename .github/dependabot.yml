@@ -501,6 +501,7 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/data-factory-moj"
+      - "terraform/environments/data-factory-moj/data-contract-management"
       - "terraform/environments/data-factory-moj/dms-core"
       - "terraform/environments/data-factory-moj/dms-core/modules/dms-test-harness"
       - "terraform/environments/data-factory-moj/dms-core/modules/oracle-test-harness"
@@ -528,6 +529,7 @@ updates:
       - "terraform/environments/data-platform/ai-gateway"
       - "terraform/environments/data-platform/airflow"
       - "terraform/environments/data-platform/airflow-cluster"
+      - "terraform/environments/data-platform/airflow-cluster/modules/kubernetes/namespace"
       - "terraform/environments/data-platform/app"
       - "terraform/environments/data-platform/cluster"
       - "terraform/environments/data-platform/cluster/modules/kubernetes/namespace"
@@ -936,10 +938,23 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
+      - "terraform/environments/integration-hub-events"
+    schedule:
+      interval: "daily"
+    groups:
+      integration-hub-events:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
       - "terraform/environments/integration-hub-file-transfer"
       - "terraform/environments/integration-hub-file-transfer/modules/file-dispatch-configuration"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup"
+      - "terraform/environments/integration-hub-file-transfer/test-harness"
     schedule:
       interval: "daily"
     groups:
@@ -952,6 +967,10 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/justice-eng-ai"
+      - "terraform/environments/justice-eng-ai/backend-processing"
+      - "terraform/environments/justice-eng-ai/modules/step_function_builder"
+      - "terraform/environments/justice-eng-ai/prototypes-infra"
+      - "terraform/environments/justice-eng-ai/web-ui"
     schedule:
       interval: "daily"
     groups:
@@ -1323,6 +1342,18 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
+      - "terraform/environments/platform-operations"
+    schedule:
+      interval: "daily"
+    groups:
+      platform-operations:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
       - "terraform/environments/ppud"
     schedule:
       interval: "daily"
@@ -1529,6 +1560,7 @@ updates:
       - "terraform/modules/efs"
       - "terraform/modules/environment"
       - "terraform/modules/fsx_windows"
+      - "terraform/modules/github_lambda"
       - "terraform/modules/ip_addresses"
       - "terraform/modules/lb_listener"
       - "terraform/modules/ncsc-aws-config-conformance-packs"

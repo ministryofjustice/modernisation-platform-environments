@@ -155,7 +155,7 @@ resource "aws_autoscaling_schedule" "weblogic_data_scale_down" {
   min_size               = 0
   max_size               = 0
   desired_capacity       = 0
-  recurrence             = "0 5 * * Mon-Fri"
+  recurrence             = "0 19 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.weblogic_testdata_api[0].name
 }
 
@@ -166,7 +166,7 @@ resource "aws_autoscaling_schedule" "weblogic_data_scale_up" {
   min_size               = var.delius_microservice_configs.weblogic_testdata_api.asg_min_size
   max_size               = var.delius_microservice_configs.weblogic_testdata_api.asg_max_size
   desired_capacity       = var.delius_microservice_configs.weblogic_testdata_api.asg_min_size
-  recurrence             = "0 19 * * Mon-Fri"
+  recurrence             = "0 5 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.weblogic_testdata_api[0].name
 }
 

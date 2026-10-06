@@ -1,6 +1,11 @@
+# Shared load balancer access log bucket, managed in ccms-feasibility root
+data "aws_s3_bucket" "lb_access_logs" {
+  bucket = "${local.application_name}-lb-access-logs"
+}
+
 module "nlb_admin" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/fbec9c4550470ccbe5818996867aebca9e01fe1b
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=fbec9c4550470ccbe5818996867aebca9e01fe1b"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=10d2292"
 
   name               = "${local.component_name}-admin-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -19,12 +24,21 @@ module "nlb_admin" {
 
   enable_deletion_protection = local.application_data.accounts[local.environment].nlb_deletion_protection
 
+  access_logs = {
+    bucket = data.aws_s3_bucket.lb_access_logs.id
+    prefix = "${local.component_name}-admin"
+  }
+
   tags = local.tags
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }
 
 module "nlb_managed" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/fbec9c4550470ccbe5818996867aebca9e01fe1b
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=fbec9c4550470ccbe5818996867aebca9e01fe1b"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=10d2292"
 
   name               = "${local.component_name}-managed-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -43,5 +57,14 @@ module "nlb_managed" {
 
   enable_deletion_protection = local.application_data.accounts[local.environment].nlb_deletion_protection
 
+  access_logs = {
+    bucket = data.aws_s3_bucket.lb_access_logs.id
+    prefix = "${local.component_name}-managed"
+  }
+
   tags = local.tags
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }

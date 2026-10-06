@@ -120,6 +120,8 @@ resource "aws_lb" "delius_core_frontend" {
     prefix  = "weblogic-${var.env_name}-alb"
     enabled = true
   }
+
+  tags = merge(local.tags, { Name = local.alb_name })
 }
 
 resource "aws_lb_listener" "listener_https" {
@@ -127,7 +129,7 @@ resource "aws_lb_listener" "listener_https" {
   port              = 443
   protocol          = "HTTPS"
   certificate_arn   = local.certificate_arn
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
     type = "fixed-response"

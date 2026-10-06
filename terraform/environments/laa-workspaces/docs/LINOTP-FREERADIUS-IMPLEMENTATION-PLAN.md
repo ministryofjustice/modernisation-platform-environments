@@ -24,7 +24,7 @@ A self-service MFA solution for AWS WorkSpaces using:
 ### Key Benefits Over Current Approach
 
 | Feature | Current (Google Authenticator PAM) | AWS Blog (LinOTP) |
-|---------|-----------------------------------|-------------------|
+| --------- | ----------------------------------- | ------------------- |
 | **User Enrollment** | Admin must SSH and run commands | Users self-enroll via web portal |
 | **User Experience** | Complex, requires IT support | Simple, self-service |
 | **Token Management** | No reset capability | Users can reset tokens |
@@ -1009,7 +1009,7 @@ The script automatically installs and configures everything when the EC2 instanc
 ### Estimated Effort
 
 | Phase | Estimated Time | Complexity | Dependencies |
-|-------|---------------|------------|--------------|
+| ------- | --------------- | ------------ | -------------- |
 | Phase 1: Infrastructure Code | 2-4 hours | Medium | None |
 | Phase 2: Installation Script | 4-6 hours | High | Phase 1 |
 | Phase 3: LinOTP Configuration | 1-2 hours | Medium | Phase 2 |
@@ -1052,7 +1052,7 @@ The script automatically installs and configures everything when the EC2 instanc
 **Options:**
 
 | Option | Pros | Cons | Cost | Recommendation |
-|--------|------|------|------|----------------|
+| -------- | ------ | ------ | ------ | ---------------- |
 | **A. Public IPs on instances** | Simple, easy to implement | Less secure, no SSL cert | Free | ❌ Dev/test only |
 | **B. Elastic IPs** | Static IPs, simple | Still less secure, no cert | ~$7/mo (2 EIPs) | ⚠️ OK for dev |
 | **C. ALB + ACM** | Professional, valid certs, HA | More complex, higher cost | ~$20/mo | ✅ Recommended for prod |
@@ -1089,7 +1089,7 @@ The script automatically installs and configures everything when the EC2 instanc
 **Options:**
 
 | Option | Pros | Cons | Cost | Recommendation |
-|--------|------|------|------|----------------|
+| -------- | ------ | ------ | ------ | ---------------- |
 | **A. Self-signed** | Free, simple | Browser warnings, unprofessional | Free | ⚠️ Dev/test only |
 | **B. ACM (with ALB)** | Free, auto-renewal, trusted | Requires ALB, public DNS | ALB cost | ✅ Best for AWS |
 | **C. Let's Encrypt** | Free, trusted | Manual setup, renewal cron | Free | ✅ If no ALB |
@@ -1122,7 +1122,7 @@ The script automatically installs and configures everything when the EC2 instanc
 ### High Risks
 
 | Risk | Impact | Likelihood | Mitigation |
-|------|--------|------------|------------|
+| ------ | -------- | ------------ | ------------ |
 | **LinOTP repo unavailable** | Blocker | Medium | Cache RPMs in S3, document URLs |
 | **AD integration fails** | Blocker | Low | Test LDAP connectivity early, validate BindDN |
 | **Database sync issues** | Major | Medium | Use RDS for shared database |
@@ -1133,7 +1133,7 @@ The script automatically installs and configures everything when the EC2 instanc
  (APPROVED DESIGN)
 
 | Resource | Quantity | Unit Cost | Monthly Cost |
-|----------|----------|-----------|--------------|
+| ---------- | ---------- | ----------- | -------------- |
 | EC2 t3.medium | **1** | ~$30 | **~$30** |
 | EBS (20GB gp3) | **1** | ~$2 | **~$2** |
 | ALB | 1 | ~$16 + data | ~$20 |
@@ -1143,7 +1143,7 @@ The script automatically installs and configures everything when the EC2 instanc
 | Secrets Manager | 3 secrets | ~$0.40 each | ~$1.20 |
 | **TOTAL** | - | - | **~$59/month
 | Resource | Quantity | Unit Cost | Monthly Cost |
-|----------|----------|-----------|--------------|
+| ---------- | ---------- | ----------- | -------------- |
 | EC2 t3.medium | 2 | ~$30 | ~$60 |
 | EBS (20GB gp3) | 2 | ~$2 | ~$4 |
 | RDS db.t3.micro (optional) | 1 | ~$15 | ~$15 |
@@ -1157,7 +1157,7 @@ The script automatically installs and configures everything when the EC2 instanc
 ### Production Environment (Recommended)
 
 | Resource | Quantity | Unit Cost | Monthly Cost |
-|----------|----------|-----------|--------------|
+| ---------- | ---------- | ----------- | -------------- |
 | EC2 t3.medium | 2 | ~$30 | ~$60 |
 | EBS (20GB gp3) | 2 | ~$2 | ~$4 |
 | RDS db.t3.small (Multi-AZ) | 1 | ~$58 | ~$58 |

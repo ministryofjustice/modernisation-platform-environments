@@ -14,7 +14,7 @@ runbook.
 ## What this module creates
 
 | Resource | Purpose |
-|----------|---------|
+| ---------- | --------- |
 | `aws_iam_role.argocd_capability` | Identity the managed Argo CD runs as. Named `<cluster-name>-argocd-capability`. Trusts the `capabilities.eks.amazonaws.com` service principal. This is the role a spoke registers in its EKS access entry. |
 | `aws_iam_role_policy.argocd_codeconnection` | Allows the capability role to read Git through AWS CodeConnections (only when `codeconnection_arn` is set). |
 | `aws_eks_capability.argocd` | The managed Argo CD capability (`type = ARGOCD`), authenticated via IAM Identity Center. One capability per cluster (an EKS hard limit). |
@@ -56,7 +56,7 @@ module "argocd" {
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ------ | ------------- | ------ | --------- | :--------: |
 | `cluster_name` | Name of the hub EKS cluster where the Argo CD capability is enabled. | `string` | — | yes |
 | `idc_instance_arn` | ARN of the AWS IAM Identity Center instance used for Argo CD authentication. | `string` | — | yes |
 | `idc_region` | Region of the IAM Identity Center instance. Defaults to the provider region. | `string` | `""` | no |

@@ -10,9 +10,9 @@ locals {
     id               = data.aws_caller_identity.current.account_id
   }
   account_config = {
-    shared_vpc_cidr    = data.aws_vpc.shared.cidr_block
-    private_subnet_ids = data.aws_subnets.shared-private.ids
-    public_subnet_ids  = data.aws_subnets.shared-public.ids
+    shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
+    private_subnet_ids            = data.aws_subnets.shared-private.ids
+    public_subnet_ids             = data.aws_subnets.shared-public.ids
     data_subnet_ids               = data.aws_subnets.shared-data.ids
     data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
     route53_inner_zone            = data.aws_route53_zone.inner
@@ -80,9 +80,9 @@ locals {
   acm_subject_alternative_names = [local.app_url, local.app_config.legacy_url]
 
   mp_non_live_natgw_ips = [
-  "13.42.163.245/32", # mod-platform-non-live-eu-west-2b-nat
-  "13.43.9.198/32",   # mod-platform-non-live-eu-west-2a-nat
-  "18.132.208.127/32" # mod-platform-non-live-eu-west-2c-nat
+    "13.42.163.245/32", # mod-platform-non-live-eu-west-2b-nat
+    "13.43.9.198/32",   # mod-platform-non-live-eu-west-2a-nat
+    "18.132.208.127/32" # mod-platform-non-live-eu-west-2c-nat
   ]
   mp_live_natgw_ips = [
     "13.41.38.176/32", # mod-platform-live-eu-west-2b-nat

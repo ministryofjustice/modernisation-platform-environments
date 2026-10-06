@@ -1,6 +1,6 @@
 module "gh_runner" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b484555
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=b484555"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=10d2292"
 
   name                  = "${local.component_name}-${local.env_label}-gh-runner"
   instance_profile_name = aws_iam_instance_profile.github_runner_instance_profile.name
@@ -21,4 +21,8 @@ module "gh_runner" {
     instance-scheduling = "skip-scheduling"
     backup              = "true"
   })
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }
