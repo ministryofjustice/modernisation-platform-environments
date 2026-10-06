@@ -51,6 +51,12 @@ module "baseline" {
     lookup(local.baseline_all_environments, "cloudwatch_metric_alarms", {}),
     lookup(local.baseline_environment_specific, "cloudwatch_metric_alarms", {}),
   )
+
+  sns_topics = merge(
+    module.baseline_presets.sns_topics,
+    lookup(local.baseline_all_environments, "sns_topics", {}),
+    lookup(local.baseline_environment_specific, "sns_topics", {}),
+  )
 }
 
 module "github_workflow_scheduler" {
