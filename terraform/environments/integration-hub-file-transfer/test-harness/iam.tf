@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     actions = ["s3:PutObject"]
 
     resources = [
-      "${data.aws_s3_bucket.incoming[0].arn}/test-harness/repository-smoke-test/direct-s3/*"
+      "${data.aws_s3_bucket.incoming[0].arn}/test-harness/repo-smoke-test/direct-s3/*"
     ]
   }
 
@@ -78,7 +78,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
       test     = "ArnLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
       values = [
-        "${data.aws_s3_bucket.incoming[0].arn}/test-harness/repository-smoke-test/direct-s3/*"
+        "${data.aws_s3_bucket.incoming[0].arn}/test-harness/repo-smoke-test/direct-s3/*"
       ]
     }
   }
@@ -92,7 +92,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["delivered/repository-smoke-test/direct-s3/*"]
+      values   = ["delivered/repo-smoke-test/direct-s3/*"]
     }
   }
 
@@ -100,7 +100,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     sid       = "ReadDeliveredFixture"
     effect    = "Allow"
     actions   = ["s3:GetObject"]
-    resources = ["${module.s3_test_harness.s3_bucket_arn}/delivered/repository-smoke-test/direct-s3/*"]
+    resources = ["${module.s3_test_harness.s3_bucket_arn}/delivered/repo-smoke-test/direct-s3/*"]
   }
 
   statement {
@@ -118,7 +118,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     condition {
       test     = "ArnLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
-      values   = ["${module.s3_test_harness.s3_bucket_arn}/delivered/repository-smoke-test/direct-s3/*"]
+      values   = ["${module.s3_test_harness.s3_bucket_arn}/delivered/repo-smoke-test/direct-s3/*"]
     }
   }
 }
