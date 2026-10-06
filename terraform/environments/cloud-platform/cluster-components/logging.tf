@@ -103,6 +103,10 @@ resource "helm_release" "fluent_bit" {
       name   = local.fluent_bit_service_account
     }
 
+    podAnnotations = {
+      "platform.justice.gov.uk/pod-identity-association" = aws_eks_pod_identity_association.fluent_bit.id
+    }
+
     # Required by the Gatekeeper lockprivcapabilities constraint
     securityContext = {
       capabilities = {
