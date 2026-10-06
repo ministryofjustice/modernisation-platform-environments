@@ -3,11 +3,6 @@ locals {
     options = {
       enable_ec2_session_manager_cloudwatch_logs    = true
       cloudwatch_metric_alarms_lambda_function_name = "${local.github_actions_project_name}-trigger"
-      sns_topics = {
-        pagerduty_integrations = {
-          pagerduty = "platform-operations-production"
-        }
-      }
     }
   }
 
