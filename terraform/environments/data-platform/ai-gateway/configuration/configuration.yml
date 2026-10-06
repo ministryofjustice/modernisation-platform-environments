@@ -27,7 +27,7 @@ teams:
         model: "bedrock-jeaie-claude-opus-5"
       - alias: "claude-sonnet-5"
         model: "bedrock-jeaie-claude-sonnet-5"
-  
+
 models:
   amazon_bedrock:
     # Amazon
