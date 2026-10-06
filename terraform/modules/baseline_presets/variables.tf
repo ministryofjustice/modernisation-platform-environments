@@ -18,6 +18,8 @@ variable "options" {
     cloudwatch_dashboard_default_widget_groups   = optional(list(string))          # create Cloudwatch-Default dashboard; list of map keys to filter local.cloudwatch_dashboard_widget_groups
     cloudwatch_log_groups_retention_in_days      = optional(number)                # number of days to retain cloudwatch log groups, retention is environment specific, so will be determined in locals.
     cloudwatch_metric_alarms_default_actions     = optional(list(string))          # default alarm_action to apply to cloudwatch metrics returned by this module
+    cloudwatch_metric_alarms_lambda_function_name = optional(string)               # Lambda function name to scope the baseline Lambda error alarm to a single function
+    cloudwatch_metric_alarms_lambda_error_period = optional(number, 60)            # evaluation period in seconds for the baseline Lambda error alarm
     cloudwatch_metric_oam_links_ssm_parameters   = optional(list(string))          # list of account names to send cloudwatch metrics to, creates placeholder SSM param for each
     cloudwatch_metric_oam_links                  = optional(list(string))          # list of account names to send cloudwatch metrics to, creates oam link for each
     db_backup_bucket_name                        = optional(string)                # override default backup bucket name

@@ -387,6 +387,23 @@ locals {
       }
     }
 
+    lambda = {
+      lambda-error-count = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
+        metric_name         = "Errors"
+        namespace           = "AWS/Lambda"
+        period              = tostring(var.options.cloudwatch_metric_alarms_lambda_error_period)
+        statistic           = "Sum"
+        threshold           = "1"
+        alarm_description   = "Triggers if there has been at least one failed Lambda invocation during the configured evaluation period"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+        dimensions          = var.options.cloudwatch_metric_alarms_lambda_function_name != null ? { FunctionName = var.options.cloudwatch_metric_alarms_lambda_function_name } : {}
+      }
+    }
+
     lb = {
       unhealthy-load-balancer-host = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -402,6 +419,7 @@ locals {
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
+
     network_lb = {
       unhealthy-network-load-balancer-host = {
         comparison_operator = "GreaterThanOrEqualToThreshold"

@@ -1,11 +1,14 @@
 locals {
   baseline_presets_production = {
     options = {
-      enable_ec2_session_manager_cloudwatch_logs = true
+      enable_ec2_session_manager_cloudwatch_logs    = true
+      cloudwatch_metric_alarms_lambda_function_name = "${local.github_actions_project_name}-trigger"
     }
   }
 
   baseline_production = {
+    cloudwatch_metric_alarms = local.lambda_alarms.production
+
     options = {
       enable_ec2_session_manager_cloudwatch_logs = true
     }

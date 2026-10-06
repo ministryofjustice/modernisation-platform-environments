@@ -45,12 +45,18 @@ module "baseline" {
   }
 
   environment = module.environment
+
+  cloudwatch_metric_alarms = merge(
+    module.baseline_presets.cloudwatch_metric_alarms_baseline,
+    lookup(local.baseline_all_environments, "cloudwatch_metric_alarms", {}),
+    lookup(local.baseline_environment_specific, "cloudwatch_metric_alarms", {}),
+  )
 }
 
 module "github_workflow_scheduler" {
   source                     = "../../modules/github_lambda"
   aws_account_id             = data.aws_caller_identity.current.id
   enable_outbound_federation = local.github_actions_lambda_environment_specific.enable_outbound_federation
-  project_name               = "github-actions"
+  project_name               = local.github_actions_project_name
   github_workflows           = local.github_actions_lambda_environment_specific.github_workflows
 }
