@@ -655,3 +655,61 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
     input = jsonencode({})
   }
 }
+
+# ------------------------------------------------------------------------------
+# Rota channel notifier schedule
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rota_channel_notifier_scheduler" {
+  count = local.is-production ? 1 : 0
+
+  name = "rota_channel_notifier_scheduler_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = { Service = "scheduler.amazonaws.com" }
+        Action    = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "rota_channel_notifier_scheduler_invoke" {
+  count = local.is-production ? 1 : 0
+
+  name = "rota_channel_notifier_scheduler_invoke_policy"
+  role = aws_iam_role.rota_channel_notifier_scheduler[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["lambda:InvokeFunction"]
+        Resource = [module.rota_channel_notifier.lambda_function_arn]
+      }
+    ]
+  })
+}
+
+resource "aws_scheduler_schedule" "rota_channel_notifier" {
+  count = local.is-production ? 1 : 0
+
+  name        = "rota_channel_notifier_0830"
+  description = "Runs the rota channel notifier at 08:30 on weekdays"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(30 8 ? * MON-FRI *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.rota_channel_notifier.lambda_function_arn
+    role_arn = aws_iam_role.rota_channel_notifier_scheduler[0].arn
+  }
+}

@@ -1491,3 +1491,46 @@ module "merge_redrive_approval" {
     RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
   }
 }
+
+# ------------------------------------------------------------------------------
+# Rota channel notifier
+# ------------------------------------------------------------------------------
+
+module "rota_channel_notifier" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "rota_channel_notifier"
+  role_name                      = aws_iam_role.rota_channel_notifier.name
+  role_arn                       = aws_iam_role.rota_channel_notifier.arn
+  handler                        = "rota_channel_notifier.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    ENVIRONMENT             = local.environment_shorthand
+    POWERTOOLS_LOG_LEVEL    = "INFO"
+    POWERTOOLS_SERVICE_NAME = "rota-channel-notifier"
+
+    PAGERDUTY_SECRET_ARN       = module.live_feed_github_app.secret_arn
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
+
+    SLACK_SECRET_ARN = module.rota_channel_notifier_slack.secret_arn
+    SLACK_CHANNEL_ID = local.rota_channel_notifier_slack_channels[
+      local.environment_shorthand
+    ]
+  }
+}
+

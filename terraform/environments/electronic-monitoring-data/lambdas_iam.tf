@@ -3860,3 +3860,39 @@ resource "aws_iam_role_policy_attachment" "downstream_reconciliation_approver" {
   role       = aws_iam_role.downstream_reconciliation_approver.name
   policy_arn = aws_iam_policy.downstream_reconciliation_chatbot_approval.arn
 }
+
+# ------------------------------------------------------------------------------
+# IAM role and policy for the rota channel notifier Lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rota_channel_notifier" {
+  name               = "rota_channel_notifier_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "rota_channel_notifier_policy_document" {
+  statement {
+    sid    = "ReadRotaChannelNotifierSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+      module.rota_channel_notifier_slack.secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "rota_channel_notifier" {
+  name   = "rota_channel_notifier_lambda_policy"
+  policy = data.aws_iam_policy_document.rota_channel_notifier_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "rota_channel_notifier_attach" {
+  role       = aws_iam_role.rota_channel_notifier.name
+  policy_arn = aws_iam_policy.rota_channel_notifier.arn
+}
