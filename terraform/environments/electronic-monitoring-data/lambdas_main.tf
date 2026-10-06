@@ -1543,8 +1543,8 @@ module "send_ear_sar_response" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "send_ear_sar_response"
-  role_name                      = aws_iam_role.send_ear_sar_response.name
-  role_arn                       = aws_iam_role.send_ear_sar_response.arn
+  role_name                      = aws_iam_role.send_ear_sar_response[0].name
+  role_arn                       = aws_iam_role.send_ear_sar_response[0].arn
   handler                        = "send_ear_sar_response.handler"
   memory_size                    = 512
   timeout                        = 60
