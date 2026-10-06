@@ -251,3 +251,18 @@ output "vpc_id" {
   description = "ID of the VPC used by the justice-eng-ai environment."
   value       = module.vpc.vpc_id
 }
+
+output "private_subnets" {
+  description = "IDs of the private subnets, in availability_zones order."
+  value       = module.vpc.private_subnets
+}
+
+output "public_subnets" {
+  description = "IDs of the public subnets, in availability_zones order."
+  value       = module.vpc.public_subnets
+}
+
+output "database_subnets" {
+  description = "IDs of the database subnets, in availability_zones order."
+  value       = module.vpc.database_subnets
+}

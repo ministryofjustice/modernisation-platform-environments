@@ -9,13 +9,14 @@ locals {
   # distinct without hardcoding environment logic here.
   builder_hostname = var.builder_hostname != "" ? var.builder_hostname : local.application_data.accounts[local.environment].builder_hostname
 
-  # Private subnets for ECS/EFS, sourced from the shared core-vpc lookups
-  # already defined in platform_data.tf (data.aws_vpc.shared et al).
-  private_subnet_ids = data.aws_subnets.shared-private.ids
+  # Private subnets for ECS/EFS, read from the parent justice-eng-ai root's
+  # state (see data.terraform_remote_state.justice_eng_ai in platform_data.tf)
+  # since this dedicated VPC is created there, not looked up by tag here.
+  private_subnet_ids = data.terraform_remote_state.justice_eng_ai.outputs.private_subnets
 
   private_subnets_by_key = {
-    a = data.aws_subnet.private_subnets_a.id
-    b = data.aws_subnet.private_subnets_b.id
-    c = data.aws_subnet.private_subnets_c.id
+    a = data.terraform_remote_state.justice_eng_ai.outputs.private_subnets[0]
+    b = data.terraform_remote_state.justice_eng_ai.outputs.private_subnets[1]
+    c = data.terraform_remote_state.justice_eng_ai.outputs.private_subnets[2]
   }
 }

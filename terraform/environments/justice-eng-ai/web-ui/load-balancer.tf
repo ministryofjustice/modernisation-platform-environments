@@ -11,7 +11,7 @@ resource "aws_lb" "app" {
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.alb.id]
-  subnets                    = data.aws_subnets.shared-public.ids
+  subnets                    = data.terraform_remote_state.justice_eng_ai.outputs.public_subnets
   drop_invalid_header_fields = true
   idle_timeout               = 120
   tags                       = local.tags
@@ -22,7 +22,7 @@ resource "aws_lb_target_group" "app" {
   port                 = var.app_container_port
   protocol             = "HTTP"
   target_type          = "ip"
-  vpc_id               = data.aws_vpc.shared.id
+  vpc_id               = data.terraform_remote_state.justice_eng_ai.outputs.vpc_id
   deregistration_delay = 30
   tags                 = local.tags
 
