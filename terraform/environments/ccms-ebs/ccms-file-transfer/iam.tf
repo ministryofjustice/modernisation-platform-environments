@@ -228,6 +228,16 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                          "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:${local.application_name}-sftp-container-ecs:*"
                          ]
         },
+         {
+            "Effect": "Allow",
+            "Action": "iam:CreateServiceLinkedRole",
+            "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*",
+            "Condition": {
+                "StringLike": {
+                    "iam:AWSServiceName": "ssm.amazonaws.com"
+                }
+            }
+        },
         {
             "Effect": "Allow",
             "Action": [
