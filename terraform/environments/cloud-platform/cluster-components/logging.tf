@@ -9,7 +9,7 @@ locals {
 }
 
 #------------------------------------------------------------------------------
-# IAM role for Fluent Bit (EKS Pod Identity) — write-only to logs/ prefix
+# IAM role for Fluent Bit (EKS Pod Identity) — S3 and CloudWatch Logs
 #------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "fluent_bit_assume" {
@@ -31,19 +31,36 @@ resource "aws_iam_role" "fluent_bit" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "fluent_bit_s3" {
+data "aws_iam_policy_document" "fluent_bit_logs" {
   statement {
-    sid       = "WriteLogs"
+    sid       = "WriteS3Logs"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
     resources = ["${data.aws_s3_bucket.fluent_bit.arn}/logs/*"]
   }
+
+  statement {
+    sid    = "WriteCloudWatchLogs"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:PutRetentionPolicy",
+    ]
+    resources = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/platform/fluent-bit/*"]
+  }
 }
 
-resource "aws_iam_role_policy" "fluent_bit_s3" {
-  name   = "fluent-bit-s3-write"
+resource "aws_iam_role_policy" "fluent_bit_logs" {
+  name   = "fluent-bit-log-write"
   role   = aws_iam_role.fluent_bit.id
-  policy = data.aws_iam_policy_document.fluent_bit_s3.json
+  policy = data.aws_iam_policy_document.fluent_bit_logs.json
+}
+
+moved {
+  from = aws_iam_role_policy.fluent_bit_s3
+  to   = aws_iam_role_policy.fluent_bit_logs
 }
 
 resource "aws_eks_pod_identity_association" "fluent_bit" {
@@ -70,7 +87,7 @@ resource "kubernetes_namespace_v1" "logging" {
 }
 
 #------------------------------------------------------------------------------
-# Fluent Bit DaemonSet — tails container logs and ships them to S3
+# Fluent Bit DaemonSet — tails container logs and ships them to S3 and CloudWatch
 #------------------------------------------------------------------------------
 
 resource "helm_release" "fluent_bit" {
@@ -159,7 +176,7 @@ resource "helm_release" "fluent_bit" {
         [FILTER]
             Name                    rewrite_tag
             Match                   kube.*
-            Rule                    $kubernetes['namespace_name'] ^(.+)$ ns.$1 false
+            Rule                    $kubernetes['namespace_name'] ^(.+)$ ns.$1 true
             Emitter_Name            ns_emitter
             Emitter_Storage.type    filesystem
             Emitter_Mem_Buf_Limit   50M
@@ -179,9 +196,23 @@ resource "helm_release" "fluent_bit" {
             store_dir                ${local.fluent_bit_state_dir}/s3
             store_dir_limit_size     2G
             storage.total_limit_size 2G
+
+          [OUTPUT]
+            Name                cloudwatch_logs
+            Match               kube.*
+            Region              ${data.aws_region.current.region}
+            Log_Group_Name      /platform/fluent-bit/fallback
+            Log_Stream_Prefix   from-fluent-bit-
+            Log_Group_Template  /platform/fluent-bit/$kubernetes['namespace_name']
+            Log_Stream_Template $kubernetes['pod_name'].$kubernetes['container_name']
+            Auto_Create_Group   On
+            Log_Retention_Days  30
       EOT
     }
   })]
 
-  depends_on = [aws_eks_pod_identity_association.fluent_bit]
+  depends_on = [
+    aws_eks_pod_identity_association.fluent_bit,
+    aws_iam_role_policy.fluent_bit_logs,
+  ]
 }
