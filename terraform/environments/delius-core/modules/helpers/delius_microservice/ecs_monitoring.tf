@@ -351,7 +351,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_desired-task-count-warning" {
 }
 
 ######################################
-###           ALB Alarms           ###
+###      Target Group Alarms       ###
 ######################################
 resource "aws_cloudwatch_metric_alarm" "alb_response_time_critical" {
   count               = var.microservice_lb != null ? 1 : 0

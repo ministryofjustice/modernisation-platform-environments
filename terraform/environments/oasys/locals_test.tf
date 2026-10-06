@@ -250,6 +250,7 @@ locals {
       })
 
       t2-onr-db-a = merge(local.ec2_instances.db11g, { # needs the terraform aws provider/user-data fix + resize
+        cloudwatch_metric_alarms = {}                  # instance is ear marked for deletion
         config = merge(local.ec2_instances.db11g.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
@@ -271,7 +272,7 @@ locals {
         tags = merge(local.ec2_instances.db11g.tags, {
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "t2"
-          oracle-sids         = "T2BOSYS T2BOAUD"
+          oracle-sids         = "T2BOSYS T2BOAUD" # these DBs are on t2-oasys host
         })
       })
     }
