@@ -249,7 +249,7 @@ resource "aws_iam_role_policy_attachment" "forge_ecs_task_package_s3" {
 resource "aws_security_group" "forge_ecs_service" {
   name        = "${local.forge_name}-ecs"
   description = "Controls access to the Forge Journey Lab ECS service"
-  vpc_id      = data.terraform_remote_state.justice_eng_ai.outputs.vpc_id
+  vpc_id      = data.aws_vpc.shared.id
   tags        = merge(local.tags, { Name = "${local.forge_name}-ecs" })
 }
 
@@ -306,7 +306,7 @@ resource "aws_lb_target_group" "forge" {
   port                 = local.forge_container_port
   protocol             = "HTTP"
   target_type          = "ip"
-  vpc_id               = data.terraform_remote_state.justice_eng_ai.outputs.vpc_id
+  vpc_id               = data.aws_vpc.shared.id
   deregistration_delay = 30
   tags                 = local.tags
 

@@ -6,19 +6,66 @@ data "aws_caller_identity" "current" {}
 # VPC and subnet data
 #
 # justice-eng-ai has its own dedicated VPC (created in the parent
-# justice-eng-ai root's vpc.tf), not the generic shared core-vpc used by
-# most other member accounts, so there's no tagged "shared" VPC to look up
-# here. Read it from the parent root's state instead, same pattern as
-# backend-processing/data.tf.
-data "terraform_remote_state" "justice_eng_ai" {
-  backend   = "s3"
-  workspace = terraform.workspace
+# justice-eng-ai root's vpc.tf via the terraform-aws-vpc module), not the
+# generic shared core-vpc used by most other member accounts. It's tagged
+# Name = "<application_name>-<environment>" (module's "name" input), with
+# subnets tagged "<application_name>-<environment>-<tier>-<az>" -- so look
+# it up directly rather than depending on the parent root's state/outputs,
+# which would only be current once that root has actually been re-applied.
+data "aws_vpc" "shared" {
+  tags = {
+    "Name" = "${local.application_name}-${local.environment}"
+  }
+}
 
-  config = {
-    bucket               = "modernisation-platform-terraform-state"
-    key                  = "terraform.tfstate"
-    region               = "eu-west-2"
-    workspace_key_prefix = "environments/members/justice-eng-ai"
+data "aws_subnets" "shared-data" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${local.application_name}-${local.environment}-data*"
+  }
+}
+
+data "aws_subnets" "shared-private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${local.application_name}-${local.environment}-private*"
+  }
+}
+
+data "aws_subnets" "shared-public" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${local.application_name}-${local.environment}-public*"
+  }
+}
+
+data "aws_subnet" "private_subnets_a" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${local.application_name}-${local.environment}-private-${data.aws_region.current.region}a"
+  }
+}
+
+data "aws_subnet" "private_subnets_b" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${local.application_name}-${local.environment}-private-${data.aws_region.current.region}b"
+  }
+}
+
+data "aws_subnet" "private_subnets_c" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${local.application_name}-${local.environment}-private-${data.aws_region.current.region}c"
   }
 }
 

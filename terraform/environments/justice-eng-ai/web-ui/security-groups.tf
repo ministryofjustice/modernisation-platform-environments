@@ -3,7 +3,7 @@
 resource "aws_security_group" "alb" {
   name        = "${local.application_resource_name}-alb"
   description = "Controls access to the builder UI ALB"
-  vpc_id      = data.terraform_remote_state.justice_eng_ai.outputs.vpc_id
+  vpc_id      = data.aws_vpc.shared.id
   tags        = merge(local.tags, { Name = "${local.application_resource_name}-alb" })
 }
 
@@ -45,7 +45,7 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
 resource "aws_security_group" "ecs_service" {
   name        = "${local.application_resource_name}-ecs"
   description = "Controls access to the builder UI ECS service"
-  vpc_id      = data.terraform_remote_state.justice_eng_ai.outputs.vpc_id
+  vpc_id      = data.aws_vpc.shared.id
   tags        = merge(local.tags, { Name = "${local.application_resource_name}-ecs" })
 }
 

@@ -46,7 +46,7 @@ resource "aws_efs_file_system" "plans" {
 resource "aws_security_group" "efs_plans" {
   name        = "${local.application_name}-ui-efs"
   description = "Controls access to the UI chat-storage EFS file system"
-  vpc_id      = data.terraform_remote_state.justice_eng_ai.outputs.vpc_id
+  vpc_id      = data.aws_vpc.shared.id
   tags        = merge(local.tags, { Name = "${local.application_name}-ui-efs" })
 }
 
