@@ -1,4 +1,4 @@
-module "destination-encryption" {
+module "kms_test_harness" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
   version = "4.2.2"
@@ -14,4 +14,9 @@ module "destination-encryption" {
   multi_region            = false
 
   tags = local.tags
+}
+
+moved {
+  from = module.destination-encryption
+  to   = module.kms_test_harness
 }

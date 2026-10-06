@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "test-harness-trust" {
+data "aws_iam_policy_document" "test_harness_trust" {
   count = local.create_test_harness ? 1 : 0
 
   statement {
@@ -21,21 +21,35 @@ data "aws_iam_policy_document" "test-harness-trust" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/integration-hub:ref:refs/heads/main"]
+      values   = ["repo:ministryofjustice/integration-hub:environment:smoke-test"]
     }
   }
 }
 
-resource "aws_iam_role" "test-harness" {
-  count = local.create_test_harness ? 1 : 0
+module "iam_role_test_harness" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.8.2"
 
-  name = "${local.application_name}-${local.component_name}-${local.environment}"
+  create          = local.create_test_harness
+  use_name_prefix = false
+  name            = "${local.application_name}-${local.component_name}-${local.environment}"
 
-  assume_role_policy = data.aws_iam_policy_document.test-harness-trust[0].json
-  tags               = local.tags
+  source_trust_policy_documents = local.create_test_harness ? [data.aws_iam_policy_document.test_harness_trust[0].json] : []
+
+  policies = {
+    smoke_test = module.iam_policy_test_harness.arn
+  }
+
+  tags = local.tags
 }
 
-data "aws_iam_policy_document" "test-harness-permissions" {
+moved {
+  from = aws_iam_role.test-harness[0]
+  to   = module.iam_role_test_harness.aws_iam_role.this[0]
+}
+
+data "aws_iam_policy_document" "test_harness_permissions" {
   count = local.create_test_harness ? 1 : 0
 
   statement {
@@ -44,7 +58,7 @@ data "aws_iam_policy_document" "test-harness-permissions" {
     actions = ["s3:PutObject"]
 
     resources = [
-      "${data.aws_s3_bucket.incoming[0].arn}/test-harness/direct-s3/*"
+      "${data.aws_s3_bucket.incoming[0].arn}/test-harness/repository-smoke-test/direct-s3/*"
     ]
   }
 
@@ -64,7 +78,7 @@ data "aws_iam_policy_document" "test-harness-permissions" {
       test     = "ArnLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
       values = [
-        "${data.aws_s3_bucket.incoming[0].arn}/test-harness/direct-s3/*"
+        "${data.aws_s3_bucket.incoming[0].arn}/test-harness/repository-smoke-test/direct-s3/*"
       ]
     }
   }
@@ -73,12 +87,12 @@ data "aws_iam_policy_document" "test-harness-permissions" {
     sid       = "CheckSmokeTestDelivery"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = [module.destination.s3_bucket_arn]
+    resources = [module.s3_test_harness.s3_bucket_arn]
 
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["delivered/direct-s3/*"]
+      values   = ["delivered/repository-smoke-test/direct-s3/*"]
     }
   }
 
@@ -86,14 +100,14 @@ data "aws_iam_policy_document" "test-harness-permissions" {
     sid       = "ReadDeliveredFixture"
     effect    = "Allow"
     actions   = ["s3:GetObject"]
-    resources = ["${module.destination.s3_bucket_arn}/delivered/direct-s3/*"]
+    resources = ["${module.s3_test_harness.s3_bucket_arn}/delivered/repository-smoke-test/direct-s3/*"]
   }
 
   statement {
     sid       = "DecryptDeliveredFixture"
     effect    = "Allow"
     actions   = ["kms:Decrypt"]
-    resources = [module.destination-encryption.key_arn]
+    resources = [module.kms_test_harness.key_arn]
 
     condition {
       test     = "StringEquals"
@@ -104,15 +118,20 @@ data "aws_iam_policy_document" "test-harness-permissions" {
     condition {
       test     = "ArnLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
-      values   = ["${module.destination.s3_bucket_arn}/delivered/direct-s3/*"]
+      values   = ["${module.s3_test_harness.s3_bucket_arn}/delivered/repository-smoke-test/direct-s3/*"]
     }
   }
 }
 
-resource "aws_iam_role_policy" "test-harness-permissions" {
-  count = local.create_test_harness ? 1 : 0
+module "iam_policy_test_harness" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "6.8.2"
 
-  name   = "pipeline-smoke-test"
-  role   = aws_iam_role.test-harness[0].id
-  policy = data.aws_iam_policy_document.test-harness-permissions[0].json
+  create      = local.create_test_harness
+  name        = "${local.application_name}-${local.component_name}-${local.environment}"
+  description = "Upload and verify Integration Hub repository smoke-test fixtures"
+  policy      = local.create_test_harness ? data.aws_iam_policy_document.test_harness_permissions[0].json : null
+
+  tags = local.tags
 }
