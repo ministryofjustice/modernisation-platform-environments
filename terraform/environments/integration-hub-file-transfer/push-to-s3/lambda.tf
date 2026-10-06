@@ -10,7 +10,6 @@ module "lambda_file_mover" {
   description                       = "Deliver clean files to configured customer S3 destinations"
   function_name                     = local.pattern_name
   handler                           = "handler.lambda_handler"
-  hash_extra                        = "push-to-s3-file-mover"
   memory_size                       = 512
   role_name                         = local.lambda_role_name
   runtime                           = "python3.12"
@@ -141,7 +140,6 @@ module "lambda_dlq_reporter" {
   description                       = "Report terminal push-to-s3 pipeline delivery failures"
   function_name                     = "${local.application_name}-${local.component_name}-dlq"
   handler                           = "reporter_handler.lambda_handler"
-  hash_extra                        = "push-to-s3-dlq-reporter"
   memory_size                       = 256
   role_name                         = "${local.application_name}-${local.component_name}-dlq"
   runtime                           = "python3.12"
