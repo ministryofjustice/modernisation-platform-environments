@@ -18,13 +18,7 @@ resource "aws_vpc_security_group_egress_rule" "oem_db_efs_sg_egress_all_0_0_cidr
   ip_protocol       = "-1"
   cidr_ipv4         = data.aws_vpc.shared.cidr_block
 
-  # Changing cidr_ipv4 forces replacement of this rule. Tie the replacement to
-  # the security group so Terraform replaces the rule in the same plan as the
-  # group (which has create_before_destroy), avoiding any window with no
-  # egress rule on the mount target.
-  lifecycle {
-    replace_triggered_by = [aws_security_group.oem_db_efs_sg]
-  }
+  
 
   tags = {
     Name = "Allow outbound traffic within the VPC"
