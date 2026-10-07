@@ -251,3 +251,28 @@ output "vpc_id" {
   description = "ID of the VPC used by the justice-eng-ai environment."
   value       = module.vpc.vpc_id
 }
+
+output "public_subnet_ids" {
+  description = "IDs of the public subnets created by the VPC module."
+  value       = module.vpc.public_subnets
+}
+
+output "private_subnet_ids" {
+  description = "IDs of the private subnets created by the VPC module."
+  value       = module.vpc.private_subnets
+}
+
+output "data_subnet_ids" {
+  description = "IDs of the data subnets created by the VPC module."
+  value       = module.vpc.database_subnets
+}
+
+output "public_prototype_subnet_ids" {
+  description = "IDs of the public prototype subnets in availability-zone order."
+  value       = [for availability_zone in local.availability_zones : aws_subnet.prototypes["public_prototypes-${availability_zone}"].id]
+}
+
+output "private_prototype_subnet_ids" {
+  description = "IDs of the private prototype subnets in availability-zone order."
+  value       = [for availability_zone in local.availability_zones : aws_subnet.prototypes["private_prototypes-${availability_zone}"].id]
+}
