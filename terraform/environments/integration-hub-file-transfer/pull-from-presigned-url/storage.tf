@@ -28,6 +28,13 @@ module "s3_pickup" {
       }
     }
   }
+  cors_rule = [{
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = [local.portal_url]
+    expose_headers  = ["last-modified", "content-length", "etag", "x-amz-version-id", "content-type", "x-amz-request-id", "x-amz-id-2", "date"]
+    max_age_seconds = 300
+  }]
   versioning = { status = true, mfa_delete = false }
   lifecycle_rule = [{
     id                                     = "seven-day-pickup"

@@ -80,10 +80,4 @@ resource "aws_lambda_event_source_mapping" "notifications" {
   scaling_config { maximum_concurrency = 2 }
   # Empty configuration deploys an inert pipeline, with no recipient access.
   enabled = length(local.recipients) > 0
-  lifecycle {
-    precondition {
-      condition     = length(local.recipients) == 0 || local.pickup_sso != null
-      error_message = "Configure and test organisational SSO before enabling recipients."
-    }
-  }
 }

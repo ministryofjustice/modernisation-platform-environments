@@ -1,200 +1,169 @@
 # Authenticated file pickup from Slack
 
-The `pull-from-presigned-url` component notifies customers in Slack when an immutable
-clean file has been retained for collection. The Slack button opens an organisational
-SSO page. After sign-in, an explicit user/group-to-file check permits a download URL
-valid for **up to five minutes**. Files remain available for **seven days** from the
-start of the successful retention attempt. Customers can reopen the same Slack link
-and obtain a fresh URL without operator intervention, while access and retention permit.
+`pull-from-presigned-url` sends a Slack notification after retaining the exact clean
+object version in private pickup storage. The button opens the **existing AWS Transfer
+web app**, which already uses IAM Identity Center. The user signs in there and browses
+to the pickup location shown in the message. No Entra application, custom OIDC client,
+API callback or separate sign-in page is required.
 
-## Access and expiry
+The notification uses the documented portal entry point, not an invented file deep
+link. It contains the destination bucket/key to locate the file after sign-in.
 
-Slack contains an authenticated pickup link, never an S3 presigned URL. Forwarding
-the Slack link does not grant access. The resulting S3 URL is a bearer credential:
-anyone receiving that URL can reuse it during its brief validity. This is the selected
-tradeoff; neither single-use download nor strict non-transferability is claimed.
-An S3 request started before expiry can continue afterwards. A disconnected download
-or new range request after expiry needs a fresh URL; the customer can obtain one
-through the same authenticated link.
+## Identity and access
 
-API Gateway validates the JWT access token's signature, issuer, audience, expiry and
-required API scope. The download Lambda uses only the gateway's verified claims,
-then checks an exact OIDC subject or group ID against the current recipient mapping.
-Agency membership, email domain, Slack membership and knowledge of a link grant no
-access. LAA, HMPPS and HMCTS users need federation/assignment in the chosen organisational
-identity provider and an explicit recipient mapping.
+The root state owns the Transfer web app, its IAM Identity Center application
+assignments and the regional S3 Access Grants instance. Its assigned group catalogue
+is shared through `../modules/transfer-web-app-identity-configuration`. The existing
+`integration-hub` group ID is unchanged. Adding an entry to this catalogue changes
+root application assignments and must be reviewed/applied there first.
 
-The broker retrieves a consistent DynamoDB receipt and signs only its recorded bucket,
-key and immutable version. The receipt must still match the configured source prefix.
-It caps validity at the earlier of 300 seconds and the remaining collection window.
-Application checks enforce the seven-day cutoff independently of asynchronous S3
-lifecycle deletion and DynamoDB TTL. Bucket policy rejects signatures over five
-minutes old. Files use private, encrypted, versioned pickup storage; clean-bucket
-retention remains unchanged. S3 current/noncurrent versions expire after seven days,
-with asynchronous lifecycle processing. Failed copy attempts may leave unannounced
-versions until lifecycle cleanup.
+This component registers only its own bucket as an Access Grants location with a
+read-only IAM role. Explicit recipient configuration binds a clean source prefix to
+one or more already-assigned groups. Files are stored under
+`<recipient-id>/<execution-hash>/<filename>`. Each DIRECTORY_GROUP grant permits READ
+only under its recipient directory, with no upload/delete permissions. Access Grants
+vends scoped temporary credentials on behalf of the authenticated user. The location
+role permits pickup reads through the existing Access Grants instance and KMS decrypt
+through S3 only. Incoming upload grants, clean permissions and other customer buckets
+are unchanged. There is no fallback grant for all MoJ users or all app users.
 
-Removing a recipient or changing its prefix prevents new URLs after configuration
-deployment. A URL already issued can remain usable for its remaining lifetime.
-Group membership changes can take until access-token expiry to take effect; use
-short access-token lifetimes (recommend five minutes) and verify provider revocation
-behaviour. The broker does not perform token introspection on every request.
+**Recipient maps remain empty.** The existing application assignment is not evidence
+that a group should see every clean-file prefix. An approved prefix-to-group mapping
+and a Slack webhook are still needed. No new application assignment is created by
+this child state. Empty maps create no reader role, location or grants, and disable
+queue consumption.
 
-## Architecture and ownership
+## URL lifetime and collection window
+
+Slack receives a portal URL, never an S3 bearer URL. A forwarded portal link grants
+no file access without the appropriate Identity Center assignment and S3 grant.
+The managed Transfer web app controls its own download mechanism. The pickup bucket
+retains a `s3:signatureAge` deny for signatures older than **300,000 milliseconds**,
+so signed S3 requests older than five minutes are rejected even if the client signs
+for longer. This is a bucket guardrail, not configuration of the managed UI's displayed
+expiry. Verify actual managed-app download and retry behaviour before activation.
+
+An S3 URL remains reusable/shareable during its effective lifetime. A request begun
+before expiry can continue afterwards. The five-minute limit does **not** shorten
+Identity Center sessions or Access Grants credentials; removing a grant/group may
+not revoke already-issued credentials immediately. Test actual revocation behaviour.
+
+Pickup storage has **seven-day current/noncurrent lifecycle expiry**, while clean
+retention is unchanged. S3 lifecycle deletion is asynchronous, and versioned bytes
+can remain beyond seven days. This managed portal does not consult the notification
+receipt and therefore **does not enforce the old custom broker's exact seven-day
+collection cutoff**. The receipt deadline only stops old notification retries. Do
+not claim an exact deletion/access deadline or production acceptance of that change.
+If an exact seven-day cutoff is mandatory, this route needs an additional enforcement
+design before activation. Existing unscoped copies are not included in the new grants.
+
+## Flow and ownership
 
 ```text
-Clean file -> existing dispatcher -> EventBridge -> SNS -> SQS -> retention/notifier Lambda
-                                                           |-> exact-version copy to pickup S3
-                                                           |-> immutable DynamoDB receipt
-                                                           `-> Slack authenticated pickup link
+Clean dispatcher -> EventBridge -> encrypted SNS -> encrypted SQS -> notifier Lambda
+                                                                   |-> exact-version pickup copy
+                                                                   |-> receipt/deduplication
+                                                                   `-> Slack portal link + location
 
-Browser -> OIDC code + S256 PKCE -> API Gateway JWT authorizer -> download Lambda
-                                                               |-> recipient/receipt check
-                                                               `-> 300-second S3 GET URL
+Existing Transfer web app -> IAM Identity Center -> S3 Access Grants -> pickup S3
 ```
 
-The notifier validates queue/topic, event source/account/region, clean bucket/prefix,
-object version and the immutable dispatch-secret version. It copies before notifying,
-uses multipart copy for large objects, and requires the configured Slack recipient in
-the dispatch secret. The notification worker has source-version read and destination
-write access. The separate broker has receipt read and retained-version read access;
-it cannot modify files, receipts, dispatch configuration or Slack secrets.
+The notifier validates event transport, source/account/region, clean prefix, immutable
+object version and immutable dispatch-secret version. It copies before notifying,
+using multipart copy for large objects. Copying and storage remain in this component;
+reuse of `push-to-s3-with-hosted-pickup` is a separate architectural decision.
 
-The child state owns encrypted transport and three DLQs, both Lambdas, receipt and
-idempotency storage, the private pickup bucket, HTTP API, webhook secret metadata and
-CloudWatch alarms. It looks up parent metadata by name and does not read parent state.
-It does not replace existing delivery actions or change clean bucket notifications.
+Notification claims last 16 minutes, Lambda timeout is 15 minutes and queue visibility
+90 minutes. Completed sends are deduplicated for 14 days. Saved receipts are reused
+without recopying or extending their deadline. An ambiguous Slack response may cause
+a duplicate notification. Copy failures never announce a file. Multipart failures
+are aborted where possible; incomplete uploads have a one-day cleanup rule. Files
+that cannot copy within Lambda's runtime need investigation. Events older than 12
+hours are skipped because clean retention is short; monitor processing age and DLQs.
 
-## Configuration and onboarding
+## Development onboarding
 
-**No recipients or SSO application are configured by default.** The download route
-is absent without SSO, the public page reports unavailable, and event consumption is
-disabled for an empty recipient map. A Terraform precondition rejects activating
-recipients without SSO. Do not use placeholder IDs as real access grants.
-
-1. Register the component in the platform environment definition; wait for generated
-   state/workflow configuration and reconcile scaffolding before planning it.
-2. The SSO application owner must register a public browser OIDC client using
-   authorization code with S256 PKCE (no client secret), JWT access tokens accepted
-   by API Gateway, and a dedicated API scope. The token endpoint must allow browser
-   CORS from the component's API origin. Configure the exact `sso_callback_url`
-   output as the allowed redirect; do not use wildcard redirects. Require the
-   organisation's MFA/conditional-access policy. Review issuer, token audience,
-   scope, claim shape and token lifetime with that owner.
-3. Set `pickup_sso_by_environment` using the approved environment-specific Terraform input process:
+1. Reconcile this branch with current main and review the Terraform plan. Root already
+   owns the identity resources; the shared-catalogue extraction should not change its
+   group ID or application assignment. Deploy root first if a new assignment is needed.
+2. Confirm the test user belongs to an existing assigned Identity Center group and
+   can open `https://web.development.file-transfer.service.justice.gov.uk`.
+3. Agree the exact clean prefix and Slack destination. Add a mapping to the development
+   map in `../modules/authenticated-pickup-configuration/main.tf`, for example:
 
    ```hcl
-   pickup_sso_by_environment = {
-     development = {
-     issuer                 = "https://<approved-issuer>"
-     audience               = "<API-access-token-audience>"
-     client_id              = "<public-client-ID>"
-     authorization_endpoint = "https://<approved-authorization-endpoint>"
-     token_endpoint         = "https://<approved-token-endpoint>"
-     download_scope         = "<dedicated-download-scope>"
-     groups_claim           = "groups"
-     }
+   test-pickup = {
+     prefix = "<approved-clean-prefix>/"
+     groups = ["integration-hub"]
    }
    ```
 
-   The group claim must be a string array (or its JSON representation in API Gateway
-   claims). Missing, malformed and group-overage claims deny group access; there is
-   no directory lookup fallback. USER IDs are OIDC `sub` values, not email addresses
-   or assumed Identity Center IDs. Confirm the actual provider's claim representation
-   in development before onboarding. Do not use an ID token for the download API.
-4. Add reviewed mappings to the environment in
-   `../modules/authenticated-pickup-configuration/main.tf`, for example:
+   This is an example, not an enabled grant. The prefix must exist in the shared
+   dispatch configuration. Preserve its existing delivery action. Additional group
+   names must first exist in the root-owned shared assignment catalogue.
+4. Apply the child component, reviewing each READ grant and its exact recipient path.
+   It creates `integration-hub-file-transfer/slack-pickup/test-pickup` secret metadata.
+   Store `{"url":"https://hooks.slack.com/services/..."}` there outside Terraform.
+   Use a webhook approved for receiving the file bucket/path metadata. Never commit
+   or log webhook credentials. Rotate in Slack and replace the secret value.
+5. Update the matching dispatch secret through the approved Secrets Manager process,
+   preserving the action and other notification settings:
 
-   ```hcl
-   example-team = {
-     prefix = "approved-customer/approved-prefix/"
-     principals = {
-       recipient_team = { type = "GROUP", id = "<approved-access-token-group-ID>" }
-     }
-   }
+   ```json
+   "slack": {"type":"authenticated-pickup","recipient":"test-pickup"}
    ```
 
-   Use a safe hyphenated recipient ID (for example `example-team`), a literal non-root
-   prefix ending in `/`, and immutable provider-issued user/group IDs. The matching
-   prefix must exist in `../modules/file-dispatch-configuration`. Keep its delivery
-   action and set notification configuration to:
+   This is a field inside `notifications`. Existing dispatch secret values ignore
+   Terraform updates, so edit the actual secret before submitting a new transfer.
+6. Upload a new non-sensitive file, confirm its retained copy and Slack message, open
+   the portal, and locate the exact bucket/path from the message.
 
-   ```hcl
-   notifications = {
-     email = null
-     slack = { type = "authenticated-pickup", recipient = "example-team" }
-     teams = null
-   }
-   ```
+## Migration from the deployed custom page
 
-5. Existing dispatch secrets ignore Terraform secret-value updates. Update the exact
-   secret through the approved Secrets Manager process, preserving other fields.
-   Events bind the immutable secret version that was current at dispatch time.
-   Populate the component-created `integration-hub-file-transfer/slack-pickup/<recipient>`
-   secret with `{"url":"https://hooks.slack.com/services/..."}` outside Terraform.
-   Use a webhook installed for the approved channel, suitable for file path metadata.
-   Rotate by replacing the webhook in Slack, updating the secret, then revoking the
-   previous webhook. No webhook credential is committed, output or logged.
-6. Review plans against current main before applying. Test with a dedicated development
-   recipient and non-sensitive files. Connect an approved operational alarm destination
-   before production; alarms have no actions, matching existing delivery components.
+The initial development foundation included an HTTP API, OIDC/PKCE browser page and
+URL-issuing Lambda. This change removes those component-owned resources and the
+`sso_callback_url` output. The old execute-api URL is retired; `portal_url` now points
+to the existing Transfer app. The pickup bucket, encryption key, notifier, queues,
+DynamoDB table and webhook secret names keep their Terraform addresses.
 
-## Verification before activation
+Review planned removal of the API, download Lambda/role/log group and its alarm.
+Do not approve deletion of the pickup bucket or any root Transfer/Identity Center
+resources. Do not apply an old saved plan. No live apply or grant is performed by
+local tests or by this PR update.
 
-Local tests exercise authorization, version binding, exact prefixes, malformed claims,
-expiry, notification ordering, multipart copy and retry behaviour. CI additionally
-validates Terraform without AWS credentials. These are not a live deployment test.
+## Acceptance tests before enabling customer access
 
-With the actual provider and a development recipient, verify:
+- An assigned group member can see/download only the approved recipient directory;
+  an app user outside that group cannot list or retrieve it, even with a forwarded link.
+- A second recipient directory is inaccessible, and upload/delete operations fail.
+- Small and greater-than-5-GiB files copy before notification and download intact.
+- Capture a test download URL privately; a new request after five minutes fails.
+  Reopening/retrying through the portal works. Verify the managed UI does not reuse
+  an old cached URL or credentials signed too early for the bucket guardrail.
+- Removing a grant/group has the documented credential/session revocation delay.
+- CORS permits only the configured Transfer origin; notifications contain no tokens
+  or signed URLs; quarantine/investigation events never notify.
+- Agree lifecycle-based collection expiry explicitly if an exact seven-day cutoff
+  was previously required. Inspect old unscoped objects rather than granting them.
 
-- Intended user/group can sign in, receive the required API scope and download the
-  correct version; another user receiving the Slack link is denied.
-- Missing/invalid/expired tokens, wrong issuer/audience/scope and ID tokens fail at
-  API Gateway. Group claims appear in the expected form, including overage behaviour.
-- Small and greater-than-5-GiB clean files produce a retained copy before notification;
-  quarantine/investigation files never notify. Compare downloaded bytes/checksums.
-- Expired URLs fail; reopening the Slack link works without support intervention.
-  Verify interrupted large-download behaviour and fresh-link retries.
-- Collection deadline and removal of recipient authorization deny new URLs. Verify
-  revocation timing and confirm token/URL/file-name data is absent from service logs.
-- Slack failures retry, DLQs alarm, and no production notification is sent during tests.
+Connect an approved operational alarm destination before production. The component's
+DLQ/error alarms currently have no actions. This is not evidence of a completed live
+Identity Center test; membership and the first approved pickup prefix remain onboarding
+inputs, and the existing managed portal must be exercised with a real assigned user.
 
-The public landing page uses a restrictive CSP, no external scripts, PKCE and one-time
-state verification. Access tokens remain in memory; only pending PKCE state is kept
-in session storage. Responses disable caching/referrers. No SSO client secret is used.
-
-## Retry and operational limits
-
-Notification claims last 16 minutes; Lambda timeout is 15 minutes and queue visibility
-90 minutes. Duplicate completed sends are suppressed for 14 days. A receipt saved
-before a Slack failure is reused with the same version and collection deadline.
-If Slack accepts a message but acknowledgement is lost, a duplicate message is possible.
-Copy failures never announce a file. Multipart failures are aborted where possible;
-incomplete uploads have a one-day lifecycle cleanup rule. Copies exceeding Lambda's
-runtime need operational investigation; this implementation does not promise unlimited
-file sizes or resumable copy jobs.
-
-Events older than 12 hours are skipped to avoid retrying copies after the one-day clean
-retention. Monitor processing lag and DLQs well before that limit. Reopening a Slack
-link is a customer retry, not a request to extend seven-day retention. After collection
-expiry, the sender must initiate a new approved transfer.
-
-## Checks
+## Local and CI checks
 
 ```sh
 terraform fmt -check -recursive terraform/environments/integration-hub-file-transfer/pull-from-presigned-url
 PYTHONPATH=terraform/environments/integration-hub-file-transfer/pull-from-presigned-url/lambda/notifier \
   python3 -m unittest discover -s terraform/environments/integration-hub-file-transfer/pull-from-presigned-url/lambda/notifier/tests -v
-PYTHONPATH=terraform/environments/integration-hub-file-transfer/pull-from-presigned-url/lambda/download \
-  python3 -m unittest discover -s terraform/environments/integration-hub-file-transfer/pull-from-presigned-url/lambda/download/tests -v
-node --test terraform/environments/integration-hub-file-transfer/pull-from-presigned-url/lambda/download/tests/browser.test.cjs
 ```
 
-The platform-owned `.github/workflows/integration-hub-file-transfer.yml` is unchanged.
-Tests and credential-free validation run in the separate
-`.github/workflows/mft-pull-from-presigned-url-checks.yml`. Follow component conventions:
-local formatting/unit tests; Terraform init/validation/plans through repository CI.
+The platform-owned MFT workflow is unchanged. The standalone pickup-checks workflow
+runs notifier/retention tests and credential-free Terraform validation. Follow existing
+component conventions: local formatting/unit tests; init/validation/plans in repository
+CI. Terraform plans must confirm the root identity assignments remain unchanged.
 
-References: [API Gateway JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html),
-[S3 presigned URL behaviour](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html),
-[presigned-request guardrails](https://docs.aws.amazon.com/prescriptive-guidance/latest/presigned-url-best-practices/additional-guardrails.html).
+References: [Transfer web app access grants](https://docs.aws.amazon.com/transfer/latest/userguide/webapp-access-grant.html),
+[Transfer web app IAM roles](https://docs.aws.amazon.com/transfer/latest/userguide/webapp-roles.html),
+[S3 presigned URL guardrails](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).

@@ -11,9 +11,8 @@ module "dispatch_configuration" {
 locals {
   pattern_name       = "${local.application_name}-${local.component_name}"
   pickup_bucket_name = "${local.application_name}-pickup-${local.environment}-${data.aws_caller_identity.current.account_id}"
-  pickup_sso         = lookup(var.pickup_sso_by_environment, local.environment, null)
   recipients         = module.pickup_configuration.recipients
-  portal_url         = aws_apigatewayv2_api.pickup.api_endpoint
+  portal_url         = local.is-production ? "https://web.file-transfer.service.justice.gov.uk" : "https://web.${local.environment}.file-transfer.service.justice.gov.uk"
   routes = { for id, recipient in local.recipients : data.aws_secretsmanager_secret.dispatch[id].arn => {
     recipient_id       = id
     prefix             = recipient.prefix
@@ -62,29 +61,4 @@ module "dynamodb_notifications" {
   server_side_encryption_kms_key_arn = module.kms_notifications_pipeline.key_arn
   deletion_protection_enabled        = true
   tags                               = local.tags
-}
-
-# A reviewed organisational OIDC application is required before recipients can be enabled.
-variable "pickup_sso_by_environment" {
-  description = "Public OIDC client using authorization code + S256 PKCE and JWT access tokens. No client secret."
-  type = map(object({
-    issuer                 = string
-    audience               = string
-    client_id              = string
-    authorization_endpoint = string
-    token_endpoint         = string
-    download_scope         = string
-    groups_claim           = optional(string, "groups")
-  }))
-  default = {}
-  validation {
-    condition = alltrue([for environment, sso in var.pickup_sso_by_environment :
-      contains(["development", "test", "preproduction", "production"], environment) &&
-      alltrue([for url in [sso.issuer, sso.authorization_endpoint, sso.token_endpoint] : can(regex("^https://[^/?#]+[^#]*$", url))]) &&
-      length(sso.audience) > 0 && length(sso.client_id) > 0 &&
-      can(regex("^[^ ]+$", sso.download_scope)) &&
-      !contains(["openid", "email", "profile"], sso.download_scope)
-    ])
-    error_message = "Use HTTPS OIDC endpoints, explicit audience/client and a dedicated API access-token scope."
-  }
 }
