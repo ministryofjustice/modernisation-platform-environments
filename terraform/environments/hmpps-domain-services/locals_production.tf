@@ -37,6 +37,7 @@ locals {
         }
       }
 
+      # TM-2057: Oct 2026: delete this cert once internally signed cert has been configured
       remote_desktop_wildcard_and_planetfm_cert_v3 = {
         certificate_transparency_logging_preference = false # this should have been set to true
         cloudwatch_metric_alarms                    = module.baseline_presets.cloudwatch_metric_alarms.acm
@@ -52,22 +53,6 @@ locals {
           description = "wildcard cert for hmpps remote desktop services"
         }
       }
-
-      # TM-2057: Oct 2026, use below to replace above 2 certs
-      # remote_desktop_wildcard_and_planetfm_cert_v4 = {
-      #   cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-      #   domain_name                         = "*.hmpps-domain.service.justice.gov.uk"
-      #   export                              = true
-      #   external_validation_records_created = true
-      #   subject_alternate_names = [
-      #     "*.planetfm.service.justice.gov.uk",
-      #     "cafmtx.az.justice.gov.uk",
-      #     "hmpps-az-gw1.justice.gov.uk",
-      #   ]
-      #   tags = {
-      #     description = "wildcard cert for hmpps remote desktop services"
-      #   }
-      # }
     }
 
     cloudwatch_dashboards = {
@@ -235,6 +220,25 @@ locals {
                   }
                 }]
               }
+              eol = {
+                priority = 300
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/eol.html.tftpl", local.lb_eol_message_production)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "eol.hmpps-domain.service.justice.gov.uk",
+                      "hmpps-az-gw1.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               maintenance = {
                 priority = 999
                 actions = [{
@@ -310,6 +314,7 @@ locals {
         ]
 
         lb_alias_records = [
+          { name = "eol", type = "A", lbs_map_key = "public" },
           { name = "maintenance", type = "A", lbs_map_key = "public" },
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
