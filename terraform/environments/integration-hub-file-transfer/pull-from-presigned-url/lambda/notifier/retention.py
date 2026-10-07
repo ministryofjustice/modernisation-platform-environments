@@ -10,7 +10,14 @@ def destination_key(pickup_id, data, route):
     filename = "".join(c for c in filename if ord(c) >= 32 and ord(c) != 127)
     if filename in ("", ".", ".."):
         filename = "download"
-    return f"{route['recipient_id']}/{pickup_id}/{filename}"
+    prefix = f"{route['recipient_id']}/{pickup_id}/"
+    budget = 1024 - len(prefix.encode("utf-8"))
+    if budget <= 0:
+        raise ValueError("Pickup prefix exceeds S3 key limit")
+    filename = filename.encode("utf-8")[:budget].decode("utf-8", errors="ignore")
+    if not filename:
+        raise ValueError("No space for pickup filename")
+    return prefix + filename
 
 
 class Retainer:
@@ -19,6 +26,9 @@ class Retainer:
         self.remaining_ms = remaining_ms
 
     def prepare(self, pickup_id, data, route, now):
+        version = data["object"].get("versionId")
+        if not isinstance(version, str) or version in ("", "null"):
+            raise ValueError("An immutable clean version is required")
         key = destination_key(pickup_id, data, route)
         receipt_key = {"id": "pickup:" + pickup_id}
         previous = self.table.get_item(Key=receipt_key, ConsistentRead=True).get("Item")
@@ -39,7 +49,8 @@ class Retainer:
                 "ServerSideEncryption": "aws:kms", "SSEKMSKeyId": self.kms_key,
                 "ContentType": "application/octet-stream", "ContentDisposition": "attachment"}
         if size <= 5 * 1000**3:
-            response = self.s3.copy_object(**dest, CopySource=source, MetadataDirective="REPLACE")
+            response = self.s3.copy_object(**dest, CopySource=source, MetadataDirective="REPLACE",
+                                           TaggingDirective="REPLACE")
         else:
             if (size + PART_SIZE - 1) // PART_SIZE > 10000:
                 raise ValueError("Object exceeds multipart limit")
