@@ -1,6 +1,6 @@
 ---
 name: cloud-platform
-on:
+"on":
   push:
     branches:
       - main

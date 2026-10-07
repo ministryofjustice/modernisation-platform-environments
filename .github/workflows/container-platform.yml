@@ -1,6 +1,6 @@
 ---
 name: container-platform
-on:
+"on":
   push:
     branches:
       - main
