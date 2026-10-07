@@ -1,38 +1,22 @@
 #------------------------------------------------------------------------------
-# OpenSearch — full-text log search (ADR-017; Option B)
+# OpenSearch — full-text log search. One shared, managed domain per environment,
+# private (in-VPC), FGAC on, audit logging to CloudWatch. Business units are kept
+# apart inside the cluster (per-BU indexes + index-level roles), not by separate
+# domains. Scoped to cloud-platform-development for now (the dev proof-of-concept).
 #
-# One managed OpenSearch domain per business unit, each in the BU's own account.
-# This file is deployed per workspace: each cloud-platform-<env> apply runs in
-# that BU-environment account (MemberInfrastructureAccess), so a domain lands in
-# each account. Live environments are sized larger than non-live (local.is_live).
+# The in-cluster parts — per-BU indexes, ISM lifecycle, Fluent Bit's write
+# mapping (#8419) — need the OpenSearch provider and are not in this file yet.
 #
-# See architecture-decision-record/cp30/ADR-017-opensearch-deployment-model.md
-# (cloud-platform repo). Scoped to cloud-platform-development for now via
-# local.opensearch_host_workspaces — the first build proves the config in the
-# development account before the per-BU rollout.
-#
-# Architecture-review decisions baked in here:
-#   - Private domain in the VPC's private subnets (not internet-facing), reached
-#     over VPN / transit gateway / VPC endpoints like the EKS clusters.
-#   - Audit logging on, published to a CloudWatch /aws/vendedlogs/ group.
-#   - Retention set per BU (local.opensearch_audit_retention_days), not global.
-#
-# Serverless is NOT used (ADR-017 D2): full managed OpenSearch everywhere.
+# Design + rationale: architecture-decision-record/cp30/ADR-017-opensearch-deployment-model.md
 #------------------------------------------------------------------------------
 
-# Fine-grained access control master user: the platform-engineer SSO role, so
-# platform engineers can reach OpenSearch Dashboards. Per-BU read-only mapping
-# and full SSO/SAML federation are a follow-up (tracked on #8420); this gets a
-# working, access-controlled domain stood up first.
+# FGAC master user: the platform-engineer SSO role.
 locals {
   opensearch_master_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_platform-engineer-admin_5e1838a3c5d27fc3"
 }
 
-#------------------------------------------------------------------------------
-# VPC lookup — the domain goes in the private subnets of the workspace VPC.
-# The VPC lives in the `network` component (separate state), so look it up by
-# tag rather than reference the module. See locals.opensearch_vpc_name.
-#------------------------------------------------------------------------------
+# VPC + private subnets. Looked up by tag because the VPC is in the `network`
+# component (separate state), so we can't reference the module.
 data "aws_vpc" "opensearch" {
   count = local.enable_opensearch ? 1 : 0
 
@@ -54,8 +38,7 @@ data "aws_subnets" "opensearch_private" {
   }
 }
 
-# Security group for the domain's VPC endpoints. HTTPS in from inside the VPC
-# only; the private network (VPN / transit gateway) is what reaches it.
+# HTTPS in from inside the VPC only.
 resource "aws_security_group" "opensearch" {
   count = local.enable_opensearch ? 1 : 0
 
@@ -77,14 +60,8 @@ resource "aws_security_group" "opensearch" {
   })
 }
 
-#------------------------------------------------------------------------------
-# Audit logging -> CloudWatch Logs.
-#
-# The log group sits under /aws/vendedlogs/ so a single broad resource policy
-# can cover every per-BU domain. CloudWatch Logs allows only 10 resource
-# policies per Region, so a per-domain policy would not scale to 22 clusters.
-# (AWS: "Monitoring OpenSearch logs with Amazon CloudWatch Logs".)
-#------------------------------------------------------------------------------
+# Audit log group. Under /aws/vendedlogs/ so one prefix-wide resource policy
+# (below) covers it — CloudWatch allows only 10 resource policies per Region.
 resource "aws_cloudwatch_log_group" "opensearch_audit" {
   #checkov:skip=CKV_AWS_158:Per ADR-017, CloudWatch is the short-retention operational tier (default AES-256); customer-managed KMS is reserved for the S3 archive. Matches the Auto Mode vended-logs group (cluster/eks-cluster.tf).
   count = local.enable_opensearch ? 1 : 0
@@ -97,9 +74,8 @@ resource "aws_cloudwatch_log_group" "opensearch_audit" {
   })
 }
 
-# Let the OpenSearch service write to any OpenSearch vended-logs group in this
-# account/region. One policy, wildcard prefix, so it covers future domains too.
-# SourceAccount/SourceArn conditions guard against the confused-deputy problem.
+# Allow the OpenSearch service to write to the vended-logs groups. SourceAccount
+# /SourceArn conditions guard against the confused-deputy problem.
 data "aws_iam_policy_document" "opensearch_audit" {
   count = local.enable_opensearch ? 1 : 0
 
@@ -136,9 +112,9 @@ resource "aws_cloudwatch_log_resource_policy" "opensearch_audit" {
 }
 
 resource "aws_opensearch_domain" "logs" {
-  #checkov:skip=CKV_AWS_247:Dev PoC uses the AWS-managed aws/es key. The per-BU shared KMS key (alias/general-<bu>) lives in core-shared-services-production, not the development account, so a customer-managed key comes with the per-BU rollout. See ADR-017.
-  #checkov:skip=CKV_AWS_318:Dedicated master nodes are a deliberate deferral for the dev PoC; HA sizing (3 masters, zone awareness) is the measured follow-up before per-BU rollout. See ADR-017.
-  #checkov:skip=CKV2_AWS_59:Same as CKV_AWS_318 — dedicated master is part of the deferred HA sizing, not the single-node dev PoC. See ADR-017.
+  #checkov:skip=CKV_AWS_247:Dev PoC uses the AWS-managed aws/es key; a customer-managed key comes with the production shared cluster. See ADR-017.
+  #checkov:skip=CKV_AWS_318:Dedicated master nodes are a deliberate deferral for the dev PoC; HA sizing (3 masters, zone awareness) is the measured follow-up for the production cluster. See ADR-017.
+  #checkov:skip=CKV2_AWS_59:Same as CKV_AWS_318 — dedicated master is part of the deferred HA sizing, not the small dev PoC. See ADR-017.
   count = local.enable_opensearch ? 1 : 0
 
   domain_name    = local.opensearch_domain_name
@@ -147,8 +123,7 @@ resource "aws_opensearch_domain" "logs" {
   cluster_config {
     instance_type  = local.opensearch_instance
     instance_count = local.opensearch_data_nodes
-    # Single-/dual-node to start; not production shard topology. Dedicated master
-    # and zone awareness are a sizing follow-up once log volume is measured (#8420).
+    # Master + zone awareness are the deferred HA sizing (see ADR-017 / Checkov skips).
     zone_awareness_enabled   = false
     dedicated_master_enabled = false
   }
@@ -159,17 +134,14 @@ resource "aws_opensearch_domain" "logs" {
     volume_size = local.opensearch_ebs_gb
   }
 
-  # Private domain: lives in the VPC's private subnets, reachable only over the
-  # private network (VPN / transit gateway / VPC endpoints), not the internet.
-  # Subnet count follows zone awareness, not node count: one subnet while zone
-  # awareness is off (AWS rejects multiple subnets otherwise). Widen this to the
-  # AZ count when multi-AZ is turned on (sizing follow-up, #8420).
+  # One subnet while zone awareness is off (AWS rejects multiple); widen to the
+  # AZ count when multi-AZ is enabled.
   vpc_options {
     subnet_ids         = slice(data.aws_subnets.opensearch_private[0].ids, 0, 1)
     security_group_ids = [aws_security_group.opensearch[0].id]
   }
 
-  # FGAC prerequisites: encryption at rest, node-to-node encryption, HTTPS.
+  # Encryption + HTTPS: required for FGAC.
   encrypt_at_rest {
     enabled = true
   }
@@ -180,10 +152,9 @@ resource "aws_opensearch_domain" "logs" {
 
   domain_endpoint_options {
     enforce_https       = true
-    tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
+    tls_security_policy = "Policy-Min-TLS-1-2-PFS-2023-10" # TLS 1.3 + 1.2 PFS
   }
 
-  # Fine-grained access control, IAM master user = the SSO admin role.
   advanced_security_options {
     enabled                        = true
     internal_user_database_enabled = false
@@ -192,7 +163,7 @@ resource "aws_opensearch_domain" "logs" {
     }
   }
 
-  # Domain access policy — allow the master role. FGAC does the fine-grained part.
+  # Allow the master role; FGAC does the fine-grained part.
   access_policies = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -203,8 +174,7 @@ resource "aws_opensearch_domain" "logs" {
     }]
   })
 
-  # Audit logging on (architecture review). Needs FGAC, which is enabled above.
-  # The resource policy must exist before the domain can publish.
+  # depends_on below: the resource policy must exist before the domain publishes.
   log_publishing_options {
     log_type                 = "AUDIT_LOGS"
     cloudwatch_log_group_arn = aws_cloudwatch_log_group.opensearch_audit[0].arn
