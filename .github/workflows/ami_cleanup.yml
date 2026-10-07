@@ -26,7 +26,6 @@ name: Cloud Cleanup (AMI & EBS)
           - ebs
 
 permissions:
-  id-token: write
   contents: read
 
 env:
@@ -65,6 +64,8 @@ jobs:
   fetch-secrets:
     name: Fetch ENV management secrets
     uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
+    permissions:
+      id-token: write
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -75,6 +76,11 @@ jobs:
   preview:
     name: Preview Deletions (Dry-Run)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      ACCOUNT_NAME: ${{ matrix.account_name }}
     needs: [build-matrix, fetch-secrets]
     if: ${{ github.event_name == 'workflow_dispatch' }}
     strategy:
@@ -104,9 +110,9 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Resolve AWS Account Number
+        id: resolve-account
         run: |
           set -euo pipefail
-          ACCOUNT_NAME="${{ matrix.account_name }}"
           ACCOUNT_NUMBER="$(jq -r --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name] // empty' <<< "$ENVIRONMENT_MANAGEMENT")"
 
           if [[ -z "${ACCOUNT_NUMBER}" ]]; then
@@ -117,18 +123,19 @@ jobs:
 
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
+          echo "account_number=${ACCOUNT_NUMBER}" >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-to-assume: "arn:aws:iam::${{ steps.resolve-account.outputs.account_number }}:role/github-actions"
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
       - name: Assume downstream infra role (MemberInfrastructureAccess)
         run: |
           set -euo pipefail
-          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "preview-${{ matrix.account_name }}" --output json)
+          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "preview-${ACCOUNT_NAME}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
@@ -138,7 +145,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "▶️ Inventory"
-          echo "Account: ${{ matrix.account_name }} | Region: eu-west-2"
+          echo "Account: ${ACCOUNT_NAME} | Region: eu-west-2"
           aws sts get-caller-identity
           echo "==== AMIs named 'cleanup-test*' ===="
           aws ec2 describe-images --owners self \
@@ -204,13 +211,13 @@ jobs:
             else
               echo "$AMI,,${NAME},${WHEN:-},$STATUS" >> reports/ami_snapshot_map.csv
             fi
-            echo "${{ matrix.account_name }},eu-west-2,preview,ami,ami,${AMI},,${NAME},${WHEN},,${STATUS},${REASON}" >> reports/cleanup_report.csv
+            echo "${ACCOUNT_NAME},eu-west-2,preview,ami,ami,${AMI},,${NAME},${WHEN},,${STATUS},${REASON}" >> reports/cleanup_report.csv
           done
-          echo "Account: ${{ matrix.account_name }} | Test window: ${AGE_MINUTES}m"
+          echo "Account: ${ACCOUNT_NAME} | Test window: ${AGE_MINUTES}m"
           echo "✅ Would delete: ${PREVIEW_DELETE_COUNT} | 🛡️ Protected: ${PREVIEW_PROTECTED_COUNT}"
           echo "ami_count=${PREVIEW_DELETE_COUNT}" >> "$GITHUB_OUTPUT"
           {
-            echo "### 🧪 AMI Preview — ${{ matrix.account_name }}"
+            echo "### 🧪 AMI Preview — ${ACCOUNT_NAME}"
             echo ""
             echo "| Status | Count |"
             echo "|---|---:|"
@@ -272,13 +279,13 @@ jobs:
               NAME=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].Tags[?Key==`Name`]|[0].Value' --output text 2>/dev/null || echo "")
               CREATED=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].CreateTime' --output text 2>/dev/null || echo "")
               echo "$VOL,${AGE:-},${NAME:-},To be deleted" >> reports/ebs_cleanup_report.csv
-              echo "${{ matrix.account_name }},eu-west-2,preview,ebs,volume,${VOL},,${NAME},${CREATED},${AGE},To be deleted," >> reports/cleanup_report.csv
+              echo "${ACCOUNT_NAME},eu-west-2,preview,ebs,volume,${VOL},,${NAME},${CREATED},${AGE},To be deleted," >> reports/cleanup_report.csv
             done
           fi
           COUNT="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
           echo "✅ Would delete EBS volumes: ${COUNT}"
           {
-            echo "### 🧪 EBS Preview — ${{ matrix.account_name }}"
+            echo "### 🧪 EBS Preview — ${ACCOUNT_NAME}"
             echo ""
             echo "| Status | Count |"
             echo "|---|---:|"
@@ -320,6 +327,11 @@ jobs:
   ami-delete:
     name: AMI Delete (Live)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      ACCOUNT_NAME: ${{ matrix.account_name }}
     needs: [build-matrix, fetch-secrets, preview]
     if: ${{ (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always() }}
     environment: ${{ matrix.account_name }}
@@ -350,17 +362,18 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Resolve AWS Account Number
+        id: resolve-account
         run: |
           set -euo pipefail
-          ACCOUNT_NAME="${{ matrix.account_name }}"
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
+          echo "account_number=${ACCOUNT_NUMBER}" >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-to-assume: "arn:aws:iam::${{ steps.resolve-account.outputs.account_number }}:role/github-actions"
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
@@ -383,7 +396,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p reports
-          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-plan-${{ matrix.account_name }}" --output json)
+          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-plan-${ACCOUNT_NAME}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
@@ -445,7 +458,7 @@ jobs:
         id: ami_live_delete
         run: |
           set -euo pipefail
-          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-delete-${{ matrix.account_name }}" --output json)
+          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-delete-${ACCOUNT_NAME}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
@@ -472,7 +485,7 @@ jobs:
             for AMI in $AMI_DELETED_IDS; do
               NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
               WHEN="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].CreationDate' --output text 2>/dev/null || echo '')"
-              echo "${{ matrix.account_name }},eu-west-2,live,ami,ami,${AMI},,${NAME},${WHEN},,Deleted," >> reports/cleanup_report.csv
+              echo "${ACCOUNT_NAME},eu-west-2,live,ami,ami,${AMI},,${NAME},${WHEN},,Deleted," >> reports/cleanup_report.csv
             done
           fi
 
@@ -480,7 +493,7 @@ jobs:
         if: always()
         run: |
           set -euo pipefail
-          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-snaps-${{ matrix.account_name }}" --output json)
+          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-snaps-${ACCOUNT_NAME}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
@@ -543,10 +556,12 @@ jobs:
 
       - name: AMI Job Summary
         if: always()
+        env:
+          DELETED: ${{ steps.ami_live_delete.outputs.deleted || 0 }}
         run: |
           set -euo pipefail
-          DEL="${{ steps.ami_live_delete.outputs.deleted || 0 }}"
-          echo "### 🚀 AMI Live — ${{ matrix.account_name }}" >> "$GITHUB_STEP_SUMMARY"
+          DEL="${DELETED}"
+          echo "### 🚀 AMI Live — ${ACCOUNT_NAME}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
           echo "|---|---:|"
@@ -579,6 +594,11 @@ jobs:
   ebs-delete:
     name: EBS Delete (Live)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      ACCOUNT_NAME: ${{ matrix.account_name }}
     needs: [build-matrix, fetch-secrets, preview]
     if: ${{ (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && always() }}
     environment: ${{ matrix.account_name }}
@@ -609,17 +629,18 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Resolve AWS Account Number
+        id: resolve-account
         run: |
           set -euo pipefail
-          ACCOUNT_NAME="${{ matrix.account_name }}"
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
+          echo "account_number=${ACCOUNT_NUMBER}" >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-to-assume: "arn:aws:iam::${{ steps.resolve-account.outputs.account_number }}:role/github-actions"
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
@@ -643,7 +664,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p reports
-          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ebs-${{ matrix.account_name }}" --output json)
+          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ebs-${ACCOUNT_NAME}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
@@ -674,10 +695,12 @@ jobs:
 
       - name: EBS Job Summary
         if: always()
+        env:
+          DELETED: ${{ steps.ebs_live_delete.outputs.deleted || 0 }}
         run: |
           set -euo pipefail
-          DEL="${{ steps.ebs_live_delete.outputs.deleted || 0 }}"
-          echo "### 🚀 EBS Live — ${{ matrix.account_name }}" >> "$GITHUB_STEP_SUMMARY"
+          DEL="${DELETED}"
+          echo "### 🚀 EBS Live — ${ACCOUNT_NAME}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
           echo "|---|---:|"
