@@ -195,7 +195,7 @@ jobs:
           set -o pipefail
           tf_args="${{ inputs.plan_apply_tfargs }}"
           echo "terraform apply -refresh-only -auto-approve ${tf_args}"
-          terraform apply -refresh-only -auto-approve ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+          terraform apply -refresh-only -auto-approve ${tf_args} | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh"
 
       #
       # Terraform Plan
@@ -212,7 +212,7 @@ jobs:
           [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tf_args} -no-color"
           [[ ${{ inputs.do_state_refresh_on_plan }} == 'true' ]] && tf_args="${tf_args} -refresh=false"
           echo "terraform plan ${tf_args} -out=tfplan"
-          terraform plan ${tf_args} -out=tfplan | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          terraform plan ${tf_args} -out=tfplan | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh" | tee tfplan.txt || exitcode=$?
           terraform show -json tfplan > tfplan.json
           echo "exitcode=${exitcode}"
           echo "exitcode=${exitcode}" >> "$GITHUB_OUTPUT"
@@ -224,7 +224,7 @@ jobs:
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
         shell: bash
         run: |
-          bash ${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh tfplan.json
+          bash "${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh" tfplan.json
 
       - name: Create Plan PR message (Optional)
         if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
@@ -233,7 +233,7 @@ jobs:
           comment() {
             url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             len=$(cat tfplan.txt | wc -c)
-            echo '**`${{ env.WORKSPACE_NAME }}`** terraform plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('${url}')'
+            echo '**`${{ env.WORKSPACE_NAME }}`** terraform plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('"${url}"')'
             echo
             echo '```'
             head -c 65476 tfplan.txt | sed -n '/Terraform will perform/,$p'
@@ -360,13 +360,13 @@ jobs:
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           echo "::add-mask::$ACCOUNT_NUMBER"
-          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
 
       - name: Get Backend AWS Account Number
         run: |
           BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
           echo "::add-mask::$BACKEND_NUMBER"
-          echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
+          echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> "$GITHUB_ENV"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd  # v6.3.0

@@ -166,7 +166,7 @@ jobs:
         id: plan
         env:
           POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && inputs.post_plan_to_pr == true }}"
-          PLAN_APPLY_TFARGS: "${{ inputs.plan_apply_tfargs }}"
+          PLAN_APPLY_TFARGS: ${{ inputs.plan_apply_tfargs }}
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
         run: |
           set -o pipefail
@@ -225,7 +225,7 @@ jobs:
       - name: Post Plan to PR (Optional)
         if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
         env:
-          message: "${{ env.TF_PLAN_OUT }}"
+          message: ${{ env.TF_PLAN_OUT }}
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         run: |
           escaped_message=$(echo "$message" | jq -Rsa .)
