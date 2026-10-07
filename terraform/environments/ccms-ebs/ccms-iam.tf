@@ -381,8 +381,8 @@ resource "aws_iam_role" "lambda_execution_role" {
 }
 
 # Lambda execution role policy 
-resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
-  name = "${local.application_name}-${local.environment}-lambda_execution_role_policy"
+resource "aws_iam_role_policy" "lambda-execution-role-policy" {
+  name = "${local.application_name}-${local.environment}-lambda-execution-role-policy"
   role = aws_iam_role.lambda_execution_role.id
 
   policy = jsonencode({
