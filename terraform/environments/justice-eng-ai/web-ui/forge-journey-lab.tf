@@ -1,155 +1,118 @@
 locals {
-  forge_name                = "forge-journey-lab"
-  forge_ecr_repository_name = "${local.application_name}-${local.forge_name}"
+  forge_internal = var.forge_deployment_mode == "internal"
+  # What the UI's forge.html iframe actually loads in the browser. Empty
+  # when forge_deployment_mode = "disabled".
+  forge_url = (
+    var.forge_deployment_mode == "internal" ? "https://${local.forge_hostname}" :
+    var.forge_deployment_mode == "external" ? var.external_forge_url :
+    ""
+  )
+  forge_name = "forge-journey-lab"
+  # Secrets Manager path prefix only -- the image itself lives in the shared
+  # ECR repository used by the UI (ecs.tf), built/pushed centrally.
+  forge_secret_path_prefix = "${local.application_name}-${local.forge_name}"
   # Per-environment hostname comes from application_variables.json (see
   # local.application_data in platform_locals.tf) so dev and prod stay distinct.
-  forge_hostname            = local.application_data.accounts[local.environment].forge_hostname
-  forge_container_image_tag = "latest"
-  forge_container_port      = 3000
-  forge_task_cpu            = 1024
-  forge_task_memory         = 2048
-  forge_desired_count       = 1
-}
-
-resource "aws_ecr_repository" "forge" {
-  # checkov:skip=CKV_AWS_51:MUTABLE supports a convenience latest tag alongside immutable commit SHA tags.
-  # checkov:skip=CKV_AWS_136:Single-account prototype images use AWS-managed ECR encryption.
-  name                 = local.forge_ecr_repository_name
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  encryption_configuration {
-    encryption_type = "AES256"
-  }
-
-  tags = local.tags
-}
-
-resource "aws_ecr_lifecycle_policy" "forge" {
-  repository = aws_ecr_repository.forge.name
-  policy = jsonencode({
-    rules = [
-      {
-        rulePriority = 1
-        description  = "Expire untagged images after 14 days"
-        selection = {
-          tagStatus   = "untagged"
-          countType   = "sinceImagePushed"
-          countUnit   = "days"
-          countNumber = 14
-        }
-        action = { type = "expire" }
-      },
-      {
-        rulePriority = 2
-        description  = "Keep the latest 30 tagged images"
-        selection = {
-          tagStatus      = "tagged"
-          tagPatternList = ["*"]
-          countType      = "imageCountMoreThan"
-          countNumber    = 30
-        }
-        action = { type = "expire" }
-      }
-    ]
-  })
+  # Only used for real when forge_internal -- see local.forge_url above for
+  # what the UI actually gets handed as MPAPB_FORGE_URL.
+  forge_hostname           = local.application_data.accounts[local.environment].forge_hostname
+  forge_ecr_repository_url = local.ui_ecr_repository_url
+  forge_container_port     = 3000
+  forge_task_cpu           = 1024
+  forge_task_memory        = 2048
+  forge_desired_count      = 1
 }
 
 resource "random_password" "forge_session_secret" {
+  count = local.forge_internal ? 1 : 0
+
   length  = 64
   special = false
 }
 
 resource "aws_secretsmanager_secret" "forge_session_secret" {
+  count = local.forge_internal ? 1 : 0
+
   # checkov:skip=CKV2_AWS_57:Rotation is coordinated with an ECS restart to avoid invalidating active sessions mid-request.
   # checkov:skip=CKV_AWS_149:AWS-managed Secrets Manager encryption is proportionate for this prototype.
-  name                    = "${local.forge_ecr_repository_name}/session-secret"
+  name                    = "${local.forge_secret_path_prefix}/session-secret"
   description             = "Express session signing secret for Forge Journey Lab"
   recovery_window_in_days = 7
   tags                    = local.tags
 }
 
 resource "aws_secretsmanager_secret_version" "forge_session_secret" {
-  secret_id     = aws_secretsmanager_secret.forge_session_secret.id
-  secret_string = random_password.forge_session_secret.result
+  count = local.forge_internal ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.forge_session_secret[0].id
+  secret_string = random_password.forge_session_secret[0].result
 
   lifecycle {
     ignore_changes = [secret_string]
   }
 }
 
-locals {
-  forge_entra_secrets = {
-    tenant_id = {
-      environment_name = "ENTRA_TENANT_ID"
-      description      = "Microsoft Entra tenant ID for Forge Journey Lab"
-    }
-    client_id = {
-      environment_name = "ENTRA_CLIENT_ID"
-      description      = "Microsoft Entra application client ID for Forge Journey Lab"
-    }
-    client_secret = {
-      environment_name = "ENTRA_CLIENT_SECRET"
-      description      = "Microsoft Entra application client secret for Forge Journey Lab"
-    }
-  }
-}
-
-resource "aws_secretsmanager_secret" "forge_entra" {
-  for_each = local.forge_entra_secrets
-
-  # checkov:skip=CKV2_AWS_57:Values are managed and rotated from the externally owned Entra application.
-  # checkov:skip=CKV_AWS_149:AWS-managed Secrets Manager encryption is proportionate for this prototype.
-  name                    = "${local.forge_ecr_repository_name}/entra-${replace(each.key, "_", "-")}"
-  description             = each.value.description
-  recovery_window_in_days = 7
-  tags                    = local.tags
-}
+# Forge Journey Lab uses the same Entra app registration as the UI, so it
+# reads the shared aws_secretsmanager_secret.entra_oidc_* secrets (oidc.tf)
+# rather than keeping its own copies.
 
 resource "aws_iam_role" "forge_ecs_task_execution" {
+  count = local.forge_internal ? 1 : 0
+
   name               = "${local.forge_name}-ecs-execution"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role.json
   tags               = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "forge_ecs_task_execution" {
-  role       = aws_iam_role.forge_ecs_task_execution.name
+  count = local.forge_internal ? 1 : 0
+
+  role       = aws_iam_role.forge_ecs_task_execution[0].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 data "aws_iam_policy_document" "forge_ecs_task_execution_secrets" {
+  count = local.forge_internal ? 1 : 0
+
   statement {
     sid     = "ReadForgeSecrets"
     effect  = "Allow"
     actions = ["secretsmanager:GetSecretValue"]
-    resources = concat(
-      [aws_secretsmanager_secret.forge_session_secret.arn],
-      [for secret in aws_secretsmanager_secret.forge_entra : secret.arn]
-    )
+    resources = [
+      aws_secretsmanager_secret.forge_session_secret[0].arn,
+      aws_secretsmanager_secret.entra_oidc_tenant_id[0].arn,
+      aws_secretsmanager_secret.entra_oidc_client_id[0].arn,
+      aws_secretsmanager_secret.entra_oidc_client_secret[0].arn,
+    ]
   }
 }
 
 resource "aws_iam_role_policy" "forge_ecs_task_execution_secrets" {
+  count = local.forge_internal ? 1 : 0
+
   name   = "read-forge-secrets"
-  role   = aws_iam_role.forge_ecs_task_execution.id
-  policy = data.aws_iam_policy_document.forge_ecs_task_execution_secrets.json
+  role   = aws_iam_role.forge_ecs_task_execution[0].id
+  policy = data.aws_iam_policy_document.forge_ecs_task_execution_secrets[0].json
 }
 
 resource "aws_iam_role" "forge_ecs_task" {
+  count = local.forge_internal ? 1 : 0
+
   name               = "${local.forge_name}-ecs-task"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role.json
   tags               = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "forge_ecs_task_bedrock" {
-  role       = aws_iam_role.forge_ecs_task.name
+  count = local.forge_internal ? 1 : 0
+
+  role       = aws_iam_role.forge_ecs_task[0].name
   policy_arn = aws_iam_policy.bedrock_runtime.arn
 }
 
 resource "aws_efs_access_point" "forge" {
+  count = local.forge_internal ? 1 : 0
+
   file_system_id = aws_efs_file_system.plans.id
 
   posix_user {
@@ -170,6 +133,8 @@ resource "aws_efs_access_point" "forge" {
 }
 
 data "aws_iam_policy_document" "forge_ecs_task_efs" {
+  count = local.forge_internal ? 1 : 0
+
   statement {
     sid    = "AllowMountAndReadWriteOnForgeAccessPoint"
     effect = "Allow"
@@ -181,29 +146,33 @@ data "aws_iam_policy_document" "forge_ecs_task_efs" {
     condition {
       test     = "StringEquals"
       variable = "elasticfilesystem:AccessPointArn"
-      values   = [aws_efs_access_point.forge.arn]
+      values   = [aws_efs_access_point.forge[0].arn]
     }
   }
 }
 
 resource "aws_iam_policy" "forge_ecs_task_efs" {
+  count = local.forge_internal ? 1 : 0
+
   name        = "${local.forge_name}-ecs-task-efs"
   description = "Allow Forge Journey Lab to mount its dedicated EFS access point"
-  policy      = data.aws_iam_policy_document.forge_ecs_task_efs.json
+  policy      = data.aws_iam_policy_document.forge_ecs_task_efs[0].json
   tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "forge_ecs_task_efs" {
-  role       = aws_iam_role.forge_ecs_task.name
-  policy_arn = aws_iam_policy.forge_ecs_task_efs.arn
+  count = local.forge_internal ? 1 : 0
+
+  role       = aws_iam_role.forge_ecs_task[0].name
+  policy_arn = aws_iam_policy.forge_ecs_task_efs[0].arn
 }
 
 # Grant Forge's task role PutObject on the artefact bucket when configured.
 # The bucket itself is created out-of-band (see var.forge_package_s3_bucket);
-# this policy is gated on the variable being set so turning the integration
-# off cleanly removes the IAM.
+# this policy is gated on the variable being set, and on Forge actually being
+# deployed here, so turning either off cleanly removes the IAM.
 locals {
-  forge_package_s3_enabled = var.forge_package_s3_bucket != ""
+  forge_package_s3_enabled = local.forge_internal && var.forge_package_s3_bucket != ""
 }
 
 data "aws_iam_policy_document" "forge_ecs_task_package_s3" {
@@ -242,11 +211,13 @@ resource "aws_iam_policy" "forge_ecs_task_package_s3" {
 
 resource "aws_iam_role_policy_attachment" "forge_ecs_task_package_s3" {
   count      = local.forge_package_s3_enabled ? 1 : 0
-  role       = aws_iam_role.forge_ecs_task.name
+  role       = aws_iam_role.forge_ecs_task[0].name
   policy_arn = aws_iam_policy.forge_ecs_task_package_s3[0].arn
 }
 
 resource "aws_security_group" "forge_ecs_service" {
+  count = local.forge_internal ? 1 : 0
+
   name        = "${local.forge_name}-ecs"
   description = "Controls access to the Forge Journey Lab ECS service"
   vpc_id      = data.aws_vpc.shared.id
@@ -254,7 +225,9 @@ resource "aws_security_group" "forge_ecs_service" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "forge_ecs_from_alb" {
-  security_group_id            = aws_security_group.forge_ecs_service.id
+  count = local.forge_internal ? 1 : 0
+
+  security_group_id            = aws_security_group.forge_ecs_service[0].id
   description                  = "Forge application traffic from the ALB"
   from_port                    = local.forge_container_port
   to_port                      = local.forge_container_port
@@ -263,16 +236,20 @@ resource "aws_vpc_security_group_ingress_rule" "forge_ecs_from_alb" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "alb_to_forge_ecs" {
+  count = local.forge_internal ? 1 : 0
+
   security_group_id            = aws_security_group.alb.id
   description                  = "Forward traffic from the ALB to Forge Journey Lab"
   from_port                    = local.forge_container_port
   to_port                      = local.forge_container_port
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.forge_ecs_service.id
+  referenced_security_group_id = aws_security_group.forge_ecs_service[0].id
 }
 
 resource "aws_vpc_security_group_egress_rule" "forge_ecs_https" {
-  security_group_id = aws_security_group.forge_ecs_service.id
+  count = local.forge_internal ? 1 : 0
+
+  security_group_id = aws_security_group.forge_ecs_service[0].id
   description       = "HTTPS egress for Entra and AWS APIs"
   from_port         = 443
   to_port           = 443
@@ -281,7 +258,9 @@ resource "aws_vpc_security_group_egress_rule" "forge_ecs_https" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "forge_ecs_to_efs" {
-  security_group_id            = aws_security_group.forge_ecs_service.id
+  count = local.forge_internal ? 1 : 0
+
+  security_group_id            = aws_security_group.forge_ecs_service[0].id
   description                  = "NFS to the Forge data access point"
   from_port                    = 2049
   to_port                      = 2049
@@ -290,15 +269,19 @@ resource "aws_vpc_security_group_egress_rule" "forge_ecs_to_efs" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "efs_from_forge_ecs" {
+  count = local.forge_internal ? 1 : 0
+
   security_group_id            = aws_security_group.efs_plans.id
   description                  = "NFS from the Forge Journey Lab ECS service"
   from_port                    = 2049
   to_port                      = 2049
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.forge_ecs_service.id
+  referenced_security_group_id = aws_security_group.forge_ecs_service[0].id
 }
 
 resource "aws_lb_target_group" "forge" {
+  count = local.forge_internal ? 1 : 0
+
   # checkov:skip=CKV_AWS_378:TLS terminates at the HTTPS ALB listener. The
   # target uses private subnets and only accepts traffic from the ALB security
   # group, matching the existing builder service's target-group architecture.
@@ -324,13 +307,15 @@ resource "aws_lb_target_group" "forge" {
 }
 
 resource "aws_lb_listener_rule" "forge" {
+  count = local.forge_internal ? 1 : 0
+
   listener_arn = aws_lb_listener.https.arn
   priority     = 10
   tags         = local.tags
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.forge.arn
+    target_group_arn = aws_lb_target_group.forge[0].arn
   }
 
   condition {
@@ -342,8 +327,11 @@ resource "aws_lb_listener_rule" "forge" {
 
 # Forge's Route53 record now lives in route53.tf, alongside the UI's --
 # both are aliases to the same ALB, split by host-header listener rule.
+# Only created when forge_internal (see route53.tf).
 
 resource "aws_cloudwatch_log_group" "forge" {
+  count = local.forge_internal ? 1 : 0
+
   # checkov:skip=CKV_AWS_158:Prototype logs use the AWS-managed CloudWatch Logs key.
   # checkov:skip=CKV_AWS_338:Thirty-day retention matches the existing prototype service.
   name              = "/ecs/${local.forge_name}"
@@ -352,19 +340,21 @@ resource "aws_cloudwatch_log_group" "forge" {
 }
 
 resource "aws_ecs_task_definition" "forge" {
+  count = local.forge_internal ? 1 : 0
+
   family                   = local.forge_name
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = local.forge_task_cpu
   memory                   = local.forge_task_memory
-  execution_role_arn       = aws_iam_role.forge_ecs_task_execution.arn
-  task_role_arn            = aws_iam_role.forge_ecs_task.arn
+  execution_role_arn       = aws_iam_role.forge_ecs_task_execution[0].arn
+  task_role_arn            = aws_iam_role.forge_ecs_task[0].arn
   tags                     = local.tags
 
   container_definitions = jsonencode([
     {
       name                   = "forge"
-      image                  = "${aws_ecr_repository.forge.repository_url}:${local.forge_container_image_tag}"
+      image                  = "${local.forge_ecr_repository_url}:${var.forge_container_image_tag}"
       essential              = true
       readonlyRootFilesystem = true
       user                   = "1000:1000"
@@ -397,13 +387,12 @@ resource "aws_ecs_task_definition" "forge" {
         { name = "TRUST_PROXY_HOPS", value = "1" },
       ]
 
-      secrets = concat(
-        [{ name = "SESSION_SECRET", valueFrom = aws_secretsmanager_secret.forge_session_secret.arn }],
-        [for key, secret in aws_secretsmanager_secret.forge_entra : {
-          name      = local.forge_entra_secrets[key].environment_name
-          valueFrom = secret.arn
-        }]
-      )
+      secrets = [
+        { name = "SESSION_SECRET", valueFrom = aws_secretsmanager_secret.forge_session_secret[0].arn },
+        { name = "ENTRA_TENANT_ID", valueFrom = aws_secretsmanager_secret.entra_oidc_tenant_id[0].arn },
+        { name = "ENTRA_CLIENT_ID", valueFrom = aws_secretsmanager_secret.entra_oidc_client_id[0].arn },
+        { name = "ENTRA_CLIENT_SECRET", valueFrom = aws_secretsmanager_secret.entra_oidc_client_secret[0].arn },
+      ]
 
       mountPoints = [{
         sourceVolume  = "data"
@@ -414,7 +403,7 @@ resource "aws_ecs_task_definition" "forge" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.forge.name
+          awslogs-group         = aws_cloudwatch_log_group.forge[0].name
           awslogs-region        = data.aws_region.current.region
           awslogs-stream-prefix = "forge"
           mode                  = "blocking"
@@ -431,7 +420,7 @@ resource "aws_ecs_task_definition" "forge" {
       transit_encryption = "ENABLED"
 
       authorization_config {
-        access_point_id = aws_efs_access_point.forge.id
+        access_point_id = aws_efs_access_point.forge[0].id
         iam             = "ENABLED"
       }
     }
@@ -439,9 +428,11 @@ resource "aws_ecs_task_definition" "forge" {
 }
 
 resource "aws_ecs_service" "forge" {
+  count = local.forge_internal ? 1 : 0
+
   name                              = local.forge_name
   cluster                           = aws_ecs_cluster.app.id
-  task_definition                   = aws_ecs_task_definition.forge.arn
+  task_definition                   = aws_ecs_task_definition.forge[0].arn
   desired_count                     = local.forge_desired_count
   launch_type                       = "FARGATE"
   health_check_grace_period_seconds = 120
@@ -455,12 +446,12 @@ resource "aws_ecs_service" "forge" {
 
   network_configuration {
     assign_public_ip = false
-    security_groups  = [aws_security_group.forge_ecs_service.id]
+    security_groups  = [aws_security_group.forge_ecs_service[0].id]
     subnets          = local.private_subnet_ids
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.forge.arn
+    target_group_arn = aws_lb_target_group.forge[0].arn
     container_name   = "forge"
     container_port   = local.forge_container_port
   }
@@ -479,16 +470,20 @@ resource "aws_ecs_service" "forge" {
 }
 
 output "forge_ecr_repository_url" {
-  description = "ECR repository URL for the Forge Journey Lab image."
-  value       = aws_ecr_repository.forge.repository_url
+  description = "Shared-services ECR repository URL the Forge Journey Lab image is pulled from. Empty unless forge_deployment_mode = \"internal\"."
+  value       = local.forge_internal ? local.forge_ecr_repository_url : ""
 }
 
 output "forge_url" {
-  description = "HTTPS URL for Forge Journey Lab."
-  value       = "https://${local.forge_hostname}"
+  description = "URL the UI embeds for Forge Journey Lab (internal/external), or empty when disabled."
+  value       = local.forge_url
 }
 
 output "forge_entra_secret_arns" {
-  description = "Secrets Manager ARNs to populate with the Forge Entra application values."
-  value       = { for key, secret in aws_secretsmanager_secret.forge_entra : key => secret.arn }
+  description = "Secrets Manager ARNs to populate with the Entra application values, shared between the UI and Forge Journey Lab. Empty unless forge_deployment_mode = \"internal\" or var.enable_oidc_auth."
+  value = {
+    tenant_id     = try(aws_secretsmanager_secret.entra_oidc_tenant_id[0].arn, "")
+    client_id     = try(aws_secretsmanager_secret.entra_oidc_client_id[0].arn, "")
+    client_secret = try(aws_secretsmanager_secret.entra_oidc_client_secret[0].arn, "")
+  }
 }

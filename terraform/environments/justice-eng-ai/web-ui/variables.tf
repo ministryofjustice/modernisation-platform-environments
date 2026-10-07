@@ -105,8 +105,14 @@ variable "builder_hostname" {
 
 variable "container_image_tag" {
   type        = string
-  description = "Container image tag to run from ECR."
-  default     = "latest"
+  description = "Container image tag to run from ECR. CI/CD pushes new task-definition revisions directly and this attribute is ignore_changes'd thereafter (see aws_ecs_service.app), so this default only matters for the service's initial creation."
+  default     = "ui-build-ce979fe"
+}
+
+variable "forge_container_image_tag" {
+  type        = string
+  description = "Image tag to run for the Forge Journey Lab container, pulled from the same shared-services ECR repository as the UI image (a forge-build-<sha> tag, not the UI's ui-build-<sha> tag). Same ignore_changes caveat as container_image_tag applies once CI/CD takes over."
+  default     = "forge-build-ce979fe"
 }
 
 variable "app_container_port" {
@@ -240,6 +246,41 @@ EOT
     "35.176.148.126/32", # MoJ core-network-services NAT (HA)
     "128.77.75.64/26",   # Palo Alto Networks Prisma Access (MoJ GP cloud gw)
   ]
+}
+
+variable "forge_deployment_mode" {
+  type        = string
+  description = <<-EOT
+    How this stack provides Forge Journey Lab to the builder UI's iframe
+    (see ui/static/forge.html -- the browser loads MPAPB_FORGE_URL directly,
+    Forge is never called server-side by the UI). One of:
+
+      "internal" -- deploy Forge's own ECS service, ECR repo, secrets and
+        EFS access point here, fronted by this ALB via a host-based
+        listener rule, with its own Route 53 record (current default).
+
+      "external" -- Forge is already deployed elsewhere. Set
+        `external_forge_url` to its browser-reachable HTTPS URL; no Forge
+        ECS/ALB/DNS resources are created by this stack.
+
+      "disabled" -- no Forge integration at all. `MPAPB_FORGE_URL` is left
+        unset and no Forge DNS record is created.
+  EOT
+  default     = "internal"
+  validation {
+    condition     = contains(["internal", "external", "disabled"], var.forge_deployment_mode)
+    error_message = "forge_deployment_mode must be one of: internal, external, disabled."
+  }
+}
+
+variable "external_forge_url" {
+  type        = string
+  description = "Browser-reachable HTTPS URL of an already-deployed Forge Journey Lab instance. Required when forge_deployment_mode = \"external\"; ignored otherwise."
+  default     = ""
+  validation {
+    condition     = var.forge_deployment_mode != "external" || var.external_forge_url != ""
+    error_message = "external_forge_url must be set when forge_deployment_mode = \"external\"."
+  }
 }
 
 variable "forge_package_s3_bucket" {

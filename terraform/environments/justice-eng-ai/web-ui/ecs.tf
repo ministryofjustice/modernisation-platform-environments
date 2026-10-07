@@ -142,7 +142,7 @@ resource "aws_ecs_task_definition" "app" {
         },
         {
           name  = "MPAPB_FORGE_URL"
-          value = "https://${local.forge_hostname}"
+          value = local.forge_url
         },
         # In-app Entra OIDC feature flag. When true (see local.in_app_oidc_
         # enabled) the app runs its own login handshake and the ALB
@@ -214,6 +214,11 @@ resource "aws_ecs_task_definition" "app" {
           readOnly      = false
         },
         {
+          sourceVolume  = "data"
+          containerPath = "/data"
+          readOnly      = false
+        },
+        {
           sourceVolume  = "plans"
           containerPath = "/data/plans"
           readOnly      = false
@@ -234,6 +239,20 @@ resource "aws_ecs_task_definition" "app" {
 
   volume {
     name = "tmp"
+  }
+
+  volume {
+    name = "data"
+
+    efs_volume_configuration {
+      file_system_id     = aws_efs_file_system.plans.id
+      transit_encryption = "ENABLED"
+
+      authorization_config {
+        access_point_id = aws_efs_access_point.data.id
+        iam             = "ENABLED"
+      }
+    }
   }
 
   volume {
