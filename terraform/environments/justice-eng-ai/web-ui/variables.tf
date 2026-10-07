@@ -105,8 +105,14 @@ variable "builder_hostname" {
 
 variable "container_image_tag" {
   type        = string
-  description = "Container image tag to run from ECR."
-  default     = "latest"
+  description = "Container image tag to run from ECR. CI/CD pushes new task-definition revisions directly and this attribute is ignore_changes'd thereafter (see aws_ecs_service.app), so this default only matters for the service's initial creation."
+  default     = "ui-build-ce979fe"
+}
+
+variable "forge_container_image_tag" {
+  type        = string
+  description = "Image tag to run for the Forge Journey Lab container, pulled from the same shared-services ECR repository as the UI image (a forge-build-<sha> tag, not the UI's ui-build-<sha> tag). Same ignore_changes caveat as container_image_tag applies once CI/CD takes over."
+  default     = "forge-build-ce979fe"
 }
 
 variable "app_container_port" {

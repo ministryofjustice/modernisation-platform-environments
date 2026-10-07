@@ -105,6 +105,33 @@ resource "aws_efs_access_point" "plans" {
   tags = merge(local.tags, { Name = "${local.application_name}-ui-plans-ap" })
 }
 
+# Separate access point rooted at a different top-level directory, mounted
+# at the container's /data itself (nested under/alongside /data/plans
+# above). The app also writes /data/records.json directly -- with only
+# /data/plans mounted that lands on the read-only root filesystem and
+# fails with EROFS. A distinct root_directory (rather than widening the
+# "plans" access point to "/") avoids touching the existing chat-storage
+# permissions/content.
+resource "aws_efs_access_point" "data" {
+  file_system_id = aws_efs_file_system.plans.id
+
+  posix_user {
+    uid = 1000
+    gid = 1000
+  }
+
+  root_directory {
+    path = "/data"
+    creation_info {
+      owner_uid   = 1000
+      owner_gid   = 1000
+      permissions = "0770"
+    }
+  }
+
+  tags = merge(local.tags, { Name = "${local.application_name}-ui-data-ap" })
+}
+
 output "efs_plans_file_system_id" {
   description = "ID of the EFS filesystem backing /data/plans in the UI runtime."
   value       = aws_efs_file_system.plans.id
