@@ -145,14 +145,14 @@ jobs:
       - name: Get AWS Account Number
         id: get-account
         run: |
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
           echo "account_number=${ACCOUNT_NUMBER}" >> "$GITHUB_OUTPUT"
 
       - name: Get Backend AWS Account Number
         run: |
-          BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$BACKEND_NUMBER"
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> "$GITHUB_ENV"
 
@@ -210,9 +210,9 @@ jobs:
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
         run: |
           set -o pipefail
-          tf_args="${PLAN_APPLY_TFARGS}"
-          echo "terraform apply -refresh-only -auto-approve ${tf_args}"
-          terraform apply -refresh-only -auto-approve ${tf_args} | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh"
+          mapfile -d '' -t tf_args < <(python3 -c 'import shlex, sys; sys.stdout.buffer.write(b"\0".join(arg.encode() for arg in shlex.split(sys.argv[1])))' "$PLAN_APPLY_TFARGS")
+          echo "terraform apply -refresh-only -auto-approve ${PLAN_APPLY_TFARGS}"
+          terraform apply -refresh-only -auto-approve "${tf_args[@]}" | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh"
 
       #
       # Terraform Plan
@@ -227,11 +227,12 @@ jobs:
         run: |
           set -o pipefail
           exitcode=0
-          tf_args="-detailed-exitcode ${PLAN_APPLY_TFARGS}"
-          [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tf_args} -no-color"
-          [[ ${DO_STATE_REFRESH_ON_PLAN} == 'true' ]] && tf_args="${tf_args} -refresh=false"
-          echo "terraform plan ${tf_args} -out=tfplan"
-          terraform plan ${tf_args} -out=tfplan | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh" | tee tfplan.txt || exitcode=$?
+          mapfile -d '' -t extra_tf_args < <(python3 -c 'import shlex, sys; sys.stdout.buffer.write(b"\0".join(arg.encode() for arg in shlex.split(sys.argv[1])))' "$PLAN_APPLY_TFARGS")
+          tf_args=(-detailed-exitcode "${extra_tf_args[@]}")
+          [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args+=(-no-color)
+          [[ ${DO_STATE_REFRESH_ON_PLAN} == 'true' ]] && tf_args+=(-refresh=false)
+          echo "terraform plan ${PLAN_APPLY_TFARGS} -out=tfplan"
+          terraform plan "${tf_args[@]}" -out=tfplan | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh" | tee tfplan.txt || exitcode=$?
           terraform show -json tfplan > tfplan.json
           echo "exitcode=${exitcode}"
           echo "exitcode=${exitcode}" >> "$GITHUB_OUTPUT"
@@ -259,6 +260,7 @@ jobs:
           comment() {
             url="https://github.com/${REPOSITORY}/actions/runs/${RUN_ID}"
             len=$(cat tfplan.txt | wc -c)
+            # shellcheck disable=SC2016
             printf '**`%s`** terraform plan on `%s` event [#%s](%s)\n' "${WORKSPACE_NAME}" "${EVENT_NAME}" "${RUN_NUMBER}" "${url}"
             echo
             echo '```'
@@ -388,14 +390,14 @@ jobs:
       - name: Get AWS Account Number
         id: get-account
         run: |
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
           echo "account_number=${ACCOUNT_NUMBER}" >> "$GITHUB_OUTPUT"
 
       - name: Get Backend AWS Account Number
         run: |
-          BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$BACKEND_NUMBER"
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> "$GITHUB_ENV"
 
@@ -437,9 +439,9 @@ jobs:
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
         run: |
           set -o pipefail
-          tf_args="-out x.tfplan ${PLAN_APPLY_TFARGS}"
-          echo "terraform plan ${tf_args}"
-          terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+          mapfile -d '' -t tf_args < <(python3 -c 'import shlex, sys; sys.stdout.buffer.write(b"\0".join(arg.encode() for arg in shlex.split(sys.argv[1])))' "$PLAN_APPLY_TFARGS")
+          echo "terraform plan -out x.tfplan ${PLAN_APPLY_TFARGS}"
+          terraform plan -out x.tfplan "${tf_args[@]}" | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh"
 
       - name: Terraform Apply
         env:
@@ -447,9 +449,9 @@ jobs:
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
         run: |
           set -o pipefail
-          tf_args="${PLAN_APPLY_TFARGS} x.tfplan"
-          echo "terraform apply ${tf_args}"
-          terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+          mapfile -d '' -t tf_args < <(python3 -c 'import shlex, sys; sys.stdout.buffer.write(b"\0".join(arg.encode() for arg in shlex.split(sys.argv[1])))' "$PLAN_APPLY_TFARGS")
+          echo "terraform apply ${PLAN_APPLY_TFARGS} x.tfplan"
+          terraform apply "${tf_args[@]}" x.tfplan 2>&1 | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh"
 
       # See the equivalent step in the plan job for rationale.
       - name: Delete AMG Service Account Token (Optional)

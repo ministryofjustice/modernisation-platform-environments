@@ -115,10 +115,11 @@ jobs:
         id: create_summary
         run: |
           # Create markdown formatted summary
-          echo "# Terraform State Operation Request" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Operation:** ${OPERATION}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Target workspace:** ${APPLICATION}-${WORKSPACE}" >> "$GITHUB_STEP_SUMMARY"
+          {
+          echo "# Terraform State Operation Request"
+          echo ""
+          echo "**Operation:** ${OPERATION}"
+          echo "**Target workspace:** ${APPLICATION}-${WORKSPACE}"
 
           SUMMARY="## Operation Details\n"
           SUMMARY+="- **Operation:** ${OPERATION}\n"
@@ -126,26 +127,26 @@ jobs:
           SUMMARY+="- **Workspace:** ${WORKSPACE}\n"
 
           if [[ "${COMPONENT}" != "root" ]]; then
-            echo "**Component:** ${COMPONENT}" >> "$GITHUB_STEP_SUMMARY"
+            echo "**Component:** ${COMPONENT}"
             SUMMARY+="- **Component:** ${COMPONENT}\n"
           fi
 
           if [[ "${BRANCH_NAME}" != "main" ]]; then
-            echo "**Branch:** ${BRANCH_NAME}" >> "$GITHUB_STEP_SUMMARY"
+            echo "**Branch:** ${BRANCH_NAME}"
             SUMMARY+="- **Branch:** ${BRANCH_NAME}\n"
           fi
 
           if [[ "${OPERATION}" == "unlock" ]]; then
-              echo "**Lock ID:** ${LOCK_ID}" >> "$GITHUB_STEP_SUMMARY"
+              echo "**Lock ID:** ${LOCK_ID}"
               SUMMARY+="- **Lock ID:** ${LOCK_ID}\n"
           else
               # Convert comma-separated values to newlines for display
               ADDRESSES_DISPLAY=$(printf '%s' "${RESOURCE_ADDRESSES}" | tr ',' '\n')
 
-              echo "**Resource Addresses:**" >> "$GITHUB_STEP_SUMMARY"
-              echo '```' >> "$GITHUB_STEP_SUMMARY"
-              echo "$ADDRESSES_DISPLAY" >> "$GITHUB_STEP_SUMMARY"
-              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              echo "**Resource Addresses:**"
+              echo '```'
+              echo "$ADDRESSES_DISPLAY"
+              echo '```'
 
               # Format for output to next job (keep as comma-separated)
               SUMMARY+="- **Resources:** ${RESOURCE_ADDRESSES}\n"
@@ -154,16 +155,19 @@ jobs:
                 # Convert comma-separated values to newlines for display
                 IDS_DISPLAY=$(printf '%s' "${RESOURCE_IDS}" | tr ',' '\n')
 
-                echo "**Resource IDs:**" >> "$GITHUB_STEP_SUMMARY"
-                echo '```' >> "$GITHUB_STEP_SUMMARY"
-                echo "$IDS_DISPLAY" >> "$GITHUB_STEP_SUMMARY"
-                echo '```' >> "$GITHUB_STEP_SUMMARY"
+                echo "**Resource IDs:**"
+                echo '```'
+                echo "$IDS_DISPLAY"
+                echo '```'
               fi
           fi
 
-          echo "summary<<EOF" >> "$GITHUB_OUTPUT"
-          echo -e "$SUMMARY" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          } >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "summary<<EOF"
+            printf '%b\n' "$SUMMARY"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
   fetch-secrets:
     permissions:
