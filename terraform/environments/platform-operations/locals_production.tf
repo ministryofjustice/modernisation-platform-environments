@@ -17,6 +17,16 @@ locals {
   github_actions_lambda_production = {
     enable_outbound_federation = true
     github_workflows = {
+      dso-useful-stuff-stale = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-useful-stuff"
+        schedule = "cron(30 1 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "stale.yml"
+      }
       hosting-migrations-platops-concierge-to-slack = {
         identity = "platops"
         inputs   = {}
