@@ -7,11 +7,15 @@ resource "aws_lb" "app" {
   # checkov:skip=CKV_AWS_91:Access logging deliberately off for the prototype;
   # Cloudflare-style access analytics are unnecessary for internal MoJ SSO
   # traffic and the S3 log bucket + lifecycle would be extra unused infra.
-  name                       = local.application_resource_name
-  internal                   = false
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.alb.id]
-  subnets                    = data.aws_subnets.shared-public.ids
+  name               = local.application_resource_name
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb.id]
+  subnets = [
+    data.aws_subnet.public_subnets_a.id,
+    data.aws_subnet.public_subnets_b.id,
+    data.aws_subnet.public_subnets_c.id,
+  ]
   drop_invalid_header_fields = true
   idle_timeout               = 120
   tags                       = local.tags

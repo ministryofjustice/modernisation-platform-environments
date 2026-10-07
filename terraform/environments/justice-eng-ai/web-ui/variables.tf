@@ -242,6 +242,41 @@ EOT
   ]
 }
 
+variable "forge_deployment_mode" {
+  type        = string
+  description = <<-EOT
+    How this stack provides Forge Journey Lab to the builder UI's iframe
+    (see ui/static/forge.html -- the browser loads MPAPB_FORGE_URL directly,
+    Forge is never called server-side by the UI). One of:
+
+      "internal" -- deploy Forge's own ECS service, ECR repo, secrets and
+        EFS access point here, fronted by this ALB via a host-based
+        listener rule, with its own Route 53 record (current default).
+
+      "external" -- Forge is already deployed elsewhere. Set
+        `external_forge_url` to its browser-reachable HTTPS URL; no Forge
+        ECS/ALB/DNS resources are created by this stack.
+
+      "disabled" -- no Forge integration at all. `MPAPB_FORGE_URL` is left
+        unset and no Forge DNS record is created.
+  EOT
+  default     = "internal"
+  validation {
+    condition     = contains(["internal", "external", "disabled"], var.forge_deployment_mode)
+    error_message = "forge_deployment_mode must be one of: internal, external, disabled."
+  }
+}
+
+variable "external_forge_url" {
+  type        = string
+  description = "Browser-reachable HTTPS URL of an already-deployed Forge Journey Lab instance. Required when forge_deployment_mode = \"external\"; ignored otherwise."
+  default     = ""
+  validation {
+    condition     = var.forge_deployment_mode != "external" || var.external_forge_url != ""
+    error_message = "external_forge_url must be set when forge_deployment_mode = \"external\"."
+  }
+}
+
 variable "forge_package_s3_bucket" {
   type        = string
   description = <<-EOT
