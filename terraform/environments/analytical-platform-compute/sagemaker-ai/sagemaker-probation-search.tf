@@ -44,8 +44,8 @@ locals {
       }
       hmpps-probation-search-prod = {
         namespace                       = "hmpps-probation-search-prod"
-        instance_type                   = "ml.g5.xlarge"
-        min_instance_count              = 1
+        instance_type                   = "ml.g6.xlarge"
+        min_instance_count              = 4
         max_instance_count              = 4
         target_invocations_per_instance = 300
         repository_name                 = "tei"

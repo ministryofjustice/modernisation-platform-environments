@@ -146,6 +146,10 @@ locals {
 
       # remember to delete associated backup plan
       qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.autoscaling_group, {
+          desired_capacity = 0
+          max_size         = 0
+        })
         autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
