@@ -104,20 +104,20 @@ resource "aws_iam_role_policy_attachment" "deny_glue_s3_de_role" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
   count = local.is-test ? 0 : 1
 
-  role       = data.aws_iam_roles.data_engineering_roles[0].name
-  policy_arn = aws_iam_policy.deny_glue_s3.arn
+  role       = data.aws_iam_roles.data_engineering_roles[0].names
+  policy_arn = aws_iam_policy.deny_glue_s3[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "deny_glue_s3_cross_account_role" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
   role       = data.aws_iam_role.dataapi_cross_role.name
-  policy_arn = aws_iam_policy.deny_glue_s3.arn
+  policy_arn = aws_iam_policy.deny_glue_s3[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "deny_glue_s3_ae_role" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
   count = local.is-test || local.is-development ? 0 : 1
 
-  role       = data.aws_iam_roles.analytics_engineering_roles[0].name
-  policy_arn = aws_iam_policy.deny_glue_s3.arn
+  role       = data.aws_iam_roles.analytics_engineering_roles[0].names
+  policy_arn = aws_iam_policy.deny_glue_s3[0].arn
 }
