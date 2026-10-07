@@ -97,6 +97,13 @@ module "vpc" {
   database_subnets       = local.subnets.data
   database_subnet_suffix = "data"
 
+  # Private subnets need internet egress for calls to external (non-AWS) HTTPS
+  # endpoints that have no VPC interface endpoint equivalent, e.g. Forge Journey
+  # Lab's Entra ID OIDC token exchange with login.microsoftonline.com. A single
+  # NAT Gateway (rather than one per AZ) is used to minimise cost.
+  enable_nat_gateway = true
+  single_nat_gateway = true
+
   # Data gets its own route table so it does not inherit the private S3 endpoint route.
   create_database_subnet_route_table = true
 
