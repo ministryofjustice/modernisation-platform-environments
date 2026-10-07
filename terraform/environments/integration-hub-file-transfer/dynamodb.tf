@@ -17,6 +17,7 @@ module "dynamodb_adapter_idempotency" {
   server_side_encryption_enabled     = true
   server_side_encryption_kms_key_arn = module.kms_dynamodb.key_arn
   point_in_time_recovery_enabled     = true
+  deletion_protection_enabled        = true
   table_class                        = "STANDARD"
   ttl_attribute_name                 = "expiration"
   ttl_enabled                        = true
@@ -53,6 +54,7 @@ module "dynamodb_file_transfer_idempotency" {
   server_side_encryption_enabled     = true
   server_side_encryption_kms_key_arn = module.kms_dynamodb.key_arn
   point_in_time_recovery_enabled     = true
+  deletion_protection_enabled        = true
   table_class                        = "STANDARD"
   ttl_attribute_name                 = "expiration"
   ttl_enabled                        = true
