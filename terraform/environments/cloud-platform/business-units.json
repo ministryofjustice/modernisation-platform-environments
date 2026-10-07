@@ -1,0 +1,8 @@
+{
+  "business_units": {
+    "octo":  { "parent_group": "office-of-the-cto", "amp_workspace_alias": "container-platform-octo" },
+    "laa":   { "parent_group": "laa",                "amp_workspace_alias": "container-platform-laa" },
+    "hmpps": { "parent_group": "hmpps-developers",   "amp_workspace_alias": "container-platform-hmpps" },
+    "cd":    { "parent_group": "central-digital",    "amp_workspace_alias": "container-platform-cd" }
+  }
+}
