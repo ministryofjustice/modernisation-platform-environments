@@ -1,6 +1,13 @@
 locals {
   bu_accounts = jsondecode(file("${path.module}/../accounts.json"))
 
+  # Shared BU -> parent IdC group mapping, sourced from the single
+  # business-units.json consumed by this component, the root grafana component
+  # and cluster-core/ (cloud-platform#8558). octo->office-of-the-cto and
+  # cd->central-digital are inferred from child-team naming; hmpps/laa are exact
+  # (see ADR-002 "Groups in use"). JSON cannot carry this note, so it lives here.
+  business_units = jsondecode(file("${path.module}/../business-units.json")).business_units
+
   mp_environments = concat(
     [
       "cloud-platform-preproduction",
@@ -95,15 +102,10 @@ locals {
   container_platform_aws_group_id   = "7682a204-00f1-7031-257e-713bb28289c6"
 
   # BU parent group NAMES that receive read-only ArgoCD UI access, one per
-  # onboarded BU (matches local.bu_configs in cluster-core). See ADR-002
-  # "Groups in use" — octo→office-of-the-cto and cd→central-digital are inferred
-  # from child-team naming; hmpps/laa are exact.
-  argocd_viewer_bu_group_names = [
-    "office-of-the-cto", # octo
-    "laa",               # laa
-    "hmpps-developers",  # hmpps
-    "central-digital",   # cd
-  ]
+  # onboarded BU (matches local.bu_configs in cluster-core). Derived from the
+  # shared business-units.json (see local.business_units) so there is a single
+  # source of truth for the BU -> parent group mapping.
+  argocd_viewer_bu_group_names = [for bu in local.business_units : bu.parent_group]
 
   # Resolve group name -> IDC group ID (only on hubs, where the lookup runs).
   argocd_idc_group_id_by_name = local.enable_argocd ? {

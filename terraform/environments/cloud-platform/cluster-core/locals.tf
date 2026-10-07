@@ -1,6 +1,14 @@
 locals {
   bu_accounts = jsondecode(file("${path.module}/../accounts.json"))
 
+  # Shared BU -> parent IdC group mapping, sourced from the single
+  # business-units.json consumed by this component, the root grafana component
+  # and cluster/ (cloud-platform#8558). Each bu_configs[*].viewer_group is read
+  # from here. octo->office-of-the-cto and cd->central-digital are inferred from
+  # child-team naming; hmpps/laa are exact (see ADR-002 "Groups in use"). JSON
+  # cannot carry this note, so it lives here.
+  business_units = jsondecode(file("${path.module}/../business-units.json")).business_units
+
   mp_environments = concat(
     [
       "cloud-platform-preproduction",
@@ -66,36 +74,39 @@ locals {
   # the BU-user access model (ADR-002, cloud-platform#8548). The paired layer-1
   # VIEWER login mapping lives in the cluster component. Group NAMES are the
   # source of truth; IDs are resolved from ListGroups (see data.tf).
-  # NOTE: octo→office-of-the-cto and cd→central-digital are inferred from
-  # child-team naming; hmpps/laa are exact (see ADR-002 "Groups in use").
+  #
+  # viewer_group is sourced from the shared business-units.json
+  # (local.business_units) so the BU -> parent group mapping has a single source
+  # of truth. The clusters map stays inline here — cluster names are specific to
+  # this component.
   bu_configs = {
     octo = {
       clusters = {
         nonlive = "container-platform-octo-nonlive"
         live    = "container-platform-octo-live"
       }
-      viewer_group = "office-of-the-cto"
+      viewer_group = local.business_units["octo"].parent_group
     }
     laa = {
       clusters = {
         nonlive = "container-platform-laa-nonlive"
         live    = "container-platform-laa-live"
       }
-      viewer_group = "laa"
+      viewer_group = local.business_units["laa"].parent_group
     }
     hmpps = {
       clusters = {
         nonlive = "container-platform-hmpps-nonlive"
         live    = "container-platform-hmpps-live"
       }
-      viewer_group = "hmpps-developers"
+      viewer_group = local.business_units["hmpps"].parent_group
     }
     cd = {
       clusters = {
         nonlive = "container-platform-cd-nonlive"
         live    = "container-platform-cd-live"
       }
-      viewer_group = "central-digital"
+      viewer_group = local.business_units["cd"].parent_group
     }
   }
 
