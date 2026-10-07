@@ -409,7 +409,9 @@ resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
         ]
 
         Resource = [
-          aws_sfn_state_machine.downstream_reconciliation.arn,
+          module.merge_into_mdss_staged_position.arn,
+          module.merge_into_mdss_ac_position.arn,
+          module.merge_into_emdi_position.arn,
         ]
       },
     ]
