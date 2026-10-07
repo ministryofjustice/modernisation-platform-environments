@@ -33,9 +33,9 @@ module "iam_role_test_harness" {
 
   create          = local.create_test_harness
   use_name_prefix = false
-  name            = "${local.application_name}-${local.component_name}-${local.environment}"
+  name            = local.test_harness_iam_name
 
-  source_trust_policy_documents = local.create_test_harness ? [data.aws_iam_policy_document.test_harness_trust[0].json] : []
+  source_trust_policy_documents = local.test_harness_trust_policy_documents
 
   policies = {
     smoke_test = module.iam_policy_test_harness.arn
@@ -53,7 +53,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     actions = ["s3:PutObject"]
 
     resources = [
-      "${data.aws_s3_bucket.incoming[0].arn}/test-harness/push-to-s3/*"
+      "${data.aws_s3_bucket.incoming[0].arn}/${local.incoming_prefix}*"
     ]
   }
 
@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
       test     = "ArnLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
       values = [
-        "${data.aws_s3_bucket.incoming[0].arn}/test-harness/push-to-s3/*"
+        "${data.aws_s3_bucket.incoming[0].arn}/${local.incoming_prefix}*"
       ]
     }
   }
@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["push-to-s3/*"]
+      values   = ["${local.destination_prefix}*"]
     }
   }
 
@@ -95,7 +95,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     sid       = "ReadDeliveredFixture"
     effect    = "Allow"
     actions   = ["s3:GetObject"]
-    resources = ["${module.s3_test_harness.s3_bucket_arn}/push-to-s3/*"]
+    resources = ["${module.s3_test_harness.s3_bucket_arn}/${local.destination_prefix}*"]
   }
 
   statement {
@@ -113,7 +113,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     condition {
       test     = "ArnLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
-      values   = ["${module.s3_test_harness.s3_bucket_arn}/push-to-s3/*"]
+      values   = ["${module.s3_test_harness.s3_bucket_arn}/${local.destination_prefix}*"]
     }
   }
 }
@@ -124,7 +124,7 @@ module "iam_policy_test_harness" {
   version = "6.8.2"
 
   create      = local.create_test_harness
-  name        = "${local.application_name}-${local.component_name}-${local.environment}"
+  name        = local.test_harness_iam_name
   description = "Upload and verify Integration Hub repository smoke-test fixtures"
   policy      = local.create_test_harness ? data.aws_iam_policy_document.test_harness_permissions[0].json : null
 

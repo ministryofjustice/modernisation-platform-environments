@@ -4,7 +4,7 @@ module "s3_test_harness" {
   version = "5.16.1"
 
   create_bucket = local.create_test_harness
-  bucket        = "${local.application_name}-${local.environment}-${local.component_name}"
+  bucket        = local.destination_bucket_name
   force_destroy = false
 
   block_public_acls       = true
