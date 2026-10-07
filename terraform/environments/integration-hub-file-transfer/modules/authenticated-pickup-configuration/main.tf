@@ -1,8 +1,12 @@
 variable "environment" { type = string }
 
+module "transfer_identity" {
+  source = "../transfer-web-app-identity-configuration"
+}
+
 locals {
-  # Add only approved mappings. Prefixes are full clean-bucket prefixes ending in /.
-  # Do not store webhook credentials here. See the component README for onboarding.
+  # Add only approved prefix-to-group mappings. Webhooks live in Secrets Manager.
+  # Group names refer to the existing Transfer web app assignment catalogue.
   recipients_by_environment = {
     development   = {}
     test          = {}
@@ -17,11 +21,13 @@ output "recipients" {
     condition = alltrue([for id, recipient in local.recipients_by_environment[var.environment] :
       can(regex("^[a-z0-9]+(-[a-z0-9]+)*$", id)) &&
       can(regex("^[^/*?]+(/[^*?]*)?/$", recipient.prefix)) &&
-      length(recipient.principals) > 0 &&
-      alltrue([for principal in values(recipient.principals) :
-        contains(["USER", "GROUP"], principal.type) && length(principal.id) > 0
-      ])
+      length(recipient.groups) > 0 &&
+      alltrue([for group in recipient.groups : contains(keys(module.transfer_identity.groups), group)])
     ])
-    error_message = "Recipients need a safe ID, a non-root literal prefix ending in /, and explicit OIDC subject/group claim IDs."
+    error_message = "Recipients require a safe ID, a literal non-root clean prefix ending in /, and explicitly assigned Transfer web app groups."
   }
+}
+
+output "assigned_groups" {
+  value = module.transfer_identity.groups
 }

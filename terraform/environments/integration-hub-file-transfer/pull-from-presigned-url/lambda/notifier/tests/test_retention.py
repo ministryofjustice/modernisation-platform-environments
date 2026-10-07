@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import Mock
-from retention import Retainer, PART_SIZE, RETENTION_SECONDS
+from retention import Retainer, PART_SIZE, RETENTION_SECONDS, destination_key
 
 
 class RetentionTests(unittest.TestCase):
@@ -71,3 +71,27 @@ class RetentionTests(unittest.TestCase):
         self.s3.abort_multipart_upload.assert_called_once()
         self.s3.complete_multipart_upload.assert_not_called()
         self.table.put_item.assert_not_called()
+
+    def test_recipient_directories_isolate_same_filename(self):
+        first = destination_key("execution", self.data, {"recipient_id": "one"})
+        second = destination_key("execution", self.data, {"recipient_id": "two"})
+        self.assertEqual(first, "one/execution/file.txt")
+        self.assertEqual(second, "two/execution/file.txt")
+        self.assertNotEqual(first, second)
+
+    def test_separate_transfers_never_overwrite_same_filename(self):
+        self.assertNotEqual(destination_key("first", self.data, self.route),
+                            destination_key("second", self.data, self.route))
+
+    def test_legacy_unscoped_receipt_cannot_be_announced(self):
+        first = self.retainer.prepare("id", self.data, self.route, 100)
+        first["key"] = "id"
+        self.table.get_item.return_value = {"Item": first}
+        with self.assertRaises(ValueError): self.retainer.prepare("id", self.data, self.route, 200)
+
+    def test_dot_names_and_control_characters_are_safe_labels(self):
+        for name in (".", "..", ""):
+            self.data["object"]["key"] = "team/" + name
+            self.assertEqual(destination_key("id", self.data, self.route), "team/id/download")
+        self.data["object"]["key"] = "team/test\r\n.txt"
+        self.assertEqual(destination_key("id", self.data, self.route), "team/id/test.txt")

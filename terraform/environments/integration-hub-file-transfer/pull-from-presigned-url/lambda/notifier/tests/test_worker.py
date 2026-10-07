@@ -7,7 +7,7 @@ from worker import InvalidNotification, Store, message, post_slack, process
 NOW = 1790762400
 SECRET = "arn:aws:secretsmanager:eu-west-2:123456789012:secret:dispatch-abcdef"
 CONFIG = {"account": "123456789012", "queue_arn": "queue", "topic_arn": "topic",
-          "clean_bucket": "clean", "portal_url": "https://abc123.execute-api.eu-west-2.amazonaws.com",
+          "clean_bucket": "clean", "portal_url": "https://web.development.file-transfer.service.justice.gov.uk",
           "pickup_bucket": "pickup", "pickup_kms_key": "key", "routes": {SECRET: {"prefix": "products-poc/uploads/", "recipient_id": "products",
                                "webhook_secret_arn": "webhook-secret"}}}
 DATA = {"actionExecutionId": "8f2f1df5-a54d-4852-be34-a75781f80418",
@@ -33,6 +33,7 @@ class WorkerTests(unittest.TestCase):
             {"SecretString": json.dumps({"url": "https://hooks.slack.com/services/T/B/credential"})}]
         self.send = Mock()
         self.retainer = Mock()
+        self.retainer.prepare.return_value = {"bucket": "pickup", "key": "products/execution/test.txt"}
 
     def run_record(self, rec=None, config=None):
         return process(rec or record(), config or CONFIG, self.store, self.secrets, self.send, lambda: NOW, self.retainer)
@@ -42,7 +43,8 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(self.secrets.get_secret_value.call_args_list[0].kwargs,
                          {"SecretId": SECRET, "VersionId": "version1"})
         payload = self.send.call_args.args[1]
-        self.assertRegex(payload["blocks"][2]["elements"][0]["url"], "^" + CONFIG["portal_url"] + "/pickups/[a-f0-9]{64}$")
+        self.assertEqual(payload["blocks"][2]["elements"][0]["url"], CONFIG["portal_url"])
+        self.assertIn("pickup/products/execution/test.txt", payload["blocks"][1]["text"]["text"])
         self.retainer.prepare.assert_called_once()
         self.assertNotIn("X-Amz", json.dumps(payload))
         self.assertNotIn("credential", json.dumps(payload))
@@ -112,7 +114,7 @@ class WorkerTests(unittest.TestCase):
 
     def test_filename_is_plain_text(self):
         data=copy.deepcopy(DATA); data["object"]["key"]="products-poc/uploads/<https://evil.invalid|click> <!channel>"
-        payload=message(data,CONFIG["portal_url"])
+        payload=message(data,CONFIG["portal_url"], {"bucket": "pickup", "key": data["object"]["key"]})
         self.assertEqual(payload["blocks"][1]["text"]["type"],"plain_text")
         self.assertFalse(payload["unfurl_links"])
 

@@ -1,3 +1,7 @@
+module "transfer_web_app_identity_configuration" {
+  source = "./modules/transfer-web-app-identity-configuration"
+}
+
 data "aws_ssoadmin_instances" "this" {
   provider = aws.sso-readonly
 }
@@ -21,7 +25,5 @@ locals {
   }
 
   # GetGroupId does not reliably resolve groups by display name, so IDs are explicit here.
-  transfer_iam_identity_center_groups = {
-    integration-hub = "8662e2b4-3021-7017-56ba-8794aa2047cd"
-  }
+  transfer_iam_identity_center_groups = module.transfer_web_app_identity_configuration.groups
 }

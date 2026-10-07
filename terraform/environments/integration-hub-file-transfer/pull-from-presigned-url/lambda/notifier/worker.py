@@ -49,16 +49,16 @@ def validate(record, config, now):
     if age > MAX_EVENT_AGE:
         return None
     portal = config["portal_url"]
-    if not re.fullmatch(r"https://[a-z0-9]+\.execute-api\.eu-west-2\.amazonaws\.com", portal):
+    if not re.fullmatch(r"https://web(?:\.(?:development|test|preproduction))?\.file-transfer\.service\.justice\.gov\.uk", portal):
         raise InvalidNotification("Unexpected portal")
     key = hashlib.sha256(json.dumps([data["actionExecutionId"], ref["secretArn"],
                                     ref["secretVersionId"], route["recipient_id"]]).encode()).hexdigest()
     return data, route, key
 
 
-def message(data, portal):
+def message(data, portal, receipt):
     # User-controlled names belong in plain_text, not Slack markdown or link labels.
-    location = data["object"]["key"]
+    location = f"{receipt['bucket']}/{receipt['key']}"
     return {
         "text": "MFT: a clean file is available. Sign in to the MFT web app to download it.",
         "unfurl_links": False,
@@ -67,10 +67,10 @@ def message(data, portal):
             {"type": "section", "text": {"type": "plain_text", "text": "A clean file is available in MFT."}},
             {"type": "section", "text": {"type": "plain_text", "text": f"Location: {location}"[:2900]}},
             {"type": "actions", "elements": [{"type": "button", "action_id": "open_mft_pickup",
-                "text": {"type": "plain_text", "text": "Download file"}, "url": portal}]},
+                "text": {"type": "plain_text", "text": "Open MFT pickup"}, "url": portal}]},
             {"type": "context", "elements": [{"type": "plain_text", "text":
                 "Sign in with your organisation account. Access is limited to authorised recipients. "
-                "Collect within seven days. Download URLs last up to five minutes; reopen this link to retry."}]},
+                "Open the pickup location shown above. Files have seven-day lifecycle expiry; collect promptly."}]},
         ],
     }
 
@@ -109,9 +109,9 @@ def process(record, config, store, secrets, send=post_slack, clock=time.time, re
     # can send again after expiry; exactly-once delivery to Slack is not guaranteed.
     if retainer is None:
         raise InvalidNotification("Pickup retention is not configured")
-    retainer.prepare(key, data, route, now)
+    receipt = retainer.prepare(key, data, route, now)
     webhook = json.loads(secrets.get_secret_value(SecretId=route["webhook_secret_arn"])["SecretString"])
-    send(webhook["url"], message(data, config["portal_url"] + "/pickups/" + key))
+    send(webhook["url"], message(data, config["portal_url"], receipt))
     store.complete(key)
     return "sent"
 
