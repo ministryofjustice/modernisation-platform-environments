@@ -1,5 +1,5 @@
 ---
-name: Generate dependabot file 
+name: Generate dependabot file
 
 "on":
   schedule:
