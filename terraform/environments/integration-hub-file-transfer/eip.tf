@@ -7,4 +7,10 @@ resource "aws_eip" "this" {
       "Name" = "${local.application_name}-transfer-server-${count.index + 1}"
     }
   )
+
+  # Partners allow-list these addresses on their own firewalls; losing one
+  # would silently block every sender behind that firewall rule.
+  lifecycle {
+    prevent_destroy = true
+  }
 }
