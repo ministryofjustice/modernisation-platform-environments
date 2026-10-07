@@ -25,7 +25,7 @@ variable "bedrock_model_id" {
 variable "enable_oidc_auth" {
   type        = bool
   description = "Whether to provision Entra ID OIDC secrets (and, in a follow-up, wire the ALB `authenticate-oidc` listener action). Secrets are created empty by Terraform and populated out-of-band; see oidc.tf."
-  default     = false
+  default     = true
 }
 
 variable "oidc_configured" {
@@ -37,7 +37,7 @@ variable "oidc_configured" {
     first apply (secrets are created empty) and flip to true only after
     populating the values via ``aws secretsmanager put-secret-value``.
   EOT
-  default     = false
+  default     = true
 }
 
 variable "enable_in_app_oidc" {
@@ -58,9 +58,12 @@ variable "enable_in_app_oidc" {
     Requires ``enable_oidc_auth = true`` and ``oidc_configured = true`` so
     the underlying secrets exist and hold populated values.
 
-    Default false so switching to the in-app path is an explicit opt-in.
+    Default true now that development's secrets are populated; actual
+    activation is still gated to the development account only via
+    ``local.oidc_auto_enabled_environment`` in oidc.tf, so production is
+    unaffected until that gate is consciously removed/widened.
   EOT
-  default     = false
+  default     = true
 }
 
 variable "entra_admin_group_id" {
