@@ -6,7 +6,7 @@ module "kms_test_harness" {
   create = local.create_test_harness
 
   description             = "Encryption for the test harness delivery destination"
-  aliases                 = ["s3/${local.application_name}-${local.component_name}-${local.environment}-delivery"]
+  aliases                 = ["s3/${local.application_name}-${local.environment}-${local.component_name}"]
   enable_default_policy   = true
   enable_key_rotation     = true
   deletion_window_in_days = 30
@@ -14,9 +14,4 @@ module "kms_test_harness" {
   multi_region            = false
 
   tags = local.tags
-}
-
-moved {
-  from = module.destination-encryption
-  to   = module.kms_test_harness
 }

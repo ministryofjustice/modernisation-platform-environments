@@ -1,11 +1,3 @@
-locals {
-  lambda_dispatch_hash = sha256(jsonencode({
-    destinations    = local.authorised_destinations_by_secret
-    delivery_roles  = local.delivery_role_arns_by_secret
-    source_prefixes = local.source_prefixes_by_secret
-  }))
-}
-
 module "lambda_file_mover" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
@@ -29,7 +21,7 @@ module "lambda_file_mover" {
       "!(.*/)?[^/]+\\.pyc$",
     ]
   }]
-  hash_extra   = "file-mover-${local.lambda_dispatch_hash}"
+  hash_extra   = "file-mover"
   timeout      = 900
   tracing_mode = "Active"
 
@@ -159,7 +151,7 @@ module "lambda_dlq_reporter" {
       "!(.*/)?[^/]+\\.pyc$",
     ]
   }]
-  hash_extra   = "dlq-reporter-${local.lambda_dispatch_hash}"
+  hash_extra   = "dlq-reporter"
   timeout      = 60
   tracing_mode = "Active"
 

@@ -10,9 +10,9 @@ Smoke-test scripts and GitHub Actions workflow configuration are outside this co
 
 The harness uses the existing file-transfer pipeline rather than deploying a separate delivery pipeline:
 
-1. The harness role uploads a non-sensitive fixture beneath `test-harness/repo-smoke-test/direct-s3/` in the test incoming bucket.
+1. The harness role uploads a non-sensitive fixture beneath `test-harness/push-to-s3/` in the test incoming bucket.
 2. The parent file-transfer pipeline scans the file and routes the clean object through the shared dispatch configuration.
-3. The `push-to-s3` component assumes its delivery role and copies the clean object to the harness-owned destination beneath `delivered/repo-smoke-test/direct-s3/`.
+3. The `push-to-s3` component assumes its delivery role and copies the clean object to the harness-owned destination beneath `push-to-s3/`.
 4. The harness role downloads the delivered object and compares it with the original fixture.
 
 The harness role does not deliver files itself. A successful test requires the
@@ -21,14 +21,14 @@ parent pipeline and `push-to-s3` configuration to be deployed and authorised.
 ## Configuration contract
 
 The route belongs in the shared
-[`file-dispatch-configuration` module](../modules/file-dispatch-configuration/locals-test.tf), under the test environment's `test-harness` identity and `/repo-smoke-test/direct-s3/` source prefix. Its action is `push-to-s3`, with these destination settings:
+[`file-dispatch-configuration` module](../modules/file-dispatch-configuration/locals-test.tf), under the test environment's `test-harness` identity and `/push-to-s3/` source prefix. Its action is `push-to-s3`, with these destination settings:
 
 | Setting | Value |
 | --- | --- |
 | `bucket_id` | `integration-hub-file-transfer-test-test-harness` |
 | `bucket_region` | `eu-west-2` |
-| `destination_prefix` | `delivered/repo-smoke-test/direct-s3/` |
-| `kms_key_arn` | The key ARN resolved from `alias/s3/integration-hub-file-transfer-test-harness-test-delivery` |
+| `destination_prefix` | `push-to-s3/` |
+| `kms_key_arn` | The key ARN resolved from `alias/s3/integration-hub-file-transfer-test-test-harness` |
 
 This component exposes `destination_bucket_name` and `destination_kms_key_arn`.
 Use the deployed outputs to verify the shared route, especially after replacing
@@ -47,9 +47,9 @@ Resources are created only in the test environment. The smoke test uses:
 | Resource | Name or prefix |
 | --- | --- |
 | Incoming bucket | `integration-hub-file-transfer-test-incoming` |
-| Upload prefix | `test-harness/repo-smoke-test/direct-s3/` |
+| Upload prefix | `test-harness/push-to-s3/` |
 | Destination bucket | `integration-hub-file-transfer-test-test-harness` |
-| Delivery prefix | `delivered/repo-smoke-test/direct-s3/` |
+| Delivery prefix | `push-to-s3/` |
 
 GitHub OIDC trust is restricted to jobs using the `smoke-test` environment in
 `ministryofjustice/integration-hub`, with audience `sts.amazonaws.com`. The
@@ -87,8 +87,8 @@ the existing scanning and delivery pipeline. Use small, non-sensitive fixtures.
 Run only against `integration-hub-file-transfer-test` after deploying the
 components and configuring GitHub environment access.
 
-1. Upload a small, non-sensitive fixture to `integration-hub-file-transfer-test-incoming` at `test-harness/repo-smoke-test/direct-s3/<unique-run-token>/payload.txt`.
-2. Wait for `push-to-s3` delivery to the harness-owned destination at `delivered/repo-smoke-test/direct-s3/<unique-run-token>/payload.txt`.
+1. Upload a small, non-sensitive fixture to `integration-hub-file-transfer-test-incoming` at `test-harness/push-to-s3/<unique-run-token>/payload.txt`.
+2. Wait for `push-to-s3` delivery to the harness-owned destination at `push-to-s3/<unique-run-token>/payload.txt`.
 3. Download the delivered object and compare its contents with the fixture. Fail on timeout or content mismatch.
 
 Use a fresh run token for every execution to avoid matching stale files.

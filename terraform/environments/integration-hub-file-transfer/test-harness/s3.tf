@@ -65,8 +65,3 @@ module "s3_test_harness" {
 
   tags = local.tags
 }
-
-moved {
-  from = module.destination
-  to   = module.s3_test_harness
-}
