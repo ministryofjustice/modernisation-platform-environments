@@ -5,6 +5,8 @@ locals {
   # Rates are matched against modelId by substring, one match per group of models sharing a rate:
   # sonnet-5 covers 5 and 5.5, sonnet-4 covers 4/4.5/4.6, opus-4 covers 4.5/4.6/4.8. Opus 5.5 is
   # cheaper than Opus 5 and "opus-5" also matches "opus-5-5", so the 5.5 hit is subtracted back out.
+  # Haiku 5.5 is the one model priced by prompt length rather than a flat rate: prompts over 100k
+  # tokens cost 5x, so its rates are the sub-100k ones scaled by h55_tier.
   # A model with no match here costs 0, so check the by-model widget for rows with calls but no cost.
   bedrock_cost_fields = <<-QUERY
     | fields coalesce(requestMetadata.user, identity.arn) as user
@@ -13,14 +15,17 @@ locals {
              strcontains(modelId, "opus-4") as m_opus4,
              strcontains(modelId, "sonnet-5") as m_sonnet5,
              strcontains(modelId, "sonnet-4") as m_sonnet4,
+             strcontains(modelId, "haiku-5-5") as m_haiku55,
              strcontains(modelId, "haiku-4-5") as m_haiku45,
              strcontains(modelId, "haiku-3-5") as m_haiku35,
              strcontains(modelId, "fable-5") as m_fable5
     | fields m_opus5_any - m_opus55 as m_opus5
-    | fields m_opus55 * 4.4 + (m_opus5 + m_opus4) * 5.5 + m_sonnet5 * 2.2 + m_sonnet4 * 3.3 + m_haiku45 * 1.1 + m_haiku35 * 0.88 + m_fable5 * 11 as r_in,
-             m_opus55 * 5.5 + (m_opus5 + m_opus4) * 6.875 + m_sonnet5 * 2.75 + m_sonnet4 * 4.125 + m_haiku45 * 1.375 + m_haiku35 * 1.1 + m_fable5 * 13.75 as r_cw,
-             m_opus55 * 0.22 + (m_opus5 + m_opus4) * 0.55 + m_sonnet5 * 0.22 + m_sonnet4 * 0.33 + m_haiku45 * 0.11 + m_haiku35 * 0.088 + m_fable5 * 1.1 as r_cr,
-             m_opus55 * 22 + (m_opus5 + m_opus4) * 27.5 + m_sonnet5 * 11 + m_sonnet4 * 16.5 + m_haiku45 * 5.5 + m_haiku35 * 4.4 + m_fable5 * 55 as r_out
+    | fields input.inputTokenCount + coalesce(input.cacheReadInputTokenCount, 0) + coalesce(input.cacheWriteInputTokenCount, 0) as prompt_len
+    | fields (prompt_len > 100000) * 4 + 1 as h55_tier
+    | fields m_opus55 * 4.4 + (m_opus5 + m_opus4) * 5.5 + m_sonnet5 * 2.2 + m_sonnet4 * 3.3 + m_haiku55 * h55_tier * 0.11 + m_haiku45 * 1.1 + m_haiku35 * 0.88 + m_fable5 * 11 as r_in,
+             m_opus55 * 5.5 + (m_opus5 + m_opus4) * 6.875 + m_sonnet5 * 2.75 + m_sonnet4 * 4.125 + m_haiku55 * h55_tier * 0.1375 + m_haiku45 * 1.375 + m_haiku35 * 1.1 + m_fable5 * 13.75 as r_cw,
+             m_opus55 * 0.22 + (m_opus5 + m_opus4) * 0.55 + m_sonnet5 * 0.22 + m_sonnet4 * 0.33 + m_haiku55 * h55_tier * 0.011 + m_haiku45 * 0.11 + m_haiku35 * 0.088 + m_fable5 * 1.1 as r_cr,
+             m_opus55 * 22 + (m_opus5 + m_opus4) * 27.5 + m_sonnet5 * 11 + m_sonnet4 * 16.5 + m_haiku55 * h55_tier * 0.55 + m_haiku45 * 5.5 + m_haiku35 * 4.4 + m_fable5 * 55 as r_out
     | fields input.inputTokenCount * r_in as c_in,
              input.cacheWriteInputTokenCount * r_cw as c_cw,
              input.cacheReadInputTokenCount * r_cr as c_cr,
