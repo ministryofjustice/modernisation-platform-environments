@@ -201,7 +201,7 @@ resource "helm_release" "fluent_bit" {
             store_dir_limit_size     2G
             storage.total_limit_size 2G
 
-          [OUTPUT]
+        [OUTPUT]
             Name                cloudwatch_logs
             Match               kube.*
             Region              ${data.aws_region.current.region}
@@ -211,6 +211,8 @@ resource "helm_release" "fluent_bit" {
             Log_Stream_Template $kubernetes['pod_name'].$kubernetes['container_name']
             Auto_Create_Group   On
             Log_Retention_Days  30
+            Retry_Limit         False
+            storage.total_limit_size 2G
       EOT
     }
   })]
