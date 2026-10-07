@@ -1,8 +1,8 @@
 {
   "accounts": {
     "development": {
-      "ebs_size_app_app": 100,
-      "ebs_size_app_inst": 50,
+      "ebs_size_app_app": 200,
+      "ebs_size_app_inst": 100,
       "ebs_size_db_app": 50,
       "ebs_size_db_inst": 50,
       "ebs_size_db_dbf": 200,
