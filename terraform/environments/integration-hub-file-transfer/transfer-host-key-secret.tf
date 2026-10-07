@@ -34,7 +34,7 @@ module "secrets_transfer_host_key" {
     }
   }
 
-  secret_string = "REPLACE_WITH_SSH_HOST_KEY_PEM_BODY"
+  secret_string = "placeholder"
 }
 
 # Reads back whatever value is currently in the secret. The host key
