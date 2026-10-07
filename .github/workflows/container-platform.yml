@@ -21,7 +21,6 @@ name: container-platform
       - '.github/workflows/reusable_terraform_components_plan_apply.yml'
 
 permissions:
-  id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
 jobs:
@@ -32,6 +31,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - id: set-matrix
         run: |
           json="["
@@ -43,6 +44,8 @@ jobs:
 
   # Fetched once here and passed down to avoid hitting rate limits from repeated calls in the reusable workflows below
   fetch-secrets:
+    permissions:
+      id-token: write
     uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
@@ -50,6 +53,9 @@ jobs:
 
   terraform-pr:
     needs: [setup, fetch-secrets]
+    permissions:
+      contents: read
+      id-token: write
     if: github.event_name == 'pull_request'
     strategy:
       fail-fast: false
@@ -70,6 +76,9 @@ jobs:
 
   terraform-main:
     needs: [setup, fetch-secrets]
+    permissions:
+      contents: read
+      id-token: write
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false

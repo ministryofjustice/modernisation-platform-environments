@@ -99,14 +99,18 @@ jobs:
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
       - name: Set Environment Variables
+        id: set-github-token
         run: |
           echo "GITHUB_TOKEN=$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" >> $GITHUB_ENV
+          echo "github_token=$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" >> "$GITHUB_OUTPUT"
 
       - name: Get AWS Account Number
+        id: get-account
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
+          echo "account_number=${ACCOUNT_NUMBER}" >> "$GITHUB_OUTPUT"
 
       - name: Get Backend AWS Account Number
         run: |
@@ -117,7 +121,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd  # v6.3.0
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-environments-read-only"
+          role-to-assume: "arn:aws:iam::${{ steps.get-account.outputs.account_number }}:role/github-actions-environments-read-only"
           role-session-name: githubactionsrolesession
           aws-region: "eu-west-2"
 
@@ -190,15 +194,20 @@ jobs:
           bash "${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh" tfplan.json
 
       - name: Create Plan PR message (Optional)
+        id: create-plan-message
         if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
         env:
           WORKSPACE_NAME: ${{ env.WORKSPACE_NAME }}
+          EVENT_NAME: ${{ github.event_name }}
+          RUN_NUMBER: ${{ github.run_number }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           comment() {
-            url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            url="https://github.com/${REPOSITORY}/actions/runs/${RUN_ID}"
             len=$(cat tfplan.txt | wc -c)
-            echo '**`$WORKSPACE_NAME`** terraform plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('${url}')'
+            printf '**`%s`** terraform plan on `%s` event [#%s](%s)\n' "${WORKSPACE_NAME}" "${EVENT_NAME}" "${RUN_NUMBER}" "${url}"
             echo
             echo '```'
             head -c 65476 tfplan.txt | sed -n '/Terraform will perform/,$p'
@@ -208,9 +217,12 @@ jobs:
               echo "** Truncated output.  See $url for the rest **"
             fi
           }
-          echo 'TF_PLAN_OUT<<EOF' >> "$GITHUB_ENV"
-          comment >> "$GITHUB_ENV"
-          echo 'EOF' >> "$GITHUB_ENV"
+          delimiter="PLAN_MESSAGE_$(date +%s%N)_${RANDOM}"
+          {
+            echo "plan_message<<${delimiter}"
+            comment
+            echo "${delimiter}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Hide Previous PR comment (Optional)
         if: ${{ github.event_name == 'pull_request' }}
@@ -225,14 +237,16 @@ jobs:
       - name: Post Plan to PR (Optional)
         if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
         env:
-          message: ${{ env.TF_PLAN_OUT }}
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          message: ${{ steps.create-plan-message.outputs.plan_message }}
+          GITHUB_TOKEN: ${{ steps.set-github-token.outputs.github_token }}
+          REPOSITORY: ${{ github.repository }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           escaped_message=$(echo "$message" | jq -Rsa .)
           curl -sS -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            "https://api.github.com/repos/${REPOSITORY}/issues/${PULL_REQUEST_NUMBER}/comments" \
             -d '{"body":'"${escaped_message}"'}'
 
       - name: Check for Approval
@@ -240,7 +254,7 @@ jobs:
         if: github.event_name == 'pull_request' && steps.evaluate_terraform_plan.outputs.resources_found == 'true'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
-          github-token: ${{ env.GITHUB_TOKEN }}
+          github-token: ${{ steps.set-github-token.outputs.github_token }}
           script: |
             const orgName = 'ministryofjustice';
             const teamSlug = 'modernisation-platform';
@@ -278,7 +292,7 @@ jobs:
         if: failure() && github.event_name == 'pull_request' && steps.check_approval.outcome == 'failure'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
-          github-token: ${{ env.GITHUB_TOKEN }}
+          github-token: ${{ steps.set-github-token.outputs.github_token }}
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
@@ -313,10 +327,12 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Get AWS Account Number
+        id: get-account
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
+          echo "account_number=${ACCOUNT_NUMBER}" >> "$GITHUB_OUTPUT"
 
       - name: Get Backend AWS Account Number
         run: |
@@ -325,19 +341,21 @@ jobs:
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> "$GITHUB_ENV"
 
       - name: Select AWS role based on environment
+        id: select-aws-role
         run: |
           # Use github-actions role on main branch, dev-test role otherwise
           if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo "OIDC_ROLE_NAME=github-actions" >> "$GITHUB_ENV"
+            OIDC_ROLE_NAME=github-actions
           else
-            echo "OIDC_ROLE_NAME=github-actions-environments-dev-test" >> "$GITHUB_ENV"
+            OIDC_ROLE_NAME=github-actions-environments-dev-test
           fi
-          echo "Role to be used: ${{ env.OIDC_ROLE_NAME }}"
+          echo "Role to be used: ${OIDC_ROLE_NAME}"
+          echo "oidc_role_name=${OIDC_ROLE_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd  # v6.3.0
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/${{ env.OIDC_ROLE_NAME }}"
+          role-to-assume: "arn:aws:iam::${{ steps.get-account.outputs.account_number }}:role/${{ steps.select-aws-role.outputs.oidc_role_name }}"
           role-session-name: githubactionsrolesession
           aws-region: "eu-west-2"
 
