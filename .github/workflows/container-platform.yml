@@ -39,7 +39,7 @@ jobs:
             env="${account##*-}"
             json+="{\"environment\":\"$env\",\"account_name\":\"$account\"},"
           done < <(jq -r '.accounts[]' terraform/environments/cloud-platform/accounts.json)
-          echo "matrix=${json%,}]" >> $GITHUB_OUTPUT
+          echo "matrix=${json%,}]" >> "$GITHUB_OUTPUT"
 
   # Fetched once here and passed down to avoid hitting rate limits from repeated calls in the reusable workflows below
   fetch-secrets:

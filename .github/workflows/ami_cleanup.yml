@@ -58,9 +58,9 @@ jobs:
           done
           sed -i '$ s/,$//' matrix.json
           echo ']}' >> matrix.json
-          echo 'matrix<<EOF' >> $GITHUB_OUTPUT
-          cat matrix.json >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
+          echo 'matrix<<EOF' >> "$GITHUB_OUTPUT"
+          cat matrix.json >> "$GITHUB_OUTPUT"
+          echo 'EOF' >> "$GITHUB_OUTPUT"
 
   fetch-secrets:
     name: Fetch ENV management secrets
@@ -83,6 +83,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -114,7 +116,7 @@ jobs:
           fi
 
           echo "::add-mask::$ACCOUNT_NUMBER"
-          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
 
       - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
@@ -327,6 +329,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -351,7 +355,7 @@ jobs:
           ACCOUNT_NAME="${{ matrix.account_name }}"
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
-          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
 
       - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
@@ -363,8 +367,8 @@ jobs:
       - name: Enable minute-based LIVE test window (optional)
         if: env.LIVE_TEST_MODE == 'true'
         run: |
-          echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
-          echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
+          echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> "$GITHUB_ENV"
+          echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> "$GITHUB_ENV"
           echo "LIVE_TEST_MODE=true → minute-based window enabled (${AGE_MINUTES}m)."
 
       - name: Live window note
@@ -448,7 +452,7 @@ jobs:
           echo "🗑️ AMI — LIVE DELETE"
           if [[ ! -s ami_commands.sh ]]; then
             echo "No AMI commands to execute after guard."
-            echo "deleted=0" >> $GITHUB_OUTPUT
+            echo "deleted=0" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           echo "First 20 deregistration commands:"
@@ -457,7 +461,7 @@ jobs:
           bash ami_commands.sh
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "✅ Deleted AMIs: ${TOTAL}"
-          echo "deleted=${TOTAL}" >> $GITHUB_OUTPUT
+          echo "deleted=${TOTAL}" >> "$GITHUB_OUTPUT"
           AMI_DELETED_IDS="$(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u || true)"
           if [[ -n "$AMI_DELETED_IDS" && -f reports/ami_snapshot_map.csv ]]; then
             printf "%s\n" $AMI_DELETED_IDS > deleted_amis_ids.tmp
@@ -584,6 +588,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -608,7 +614,7 @@ jobs:
           ACCOUNT_NAME="${{ matrix.account_name }}"
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
-          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> "$GITHUB_ENV"
 
       - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
@@ -620,8 +626,8 @@ jobs:
       - name: Enable minute-based LIVE test window (optional)
         if: env.LIVE_TEST_MODE == 'true'
         run: |
-          echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
-          echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
+          echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> "$GITHUB_ENV"
+          echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> "$GITHUB_ENV"
           echo "LIVE_TEST_MODE=true → minute-based window enabled (${AGE_MINUTES}m)."
 
       - name: Live window note
@@ -656,7 +662,7 @@ jobs:
           done
           COUNT="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
           echo "✅ Deleted EBS volumes: ${COUNT}"
-          echo "deleted=${COUNT}" >> $GITHUB_OUTPUT
+          echo "deleted=${COUNT}" >> "$GITHUB_OUTPUT"
 
       - name: Upload EBS Live Artifacts (reports only)
         if: always()
