@@ -35,13 +35,13 @@ module "iam_role_pickup_access_grants" {
 
 module "iam_policy_pickup_access_grants" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  source        = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version       = "6.8.2"
-  create_policy = length(local.recipients) > 0
-  name          = "${local.pattern_name}-reader"
-  description   = "Read retained files using identity-scoped S3 Access Grants"
-  policy        = data.aws_iam_policy_document.pickup_access.json
-  tags          = local.tags
+  source      = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version     = "6.8.2"
+  create      = length(local.recipients) > 0
+  name        = "${local.pattern_name}-reader"
+  description = "Read retained files using identity-scoped S3 Access Grants"
+  policy      = data.aws_iam_policy_document.pickup_access.json
+  tags        = local.tags
 }
 
 data "aws_iam_policy_document" "pickup_access" {
