@@ -21,9 +21,15 @@ locals {
 # secrets.tf -- Terraform never sees the plaintext). Consumed by the UI task
 # (ecs.tf's `secrets` block) when in-app OIDC is enabled, or by the ALB
 # listener (load-balancer.tf) if the ALB-owned path is wired instead.
+# Also shared with Forge Journey Lab (forge-journey-lab.tf) -- both use the
+# same Entra app registration, so there is only one set of secrets to
+# populate, not one per component.
+locals {
+  entra_oidc_secrets_needed = var.enable_oidc_auth || local.forge_internal
+}
 
 resource "aws_secretsmanager_secret" "entra_oidc_tenant_id" {
-  count = var.enable_oidc_auth ? 1 : 0
+  count = local.entra_oidc_secrets_needed ? 1 : 0
 
   # checkov:skip=CKV2_AWS_57:Value is owned by the Entra app registration;
   # rotation is coordinated on the IdP side, not via Secrets Manager's
@@ -31,13 +37,13 @@ resource "aws_secretsmanager_secret" "entra_oidc_tenant_id" {
   # checkov:skip=CKV_AWS_149:AWS-managed Secrets Manager encryption is
   # proportionate for this prototype migration.
   name                    = "${local.application_name}-ui/entra-oidc-tenant-id"
-  description             = "Microsoft Entra tenant ID for the builder UI. Populate manually after apply."
+  description             = "Microsoft Entra tenant ID, shared by the builder UI and Forge Journey Lab. Populate manually after apply."
   recovery_window_in_days = 7
   tags                    = local.tags
 }
 
 resource "aws_secretsmanager_secret" "entra_oidc_client_id" {
-  count = var.enable_oidc_auth ? 1 : 0
+  count = local.entra_oidc_secrets_needed ? 1 : 0
 
   # checkov:skip=CKV2_AWS_57:Value is owned by the Entra app registration;
   # rotation is coordinated on the IdP side, not via Secrets Manager's
@@ -45,13 +51,13 @@ resource "aws_secretsmanager_secret" "entra_oidc_client_id" {
   # checkov:skip=CKV_AWS_149:AWS-managed Secrets Manager encryption is
   # proportionate for this prototype migration.
   name                    = "${local.application_name}-ui/entra-oidc-client-id"
-  description             = "Microsoft Entra application (client) ID for the builder UI. Populate manually after apply."
+  description             = "Microsoft Entra application (client) ID, shared by the builder UI and Forge Journey Lab. Populate manually after apply."
   recovery_window_in_days = 7
   tags                    = local.tags
 }
 
 resource "aws_secretsmanager_secret" "entra_oidc_client_secret" {
-  count = var.enable_oidc_auth ? 1 : 0
+  count = local.entra_oidc_secrets_needed ? 1 : 0
 
   # checkov:skip=CKV2_AWS_57:Value is owned by the Entra app registration;
   # rotation is coordinated on the IdP side, not via Secrets Manager's
@@ -59,7 +65,7 @@ resource "aws_secretsmanager_secret" "entra_oidc_client_secret" {
   # checkov:skip=CKV_AWS_149:AWS-managed Secrets Manager encryption is
   # proportionate for this prototype migration.
   name                    = "${local.application_name}-ui/entra-oidc-client-secret"
-  description             = "Microsoft Entra application client secret for the builder UI. Populate manually after apply."
+  description             = "Microsoft Entra application client secret, shared by the builder UI and Forge Journey Lab. Populate manually after apply."
   recovery_window_in_days = 7
   tags                    = local.tags
 }

@@ -52,33 +52,9 @@ resource "aws_secretsmanager_secret_version" "forge_session_secret" {
   }
 }
 
-locals {
-  forge_entra_secrets = local.forge_internal ? {
-    tenant_id = {
-      environment_name = "ENTRA_TENANT_ID"
-      description      = "Microsoft Entra tenant ID for Forge Journey Lab"
-    }
-    client_id = {
-      environment_name = "ENTRA_CLIENT_ID"
-      description      = "Microsoft Entra application client ID for Forge Journey Lab"
-    }
-    client_secret = {
-      environment_name = "ENTRA_CLIENT_SECRET"
-      description      = "Microsoft Entra application client secret for Forge Journey Lab"
-    }
-  } : {}
-}
-
-resource "aws_secretsmanager_secret" "forge_entra" {
-  for_each = local.forge_entra_secrets
-
-  # checkov:skip=CKV2_AWS_57:Values are managed and rotated from the externally owned Entra application.
-  # checkov:skip=CKV_AWS_149:AWS-managed Secrets Manager encryption is proportionate for this prototype.
-  name                    = "${local.forge_secret_path_prefix}/entra-${replace(each.key, "_", "-")}"
-  description             = each.value.description
-  recovery_window_in_days = 7
-  tags                    = local.tags
-}
+# Forge Journey Lab uses the same Entra app registration as the UI, so it
+# reads the shared aws_secretsmanager_secret.entra_oidc_* secrets (oidc.tf)
+# rather than keeping its own copies.
 
 resource "aws_iam_role" "forge_ecs_task_execution" {
   count = local.forge_internal ? 1 : 0
@@ -102,10 +78,12 @@ data "aws_iam_policy_document" "forge_ecs_task_execution_secrets" {
     sid     = "ReadForgeSecrets"
     effect  = "Allow"
     actions = ["secretsmanager:GetSecretValue"]
-    resources = concat(
-      [aws_secretsmanager_secret.forge_session_secret[0].arn],
-      [for secret in aws_secretsmanager_secret.forge_entra : secret.arn]
-    )
+    resources = [
+      aws_secretsmanager_secret.forge_session_secret[0].arn,
+      aws_secretsmanager_secret.entra_oidc_tenant_id[0].arn,
+      aws_secretsmanager_secret.entra_oidc_client_id[0].arn,
+      aws_secretsmanager_secret.entra_oidc_client_secret[0].arn,
+    ]
   }
 }
 
@@ -409,13 +387,12 @@ resource "aws_ecs_task_definition" "forge" {
         { name = "TRUST_PROXY_HOPS", value = "1" },
       ]
 
-      secrets = concat(
-        [{ name = "SESSION_SECRET", valueFrom = aws_secretsmanager_secret.forge_session_secret[0].arn }],
-        [for key, secret in aws_secretsmanager_secret.forge_entra : {
-          name      = local.forge_entra_secrets[key].environment_name
-          valueFrom = secret.arn
-        }]
-      )
+      secrets = [
+        { name = "SESSION_SECRET", valueFrom = aws_secretsmanager_secret.forge_session_secret[0].arn },
+        { name = "ENTRA_TENANT_ID", valueFrom = aws_secretsmanager_secret.entra_oidc_tenant_id[0].arn },
+        { name = "ENTRA_CLIENT_ID", valueFrom = aws_secretsmanager_secret.entra_oidc_client_id[0].arn },
+        { name = "ENTRA_CLIENT_SECRET", valueFrom = aws_secretsmanager_secret.entra_oidc_client_secret[0].arn },
+      ]
 
       mountPoints = [{
         sourceVolume  = "data"
@@ -503,6 +480,10 @@ output "forge_url" {
 }
 
 output "forge_entra_secret_arns" {
-  description = "Secrets Manager ARNs to populate with the Forge Entra application values. Empty unless forge_deployment_mode = \"internal\"."
-  value       = { for key, secret in aws_secretsmanager_secret.forge_entra : key => secret.arn }
+  description = "Secrets Manager ARNs to populate with the Entra application values, shared between the UI and Forge Journey Lab. Empty unless forge_deployment_mode = \"internal\" or var.enable_oidc_auth."
+  value = {
+    tenant_id     = try(aws_secretsmanager_secret.entra_oidc_tenant_id[0].arn, "")
+    client_id     = try(aws_secretsmanager_secret.entra_oidc_client_id[0].arn, "")
+    client_secret = try(aws_secretsmanager_secret.entra_oidc_client_secret[0].arn, "")
+  }
 }
