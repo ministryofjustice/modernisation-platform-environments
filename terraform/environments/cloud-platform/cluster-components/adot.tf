@@ -77,7 +77,7 @@ resource "kubernetes_cluster_role_v1" "adot_collector" {
   }
 
   rule {
-    non_resource_urls = ["/metrics", "/metrics/cadvisor"]
+    non_resource_urls = ["/metrics", "/metrics/cadvisor", "/metrics/resource"]
     verbs             = ["get"]
   }
 
@@ -130,116 +130,9 @@ resource "kubectl_manifest" "adot_collector" {
                 scrape_interval = "60s"
                 scrape_timeout  = "15s"
               }
-              scrape_configs = [
-                {
-                  job_name = "kubernetes-nodes-cadvisor"
-                  scheme   = "https"
-                  tls_config = {
-                    ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-                    insecure_skip_verify = true
-                  }
-                  bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-                  kubernetes_sd_configs = [
-                    { role = "node" }
-                  ]
-                  relabel_configs = [
-                    {
-                      action = "labelmap"
-                      regex  = "__meta_kubernetes_node_label_(.+)"
-                    },
-                    {
-                      target_label = "__address__"
-                      replacement  = "kubernetes.default.svc:443"
-                    },
-                    {
-                      source_labels = ["__meta_kubernetes_node_name"]
-                      regex         = "(.+)"
-                      target_label  = "__metrics_path__"
-                      replacement   = "/api/v1/nodes/$1/proxy/metrics/cadvisor"
-                    }
-                  ]
-                },
-                {
-                  job_name = "kubernetes-pods"
-                  kubernetes_sd_configs = [
-                    { role = "pod" }
-                  ]
-                  relabel_configs = [
-                    {
-                      source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
-                      action        = "keep"
-                      regex         = "true"
-                    },
-                    {
-                      source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_path"]
-                      action        = "replace"
-                      target_label  = "__metrics_path__"
-                      regex         = "(.+)"
-                    },
-                    {
-                      source_labels = ["__address__", "__meta_kubernetes_pod_annotation_prometheus_io_port"]
-                      action        = "replace"
-                      regex         = "([^:]+)(?::\\d+)?;(\\d+)"
-                      replacement   = "$1:$2"
-                      target_label  = "__address__"
-                    },
-                    {
-                      action = "labelmap"
-                      regex  = "__meta_kubernetes_pod_label_(.+)"
-                    },
-                    {
-                      source_labels = ["__meta_kubernetes_namespace"]
-                      action        = "replace"
-                      target_label  = "namespace"
-                    },
-                    {
-                      source_labels = ["__meta_kubernetes_pod_name"]
-                      action        = "replace"
-                      target_label  = "pod"
-                    }
-                  ]
-                },
-                {
-                  job_name = "kubernetes-service-endpoints"
-                  kubernetes_sd_configs = [
-                    { role = "endpoints" }
-                  ]
-                  relabel_configs = [
-                    {
-                      source_labels = ["__meta_kubernetes_service_annotation_prometheus_io_scrape"]
-                      action        = "keep"
-                      regex         = "true"
-                    },
-                    {
-                      source_labels = ["__meta_kubernetes_service_annotation_prometheus_io_path"]
-                      action        = "replace"
-                      target_label  = "__metrics_path__"
-                      regex         = "(.+)"
-                    },
-                    {
-                      source_labels = ["__address__", "__meta_kubernetes_service_annotation_prometheus_io_port"]
-                      action        = "replace"
-                      regex         = "([^:]+)(?::\\d+)?;(\\d+)"
-                      replacement   = "$1:$2"
-                      target_label  = "__address__"
-                    },
-                    {
-                      action = "labelmap"
-                      regex  = "__meta_kubernetes_service_label_(.+)"
-                    },
-                    {
-                      source_labels = ["__meta_kubernetes_namespace"]
-                      action        = "replace"
-                      target_label  = "namespace"
-                    },
-                    {
-                      source_labels = ["__meta_kubernetes_service_name"]
-                      action        = "replace"
-                      target_label  = "service"
-                    }
-                  ]
-                }
-              ]
+              # Scrape jobs are defined as named locals in adot-scrape-config.tf
+              # and composed into this list there.
+              scrape_configs = local.adot_scrape_configs
             }
           }
         }

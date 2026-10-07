@@ -88,6 +88,7 @@ module "domain_builder_backend_db" {
   db_instance_class  = local.rds_dbuilder_inst_class
   master_user        = local.rds_dbuilder_user
   storage_type       = local.rds_dbuilder_store_type
+  engine_version     = local.rds_dbuilder_engine_version
   parameter_group    = local.rds_dbuilder_parameter_group
   ca_cert_identifier = "rds-ca-rsa2048-g1" # Updated on 29th July 2024
 
