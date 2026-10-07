@@ -1,7 +1,7 @@
 ---
 name: terraform plan apply
 
-on:
+"on":
   workflow_call:
     inputs:
       application:
@@ -287,7 +287,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      
+
       - name: Decrypt Secrets
         uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
         with:
