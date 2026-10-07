@@ -78,6 +78,7 @@ locals {
     "states",
     "sync-states",
     "secretsmanager",
+    "bedrock-runtime",
   ]
 
 }
