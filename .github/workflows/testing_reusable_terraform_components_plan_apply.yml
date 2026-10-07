@@ -59,7 +59,7 @@ concurrency:
   group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
 jobs:
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@6a78b87ea8e63646ec10701857c70cb2487738ab # v6.2.7
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
