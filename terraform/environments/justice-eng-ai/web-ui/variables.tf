@@ -109,6 +109,12 @@ variable "container_image_tag" {
   default     = "latest"
 }
 
+variable "forge_container_image_tag" {
+  type        = string
+  description = "Image tag to run for the Forge Journey Lab container, pulled from the same shared-services ECR repository as the UI image (e.g. a forge-build-<sha> tag)."
+  default     = "latest"
+}
+
 variable "app_container_port" {
   type        = number
   description = "Port exposed by the UI container."

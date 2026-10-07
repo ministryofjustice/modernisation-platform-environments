@@ -7,69 +7,20 @@ locals {
     var.forge_deployment_mode == "external" ? var.external_forge_url :
     ""
   )
-  forge_name                = "forge-journey-lab"
-  forge_ecr_repository_name = "${local.application_name}-${local.forge_name}"
+  forge_name = "forge-journey-lab"
+  # Secrets Manager path prefix only -- the image itself lives in the shared
+  # ECR repository used by the UI (ecs.tf), built/pushed centrally.
+  forge_secret_path_prefix = "${local.application_name}-${local.forge_name}"
   # Per-environment hostname comes from application_variables.json (see
   # local.application_data in platform_locals.tf) so dev and prod stay distinct.
   # Only used for real when forge_internal -- see local.forge_url above for
   # what the UI actually gets handed as MPAPB_FORGE_URL.
-  forge_hostname            = local.application_data.accounts[local.environment].forge_hostname
-  forge_container_image_tag = "latest"
-  forge_container_port      = 3000
-  forge_task_cpu            = 1024
-  forge_task_memory         = 2048
-  forge_desired_count       = 1
-}
-
-resource "aws_ecr_repository" "forge" {
-  count = local.forge_internal ? 1 : 0
-
-  # checkov:skip=CKV_AWS_51:MUTABLE supports a convenience latest tag alongside immutable commit SHA tags.
-  # checkov:skip=CKV_AWS_136:Single-account prototype images use AWS-managed ECR encryption.
-  name                 = local.forge_ecr_repository_name
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  encryption_configuration {
-    encryption_type = "AES256"
-  }
-
-  tags = local.tags
-}
-
-resource "aws_ecr_lifecycle_policy" "forge" {
-  count = local.forge_internal ? 1 : 0
-
-  repository = aws_ecr_repository.forge[0].name
-  policy = jsonencode({
-    rules = [
-      {
-        rulePriority = 1
-        description  = "Expire untagged images after 14 days"
-        selection = {
-          tagStatus   = "untagged"
-          countType   = "sinceImagePushed"
-          countUnit   = "days"
-          countNumber = 14
-        }
-        action = { type = "expire" }
-      },
-      {
-        rulePriority = 2
-        description  = "Keep the latest 30 tagged images"
-        selection = {
-          tagStatus      = "tagged"
-          tagPatternList = ["*"]
-          countType      = "imageCountMoreThan"
-          countNumber    = 30
-        }
-        action = { type = "expire" }
-      }
-    ]
-  })
+  forge_hostname           = local.application_data.accounts[local.environment].forge_hostname
+  forge_ecr_repository_url = local.ui_ecr_repository_url
+  forge_container_port     = 3000
+  forge_task_cpu           = 1024
+  forge_task_memory        = 2048
+  forge_desired_count      = 1
 }
 
 resource "random_password" "forge_session_secret" {
@@ -84,7 +35,7 @@ resource "aws_secretsmanager_secret" "forge_session_secret" {
 
   # checkov:skip=CKV2_AWS_57:Rotation is coordinated with an ECS restart to avoid invalidating active sessions mid-request.
   # checkov:skip=CKV_AWS_149:AWS-managed Secrets Manager encryption is proportionate for this prototype.
-  name                    = "${local.forge_ecr_repository_name}/session-secret"
+  name                    = "${local.forge_secret_path_prefix}/session-secret"
   description             = "Express session signing secret for Forge Journey Lab"
   recovery_window_in_days = 7
   tags                    = local.tags
@@ -123,7 +74,7 @@ resource "aws_secretsmanager_secret" "forge_entra" {
 
   # checkov:skip=CKV2_AWS_57:Values are managed and rotated from the externally owned Entra application.
   # checkov:skip=CKV_AWS_149:AWS-managed Secrets Manager encryption is proportionate for this prototype.
-  name                    = "${local.forge_ecr_repository_name}/entra-${replace(each.key, "_", "-")}"
+  name                    = "${local.forge_secret_path_prefix}/entra-${replace(each.key, "_", "-")}"
   description             = each.value.description
   recovery_window_in_days = 7
   tags                    = local.tags
@@ -425,7 +376,7 @@ resource "aws_ecs_task_definition" "forge" {
   container_definitions = jsonencode([
     {
       name                   = "forge"
-      image                  = "${aws_ecr_repository.forge[0].repository_url}:${local.forge_container_image_tag}"
+      image                  = "${local.forge_ecr_repository_url}:${var.forge_container_image_tag}"
       essential              = true
       readonlyRootFilesystem = true
       user                   = "1000:1000"
@@ -542,8 +493,8 @@ resource "aws_ecs_service" "forge" {
 }
 
 output "forge_ecr_repository_url" {
-  description = "ECR repository URL for the Forge Journey Lab image. Empty unless forge_deployment_mode = \"internal\"."
-  value       = try(aws_ecr_repository.forge[0].repository_url, "")
+  description = "Shared-services ECR repository URL the Forge Journey Lab image is pulled from. Empty unless forge_deployment_mode = \"internal\"."
+  value       = local.forge_internal ? local.forge_ecr_repository_url : ""
 }
 
 output "forge_url" {
