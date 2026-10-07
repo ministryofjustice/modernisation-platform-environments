@@ -41,8 +41,11 @@ locals {
   nacl_ephemeral_in = { rule_number = 1000, rule_action = "allow", protocol = "tcp", from_port = 1024, to_port = 65535, cidr_block = "0.0.0.0/0" }
   nacl_all_out      = { rule_number = 1000, rule_action = "allow", protocol = "-1", from_port = 0, to_port = 0, cidr_block = "0.0.0.0/0" }
 
+  # The NAT Gateway lives in the public subnets and re-maps outbound connections to
+  # ephemeral source ports, so return traffic needs the ephemeral range allowed inbound
+  # here too (not just 443), or it gets silently dropped by this stateless NACL.
   nacl_inbound_rules = {
-    public             = concat(local.nacl_peer_rules.public, [local.nacl_deny_vpc, local.nacl_https])
+    public             = concat(local.nacl_peer_rules.public, [local.nacl_deny_vpc, local.nacl_https, merge(local.nacl_ephemeral_in, { rule_number = 1010 })])
     private            = concat(local.nacl_peer_rules.private, [local.nacl_deny_vpc, local.nacl_ephemeral_in])
     data               = local.nacl_peer_rules.data
     public_prototypes  = concat(local.nacl_peer_rules.public_prototypes, [local.nacl_deny_vpc, local.nacl_https])
