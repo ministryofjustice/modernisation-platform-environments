@@ -44,8 +44,11 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     test = {
-      litellm_version     = "1.101.0"
-      ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
+      litellm_version           = "1.101.0"
+      litellm_image_repository  = "docker.io/litellmenterprise/litellm"
+      litellm_image_tag         = "1.101.5-enterprise"
+      litellm_image_pull_secret = "litellm-enterprise-pull"
+      ai_gateway_hostname       = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
