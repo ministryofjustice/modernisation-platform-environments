@@ -5,6 +5,11 @@ image:
   repository: ${imageRepository}
   tag: ${imageTag}
 
+%{ if imagePullSecret != "" ~}
+imagePullSecrets:
+  - name: ${imagePullSecret}
+
+%{ endif ~}
 nameOverride: "litellm-admin"
 
 service:
@@ -169,8 +174,15 @@ extraInitContainers:
     command: ["sh", "-c"]
     args:
       - |
-        cp -r /var/lib/litellm/ui/* /app/var/litellm/ui/ && \
-        cp -r /var/lib/litellm/assets/* /app/var/litellm/assets/
+        set -eu
+        if [ -d /var/lib/litellm/ui ] && [ -d /var/lib/litellm/assets ]; then
+          cp -R /var/lib/litellm/ui/. /app/var/litellm/ui/
+          cp -R /var/lib/litellm/assets/. /app/var/litellm/assets/
+        else
+          proxy_dir=$(python -c 'import importlib.util; from pathlib import Path; print(Path(importlib.util.find_spec("litellm").origin).parent / "proxy")')
+          cp -R "$proxy_dir/_experimental/out/." /app/var/litellm/ui/
+          cp "$proxy_dir/logo.jpg" "$proxy_dir/logo_dark.png" /app/var/litellm/assets/
+        fi
     volumeMounts:
       - name: ui
         mountPath: /app/var/litellm/ui
