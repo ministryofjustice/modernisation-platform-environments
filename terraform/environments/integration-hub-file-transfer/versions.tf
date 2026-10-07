@@ -1,12 +1,9 @@
 terraform {
   required_providers {
     aws = {
-      # >= 6.16.0 for aws_transfer_host_key, used to import the SFTP host key
-      # held in Secrets Manager (see transfer-host-key-secret.tf).
       version = ">= 6.16.0, < 7.0.0"
       source  = "hashicorp/aws"
     }
-    # Retained until the Lambda resources have been removed from state.
     external = {
       version = "2.4.2"
       source  = "hashicorp/external"
