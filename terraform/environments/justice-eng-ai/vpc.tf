@@ -77,6 +77,7 @@ locals {
     "ecr.dkr",
     "states",
     "sync-states",
+    "secretsmanager",
   ]
 
 }
