@@ -18,36 +18,12 @@ data "aws_vpc" "shared" {
   }
 }
 
-data "aws_subnets" "shared-data" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${local.application_name}-${local.environment}-data*"
-  }
-}
-
-data "aws_subnets" "shared-private" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${local.application_name}-${local.environment}-private*"
-  }
-}
-
-data "aws_subnets" "shared-public" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${local.application_name}-${local.environment}-public*"
-  }
-}
-
+# Exact per-AZ lookups rather than a wildcard "tier*" tag match -- the
+# parent root also has public_prototypes/private_prototypes tiers whose
+# Name tags (e.g. "...-public-prototypes-eu-west-2a") start with the same
+# "public"/"private" prefix, so a wildcard match pulls in those subnets too
+# and gives the ALB two subnets in the same AZ ("cannot be attached to
+# multiple subnets in the same Availability Zone").
 data "aws_subnet" "private_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
@@ -66,6 +42,27 @@ data "aws_subnet" "private_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
     "Name" = "${local.application_name}-${local.environment}-private-${data.aws_region.current.region}c"
+  }
+}
+
+data "aws_subnet" "public_subnets_a" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${local.application_name}-${local.environment}-public-${data.aws_region.current.region}a"
+  }
+}
+
+data "aws_subnet" "public_subnets_b" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${local.application_name}-${local.environment}-public-${data.aws_region.current.region}b"
+  }
+}
+
+data "aws_subnet" "public_subnets_c" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${local.application_name}-${local.environment}-public-${data.aws_region.current.region}c"
   }
 }
 

@@ -142,7 +142,7 @@ resource "aws_ecs_task_definition" "app" {
         },
         {
           name  = "MPAPB_FORGE_URL"
-          value = "https://${local.forge_hostname}"
+          value = local.forge_url
         },
         # In-app Entra OIDC feature flag. When true (see local.in_app_oidc_
         # enabled) the app runs its own login handshake and the ALB

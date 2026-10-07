@@ -19,7 +19,7 @@ output "route53_zone_name_servers" {
 
 resource "aws_acm_certificate" "site_eu_west_2" {
   domain_name               = local.builder_hostname
-  subject_alternative_names = [local.forge_hostname]
+  subject_alternative_names = local.forge_internal ? [local.forge_hostname] : []
   validation_method         = "DNS"
   tags                      = local.tags
 
@@ -63,6 +63,8 @@ resource "aws_route53_record" "builder" {
 }
 
 resource "aws_route53_record" "forge" {
+  count = local.forge_internal ? 1 : 0
+
   zone_id = aws_route53_zone.app.zone_id
   name    = local.forge_hostname
   type    = "A"
