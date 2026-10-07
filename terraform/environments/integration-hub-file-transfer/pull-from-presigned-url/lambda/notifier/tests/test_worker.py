@@ -29,7 +29,7 @@ class WorkerTests(unittest.TestCase):
         self.store.claim.return_value = True
         self.secrets = Mock()
         self.secrets.get_secret_value.side_effect = [
-            {"SecretString": json.dumps({"notifications": {"slack": {"type": "authenticated-pickup", "recipient": "products"}}})},
+            {"SecretString": json.dumps({"notifications": {"slack": "products"}})},
             {"SecretString": json.dumps({"url": "https://hooks.slack.com/services/T/B/credential"})}]
         self.send = Mock()
         self.retainer = Mock()
@@ -51,7 +51,7 @@ class WorkerTests(unittest.TestCase):
         self.store.complete.assert_called_once()
 
     def test_untrusted_objects_rejected_before_secret_read(self):
-        for change in ({"bucket": "quarantine"}, {"bucket": "investigation"}, {"versionId": ""},
+        for change in ({"bucket": "quarantine"}, {"bucket": "investigation"}, {"versionId": ""}, {"versionId": "null"}, {"versionId": 1},
                        {"key": "products-poc/uploads-other/test.txt"}, {"key": "another-client/test.txt"}):
             with self.subTest(change=change):
                 data = copy.deepcopy(DATA); data["object"].update(change)
@@ -71,7 +71,7 @@ class WorkerTests(unittest.TestCase):
         self.secrets.get_secret_value.assert_not_called()
 
     def test_wrong_recipient_rejected(self):
-        self.secrets.get_secret_value.side_effect = [{"SecretString": json.dumps({"notifications": {"slack": {"type": "authenticated-pickup", "recipient": "other"}}})}]
+        self.secrets.get_secret_value.side_effect = [{"SecretString": json.dumps({"notifications": {"slack": "other"}})}]
         with self.assertRaises(InvalidNotification): self.run_record()
         self.store.claim.assert_not_called()
 

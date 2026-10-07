@@ -21,6 +21,8 @@ class RetentionTests(unittest.TestCase):
         args = self.s3.copy_object.call_args.kwargs
         self.assertEqual(args["CopySource"]["VersionId"], "clean-v1")
         self.assertEqual(args["MetadataDirective"], "REPLACE")
+        self.assertEqual(args["TaggingDirective"], "REPLACE")
+        self.assertNotIn("Tagging", args)
         self.assertEqual(args["ContentDisposition"], "attachment")
 
     def test_retry_reuses_receipt_without_copy_or_retention_extension(self):
@@ -95,3 +97,17 @@ class RetentionTests(unittest.TestCase):
             self.assertEqual(destination_key("id", self.data, self.route), "team/id/download")
         self.data["object"]["key"] = "team/test\r\n.txt"
         self.assertEqual(destination_key("id", self.data, self.route), "team/id/test.txt")
+
+    def test_null_source_version_never_reaches_s3(self):
+        self.data["object"]["versionId"] = "null"
+        with self.assertRaises(ValueError): self.retainer.prepare("id", self.data, self.route, 100)
+        self.s3.head_object.assert_not_called()
+        self.s3.copy_object.assert_not_called()
+
+    def test_long_ascii_and_unicode_filenames_fit_s3_byte_limit(self):
+        for filename in ("a" * 1019, "文" * 339):
+            self.data["object"]["key"] = "team/" + filename
+            key = destination_key("a" * 64, self.data, self.route)
+            self.assertLessEqual(len(key.encode("utf-8")), 1024)
+            self.assertTrue(key.startswith("team/" + "a" * 64 + "/"))
+            self.assertEqual(key.encode("utf-8").decode("utf-8"), key)

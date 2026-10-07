@@ -33,10 +33,10 @@ def validate(record, config, now):
         raise InvalidNotification("Slack not requested")
     ref = data["configurationReference"]
     route = config["routes"].get(ref["secretArn"])
-    if not route or not ref.get("secretVersionId"):
+    if not route or (not isinstance(ref.get("secretVersionId"), str) or ref["secretVersionId"] in ("", "null")):
         raise InvalidNotification("Unknown configuration")
     obj = data["object"]
-    if (obj.get("bucket") != config["clean_bucket"] or not obj.get("versionId")
+    if (obj.get("bucket") != config["clean_bucket"] or (not isinstance(obj.get("versionId"), str) or obj["versionId"] in ("", "null"))
             or not isinstance(obj.get("key"), str) or not obj["key"].startswith(route["prefix"])):
         raise InvalidNotification("Object outside authorised clean prefix")
     requested = datetime.fromisoformat(data["requestedAt"].replace("Z", "+00:00"))
@@ -100,8 +100,7 @@ def process(record, config, store, secrets, send=post_slack, clock=time.time, re
     ref = data["configurationReference"]
     dispatch = json.loads(secrets.get_secret_value(SecretId=ref["secretArn"],
                           VersionId=ref["secretVersionId"])["SecretString"])
-    if dispatch.get("notifications", {}).get("slack") != {
-            "type": "authenticated-pickup", "recipient": route["recipient_id"]}:
+    if dispatch.get("notifications", {}).get("slack") != route["recipient_id"]:
         raise InvalidNotification("Dispatch recipient mismatch")
     if not store.claim(key, now):
         return "duplicate"
