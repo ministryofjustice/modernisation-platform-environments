@@ -1,3 +1,8 @@
+output "service_arn" {
+  value       = try(module.ecs_service[0].service_arn, null)
+  description = "The ARN for the ECS Service"
+}
+
 output "target_group_arn" {
   value = try(aws_lb_target_group.frontend[0].arn, null)
 }

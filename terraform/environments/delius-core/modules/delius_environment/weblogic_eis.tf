@@ -185,3 +185,24 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
   }
 }
 
+locals {
+  weblogic_eis_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_arn}/${var.env_name}-weblogic-eis"
+  weblogic_eis_task_count = {
+    dev     = 1
+    test    = 1
+    stage   = 0
+    preprod = 2
+    prod    = 2
+  }
+}
+
+module "ecs_nightly_restart_weblogic_eis" {
+  count  = var.env_name == "dev" ? 1 : 0
+  source = "../components/ecs_nightly_restart"
+
+  env_name     = var.env_name
+  cluster_name = module.ecs.ecs_cluster_arn
+  service_name = "${var.env_name}-weblogic-eis"
+  service_arn  = local.weblogic_eis_service_arn
+  task_count   = local.weblogic_eis_task_count[var.env_name]
+}
