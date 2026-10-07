@@ -226,7 +226,7 @@ locals {
                   type = "fixed-response"
                   fixed_response = {
                     content_type = "text/html"
-                    message_body = templatefile("templates/eol.html.tftpl", local.lb_eol_message_production)
+                    message_body = file("templates/eol.html")
                     status_code  = "200"
                   }
                 }]
