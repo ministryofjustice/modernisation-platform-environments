@@ -126,7 +126,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_443" {
   cidr_ipv4         = each.value
 }
 
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_443" {
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_cp_443" {
 
   security_group_id = aws_security_group.ecs_tasks_connector.id
   description       = "Connector ECS tasks egress to CP BC"
