@@ -66,9 +66,16 @@ data "archive_file" "nightly_restart_lambda_zip" {
 }
 
 resource "aws_lambda_function" "nightly_restart_lambda" {
+  #checkov:skip=CKV_AWS_117: "VPC not required - Lambda only calls AWS APIs via service endpoints"
+  #checkov:skip=CKV_AWS_173: "Env Vars are not sensitive"
+  #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
+  #checkov:skip=CKV_AWS_116: "DLQ not required"
+  #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
+  
   function_name    = local.lambda_name
+  description      = "Lambda function to restart the ${var.service_name} ECS service nightly"
   role             = aws_iam_role.lambda_role.arn
-  runtime          = "python3.8"
+  runtime          = "python3.14"
   handler          = "lambda.handler"
   filename         = data.archive_file.nightly_restart_lambda_zip.output_path
   source_code_hash = filebase64sha256(data.archive_file.nightly_restart_lambda_zip.output_path)

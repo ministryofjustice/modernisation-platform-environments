@@ -195,3 +195,18 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_testdata_a
     target_group_arn = module.weblogic_testdata_api[0].target_group_arn
   }
 }
+
+locals {
+  weblogic_data_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic-data"
+}
+
+module "ecs_nightly_restart_weblogic_data" {
+  count = var.env_name == "test" ? 1 : 0
+  source = "../components/ecs_nightly_restart"
+
+  env_name     = var.env_name
+  cluster_name = module.ecs.ecs_cluster_arn
+  service_name = "${var.env_name}-weblogic-data"
+  service_arn  = local.weblogic_data_service_arn
+  task_count   = 1
+}

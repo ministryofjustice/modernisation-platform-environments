@@ -313,7 +313,7 @@ resource "aws_lb_listener_certificate" "legacy_prod" {
 }
 
 locals {
-  weblogic_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_arn}/${var.env_name}-weblogic"
+  weblogic_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic"
   weblogic_task_count = {
     dev     = 1
     test    = 4
@@ -324,7 +324,6 @@ locals {
 }
 
 module "ecs_nightly_restart_weblogic" {
-  count  = var.env_name == "dev" ? 1 : 0
   source = "../components/ecs_nightly_restart"
 
   env_name     = var.env_name
