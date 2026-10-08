@@ -113,7 +113,7 @@ resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_cp_443" {
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
-  cidr_ipv4         = local.application_data.accounts[local.environment].cloud_platform_cidr
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_mysql" {
