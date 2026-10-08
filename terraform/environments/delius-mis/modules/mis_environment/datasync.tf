@@ -184,7 +184,7 @@ resource "aws_cloudwatch_event_rule" "datasync_password_updater" {
       eventSource = ["secretsmanager.amazonaws.com"]
       eventName   = ["PutSecretValue", "UpdateSecret", "RotationSucceeded"]
       additionalEventData = {
-        SecretId = [data.aws_secretsmanager_secret.datasync_ad_admin_password.arn]
+        SecretId = [data.aws_secretsmanager_secret.datasync_ad_admin_password[0].arn]
       }
     }
   })
