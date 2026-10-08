@@ -13,7 +13,9 @@ locals {
   # bucket un-managed by this root -- see its description), but falls back
   # to the backend-processing root's staging bucket, now that one exists in
   # every account, rather than requiring every environment to set it.
-  forge_package_s3_bucket = var.forge_package_s3_bucket != "" ? var.forge_package_s3_bucket : data.terraform_remote_state.backend_processing.outputs.staging_bucket_name
+  # try() guards against backend-processing not having been applied with
+  # its staging_bucket_name output yet -- remove once it has been.
+  forge_package_s3_bucket = var.forge_package_s3_bucket != "" ? var.forge_package_s3_bucket : try(data.terraform_remote_state.backend_processing.outputs.staging_bucket_name, "")
 
   # Private subnets for ECS/EFS, sourced from the shared-VPC lookups
   # defined in platform_data.tf (data.aws_vpc.shared et al).
