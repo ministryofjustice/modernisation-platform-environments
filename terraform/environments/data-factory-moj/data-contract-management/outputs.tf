@@ -88,3 +88,19 @@ output "generation_ecr_repository_url" {
     aws_ecr_repository.schema_generation[0].repository_url
   ) : null
 }
+
+output "generation_sources" {
+  description = "Schema generation resource references, grouped by source."
+  value = {
+    for source_key, generation in module.schema_generation :
+    source_key => {
+      function_name      = generation.function_name
+      function_arn       = generation.function_arn
+      execution_role_arn = generation.execution_role_arn
+      log_group_name     = generation.log_group_name
+      failure_queue_url  = generation.failure_queue_url
+      failure_queue_arn  = generation.failure_queue_arn
+      alarm_arns         = generation.alarm_arns
+    }
+  }
+}

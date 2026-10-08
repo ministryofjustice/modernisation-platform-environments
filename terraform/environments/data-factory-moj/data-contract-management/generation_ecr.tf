@@ -47,7 +47,7 @@ data "aws_iam_policy_document" "generation_image_access" {
       test     = "ArnLike"
       variable = "aws:SourceArn"
       values = [
-        "arn:${data.aws_partition.current.partition}:lambda:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:function:${local.generation_name_prefix}-*",
+        "arn:${data.aws_partition.current.partition}:lambda:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:function:${local.generation_function_prefix}-*",
       ]
     }
   }
