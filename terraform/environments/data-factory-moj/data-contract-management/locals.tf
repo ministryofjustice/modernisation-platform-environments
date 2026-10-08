@@ -1,7 +1,8 @@
 locals {
   contract_management_enabled = local.is-development
 
-  registration_name = "${local.application_name}-${local.environment}-contracts"
+  registration_name      = "${local.application_name}-${local.environment}-contracts"
+  generation_name_prefix = "${local.application_name}-${local.environment}-contract-generation"
 
   registration_image_uri = lookup(
     var.registration_image_uris,

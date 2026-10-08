@@ -75,3 +75,16 @@ output "registration_alarm_arns" {
   ) : null
 }
 
+output "generation_ecr_repository_name" {
+  description = "Repository name for the schema generation runtime image."
+  value = local.contract_management_enabled ? (
+    aws_ecr_repository.schema_generation[0].name
+  ) : null
+}
+
+output "generation_ecr_repository_url" {
+  description = "Repository URL used to publish the schema generation runtime image."
+  value = local.contract_management_enabled ? (
+    aws_ecr_repository.schema_generation[0].repository_url
+  ) : null
+}
