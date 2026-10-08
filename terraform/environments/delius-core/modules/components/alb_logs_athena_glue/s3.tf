@@ -15,7 +15,6 @@ module "s3_bucket" {
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
-
   statement {
     sid     = "EnforceTLSv12orHigher"
     effect  = "Deny"
@@ -45,32 +44,26 @@ data "aws_iam_policy_document" "bucket_policy" {
       "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-connection/AWSLogs/${var.account_id}/*"
     ]
     principals {
-      type        = "AWS"
-      identifiers = [data.aws_elb_service_account.default.arn]
+      type        = "Service"
+      identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
     }
   }
 
   statement {
+    sid    = "AllowALBLogDelivery"
     effect = "Allow"
-    sid    = "AWSLogDeliveryWrite"
     actions = [
       "s3:PutObject"
     ]
-    resources = [
-      "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-access/AWSLogs/*",
-      "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-connection/AWSLogs/*"
-    ]
-    condition {
-      test     = "StringEquals"
-      variable = "s3:x-amz-acl"
 
-      values = [
-        "bucket-owner-full-control"
-      ]
-    }
+    resources = [
+      "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-access/AWSLogs/${var.account_id}/*",
+      "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-connection/AWSLogs/${var.account_id}/*"
+    ]
+
     principals {
       type        = "Service"
-      identifiers = ["delivery.logs.amazonaws.com"]
+      identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
     }
   }
 
@@ -85,7 +78,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
     principals {
       type        = "Service"
-      identifiers = ["delivery.logs.amazonaws.com"]
+      identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
     }
   }
 }
