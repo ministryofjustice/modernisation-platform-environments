@@ -3,13 +3,13 @@ module "s3_bucket" {
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
-  sse_algorithm        = "AES256"
-  bucket_prefix        = "${var.application_name}-lb-logs"
-  bucket_policy        = [data.aws_iam_policy_document.bucket_policy.json]
-  replication_enabled  = false
-  versioning_enabled   = var.s3_versioning
-  force_destroy        = var.force_destroy_bucket
-  lifecycle_rule       = var.access_logs_lifecycle_rule
+  sse_algorithm       = "AES256"
+  bucket_prefix       = "${local.name}-lb-logs"
+  bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
+  replication_enabled = false
+  versioning_enabled  = var.s3_versioning
+  force_destroy       = var.force_destroy_bucket
+  lifecycle_rule      = var.access_logs_lifecycle_rule
 
   tags = { backup = false }
 }
@@ -41,8 +41,8 @@ data "aws_iam_policy_document" "bucket_policy" {
       "s3:PutObject"
     ]
     resources = [
-      "${module.weblogic_alb_access_logs.bucket.arn}/weblogic-${var.env_name}-access/AWSLogs/${var.account_number}/*",
-      "${module.weblogic_alb_access_logs.bucket.arn}/weblogic-${var.env_name}-connection/AWSLogs/${var.account_number}/*"
+      "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-access/AWSLogs/${var.account_id}/*",
+      "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-connection/AWSLogs/${var.account_id}/*"
     ]
     principals {
       type        = "AWS"

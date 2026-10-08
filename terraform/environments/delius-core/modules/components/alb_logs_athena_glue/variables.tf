@@ -1,3 +1,13 @@
+variable "account_id" {
+  description = "The AWS account number"
+  type        = string
+}
+
+variable "account_region" {
+  description = "The AWS region"
+  type        = string
+}
+
 variable "env_name" {
   description = "The name of the env where file system is being created"
   type        = string
@@ -7,14 +17,6 @@ variable "app_name" {
   description = "The name of the application"
   type        = string
 }
-
-variable "alb_bucket_name" {
-  description = "The name of the S3 bucket to store ALB logs"
-  type        = string
-}
-
-
-
 
 variable "s3_versioning" {
   type        = bool
