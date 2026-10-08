@@ -10,6 +10,7 @@ module "lambda_file_mover" {
   description                       = "Deliver clean files to isolated hosted pickup buckets"
   function_name                     = local.pattern_name
   handler                           = "handler.lambda_handler"
+  ignore_source_code_hash           = true
   memory_size                       = 512
   role_name                         = local.lambda_role_name
   runtime                           = "python3.12"
@@ -161,6 +162,7 @@ module "lambda_dlq_reporter" {
   description                       = "Report terminal hosted pickup pipeline failures"
   function_name                     = "${local.application_name}-${local.component_name}-dlq"
   handler                           = "reporter_handler.lambda_handler"
+  ignore_source_code_hash           = true
   memory_size                       = 256
   role_name                         = "${local.application_name}-${local.component_name}-dlq"
   runtime                           = "python3.12"
