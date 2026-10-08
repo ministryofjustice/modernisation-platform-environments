@@ -91,7 +91,7 @@ output "generation_ecr_repository_url" {
 
 output "generation_sources" {
   description = "Schema generation resource references, grouped by source."
-  value = {
+  value = local.contract_management_enabled ? {
     for source_key, generation in module.schema_generation :
     source_key => {
       function_name      = generation.function_name
@@ -102,5 +102,5 @@ output "generation_sources" {
       failure_queue_arn  = generation.failure_queue_arn
       alarm_arns         = generation.alarm_arns
     }
-  }
+  } : null
 }
