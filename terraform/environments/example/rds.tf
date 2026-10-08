@@ -57,13 +57,13 @@
    vpc_id      = data.aws_vpc.shared.id
  }
  resource "aws_security_group_rule" "rds_example_ingress_cp3_octo_nonlive" {
-  description       = "container-platform-octo-nonlive nodes"
-  type              = "ingress"
-  from_port         = 3306
-  to_port           = 3306
-  protocol          = "tcp"
-  security_group_id = aws_security_group.rds-example.id
-  cidr_blocks       = ["10.195.48.0/20"]
+   description       = "container-platform-octo-nonlive nodes"
+   type              = "ingress"
+   from_port         = 3306
+   to_port           = 3306
+   protocol          = "tcp"
+   security_group_id = aws_security_group.rds-example.id
+   cidr_blocks       = ["10.195.48.0/20"]
  }
  resource "aws_iam_role" "rds_enhanced_monitoring" {
    assume_role_policy = data.aws_iam_policy_document.rds_enhanced_monitoring[0].json
