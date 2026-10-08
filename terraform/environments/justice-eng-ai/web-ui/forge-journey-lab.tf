@@ -167,12 +167,13 @@ resource "aws_iam_role_policy_attachment" "forge_ecs_task_efs" {
   policy_arn = aws_iam_policy.forge_ecs_task_efs[0].arn
 }
 
-# Grant Forge's task role PutObject on the artefact bucket when configured.
-# The bucket itself is created out-of-band (see var.forge_package_s3_bucket);
-# this policy is gated on the variable being set, and on Forge actually being
-# deployed here, so turning either off cleanly removes the IAM.
+# Grant Forge's task role PutObject on the artefact bucket. The bucket
+# itself is created out-of-band (see local.forge_package_s3_bucket in
+# locals.tf, which defaults to the backend-processing root's staging
+# bucket); this policy is gated on Forge actually being deployed here, so
+# turning that off cleanly removes the IAM.
 locals {
-  forge_package_s3_enabled = local.forge_internal && var.forge_package_s3_bucket != ""
+  forge_package_s3_enabled = local.forge_internal && local.forge_package_s3_bucket != ""
 }
 
 data "aws_iam_policy_document" "forge_ecs_task_package_s3" {
@@ -182,7 +183,7 @@ data "aws_iam_policy_document" "forge_ecs_task_package_s3" {
     sid       = "WriteForgePackages"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
-    resources = ["arn:${data.aws_partition.current.partition}:s3:::${var.forge_package_s3_bucket}/${var.forge_package_s3_prefix}*"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${local.forge_package_s3_bucket}/${var.forge_package_s3_prefix}*"]
   }
 
   # SSE-KMS buckets require GenerateDataKey + Decrypt on the KMS key S3 uses
@@ -204,7 +205,7 @@ data "aws_iam_policy_document" "forge_ecs_task_package_s3" {
 resource "aws_iam_policy" "forge_ecs_task_package_s3" {
   count       = local.forge_package_s3_enabled ? 1 : 0
   name        = "${local.forge_name}-ecs-task-package-s3"
-  description = "Allow Forge Journey Lab to write packaged build artefacts to the S3 bucket referenced by var.forge_package_s3_bucket."
+  description = "Allow Forge Journey Lab to write packaged build artefacts to the S3 bucket referenced by local.forge_package_s3_bucket."
   policy      = data.aws_iam_policy_document.forge_ecs_task_package_s3[0].json
   tags        = local.tags
 }
@@ -374,7 +375,7 @@ resource "aws_ecs_task_definition" "forge" {
         { name = "ENTRA_AUTH_ENABLED", value = "true" },
         { name = "ENTRA_POST_LOGOUT_REDIRECT_URI", value = "https://${local.forge_hostname}/" },
         { name = "ENTRA_REDIRECT_URI", value = "https://${local.forge_hostname}/auth/callback" },
-        { name = "FORGE_PACKAGE_S3_BUCKET", value = var.forge_package_s3_bucket },
+        { name = "FORGE_PACKAGE_S3_BUCKET", value = local.forge_package_s3_bucket },
         { name = "FORGE_PACKAGE_S3_PREFIX", value = var.forge_package_s3_prefix },
         { name = "FORGE_PACKAGE_S3_REGION", value = data.aws_region.current.region },
         { name = "LLM_MODEL", value = var.bedrock_model_id },

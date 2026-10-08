@@ -9,6 +9,12 @@ locals {
   # distinct without hardcoding environment logic here.
   builder_hostname = var.builder_hostname != "" ? var.builder_hostname : local.application_data.accounts[local.environment].builder_hostname
 
+  # var.forge_package_s3_bucket stays an explicit override (and keeps the
+  # bucket un-managed by this root -- see its description), but falls back
+  # to the backend-processing root's staging bucket, now that one exists in
+  # every account, rather than requiring every environment to set it.
+  forge_package_s3_bucket = var.forge_package_s3_bucket != "" ? var.forge_package_s3_bucket : data.terraform_remote_state.backend_processing.outputs.staging_bucket_name
+
   # Private subnets for ECS/EFS, sourced from the shared-VPC lookups
   # defined in platform_data.tf (data.aws_vpc.shared et al).
   private_subnet_ids = [
