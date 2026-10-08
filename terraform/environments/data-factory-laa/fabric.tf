@@ -12,7 +12,7 @@ module "fabric_oidc_provider" {
 # Curated S3 bucket exposed to Microsoft Fabric via OneLake shortcuts.
 # TODO: Use KMS key for encryption.
 module "fabric_curated_bucket" {
-  count  = local.fabric_oidc_enabled ? 1 : 0
+  count  = local.fabric_curated_bucket_enabled ? 1 : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=ce9c0c07489e393ce80441aed0fd5bf7798956a3"
 
   bucket_prefix      = "laa-data-factory-curated"
@@ -36,8 +36,13 @@ module "fabric_iam_role" {
   object_id                          = local.fabric_enterprise_app_object_id
   oidc_provider_arn                  = module.fabric_oidc_provider[0].arn
   oidc_provider_condition_key_prefix = module.fabric_oidc_provider[0].condition_key_prefix
+  audience                           = module.fabric_oidc_provider[0].client_id
 
-  bucket_arn       = module.fabric_curated_bucket[0].bucket.arn
+  bucket_arn = (
+    local.environment == "development"
+    ? module.fabric_curated_bucket[0].bucket.arn
+    : "arn:aws:s3:::laa-data-factory-processedraw-766696030771-eu-west-2-an"
+  )
   role_name        = "fabric-s3-access"
   role_policy_name = "fabric-s3-read-policy"
 }

@@ -3,12 +3,18 @@ locals {
   current_account_id     = data.aws_caller_identity.current.account_id
   current_account_region = data.aws_region.current.region
 
-  fabric_oidc_enabled_environments = ["development"]
+  fabric_oidc_enabled_environments = [
+    "development",
+    "test"
+  ]
 
   fabric_oidc_enabled = contains(
     local.fabric_oidc_enabled_environments,
     local.environment
   )
+
+  # Curated bucket is only created in development; other environments reuse existing buckets.
+  fabric_curated_bucket_enabled = local.environment == "development"
 
   fabric_tenant_id = (
     local.fabric_oidc_enabled
