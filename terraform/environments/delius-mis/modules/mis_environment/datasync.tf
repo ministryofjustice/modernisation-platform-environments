@@ -172,30 +172,37 @@ resource "aws_lambda_function" "datasync_password_updater" {
   tags = local.tags
 }
 
-# Schedule the Lambda to run 30 minutes before DataSync task to ensure fresh password
-resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
+# trigger when the admin password is updated
+resource "aws_cloudwatch_event_rule" "datasync_password_updater" {
   count = var.datasync_config != null ? 1 : 0
-  name  = "${var.app_name}-${var.env_name}-pre-datasync-password-update"
+  name  = "${var.app_name}-${var.env_name}-datasync-password-trigger"
 
-  # Run 15 minutes before the DataSync schedule to ensure fresh password
-  # Default: Lambda at 04:00 UTC, DataSync at 04:15 UTC
-  # Can be overridden with var.datasync_config.lambda_schedule_expression
-  schedule_expression = var.datasync_config.lambda_schedule_expression
+  event_pattern = jsonencode({
+    source      = ["aws.secretsmanager"]
+    detail_type = ["AWS API Call via CloudTrail"]
+    detail = {
+      eventSource = ["secretsmanager.amazonaws.com"]
+      eventName   = ["PutSecretValue", "UpdateSecret", "RotationSucceeded"]
+      requestParameters = {
+        secretId = [data.aws_secretsmanager_secret.datasync_ad_admin_password[0].arn]
+      }
+    }
+  })
 }
 
-resource "aws_cloudwatch_event_target" "pre_datasync_lambda_target" {
+resource "aws_cloudwatch_event_target" "datasync_password_updater" {
   count = var.datasync_config != null ? 1 : 0
-  rule  = aws_cloudwatch_event_rule.pre_datasync_password_update[0].name
+  rule  = aws_cloudwatch_event_rule.datasync_password_updater[0].name
   arn   = aws_lambda_function.datasync_password_updater[0].arn
 }
 
-resource "aws_lambda_permission" "allow_scheduled_execution" {
+resource "aws_lambda_permission" "datasync_password_updater" {
   count         = var.datasync_config != null ? 1 : 0
-  statement_id  = "AllowExecutionFromSchedule"
+  statement_id  = "AllowExecutionFromSecretUpdate"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.datasync_password_updater[0].function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.pre_datasync_password_update[0].arn
+  source_arn    = aws_cloudwatch_event_rule.datasync_password_updater[0].arn
 }
 
 #############################################
