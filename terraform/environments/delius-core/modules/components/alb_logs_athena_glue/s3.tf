@@ -40,8 +40,8 @@ data "aws_iam_policy_document" "bucket_policy" {
       "s3:PutObject"
     ]
     resources = [
-      "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-access/AWSLogs/${var.account_id}/*",
-      "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-connection/AWSLogs/${var.account_id}/*"
+      "${module.s3_bucket.bucket.arn}/${local.name}-access/AWSLogs/${var.account_id}/*",
+      "${module.s3_bucket.bucket.arn}/${local.name}-connection/AWSLogs/${var.account_id}/*"
     ]
     principals {
       type        = "Service"
@@ -57,8 +57,8 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
 
     resources = [
-      "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-access/AWSLogs/${var.account_id}/*",
-      "${module.s3_bucket.bucket.arn}/weblogic-${var.env_name}-connection/AWSLogs/${var.account_id}/*"
+      "${module.s3_bucket.bucket.arn}/${local.name}-access/AWSLogs/${var.account_id}/*",
+      "${module.s3_bucket.bucket.arn}/${local.name}-connection/AWSLogs/${var.account_id}/*"
     ]
 
     principals {
