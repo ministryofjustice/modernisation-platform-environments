@@ -172,6 +172,28 @@ resource "aws_lambda_function" "datasync_password_updater" {
   tags = local.tags
 }
 
+# trigger on cron 30 mins before datasync task (keep this in case event trigger fails)
+resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
+  count               = var.datasync_config != null ? 1 : 0
+  name                = "${var.app_name}-${var.env_name}-pre-datasync-password-update"
+  schedule_expression = var.datasync_config.lambda_schedule_expression
+}
+
+resource "aws_cloudwatch_event_target" "pre_datasync_lambda_target" {
+  count = var.datasync_config != null ? 1 : 0
+  rule  = aws_cloudwatch_event_rule.pre_datasync_password_update[0].name
+  arn   = aws_lambda_function.datasync_password_updater[0].arn
+}
+
+resource "aws_lambda_permission" "allow_scheduled_execution" {
+  count         = var.datasync_config != null ? 1 : 0
+  statement_id  = "AllowExecutionFromSchedule"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.datasync_password_updater[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.pre_datasync_password_update[0].arn
+}
+
 # trigger when the admin password is updated
 resource "aws_cloudwatch_event_rule" "datasync_password_updater" {
   count = var.datasync_config != null ? 1 : 0
@@ -202,27 +224,6 @@ resource "aws_lambda_permission" "datasync_password_updater" {
   source_arn    = aws_cloudwatch_event_rule.datasync_password_updater[0].arn
 }
 
-# trigger on cron as a fallback 30 mins before datasync task
-resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
-  count               = var.datasync_config != null ? 1 : 0
-  name                = "${var.app_name}-${var.env_name}-pre-datasync-password-update"
-  schedule_expression = var.datasync_config.lambda_schedule_expression
-}
-
-resource "aws_cloudwatch_event_target" "pre_datasync_lambda_target" {
-  count = var.datasync_config != null ? 1 : 0
-  rule  = aws_cloudwatch_event_rule.pre_datasync_password_update[0].name
-  arn   = aws_lambda_function.datasync_password_updater[0].arn
-}
-
-resource "aws_lambda_permission" "allow_scheduled_execution" {
-  count         = var.datasync_config != null ? 1 : 0
-  statement_id  = "AllowExecutionFromSchedule"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.datasync_password_updater[0].function_name
-  principal     = "://amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.pre_datasync_password_update[0].arn
-}
 
 #############################################
 ### DataSync Agent Security Group
