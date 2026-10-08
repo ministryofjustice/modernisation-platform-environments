@@ -1,7 +1,16 @@
 locals {
   contract_management_enabled = local.is-development
 
-  registration_name = "${local.application_name}-${local.environment}-contracts"
+  registration_name      = "${local.application_name}-${local.environment}-contracts"
+  generation_name_prefix = "${local.application_name}-${local.environment}-contract-generation"
+
+  generation_function_prefix = "df-moj-${local.environment}-gen"
+
+  generation_sources = local.contract_management_enabled ? lookup(
+    var.generation_sources_by_environment,
+    local.environment,
+    {}
+  ) : {}
 
   registration_image_uri = lookup(
     var.registration_image_uris,

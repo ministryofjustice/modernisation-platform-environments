@@ -106,6 +106,16 @@ resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_443" {
   cidr_ipv4         = each.value
 }
 
+resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_cp_443" {
+
+  security_group_id = aws_security_group.cluster_ec2.id
+  description       = "EC2 egress to CP BC"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
 resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_mysql" {
   for_each = toset([
     data.aws_subnet.data_subnets_a.cidr_block,
