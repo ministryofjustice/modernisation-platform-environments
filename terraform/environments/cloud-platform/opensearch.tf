@@ -1,63 +1,24 @@
 #------------------------------------------------------------------------------
 # OpenSearch — full-text log search. One shared, managed domain per environment,
-# private (in-VPC), FGAC on, audit logging to CloudWatch. Business units are kept
-# apart inside the cluster (per-BU indexes + index-level roles), not by separate
-# domains. Scoped to cloud-platform-development for now (the dev proof-of-concept).
+# FGAC on, audit logging to CloudWatch. Business units are kept apart inside the
+# cluster (per-BU indexes + index-level roles), not by separate domains. Scoped to
+# cloud-platform-development for now (the dev proof-of-concept).
 #
-# The in-cluster parts — per-BU indexes, ISM lifecycle, Fluent Bit's write
-# mapping (#8419) — need the OpenSearch provider and are not in this file yet.
+# Public endpoint for now (no VPN to reach a private one); goes in-VPC later. The
+# in-cluster parts (per-BU indexes, ISM, Fluent Bit write #8419) are phase 2.
 #
-# Design + rationale: architecture-decision-record/cp30/ADR-017-opensearch-deployment-model.md
+# Rationale: architecture-decision-record/cp30/ADR-017-opensearch-deployment-model.md
 #------------------------------------------------------------------------------
 
-# FGAC master user: the platform-engineer SSO role.
+# FGAC master = platform-engineer SSO role, resolved by permission-set name (the
+# ARN suffix is account-specific). Same lookup as cluster/eks-cluster.tf.
+data "aws_iam_roles" "platform_engineer_admin_sso_role" {
+  name_regex  = "AWSReservedSSO_platform-engineer-admin_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+
 locals {
-  opensearch_master_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_platform-engineer-admin_5e1838a3c5d27fc3"
-}
-
-# VPC + private subnets. Looked up by tag because the VPC is in the `network`
-# component (separate state), so we can't reference the module.
-data "aws_vpc" "opensearch" {
-  count = local.enable_opensearch ? 1 : 0
-
-  tags = {
-    Name = local.opensearch_vpc_name
-  }
-}
-
-data "aws_subnets" "opensearch_private" {
-  count = local.enable_opensearch ? 1 : 0
-
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.opensearch[0].id]
-  }
-
-  tags = {
-    SubnetType = "Private"
-  }
-}
-
-# HTTPS in from inside the VPC only.
-resource "aws_security_group" "opensearch" {
-  count = local.enable_opensearch ? 1 : 0
-
-  name        = "${local.opensearch_domain_name}-opensearch"
-  description = "OpenSearch domain ${local.opensearch_domain_name} - HTTPS from within the VPC"
-  vpc_id      = data.aws_vpc.opensearch[0].id
-
-  ingress {
-    description = "HTTPS from within the VPC"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.opensearch[0].cidr_block]
-  }
-
-  tags = merge(local.tags, {
-    Name      = "${local.opensearch_domain_name}-opensearch"
-    component = "observability"
-  })
+  opensearch_master_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
 }
 
 # Audit log group. Under /aws/vendedlogs/ so one prefix-wide resource policy
@@ -112,13 +73,15 @@ resource "aws_cloudwatch_log_resource_policy" "opensearch_audit" {
 }
 
 resource "aws_opensearch_domain" "logs" {
-  #checkov:skip=CKV_AWS_247:Dev PoC uses the AWS-managed aws/es key; a customer-managed key comes with the production shared cluster. See ADR-017.
-  #checkov:skip=CKV_AWS_318:Dedicated master nodes are a deliberate deferral for the dev PoC; HA sizing (3 masters, zone awareness) is the measured follow-up for the production cluster. See ADR-017.
-  #checkov:skip=CKV2_AWS_59:Same as CKV_AWS_318 — dedicated master is part of the deferred HA sizing, not the small dev PoC. See ADR-017.
+  #checkov:skip=CKV_AWS_247:CMK deferred to production; dev PoC uses the aws/es key. See ADR-017.
+  #checkov:skip=CKV_AWS_318:Dedicated master is deferred HA sizing, not the dev PoC. See ADR-017.
+  #checkov:skip=CKV2_AWS_59:As CKV_AWS_318 — deferred HA sizing.
+  #checkov:skip=CKV_AWS_137:Public on purpose for now (no VPN for a private endpoint); goes in-VPC later. See ADR-017.
+  #checkov:skip=CKV_AWS_248:No SG — public, not in a VPC (as CKV_AWS_137).
   count = local.enable_opensearch ? 1 : 0
 
   domain_name    = local.opensearch_domain_name
-  engine_version = local.opensearch_engine # pinned: OpenSearch_3.7 (ADR-017 D5)
+  engine_version = local.opensearch_engine # pinned OpenSearch_3.7
 
   cluster_config {
     instance_type  = local.opensearch_instance
@@ -132,13 +95,6 @@ resource "aws_opensearch_domain" "logs" {
     ebs_enabled = true
     volume_type = "gp3"
     volume_size = local.opensearch_ebs_gb
-  }
-
-  # One subnet while zone awareness is off (AWS rejects multiple); widen to the
-  # AZ count when multi-AZ is enabled.
-  vpc_options {
-    subnet_ids         = slice(data.aws_subnets.opensearch_private[0].ids, 0, 1)
-    security_group_ids = [aws_security_group.opensearch[0].id]
   }
 
   # Encryption + HTTPS: required for FGAC.

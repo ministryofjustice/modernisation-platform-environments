@@ -37,26 +37,19 @@ locals {
     "cloud-platform-development",
   ]
   enable_opensearch = contains(local.opensearch_host_workspaces, terraform.workspace)
-  opensearch_engine = "OpenSearch_3.7" # pinned (ADR-017 D5)
+  opensearch_engine = "OpenSearch_3.7" # pinned; don't rely on the default
 
-  # Prefix shortened to "cp-" to stay within the 28-char domain-name limit
-  # (cloud-platform-development-logs is 30).
+  # "cp-" prefix keeps the name under the 28-char domain limit.
   opensearch_domain_name = "${replace(replace(terraform.workspace, "container-platform-", "cp-"), "cloud-platform-", "cp-")}-logs"
   opensearch_is_live     = local.is_live[0] == "live"
   opensearch_instance    = local.opensearch_is_live ? "or1.large.search" : "or1.medium.search"
   opensearch_data_nodes  = local.opensearch_is_live ? 2 : 1
 
-  # Hot (gp3) disk. Right-size, don't provision for peak (ADR-017). Settable per
-  # environment via environment_configurations.
+  # Hot (gp3) disk; right-size per environment, don't provision for peak.
   opensearch_ebs_gb = lookup(local.environment_configuration, "opensearch_ebs_gb", local.opensearch_is_live ? 100 : 20)
 
-  # VPC looked up by tag (it's in the `network` component, separate state).
-  opensearch_vpc_name = terraform.workspace
-
-  # Audit log group under /aws/vendedlogs/ (see opensearch.tf for why).
   opensearch_audit_log_group = "/aws/vendedlogs/opensearch/${local.opensearch_domain_name}/audit"
 
-  # CloudWatch audit-group retention (not OpenSearch log-data retention — that's
-  # per-index ISM). Settable per environment; defaults to 30 days.
+  # CloudWatch audit-group retention (not OpenSearch's own data retention — that's per-index ISM).
   opensearch_audit_retention_days = lookup(local.environment_configuration, "opensearch_audit_retention_days", 30)
 }
