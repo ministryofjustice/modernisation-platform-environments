@@ -88,7 +88,7 @@ GuardDuty alerts SNS topic. To receive them in Slack:
     ```
 4. Set `TF_VAR_enable_guardduty_slack_notifications=true`
 
-See https://github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot/
+See [modernisation-platform-terraform-aws-chatbot](https://github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot/).
 
 ### 5. Lambda quarantines selected objects
 

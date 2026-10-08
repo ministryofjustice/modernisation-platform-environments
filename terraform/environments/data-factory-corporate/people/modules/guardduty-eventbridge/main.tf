@@ -78,7 +78,16 @@ data "aws_iam_policy_document" "scan_alerts" {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
 
-    actions   = ["sns:*"]
+    actions = [
+      "sns:GetTopicAttributes",
+      "sns:SetTopicAttributes",
+      "sns:AddPermission",
+      "sns:RemovePermission",
+      "sns:DeleteTopic",
+      "sns:Subscribe",
+      "sns:ListSubscriptionsByTopic",
+      "sns:Publish",
+    ]
     resources = [aws_sns_topic.scan_alerts.arn]
   }
 

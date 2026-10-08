@@ -79,12 +79,20 @@ module "sherlock_logging_kms_key" {
   }
 }
 
+variable "enable_external_iam_role" {
+  description = "Create the external IAM role after the external account secret has been populated."
+  type        = bool
+  default     = true
+}
+
 data "aws_secretsmanager_secret" "external_account_id" {
+  count = var.enable_external_iam_role ? 1 : 0
   name = "external-aws-account"
 }
 
 data "aws_secretsmanager_secret_version" "external_account_id" {
-  secret_id = data.aws_secretsmanager_secret.external_account_id.id
+  count     = var.enable_external_iam_role ? 1 : 0
+  secret_id = data.aws_secretsmanager_secret.external_account_id[0].id
 }
 
 locals {
@@ -220,11 +228,12 @@ module "sherlock_glue_database" {
 }
 
 module "assume_iam_role" {
+  count  = var.enable_external_iam_role ? 1 : 0
   source = "./modules/external-iam-role"
 
   role_name = "datafactory_${local.environment}_assume_role"
 
-  trusted_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
+  trusted_account_id = data.aws_secretsmanager_secret_version.external_account_id[0].secret_string
 
   bucket_arn = module.sherlock_landing_bucket_mp.bucket.arn
 
