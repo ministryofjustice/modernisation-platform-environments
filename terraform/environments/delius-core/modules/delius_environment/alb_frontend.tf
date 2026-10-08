@@ -117,13 +117,13 @@ resource "aws_lb" "delius_core_frontend" {
 
   access_logs {
     bucket  = module.weblogic_alb_logs.bucket_id
-    prefix  = "weblogic-${var.env_name}-access"
+    prefix  = "${var.env_name}-weblogic-access"
     enabled = true
   }
 
   connection_logs {
     bucket  = module.weblogic_alb_logs.bucket_id
-    prefix  = "weblogic-${var.env_name}-connection"
+    prefix  = "${var.env_name}-weblogic-connection"
     enabled = true
   }
 
