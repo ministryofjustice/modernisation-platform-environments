@@ -136,6 +136,15 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_443" {
   cidr_ipv4         = each.value
 }
 
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_cp_443" {
+  security_group_id = aws_security_group.ecs_tasks_connector.id
+  description       = "HTTPS to Cloud Platform Benefit Checker"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_1521" {
   for_each = toset([
     data.aws_subnet.data_subnets_a.cidr_block,
@@ -164,11 +173,11 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_1522" 
   cidr_ipv4         = each.value
 }
 
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_2049_efs" {
-  security_group_id            = aws_security_group.ecs_tasks_connector.id
-  description                  = "Allow egress to EFS security group on port 2049"
-  ip_protocol                  = "tcp"
-  from_port                    = 2049
-  to_port                      = 2049
-  referenced_security_group_id = aws_security_group.oia-efs-security-group.id
-}
+# resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_2049_efs" {
+#   security_group_id            = aws_security_group.ecs_tasks_connector.id
+#   description                  = "Allow egress to EFS security group on port 2049"
+#   ip_protocol                  = "tcp"
+#   from_port                    = 2049
+#   to_port                      = 2049
+#   referenced_security_group_id = aws_security_group.oia-efs-security-group.id
+# }
