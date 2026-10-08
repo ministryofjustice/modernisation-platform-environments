@@ -339,6 +339,7 @@ resource "aws_lambda_function" "workspace_event_slack" {
   environment {
     variables = {
       SLACK_WEBHOOK_SECRET = aws_secretsmanager_secret.workspace_event_slack_webhook.name
+      ENVIRONMENT          = local.environment
     }
   }
 
@@ -415,6 +416,7 @@ resource "aws_lambda_function" "iam_policy_event_slack" {
   environment {
     variables = {
       SLACK_WEBHOOK_SECRET = aws_secretsmanager_secret.workspace_event_slack_webhook.name
+      ENVIRONMENT          = local.environment
     }
   }
 
