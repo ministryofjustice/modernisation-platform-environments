@@ -199,3 +199,18 @@ resource "aws_lb_listener_rule" "homepage_listener_rule" {
     }
   }
 }
+
+module "weblogic_alb_logs" {
+  source = "../../components/alb_logs_athena_glue"
+
+  providers = {
+    aws                        = aws
+    aws.bucket-replication     = aws
+  }
+
+  env_name        = var.env_name
+  app_name        = "weblogic"
+  alb_bucket_name = module.weblogic_alb_access_logs.bucket.id
+  account_config  = var.account_config
+  environment_config = var.environment_config
+}
