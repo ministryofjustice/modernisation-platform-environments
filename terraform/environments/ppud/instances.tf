@@ -487,7 +487,7 @@ resource "aws_instance" "s609693lo6vw117" {
   instance_type          = "m5.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.conditional["Team-Foundation-Server-Security-Group"].id]
+  vpc_security_group_ids = [aws_security_group.conditional["Dev-Ops-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
