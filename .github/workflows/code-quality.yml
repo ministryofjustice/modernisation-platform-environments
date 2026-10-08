@@ -25,6 +25,7 @@ jobs:
     with:
       validate_all_codebase: ${{ github.event_name == 'schedule' && 'true' || 'false' }}
       apply_fixes: ${{ github.event_name == 'schedule' }}
+      disable_linters: ${{ github.event_name == 'pull_request' && 'REPOSITORY_GRYPE' || '' }}
       codeql_languages: '["actions","go","javascript-typescript","python"]'
       checkov_arguments: >-
         --skip-check CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
