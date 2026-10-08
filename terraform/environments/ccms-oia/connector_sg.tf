@@ -126,6 +126,17 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_443" {
   cidr_ipv4         = each.value
 }
 
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_443" {
+
+  security_group_id = aws_security_group.ecs_tasks_connector.id
+  description       = "Connector ECS tasks egress to CP BC"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = local.application_data.accounts[local.environment].cloud_platform_cidr
+}
+
+
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_1521" {
   for_each = toset([
     data.aws_subnet.data_subnets_a.cidr_block,
