@@ -4,7 +4,7 @@ module "lambda_notifier" {
   version       = "8.9.0"
   function_name = local.pattern_name
   role_name     = local.pattern_name
-  description   = "Notify recipients in Slack with an authenticated MFT portal link"
+  description   = "Notify recipients in Slack with an authenticated file-transfer portal link"
   runtime       = "python3.12"
   architectures = ["arm64"]
   handler       = "handler.lambda_handler"
@@ -63,10 +63,13 @@ module "lambda_notifier" {
       actions   = ["kms:GenerateDataKey"]
       resources = [module.kms_notifications_pipeline.key_arn]
     }
+    publish_slack = {
+      actions   = ["sns:Publish"]
+      resources = [for topic in module.sns_slack : topic.topic_arn]
+    }
     secrets = {
-      actions = ["secretsmanager:GetSecretValue"]
-      resources = concat([for secret in data.aws_secretsmanager_secret.dispatch : secret.arn],
-      [for secret in aws_secretsmanager_secret.webhook : secret.arn])
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [for secret in data.aws_secretsmanager_secret.dispatch : secret.arn]
     }
     decrypt_secrets = {
       actions   = ["kms:Decrypt"]

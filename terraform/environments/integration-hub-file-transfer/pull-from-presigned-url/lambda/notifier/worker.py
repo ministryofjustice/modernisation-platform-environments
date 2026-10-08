@@ -3,9 +3,9 @@ import hashlib
 import json
 import re
 import time
-import urllib.request
 from datetime import datetime, timezone
 from uuid import UUID
+from urllib.parse import quote
 
 SOURCE = "uk.gov.justice.service.managed-file-transfer"
 MAX_EVENT_AGE = 12 * 60 * 60
@@ -57,41 +57,24 @@ def validate(record, config, now):
 
 
 def message(data, portal, receipt):
-    # User-controlled names belong in plain_text, not Slack markdown or link labels.
-    location = f"{receipt['bucket']}/{receipt['key']}"
+    # Encode the key so user-controlled names cannot inject Slack mentions or links.
+    location = f"s3://{receipt['bucket']}/{quote(receipt['key'], safe='/')}"
     return {
-        "text": "MFT: a clean file is available. Sign in to the MFT web app to download it.",
-        "unfurl_links": False,
-        "unfurl_media": False,
-        "blocks": [
-            {"type": "section", "text": {"type": "plain_text", "text": "A clean file is available in MFT."}},
-            {"type": "section", "text": {"type": "plain_text", "text": f"Location: {location}"[:2900]}},
-            {"type": "actions", "elements": [{"type": "button", "action_id": "open_mft_pickup",
-                "text": {"type": "plain_text", "text": "Open MFT pickup"}, "url": portal}]},
-            {"type": "context", "elements": [{"type": "plain_text", "text":
-                "Sign in with your organisation account. Access is limited to authorised recipients. "
-                "Open the pickup location shown above. Files have seven-day lifecycle expiry; collect promptly."}]},
-        ],
+        "version": "1.0",
+        "source": "custom",
+        "id": data["actionExecutionId"],
+        "content": {
+            "textType": "client-markdown",
+            "title": "A clean file is ready for pickup",
+            "description": f"Location (URL-encoded): {location}\n<{portal}|Open file-transfer pickup>",
+            "nextSteps": ["Sign in with your organisational account and locate the file. Access requires an authorised group.",
+                          "Files have seven-day lifecycle expiry; collect promptly."],
+        },
+        "metadata": {"enableCustomActions": False},
     }
 
 
-class NoRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        return None
-
-
-def post_slack(url, payload):
-    if not isinstance(url, str) or not re.fullmatch(r"https://hooks\.slack\.com/services/[A-Za-z0-9_-]+/[A-Za-z0-9_-]+/[A-Za-z0-9_-]+", url):
-        raise InvalidNotification("Invalid Slack webhook")
-    request = urllib.request.Request(url, data=json.dumps(payload).encode(),
-                                     headers={"Content-Type": "application/json"}, method="POST")
-    # Redirects cannot leak the webhook request to another destination.
-    with urllib.request.build_opener(NoRedirect()).open(request, timeout=10) as response:
-        if response.status != 200 or response.read(64).strip() != b"ok":
-            raise RuntimeError("Slack rejected notification")
-
-
-def process(record, config, store, secrets, send=post_slack, clock=time.time, retainer=None):
+def process(record, config, store, secrets, send, clock=time.time, retainer=None):
     now = int(clock())
     validated = validate(record, config, now)
     if validated is None:
@@ -104,15 +87,14 @@ def process(record, config, store, secrets, send=post_slack, clock=time.time, re
         raise InvalidNotification("Dispatch recipient mismatch")
     if not store.claim(key, now):
         return "duplicate"
-    # Leave the lease on failure, including ambiguous Slack outcomes. A later retry
+    # Leave the lease on failure, including ambiguous SNS outcomes. A later retry
     # can send again after expiry; exactly-once delivery to Slack is not guaranteed.
     if retainer is None:
         raise InvalidNotification("Pickup retention is not configured")
     receipt = retainer.prepare(key, data, route, now)
-    webhook = json.loads(secrets.get_secret_value(SecretId=route["webhook_secret_arn"])["SecretString"])
-    send(webhook["url"], message(data, config["portal_url"], receipt))
+    send(route["notification_topic_arn"], message(data, config["portal_url"], receipt))
     store.complete(key)
-    return "sent"
+    return "published"
 
 
 class Store:

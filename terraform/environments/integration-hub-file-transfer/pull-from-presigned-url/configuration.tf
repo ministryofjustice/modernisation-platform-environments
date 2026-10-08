@@ -14,9 +14,9 @@ locals {
   recipients         = module.pickup_configuration.recipients
   portal_url         = local.is-production ? "https://web.file-transfer.service.justice.gov.uk" : "https://web.${local.environment}.file-transfer.service.justice.gov.uk"
   routes = { for id, recipient in local.recipients : data.aws_secretsmanager_secret.dispatch[id].arn => {
-    recipient_id       = id
-    prefix             = recipient.prefix
-    webhook_secret_arn = aws_secretsmanager_secret.webhook[id].arn
+    recipient_id           = id
+    prefix                 = recipient.prefix
+    notification_topic_arn = module.sns_slack[id].topic_arn
   } }
 }
 
@@ -33,17 +33,6 @@ data "aws_secretsmanager_secret" "dispatch" {
       error_message = "Each pickup prefix must have an existing shared dispatch entry; deploy its secret from root first."
     }
   }
-}
-
-# Populate {"url":"https://hooks.slack.com/services/..."} outside Terraform.
-resource "aws_secretsmanager_secret" "webhook" {
-  #checkov:skip=CKV2_AWS_57:Externally issued Slack webhook; revoke/reissue in Slack and replace this secret. No AWS-managed rotation is available.
-  for_each                = local.recipients
-  name                    = "${local.application_name}/slack-pickup/${each.key}"
-  description             = "Slack incoming webhook for authenticated pickup notifications"
-  kms_key_id              = data.aws_kms_key.secrets.arn
-  recovery_window_in_days = 30
-  tags                    = local.tags
 }
 
 module "dynamodb_notifications" {

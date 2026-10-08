@@ -22,11 +22,11 @@ class DispatchContractTests(unittest.TestCase):
         configuration = dispatcher.parse_dispatch_configuration(secret)
         self.assertIn("slack", configuration.notifications)
         secrets = Mock()
-        secrets.get_secret_value.side_effect = [secret, {"SecretString": '{"url":"https://hooks.slack.com/services/T/B/C"}'}]
+        secrets.get_secret_value.side_effect = [secret]
         retainer = Mock()
         retainer.prepare.return_value = {"bucket": "pickup", "key": "products/execution/test.txt"}
         send = Mock()
-        self.assertEqual(process(record(), CONFIG, Mock(), secrets, send, lambda: NOW, retainer), "sent")
+        self.assertEqual(process(record(), CONFIG, Mock(), secrets, send, lambda: NOW, retainer), "published")
         send.assert_called_once()
 
     def test_legacy_object_destination_is_rejected_by_dispatcher(self):
