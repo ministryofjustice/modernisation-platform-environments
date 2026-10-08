@@ -5,7 +5,7 @@ terraform {
     aws = {
       source                = "hashicorp/aws"
       version               = "~> 6.0"
-      configuration_aliases = [aws.us_east_1]
+      configuration_aliases = [aws.us_east_1, aws.core_network_services]
     }
   }
 }
@@ -316,9 +316,10 @@ resource "aws_cloudfront_distribution" "shared" {
 }
 
 resource "aws_route53_record" "prototypes" {
-  zone_id = var.configuration.hosted_zone_id
-  name    = "*.${var.configuration.domain_name}"
-  type    = "A"
+  provider = aws.core_network_services
+  zone_id  = var.configuration.hosted_zone_id
+  name     = "*.${var.configuration.domain_name}"
+  type     = "A"
   alias {
     name                   = aws_cloudfront_distribution.shared.domain_name
     zone_id                = aws_cloudfront_distribution.shared.hosted_zone_id

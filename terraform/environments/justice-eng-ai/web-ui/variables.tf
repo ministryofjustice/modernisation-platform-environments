@@ -24,7 +24,7 @@ variable "bedrock_model_id" {
 
 variable "enable_oidc_auth" {
   type        = bool
-  description = "Whether to provision Entra ID OIDC secrets (and, in a follow-up, wire the ALB `authenticate-oidc` listener action). Secrets are created empty by Terraform and populated out-of-band; see oidc.tf."
+  description = "Whether to provision Entra ID OIDC secrets. Secret values are populated out-of-band; see oidc.tf."
   default     = true
 }
 
@@ -32,10 +32,8 @@ variable "oidc_configured" {
   type        = bool
   description = <<-EOT
     Whether the three Entra OIDC secrets in Secrets Manager already hold
-    populated values. Setting this to true causes the ALB listener to be
-    wired with the ``authenticate-oidc`` action; leave false during the
-    first apply (secrets are created empty) and flip to true only after
-    populating the values via ``aws secretsmanager put-secret-value``.
+    populated values. Both workspaces default to true because their secrets
+    are populated and OIDC callback URIs are registered for the shared Entra app.
   EOT
   default     = true
 }

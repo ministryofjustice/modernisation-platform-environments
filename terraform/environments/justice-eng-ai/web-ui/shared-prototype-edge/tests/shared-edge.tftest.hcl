@@ -4,6 +4,10 @@ mock_provider "aws" {
   alias = "us_east_1"
 }
 
+mock_provider "aws" {
+  alias = "core_network_services"
+}
+
 variables {
   tags = { environment = "test" }
   configuration = {
