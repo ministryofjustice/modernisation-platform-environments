@@ -34,7 +34,7 @@ resource "aws_athena_named_query" "main_table_admin" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = local.lb_log_prefix_soa_admin
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }
@@ -50,7 +50,7 @@ resource "aws_athena_named_query" "tls_requests_admin" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = local.lb_log_prefix_soa_admin
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }
@@ -65,7 +65,7 @@ resource "aws_athena_named_query" "main_table_managed" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = local.lb_log_prefix_soa_managed
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }
@@ -80,7 +80,7 @@ resource "aws_athena_named_query" "tls_requests_managed" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = local.lb_log_prefix_soa_managed
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }
