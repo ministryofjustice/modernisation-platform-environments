@@ -376,6 +376,7 @@ resource "aws_ecs_task_definition" "forge" {
         { name = "ENTRA_POST_LOGOUT_REDIRECT_URI", value = "https://${local.forge_hostname}/" },
         { name = "ENTRA_REDIRECT_URI", value = "https://${local.forge_hostname}/auth/callback" },
         { name = "FORGE_PACKAGE_S3_BUCKET", value = local.forge_package_s3_bucket },
+        { name = "FORGE_PACKAGE_S3_KMS_KEY_ARN", value = local.forge_package_s3_kms_key_arn },
         { name = "FORGE_PACKAGE_S3_PREFIX", value = var.forge_package_s3_prefix },
         { name = "FORGE_PACKAGE_S3_REGION", value = data.aws_region.current.region },
         { name = "LLM_MODEL", value = var.bedrock_model_id },
