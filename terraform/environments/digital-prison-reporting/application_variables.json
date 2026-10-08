@@ -44,6 +44,7 @@
       "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres14",
+      "domain_builder_rds_engine_version": "14.24",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
       "enable_bedrock": true,
@@ -99,7 +100,9 @@
         "dps-acc-pro-custody",
         "dps-offences",
         "dps-visits",
-        "dps-body-scans"
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -210,6 +213,9 @@
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
       "enable_probation_discovery_node": true,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": true,
         "create_replica": true,
@@ -230,7 +236,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.15",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -286,6 +292,7 @@
       "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres14",
+      "domain_builder_rds_engine_version": "14.24",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
       "enable_bedrock": true,
@@ -335,7 +342,9 @@
         "dps-acc-pro-custody",
         "dps-offences",
         "dps-visits",
-        "dps-body-scans"
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -427,11 +436,14 @@
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
       "enable_probation_discovery_node": false,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": true,
         "create_replica": true,
         "engine": "postgres",
-        "engine_version": "16",
+        "engine_version": "16.15",
         "replica_engine_version": "16",
         "init_size": "158",
         "max_size": "1000",
@@ -447,7 +459,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.15",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -503,6 +515,7 @@
       "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres14",
+      "domain_builder_rds_engine_version": "14.24",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
       "enable_bedrock": true,
@@ -554,7 +567,9 @@
         "dps-acc-pro-custody",
         "dps-offences",
         "dps-visits",
-        "dps-body-scans"
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -661,6 +676,9 @@
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": false,
       "enable_probation_discovery_node": false,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": false,
         "create_replica": false,
@@ -681,7 +699,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.15",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -737,6 +755,7 @@
       "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres15",
+      "domain_builder_rds_engine_version": "15.19",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
       "enable_bedrock": true,
@@ -786,7 +805,9 @@
         "dps-acc-pro-custody",
         "dps-offences",
         "dps-visits",
-        "dps-body-scans"
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -901,6 +922,9 @@
       "enable_s3_data_migrate_lambda": false,
       "create_postgres_load_generator_job": false,
       "enable_probation_discovery_node": false,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": false,
         "create_replica": false,
@@ -921,7 +945,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.15",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",

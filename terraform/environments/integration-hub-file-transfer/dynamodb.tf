@@ -1,7 +1,7 @@
 module "dynamodb_adapter_idempotency" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.1"
+  version = "5.5.2"
 
   name         = "${local.application_name}-${local.environment}-adapter-idempotency"
   billing_mode = "PAY_PER_REQUEST"
@@ -17,6 +17,7 @@ module "dynamodb_adapter_idempotency" {
   server_side_encryption_enabled     = true
   server_side_encryption_kms_key_arn = module.kms_dynamodb.key_arn
   point_in_time_recovery_enabled     = true
+  deletion_protection_enabled        = true
   table_class                        = "STANDARD"
   ttl_attribute_name                 = "expiration"
   ttl_enabled                        = true
@@ -32,7 +33,7 @@ module "dynamodb_adapter_idempotency" {
 module "dynamodb_file_transfer_idempotency" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.1"
+  version = "5.5.2"
 
   name         = "${local.application_name}-${local.environment}-file-transfer-idempotency"
   billing_mode = "PAY_PER_REQUEST"
@@ -53,6 +54,7 @@ module "dynamodb_file_transfer_idempotency" {
   server_side_encryption_enabled     = true
   server_side_encryption_kms_key_arn = module.kms_dynamodb.key_arn
   point_in_time_recovery_enabled     = true
+  deletion_protection_enabled        = true
   table_class                        = "STANDARD"
   ttl_attribute_name                 = "expiration"
   ttl_enabled                        = true

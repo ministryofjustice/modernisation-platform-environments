@@ -92,7 +92,7 @@
 - **Scheme**: internet-facing
 - **Subnets**: public subnets (AZ a+b)
 - **Target Group**: `lntp3-*` (port 5000, HTTP)
-- **Health Check**: 
+- **Health Check**:
   - Path: `/`
   - Matcher: 200-399
   - Status: HEALTHY ✅
@@ -109,7 +109,7 @@
 
 - **VPC**: `vpc-04f62e7380681cda7`
 - **CIDR**: 10.200.0.0/16
-- **Private Subnets**: 
+- **Private Subnets**:
   - `subnet-0d3e921da3d271eed` (eu-west-2a, 10.200.1.0/24)
   - `subnet-004ec33a28bc77fe9` (eu-west-2b, 10.200.2.0/24)
 
@@ -414,7 +414,7 @@ radtest <username> <password> <nlb-dns-name> 1812 <radius-secret>
 ## Troubleshooting Quick Reference
 
 | Issue | Check | Fix |
-|-------|-------|-----|
+| ------- | ------- | ----- |
 | Tasks failing to start | CloudWatch logs | Check for missing dependencies, environment variables |
 | ALB targets unhealthy | Security groups | Verify ALB egress + ECS ingress rules |
 | Can't pull ECR images | VPC endpoints | Ensure `ecr.api` and `ecr.dkr` endpoints exist |
@@ -428,7 +428,7 @@ radtest <username> <password> <nlb-dns-name> 1812 <radius-secret>
 
 **STATUS**: ✅ **Automated** (see LINOTP-AUTOMATION.md)
 
-The LinOTP configuration is now **fully automated** via a Python script that runs on container startup. 
+The LinOTP configuration is now **fully automated** via a Python script that runs on container startup.
 
 ### What's Automated
 
@@ -490,9 +490,9 @@ terraform/environments/laa-workspaces/workspace-components/dockerfiles/
 
 ## References
 
-- **LinOTP 3 Documentation**: https://linotp.org/doc/latest/
-- **FreeRADIUS Documentation**: https://freeradius.org/documentation/
-- **AWS ECS Fargate**: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html
+- **LinOTP 3 Documentation**: <https://linotp.org/doc/latest/>
+- **FreeRADIUS Documentation**: <https://freeradius.org/documentation/>
+- **AWS ECS Fargate**: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html>
 - **LinOTP Automation Guide**: LINOTP-AUTOMATION.md
 - **Branch**: `STB-4290-v1`
 - **Ticket**: STB-4290

@@ -15,6 +15,11 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
         "ecs-tasks.amazonaws.com",
       ]
     }
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceAccount"
+      values   = ["${data.aws_caller_identity.current.account_id}"]
+    }
   }
 }
 
@@ -120,9 +125,30 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ds:CreateComputer",
                 "ds:DescribeDirectories",
                 "ec2:DescribeInstanceStatus",
-                "logs:*",
-                "ssm:*",
-                "ec2messages:*"
+                "ec2messages:AcknowledgeMessage",
+                "ec2messages:DeleteMessage",
+                "ec2messages:FailMessage",
+                "ec2messages:GetEndpoint",
+                "ec2messages:GetMessages",
+                "ec2messages:SendReply",
+                "ssm:DescribeAssociation",
+                "ssm:GetDeployablePatchSnapshotForInstance",
+                "ssm:GetDocument",
+                "ssm:DescribeDocument",
+                "ssm:GetManifest",
+                "ssm:ListAssociations",
+                "ssm:ListInstanceAssociations",
+                "ssm:PutInventory",
+                "ssm:PutComplianceItems",
+                "ssm:PutConfigurePackageResult",
+                "ssm:UpdateAssociationStatus",
+                "ssm:UpdateInstanceAssociationStatus",
+                "ssm:UpdateInstanceInformation",
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents"
             ],
             "Resource": "*"
         },

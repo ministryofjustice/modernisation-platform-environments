@@ -103,6 +103,68 @@ resource "aws_lakeformation_permissions" "fms_validation_reporter_tables" {
 }
 
 # ------------------------------------------------------------------------
+# Lake Formation for downstream position reconciliation
+# ------------------------------------------------------------------------
+
+resource "aws_lakeformation_permissions" "merge_redrive_planner_database_access" {
+  for_each = toset([
+    "allied_mdss${local.db_suffix}",
+    "staged_mdss${local.dbt_suffix}",
+    "acquisitive_crime${local.dbt_suffix}",
+    "data_insights${local.dbt_suffix}",
+  ])
+
+  principal   = aws_iam_role.merge_redrive_planner.arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_redrive_planner_table_access" {
+  for_each = {
+    raw_position = {
+      database = "allied_mdss${local.db_suffix}"
+      table    = "position"
+    }
+
+    staged_position = {
+      database = "staged_mdss${local.dbt_suffix}"
+      table    = "position"
+    }
+
+    ac_position = {
+      database = "acquisitive_crime${local.dbt_suffix}"
+      table    = "position"
+    }
+
+    ac_device_activations = {
+      database = "acquisitive_crime${local.dbt_suffix}"
+      table    = "device_activations"
+    }
+
+    emdi_position = {
+      database = "data_insights${local.dbt_suffix}"
+      table    = "position"
+    }
+
+    emdi_device_activations = {
+      database = "data_insights${local.dbt_suffix}"
+      table    = "device_activations"
+    }
+  }
+
+  principal   = aws_iam_role.merge_redrive_planner.arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = each.value.database
+    name          = each.value.table
+  }
+}
+
+# ------------------------------------------------------------------------
 # Lake Formation - admin permissions
 # https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/adding-admin-data-lake-formation-permissions.html
 # ------------------------------------------------------------------------
@@ -161,3 +223,4 @@ module "lakeformation_registration_iam_role" {
     }
   }
 }
+

@@ -68,6 +68,7 @@ module "ears_sars_step_function" {
     {
       "ears_sars_request"   = module.ears_sars_request[0].lambda_function_name,
       "write_to_sharepoint" = module.write_to_sharepoint[0].lambda_function_name,
+      "send_email"          = module.send_ear_sar_response[0].lambda_function_name,
     }
   )
   type = "STANDARD"
@@ -130,7 +131,7 @@ module "iceberg_table_maintenance_step_function" {
 # ------------------------------------------
 
 module "merge_into_mdss_staged_position" {
-  source       = "./modules/merge_into_reconciler"
+  source              = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_mdss_staged_position[0]
 }
 
@@ -139,7 +140,7 @@ module "merge_into_mdss_staged_position" {
 # ------------------------------------------
 
 module "merge_into_mdss_staged_event" {
-  source       = "./modules/merge_into_reconciler"
+  source              = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_mdss_staged_event[0]
 }
 
@@ -148,7 +149,7 @@ module "merge_into_mdss_staged_event" {
 # ------------------------------------------
 
 module "merge_into_emdi_position" {
-  source       = "./modules/merge_into_reconciler"
+  source              = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_emdi_position[0]
 }
 
@@ -157,7 +158,7 @@ module "merge_into_emdi_position" {
 # ------------------------------------------
 
 module "merge_into_mdss_ac_position" {
-  source       = "./modules/merge_into_reconciler"
+  source              = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_ac_position[0]
 }
 
@@ -401,10 +402,867 @@ module "trigger_cadt_step_function" {
   iam_policies = tomap({ "trigger_cadt_step_function_policy" = aws_iam_policy.trigger_cadt_step_function_policy })
   variable_dictionary = tomap(
     {
-      "trigger_cadt"  = module.trigger_cadt.lambda_function_name,
-      "environment"   = local.environment,
-      "poll_cadt"     = module.poll_cadt.lambda_function_name,
+      "trigger_cadt" = module.trigger_cadt.lambda_function_name,
+      "environment"  = local.environment,
+      "poll_cadt"    = module.poll_cadt.lambda_function_name,
     }
   )
   type = "STANDARD"
+}
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation Step Function
+# ------------------------------------------------------------------------------
+
+resource "aws_sfn_state_machine" "downstream_reconciliation" {
+  name     = "downstream_position_reconciliation"
+  role_arn = aws_iam_role.downstream_reconciliation_state_machine.arn
+
+  definition = jsonencode(
+    {
+      Comment = "Runs rolling, ranged and full downstream position reconciliation."
+      StartAt = "SelectInputMode"
+
+      States = {
+        SelectInputMode = {
+          Type = "Choice"
+
+          Choices = [
+            {
+              Variable     = "$.mode"
+              StringEquals = "rolling"
+              Next         = "DiscoverRolling"
+            },
+            {
+              Variable     = "$.mode"
+              StringEquals = "range"
+              Next         = "StartHistoricalRange"
+            },
+            {
+              Variable     = "$.mode"
+              StringEquals = "full"
+              Next         = "StartHistoricalFull"
+            },
+          ]
+
+          Default = "UnsupportedMode"
+        }
+
+        DiscoverRolling = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action       = "discover_rolling"
+              "consumer.$" = "$.consumer"
+            }
+          }
+
+          OutputPath = "$.Payload"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "CheckRollingDiscovery"
+        }
+
+        CheckRollingDiscovery = {
+          Type = "Choice"
+
+          Choices = [
+            {
+              Variable     = "$.status"
+              StringEquals = "clean"
+              Next         = "RollingComplete"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "manual_review_required"
+              Next         = "RollingManualReviewRequired"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "replay_ready"
+              Next         = "ReplayRollingCandidates"
+            },
+          ]
+
+          Default = "UnexpectedRollingResult"
+        }
+
+        ReplayRollingCandidates = {
+          Type           = "Map"
+          ItemsPath      = "$.candidates"
+          MaxConcurrency = 1
+          ResultPath     = null
+
+          ItemProcessor = {
+            ProcessorConfig = {
+              Mode = "INLINE"
+            }
+
+            StartAt = "SelectRollingConsumer"
+
+            States = {
+              SelectRollingConsumer = {
+                Type = "Choice"
+
+                Choices = [
+                  {
+                    Variable     = "$.consumer"
+                    StringEquals = "STAGED"
+                    Next         = "ReplayRollingStagedPosition"
+                  },
+                  {
+                    Variable     = "$.consumer"
+                    StringEquals = "AC"
+                    Next         = "ReplayRollingAcPosition"
+                  },
+                  {
+                    Variable     = "$.consumer"
+                    StringEquals = "EMDI"
+                    Next         = "ReplayRollingEmdiPosition"
+                  },
+                ]
+
+                Default = "UnsupportedRollingConsumer"
+              }
+
+              ReplayRollingStagedPosition = {
+                Type     = "Task"
+                Resource = "arn:aws:states:::lambda:invoke"
+
+                Parameters = {
+                  FunctionName = module.merge_mdss_staged_position[0].lambda_function_arn
+                  "Payload.$"  = "$.replay_input"
+                }
+
+                ResultPath = null
+
+                Retry = [
+                  {
+                    ErrorEquals = [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException",
+                    ]
+
+                    IntervalSeconds = 5
+                    BackoffRate     = 2
+                    MaxAttempts     = 3
+                  }
+                ]
+
+                Next = "VerifyRollingCandidate"
+              }
+
+              ReplayRollingAcPosition = {
+                Type     = "Task"
+                Resource = "arn:aws:states:::lambda:invoke"
+
+                Parameters = {
+                  FunctionName = module.merge_ac_position[0].lambda_function_arn
+                  "Payload.$"  = "$.replay_input"
+                }
+
+                ResultPath = null
+
+                Retry = [
+                  {
+                    ErrorEquals = [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException",
+                    ]
+
+                    IntervalSeconds = 5
+                    BackoffRate     = 2
+                    MaxAttempts     = 3
+                  }
+                ]
+
+                Next = "VerifyRollingCandidate"
+              }
+
+              ReplayRollingEmdiPosition = {
+                Type     = "Task"
+                Resource = "arn:aws:states:::lambda:invoke"
+
+                Parameters = {
+                  FunctionName = module.merge_emdi_position[0].lambda_function_arn
+                  "Payload.$"  = "$.replay_input"
+                }
+
+                ResultPath = null
+
+                Retry = [
+                  {
+                    ErrorEquals = [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException",
+                    ]
+
+                    IntervalSeconds = 5
+                    BackoffRate     = 2
+                    MaxAttempts     = 3
+                  }
+                ]
+
+                Next = "VerifyRollingCandidate"
+              }
+
+              VerifyRollingCandidate = {
+                Type     = "Task"
+                Resource = "arn:aws:states:::lambda:invoke"
+
+                Parameters = {
+                  FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+                  Payload = {
+                    action        = "verify_rolling"
+                    "candidate.$" = "$"
+                  }
+                }
+
+                OutputPath = "$.Payload"
+
+                Retry = [
+                  {
+                    ErrorEquals = [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException",
+                    ]
+
+                    IntervalSeconds = 2
+                    BackoffRate     = 2
+                    MaxAttempts     = 3
+                  }
+                ]
+
+                Next = "CheckRollingVerification"
+              }
+
+              CheckRollingVerification = {
+                Type = "Choice"
+
+                Choices = [
+                  {
+                    Variable     = "$.status"
+                    StringEquals = "verified"
+                    Next         = "RollingCandidateVerified"
+                  },
+                  {
+                    Variable     = "$.status"
+                    StringEquals = "verification_failed"
+                    Next         = "RollingVerificationFailed"
+                  },
+                ]
+
+                Default = "UnexpectedRollingVerificationResult"
+              }
+
+              RollingCandidateVerified = {
+                Type = "Succeed"
+              }
+
+              UnsupportedRollingConsumer = {
+                Type  = "Fail"
+                Error = "UnsupportedRollingReconciliationConsumer"
+                Cause = "The rolling reconciliation consumer is not supported."
+              }
+
+              RollingVerificationFailed = {
+                Type  = "Fail"
+                Error = "RollingReconciliationVerificationFailed"
+                Cause = "Stale positions remain after rolling replay."
+              }
+
+              UnexpectedRollingVerificationResult = {
+                Type  = "Fail"
+                Error = "UnexpectedRollingVerificationResult"
+                Cause = "The planner returned an unexpected rolling verification status."
+              }
+            }
+          }
+
+          Next = "RollingComplete"
+        }
+
+        RollingComplete = {
+          Type = "Succeed"
+        }
+
+        RollingManualReviewRequired = {
+          Type = "Succeed"
+        }
+
+        StartHistoricalRange = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action         = "start_historical"
+              "consumer.$"   = "$.consumer"
+              "mode.$"       = "$.mode"
+              "start_date.$" = "$.start_date"
+              "end_date.$"   = "$.end_date"
+            }
+          }
+
+          OutputPath = "$.Payload"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "CheckHistoricalStart"
+        }
+
+        StartHistoricalFull = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action       = "start_historical"
+              "consumer.$" = "$.consumer"
+              "mode.$"     = "$.mode"
+            }
+          }
+
+          OutputPath = "$.Payload"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "CheckHistoricalStart"
+        }
+
+        CheckHistoricalStart = {
+          Type = "Choice"
+
+          Choices = [
+            {
+              Variable     = "$.status"
+              StringEquals = "planning"
+              Next         = "PlanHistorical"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "completed"
+              Next         = "HistoricalComplete"
+            },
+          ]
+
+          Default = "UnexpectedHistoricalPlanningResult"
+        }
+
+        PlanHistorical = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action           = "plan_historical"
+              "consumer.$"     = "$.consumer"
+              "execution_id.$" = "$.execution_id"
+            }
+          }
+
+          OutputPath = "$.Payload"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "CheckHistoricalPlanning"
+        }
+
+        CheckHistoricalPlanning = {
+          Type = "Choice"
+
+          Choices = [
+            {
+              Variable     = "$.status"
+              StringEquals = "planning"
+              Next         = "WaitBeforeHistoricalPlanning"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "replay_ready"
+              Next         = "NextHistoricalChunk"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "approval_required"
+              Next         = "WaitForHistoricalApproval"
+            },
+          ]
+
+          Default = "UnexpectedHistoricalPlanningResult"
+        }
+
+        WaitBeforeHistoricalPlanning = {
+          Type    = "Wait"
+          Seconds = 1
+          Next    = "PlanHistorical"
+        }
+
+        WaitForHistoricalApproval = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke.waitForTaskToken"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action           = "park_historical_approval"
+              "consumer.$"     = "$.consumer"
+              "execution_id.$" = "$.execution_id"
+              "plan_id.$"      = "$.plan_id"
+              "task_token.$"   = "$$.Task.Token"
+            }
+          }
+
+          ResultPath = "$.approval"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "RecordHistoricalApproval"
+        }
+
+        RecordHistoricalApproval = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action           = "record_historical_approval"
+              "consumer.$"     = "$.consumer"
+              "execution_id.$" = "$.execution_id"
+              "plan_id.$"      = "$.plan_id"
+              "decision.$"     = "$.approval.decision"
+            }
+          }
+
+          OutputPath = "$.Payload"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "CheckHistoricalApproval"
+        }
+
+        CheckHistoricalApproval = {
+          Type = "Choice"
+
+          Choices = [
+            {
+              Variable     = "$.status"
+              StringEquals = "replay_ready"
+              Next         = "NextHistoricalChunk"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "rejected"
+              Next         = "HistoricalRejected"
+            },
+          ]
+
+          Default = "UnexpectedHistoricalApprovalResult"
+        }
+
+        NextHistoricalChunk = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action           = "next_historical_chunk"
+              "consumer.$"     = "$.consumer"
+              "execution_id.$" = "$.execution_id"
+            }
+          }
+
+          OutputPath = "$.Payload"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "CheckHistoricalChunk"
+        }
+
+        CheckHistoricalChunk = {
+          Type = "Choice"
+
+          Choices = [
+            {
+              Variable     = "$.status"
+              StringEquals = "chunk_ready"
+              Next         = "SelectHistoricalConsumer"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "complete"
+              Next         = "CompleteHistorical"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "approval_required"
+              Next         = "WaitForHistoricalApproval"
+            },
+          ]
+
+          Default = "UnexpectedHistoricalReplayResult"
+        }
+
+        SelectHistoricalConsumer = {
+          Type = "Choice"
+
+          Choices = [
+            {
+              Variable     = "$.consumer"
+              StringEquals = "AC"
+              Next         = "ReplayHistoricalAcPosition"
+            },
+            {
+              Variable     = "$.consumer"
+              StringEquals = "EMDI"
+              Next         = "ReplayHistoricalEmdiPosition"
+            },
+          ]
+
+          Default = "UnsupportedHistoricalConsumer"
+        }
+
+        ReplayHistoricalAcPosition = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_ac_position[0].lambda_function_arn
+            "Payload.$"  = "$.replay_input"
+          }
+
+          ResultPath = null
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 5
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "VerifyHistoricalChunk"
+        }
+
+        ReplayHistoricalEmdiPosition = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_emdi_position[0].lambda_function_arn
+            "Payload.$"  = "$.replay_input"
+          }
+
+          ResultPath = null
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 5
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "VerifyHistoricalChunk"
+        }
+
+        VerifyHistoricalChunk = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action           = "verify_historical_chunk"
+              "consumer.$"     = "$.consumer"
+              "execution_id.$" = "$.execution_id"
+              "chunk_index.$"  = "$.chunk_index"
+            }
+          }
+
+          OutputPath = "$.Payload"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "CheckHistoricalVerification"
+        }
+
+        CheckHistoricalVerification = {
+          Type = "Choice"
+
+          Choices = [
+            {
+              Variable     = "$.status"
+              StringEquals = "verified"
+              Next         = "CheckpointHistoricalChunk"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "verification_failed"
+              Next         = "HistoricalVerificationFailed"
+            },
+          ]
+
+          Default = "UnexpectedHistoricalVerificationResult"
+        }
+
+        CheckpointHistoricalChunk = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action                    = "checkpoint_historical"
+              "consumer.$"              = "$.consumer"
+              "execution_id.$"          = "$.execution_id"
+              "chunk_index.$"           = "$.chunk_index"
+              "verification_status.$"   = "$.status"
+              "positions_recovered.$"   = "$.positions_recovered"
+              "data_scanned_in_bytes.$" = "$.data_scanned_in_bytes"
+              "period.$"                = "$.period"
+            }
+          }
+
+          OutputPath = "$.Payload"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "NextHistoricalChunk"
+        }
+
+        CompleteHistorical = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action           = "complete_historical"
+              "consumer.$"     = "$.consumer"
+              "execution_id.$" = "$.execution_id"
+            }
+          }
+
+          OutputPath = "$.Payload"
+          Next       = "HistoricalComplete"
+        }
+
+        HistoricalComplete = {
+          Type = "Succeed"
+        }
+
+        HistoricalRejected = {
+          Type = "Succeed"
+        }
+
+        UnsupportedMode = {
+          Type  = "Fail"
+          Error = "UnsupportedReconciliationMode"
+          Cause = "The reconciliation mode must be rolling, range or full."
+        }
+
+        UnsupportedHistoricalConsumer = {
+          Type  = "Fail"
+          Error = "UnsupportedHistoricalReconciliationConsumer"
+          Cause = "Historical reconciliation only supports AC and EMDI."
+        }
+
+        UnexpectedRollingResult = {
+          Type  = "Fail"
+          Error = "UnexpectedRollingReconciliationResult"
+          Cause = "The planner returned an unexpected rolling status."
+        }
+
+        UnexpectedHistoricalPlanningResult = {
+          Type  = "Fail"
+          Error = "UnexpectedHistoricalPlanningResult"
+          Cause = "The planner returned an unexpected historical planning status."
+        }
+
+        UnexpectedHistoricalApprovalResult = {
+          Type  = "Fail"
+          Error = "UnexpectedHistoricalApprovalResult"
+          Cause = "The historical approval callback returned an unexpected result."
+        }
+
+        UnexpectedHistoricalReplayResult = {
+          Type  = "Fail"
+          Error = "UnexpectedHistoricalReplayResult"
+          Cause = "The planner returned an unexpected historical replay status."
+        }
+
+        HistoricalVerificationFailed = {
+          Type  = "Fail"
+          Error = "HistoricalReconciliationVerificationFailed"
+          Cause = "Eligible positions remain after historical replay."
+        }
+
+        UnexpectedHistoricalVerificationResult = {
+          Type  = "Fail"
+          Error = "UnexpectedHistoricalVerificationResult"
+          Cause = "The planner returned an unexpected historical verification status."
+        }
+      }
+    }
+  )
 }

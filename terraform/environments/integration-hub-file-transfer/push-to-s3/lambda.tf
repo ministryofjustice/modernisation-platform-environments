@@ -1,7 +1,7 @@
 module "lambda_file_mover" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   architectures                     = ["arm64"]
   attach_tracing_policy             = true
@@ -10,6 +10,7 @@ module "lambda_file_mover" {
   description                       = "Deliver clean files to configured customer S3 destinations"
   function_name                     = local.pattern_name
   handler                           = "handler.lambda_handler"
+  ignore_source_code_hash           = true
   memory_size                       = 512
   role_name                         = local.lambda_role_name
   runtime                           = "python3.12"
@@ -21,6 +22,7 @@ module "lambda_file_mover" {
       "!(.*/)?[^/]+\\.pyc$",
     ]
   }]
+  hash_extra   = "file-mover"
   timeout      = 900
   tracing_mode = "Active"
 
@@ -130,7 +132,7 @@ resource "aws_lambda_event_source_mapping" "push_to_s3" {
 module "lambda_dlq_reporter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   architectures                     = ["arm64"]
   attach_tracing_policy             = true
@@ -139,6 +141,7 @@ module "lambda_dlq_reporter" {
   description                       = "Report terminal push-to-s3 pipeline delivery failures"
   function_name                     = "${local.application_name}-${local.component_name}-dlq"
   handler                           = "reporter_handler.lambda_handler"
+  ignore_source_code_hash           = true
   memory_size                       = 256
   role_name                         = "${local.application_name}-${local.component_name}-dlq"
   runtime                           = "python3.12"
@@ -150,6 +153,7 @@ module "lambda_dlq_reporter" {
       "!(.*/)?[^/]+\\.pyc$",
     ]
   }]
+  hash_extra   = "dlq-reporter"
   timeout      = 60
   tracing_mode = "Active"
 

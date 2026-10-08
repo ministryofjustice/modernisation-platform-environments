@@ -2,19 +2,19 @@ locals {
   definitions_bucket_name = "${local.project}-data-product-definitions-${local.env}"
   dpd_publishing_teams = {
     activities = {
-      github_repo = "hmpps-dpr-activities-dpds"
+      github_repo    = "hmpps-dpr-activities-dpds"
       github_repo_id = "1277088899"
-      s3_prefix   = "activities"
+      s3_prefix      = "activities"
     }
     "incident-reporting" = {
-      github_repo = "hmpps-dpr-incident-reporting-dpds"
+      github_repo    = "hmpps-dpr-incident-reporting-dpds"
       github_repo_id = "1353761083"
-      s3_prefix   = "incident-reporting"
+      s3_prefix      = "incident-reporting"
     }
     "move-a-prisoner" = {
-      github_repo = "hmpps-dpr-move-a-prisoner-dpds"
+      github_repo    = "hmpps-dpr-move-a-prisoner-dpds"
       github_repo_id = "1361146782"
-      s3_prefix   = "move-a-prisoner"
+      s3_prefix      = "move-a-prisoner"
     }
   }
 }

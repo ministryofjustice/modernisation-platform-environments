@@ -165,11 +165,11 @@ resource "null_resource" "execute_create_table_query" {
     script_hash = filesha256("${path.module}/queries/fct_daily_cost.sql")
 
     # Ensure the CTAS re-runs when these execution parameters change.
-    bucket     = "coat-${local.environment}-cur-v2-hourly"
-    workgroup  = aws_athena_workgroup.ctas_athena_workgroup.name
-    output_s3  = "s3://coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/"
-    database   = aws_glue_catalog_database.cur_v2_database.name
-    region     = data.aws_region.current.region
+    bucket    = "coat-${local.environment}-cur-v2-hourly"
+    workgroup = aws_athena_workgroup.ctas_athena_workgroup.name
+    output_s3 = "s3://coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/"
+    database  = aws_glue_catalog_database.cur_v2_database.name
+    region    = data.aws_region.current.region
   }
 
   provisioner "local-exec" {
@@ -208,11 +208,11 @@ resource "null_resource" "execute_create_cost_movement_query" {
     script_hash = filesha256("${path.module}/queries/fct_cost_movement.sql")
 
     # Ensure the CTAS re-runs when these execution parameters change.
-    bucket     = "coat-${local.environment}-cur-v2-hourly"
-    workgroup   = aws_athena_workgroup.ctas_athena_workgroup.name
-    output_s3   = "s3://coat-${local.environment}-cur-v2-hourly/ctas/fct-cost-movement/"
-    database    = aws_glue_catalog_database.cur_v2_database.name
-    region      = data.aws_region.current.region
+    bucket    = "coat-${local.environment}-cur-v2-hourly"
+    workgroup = aws_athena_workgroup.ctas_athena_workgroup.name
+    output_s3 = "s3://coat-${local.environment}-cur-v2-hourly/ctas/fct-cost-movement/"
+    database  = aws_glue_catalog_database.cur_v2_database.name
+    region    = data.aws_region.current.region
   }
 
   provisioner "local-exec" {

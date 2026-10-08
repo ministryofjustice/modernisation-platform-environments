@@ -34,7 +34,7 @@ flowchart LR
 ## Key facts
 
 | | |
-|---|---|
+| --- | --- |
 | **Trigger** | EventBridge fires on a new version of the `user_list` secret |
 | **Why an EC2 hop** | AD user creation runs as a PowerShell/RSAT script over SSM on a domain-joined Windows box — the Directory Service Data API alone can't set passwords |
 | **Guardrail** | `ALLOW_MASS_DELETE=false` on user-lifecycle to prevent a bad secret edit from bulk-deleting users |

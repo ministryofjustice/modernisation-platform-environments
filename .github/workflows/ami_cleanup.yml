@@ -1,7 +1,8 @@
+---
 # .github/workflows/ami_cleanup.yml
 name: Cloud Cleanup (AMI & EBS)
 
-on:
+"on":
   workflow_dispatch:
     inputs:
       application:
@@ -29,12 +30,12 @@ permissions:
   contents: read
 
 env:
-  APPLICATION:   ${{ github.event.inputs.application || 'cooker' }}
-  ENVIRONMENTS:  ${{ github.event.inputs.environments || 'development' }}
-  AMI_ARGS:      "-c -m 3"    # month-based AMI threshold for live runs
-  EBS_MONTHS:    "1"          # month-based EBS threshold for live runs
-  AGE_MINUTES:   "3"          # age of resources in minutes when testing preview/live
-  LIVE_TEST_MODE: "false"     # false uses month gates and true uses the minute-based threshold
+  APPLICATION: ${{ github.event.inputs.application || 'cooker' }}
+  ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
+  AMI_ARGS: "-c -m 3" # month-based AMI threshold for live runs
+  EBS_MONTHS: "1" # month-based EBS threshold for live runs
+  AGE_MINUTES: "3" # age of resources in minutes when testing preview/live
+  LIVE_TEST_MODE: "false" # false uses month gates and true uses the minute-based threshold
 
 jobs:
   build-matrix:
@@ -63,7 +64,7 @@ jobs:
 
   fetch-secrets:
     name: Fetch ENV management secrets
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@2caea529829b1a7959afd2c16da632b0ea7308dc # v6.2.6
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@6a78b87ea8e63646ec10701857c70cb2487738ab # v6.2.7
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -94,7 +95,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@2caea529829b1a7959afd2c16da632b0ea7308dc # v6.2.6
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -338,7 +339,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@2caea529829b1a7959afd2c16da632b0ea7308dc # v6.2.6
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -595,7 +596,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@2caea529829b1a7959afd2c16da632b0ea7308dc # v6.2.6
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}

@@ -30,4 +30,10 @@ resource "aws_transfer_server" "this" {
   )
 
   depends_on = [aws_acm_certificate_validation.ftps]
+
+  # Recreating the server generates a new host key, breaking every partner's
+  # known_hosts entry.
+  lifecycle {
+    prevent_destroy = true
+  }
 }

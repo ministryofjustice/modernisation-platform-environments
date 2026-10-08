@@ -1,0 +1,107 @@
+---
+# EKS custom CNI overlay networking; pod IPs are allocated from an internal cluster pool.
+k8sServiceHost: ${k8sServiceHost}
+k8sServicePort: "443"
+
+tunnelProtocol: vxlan
+
+eni:
+  enabled: false
+
+kubeProxyReplacement: true
+
+cluster:
+  name: ${cluster_name}
+  id: 1
+
+ipam:
+  mode: cluster-pool
+  operator:
+    clusterPoolIPv4PodCIDRList:
+      - 100.64.0.0/16
+    clusterPoolIPv4MaskSize: 25
+
+egressMasqueradeInterfaces: eth0
+
+operator:
+  replicas: 2
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+  prometheus:
+    serviceMonitor:
+      enabled: true
+
+hubble:
+  relay:
+    enabled: true
+    nodeSelector:
+      compute.data-platform.service.justice.gov.uk/node: system
+    tolerations:
+      - key: compute.data-platform.service.justice.gov.uk/node
+        operator: Equal
+        value: system
+        effect: NoSchedule
+    prometheus:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  ui:
+    enabled: true
+    nodeSelector:
+      compute.data-platform.service.justice.gov.uk/node: system
+    tolerations:
+      - key: compute.data-platform.service.justice.gov.uk/node
+        operator: Equal
+        value: system
+        effect: NoSchedule
+
+localRedirectPolicies:
+  enabled: true
+
+tolerations:
+  - operator: Exists
+    effect: NoSchedule
+  - operator: Exists
+    effect: NoExecute
+
+envoy:
+  enabled: true
+  tolerations:
+    - operator: Exists
+      effect: NoSchedule
+    - operator: Exists
+      effect: NoExecute
+  prometheus:
+    serviceMonitor:
+      enabled: true
+
+resources:
+  limits:
+    cpu: 4000m
+    memory: 4Gi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+
+enableEndpointRoutes: true
+
+routingMode: tunnel
+
+prometheus:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+crdWaitTimeout: 15m
+
+rollOutCiliumPods: true
+
+gatewayAPI:
+  enabled: true
+  gatewayClass:
+    create: "false"

@@ -242,6 +242,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       var.enable_status_check ? aws_api_gateway_method.get_status[0].id : null,
       aws_api_gateway_integration.step_function_integration.id,
       var.enable_status_check ? aws_api_gateway_integration.status_integration[0].id : null,
+      aws_api_gateway_rest_api_policy.vpc_policy.policy,
     ])))
   }
 

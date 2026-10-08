@@ -80,7 +80,7 @@ locals {
     ] : local.is-preproduction ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-preprod}",
-  ] : [
+    ] : [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-prod}",
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-prod}",
   ]
@@ -288,7 +288,7 @@ data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
     sid       = "AllowAccessToTriggerUpdateP1API"
     effect    = "Allow"
     actions   = ["execute-api:Invoke"]
-    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
+    resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
   }
   statement {
     sid       = "ListAccountAliasForEnvironmentClass"
@@ -362,7 +362,7 @@ resource "aws_iam_role_policy_attachment" "athena_access_em_test_tags" {
 }
 
 resource "aws_lakeformation_permissions" "em_test_tags_db" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   principal   = module.emd_test_tags_role[0].iam_role_arn
   permissions = ["DESCRIBE"]
   database {
@@ -371,7 +371,7 @@ resource "aws_lakeformation_permissions" "em_test_tags_db" {
 }
 
 resource "aws_lakeformation_permissions" "em_test_tags_table" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   principal   = module.emd_test_tags_role[0].iam_role_arn
   permissions = ["DESCRIBE", "SELECT"]
   table {
@@ -381,7 +381,7 @@ resource "aws_lakeformation_permissions" "em_test_tags_table" {
 }
 
 resource "aws_lakeformation_permissions" "em_test_tags_s3" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   principal   = module.emd_test_tags_role[0].iam_role_arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -1045,7 +1045,7 @@ resource "aws_iam_role_policy_attachment" "standard_athena_access_api" {
 }
 
 resource "aws_iam_role_policy_attachment" "database_access_api" {
-  count      = local.is-development ? 1 :0 
+  count      = local.is-development ? 1 : 0
   policy_arn = aws_iam_policy.em_data_api_permissions[0].arn
   role       = module.data_api_role.iam_role_name
 }

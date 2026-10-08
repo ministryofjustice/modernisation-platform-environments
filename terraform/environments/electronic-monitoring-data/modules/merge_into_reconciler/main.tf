@@ -5,7 +5,7 @@ module "merge_into_this" {
   variable_dictionary = tomap(
     {
       "merge_function_name" = var.function_to_iterate.lambda_function_arn,
-      "table_name"          = local.camel_name 
+      "table_name"          = local.camel_name
     }
   )
   type = "STANDARD"
@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "merge_into_this" {
   statement {
     effect    = "Allow"
     actions   = ["lambda:InvokeFunction"]
-    resources = [var.function_to_iterate.lambda_function_arn,]
+    resources = [var.function_to_iterate.lambda_function_arn, ]
   }
 }
 

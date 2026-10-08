@@ -265,7 +265,7 @@ resource "aws_instance" "s609693lo6vw108" {
   }
 }
 
-# Development Server
+# Team Foundation Server
 
 resource "aws_instance" "s609693lo6vw109" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -397,7 +397,7 @@ resource "aws_instance" "s609693lo6vw113" {
   }
 }
 
-# Development Server
+# AI Development Server
 
 resource "aws_instance" "s609693lo6vw114" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -473,6 +473,32 @@ resource "aws_instance" "s609693lo6vw116" {
     Name        = "s609693lo6vw116"
     patch_group = "dev_win_patch"
     role        = "ses_sql_config"
+    backup      = true
+  }
+}
+
+# Dev Ops Server 2022 (POC)
+
+resource "aws_instance" "s609693lo6vw117" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0a962366cd0ca6b5e"
+  instance_type          = "m5.xlarge"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["Team-Foundation-Server-Security-Group"].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw117"
+    patch_group = "dev_win_patch"
+    role        = "ses_tfs_config"
     backup      = true
   }
 }
@@ -630,7 +656,7 @@ resource "aws_instance" "s618358rgvw029" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-08a06c03d368d86da"
-  instance_type          = "c6i.xlarge"     # temporary instance type for testing - to be downgraded to an m5.large as a later date
+  instance_type          = "c6i.xlarge" # temporary instance type for testing - to be downgraded to an m5.large as a later date
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.all["Tooling-Service-Server-Security-Group"].id]
@@ -716,7 +742,7 @@ resource "aws_instance" "s618358rgvw019" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   # vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id] = prestaged new security group for CHG0125710 on 11 October
-  subnet_id              = data.aws_subnet.private_subnets_b.id
+  subnet_id = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
     http_tokens   = "required"
@@ -745,7 +771,7 @@ resource "aws_instance" "s618358rgvw020" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   # vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id] # prestaged new security group for CHG0125710 on 11 October
-  subnet_id              = data.aws_subnet.private_subnets_c.id
+  subnet_id = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
     http_tokens   = "required"
@@ -774,7 +800,7 @@ resource "aws_instance" "s618358rgvw021" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-PROD-Database[0].id]
   # vpc_security_group_ids = [aws_security_group.conditional["PPUD-PROD-Database-Security-Group"].id] # prestaged new security group for CHG0125710 on 11 October
-  subnet_id              = data.aws_subnet.data_subnets_a.id
+  subnet_id = data.aws_subnet.data_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -807,7 +833,7 @@ resource "aws_instance" "s618358rgvw022" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Archive-DOC-Server[0].id]
   # vpc_security_group_ids = [aws_security_group.all["Document-Service-Servers-Security-Group"].id] # prestaged new security group for CHG0125710 on 11 October
-  subnet_id              = data.aws_subnet.private_subnets_b.id
+  subnet_id = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
     http_tokens   = "required"
@@ -841,7 +867,7 @@ resource "aws_instance" "s618358rgsw025p" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   # vpc_security_group_ids = [aws_security_group.all["WAM-Data-Access-Server-Security-Group"].id] # prestaged new security group for CHG0125710 on 11 October
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -870,7 +896,7 @@ resource "aws_instance" "s618358rgvw027" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Live-DOC-Server[0].id]
   # vpc_security_group_ids = [aws_security_group.all["Document-Service-Servers-Security-Group"].id] # prestaged new security group for CHG0125710 on 11 October
-  subnet_id              = data.aws_subnet.private_subnets_c.id
+  subnet_id = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
     http_tokens   = "required"
@@ -901,7 +927,7 @@ resource "aws_instance" "s618358rgvw030" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]
-  subnet_id = data.aws_subnet.private_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -980,7 +1006,7 @@ resource "aws_instance" "s618358rgvw204" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   # vpc_security_group_ids = [aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id] # prestaged new security group for CHG0125710 on 11 October
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -1007,7 +1033,7 @@ resource "aws_instance" "s618358rgvw205" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
   # vpc_security_group_ids = [aws_security_group.conditional["WAM-Bridge-Server-Security-Group"].id] # prestaged new security group for CHG0125710 on 11 October
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -1200,7 +1226,7 @@ resource "aws_instance" "internal-mail-relay" {
   tags = {
     Name              = "internal-mail-relay"
     is-production     = true
-    patch_group       = "prod_lin_patch"
+    patch_group       = "prod_lin_patch_al2023"
     docker_service    = "true"
     container_service = "true"
     archive_volume    = "true"
@@ -1230,7 +1256,7 @@ resource "aws_instance" "non-cjsm-mail-relay" {
   tags = {
     Name              = "non-cjsm-mail-relay"
     is-production     = true
-    patch_group       = "prod_lin_patch"
+    patch_group       = "prod_lin_patch_al2023"
     docker_service    = "true"
     container_service = "true"
     port25_check      = "true"
@@ -1260,7 +1286,7 @@ resource "aws_instance" "cjsm-mail-relay" {
   tags = {
     Name              = "cjsm-mail-relay"
     is-production     = true
-    patch_group       = "prod_lin_patch"
+    patch_group       = "prod_lin_patch_al2023"
     docker_service    = "true"
     container_service = "true"
     port25_check      = "true"
@@ -1290,7 +1316,7 @@ resource "aws_instance" "docker-build-instance" {
   tags = {
     Name          = "docker-build-instance"
     is-production = true
-    patch_group   = "prod_lin_patch"
+    patch_group   = "prod_lin_patch_al2023"
   }
 }
 

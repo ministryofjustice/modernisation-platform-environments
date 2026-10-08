@@ -610,6 +610,45 @@ locals {
       }
     }
 
+    ec2_instance_cwagent_collectd_rclone_sync = {
+      rclone-sync-error = {
+        type            = "metric"
+        alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_rclone_sync_value\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 Instance rclone-sync-error"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "exitcode"
+            }
+          }
+        }
+      }
+      rclone-sync-metric-not-updated = {
+        type            = "metric"
+        alarm_threshold = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_rclone_sync.rclone-sync-metric-not-updated.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_textfile_monitoring_rclone_sync_seconds\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Instance rclone-sync-metric-not-updated"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "seconds"
+            }
+          }
+        }
+      }
+    }
+
     lb = {
       load-balancer-requests = {
         type       = "metric"
@@ -1195,6 +1234,14 @@ locals {
       widgets = [
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_filesystems_check.filesystems-check-error,
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_filesystems_check.filesystems-check-metric-not-updated,
+      ]
+    }
+    ec2_instance_rclone_sync = {
+      width  = 8
+      height = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_rclone_sync.rclone-sync-error,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_rclone_sync.rclone-sync-metric-not-updated,
       ]
     }
     ec2_instance_endpoint_monitoring = {

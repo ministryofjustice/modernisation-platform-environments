@@ -1,0 +1,12 @@
+{
+  "accounts": {
+    "development": {
+      "builder_hostname": "ai-builder-dev.modernisation-platform.service.justice.gov.uk",
+      "forge_hostname": "forge.ai-builder-dev.modernisation-platform.service.justice.gov.uk"
+    },
+    "production": {
+      "builder_hostname": "ai-builder.modernisation-platform.service.justice.gov.uk",
+      "forge_hostname": "forge.ai-builder.modernisation-platform.service.justice.gov.uk"
+    }
+  }
+}

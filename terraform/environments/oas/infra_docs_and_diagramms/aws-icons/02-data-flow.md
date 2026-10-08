@@ -59,7 +59,7 @@ sequenceDiagram
 ## Key facts
 
 | | |
-|---|---|
+| --- | --- |
 | **Console/EM ports** | 9500 (HTTP) / 9501 (HTTPS) |
 | **Analytics/DV ports** | 9502 (HTTP) / 9503 (HTTPS) |
 | **Direct DB access** | LZ Workspaces reach RDS on 1521 without going through the ALB or EC2 — allowed by a dedicated RDS security group rule for the management CIDR |

@@ -130,7 +130,7 @@ resource "aws_autoscaling_schedule" "weblogic_eis_scale_down" {
   min_size               = 0
   max_size               = 0
   desired_capacity       = 0
-  recurrence             = "0 5 * * Mon-Fri"
+  recurrence             = "0 19 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.weblogic_eis.name
 }
 
@@ -141,7 +141,7 @@ resource "aws_autoscaling_schedule" "weblogic_eis_scale_up" {
   min_size               = var.delius_microservice_configs.weblogic_eis.asg_min_size
   max_size               = var.delius_microservice_configs.weblogic_eis.asg_max_size
   desired_capacity       = var.delius_microservice_configs.weblogic_eis.asg_min_size
-  recurrence             = "0 19 * * Mon-Fri"
+  recurrence             = "0 5 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.weblogic_eis.name
 }
 
@@ -185,3 +185,23 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
   }
 }
 
+locals {
+  weblogic_eis_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic-eis"
+  weblogic_eis_task_count = {
+    dev     = 1
+    test    = 1
+    stage   = 0
+    preprod = 2
+    prod    = 2
+  }
+}
+
+module "ecs_nightly_restart_weblogic_eis" {
+  source = "../components/ecs_nightly_restart"
+
+  env_name     = var.env_name
+  cluster_name = module.ecs.ecs_cluster_arn
+  service_name = "${var.env_name}-weblogic-eis"
+  service_arn  = local.weblogic_eis_service_arn
+  task_count   = local.weblogic_eis_task_count[var.env_name]
+}

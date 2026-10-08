@@ -3599,3 +3599,339 @@ resource "aws_lakeformation_permissions" "specials_remediation_table_access" {
     name          = "position"
   }
 }
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation IAM
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "merge_redrive_planner" {
+  name               = "merge_redrive_planner_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
+  statement {
+    sid    = "AthenaReconciliationQueries"
+    effect = "Allow"
+
+    actions = [
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution",
+    ]
+
+    resources = [
+      aws_athena_workgroup.downstream_reconciliation.arn,
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:datacatalog/AwsDataCatalog",
+    ]
+  }
+
+  statement {
+    sid    = "GlueReconciliationMetadata"
+    effect = "Allow"
+
+    actions = [
+      "glue:GetCatalog",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetTable",
+      "glue:GetTables",
+    ]
+
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/allied_mdss${local.db_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_mdss${local.dbt_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/acquisitive_crime${local.dbt_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights${local.dbt_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/allied_mdss${local.db_suffix}/position",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_mdss${local.dbt_suffix}/position",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquisitive_crime${local.dbt_suffix}/position",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquisitive_crime${local.dbt_suffix}/device_activations",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights${local.dbt_suffix}/position",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights${local.dbt_suffix}/device_activations",
+    ]
+  }
+
+  statement {
+    sid       = "LakeFormationReconciliationRead"
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AthenaReconciliationBucket"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+    ]
+
+    resources = [
+      module.s3-athena-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AthenaReconciliationResults"
+    effect = "Allow"
+
+    actions = [
+      "s3:AbortMultipartUpload",
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:ListMultipartUploadParts",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-athena-bucket.bucket.arn}/output/downstream_reconciliation/*",
+    ]
+  }
+
+  statement {
+    sid     = "PublishReconciliationNotifications"
+    effect  = "Allow"
+    actions = ["sns:Publish"]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+    ]
+  }
+
+  statement {
+    sid    = "UseReconciliationNotificationKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*",
+    ]
+
+    resources = [
+      aws_kms_key.emds_alerts.arn,
+    ]
+  }
+  statement {
+    sid    = "ReconciliationStateAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid    = "StoreReconciliationApprovalToken"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation-approval-tokens/${local.environment_shorthand}/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "merge_redrive_planner" {
+  name   = "merge_redrive_planner_lambda_policy"
+  policy = data.aws_iam_policy_document.merge_redrive_planner_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "merge_redrive_planner" {
+  role       = aws_iam_role.merge_redrive_planner.name
+  policy_arn = aws_iam_policy.merge_redrive_planner.arn
+}
+
+resource "aws_iam_role" "merge_redrive_approval" {
+  name               = "merge_redrive_approval_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "merge_redrive_approval_policy_document" {
+  statement {
+    sid    = "ReadReconciliationApprovalState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid    = "ConsumeReconciliationApprovalToken"
+    effect = "Allow"
+
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation-approval-tokens/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid       = "CompleteReconciliationApprovalCallback"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "merge_redrive_approval" {
+  name   = "merge_redrive_approval_lambda_policy"
+  policy = data.aws_iam_policy_document.merge_redrive_approval_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "merge_redrive_approval" {
+  role       = aws_iam_role.merge_redrive_approval.name
+  policy_arn = aws_iam_policy.merge_redrive_approval.arn
+}
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation approval access
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "downstream_reconciliation_chatbot_approval" {
+  statement {
+    sid    = "InvokeReconciliationApprovalLambda"
+    effect = "Allow"
+
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+
+    resources = [
+      module.merge_redrive_approval.lambda_function_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "downstream_reconciliation_chatbot_approval" {
+  name = "downstream_reconciliation_chatbot_approval"
+
+  policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_chatbot_approval.json
+  )
+}
+
+data "aws_iam_policy_document" "downstream_reconciliation_approver_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["chatbot.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "downstream_reconciliation_approver" {
+  name = "downstream_reconciliation_approver"
+
+  assume_role_policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_approver_assume.json
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "downstream_reconciliation_approver" {
+  role       = aws_iam_role.downstream_reconciliation_approver.name
+  policy_arn = aws_iam_policy.downstream_reconciliation_chatbot_approval.arn
+}
+
+# ------------------------------------------------------------------------------
+# IAM role and policy for the rota channel notifier Lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rota_channel_notifier" {
+  name               = "rota_channel_notifier_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "rota_channel_notifier_policy_document" {
+  statement {
+    sid    = "ReadRotaChannelNotifierSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+      module.rota_channel_notifier_slack.secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "rota_channel_notifier" {
+  name   = "rota_channel_notifier_lambda_policy"
+  policy = data.aws_iam_policy_document.rota_channel_notifier_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "rota_channel_notifier_attach" {
+  role       = aws_iam_role.rota_channel_notifier.name
+  policy_arn = aws_iam_policy.rota_channel_notifier.arn
+}
+
+# ------------------------------------------------------------------------------
+# send_ear_sar_response
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "send_ear_sar_response" {
+  count = local.is-test ? 0 : 1
+  name               = "send_ear_sar_response_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "send_ear_sar_response_policy_document" {
+  count = local.is-test ? 0 : 1
+  statement {
+    sid    = "ReadGovNotifySecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.gov_notify_details[0].secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "send_ear_sar_response" {
+  count = local.is-test ? 0 : 1
+  name   = "send_ear_sar_response_lambda_policy"
+  policy = data.aws_iam_policy_document.send_ear_sar_response_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "send_ear_sar_response_attach" {
+  count = local.is-test ? 0 : 1
+  role       = aws_iam_role.send_ear_sar_response[0].name
+  policy_arn = aws_iam_policy.send_ear_sar_response[0].arn
+}
