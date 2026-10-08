@@ -58,10 +58,8 @@ variable "enable_in_app_oidc" {
     Requires ``enable_oidc_auth = true`` and ``oidc_configured = true`` so
     the underlying secrets exist and hold populated values.
 
-    Default true now that development's secrets are populated; actual
-    activation is still gated to the development account only via
-    ``local.oidc_auto_enabled_environment`` in oidc.tf, so production is
-    unaffected until that gate is consciously removed/widened.
+    Default true now that both accounts' secrets are populated and their
+    redirect URIs are registered in the shared Entra app registration.
   EOT
   default     = true
 }
