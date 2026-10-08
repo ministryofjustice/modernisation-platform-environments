@@ -1276,7 +1276,6 @@ data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document
       "glue:GetTables",
       "glue:GetTable",
       "glue:GetDatabase",
-      "glue:UpdateTable",
       "glue:DeleteTable",
       "glue:DeleteDatabase",
     ]
@@ -1293,8 +1292,6 @@ data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document
     effect = "Allow"
     actions = [
       "s3:ListBucket",
-      "s3:GetObject",
-      "s3:PutObject",
       "s3:DeleteObject",
       "s3:DeleteObjectVersion",
       "s3:GetBucketLocation",
@@ -1302,8 +1299,6 @@ data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document
     resources = [
       module.s3-create-a-derived-table-bucket.bucket.arn,
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
-      module.s3-athena-bucket.bucket.arn,
-      "${module.s3-athena-bucket.bucket.arn}/*",
     ]
   }
 
@@ -1314,6 +1309,7 @@ data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document
       "lakeformation:GrantPermissions",
       "lakeformation:RevokePermissions",
       "lakeformation:ListPermissions",
+      "lakeformation:GetDataAccess",
     ]
     resources = ["*"]
   }
