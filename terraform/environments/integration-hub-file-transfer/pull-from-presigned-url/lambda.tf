@@ -1,14 +1,14 @@
 module "lambda_notifier" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  source                            = "terraform-aws-modules/lambda/aws"
-  version                           = "8.9.0"
-  function_name                     = local.pattern_name
-  role_name                         = local.pattern_name
-  description                       = "Notify recipients in Slack with an authenticated MFT portal link"
-  runtime                           = "python3.12"
-  architectures                     = ["arm64"]
-  handler                           = "handler.lambda_handler"
-  source_path                       = [{ path = "${path.module}/lambda/notifier", patterns = ["!tests/.*", "!.*__pycache__/.*"] }]
+  source        = "terraform-aws-modules/lambda/aws"
+  version       = "8.9.0"
+  function_name = local.pattern_name
+  role_name     = local.pattern_name
+  description   = "Notify recipients in Slack with an authenticated MFT portal link"
+  runtime       = "python3.12"
+  architectures = ["arm64"]
+  handler       = "handler.lambda_handler"
+  source_path   = [{ path = "${path.module}/lambda/notifier", patterns = ["!tests/.*", "!.*__pycache__/.*"] }]
   # Match the other delivery components: the content-derived package filename
   # tracks code changes without comparing rebuilt ZIP bytes during apply.
   ignore_source_code_hash           = true
