@@ -83,7 +83,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Principal = {
           AWS = "*"
         },
-        Action   = "s3:*",
+        Action = "s3:*",
         Resource = [
           "${module.s3-bucket-logging.bucket.arn}/*",
           module.s3-bucket-logging.bucket.arn
