@@ -1,4 +1,4 @@
 output "portal_url" { value = local.portal_url }
-output "webhook_secret_names" {
-  value = { for id, secret in aws_secretsmanager_secret.webhook : id => secret.name }
+output "slack_notification_topics" {
+  value = { for id, topic in module.sns_slack : id => topic.topic_arn }
 }

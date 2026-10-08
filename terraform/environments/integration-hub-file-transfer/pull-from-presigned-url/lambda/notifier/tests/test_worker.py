@@ -2,14 +2,14 @@ import copy
 import json
 import unittest
 from unittest.mock import Mock, patch
-from worker import InvalidNotification, Store, message, post_slack, process
+from worker import InvalidNotification, Store, message, process
 
 NOW = 1790762400
 SECRET = "arn:aws:secretsmanager:eu-west-2:123456789012:secret:dispatch-abcdef"
 CONFIG = {"account": "123456789012", "queue_arn": "queue", "topic_arn": "topic",
           "clean_bucket": "clean", "portal_url": "https://web.development.file-transfer.service.justice.gov.uk",
           "pickup_bucket": "pickup", "pickup_kms_key": "key", "routes": {SECRET: {"prefix": "products-poc/uploads/", "recipient_id": "products",
-                               "webhook_secret_arn": "webhook-secret"}}}
+                               "notification_topic_arn": "slack-topic"}}}
 DATA = {"actionExecutionId": "8f2f1df5-a54d-4852-be34-a75781f80418",
         "fileId": "8f2f1df5-a54d-4852-be34-a75781f80419", "requestedAt": "2026-09-30T10:00:00Z",
         "notifications": ["slack"], "configurationReference": {"secretArn": SECRET, "secretVersionId": "version1"},
@@ -29,8 +29,7 @@ class WorkerTests(unittest.TestCase):
         self.store.claim.return_value = True
         self.secrets = Mock()
         self.secrets.get_secret_value.side_effect = [
-            {"SecretString": json.dumps({"notifications": {"slack": "products"}})},
-            {"SecretString": json.dumps({"url": "https://hooks.slack.com/services/T/B/credential"})}]
+            {"SecretString": json.dumps({"notifications": {"slack": "products"}})}]
         self.send = Mock()
         self.retainer = Mock()
         self.retainer.prepare.return_value = {"bucket": "pickup", "key": "products/execution/test.txt"}
@@ -39,12 +38,16 @@ class WorkerTests(unittest.TestCase):
         return process(rec or record(), config or CONFIG, self.store, self.secrets, self.send, lambda: NOW, self.retainer)
 
     def test_sends_only_portal_link_and_reads_exact_dispatch_version(self):
-        self.assertEqual(self.run_record(), "sent")
+        self.assertEqual(self.run_record(), "published")
         self.assertEqual(self.secrets.get_secret_value.call_args_list[0].kwargs,
                          {"SecretId": SECRET, "VersionId": "version1"})
         payload = self.send.call_args.args[1]
-        self.assertEqual(payload["blocks"][2]["elements"][0]["url"], CONFIG["portal_url"])
-        self.assertIn("pickup/products/execution/test.txt", payload["blocks"][1]["text"]["text"])
+        self.assertIn(CONFIG["portal_url"], payload["content"]["description"])
+        self.assertEqual(self.send.call_args.args[0], "slack-topic")
+        self.assertEqual(self.secrets.get_secret_value.call_count, 1)
+        self.assertEqual(payload["source"], "custom")
+        self.assertEqual(payload["version"], "1.0")
+        self.assertIn("pickup/products/execution/test.txt", payload["content"]["description"])
         self.retainer.prepare.assert_called_once()
         self.assertNotIn("X-Amz", json.dumps(payload))
         self.assertNotIn("credential", json.dumps(payload))
@@ -112,20 +115,16 @@ class WorkerTests(unittest.TestCase):
         config=copy.deepcopy(CONFIG); config["portal_url"]="https://evil.invalid/"
         with self.assertRaises(InvalidNotification): self.run_record(config=config)
 
-    def test_filename_is_plain_text(self):
-        data=copy.deepcopy(DATA); data["object"]["key"]="products-poc/uploads/<https://evil.invalid|click> <!channel>"
-        payload=message(data,CONFIG["portal_url"], {"bucket": "pickup", "key": data["object"]["key"]})
-        self.assertEqual(payload["blocks"][1]["text"]["type"],"plain_text")
-        self.assertFalse(payload["unfurl_links"])
-
-    def test_webhook_ssrf_blocked(self):
-        for url in ("http://hooks.slack.com/services/T/B/C", "https://evil.invalid/services/T/B/C",
-                    "https://hooks.slack.com.evil.invalid/services/T/B/C", "https://hooks.slack.com/services/T/B/C?redirect=evil"):
-            with self.assertRaises(InvalidNotification): post_slack(url,{})
-
-    def test_redirect_handler_refuses_redirects(self):
-        from worker import NoRedirect
-        self.assertIsNone(NoRedirect().redirect_request(None,None,302,"",{},"https://evil.invalid"))
+    def test_filename_cannot_inject_slack_markup(self):
+        key = "products-poc/uploads/<https://evil.invalid|click> <!channel> `name` &test"
+        payload = message(DATA, CONFIG["portal_url"], {"bucket": "pickup", "key": key})
+        description = payload["content"]["description"]
+        self.assertNotIn("<!channel>", description)
+        self.assertNotIn("<https://evil.invalid", description)
+        self.assertIn("%3C%21channel%3E", description)
+        from urllib.parse import unquote
+        self.assertEqual(unquote(description.split("s3://pickup/", 1)[1].split("\n", 1)[0]), key)
+        self.assertFalse(payload["metadata"]["enableCustomActions"])
 
     def test_store_retries_in_progress_but_acknowledges_sent(self):
         class ConditionalError(Exception):
@@ -149,8 +148,11 @@ class HandlerTests(unittest.TestCase):
                 "os.environ", {"CONFIG": json.dumps(CONFIG), "IDEMPOTENCY_TABLE": "test"}):
             spec=importlib.util.spec_from_file_location("notifier_test_handler",Path(__file__).parents[1]/"handler.py")
             handler=importlib.util.module_from_spec(spec);spec.loader.exec_module(handler)
+        payload = message(DATA, CONFIG["portal_url"], {"bucket": "pickup", "key": "products/test.txt"})
+        handler.publish_notification("slack-topic", payload)
+        handler.SNS.publish.assert_called_once_with(TopicArn="slack-topic", Message=json.dumps(payload))
         output=io.StringIO()
-        with patch.object(handler,"process",side_effect=["sent",RuntimeError("https://hooks.slack.com/services/SECRET")]), redirect_stdout(output):
+        with patch.object(handler,"process",side_effect=["published",RuntimeError("SECRET")]), redirect_stdout(output):
             result=handler.lambda_handler({"Records":[{"messageId":"ok"},{"messageId":"retry"}]},Mock())
         self.assertEqual(result,{"batchItemFailures":[{"itemIdentifier":"retry"}]})
         self.assertNotIn("SECRET",output.getvalue())

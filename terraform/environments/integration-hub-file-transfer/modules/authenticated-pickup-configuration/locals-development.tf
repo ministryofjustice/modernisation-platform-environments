@@ -1,10 +1,11 @@
 locals {
   development = {
-    # Notification-only API trial in #integration-hub-team. Configure the channel's
-    # incoming webhook in the generated secret; no download access is granted yet.
+    # Notification-only API trial; download access remains disabled.
     products-poc-slack-test = {
-      prefix = "products-poc/uploads/"
-      groups = []
+      prefix           = "products-poc/uploads/"
+      groups           = []
+      slack_channel_id = "C0ARA0C101L" # integration-hub-team
+      slack_team_id    = "T02DYEB3A"   # Justice Digital
     }
   }
 }
