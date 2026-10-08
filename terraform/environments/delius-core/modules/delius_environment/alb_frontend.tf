@@ -116,8 +116,14 @@ resource "aws_lb" "delius_core_frontend" {
   drop_invalid_header_fields = true
 
   access_logs {
-    bucket  = module.weblogic_alb_access_logs.bucket.id
-    prefix  = "weblogic-${var.env_name}-alb"
+    bucket  = module.weblogic_alb_logs.bucket_id
+    prefix  = "${var.env_name}-weblogic-access"
+    enabled = true
+  }
+
+  connection_logs {
+    bucket  = module.weblogic_alb_logs.bucket_id
+    prefix  = "${var.env_name}-weblogic-connection"
     enabled = true
   }
 
@@ -194,4 +200,18 @@ resource "aws_lb_listener_rule" "homepage_listener_rule" {
       path        = var.environment_config.homepage_path
     }
   }
+}
+
+module "weblogic_alb_logs" {
+  source = "../components/alb_logs_athena_glue"
+
+  providers = {
+    aws                    = aws
+    aws.bucket-replication = aws
+  }
+
+  account_id     = data.aws_caller_identity.current.account_id
+  account_region = var.account_info.region
+  env_name       = var.env_name
+  app_name       = "weblogic"
 }
