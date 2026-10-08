@@ -1,5 +1,25 @@
 locals {
   script_runner_container_image_tag_parameter_name = "/modernisation-platform-ai-builder-core/script-runner/container-image-tag"
+  forge_runtime_version_parameter_name             = "/${local.application_name}/${local.environment}/forge_runtime_version"
+}
+
+resource "aws_ssm_parameter" "forge_runtime_version" {
+  #checkov:skip=CKV_AWS_337:Forge runtime version is non-sensitive.
+  #checkov:skip=CKV2_AWS_34:Forge runtime version is non-sensitive.
+  name  = local.forge_runtime_version_parameter_name
+  type  = "String"
+  value = "0.0.0"
+  tags  = local.tags
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+data "aws_ssm_parameter" "forge_runtime_version" {
+  name = local.forge_runtime_version_parameter_name
+
+  depends_on = [aws_ssm_parameter.forge_runtime_version]
 }
 
 resource "aws_ssm_parameter" "script_runner_container_image_tag" {
@@ -26,8 +46,8 @@ data "aws_iam_role" "modernisation_platform_oidc_cicd" {
   name = "modernisation-platform-oidc-cicd"
 }
 
-resource "aws_iam_role_policy" "script_runner_container_image_tag" {
-  name = "script-runner-container-image-tag"
+resource "aws_iam_role_policy" "backend_processing_cicd" {
+  name = "backend-processing-cicd"
   role = data.aws_iam_role.modernisation_platform_oidc_cicd.name
 
   policy = jsonencode({

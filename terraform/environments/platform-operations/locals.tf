@@ -4,6 +4,7 @@ locals {
 
   baseline_presets_all_environments = {
     options = {
+      cloudwatch_metric_alarms_default_actions    = ["dso-pipelines-pagerduty"]
       enable_business_unit_kms_cmks               = true
       enable_ec2_cloud_watch_agent                = true
       enable_ec2_oracle_enterprise_managed_server = true
@@ -40,4 +41,6 @@ locals {
     production  = local.github_actions_lambda_production
   }
   github_actions_lambda_environment_specific = local.github_actions_lambda_environments_specific[local.environment]
+
+  github_actions_project_name = "github-actions"
 }

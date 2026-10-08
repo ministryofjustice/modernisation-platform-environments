@@ -3855,6 +3855,82 @@ resource "aws_iam_role_policy_attachment" "downstream_reconciliation_approver" {
 }
 
 # ------------------------------------------------------------------------------
+# IAM role and policy for the rota channel notifier Lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rota_channel_notifier" {
+  name               = "rota_channel_notifier_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "rota_channel_notifier_policy_document" {
+  statement {
+    sid    = "ReadRotaChannelNotifierSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+      module.rota_channel_notifier_slack.secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "rota_channel_notifier" {
+  name   = "rota_channel_notifier_lambda_policy"
+  policy = data.aws_iam_policy_document.rota_channel_notifier_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "rota_channel_notifier_attach" {
+  role       = aws_iam_role.rota_channel_notifier.name
+  policy_arn = aws_iam_policy.rota_channel_notifier.arn
+}
+
+# ------------------------------------------------------------------------------
+# send_ear_sar_response
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "send_ear_sar_response" {
+  count = local.is-test ? 0 : 1
+  name               = "send_ear_sar_response_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "send_ear_sar_response_policy_document" {
+  count = local.is-test ? 0 : 1
+  statement {
+    sid    = "ReadGovNotifySecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.gov_notify_details[0].secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "send_ear_sar_response" {
+  count = local.is-test ? 0 : 1
+  name   = "send_ear_sar_response_lambda_policy"
+  policy = data.aws_iam_policy_document.send_ear_sar_response_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "send_ear_sar_response_attach" {
+  count = local.is-test ? 0 : 1
+  role       = aws_iam_role.send_ear_sar_response[0].name
+  policy_arn = aws_iam_policy.send_ear_sar_response[0].arn
+}
+
+
+# ------------------------------------------------------------------------------
 # Trigger DLT Iceberg Maintenance
 # ------------------------------------------------------------------------------
 

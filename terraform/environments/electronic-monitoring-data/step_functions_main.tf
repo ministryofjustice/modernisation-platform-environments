@@ -83,6 +83,7 @@ module "ears_sars_step_function" {
     {
       "ears_sars_request"   = module.ears_sars_request[0].lambda_function_name,
       "write_to_sharepoint" = module.write_to_sharepoint[0].lambda_function_name,
+      "send_email"          = module.send_ear_sar_response[0].lambda_function_name,
     }
   )
   type = "STANDARD"

@@ -15,6 +15,11 @@ variable "steps" {
     or {name, path}. A step_function item has state_machine_name and optional
     input_path. Optional retry, timeout_seconds, and result_path fields apply
     to either type.
+
+    Scope input_path to the specific prior result a step_function step needs
+    (e.g. "$.previous_step_name") rather than "$", to avoid forwarding the
+    full accumulated state and risking the 256 KB Step Functions data limit.
+    See the README for details.
   EOT
   type        = any
 

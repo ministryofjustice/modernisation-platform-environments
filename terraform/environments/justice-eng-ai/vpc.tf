@@ -77,6 +77,8 @@ locals {
     "ecr.dkr",
     "states",
     "sync-states",
+    "secretsmanager",
+    "bedrock-runtime",
   ]
 
 }
@@ -94,6 +96,13 @@ module "vpc" {
   private_subnets        = local.subnets.private
   database_subnets       = local.subnets.data
   database_subnet_suffix = "data"
+
+  # Private subnets need internet egress for calls to external (non-AWS) HTTPS
+  # endpoints that have no VPC interface endpoint equivalent, e.g. Forge Journey
+  # Lab's Entra ID OIDC token exchange with login.microsoftonline.com. A single
+  # NAT Gateway (rather than one per AZ) is used to minimise cost.
+  enable_nat_gateway = true
+  single_nat_gateway = true
 
   # Data gets its own route table so it does not inherit the private S3 endpoint route.
   create_database_subnet_route_table = true
@@ -250,4 +259,29 @@ resource "aws_vpc_security_group_ingress_rule" "vpc_endpoints_https" {
 output "vpc_id" {
   description = "ID of the VPC used by the justice-eng-ai environment."
   value       = module.vpc.vpc_id
+}
+
+output "public_subnet_ids" {
+  description = "IDs of the public subnets created by the VPC module."
+  value       = module.vpc.public_subnets
+}
+
+output "private_subnet_ids" {
+  description = "IDs of the private subnets created by the VPC module."
+  value       = module.vpc.private_subnets
+}
+
+output "data_subnet_ids" {
+  description = "IDs of the data subnets created by the VPC module."
+  value       = module.vpc.database_subnets
+}
+
+output "public_prototype_subnet_ids" {
+  description = "IDs of the public prototype subnets in availability-zone order."
+  value       = [for availability_zone in local.availability_zones : aws_subnet.prototypes["public_prototypes-${availability_zone}"].id]
+}
+
+output "private_prototype_subnet_ids" {
+  description = "IDs of the private prototype subnets in availability-zone order."
+  value       = [for availability_zone in local.availability_zones : aws_subnet.prototypes["private_prototypes-${availability_zone}"].id]
 }
