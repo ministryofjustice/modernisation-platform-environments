@@ -303,6 +303,26 @@ resource "aws_iam_policy" "trigger_cadt_step_function_policy" {
 }
 
 # ------------------------------------------------------------------------------
+# DLT Iceberg maintenance trigger policy
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "dlt_iceberg_maintenance_invoke" {
+  statement {
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [
+      module.trigger_dlt_iceberg_maintenance.lambda_function_arn,
+      module.poll_dlt_iceberg_maintenance.lambda_function_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "dlt_iceberg_maintenance_invoke" {
+  name   = "dlt-iceberg-maintenance-invoke"
+  policy = data.aws_iam_policy_document.dlt_iceberg_maintenance_invoke.json
+}
+
+# ------------------------------------------------------------------------------
 # Downstream position reconciliation Step Function
 # ------------------------------------------------------------------------------
 

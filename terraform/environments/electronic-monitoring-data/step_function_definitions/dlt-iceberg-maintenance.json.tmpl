@@ -1,0 +1,88 @@
+{
+  "StartAt": "TriggerOptimize",
+  "TimeoutSeconds": 3000,
+  "States": {
+    "TriggerOptimize": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${trigger_arn}",
+        "Payload": {"operation": "optimize"}
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [{
+        "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+        "IntervalSeconds": 2,
+        "BackoffRate": 2,
+        "MaxAttempts": 2
+      }],
+      "Catch": [{"ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "MaintenanceFailed"}],
+      "Next": "WaitOptimize"
+    },
+    "WaitOptimize": {"Type": "Wait", "Seconds": 30, "Next": "PollOptimize"},
+    "PollOptimize": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {"FunctionName": "${poll_arn}", "Payload.$": "$"},
+      "OutputPath": "$.Payload",
+      "Retry": [{
+        "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+        "IntervalSeconds": 2,
+        "BackoffRate": 2,
+        "MaxAttempts": 2
+      }],
+      "Catch": [{"ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "MaintenanceFailed"}],
+      "Next": "OptimizeStatus"
+    },
+    "OptimizeStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {"Variable": "$.status", "StringEquals": "in_progress", "Next": "WaitOptimize"},
+        {"Variable": "$.status", "StringEquals": "succeeded", "Next": "TriggerVacuum"}
+      ],
+      "Default": "MaintenanceFailed"
+    },
+    "TriggerVacuum": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${trigger_arn}",
+        "Payload": {"operation": "vacuum"}
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [{
+        "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+        "IntervalSeconds": 2,
+        "BackoffRate": 2,
+        "MaxAttempts": 2
+      }],
+      "Catch": [{"ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "MaintenanceFailed"}],
+      "Next": "WaitVacuum"
+    },
+    "WaitVacuum": {"Type": "Wait", "Seconds": 30, "Next": "PollVacuum"},
+    "PollVacuum": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {"FunctionName": "${poll_arn}", "Payload.$": "$"},
+      "OutputPath": "$.Payload",
+      "Retry": [{
+        "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+        "IntervalSeconds": 2,
+        "BackoffRate": 2,
+        "MaxAttempts": 2
+      }],
+      "Catch": [{"ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "MaintenanceFailed"}],
+      "Next": "VacuumStatus"
+    },
+    "VacuumStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {"Variable": "$.status", "StringEquals": "in_progress", "Next": "WaitVacuum"},
+        {"Variable": "$.status", "StringEquals": "succeeded", "Next": "MaintenanceSucceeded"}
+      ],
+      "Default": "MaintenanceFailed"
+    },
+    "MaintenanceSucceeded": {"Type": "Succeed"},
+    "MaintenanceFailed": {"Type": "Fail", "Error": "IcebergMaintenanceFailed"}
+  }
+}
