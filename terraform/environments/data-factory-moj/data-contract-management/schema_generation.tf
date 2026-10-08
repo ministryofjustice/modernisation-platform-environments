@@ -61,9 +61,6 @@ module "schema_generation" {
 
   depends_on = [
     aws_ecr_repository_policy.schema_generation,
-    aws_vpc_security_group_egress_rule.generation_database,
-    aws_vpc_security_group_egress_rule.generation_https,
-    aws_vpc_security_group_ingress_rule.database_from_generation,
     aws_s3_bucket_versioning.contract_management,
     aws_s3_bucket_server_side_encryption_configuration.contract_management,
     aws_s3_bucket_policy.contract_management,
