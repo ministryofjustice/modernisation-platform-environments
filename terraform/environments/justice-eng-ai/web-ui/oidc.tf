@@ -7,10 +7,15 @@
 # `local.oidc_wired` in case that decision changes later, but the two are
 # mutually exclusive -- running both at once would double-authenticate.
 locals {
-  in_app_oidc_enabled = var.enable_in_app_oidc && var.enable_oidc_auth && var.oidc_configured
+  # Only the development account has had its Entra callback URIs reviewed
+  # and secrets populated so far; production needs a conscious re-review
+  # before this flips on there too (see var.enable_in_app_oidc default).
+  oidc_auto_enabled_environment = local.environment == "development"
+
+  in_app_oidc_enabled = var.enable_in_app_oidc && var.enable_oidc_auth && var.oidc_configured && local.oidc_auto_enabled_environment
   in_app_oidc_count   = local.in_app_oidc_enabled ? 1 : 0
 
-  oidc_wired       = var.enable_oidc_auth && var.oidc_configured && !var.enable_in_app_oidc
+  oidc_wired       = var.enable_oidc_auth && var.oidc_configured && !var.enable_in_app_oidc && local.oidc_auto_enabled_environment
   oidc_wired_count = local.oidc_wired ? 1 : 0
 }
 
