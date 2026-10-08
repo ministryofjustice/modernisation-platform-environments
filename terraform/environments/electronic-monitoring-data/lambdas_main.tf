@@ -1580,7 +1580,7 @@ module "send_ear_sar_response" {
 module "trigger_dlt_iceberg_maintenance" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "trigger-dlt-iceberg-maintenance"
+  function_name                  = "trigger_dlt_iceberg_maintenance"
   image_name                     = "trigger_dlt_iceberg_maintenance"
   role_name                      = aws_iam_role.trigger_dlt_iceberg_maintenance.name
   role_arn                       = aws_iam_role.trigger_dlt_iceberg_maintenance.arn
@@ -1609,7 +1609,7 @@ module "trigger_dlt_iceberg_maintenance" {
 module "poll_dlt_iceberg_maintenance" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "poll-dlt-iceberg-maintenance"
+  function_name                  = "poll_dlt_iceberg-maintenance"
   image_name                     = "poll_dlt_iceberg_maintenance"
   role_name                      = aws_iam_role.poll_dlt_iceberg_maintenance.name
   role_arn                       = aws_iam_role.poll_dlt_iceberg_maintenance.arn
