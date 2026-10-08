@@ -64,7 +64,7 @@ resource "aws_launch_template" "ec2_launch_template_opa" {
   )
 }
 
-resource "aws_autoscaling_group" "cluster_scaling_group" {
+resource "aws_autoscaling_group" "opa_cluster_scaling_group" {
   name                  = "${local.first_cluster_name}-auto-scaling-group"
   vpc_zone_identifier   = data.aws_subnets.shared-private.ids
   desired_capacity      = local.application_data.accounts[local.environment].opa_ec2_desired_capacity
@@ -134,22 +134,22 @@ resource "aws_launch_template" "ec2_launch_template_opa" {
   )
 }
 
-resource "aws_autoscaling_group" "cluster_scaling_group" {
-  name                  = "${local.first_cluster_name}-auto-scaling-group"
+resource "aws_autoscaling_group" "conn_saa_cluster_scaling_group" {
+  name                  = "${local.second_cluster_name}-auto-scaling-group"
   vpc_zone_identifier   = data.aws_subnets.shared-private.ids
-  desired_capacity      = local.application_data.accounts[local.environment].opa_ec2_desired_capacity
-  max_size              = local.application_data.accounts[local.environment].opa_ec2_max_size
-  min_size              = local.application_data.accounts[local.environment].opa_ec2_min_size
+  desired_capacity      = local.application_data.accounts[local.environment].conn_saa_ec2_desired_capacity
+  max_size              = local.application_data.accounts[local.environment].conn_saa_ec2_max_size
+  min_size              = local.application_data.accounts[local.environment].conn_saa_ec2_min_size
   protect_from_scale_in = true
 
   launch_template {
-    id      = aws_launch_template.ec2_launch_template_opa.id
+    id      = aws_launch_template.ec2_launch_template_conn_saa.id
     version = "$Latest"
   }
 
   tag {
     key                 = "Name"
-    value               = "${local.first_cluster_name}-ecs-instance"
+    value               = "${local.second_cluster_name}-ecs-instance"
     propagate_at_launch = true
   }
 }
