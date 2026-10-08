@@ -1,4 +1,5 @@
 locals {
+  create_transfer_host_key        = data.aws_secretsmanager_secret_version.transfer_host_key.secret_string != module.secrets_transfer_host_key.secret_string ? 1 : 0
   transfer_address_allocation_ids = [for key, value in aws_eip.this : value.id]
   transfer_subnet_ids             = local.is-production ? sort(module.vpc_isolated.public_subnets) : slice(sort(module.vpc_isolated.public_subnets), 0, 1)
 

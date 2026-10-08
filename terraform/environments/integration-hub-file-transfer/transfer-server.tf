@@ -37,3 +37,10 @@ resource "aws_transfer_server" "this" {
     prevent_destroy = true
   }
 }
+
+resource "aws_transfer_host_key" "this" {
+  count            = local.create_transfer_host_key
+  description      = "Host key for the ${local.environment} transfer server"
+  host_key_body_wo = data.aws_secretsmanager_secret_version.transfer_host_key.secret_string
+  server_id        = aws_transfer_server.this.id
+}
