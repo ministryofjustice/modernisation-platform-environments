@@ -201,7 +201,7 @@ locals {
 }
 
 module "ecs_nightly_restart_weblogic_data" {
-  count = var.env_name == "test" ? 1 : 0
+  count  = var.env_name == "test" ? 1 : 0
   source = "../components/ecs_nightly_restart"
 
   env_name     = var.env_name

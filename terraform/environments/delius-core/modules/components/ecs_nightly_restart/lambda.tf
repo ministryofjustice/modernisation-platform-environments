@@ -71,7 +71,7 @@ resource "aws_lambda_function" "nightly_restart_lambda" {
   #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
   #checkov:skip=CKV_AWS_116: "DLQ not required"
   #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
-  
+
   function_name    = local.lambda_name
   description      = "Lambda function to restart the ${var.service_name} ECS service nightly"
   role             = aws_iam_role.lambda_role.arn
