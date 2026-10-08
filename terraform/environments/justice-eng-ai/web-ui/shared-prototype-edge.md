@@ -8,13 +8,13 @@ ACL, certificate or DNS record.
 
 ## Configuration and Ownership
 
-The `web-ui` root looks up the public
-`ai-prototype.modernisation-platform.service.justice.gov.uk` hosted zone through
-the existing `core-network-services` provider. It issues a wildcard ACM certificate
+The `web-ui` root uses the public
+`modernisation-platform.service.justice.gov.uk` hosted zone already looked up
+through the `core-network-services` provider. It issues a wildcard ACM certificate
 in `us-east-1` in the `web-ui` account, where CloudFront is deployed, and writes
-the DNS validation records and prototype wildcard alias into the existing zone via
-`core-network-services`. The role must be able to read that hosted zone and change
-its records. No hosted-zone ID or certificate ARN is copied into component config.
+the DNS validation records and `*.ai-prototype` alias into the parent zone via
+`core-network-services`. The role must be able to change that zone's records. No
+hosted-zone ID or certificate ARN is copied into component config.
 
 The edge WAF reuses `var.allowed_ingress_cidrs` from the same `web-ui` root. There
 is no second CIDR list or cross-state output dependency. This means the prototypes

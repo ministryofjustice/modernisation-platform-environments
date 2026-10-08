@@ -3,12 +3,6 @@ locals {
   prototype_bucket_prefix = "justice-eng-ai-prototypes"
 }
 
-data "aws_route53_zone" "prototypes" {
-  provider     = aws.core-network-services
-  name         = "${local.prototype_domain_name}."
-  private_zone = false
-}
-
 resource "aws_acm_certificate" "prototypes" {
   provider                  = aws.us-east-1
   domain_name               = local.prototype_domain_name
@@ -32,7 +26,7 @@ resource "aws_route53_record" "prototype_certificate_validation" {
     }
   }
 
-  zone_id         = data.aws_route53_zone.prototypes.zone_id
+  zone_id         = data.aws_route53_zone.network-services.zone_id
   name            = each.value.name
   type            = each.value.type
   ttl             = 60
@@ -57,7 +51,7 @@ module "shared-prototype-edge" {
 
   configuration = {
     domain_name        = local.prototype_domain_name
-    hosted_zone_id     = data.aws_route53_zone.prototypes.zone_id
+    hosted_zone_id     = data.aws_route53_zone.network-services.zone_id
     certificate_arn    = aws_acm_certificate_validation.prototypes.certificate_arn
     bucket_prefix      = local.prototype_bucket_prefix
     allowed_ipv4_cidrs = toset(var.allowed_ingress_cidrs)
