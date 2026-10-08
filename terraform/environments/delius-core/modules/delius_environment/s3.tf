@@ -1,3 +1,4 @@
+
 # S3 bucket to host Weblogic ALB Access logs
 module "weblogic_alb_access_logs" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
@@ -11,6 +12,8 @@ module "weblogic_alb_access_logs" {
   }
 
   bucket_policy = local.alb_access_logs_bucket_policy
+
+  force_destroy = true
 
   tags = local.tags
 }

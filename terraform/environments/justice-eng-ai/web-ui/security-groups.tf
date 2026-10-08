@@ -60,7 +60,7 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_from_alb" {
 
 resource "aws_vpc_security_group_egress_rule" "ecs_https" {
   security_group_id = aws_security_group.ecs_service.id
-  description       = "HTTPS egress for Bedrock, Entra and AWS APIs"
+  description       = "HTTPS egress for Bedrock, Entra, GitHub Actions API and other AWS/external APIs"
   from_port         = 443
   to_port           = 443
   ip_protocol       = "tcp"

@@ -18,7 +18,7 @@ resource "aws_vpc_security_group_egress_rule" "oem_db_efs_sg_egress_all_0_0_cidr
   ip_protocol       = "-1"
   cidr_ipv4         = data.aws_vpc.shared.cidr_block
 
-  
+
 
   tags = {
     Name = "Allow outbound traffic within the VPC"
