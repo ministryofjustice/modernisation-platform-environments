@@ -42,6 +42,15 @@ locals {
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFDNeV/A8zoNDSnBXTjjuT+9QQ8S6XD9PJJm2Ds1YV3K"
       ]
     }
+
+    sreelakshmi137 = {
+      environments         = ["development"]
+      server_id_allow_list = []
+      cidr_blocks          = ["35.176.92.0/22"]
+      ssh_public_keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMfYzM1SJj6ja/G3x7bUcciaD1YP3VF0swR4ld5+UYpK"
+      ]
+    }
   }
 
   environment_transfer_server_users = {
