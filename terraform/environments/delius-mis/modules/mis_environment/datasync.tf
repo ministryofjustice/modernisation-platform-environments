@@ -185,7 +185,7 @@ resource "aws_cloudwatch_event_rule" "datasync_password_updater" {
       eventName   = ["PutSecretValue", "UpdateSecret"]
       requestParameters = {
         secretId = [
-          data.aws_secretsmanager_secret.datasync_ad_admin_password[0].name
+          aws_secretsmanager_secret.ad_admin_password.name
         ]
       }
     }
