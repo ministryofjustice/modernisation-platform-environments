@@ -60,7 +60,7 @@ locals {
   }
 
   transfer_user_cidr_blocks = {
-    for username, user in local.environment_transfer_server_users : username => user.cidr_blocks
+    for username, user in local.environment_transfer_server_users : username => distinct(user.cidr_blocks)
     if length(user.cidr_blocks) > 0
   }
 
