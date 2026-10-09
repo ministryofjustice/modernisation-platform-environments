@@ -333,6 +333,7 @@ output "hosting" {
     distribution_arn       = aws_cloudfront_distribution.shared.arn
     web_acl_arn            = aws_wafv2_web_acl.shared.arn
     bucket_name            = module.prototypes.bucket.id
+    bucket_arn             = module.prototypes.bucket.arn
     domain_name            = var.configuration.domain_name
     prototype_url_template = "https://{prototype-id}.${var.configuration.domain_name}"
     upload_prefix_template = "{prototype-id}/"
