@@ -103,7 +103,7 @@ data "aws_ami" "ecs_ami" {
 resource "aws_launch_template" "weblogic" {
   #checkov:skip=CKV_AWS_341: "To Do: Test required hop limit"
   name_prefix   = "weblogic-${var.env_name}-ecs-"
-  image_id      = data.aws_ami.ecs_ami.id
+  image_id      = var.delius_microservice_configs.weblogic.ami_id
   instance_type = var.delius_microservice_configs.weblogic.ec2_instance_type
 
   user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", { ecs_cluster_name = module.ecs.ecs_cluster_name }))
