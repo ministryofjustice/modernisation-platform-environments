@@ -38,7 +38,7 @@ jobs:
         with:
           persist-credentials: true
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b9151ad79209d53d7f738430aa6868c5b7589237 # v6.2.9
         with:
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
