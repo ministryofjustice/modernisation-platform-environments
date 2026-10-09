@@ -10,6 +10,7 @@ module "weblogic_eis" {
   name              = "weblogic-eis"
   create_service    = "false"
   env_name          = var.env_name
+  desired_count     = data.aws_ssm_parameter.weblogic_eis_task_count.value
   account_config    = var.account_config
   account_info      = var.account_info
   capacity_provider = aws_ecs_capacity_provider.weblogic_eis.name
@@ -74,7 +75,7 @@ module "weblogic_eis" {
 resource "aws_launch_template" "weblogic_eis" {
   #checkov:skip=CKV_AWS_341: "To Do: Test required hop limit"
   name_prefix   = "weblogic-eis-${var.env_name}-ecs-"
-  image_id      = data.aws_ami.ecs_ami.id
+  image_id      = var.delius_microservice_configs.weblogic_eis.ami_id
   instance_type = var.delius_microservice_configs.weblogic_eis.ec2_instance_type
 
   user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", { ecs_cluster_name = module.ecs.ecs_cluster_name }))
@@ -187,13 +188,6 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
 
 locals {
   weblogic_eis_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic-eis"
-  weblogic_eis_task_count = {
-    dev     = 1
-    test    = 1
-    stage   = 0
-    preprod = 2
-    prod    = 2
-  }
 }
 
 module "ecs_nightly_restart_weblogic_eis" {
@@ -203,5 +197,5 @@ module "ecs_nightly_restart_weblogic_eis" {
   cluster_name = module.ecs.ecs_cluster_arn
   service_name = "${var.env_name}-weblogic-eis"
   service_arn  = local.weblogic_eis_service_arn
-  task_count   = local.weblogic_eis_task_count[var.env_name]
+  task_count   = data.aws_ssm_parameter.weblogic_eis_task_count.value
 }
