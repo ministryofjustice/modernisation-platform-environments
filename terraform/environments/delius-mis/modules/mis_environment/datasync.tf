@@ -508,7 +508,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_s3_to_fsx_error" {
   treat_missing_data  = "breaching"
 
   dimensions = {
-    TaskId = aws_datasync_task.id
+    TaskId = aws_datasync_task.dfi_s3_to_fsx.id
   }
 
   tags = local.tags
