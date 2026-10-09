@@ -140,6 +140,9 @@ locals {
             patch-manager = "group2"
           }
         })
+        ebs_volumes = merge(local.ec2_instances.jumpserver.ebs_volumes, {
+          "/dev/sda1" = { type = "gp3", size = 150 }  
+      })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name              = "azure.noms.root"
           gha-jumpserver-startstop = "test"
