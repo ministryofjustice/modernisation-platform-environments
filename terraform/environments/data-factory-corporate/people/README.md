@@ -22,7 +22,7 @@ The data factory allows for:
 
 ### 1. An external account is trusted
 
-The account ID stored in the `external-aws-account` Secrets Manager secret is used to create the trust relationship for `datafactory_dev_assume_role`.
+The account ID stored in the `sherlock-external-aws-account` Secrets Manager secret is used to create the trust relationship for `datafactory_dev_assume_role`.
 
 The secret and role require a staged deployment:
 
@@ -30,7 +30,7 @@ The secret and role require a staged deployment:
     [main.tf](main.tf) left at `false`.
     Terraform creates the secret without a value and skips the secret lookups and
     external role.
-2. Populate `external-aws-account` in the target AWS account and region with the
+2. Populate `sherlock-external-aws-account` in the target AWS account and region with the
     trusted external account's 12-digit account ID as plain text, not JSON.
 3. Set `enable_external_iam_role = true` in the `locals` block in
     [main.tf](main.tf), then plan and apply again to create the role.
@@ -93,7 +93,7 @@ GuardDuty alerts SNS topic. To receive them in Slack:
     for this AWS account.
 2. Plan and apply with `enable_guardduty_slack_notifications` in the `locals`
     block in [main.tf](main.tf) left at `false`. Terraform creates the KMS-encrypted Secrets Manager
-    secret `guardduty-slack` as an empty secret.
+    secret `corporate-guardduty-slack` as an empty secret.
 3. Add a value to the new secret in this AWS account and region containing the
     authorised Slack workspace ID and destination channel ID:
     ```json

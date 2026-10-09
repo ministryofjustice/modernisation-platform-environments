@@ -39,6 +39,32 @@ resource "aws_sns_topic" "cloudtrail" {
   tags = local.common_tags
 }
 
+data "aws_iam_policy_document" "cloudtrail-publish" {
+  statement {
+    sid    = "AllowCloudTrailPublish"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.cloudtrail.arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:cloudtrail:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:trail/${local.cloudtrail_name}"]
+    }
+  }
+}
+
+resource "aws_sns_topic_policy" "cloudtrail-publish" {
+  arn    = aws_sns_topic.cloudtrail.arn
+  policy = data.aws_iam_policy_document.cloudtrail-publish.json
+}
+
 resource "aws_cloudtrail" "sherlock" {
   name = local.cloudtrail_name
 
@@ -53,4 +79,6 @@ resource "aws_cloudtrail" "sherlock" {
   is_multi_region_trail         = true
   include_global_service_events = true
   enable_log_file_validation    = true
+
+  depends_on = [aws_sns_topic_policy.cloudtrail-publish]
 }

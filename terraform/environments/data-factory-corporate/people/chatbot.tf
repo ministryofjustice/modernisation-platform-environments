@@ -1,6 +1,6 @@
 resource "aws_secretsmanager_secret" "guardduty_slack" {
   #checkov:skip=CKV2_AWS_57: "Secret holds a static slack workspace and channel id"
-  name        = "guardduty-slack"
+  name        = "corporate-guardduty-slack"
   description = "Slack workspace and channel IDs for GuardDuty alerts"
   kms_key_id  = module.sherlock_kms_key.key_arn
 
