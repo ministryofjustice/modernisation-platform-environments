@@ -1,3 +1,39 @@
+resource "kubernetes_manifest" "external_secret_litellm_registry" {
+  count = try(local.environment_configuration.litellm_image_pull_secret, "") != "" ? 1 : 0
+
+  depends_on = [module.ai_gateway_namespace]
+
+  manifest = {
+    apiVersion = "external-secrets.io/v1"
+    kind       = "ExternalSecret"
+    metadata = {
+      name      = local.environment_configuration.litellm_image_pull_secret
+      namespace = module.ai_gateway_namespace.name
+    }
+    spec = {
+      refreshInterval = "5m"
+      secretStoreRef = {
+        name = "aws-secretsmanager"
+        kind = "ClusterSecretStore"
+      }
+      target = {
+        name = local.environment_configuration.litellm_image_pull_secret
+        template = {
+          type = "kubernetes.io/dockerconfigjson"
+        }
+      }
+      data = [
+        {
+          secretKey = ".dockerconfigjson"
+          remoteRef = {
+            key = tostring(module.litellm_registry_secret[0].secret_id)
+          }
+        }
+      ]
+    }
+  }
+}
+
 resource "kubernetes_manifest" "external_secret_litellm_license" {
   depends_on = [module.ai_gateway_namespace]
 

@@ -131,3 +131,41 @@ data "aws_secretsmanager_secret_version" "entra_app_details" {
   count     = local.is-test ? 0 : 1
   secret_id = module.entra_app_details[0].secret_id
 }
+
+module "gov_notify_details" {
+  count  = local.is-test ? 0 : 1
+  source = "terraform-aws-modules/secrets-manager/aws"
+
+  name_prefix             = "gov_notify_details"
+  description             = "Keys for gov notify."
+  recovery_window_in_days = 30
+
+  create_policy       = true
+  block_public_policy = true
+  policy_statements = {
+    read = {
+      sid = "AllowAccountRead"
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${local.env_account_id}:root"]
+      }]
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["*"]
+    }
+  }
+
+  ignore_secret_changes = true
+  secret_string = jsonencode({
+    api_key          = ""
+    ear_sar_template = ""
+    reply_key        = ""
+    emails           = ""
+  })
+
+  tags = local.tags
+}
+
+data "aws_secretsmanager_secret_version" "gov_notify_details" {
+  count     = local.is-test ? 0 : 1
+  secret_id = module.gov_notify_details[0].secret_id
+}
