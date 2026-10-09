@@ -53,7 +53,7 @@ data "aws_bedrock_inference_profile" "sip_delivery_assistant" {
 }
 
 data "aws_iam_policy_document" "sip_delivery_assistant_bedrock_assume_role" {
-  #checkov:skip=CKV_AWS_358:This repository uses GitHub immutable OIDC subjects; owner ID 2203574 and repository ID 1373350473 bind the identity, the subject is restricted to the sip-generation environment, and the audience remains exactly sts.amazonaws.com; this is a Checkov compatibility false positive.
+  #checkov:skip=CKV_AWS_358:This repository uses GitHub immutable OIDC subjects; owner ID 2203574 and repository ID 1373350473 bind the identity, subjects are restricted to the sip-assessment and sip-generation environments, and the audience remains exactly sts.amazonaws.com; this is a Checkov compatibility false positive.
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRoleWithWebIdentity"]
@@ -72,7 +72,10 @@ data "aws_iam_policy_document" "sip_delivery_assistant_bedrock_assume_role" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice@2203574/modernisation-platform-sip-delivery-assistant@1373350473:environment:sip-generation"]
+      values = [
+        "repo:ministryofjustice@2203574/modernisation-platform-sip-delivery-assistant@1373350473:environment:sip-assessment",
+        "repo:ministryofjustice@2203574/modernisation-platform-sip-delivery-assistant@1373350473:environment:sip-generation",
+      ]
     }
   }
 }
@@ -140,7 +143,7 @@ resource "aws_iam_role_policy_attachment" "sip_delivery_assistant_bedrock" {
 }
 
 output "sip_delivery_assistant_bedrock_role_arn" {
-  description = "Configure this non-secret ARN as SIP_BEDROCK_ROLE_ARN in the delivery assistant's sip-generation GitHub Environment."
+  description = "Configure this non-secret ARN as SIP_BEDROCK_ROLE_ARN in the delivery assistant's sip-assessment and sip-generation GitHub Environments."
   value       = aws_iam_role.sip_delivery_assistant_bedrock.arn
 }
 

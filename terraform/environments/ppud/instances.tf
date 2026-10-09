@@ -265,7 +265,7 @@ resource "aws_instance" "s609693lo6vw108" {
   }
 }
 
-# Development Server
+# Team Foundation Server
 
 resource "aws_instance" "s609693lo6vw109" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -397,7 +397,7 @@ resource "aws_instance" "s609693lo6vw113" {
   }
 }
 
-# Development Server
+# AI Development Server
 
 resource "aws_instance" "s609693lo6vw114" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -473,6 +473,32 @@ resource "aws_instance" "s609693lo6vw116" {
     Name        = "s609693lo6vw116"
     patch_group = "dev_win_patch"
     role        = "ses_sql_config"
+    backup      = true
+  }
+}
+
+# Dev Ops Server 2022 (POC)
+
+resource "aws_instance" "s609693lo6vw117" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0a962366cd0ca6b5e"
+  instance_type          = "m5.xlarge"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["Dev-Ops-Server-Security-Group"].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw117"
+    patch_group = "dev_win_patch"
+    role        = "ses_tfs_config"
     backup      = true
   }
 }

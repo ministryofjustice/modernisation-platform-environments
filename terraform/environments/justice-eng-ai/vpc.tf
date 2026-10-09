@@ -41,8 +41,11 @@ locals {
   nacl_ephemeral_in = { rule_number = 1000, rule_action = "allow", protocol = "tcp", from_port = 1024, to_port = 65535, cidr_block = "0.0.0.0/0" }
   nacl_all_out      = { rule_number = 1000, rule_action = "allow", protocol = "-1", from_port = 0, to_port = 0, cidr_block = "0.0.0.0/0" }
 
+  # The NAT Gateway lives in the public subnets and re-maps outbound connections to
+  # ephemeral source ports, so return traffic needs the ephemeral range allowed inbound
+  # here too (not just 443), or it gets silently dropped by this stateless NACL.
   nacl_inbound_rules = {
-    public             = concat(local.nacl_peer_rules.public, [local.nacl_deny_vpc, local.nacl_https])
+    public             = concat(local.nacl_peer_rules.public, [local.nacl_deny_vpc, local.nacl_https, merge(local.nacl_ephemeral_in, { rule_number = 1010 })])
     private            = concat(local.nacl_peer_rules.private, [local.nacl_deny_vpc, local.nacl_ephemeral_in])
     data               = local.nacl_peer_rules.data
     public_prototypes  = concat(local.nacl_peer_rules.public_prototypes, [local.nacl_deny_vpc, local.nacl_https])
@@ -77,6 +80,8 @@ locals {
     "ecr.dkr",
     "states",
     "sync-states",
+    "secretsmanager",
+    "bedrock-runtime",
   ]
 
 }
@@ -94,6 +99,13 @@ module "vpc" {
   private_subnets        = local.subnets.private
   database_subnets       = local.subnets.data
   database_subnet_suffix = "data"
+
+  # Private subnets need internet egress for calls to external (non-AWS) HTTPS
+  # endpoints that have no VPC interface endpoint equivalent, e.g. Forge Journey
+  # Lab's Entra ID OIDC token exchange with login.microsoftonline.com. A single
+  # NAT Gateway (rather than one per AZ) is used to minimise cost.
+  enable_nat_gateway = true
+  single_nat_gateway = true
 
   # Data gets its own route table so it does not inherit the private S3 endpoint route.
   create_database_subnet_route_table = true
@@ -250,4 +262,29 @@ resource "aws_vpc_security_group_ingress_rule" "vpc_endpoints_https" {
 output "vpc_id" {
   description = "ID of the VPC used by the justice-eng-ai environment."
   value       = module.vpc.vpc_id
+}
+
+output "public_subnet_ids" {
+  description = "IDs of the public subnets created by the VPC module."
+  value       = module.vpc.public_subnets
+}
+
+output "private_subnet_ids" {
+  description = "IDs of the private subnets created by the VPC module."
+  value       = module.vpc.private_subnets
+}
+
+output "data_subnet_ids" {
+  description = "IDs of the data subnets created by the VPC module."
+  value       = module.vpc.database_subnets
+}
+
+output "public_prototype_subnet_ids" {
+  description = "IDs of the public prototype subnets in availability-zone order."
+  value       = [for availability_zone in local.availability_zones : aws_subnet.prototypes["public_prototypes-${availability_zone}"].id]
+}
+
+output "private_prototype_subnet_ids" {
+  description = "IDs of the private prototype subnets in availability-zone order."
+  value       = [for availability_zone in local.availability_zones : aws_subnet.prototypes["private_prototypes-${availability_zone}"].id]
 }

@@ -1291,6 +1291,20 @@ locals {
         { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
+    "Dev-Ops-Server-Security-Group" = {
+      name        = "Dev-Ops-Server-Security-Group"
+      description = "Dev Ops Server security group for the development environment"
+      ingress = [
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
+        { port = 443, cidr = "vpc", description = "Allow port 443 inbound" },
+      ]
+      egress = [
+        { port = 0, to_port = 0, protocol = "-1", cidr = "vpc", description = "Allow all outbound (VPC)" },
+        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+      ]
+    }
     "Development-Servers-Standard-Security-Group" = {
       name        = "Development-Servers-Standard-Security-Group"
       description = "Development servers standard security group for the development environment"

@@ -103,19 +103,6 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr
   }
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr_any" {
-#   security_group_id = aws_security_group.load_balancer_security_group.id
-#   description       = "Oracle EM Console HTTP from internet (public access)"
-#   ip_protocol       = "tcp"
-#   from_port         = 3872
-#   to_port           = 3872
-#   cidr_ipv4         = "0.0.0.0/0"
-#
-#   tags = {
-#     Name = "Oracle EM Console HTTP from anywhere"
-#   }
-# }
-
 resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr_1" {
   security_group_id = aws_security_group.load_balancer_security_group.id
   description       = "Oracle EM Console HTTPS from shared VPC"
@@ -154,19 +141,6 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr
     Name = "Oracle EM Console HTTPS from prod workspaces"
   }
 }
-
-# resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr_any" {
-#   security_group_id = aws_security_group.load_balancer_security_group.id
-#   description       = "Oracle EM Console HTTPS from internet (public access)"
-#   ip_protocol       = "tcp"
-#   from_port         = 4903
-#   to_port           = 4903
-#   cidr_ipv4         = "0.0.0.0/0"
-#
-#   tags = {
-#     Name = "Oracle EM Console HTTPS from anywhere"
-#   }
-# }
 
 resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7102_7102_cidr_1" {
   security_group_id = aws_security_group.load_balancer_security_group.id
@@ -245,16 +219,3 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr
     Name = "Oracle EM port 7803 from prod workspaces"
   }
 }
-
-# resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr_any" {
-#   security_group_id = aws_security_group.load_balancer_security_group.id
-#   description       = "Oracle EM additional port from internet (public access)"
-#   ip_protocol       = "tcp"
-#   from_port         = 7803
-#   to_port           = 7803
-#   cidr_ipv4         = "0.0.0.0/0"
-#
-#   tags = {
-#     Name = "Oracle EM port 7803 from anywhere"
-#   }
-# }

@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "ecs_task_efs" {
     condition {
       test     = "StringEquals"
       variable = "elasticfilesystem:AccessPointArn"
-      values   = [aws_efs_access_point.plans.arn]
+      values   = [aws_efs_access_point.plans.arn, aws_efs_access_point.data.arn]
     }
   }
 }
