@@ -489,13 +489,13 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_percentage_heap_free_m
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_stuck_threads" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-managed-custom-checks-stuck-threads"
   alarm_description   = "${local.environment} | ${local.aws_account_id} | There are stuck threads on the SOA managed servers."
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_stuck_threads.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
   period              = "300"
   evaluation_periods  = "1"
-  threshold           = "5"
+  threshold           = "1"
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.alerts.arn]
@@ -505,13 +505,13 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_stuck_threads" {
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_hogging_threads" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-managed-custom-checks-hogging-threads"
   alarm_description   = "${local.environment} | ${local.aws_account_id} | There are hogging threads on the SOA managed servers."
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_hogging_threads.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
   period              = "300"
   evaluation_periods  = "1"
-  threshold           = "5"
+  threshold           = "1"
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.alerts.arn]
