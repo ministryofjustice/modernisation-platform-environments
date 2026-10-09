@@ -110,6 +110,12 @@ models:
       model_name: "Anthropic Claude Sonnet 5 (EU)"
       region: eu-west-2
       generally_available: true
+    claude-sonnet-5-5:
+      model_id: eu.anthropic.claude-sonnet-5-5
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5.5 (EU)"
+      region: eu-west-2
+      generally_available: true
     # Cohere
     cohere-embed-english-v3:
       model_id: "cohere.embed-english-v3"
