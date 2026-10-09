@@ -24,6 +24,40 @@ resource "litellm_model" "amazon_bedrock" {
   ]
 }
 
+# Companion "batch" mode deployment for models that support Bedrock batch inference; a separate
+# model_name is required because LiteLLM routes batch vs. real-time traffic by model deployment.
+resource "litellm_model" "amazon_bedrock_batch" {
+  for_each = local.ai_gateway_bedrock_batch_models
+
+  custom_llm_provider = "bedrock"
+  model_name          = "bedrock-batch-${each.key}"
+  base_model          = each.value.model_id
+  tier                = "paid"
+  mode                = "batch"
+
+  aws_region_name = each.value.region
+  aws_role_name   = module.iam_role.arn
+
+  additional_litellm_params = {
+    s3_bucket_name       = module.batch_inference.s3_bucket_id
+    s3_region_name       = each.value.region
+    aws_batch_role_arn   = aws_iam_role.bedrock_batch_execution.arn
+    s3_encryption_key_id = module.ai_gateway_batch_inference_kms_key.key_arn
+
+    ai_model_provider            = try(each.value.model_provider, "Amazon Bedrock")
+    ai_model_family              = each.value.model_family
+    ai_model_name                = each.value.model_name
+    ai_model_generally_available = each.value.generally_available
+    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_generally_available\"]"
+  }
+
+  depends_on = [
+    helm_release.ai_gateway_configuration,
+    helm_release.litellm,
+    helm_release.litellm_admin
+  ]
+}
+
 resource "litellm_model" "google_gemini_enterprise_agent_platform" {
   for_each = try(local.ai_gateway_models_filtered.google_gemini_enterprise_agent_platform, {})
 
