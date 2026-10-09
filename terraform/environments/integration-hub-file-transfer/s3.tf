@@ -7,7 +7,9 @@ module "s3_audit_bucket" {
   attach_deny_insecure_transport_policy = true
   attach_policy                         = true
   bucket                                = "${local.application_name}-${local.environment}-cloudtrail-logs"
-  policy                                = data.aws_iam_policy_document.s3_audit.json
+  # Preserve Object Lock on the existing audit bucket; disabling it forces replacement.
+  object_lock_enabled = true
+  policy              = data.aws_iam_policy_document.s3_audit.json
 
   server_side_encryption_configuration = {
     rule = {
