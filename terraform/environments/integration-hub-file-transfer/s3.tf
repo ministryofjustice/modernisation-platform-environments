@@ -25,15 +25,14 @@ module "s3_audit_bucket" {
 
   lifecycle_rule = [
     {
-      id     = "expire-cloudtrail-logs-after-13-months"
+      id     = "expire-cloudtrail-logs"
       status = "Enabled"
       filter = {}
       expiration = {
-        # S3 lifecycle expiry is configured in days; 400 days retains logs for at least 13 months.
-        days = 400
+        days = local.cloudtrail_retention_days
       }
       noncurrent_version_expiration = {
-        noncurrent_days = 400
+        noncurrent_days = local.cloudtrail_retention_days
       }
     }
   ]
@@ -44,8 +43,7 @@ module "s3_audit_bucket" {
     rule = {
       default_retention = {
         mode = "GOVERNANCE"
-        # S3 object_lock is configured in days; 400 days retains logs for at least 13 months.
-        days = 400
+        days = local.cloudtrail_retention_days
       }
     }
   }
