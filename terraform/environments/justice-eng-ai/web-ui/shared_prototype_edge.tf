@@ -1,7 +1,7 @@
 locals {
   prototype_domain_name   = "ai-prototype.modernisation-platform.service.justice.gov.uk"
   prototype_bucket_prefix = "justice-eng-ai-prototypes"
-  prototype_edge_enabled = local.is-production
+  prototype_edge_enabled  = local.is-production
 }
 
 resource "aws_acm_certificate" "prototypes" {
@@ -157,10 +157,10 @@ resource "aws_ssm_parameter" "prototype_publisher_config" {
   description = "Non-secret shared edge values read by the static prototype publisher."
   type        = "String"
   value = jsonencode({
-    bucket_name           = module.shared-prototype-edge[0].hosting.bucket_name
-    domain_name           = module.shared-prototype-edge[0].hosting.domain_name
-    distribution_id       = module.shared-prototype-edge[0].hosting.distribution_id
-    key_value_store_arn   = module.shared-prototype-edge[0].hosting.key_value_store_arn
+    bucket_name         = module.shared-prototype-edge[0].hosting.bucket_name
+    domain_name         = module.shared-prototype-edge[0].hosting.domain_name
+    distribution_id     = module.shared-prototype-edge[0].hosting.distribution_id
+    key_value_store_arn = module.shared-prototype-edge[0].hosting.key_value_store_arn
   })
   tags = local.tags
 }
