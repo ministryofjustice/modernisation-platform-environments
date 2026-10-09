@@ -164,3 +164,48 @@ data "aws_iam_policy_document" "script_runner_common" {
     resources = ["arn:${data.aws_partition.current.partition}:ecr:${data.aws_region.current.region}:${local.environment_management.account_ids["core-shared-services-production"]}:repository/${local.application_data.accounts[local.environment].ecr_repository_name}"]
   }
 }
+
+data "aws_iam_policy_document" "step_functions_upload_trigger_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.staging_bucket_root_upload.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+resource "aws_iam_role" "step_functions_upload_trigger" {
+  name               = "${local.application_name}-upload-trigger"
+  assume_role_policy = data.aws_iam_policy_document.step_functions_upload_trigger_assume_role.json
+  tags               = local.tags
+}
+
+data "aws_iam_policy_document" "step_functions_upload_trigger" {
+  statement {
+    sid       = "StartRootWorkflow"
+    effect    = "Allow"
+    actions   = ["states:StartExecution"]
+    resources = [module.step_functions_root.arn]
+  }
+}
+
+resource "aws_iam_role_policy" "step_functions_upload_trigger" {
+  name   = "${local.application_name}-upload-trigger"
+  role   = aws_iam_role.step_functions_upload_trigger.id
+  policy = data.aws_iam_policy_document.step_functions_upload_trigger.json
+}

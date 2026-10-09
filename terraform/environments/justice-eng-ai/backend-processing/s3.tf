@@ -196,3 +196,46 @@ resource "aws_iam_role_policy" "ecs_staging_bucket_kms" {
   role   = each.value.name
   policy = data.aws_iam_policy_document.ecs_staging_bucket_kms.json
 }
+
+resource "aws_s3_bucket_notification" "staging_bucket" {
+  bucket      = aws_s3_bucket.staging_bucket.id
+  eventbridge = true
+}
+
+resource "aws_cloudwatch_event_rule" "staging_bucket_root_upload" {
+  name        = "${local.application_name}-staging-root-upload"
+  description = "Start the root workflow when an object is created in the staging bucket root"
+
+  event_pattern = jsonencode({
+    source        = ["aws.s3"]
+    "detail-type" = ["Object Created"]
+    detail = {
+      bucket = {
+        name = [aws_s3_bucket.staging_bucket.id]
+      }
+      object = {
+        key = [{ "anything-but" = { wildcard = "*/*" } }]
+      }
+    }
+  })
+
+  tags = local.tags
+}
+
+resource "aws_cloudwatch_event_target" "staging_bucket_root_upload" {
+  rule      = aws_cloudwatch_event_rule.staging_bucket_root_upload.name
+  target_id = "start-root-workflow"
+  arn       = module.step_functions_root.arn
+  role_arn  = aws_iam_role.step_functions_upload_trigger.arn
+
+  input_transformer {
+    input_paths = {
+      s3_file = "$.detail.object.key"
+    }
+    input_template = <<-JSON
+      {"s3_folder": "", "s3_file": <s3_file>}
+    JSON
+  }
+
+  depends_on = [aws_iam_role_policy.step_functions_upload_trigger]
+}
