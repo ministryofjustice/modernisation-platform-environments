@@ -1,6 +1,7 @@
 locals {
   alb_access_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-alb-logs"
   audit_logs_bucket_name      = "mojdp-${local.environment}-${local.component_name}-audit-logs"
+  batch_inference_bucket_name = "mojdp-${local.environment}-${local.component_name}-batch-inference"
 }
 
 data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
@@ -59,6 +60,47 @@ module "alb_access_logs" {
 
       expiration = {
         days = 365
+      }
+    }
+  ]
+}
+
+# ---------------------------------------------------------------------------
+# TODO(data-protection-review): the 30-day expiry below is a PROVISIONAL value
+# only, not a final decision. Unlike the audit-logs bucket (which stores audit
+# metadata), this bucket stores the full prompts and completions submitted to
+# and returned from Bedrock batch inference jobs. Retention MUST be confirmed
+# with the data protection / security team before this is relied on in
+# test/preproduction/production.
+# ---------------------------------------------------------------------------
+module "batch_inference" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
+
+  bucket = local.batch_inference_bucket_name
+
+  force_destroy = false
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = module.ai_gateway_batch_inference_kms_key.key_arn
+      }
+      bucket_key_enabled = true
+    }
+  }
+
+  versioning = {
+    status = "Disabled"
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "expire-batch-inference-files"
+      enabled = true
+
+      expiration = {
+        days = 30
       }
     }
   ]

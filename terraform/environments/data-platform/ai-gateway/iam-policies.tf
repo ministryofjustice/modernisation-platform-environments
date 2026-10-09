@@ -41,6 +41,78 @@ data "aws_iam_policy_document" "ai_gateway" {
     ]
   }
 
+  # Lets the pod submit batch inference jobs against the same models it can already invoke directly
+  statement {
+    sid     = "BedrockCreateBatchInferenceJob"
+    effect  = "Allow"
+    actions = ["bedrock:CreateModelInvocationJob"]
+    resources = concat(
+      formatlist("arn:aws:bedrock:%s:${data.aws_caller_identity.current.account_id}:inference-profile/*", ["eu-west-1", "eu-west-2"]),
+      ["arn:aws:bedrock:eu-*::foundation-model/*"],
+      ["arn:aws:bedrock:eu-west-2:${data.aws_caller_identity.current.account_id}:model-invocation-job/*"]
+    )
+  }
+
+  statement {
+    sid    = "BedrockManageBatchInferenceJobs"
+    effect = "Allow"
+    actions = [
+      "bedrock:GetModelInvocationJob",
+      "bedrock:StopModelInvocationJob"
+    ]
+    resources = ["arn:aws:bedrock:eu-west-2:${data.aws_caller_identity.current.account_id}:model-invocation-job/*"]
+  }
+
+  # ListModelInvocationJobs/TagResource/etc. don't support resource-level scoping
+  statement {
+    sid    = "BedrockListBatchInferenceJobs"
+    effect = "Allow"
+    actions = [
+      "bedrock:ListModelInvocationJobs",
+      "bedrock:TagResource",
+      "bedrock:UntagResource",
+      "bedrock:ListTagsForResource"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "PassBedrockBatchExecutionRole"
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = [aws_iam_role.bedrock_batch_execution.arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["bedrock.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid    = "BatchInferenceS3Access"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      module.batch_inference.s3_bucket_arn,
+      "${module.batch_inference.s3_bucket_arn}/*"
+    ]
+  }
+
+  statement {
+    sid    = "BatchInferenceKMSAccess"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+    ]
+    resources = [module.ai_gateway_batch_inference_kms_key.key_arn]
+  }
+
   statement {
     sid       = "AuditLogS3Access"
     effect    = "Allow"
