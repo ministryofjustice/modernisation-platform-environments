@@ -1,6 +1,6 @@
 module "api_access_log_group" {
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
-  version = "5.7.2"
+  version = "5.7.3"
 
   name              = "/aws/apigateway/${local.resource_name_prefix}"
   kms_key_id        = module.kms_cloudwatch_logs.key_arn
@@ -10,7 +10,7 @@ module "api_access_log_group" {
 
 module "cloudwatch_api_gateway_5xx" {
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
-  version = "5.7.2"
+  version = "5.7.3"
 
   alarm_name          = "${local.resource_name_prefix}-api-gateway-5xx"
   alarm_description   = "Integration Hub API Gateway is returning server errors"
@@ -35,7 +35,7 @@ module "cloudwatch_api_gateway_5xx" {
 
 module "cloudwatch_api_gateway_latency" {
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
-  version = "5.7.2"
+  version = "5.7.3"
 
   alarm_name          = "${local.resource_name_prefix}-api-gateway-latency"
   alarm_description   = "Integration Hub API Gateway latency is above the expected threshold"
@@ -62,7 +62,7 @@ module "cloudwatch_lambda_errors" {
   for_each = local.cloudwatch_lambda_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
-  version = "5.7.2"
+  version = "5.7.3"
 
   alarm_name          = "${each.value.alarm_name_prefix}-errors"
   alarm_description   = "${each.value.description} returned one or more errors"
@@ -84,7 +84,7 @@ module "cloudwatch_lambda_throttles" {
   for_each = local.cloudwatch_lambda_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
-  version = "5.7.2"
+  version = "5.7.3"
 
   alarm_name          = "${each.value.alarm_name_prefix}-throttles"
   alarm_description   = "${each.value.description} is throttling"
@@ -106,7 +106,7 @@ module "cloudwatch_lambda_duration" {
   for_each = local.cloudwatch_lambda_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
-  version = "5.7.2"
+  version = "5.7.3"
 
   alarm_name          = "${each.value.alarm_name_prefix}-duration"
   alarm_description   = "${each.value.description} duration is above the expected threshold"
