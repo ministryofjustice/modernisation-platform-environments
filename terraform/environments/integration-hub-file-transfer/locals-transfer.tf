@@ -1,4 +1,5 @@
 locals {
+  create_transfer_host_key        = data.aws_secretsmanager_secret_version.transfer_host_key.secret_string != module.secrets_transfer_host_key.secret_string ? 1 : 0
   transfer_address_allocation_ids = [for key, value in aws_eip.this : value.id]
   transfer_subnet_ids             = local.is-production ? sort(module.vpc_isolated.public_subnets) : slice(sort(module.vpc_isolated.public_subnets), 0, 1)
 
@@ -58,10 +59,7 @@ locals {
     if contains(user.environments, local.environment)
   }
 
-  transfer_user_cidr_blocks = {
-    for username, user in local.environment_transfer_server_users : username => user.cidr_blocks
-    if length(user.cidr_blocks) > 0
-  }
+  transfer_cidr_blocks = toset(flatten([for user in local.environment_transfer_server_users : user.cidr_blocks]))
 
   custom_idp_configuration = {
     log_level     = "INFO"

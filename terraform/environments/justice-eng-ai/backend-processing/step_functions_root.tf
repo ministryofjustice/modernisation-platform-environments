@@ -3,31 +3,17 @@ locals {
 
   root_process_steps = [
     {
-      name               = "get_app_data"
+      name               = "build_test_deploy_app_image"
       type               = "step_function"
-      state_machine_name = "${local.application_name}-get-app-data"
+      state_machine_name = local.build_image_state_machine_name
       input_path         = "$"
-      result_path        = "$.get_app_id"
-    },
-    {
-      name               = "build_deploy_app_image"
-      type               = "step_function"
-      state_machine_name = "${local.application_name}-build-app-image"
-      input_path         = "$.get_app_id"
-      result_path        = "$.build_app_image"
-    },
-    {
-      name               = "test_app_image"
-      type               = "step_function"
-      state_machine_name = "${local.application_name}-test-app-image"
-      input_path         = "$.build_app_image"
-      result_path        = "$.test_app_image"
+      result_path        = "$.build_test_deploy_app_image"
     },
     {
       name               = "build_app_infra"
       type               = "step_function"
       state_machine_name = "${local.application_name}-build-app-infra"
-      input_path         = "$.build_app_image"
+      input_path         = "$.build_test_deploy_app_image"
       result_path        = "$.build_app_infra"
     },
     {
@@ -48,5 +34,8 @@ module "step_functions_root" {
   execution_role_arn = aws_iam_role.step_functions_common.arn
   tags               = local.tags
 
-  depends_on = [aws_iam_role_policy.step_functions_common]
+  depends_on = [
+    aws_iam_role_policy.step_functions_common,
+    module.step_functions_build_image,
+  ]
 }
