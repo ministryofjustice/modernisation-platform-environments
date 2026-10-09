@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "fluent_bit_logs" {
       "logs:PutLogEvents",
       "logs:PutRetentionPolicy",
     ]
-    resources = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/platform/fluent-bit/*"]
+    resources = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${terraform.workspace}/fluentbit/*"]
   }
 }
 
@@ -196,7 +196,7 @@ resource "helm_release" "fluent_bit" {
             compression              gzip
             use_put_object           On
             total_file_size          50M
-            upload_timeout           5m
+            upload_timeout           10m
             store_dir                ${local.fluent_bit_state_dir}/s3
             store_dir_limit_size     2G
             storage.total_limit_size 2G
@@ -205,9 +205,9 @@ resource "helm_release" "fluent_bit" {
             Name                cloudwatch_logs
             Match               kube.*
             Region              ${data.aws_region.current.region}
-            Log_Group_Name      /platform/fluent-bit/fallback
+            Log_Group_Name      /aws/eks/${terraform.workspace}/fluentbit/fallback
             Log_Stream_Prefix   from-fluent-bit-
-            Log_Group_Template  /platform/fluent-bit/$kubernetes['namespace_name']
+            Log_Group_Template  /aws/eks/${terraform.workspace}/fluentbit/$kubernetes['namespace_name']
             Log_Stream_Template $kubernetes['pod_name'].$kubernetes['container_name']
             Auto_Create_Group   On
             Log_Retention_Days  30
