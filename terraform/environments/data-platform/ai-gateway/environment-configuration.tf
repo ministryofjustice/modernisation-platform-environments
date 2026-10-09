@@ -12,7 +12,11 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # Development Compute
+        "18.133.132.50/32",
+        "18.132.51.177/32",
+        "13.42.93.133/32"
       ]
       ai_gateway_admin_ingress_allowlist = [
         # VPN
