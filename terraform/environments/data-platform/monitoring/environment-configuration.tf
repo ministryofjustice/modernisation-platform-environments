@@ -98,6 +98,8 @@ locals {
             vertex_latency_p99_warn                   = 4000
             litellm_deployment_latency_per_token_warn = 1.5
             litellm_deployment_latency_per_token_crit = 2.5
+            litellm_llm_api_latency_p99_warn          = 60
+            litellm_llm_api_latency_p99_crit          = 90
           }
         }
       ]
