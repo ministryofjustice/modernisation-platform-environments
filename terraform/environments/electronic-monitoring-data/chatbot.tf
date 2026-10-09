@@ -1,6 +1,5 @@
-
 module "chatbot_alerts" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=REPLACE_WITH_MERGED_SHA"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=4214f6ab7ecc2224365b110c43269063443b325c"
 
   # Map Slack channel per environment
   slack_channel_id = {
