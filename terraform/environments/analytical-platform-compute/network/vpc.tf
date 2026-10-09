@@ -8,7 +8,7 @@ module "vpc" {
   version = "6.6.1"
 
   name                = local.our_vpc_name
-  azs                 = slice(data.aws_availability_zones.available.names, 0, 3)
+  azs                 = local.availability_zones
   cidr                = local.environment_configuration.vpc_cidr
   public_subnets      = local.environment_configuration.vpc_public_subnets
   database_subnets    = local.environment_configuration.vpc_database_subnets
