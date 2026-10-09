@@ -227,6 +227,27 @@ resource "aws_lambda_permission" "datasync_password_updater" {
   source_arn    = aws_cloudwatch_event_rule.datasync_password_updater[0].arn
 }
 
+resource "aws_cloudwatch_metric_alarm" "datasync_password_updater_error" {
+  alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
+  alarm_description   = "Triggers if there has been a failed password updater lambda command, or the lambda didn't run,  within last 24 hours"
+  alarm_name          = "${var.app_name}-${var.env_name}-datasync-password-updater-lambda-error"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  datapoints_to_alarm = 1
+  evaluation_periods  = 1
+  ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = 86400
+  statistic           = "Maximum"
+  threshold           = 1
+  treat_missing_data  = "breaching"
+
+  dimensions = {
+    FunctionName = "delius-mis-dev-datasync-password-updater"
+  }
+
+  tags = local.tags
+}
 
 #############################################
 ### DataSync Agent Security Group
