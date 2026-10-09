@@ -7,6 +7,7 @@ resource "aws_transfer_server" "this" {
   logging_role                = module.iam_role_transfer.arn
   protocols                   = ["FTPS", "SFTP"]
   security_policy_name        = "TransferSecurityPolicy-2025-03"
+  sftp_authentication_methods = "PUBLIC_KEY"
   structured_log_destinations = ["${module.cloudwatch_transfer.cloudwatch_log_group_arn}:*"]
 
   endpoint_details {
