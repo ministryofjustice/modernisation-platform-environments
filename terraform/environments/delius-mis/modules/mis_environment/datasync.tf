@@ -172,7 +172,7 @@ resource "aws_lambda_function" "datasync_password_updater" {
   tags = local.tags
 }
 
-# trigger on cron 30 mins before datasync task (keep this in case event trigger fails)
+# Trigger on cron 30 mins before datasync task (keep this in case event trigger fails)
 resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
   count               = var.datasync_config != null ? 1 : 0
   name                = "${var.app_name}-${var.env_name}-pre-datasync-password-update"
@@ -194,7 +194,7 @@ resource "aws_lambda_permission" "allow_scheduled_execution" {
   source_arn    = aws_cloudwatch_event_rule.pre_datasync_password_update[0].arn
 }
 
-# trigger when the admin password is updated
+# Trigger when the admin password is updated
 resource "aws_cloudwatch_event_rule" "datasync_password_updater" {
   count = var.datasync_config != null ? 1 : 0
   name  = "${var.app_name}-${var.env_name}-datasync-password-trigger"
@@ -227,6 +227,7 @@ resource "aws_lambda_permission" "datasync_password_updater" {
   source_arn    = aws_cloudwatch_event_rule.datasync_password_updater[0].arn
 }
 
+# Lambda alarms
 resource "aws_cloudwatch_metric_alarm" "datasync_password_updater_error" {
   alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
   alarm_description   = "Triggers if there has been a failed password updater lambda command, or the lambda didn't run,  within last 24 hours"
@@ -238,7 +239,7 @@ resource "aws_cloudwatch_metric_alarm" "datasync_password_updater_error" {
   metric_name         = "Errors"
   namespace           = "AWS/Lambda"
   period              = 86400
-  statistic           = "Maximum"
+  statistic           = "Sum"
   threshold           = 1
   treat_missing_data  = "breaching"
 
@@ -489,6 +490,28 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
     aws_datasync_location_fsx_windows_file_system.dfi_fsx_destination,
     aws_cloudwatch_log_group.datasync_logs
   ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "datasync_password_updater_error" {
+  alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
+  alarm_description   = "Triggers if there has been no data transferred within the last 24 hours"
+  alarm_name          = "${var.app_name}-${var.env_name}-dfi-s3-to-fsx-sync-no-data-transferred"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  datapoints_to_alarm = 1
+  evaluation_periods  = 1
+  ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
+  metric_name         = "BytesWritten"
+  namespace           = "AWS/DataSync"
+  period              = 86400
+  statistic           = "Sum"
+  threshold           = 0
+  treat_missing_data  = "breaching"
+
+  dimensions = {
+    TaskId = aws_datasync_task.id
+  }
+
+  tags = local.tags
 }
 
 #############################################
