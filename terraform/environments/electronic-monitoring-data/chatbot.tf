@@ -1,5 +1,6 @@
+
 module "chatbot_alerts" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=REPLACE_WITH_MERGED_SHA"
 
   # Map Slack channel per environment
   slack_channel_id = {
@@ -11,6 +12,8 @@ module "chatbot_alerts" {
 
   slack_team_id  = "T02DYEB3A"
   sns_topic_arns = [aws_sns_topic.emds_alerts.arn]
+
+  user_authorization_required = local.is-preproduction
 
   guardrail_policies = [
     "arn:aws:iam::aws:policy/ReadOnlyAccess",
