@@ -120,7 +120,7 @@ jobs:
           echo "SKIP_PLAN_EVALUATOR=${SKIP_PLAN_EVALUATOR}" >> $GITHUB_ENV
 
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b9151ad79209d53d7f738430aa6868c5b7589237 # v6.2.9
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management || secrets.ENVIRONMENT_MANAGEMENT }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat || secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
@@ -349,7 +349,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b70a7dc60395eb3df40beacbf221fcee459b4c01 # v6.2.8
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b9151ad79209d53d7f738430aa6868c5b7589237 # v6.2.9
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management || secrets.ENVIRONMENT_MANAGEMENT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}

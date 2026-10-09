@@ -49,6 +49,7 @@ jobs:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      post_plan_to_pr: true
       component: "root"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
@@ -70,6 +71,7 @@ jobs:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      post_plan_to_pr: true
       component: "network"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
@@ -87,6 +89,7 @@ jobs:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      post_plan_to_pr: true
       plan_apply_tfargs: ${{ format('-var=created_by={0}/{1}/actions/runs/{2}/', github.server_url, github.repository, github.run_id) }}
       component: "cluster"
       account_name: ${{ inputs.account_name }}
@@ -105,6 +108,7 @@ jobs:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      post_plan_to_pr: true
       component: "cluster-base"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
@@ -122,6 +126,7 @@ jobs:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      post_plan_to_pr: true
       component: "cluster-core"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
@@ -139,10 +144,11 @@ jobs:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      post_plan_to_pr: true
       component: "cluster-components"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
-      runner: "octo-production" 
+      runner: "octo-production"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}

@@ -162,6 +162,14 @@ locals {
             "Ec2PDSharepointPolicy",
           ])
         })
+
+        ebs_volumes = merge(local.ec2_instances.bip_cms.ebs_volumes, {
+          "/dev/sdc" = {
+            type = "gp3"
+            size = 150
+          }
+        })
+
         tags = merge(local.ec2_instances.bip_cms.tags, {
           nomis-combined-reporting-environment = "pd"
         })
@@ -179,6 +187,14 @@ locals {
             "Ec2PDSharepointPolicy",
           ])
         })
+
+        ebs_volumes = merge(local.ec2_instances.bip_cms.ebs_volumes, {
+          "/dev/sdc" = {
+            type = "gp3"
+            size = 150
+          }
+        })
+
         tags = merge(local.ec2_instances.bip_cms.tags, {
           nomis-combined-reporting-environment = "pd"
         })
