@@ -71,7 +71,11 @@ data "aws_iam_policy_document" "ears_sars_policy_document" {
   statement {
     effect    = "Allow"
     actions   = ["lambda:InvokeFunction"]
-    resources = [module.ears_sars_request[0].lambda_function_arn, module.write_to_sharepoint[0].lambda_function_arn, ]
+    resources = [
+      module.ears_sars_request[0].lambda_function_arn,
+      module.write_to_sharepoint[0].lambda_function_arn,
+      module.send_ear_sar_response[0].lambda_function_arn,
+    ]
   }
 }
 
