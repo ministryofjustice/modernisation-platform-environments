@@ -170,4 +170,3 @@ resource "aws_security_group_rule" "gov_notify_access" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.lambda_cp_sg.id
 }
-api.notifications.service.gov.uk
