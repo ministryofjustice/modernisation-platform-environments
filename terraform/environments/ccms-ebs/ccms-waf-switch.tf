@@ -49,7 +49,9 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
     Statement = [
       { Effect = "Allow",
         Action = ["wafv2:GetWebACL", "wafv2:UpdateWebACL"],
-        Resource = ["arn:aws:wafv2:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:regional/webacl/ebs_internal_waf/*"]
+        Resource = ["arn:aws:wafv2:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:regional/webacl/ebs_internal_waf/*",
+                    "arn:aws:wafv2:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:regional/ipset/ebsapps_internal_waf_ip_set/*"
+        ]
        },
       { Effect = "Allow",
         Action = ["wafv2:GetRuleGroup"],
