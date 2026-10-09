@@ -76,7 +76,7 @@ module "pagerduty_alerts_app" {
   depends_on = [
     aws_sns_topic.alerts_topic
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.alerts_topic.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["performance_hub_prod_alarms"]
 }
@@ -85,7 +85,7 @@ module "pagerduty_alerts_ddos" {
   depends_on = [
     aws_sns_topic.ddos_topic
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.ddos_topic.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["ddos_cloudwatch"]
 }
