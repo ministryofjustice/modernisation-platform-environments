@@ -7,6 +7,8 @@ data "aws_iam_role" "account" {
 }
 
 locals {
+  s3_folder = trim(local.application_data.accounts[local.environment].s3_folder, "/")
+
   ecs_task_roles = {
     for name, role in data.aws_iam_role.account : name => role
     if anytrue([
@@ -204,7 +206,7 @@ resource "aws_s3_bucket_notification" "staging_bucket" {
 
 resource "aws_cloudwatch_event_rule" "staging_bucket_root_upload" {
   name        = "${local.application_name}-staging-root-upload"
-  description = "Start the root workflow when an object is created under forge-builds/ in the staging bucket"
+  description = "Start the root workflow when an object is created under ${local.s3_folder}/ in the staging bucket"
 
   event_pattern = jsonencode({
     source        = ["aws.s3"]
@@ -214,7 +216,7 @@ resource "aws_cloudwatch_event_rule" "staging_bucket_root_upload" {
         name = [aws_s3_bucket.staging_bucket.id]
       }
       object = {
-        key = [{ prefix = "forge-builds/" }]
+        key = [{ prefix = local.s3_folder == "" ? "" : "${local.s3_folder}/" }]
       }
     }
   })
@@ -233,7 +235,7 @@ resource "aws_cloudwatch_event_target" "staging_bucket_root_upload" {
       s3_file = "$.detail.object.key"
     }
     input_template = <<-JSON
-      {"s3_folder": "", "s3_file": <s3_file>}
+      {"s3_folder": ${jsonencode(local.s3_folder)}, "s3_file": <s3_file>}
     JSON
   }
 
