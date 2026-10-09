@@ -1,7 +1,7 @@
 module "sns_pagerduty_high_priority" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sns/aws"
-  version = "7.1.1"
+  version = "7.2.0"
 
   name              = "pagerduty-high-priority"
   kms_master_key_id = module.kms_sns.key_arn
@@ -34,7 +34,7 @@ module "sns_pagerduty_high_priority" {
 module "sns_pagerduty_low_priority" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sns/aws"
-  version = "7.1.1"
+  version = "7.2.0"
 
   name              = "pagerduty-low-priority"
   kms_master_key_id = module.kms_sns.key_arn
