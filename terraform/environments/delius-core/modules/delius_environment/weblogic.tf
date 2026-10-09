@@ -225,7 +225,7 @@ resource "aws_ecs_capacity_provider" "weblogic" {
       target_capacity = 100
     }
 
-    managed_termination_protection = "ENABLED"
+    managed_termination_protection = var.enable_autoscaling_schedule ? "DISABLED" : "ENABLED"
   }
 }
 
@@ -310,4 +310,25 @@ resource "aws_lb_listener_certificate" "legacy_prod" {
 
   listener_arn    = aws_lb_listener.listener_https.arn
   certificate_arn = aws_acm_certificate.legacy_prod[0].arn
+}
+
+locals {
+  weblogic_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic"
+  weblogic_task_count = {
+    dev     = 1
+    test    = 4
+    stage   = 2
+    preprod = 20
+    prod    = 30
+  }
+}
+
+module "ecs_nightly_restart_weblogic" {
+  source = "../components/ecs_nightly_restart"
+
+  env_name     = var.env_name
+  cluster_name = module.ecs.ecs_cluster_arn
+  service_name = "${var.env_name}-weblogic"
+  service_arn  = local.weblogic_service_arn
+  task_count   = local.weblogic_task_count[var.env_name]
 }

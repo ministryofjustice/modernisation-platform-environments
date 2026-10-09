@@ -25,7 +25,7 @@ variable "bedrock_model_id" {
 variable "enable_oidc_auth" {
   type        = bool
   description = "Whether to provision Entra ID OIDC secrets (and, in a follow-up, wire the ALB `authenticate-oidc` listener action). Secrets are created empty by Terraform and populated out-of-band; see oidc.tf."
-  default     = false
+  default     = true
 }
 
 variable "oidc_configured" {
@@ -37,7 +37,7 @@ variable "oidc_configured" {
     first apply (secrets are created empty) and flip to true only after
     populating the values via ``aws secretsmanager put-secret-value``.
   EOT
-  default     = false
+  default     = true
 }
 
 variable "enable_in_app_oidc" {
@@ -58,9 +58,10 @@ variable "enable_in_app_oidc" {
     Requires ``enable_oidc_auth = true`` and ``oidc_configured = true`` so
     the underlying secrets exist and hold populated values.
 
-    Default false so switching to the in-app path is an explicit opt-in.
+    Default true now that both accounts' secrets are populated and their
+    redirect URIs are registered in the shared Entra app registration.
   EOT
-  default     = false
+  default     = true
 }
 
 variable "entra_admin_group_id" {
@@ -286,13 +287,14 @@ variable "external_forge_url" {
 variable "forge_package_s3_bucket" {
   type        = string
   description = <<-EOT
-    Name of the S3 bucket where Forge Journey Lab writes "Package for
+    Override for the S3 bucket where Forge Journey Lab writes "Package for
     deployment" artefacts (``s3://<bucket>/<forge_package_s3_prefix><appId>/<buildId>.json``).
-    Leave empty to disable S3 uploads -- Forge will fall back to writing
-    the artefact to its own EFS data directory under ``/data/packages``.
-    The bucket is NOT managed by this Terraform; create it out-of-band
-    (``aws s3 mb s3://<bucket>``) with whatever lifecycle / encryption
-    policies you need.
+    Leave empty (the default) to use the sibling backend-processing root's
+    staging bucket instead -- see local.forge_package_s3_bucket in
+    locals.tf, which reads that bucket's name via terraform_remote_state.
+    That bucket is NOT managed by this root; it's created in
+    backend-processing/s3.tf. Set this var only to point Forge at a
+    different bucket than that default.
   EOT
   default     = ""
 }

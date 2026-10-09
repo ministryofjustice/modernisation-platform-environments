@@ -7,6 +7,9 @@
 # `local.oidc_wired` in case that decision changes later, but the two are
 # mutually exclusive -- running both at once would double-authenticate.
 locals {
+  # Both accounts now have their Entra callback URIs registered and
+  # secrets populated, so no further per-environment gating is needed here
+  # beyond the three var.enable_*/oidc_configured flags themselves.
   in_app_oidc_enabled = var.enable_in_app_oidc && var.enable_oidc_auth && var.oidc_configured
   in_app_oidc_count   = local.in_app_oidc_enabled ? 1 : 0
 
