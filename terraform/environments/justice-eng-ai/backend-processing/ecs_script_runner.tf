@@ -345,6 +345,7 @@ resource "aws_launch_template" "script_runner" {
       volume_size = 50
       volume_type = "gp3"
       encrypted   = true
+      kms_key_id  = aws_kms_key.script_runner_ebs.arn
     }
   }
 
@@ -361,11 +362,12 @@ resource "aws_launch_template" "script_runner" {
 }
 
 resource "aws_autoscaling_group" "script_runner" {
-  name                = "${local.application_name}-script-runner"
-  min_size            = 1
-  max_size            = 1
-  desired_capacity    = 1
-  vpc_zone_identifier = data.terraform_remote_state.justice_eng_ai.outputs.private_subnet_ids
+  name                    = "${local.application_name}-script-runner"
+  min_size                = 1
+  max_size                = 1
+  desired_capacity        = 1
+  vpc_zone_identifier     = data.terraform_remote_state.justice_eng_ai.outputs.private_subnet_ids
+  service_linked_role_arn = data.aws_iam_role.script_runner_autoscaling.arn
 
   launch_template {
     id      = aws_launch_template.script_runner.id
@@ -437,4 +439,71 @@ resource "aws_ecs_task_definition" "script_runner" {
       }
     }
   ])
+}
+
+data "aws_iam_role" "script_runner_autoscaling" {
+  name = "AWSServiceRoleForAutoScaling"
+}
+
+data "aws_iam_policy_document" "script_runner_ebs" {
+  statement {
+    sid       = "EnableAccountIAMPermissions"
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+
+  statement {
+    sid    = "AllowAutoScalingKeyUse"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+    ]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [data.aws_iam_role.script_runner_autoscaling.arn]
+    }
+  }
+
+  statement {
+    sid       = "AllowAutoScalingResourceGrants"
+    effect    = "Allow"
+    actions   = ["kms:CreateGrant"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [data.aws_iam_role.script_runner_autoscaling.arn]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "kms:GrantIsForAWSResource"
+      values   = ["true"]
+    }
+  }
+}
+
+resource "aws_kms_key" "script_runner_ebs" {
+  description             = "Encrypt EBS volumes for the script runner EC2 instances"
+  enable_key_rotation     = true
+  deletion_window_in_days = 30
+  policy                  = data.aws_iam_policy_document.script_runner_ebs.json
+  tags                    = local.tags
+}
+
+resource "aws_kms_alias" "script_runner_ebs" {
+  name          = "alias/${local.application_name}-script-runner-ebs"
+  target_key_id = aws_kms_key.script_runner_ebs.key_id
 }
