@@ -1,0 +1,123 @@
+"""Retain the clean version and send an authenticated pickup link to Slack."""
+import hashlib
+import json
+import re
+import time
+from datetime import datetime, timezone
+from uuid import UUID
+from urllib.parse import quote
+
+SOURCE = "uk.gov.justice.service.managed-file-transfer"
+MAX_EVENT_AGE = 12 * 60 * 60
+
+
+class InvalidNotification(ValueError):
+    pass
+
+
+def validate(record, config, now):
+    if record.get("eventSource") != "aws:sqs" or record.get("eventSourceARN") != config["queue_arn"]:
+        raise InvalidNotification("Unexpected queue")
+    envelope = json.loads(record["body"])
+    if envelope.get("Type") != "Notification" or envelope.get("TopicArn") != config["topic_arn"]:
+        raise InvalidNotification("Unexpected topic")
+    event = json.loads(envelope["Message"])
+    if (event.get("source") != SOURCE or event.get("account") != config["account"]
+            or event.get("region") != "eu-west-2"
+            or event.get("detail-type") != "FileActionExecutionRequested.v1"):
+        raise InvalidNotification("Unexpected event")
+    data = event["detail"]["data"]
+    UUID(data["actionExecutionId"])
+    UUID(data["fileId"])
+    if "slack" not in data["notifications"]:
+        raise InvalidNotification("Slack not requested")
+    ref = data["configurationReference"]
+    route = config["routes"].get(ref["secretArn"])
+    if not route or (not isinstance(ref.get("secretVersionId"), str) or ref["secretVersionId"] in ("", "null")):
+        raise InvalidNotification("Unknown configuration")
+    obj = data["object"]
+    if (obj.get("bucket") != config["clean_bucket"] or (not isinstance(obj.get("versionId"), str) or obj["versionId"] in ("", "null"))
+            or not isinstance(obj.get("key"), str) or not obj["key"].startswith(route["prefix"])):
+        raise InvalidNotification("Object outside authorised clean prefix")
+    requested = datetime.fromisoformat(data["requestedAt"].replace("Z", "+00:00"))
+    if requested.tzinfo is None:
+        raise InvalidNotification("Timestamp needs timezone")
+    age = now - requested.timestamp()
+    if age < -300:
+        raise InvalidNotification("Future event")
+    # Do not notify from old DLQs once the one-day clean retention is likely exhausted.
+    if age > MAX_EVENT_AGE:
+        return None
+    portal = config["portal_url"]
+    if not re.fullmatch(r"https://web(?:\.(?:development|test|preproduction))?\.file-transfer\.service\.justice\.gov\.uk", portal):
+        raise InvalidNotification("Unexpected portal")
+    key = hashlib.sha256(json.dumps([data["actionExecutionId"], ref["secretArn"],
+                                    ref["secretVersionId"], route["recipient_id"]]).encode()).hexdigest()
+    return data, route, key
+
+
+def message(data, portal, receipt):
+    # Encode the key so user-controlled names cannot inject Slack mentions or links.
+    location = f"s3://{receipt['bucket']}/{quote(receipt['key'], safe='/')}"
+    return {
+        "version": "1.0",
+        "source": "custom",
+        "id": data["actionExecutionId"],
+        "content": {
+            "textType": "client-markdown",
+            "title": "A clean file is ready for pickup",
+            "description": f"Location (URL-encoded): {location}\n<{portal}|Open file-transfer pickup>",
+            "nextSteps": ["Sign in with your organisational account and locate the file. Access requires an authorised group.",
+                          "Files have seven-day lifecycle expiry; collect promptly."],
+        },
+        "metadata": {"enableCustomActions": False},
+    }
+
+
+def process(record, config, store, secrets, send, clock=time.time, retainer=None):
+    now = int(clock())
+    validated = validate(record, config, now)
+    if validated is None:
+        return "expired"
+    data, route, key = validated
+    ref = data["configurationReference"]
+    dispatch = json.loads(secrets.get_secret_value(SecretId=ref["secretArn"],
+                          VersionId=ref["secretVersionId"])["SecretString"])
+    if dispatch.get("notifications", {}).get("slack") != route["recipient_id"]:
+        raise InvalidNotification("Dispatch recipient mismatch")
+    if not store.claim(key, now):
+        return "duplicate"
+    # Leave the lease on failure, including ambiguous SNS outcomes. A later retry
+    # can send again after expiry; exactly-once delivery to Slack is not guaranteed.
+    if retainer is None:
+        raise InvalidNotification("Pickup retention is not configured")
+    receipt = retainer.prepare(key, data, route, now)
+    send(route["notification_topic_arn"], message(data, config["portal_url"], receipt))
+    store.complete(key)
+    return "published"
+
+
+class Store:
+    def __init__(self, table):
+        self.table = table
+
+    def claim(self, key, now):
+        try:
+            self.table.put_item(Item={"id": key, "status": "IN_PROGRESS", "leaseUntil": now + 960,
+                                      "expiresAt": now + 14 * 86400},
+                ConditionExpression="attribute_not_exists(id) OR (#s = :working AND leaseUntil < :now)",
+                ExpressionAttributeNames={"#s": "status"},
+                ExpressionAttributeValues={":working": "IN_PROGRESS", ":now": now})
+            return True
+        except Exception as error:
+            if getattr(error, "response", {}).get("Error", {}).get("Code") != "ConditionalCheckFailedException":
+                raise
+            item = self.table.get_item(Key={"id": key}, ConsistentRead=True).get("Item", {})
+            if item.get("status") == "SENT":
+                return False
+            raise RuntimeError("Notification already in progress") from None
+
+    def complete(self, key):
+        self.table.update_item(Key={"id": key}, UpdateExpression="SET #s = :sent",
+                               ExpressionAttributeNames={"#s": "status"},
+                               ExpressionAttributeValues={":sent": "SENT"})
