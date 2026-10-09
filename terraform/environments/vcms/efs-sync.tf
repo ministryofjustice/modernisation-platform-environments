@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "destination_efs_replication_policy" {
       "elasticfilesystem:ReplicationWrite"
     ]
 
-    resources = [module.efs.file_system_arn]
+    resources = [aws_efs_file_system.vcms.arn]
   }
 
   statement {
@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "destination_efs_replication_policy" {
       "elasticfilesystem:ClientRootAccess"
     ]
 
-    resources = [module.efs.file_system_arn]
+    resources = [aws_efs_file_system.vcms.arn]
 
     condition {
       test     = "Bool"
@@ -46,6 +46,6 @@ data "aws_iam_policy_document" "destination_efs_replication_policy" {
 }
 
 resource "aws_efs_file_system_policy" "destination_replication" {
-  file_system_id = module.efs.file_system_id
+  file_system_id = aws_efs_file_system.vcms.id
   policy         = data.aws_iam_policy_document.destination_efs_replication_policy.json
 }
