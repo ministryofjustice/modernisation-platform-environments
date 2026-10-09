@@ -172,14 +172,10 @@ resource "aws_lambda_function" "datasync_password_updater" {
   tags = local.tags
 }
 
-# Schedule the Lambda to run 30 minutes before DataSync task to ensure fresh password
+# Trigger on cron 30 mins before datasync task (keep this in case event trigger fails)
 resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
-  count = var.datasync_config != null ? 1 : 0
-  name  = "${var.app_name}-${var.env_name}-pre-datasync-password-update"
-
-  # Run 15 minutes before the DataSync schedule to ensure fresh password
-  # Default: Lambda at 04:00 UTC, DataSync at 04:15 UTC
-  # Can be overridden with var.datasync_config.lambda_schedule_expression
+  count               = var.datasync_config != null ? 1 : 0
+  name                = "${var.app_name}-${var.env_name}-pre-datasync-password-update"
   schedule_expression = var.datasync_config.lambda_schedule_expression
 }
 
@@ -196,6 +192,62 @@ resource "aws_lambda_permission" "allow_scheduled_execution" {
   function_name = aws_lambda_function.datasync_password_updater[0].function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.pre_datasync_password_update[0].arn
+}
+
+# Trigger when the admin password is updated
+resource "aws_cloudwatch_event_rule" "datasync_password_updater" {
+  count = var.datasync_config != null ? 1 : 0
+  name  = "${var.app_name}-${var.env_name}-datasync-password-trigger"
+
+  event_pattern = jsonencode({
+    source      = ["aws.secretsmanager"]
+    detail-type = ["AWS API Call via CloudTrail"]
+    detail = {
+      eventSource = ["secretsmanager.amazonaws.com"]
+      eventName   = ["PutSecretValue"]
+      requestParameters = {
+        secretId = [data.aws_secretsmanager_secret.datasync_ad_admin_password[0].name]
+      }
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "datasync_password_updater" {
+  count = var.datasync_config != null ? 1 : 0
+  rule  = aws_cloudwatch_event_rule.datasync_password_updater[0].name
+  arn   = aws_lambda_function.datasync_password_updater[0].arn
+}
+
+resource "aws_lambda_permission" "datasync_password_updater" {
+  count         = var.datasync_config != null ? 1 : 0
+  statement_id  = "AllowExecutionFromSecretUpdate"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.datasync_password_updater[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.datasync_password_updater[0].arn
+}
+
+# Lambda alarms
+resource "aws_cloudwatch_metric_alarm" "datasync_password_updater_error" {
+  alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
+  alarm_description   = "Triggers if there has been a failed password updater lambda command, or the lambda didn't run,  within last 24 hours"
+  alarm_name          = "${var.app_name}-${var.env_name}-datasync-password-updater-lambda-error"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  datapoints_to_alarm = 1
+  evaluation_periods  = 1
+  ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = 86400
+  statistic           = "Sum"
+  threshold           = 1
+  treat_missing_data  = "breaching"
+
+  dimensions = {
+    FunctionName = "delius-mis-dev-datasync-password-updater"
+  }
+
+  tags = local.tags
 }
 
 #############################################
@@ -438,6 +490,30 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
     aws_datasync_location_fsx_windows_file_system.dfi_fsx_destination,
     aws_cloudwatch_log_group.datasync_logs
   ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "dfi_s3_to_fsx_error" {
+  count = var.datasync_config != null ? 1 : 0
+
+  alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
+  alarm_description   = "Triggers if there has been no data transferred within the last 24 hours"
+  alarm_name          = "${var.app_name}-${var.env_name}-dfi-s3-to-fsx-sync-no-data-transferred"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  datapoints_to_alarm = 1
+  evaluation_periods  = 1
+  ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
+  metric_name         = "BytesWritten"
+  namespace           = "AWS/DataSync"
+  period              = 86400
+  statistic           = "Sum"
+  threshold           = 0
+  treat_missing_data  = "breaching"
+
+  dimensions = {
+    TaskId = split("/", aws_datasync_task.dfi_s3_to_fsx[0].arn)[1] # have to split as .id is also in arn format
+  }
+
+  tags = local.tags
 }
 
 #############################################
