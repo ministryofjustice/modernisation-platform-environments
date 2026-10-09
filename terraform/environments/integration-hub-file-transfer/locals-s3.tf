@@ -1,4 +1,6 @@
 locals {
+  cloudtrail_retention_days = local.is-production ? 400 : 30
+
   s3_bucket_keys = [
     "incoming",
     "processing",
