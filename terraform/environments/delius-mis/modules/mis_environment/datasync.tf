@@ -493,6 +493,8 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "dfi_s3_to_fsx_error" {
+  count = var.datasync_config != null ? 1 : 0
+
   alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
   alarm_description   = "Triggers if there has been no data transferred within the last 24 hours"
   alarm_name          = "${var.app_name}-${var.env_name}-dfi-s3-to-fsx-sync-no-data-transferred"
@@ -508,7 +510,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_s3_to_fsx_error" {
   treat_missing_data  = "breaching"
 
   dimensions = {
-    TaskId = aws_datasync_task.dfi_s3_to_fsx.id
+    TaskId = aws_datasync_task.dfi_s3_to_fsx[0].id
   }
 
   tags = local.tags
