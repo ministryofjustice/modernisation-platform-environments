@@ -2,6 +2,14 @@ locals {
   prototype_domain_name   = "ai-prototype.modernisation-platform.service.justice.gov.uk"
   prototype_bucket_prefix = "justice-eng-ai-prototypes"
   prototype_edge_enabled = local.is-production
+  prototype_validation_records = {
+    for option in local.prototype_edge_enabled ? aws_acm_certificate.prototypes[0].domain_validation_options : [] :
+    option.resource_record_name => {
+      name  = option.resource_record_name
+      type  = option.resource_record_type
+      value = option.resource_record_value
+    }...
+  }
 }
 
 resource "aws_acm_certificate" "prototypes" {
@@ -20,20 +28,13 @@ resource "aws_acm_certificate" "prototypes" {
 
 resource "aws_route53_record" "prototype_certificate_validation" {
   provider = aws.core-network-services
-  for_each = {
-    for domain_validation_option in local.prototype_edge_enabled ? aws_acm_certificate.prototypes[0].domain_validation_options : [] :
-    domain_validation_option.domain_name => {
-      name  = domain_validation_option.resource_record_name
-      type  = domain_validation_option.resource_record_type
-      value = domain_validation_option.resource_record_value
-    }
-  }
+  for_each = local.prototype_validation_records
 
   zone_id         = data.aws_route53_zone.network-services.zone_id
-  name            = each.value.name
-  type            = each.value.type
+  name            = each.value[0].name
+  type            = each.value[0].type
   ttl             = 60
-  records         = [each.value.value]
+  records         = [each.value[0].value]
   allow_overwrite = true
 }
 
