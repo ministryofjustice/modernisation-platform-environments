@@ -255,6 +255,17 @@ resource "aws_security_group_rule" "egress_traffic_ebsapps_443" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+### The following egress rule is added for Azure Virtual Desktop to connect to EBS Apps instances on HTTPS port 443. 
+resource "aws_security_group_rule" "ingress_traffic_ebsapps_443" {
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "ingress"
+  description       = "HTTPS connection from EBS apps to EBS LB - Azure Virtual Desktop"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = ["10.192.64.0/22"]
+}
+
 ### FTP
 
 resource "aws_security_group_rule" "egress_traffic_ebsapps_2x" {
