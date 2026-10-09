@@ -204,7 +204,7 @@ resource "aws_s3_bucket_notification" "staging_bucket" {
 
 resource "aws_cloudwatch_event_rule" "staging_bucket_root_upload" {
   name        = "${local.application_name}-staging-root-upload"
-  description = "Start the root workflow when an object is created in the staging bucket root"
+  description = "Start the root workflow when an object is created under forge-builds/ in the staging bucket"
 
   event_pattern = jsonencode({
     source        = ["aws.s3"]
@@ -214,7 +214,7 @@ resource "aws_cloudwatch_event_rule" "staging_bucket_root_upload" {
         name = [aws_s3_bucket.staging_bucket.id]
       }
       object = {
-        key = [{ "anything-but" = { wildcard = "*/*" } }]
+        key = [{ prefix = "forge-builds/" }]
       }
     }
   })
