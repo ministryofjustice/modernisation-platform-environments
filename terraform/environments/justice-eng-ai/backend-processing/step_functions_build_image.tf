@@ -15,7 +15,7 @@ locals {
       script_path = "scripts/prototype-image-build/build-prototype-image.py"
       shell_type  = "python3"
       variables = [
-        { name = "S3_BUCKET", value = module.staging_bucket.bucket.id },
+        { name = "S3_BUCKET", value = aws_s3_bucket.staging_bucket.id },
         { name = "S3_FOLDER", path = "$.s3_folder" },
         { name = "S3_FILE", path = "$.s3_file" },
         { name = "ECR_REPOSITORY_URI", value = local.ecr_repository_uri },
