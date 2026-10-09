@@ -421,7 +421,7 @@ resource "aws_iam_role_policy" "lambda-execution-role-policy" {
       {
         "Effect" = "Allow",
         "Action" = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
-        "Resource" = ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:db-${local.environment}-credentials"]
+        "Resource" = ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:db-${local.environment}-credentials*"]
       }
     ]
   })
