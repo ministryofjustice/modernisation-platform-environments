@@ -131,3 +131,36 @@ resource "aws_iam_role_policy" "step_functions_common" {
   role   = aws_iam_role.step_functions_common.id
   policy = data.aws_iam_policy_document.step_functions_common.json
 }
+
+data "aws_iam_policy_document" "script_runner_common" {
+  statement {
+    sid       = "AuthenticateToEcr"
+    effect    = "Allow"
+    actions   = ["ecr:GetAuthorizationToken"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "PullForgeRuntimeBaseImage"
+    effect = "Allow"
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
+      "ecr:GetDownloadUrlForLayer",
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:ecr:${data.aws_region.current.region}:${local.environment_management.account_ids["core-shared-services-production"]}:repository/${local.application_data.accounts[local.environment].forge_runtime_base_ecr_repository_name}"]
+  }
+
+  statement {
+    sid    = "PushPrototypeImagesToSharedRepository"
+    effect = "Allow"
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:InitiateLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:CompleteLayerUpload",
+      "ecr:PutImage",
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:ecr:${data.aws_region.current.region}:${local.environment_management.account_ids["core-shared-services-production"]}:repository/${local.application_data.accounts[local.environment].ecr_repository_name}"]
+  }
+}

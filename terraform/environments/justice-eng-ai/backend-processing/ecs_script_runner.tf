@@ -99,6 +99,8 @@ resource "aws_iam_role" "script_runner_ecs_task" {
 }
 
 data "aws_iam_policy_document" "script_runner_ecs_task" {
+  source_policy_documents = [data.aws_iam_policy_document.script_runner_common.json]
+
   statement {
     sid       = "ListBucketsOwnedByCurrentAccount"
     effect    = "Allow"
