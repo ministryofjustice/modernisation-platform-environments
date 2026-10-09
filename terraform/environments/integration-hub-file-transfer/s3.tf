@@ -38,6 +38,18 @@ module "s3_audit_bucket" {
     }
   ]
 
+  object_lock_enabled = true
+
+  object_lock_configuration = {
+    rule = {
+      default_retention = {
+        mode = "GOVERNANCE"
+        # S3 object_lock is configured in days; 400 days retains logs for at least 13 months.
+        days = 400
+      }
+    }
+  }
+
   versioning = {
     status     = true
     mfa_delete = false
