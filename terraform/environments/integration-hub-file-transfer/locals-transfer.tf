@@ -59,10 +59,7 @@ locals {
     if contains(user.environments, local.environment)
   }
 
-  transfer_user_cidr_blocks = {
-    for username, user in local.environment_transfer_server_users : username => distinct(user.cidr_blocks)
-    if length(user.cidr_blocks) > 0
-  }
+  transfer_cidr_blocks = toset(flatten([for user in local.environment_transfer_server_users : user.cidr_blocks]))
 
   custom_idp_configuration = {
     log_level     = "INFO"
