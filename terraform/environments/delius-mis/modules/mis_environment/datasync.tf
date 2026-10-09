@@ -201,7 +201,7 @@ resource "aws_cloudwatch_event_rule" "datasync_password_updater" {
 
   event_pattern = jsonencode({
     source      = ["aws.secretsmanager"]
-    detail_type = ["AWS API Call via CloudTrail"]
+    detail-type = ["AWS API Call via CloudTrail"]
     detail = {
       eventSource = ["secretsmanager.amazonaws.com"]
       eventName   = ["PutSecretValue"]
