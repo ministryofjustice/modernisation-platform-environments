@@ -287,13 +287,14 @@ variable "external_forge_url" {
 variable "forge_package_s3_bucket" {
   type        = string
   description = <<-EOT
-    Name of the S3 bucket where Forge Journey Lab writes "Package for
+    Override for the S3 bucket where Forge Journey Lab writes "Package for
     deployment" artefacts (``s3://<bucket>/<forge_package_s3_prefix><appId>/<buildId>.json``).
-    Leave empty to disable S3 uploads -- Forge will fall back to writing
-    the artefact to its own EFS data directory under ``/data/packages``.
-    The bucket is NOT managed by this Terraform; create it out-of-band
-    (``aws s3 mb s3://<bucket>``) with whatever lifecycle / encryption
-    policies you need.
+    Leave empty (the default) to use the sibling backend-processing root's
+    staging bucket instead -- see local.forge_package_s3_bucket in
+    locals.tf, which reads that bucket's name via terraform_remote_state.
+    That bucket is NOT managed by this root; it's created in
+    backend-processing/s3.tf. Set this var only to point Forge at a
+    different bucket than that default.
   EOT
   default     = ""
 }
