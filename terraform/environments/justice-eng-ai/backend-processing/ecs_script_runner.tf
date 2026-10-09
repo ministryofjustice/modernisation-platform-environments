@@ -367,7 +367,7 @@ resource "aws_autoscaling_group" "script_runner" {
   max_size                = 1
   desired_capacity        = 1
   vpc_zone_identifier     = data.terraform_remote_state.justice_eng_ai.outputs.private_subnet_ids
-  service_linked_role_arn = data.aws_iam_role.script_runner_autoscaling.arn
+  service_linked_role_arn = aws_iam_service_linked_role.script_runner_autoscaling.arn
 
   launch_template {
     id      = aws_launch_template.script_runner.id
@@ -441,8 +441,10 @@ resource "aws_ecs_task_definition" "script_runner" {
   ])
 }
 
-data "aws_iam_role" "script_runner_autoscaling" {
-  name = "AWSServiceRoleForAutoScaling"
+resource "aws_iam_service_linked_role" "script_runner_autoscaling" {
+  aws_service_name = "autoscaling.amazonaws.com"
+  custom_suffix    = "${local.application_name}-script-runner"
+  description      = "Allow Auto Scaling to manage script runner EC2 instances"
 }
 
 data "aws_iam_policy_document" "script_runner_ebs" {
@@ -472,7 +474,7 @@ data "aws_iam_policy_document" "script_runner_ebs" {
 
     principals {
       type        = "AWS"
-      identifiers = [data.aws_iam_role.script_runner_autoscaling.arn]
+      identifiers = [aws_iam_service_linked_role.script_runner_autoscaling.arn]
     }
   }
 
@@ -484,7 +486,7 @@ data "aws_iam_policy_document" "script_runner_ebs" {
 
     principals {
       type        = "AWS"
-      identifiers = [data.aws_iam_role.script_runner_autoscaling.arn]
+      identifiers = [aws_iam_service_linked_role.script_runner_autoscaling.arn]
     }
 
     condition {
