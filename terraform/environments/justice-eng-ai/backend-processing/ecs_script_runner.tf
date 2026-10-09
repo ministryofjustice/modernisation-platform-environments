@@ -329,7 +329,7 @@ resource "aws_iam_instance_profile" "script_runner_ec2_instance" {
 resource "aws_launch_template" "script_runner" {
   name_prefix            = "${local.application_name}-script-runner-"
   image_id               = data.aws_ssm_parameter.ecs_optimized_ami.value
-  instance_type          = "t3.large"
+  instance_type          = "t3.medium"
   vpc_security_group_ids = [aws_security_group.script_runner_task.id]
   user_data              = base64encode("#!/bin/bash\necho ECS_CLUSTER=${aws_ecs_cluster.script_runner.name} >> /etc/ecs/ecs.config\n")
   tags                   = local.tags
