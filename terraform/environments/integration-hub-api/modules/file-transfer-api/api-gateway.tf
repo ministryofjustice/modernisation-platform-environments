@@ -1,7 +1,7 @@
 module "api_gateway" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/apigateway-v2/aws"
-  version = "6.1.0"
+  version = "6.1.1"
 
   name          = local.resource_name_prefix
   protocol_type = "HTTP"
