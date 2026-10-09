@@ -19,17 +19,10 @@ locals {
       {
         Type     = "Task"
         Resource = "arn:${data.aws_partition.current.partition}:states:::ecs:runTask.sync"
-        Parameters = {
-          LaunchType     = "FARGATE"
+        Parameters = merge({
+          LaunchType     = var.script_runner.launch_type
           Cluster        = var.script_runner.cluster_arn
           TaskDefinition = var.script_runner.task_definition_family
-          NetworkConfiguration = {
-            AwsvpcConfiguration = {
-              Subnets        = var.script_runner.subnets
-              SecurityGroups = var.script_runner.security_groups
-              AssignPublicIp = var.script_runner.assign_public_ip
-            }
-          }
           Overrides = {
             ContainerOverrides = [{
               Name = var.script_runner.container_name
@@ -47,7 +40,17 @@ locals {
               )
             }]
           }
-        }
+          },
+          # Host-network EC2 tasks cannot take an awsvpc network configuration.
+          var.script_runner.launch_type != "FARGATE" ? {} : {
+            NetworkConfiguration = {
+              AwsvpcConfiguration = {
+                Subnets        = var.script_runner.subnets
+                SecurityGroups = var.script_runner.security_groups
+                AssignPublicIp = var.script_runner.assign_public_ip
+              }
+            }
+        })
       },
       local.transitions[step.name],
       try(step.timeout_seconds, null) == null ? {} : { TimeoutSeconds = step.timeout_seconds },

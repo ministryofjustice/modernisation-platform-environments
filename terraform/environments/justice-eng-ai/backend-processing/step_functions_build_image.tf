@@ -44,11 +44,13 @@ module "step_functions_build_image" {
     assign_public_ip       = "DISABLED"
     execution_role_arn     = aws_iam_role.script_runner_ecs_execution.arn
     task_role_arn          = aws_iam_role.script_runner_ecs_task.arn
+    launch_type            = "EC2"
   }
   tags = local.tags
 
   depends_on = [
     aws_ecs_task_definition.script_runner,
+    aws_autoscaling_group.script_runner,
     aws_iam_role_policy.step_functions_common,
     aws_iam_role_policy_attachment.script_runner_ecs_task,
     aws_iam_role_policy_attachment.script_runner_ecs_execution,

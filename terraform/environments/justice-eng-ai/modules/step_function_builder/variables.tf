@@ -57,6 +57,7 @@ variable "script_runner" {
     assign_public_ip       = string
     execution_role_arn     = string
     task_role_arn          = string
+    launch_type            = optional(string, "FARGATE")
   })
   default = null
 

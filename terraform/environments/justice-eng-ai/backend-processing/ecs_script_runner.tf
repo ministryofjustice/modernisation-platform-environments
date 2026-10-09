@@ -17,7 +17,7 @@ locals {
 
   script_runner_environment_variables = []
 
-  # Fargate task capacity; adjust after the script requirements are known.
+  # Task capacity; adjust after the script requirements are known.
   script_runner_task_cpu    = 1024
   script_runner_task_memory = 2048
 }
@@ -283,23 +283,148 @@ resource "aws_iam_role_policy_attachment" "script_runner_ecs_task" {
   policy_arn = aws_iam_policy.script_runner_ecs_task.arn
 }
 
+# ---------- EC2 capacity: gives the task access to a Docker daemon ----------
+# Fargate cannot run docker, and the prototype image build needs docker/buildx,
+# so the script runner tasks run on a single ECS-optimised EC2 instance and
+# use its Docker daemon via the mounted socket.
+
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended/image_id"
+}
+
+data "aws_iam_policy_document" "script_runner_ec2_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "script_runner_ec2_instance" {
+  name               = "${local.script_runner_role_name_prefix}-ec2-instance"
+  assume_role_policy = data.aws_iam_policy_document.script_runner_ec2_assume_role.json
+  tags               = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "script_runner_ec2_instance" {
+  for_each = toset([
+    "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
+    "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore",
+  ])
+
+  role       = aws_iam_role.script_runner_ec2_instance.name
+  policy_arn = each.value
+}
+
+resource "aws_iam_instance_profile" "script_runner_ec2_instance" {
+  name = "${local.script_runner_role_name_prefix}-ec2-instance"
+  role = aws_iam_role.script_runner_ec2_instance.name
+  tags = local.tags
+}
+
+resource "aws_launch_template" "script_runner" {
+  name_prefix            = "${local.application_name}-script-runner-"
+  image_id               = data.aws_ssm_parameter.ecs_optimized_ami.value
+  instance_type          = "t3.large"
+  vpc_security_group_ids = [aws_security_group.script_runner_task.id]
+  user_data              = base64encode("#!/bin/bash\necho ECS_CLUSTER=${aws_ecs_cluster.script_runner.name} >> /etc/ecs/ecs.config\n")
+  tags                   = local.tags
+
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.script_runner_ec2_instance.arn
+  }
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      volume_size = 50
+      volume_type = "gp3"
+      encrypted   = true
+    }
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = merge(local.tags, { Name = "${local.application_name}-script-runner" })
+  }
+}
+
+resource "aws_autoscaling_group" "script_runner" {
+  name                = "${local.application_name}-script-runner"
+  min_size            = 1
+  max_size            = 1
+  desired_capacity    = 1
+  vpc_zone_identifier = data.terraform_remote_state.justice_eng_ai.outputs.private_subnet_ids
+
+  launch_template {
+    id      = aws_launch_template.script_runner.id
+    version = aws_launch_template.script_runner.latest_version
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+
+    preferences {
+      min_healthy_percentage = 0
+    }
+  }
+
+  dynamic "tag" {
+    for_each = merge(local.tags, { Name = "${local.application_name}-script-runner" })
+
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
+}
+
 resource "aws_ecs_task_definition" "script_runner" {
   family                   = local.script_runner_task_definition_family
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  cpu                      = local.script_runner_task_cpu
-  memory                   = local.script_runner_task_memory
-  execution_role_arn       = aws_iam_role.script_runner_ecs_execution.arn
-  task_role_arn            = aws_iam_role.script_runner_ecs_task.arn
-  tags                     = local.tags
+  requires_compatibilities = ["EC2"]
+  # Host networking so the build script can reach containers it publishes on
+  # the instance's Docker daemon (the image smoke test hits 127.0.0.1).
+  network_mode       = "host"
+  cpu                = local.script_runner_task_cpu
+  memory             = local.script_runner_task_memory
+  execution_role_arn = aws_iam_role.script_runner_ecs_execution.arn
+  task_role_arn      = aws_iam_role.script_runner_ecs_task.arn
+  tags               = local.tags
+
+  volume {
+    name      = "docker-socket"
+    host_path = "/var/run/docker.sock"
+  }
 
   container_definitions = jsonencode([
     {
       name      = "script-runner"
       image     = "${local.script_runner_ecr_repository_url}:${local.script_runner_image_tag}"
       essential = true
+      # The docker socket is root-owned; the image's default user cannot use it.
+      user = "root"
 
       environment = local.script_runner_environment_variables
+
+      mountPoints = [
+        {
+          sourceVolume  = "docker-socket"
+          containerPath = "/var/run/docker.sock"
+          readOnly      = false
+        }
+      ]
 
       logConfiguration = {
         logDriver = "awslogs"
