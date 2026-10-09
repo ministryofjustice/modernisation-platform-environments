@@ -149,3 +149,24 @@ resource "aws_security_group_rule" "cloud_platform_access" {
   cidr_blocks       = ["172.16.0.0/12"]
   security_group_id = aws_security_group.lambda_cp_sg.id
 }
+
+resource "aws_security_group" "lambda_gov_notify_access" {
+
+  name_prefix = "${local.bucket_prefix}-outbound-gov-notify-lambda-sg"
+  description = "Gov Notify Lambda Security Group"
+  vpc_id      = data.aws_vpc.shared.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "gov_notify_access" {
+  type              = "egress"
+  description       = "allow gov notify egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.lambda_cp_sg.id
+}

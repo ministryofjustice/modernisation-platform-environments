@@ -1560,7 +1560,7 @@ module "send_ear_sar_response" {
   ]
 
   security_group_ids = [
-    aws_security_group.lambda_generic.id,
+    aws_security_group.lambda_gov_notify_access.id,
   ]
 
   subnet_ids = data.aws_subnets.shared-private.ids
