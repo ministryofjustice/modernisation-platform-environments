@@ -67,12 +67,44 @@ variable "script_runner" {
     ])
     error_message = "script_runner configuration is required when steps include script_runner tasks."
   }
+
+  validation {
+    condition     = var.script_runner == null ? true : contains(["FARGATE", "EC2"], var.script_runner.launch_type)
+    error_message = "script_runner.launch_type must be FARGATE or EC2. EC2 always uses a disposable instance."
+  }
 }
 
 variable "tags" {
   description = "Tags applied to the state machine role and log group."
   type        = map(string)
   default     = {}
+}
+
+variable "ec2" {
+  description = "Host settings required for EC2 mode and not allowed in Fargate mode. The supplied execution role must permit instance launch, cleanup and starting the expiry workflow."
+  type = object({
+    launch_template_id      = string
+    launch_template_version = string
+    subnet_id               = string
+    managed_by              = string
+    tags                    = map(string)
+    registration_attempts   = optional(number, 30)
+    max_lifetime_seconds    = optional(number, 5400)
+  })
+  default = null
+
+  validation {
+    condition = var.ec2 == null ? true : (
+      length(trimspace(var.ec2.launch_template_id)) > 0 &&
+      length(trimspace(var.ec2.launch_template_version)) > 0 &&
+      length(trimspace(var.ec2.subnet_id)) > 0 &&
+      length(trimspace(var.ec2.managed_by)) > 0 &&
+      var.ec2.registration_attempts > 0 &&
+      floor(var.ec2.registration_attempts) == var.ec2.registration_attempts &&
+      var.ec2.max_lifetime_seconds >= 600
+    )
+    error_message = "EC2 requires non-empty launch template, version, subnet and ownership settings, positive integer registration_attempts and max_lifetime_seconds of at least 600."
+  }
 }
 
 variable "log_retention_in_days" {

@@ -69,6 +69,94 @@ data "aws_iam_policy_document" "step_functions_common" {
   }
 
   statement {
+    sid       = "LaunchDisposableBuildInstances"
+    effect    = "Allow"
+    actions   = ["ec2:RunInstances"]
+    resources = ["arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:instance/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/ManagedBy"
+      values   = [local.build_instance_managed_by]
+    }
+  }
+
+  statement {
+    sid     = "UseBuildLaunchResources"
+    effect  = "Allow"
+    actions = ["ec2:RunInstances"]
+    resources = concat([
+      aws_launch_template.script_runner.arn,
+      aws_security_group.script_runner_task.arn,
+      "arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}::image/${data.aws_ssm_parameter.ecs_optimized_ami.value}",
+      "arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:volume/*",
+      "arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:network-interface/*",
+      ], [for subnet in data.terraform_remote_state.justice_eng_ai.outputs.private_subnet_ids :
+      "arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:subnet/${subnet}"
+    ])
+  }
+
+  statement {
+    sid       = "TagDisposableBuildInstances"
+    effect    = "Allow"
+    actions   = ["ec2:CreateTags"]
+    resources = ["arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:instance/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:CreateAction"
+      values   = ["RunInstances"]
+    }
+  }
+
+  statement {
+    sid       = "TerminateDisposableBuildInstances"
+    effect    = "Allow"
+    actions   = ["ec2:TerminateInstances"]
+    resources = ["arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:instance/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:ResourceTag/ManagedBy"
+      values   = [local.build_instance_managed_by]
+    }
+  }
+
+  statement {
+    sid       = "DescribeDisposableBuildInstances"
+    effect    = "Allow"
+    actions   = ["ec2:DescribeInstances"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "ListBuildContainerInstances"
+    effect    = "Allow"
+    actions   = ["ecs:ListContainerInstances"]
+    resources = [aws_ecs_cluster.script_runner.arn]
+  }
+
+  statement {
+    sid       = "DeregisterBuildContainerInstances"
+    effect    = "Allow"
+    actions   = ["ecs:DeregisterContainerInstance"]
+    resources = ["arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:container-instance/${local.application_name}-script-runner/*"]
+  }
+
+  statement {
+    sid       = "PassBuildInstanceRole"
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = [aws_iam_role.script_runner_ec2_instance.arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["ec2.amazonaws.com"]
+    }
+  }
+
+  statement {
     sid       = "StartChildStateMachines"
     effect    = "Allow"
     actions   = ["states:StartExecution"]

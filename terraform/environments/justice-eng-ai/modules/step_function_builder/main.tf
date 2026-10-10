@@ -3,12 +3,14 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 locals {
+  ec2_mode = try(var.script_runner.launch_type, "FARGATE") == "EC2"
+
   script_runner_steps = [for step in var.steps : step if step.type == "script_runner"]
   step_function_steps = [for step in var.steps : step if step.type == "step_function"]
 
   transitions = {
     for index, step in var.steps : step.name => index < length(var.steps) - 1 ? {
-      Next = var.steps[index + 1].name
+      Next = local.ec2_mode && var.steps[index + 1].type == "script_runner" ? "${var.steps[index + 1].name}_prepare_host" : var.steps[index + 1].name
       } : {
       End = true
     }
@@ -41,6 +43,13 @@ locals {
             }]
           }
           },
+          !local.ec2_mode ? {} : {
+            Count = 1
+            PlacementConstraints = [{
+              Type           = "memberOf"
+              "Expression.$" = "States.Format('ec2InstanceId == {}', $.script_runner_host.instance.instance_id)"
+            }]
+          },
           # Host-network EC2 tasks cannot take an awsvpc network configuration.
           var.script_runner.launch_type != "FARGATE" ? {} : {
             NetworkConfiguration = {
@@ -52,10 +61,16 @@ locals {
             }
         })
       },
-      local.transitions[step.name],
-      try(step.timeout_seconds, null) == null ? {} : { TimeoutSeconds = step.timeout_seconds },
-      try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
-      length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry }
+      !local.ec2_mode ? local.transitions[step.name] : {
+        Next       = "${step.name}_check_exit_code"
+        ResultPath = "$.script_runner_host.task_result"
+        Catch      = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.script_runner_host.failure", Next = "${step.name}_terminate_instance" }]
+      },
+      local.ec2_mode ? { TimeoutSeconds = try(step.timeout_seconds, 3600) } : try(step.timeout_seconds, null) == null ? {} : { TimeoutSeconds = step.timeout_seconds },
+      local.ec2_mode || try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
+      length(try(step.retry, [])) > 0 ? { Retry = step.retry } : !local.ec2_mode ? {} : {
+        Retry                                   = [{ ErrorEquals = ["AmazonECS.Unknown"], IntervalSeconds = 15, BackoffRate = 2, MaxAttempts = 3 }]
+      }
     )
   }
 
@@ -78,8 +93,8 @@ locals {
 
   definition = {
     Comment = "Runs an ordered process using ECS script runner tasks and nested Step Functions."
-    StartAt = var.steps[0].name
-    States  = merge(local.script_runner_states, local.step_function_states)
+    StartAt = local.ec2_mode && var.steps[0].type == "script_runner" ? "${var.steps[0].name}_prepare_host" : var.steps[0].name
+    States  = merge(local.script_runner_states, local.step_function_states, local.disposable_lifecycle_states)
   }
 
 }
@@ -97,7 +112,22 @@ resource "aws_sfn_state_machine" "this" {
   definition = jsonencode(local.definition)
   tags       = var.tags
 
-  depends_on = [aws_cloudwatch_log_group.this]
+  depends_on = [aws_cloudwatch_log_group.this, aws_sfn_state_machine.disposable_expiry]
+
+  lifecycle {
+    precondition {
+      condition     = local.ec2_mode ? var.ec2 != null : var.ec2 == null
+      error_message = "EC2 mode requires ec2 host settings. FARGATE mode must not supply ec2 host settings."
+    }
+
+    precondition {
+      condition = var.ec2 == null ? true : alltrue([
+        for step in local.script_runner_steps : var.ec2.max_lifetime_seconds >
+        (var.ec2.registration_attempts + 1) * 30 + try(step.timeout_seconds, 3600) + 600
+      ])
+      error_message = "The instance lifetime must exceed registration polling plus each task timeout and a 600-second cleanup margin."
+    }
+  }
 
   logging_configuration {
     log_destination        = "${aws_cloudwatch_log_group.this.arn}:*"
