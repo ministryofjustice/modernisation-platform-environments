@@ -43,13 +43,13 @@ locals {
             }]
           }
           },
-          !local.ec2_mode ? {} : {
+          { for key, value in {
             Count = 1
             PlacementConstraints = [{
               Type           = "memberOf"
               "Expression.$" = "States.Format('ec2InstanceId == {}', $.script_runner_host.instance.instance_id)"
             }]
-          },
+          } : key => value if local.ec2_mode },
           # Host-network EC2 tasks cannot take an awsvpc network configuration.
           var.script_runner.launch_type != "FARGATE" ? {} : {
             NetworkConfiguration = {
@@ -61,11 +61,12 @@ locals {
             }
         })
       },
-      !local.ec2_mode ? local.transitions[step.name] : {
+      { for key, value in local.transitions[step.name] : key => value if !local.ec2_mode },
+      { for key, value in {
         Next       = "${step.name}_check_exit_code"
         ResultPath = "$.script_runner_host.task_result"
         Catch      = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.script_runner_host.failure", Next = "${step.name}_terminate_instance" }]
-      },
+      } : key => value if local.ec2_mode },
       local.ec2_mode ? { TimeoutSeconds = try(step.timeout_seconds, 3600) } : try(step.timeout_seconds, null) == null ? {} : { TimeoutSeconds = step.timeout_seconds },
       local.ec2_mode || try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
       length(try(step.retry, [])) > 0 ? { Retry = step.retry } : !local.ec2_mode ? {} : {
