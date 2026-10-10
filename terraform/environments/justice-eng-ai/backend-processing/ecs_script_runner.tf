@@ -285,7 +285,7 @@ resource "aws_iam_role_policy_attachment" "script_runner_ecs_task" {
 
 # ---------- EC2 capacity: gives the task access to a Docker daemon ----------
 # Fargate cannot run docker, and the prototype image build needs docker/buildx,
-# so the script runner tasks run on a single ECS-optimised EC2 instance and
+# so each script runner build runs on a disposable ECS-optimised EC2 instance and
 # use its Docker daemon via the mounted socket.
 
 data "aws_ssm_parameter" "ecs_optimized_ami" {
@@ -327,12 +327,13 @@ resource "aws_iam_instance_profile" "script_runner_ec2_instance" {
 }
 
 resource "aws_launch_template" "script_runner" {
-  name_prefix            = "${local.application_name}-script-runner-"
-  image_id               = data.aws_ssm_parameter.ecs_optimized_ami.value
-  instance_type          = "t3.medium"
-  vpc_security_group_ids = [aws_security_group.script_runner_task.id]
-  user_data              = base64encode("#!/bin/bash\necho ECS_CLUSTER=${aws_ecs_cluster.script_runner.name} >> /etc/ecs/ecs.config\n")
-  tags                   = local.tags
+  name_prefix                          = "${local.application_name}-script-runner-"
+  image_id                             = data.aws_ssm_parameter.ecs_optimized_ami.value
+  instance_type                        = "t3.medium"
+  instance_initiated_shutdown_behavior = "terminate"
+  vpc_security_group_ids               = [aws_security_group.script_runner_task.id]
+  user_data                            = base64encode("#!/bin/bash\necho ECS_CLUSTER=${aws_ecs_cluster.script_runner.name} >> /etc/ecs/ecs.config\n")
+  tags                                 = local.tags
 
   iam_instance_profile {
     arn = aws_iam_instance_profile.script_runner_ec2_instance.arn
@@ -342,10 +343,11 @@ resource "aws_launch_template" "script_runner" {
     device_name = "/dev/xvda"
 
     ebs {
-      volume_size = 50
-      volume_type = "gp3"
-      encrypted   = true
-      kms_key_id  = aws_kms_key.script_runner_ebs.arn
+      volume_size           = 50
+      volume_type           = "gp3"
+      encrypted             = true
+      kms_key_id            = aws_kms_key.script_runner_ebs.arn
+      delete_on_termination = true
     }
   }
 
@@ -358,38 +360,6 @@ resource "aws_launch_template" "script_runner" {
   tag_specifications {
     resource_type = "instance"
     tags          = merge(local.tags, { Name = "${local.application_name}-script-runner" })
-  }
-}
-
-resource "aws_autoscaling_group" "script_runner" {
-  name                    = "${local.application_name}-script-runner"
-  min_size                = 1
-  max_size                = 1
-  desired_capacity        = 1
-  vpc_zone_identifier     = data.terraform_remote_state.justice_eng_ai.outputs.private_subnet_ids
-  service_linked_role_arn = aws_iam_service_linked_role.script_runner_autoscaling.arn
-
-  launch_template {
-    id      = aws_launch_template.script_runner.id
-    version = aws_launch_template.script_runner.latest_version
-  }
-
-  instance_refresh {
-    strategy = "Rolling"
-
-    preferences {
-      min_healthy_percentage = 0
-    }
-  }
-
-  dynamic "tag" {
-    for_each = merge(local.tags, { Name = "${local.application_name}-script-runner" })
-
-    content {
-      key                 = tag.key
-      value               = tag.value
-      propagate_at_launch = true
-    }
   }
 }
 
@@ -441,12 +411,6 @@ resource "aws_ecs_task_definition" "script_runner" {
   ])
 }
 
-resource "aws_iam_service_linked_role" "script_runner_autoscaling" {
-  aws_service_name = "autoscaling.amazonaws.com"
-  custom_suffix    = "${local.application_name}-script-runner"
-  description      = "Allow Auto Scaling to manage script runner EC2 instances"
-}
-
 data "aws_iam_policy_document" "script_runner_ebs" {
   statement {
     sid       = "EnableAccountIAMPermissions"
@@ -461,7 +425,7 @@ data "aws_iam_policy_document" "script_runner_ebs" {
   }
 
   statement {
-    sid    = "AllowAutoScalingKeyUse"
+    sid    = "AllowBuildOrchestrationKeyUse"
     effect = "Allow"
     actions = [
       "kms:Encrypt",
@@ -474,19 +438,19 @@ data "aws_iam_policy_document" "script_runner_ebs" {
 
     principals {
       type        = "AWS"
-      identifiers = [aws_iam_service_linked_role.script_runner_autoscaling.arn]
+      identifiers = [aws_iam_role.step_functions_common.arn]
     }
   }
 
   statement {
-    sid       = "AllowAutoScalingResourceGrants"
+    sid       = "AllowBuildOrchestrationResourceGrants"
     effect    = "Allow"
     actions   = ["kms:CreateGrant"]
     resources = ["*"]
 
     principals {
       type        = "AWS"
-      identifiers = [aws_iam_service_linked_role.script_runner_autoscaling.arn]
+      identifiers = [aws_iam_role.step_functions_common.arn]
     }
 
     condition {
