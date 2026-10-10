@@ -137,10 +137,13 @@ data "aws_iam_policy_document" "step_functions_common" {
   }
 
   statement {
-    sid       = "DeregisterBuildContainerInstances"
-    effect    = "Allow"
-    actions   = ["ecs:DeregisterContainerInstance"]
-    resources = ["arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:container-instance/${local.application_name}-script-runner/*"]
+    sid     = "DeregisterBuildContainerInstances"
+    effect  = "Allow"
+    actions = ["ecs:DeregisterContainerInstance"]
+    resources = [
+      aws_ecs_cluster.script_runner.arn,
+      "arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:container-instance/${local.application_name}-script-runner/*",
+    ]
   }
 
   statement {
