@@ -300,3 +300,87 @@ resource "kubernetes_cluster_role_binding_v1" "argocd_hub_deploy" {
 
   depends_on = [aws_eks_access_entry.argocd_spoke_capability]
 }
+
+# Enforce the spoke's BU boundary at admission time. AppProject destination
+# rules match namespace names, not namespace labels; the baseline chart labels
+# each product namespace with container-platform/bu from product.yaml.
+resource "kubernetes_manifest" "argocd_bu_namespace_policy" {
+  count = local.is_argocd_spoke ? 1 : 0
+
+  manifest = {
+    apiVersion = "admissionregistration.k8s.io/v1"
+    kind       = "ValidatingAdmissionPolicy"
+    metadata = {
+      name = "argocd-bu-namespace-boundary"
+      labels = {
+        "app.kubernetes.io/managed-by" = "terraform"
+        "container-platform/purpose"   = "argocd-bu-namespace-boundary"
+      }
+    }
+    spec = {
+      failurePolicy = "Fail"
+      matchConstraints = {
+        matchPolicy = "Equivalent"
+        resourceRules = [
+          {
+            apiGroups   = [""]
+            apiVersions = ["v1"]
+            operations  = ["CREATE", "UPDATE", "DELETE"]
+            resources   = ["namespaces"]
+            scope       = "Cluster"
+          },
+          {
+            apiGroups   = ["*"]
+            apiVersions = ["*"]
+            operations  = ["CREATE", "UPDATE", "DELETE"]
+            resources   = ["*"]
+            scope       = "Namespaced"
+          },
+        ]
+      }
+      matchConditions = [
+        {
+          name       = "argocd-hub-writer"
+          expression = "'${local.argocd_hub_capability_rbac_group}' in request.userInfo.groups"
+        }
+      ]
+      validations = [
+        {
+          expression = "request.resource.resource == 'namespaces' ? (request.operation == 'CREATE' ? object.metadata.labels['container-platform/bu'] == '${local.argocd_spoke_bu_name}' : (request.operation == 'UPDATE' ? (oldObject.metadata.labels['container-platform/bu'] == '${local.argocd_spoke_bu_name}' && object.metadata.labels['container-platform/bu'] == '${local.argocd_spoke_bu_name}') : oldObject.metadata.labels['container-platform/bu'] == '${local.argocd_spoke_bu_name}')) : namespaceObject.metadata.labels['container-platform/bu'] == '${local.argocd_spoke_bu_name}'"
+          message    = "Argo CD may only write to namespaces labelled container-platform/bu=${local.argocd_spoke_bu_name}."
+        }
+      ]
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition     = local.argocd_spoke_bu_name != ""
+      error_message = "Cannot enforce the Argo CD namespace boundary because this spoke's BU could not be determined from its workspace name."
+    }
+  }
+
+  depends_on = [aws_eks_access_entry.argocd_spoke_capability]
+}
+
+resource "kubernetes_manifest" "argocd_bu_namespace_policy_binding" {
+  count = local.is_argocd_spoke ? 1 : 0
+
+  manifest = {
+    apiVersion = "admissionregistration.k8s.io/v1"
+    kind       = "ValidatingAdmissionPolicyBinding"
+    metadata = {
+      name = "argocd-bu-namespace-boundary"
+      labels = {
+        "app.kubernetes.io/managed-by" = "terraform"
+        "container-platform/purpose"   = "argocd-bu-namespace-boundary"
+      }
+    }
+    spec = {
+      policyName        = kubernetes_manifest.argocd_bu_namespace_policy[0].object.metadata.name
+      validationActions = ["Deny"]
+    }
+  }
+
+  depends_on = [kubernetes_manifest.argocd_bu_namespace_policy]
+}

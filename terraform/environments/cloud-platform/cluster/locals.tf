@@ -188,6 +188,13 @@ locals {
     local.argocd_hub_capability_convention_role_arn
   )
 
+  # Permanent spoke workspaces follow container-platform-<bu>-<tier>; matching
+  # greedily before the tier also supports BU names containing hyphens.
+  # Ephemeral spokes use the dedicated ephemeral BU label in baseline namespaces.
+  argocd_spoke_bu_name = local.is_argocd_ephemeral_spoke ? "ephemeral" : (
+    local.is_argocd_permanent_spoke ? try(regex("^container-platform-(.+)-(nonlive|live)$", terraform.workspace)[0], "") : ""
+  )
+
   # Kubernetes RBAC group that the hub capability role is placed into on this spoke.
   # The access entry declares this group explicitly via kubernetes_groups (EKS
   # does NOT auto-create an "eks-access-entry:<arn>" group), and the custom
