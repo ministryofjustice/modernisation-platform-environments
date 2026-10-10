@@ -163,12 +163,12 @@ resource "aws_ecs_capacity_provider" "weblogic_eis" {
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 31
+  priority     = 32
   condition {
     host_header {
       values = [
-        "interface.${var.env_name}.${var.account_config.dns_suffix}",
-        "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        var.env_name == "prod" ? "interface.probation.service.justice.gov.uk" : "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "interface.${var.env_name}.${var.account_config.dns_suffix}"
       ]
     }
   }

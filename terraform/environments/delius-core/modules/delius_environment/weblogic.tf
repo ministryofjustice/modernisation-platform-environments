@@ -203,15 +203,17 @@ resource "aws_ecs_capacity_provider" "weblogic" {
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 61
+  priority     = 62
+
   condition {
     host_header {
       values = [
-        "ndelius.${var.env_name}.${var.account_config.dns_suffix}",
-        "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        var.env_name == "prod" ? "ndelius.probation.service.justice.gov.uk" : "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "ndelius.${var.env_name}.${var.account_config.dns_suffix}"
       ]
     }
   }
+
   condition {
     path_pattern {
       values = [
@@ -220,12 +222,12 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
       ]
     }
   }
+
   action {
     type             = "forward"
     target_group_arn = module.weblogic.target_group_arn
   }
 }
-
 
 locals {
   weblogic_cutover_envs = ["dev", "test", "stage", "preprod", "prod"]
