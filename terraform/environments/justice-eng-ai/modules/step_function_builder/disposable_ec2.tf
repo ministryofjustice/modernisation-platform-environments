@@ -1,5 +1,5 @@
 locals {
-  disposable_steps = local.ec2_mode && var.ec2 != null ? local.script_runner_steps : []
+  disposable_steps = local.ec2_mode && var.ec2 != null ? local.task_steps : []
   disposable_api_retry = [{
     ErrorEquals     = ["States.TaskFailed"]
     IntervalSeconds = 5

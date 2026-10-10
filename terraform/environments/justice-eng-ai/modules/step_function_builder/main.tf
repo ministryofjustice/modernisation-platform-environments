@@ -5,7 +5,7 @@ data "aws_caller_identity" "current" {}
 locals {
   ec2_mode = try(var.script_runner.launch_type, "FARGATE") == "EC2"
 
-  script_runner_steps = [for step in var.steps : step if step.type == "script_runner"]
+  task_steps          = [for step in var.steps : step if step.type == "script_runner"]
   step_function_steps = [for step in var.steps : step if step.type == "step_function"]
 
   transitions = {
@@ -16,8 +16,8 @@ locals {
     }
   }
 
-  script_runner_states = {
-    for step in local.script_runner_steps : step.name => merge(
+  task_states = {
+    for step in local.task_steps : step.name => merge(
       {
         Type     = "Task"
         Resource = "arn:${data.aws_partition.current.partition}:states:::ecs:runTask.sync"
@@ -94,7 +94,7 @@ locals {
   definition = {
     Comment = "Runs an ordered process using ECS script runner tasks and nested Step Functions."
     StartAt = local.ec2_mode && var.steps[0].type == "script_runner" ? "${var.steps[0].name}_prepare_host" : var.steps[0].name
-    States  = merge(local.script_runner_states, local.step_function_states, local.disposable_lifecycle_states)
+    States  = merge(local.task_states, local.step_function_states, local.disposable_lifecycle_states)
   }
 
 }
