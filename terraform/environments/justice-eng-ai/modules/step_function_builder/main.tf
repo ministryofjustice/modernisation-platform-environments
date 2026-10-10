@@ -44,7 +44,6 @@ locals {
           }
           },
           { for key, value in {
-            Count = 1
             PlacementConstraints = [{
               Type           = "memberOf"
               "Expression.$" = "States.Format('ec2InstanceId == {}', $.script_runner_host.instance.instance_id)"
