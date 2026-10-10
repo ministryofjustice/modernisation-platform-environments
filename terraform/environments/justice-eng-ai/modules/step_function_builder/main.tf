@@ -112,7 +112,7 @@ resource "aws_sfn_state_machine" "this" {
   definition = jsonencode(local.definition)
   tags       = var.tags
 
-  depends_on = [aws_cloudwatch_log_group.this, aws_sfn_state_machine.disposable_expiry]
+  depends_on = [aws_cloudwatch_log_group.this]
 
   lifecycle {
     precondition {
@@ -120,13 +120,6 @@ resource "aws_sfn_state_machine" "this" {
       error_message = "EC2 mode requires ec2 host settings. FARGATE mode must not supply ec2 host settings."
     }
 
-    precondition {
-      condition = var.ec2 == null ? true : alltrue([
-        for step in local.script_runner_steps : var.ec2.max_lifetime_seconds >
-        (var.ec2.registration_attempts + 1) * 30 + try(step.timeout_seconds, 3600) + 600
-      ])
-      error_message = "The instance lifetime must exceed registration polling plus each task timeout and a 600-second cleanup margin."
-    }
   }
 
   logging_configuration {
