@@ -59,7 +59,21 @@ locals {
   # workspace alias and the real IdC group names here, e.g.:
   #   "bu1" = { amp_workspace_alias = "cp-DDMM-HHMM-bu1-metrics", idc_group_names = ["cloud-platform-engineers"] }
   # Left empty on commit so no stale alias can fail a plan.
-  grafana_simulated_bus_dev = {}
+  #
+  # !!! TEST-ONLY — DO NOT MERGE (cloud-platform#8558 / #8509 isolation PoC) !!!
+  # Populated to validate the default-deny isolation control on the dev AMG
+  # workspace. bu1/bu2 point at two healthy ephemeral-cluster AMP workspaces and
+  # two IdC groups the tester is a member of. Revert to {} before merging.
+  grafana_simulated_bus_dev = {
+    bu1 = {
+      amp_workspace_alias = "cp-0310-0714-metrics"
+      idc_group_names     = ["container-platform-aws"]
+    }
+    bu2 = {
+      amp_workspace_alias = "cp-0310-0845-metrics"
+      idc_group_names     = ["container-platform-user-testing"]
+    }
+  }
 
   # Per-workspace BU map. Live carries the real BUs (but is gated OFF, see
   # above); development carries only the dev simulated BUs.
