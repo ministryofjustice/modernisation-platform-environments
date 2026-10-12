@@ -1593,9 +1593,11 @@ module "trigger_dlt_iceberg_maintenance" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    CATALOG_ID       = data.aws_caller_identity.current.account_id
-    ENVIRONMENT_NAME = local.env_name
-    ATHENA_WORKGROUP = aws_athena_workgroup.default.name
+    CATALOG_ID              = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME        = local.env_name
+    ATHENA_WORKGROUP        = aws_athena_workgroup.default.name
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
 
   depends_on = [
@@ -1622,10 +1624,12 @@ module "poll_dlt_iceberg_maintenance" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    CATALOG_ID       = data.aws_caller_identity.current.account_id
-    ENVIRONMENT_NAME = local.env_name
-    ATHENA_WORKGROUP = aws_athena_workgroup.default.name
-    MAX_WAIT_SECONDS = "1200"
+    CATALOG_ID              = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME        = local.env_name
+    ATHENA_WORKGROUP        = aws_athena_workgroup.default.name
+    MAX_WAIT_SECONDS        = "1200"
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
 
   depends_on = [aws_iam_role_policy.poll_dlt_iceberg_maintenance]
