@@ -3937,6 +3937,13 @@ resource "aws_iam_role" "trigger_dlt_iceberg_maintenance" {
 
 data "aws_iam_policy_document" "trigger_dlt_iceberg_maintenance" {
   statement {
+    sid       = "DiscoverS3Buckets"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets"]
+    resources = ["*"]
+  }
+
+  statement {
     effect = "Allow"
     actions = [
       "athena:StartQueryExecution",
@@ -4044,6 +4051,13 @@ resource "aws_iam_role" "poll_dlt_iceberg_maintenance" {
 }
 
 data "aws_iam_policy_document" "poll_dlt_iceberg_maintenance" {
+  statement {
+    sid       = "DiscoverS3Buckets"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets"]
+    resources = ["*"]
+  }
+
   statement {
     effect = "Allow"
     actions = [
