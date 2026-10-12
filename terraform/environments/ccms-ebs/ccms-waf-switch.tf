@@ -49,13 +49,22 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
     Statement = [
       { Effect = "Allow",
         Action = ["wafv2:GetWebACL", "wafv2:UpdateWebACL"],
-      Resource = "*" },
+        Resource = ["arn:aws:wafv2:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:regional/webacl/ebs_internal_waf/*",
+                    "arn:aws:wafv2:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:regional/ipset/ebsapps_internal_waf_ip_set/*"
+        ]
+       },
       { Effect = "Allow",
         Action = ["wafv2:GetRuleGroup"],
-      Resource = "*" },
+        Resource = ["arn:aws:wafv2:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:regional/rulegroup/ebs-trusted-rule-ip-set"]
+       },
+       { Effect = "Allow",
+        Action = ["logs:CreateLogGroup"],
+        Resource = ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:*"]
+       },
       { Effect = "Allow",
-        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-      Resource = "*" }
+        Action = ["logs:CreateLogStream", "logs:PutLogEvents"],
+      Resource = ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/waf-maintenance-${local.environment}:*"]
+       }
     ]
   })
 }
