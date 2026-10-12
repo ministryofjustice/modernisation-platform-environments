@@ -174,7 +174,7 @@ resource "kubernetes_manifest" "actions_runners_github_app_mojas_registration_se
       "data" = [
         {
           "remoteRef" = {
-            "key"              = "actions-runners/app/mojas-registration-apc-self-hosted-runners"
+            "key"              = "actions-runners/app/apc-self-hosted-runners-mojas-registration"
             "property"         = "private_key"
             "decodingStrategy" = "Base64"
           }
@@ -252,7 +252,7 @@ resource "kubernetes_manifest" "actions_runners_github_app_moj_registration_secr
       "data" = [
         {
           "remoteRef" = {
-            "key"              = "actions-runners/app/moj-registration-apc-self-hosted-runners"
+            "key"              = "actions-runners/app/apc-self-hosted-runners-moj-registration"
             "property"         = "private_key"
             "decodingStrategy" = "Base64"
           }

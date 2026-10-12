@@ -34,6 +34,8 @@ module "actions_runners_github_app_apc_self_hosted_runners_secret" {
 # Installed on: airflow, airflow-create-a-pipeline, create-a-derived-table.
 # Permissions (set on the App): Repository -> Administration: Read & write.
 # Values set manually in Secrets Manager (private_key = PEM, base64-encoded).
+# Name starts with "actions-runners/app/apc-self-hosted-runners-" so it is covered by the
+# existing External Secrets IAM pattern "actions-runners/app/apc-self-hosted-runners-*".
 # =============================================================================
 module "actions_runners_github_app_mojas_registration_secret" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
@@ -44,7 +46,7 @@ module "actions_runners_github_app_mojas_registration_secret" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "2.1.0"
 
-  name        = "actions-runners/app/mojas-registration-apc-self-hosted-runners"
+  name        = "actions-runners/app/apc-self-hosted-runners-mojas-registration"
   description = "GitHub App (moj-analytical-services org) - runner registration (Administration: RW)"
   kms_key_id  = data.aws_kms_key.common_secrets_manager_kms.arn
 
@@ -65,6 +67,8 @@ module "actions_runners_github_app_mojas_registration_secret" {
 # Installed on: data-catalogue.
 # Permissions (set on the App): Repository -> Administration: Read & write.
 # Values set manually in Secrets Manager (private_key = PEM, base64-encoded).
+# Name starts with "actions-runners/app/apc-self-hosted-runners-" so it is covered by the
+# existing External Secrets IAM pattern "actions-runners/app/apc-self-hosted-runners-*".
 # =============================================================================
 module "actions_runners_github_app_moj_registration_secret" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
@@ -75,7 +79,7 @@ module "actions_runners_github_app_moj_registration_secret" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "2.1.0"
 
-  name        = "actions-runners/app/moj-registration-apc-self-hosted-runners"
+  name        = "actions-runners/app/apc-self-hosted-runners-moj-registration"
   description = "GitHub App (ministryofjustice org) - data-catalogue runner registration (Administration: RW)"
   kms_key_id  = data.aws_kms_key.common_secrets_manager_kms.arn
 
