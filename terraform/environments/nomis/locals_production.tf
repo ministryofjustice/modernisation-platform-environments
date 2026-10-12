@@ -48,7 +48,6 @@ locals {
         start          = "-PT6H"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
-          local.cloudwatch_dashboard_widget_groups.connectivity,
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.xtag,
           local.cloudwatch_dashboard_widget_groups.asg,
