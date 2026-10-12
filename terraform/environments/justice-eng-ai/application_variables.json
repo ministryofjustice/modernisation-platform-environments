@@ -2,21 +2,25 @@
   "accounts": {
     "development": {
       "vpc_cidr": "10.0.0.0/16",
+      "s3_folder": "forge-builds",
       "ecr_repository_name": "modernisation-platform-ai-builder-user-applications",
       "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
     },
     "test": {
       "vpc_cidr": "10.0.0.0/16",
+      "s3_folder": "forge-builds",
       "ecr_repository_name": "",
       "forge_runtime_base_ecr_repository_name": ""
     },
     "preproduction": {
       "vpc_cidr": "10.0.0.0/16",
+      "s3_folder": "forge-builds",
       "ecr_repository_name": "",
       "forge_runtime_base_ecr_repository_name": ""
     },
     "production": {
       "vpc_cidr": "10.0.0.0/16",
+      "s3_folder": "forge-builds",
       "ecr_repository_name": "modernisation-platform-ai-builder-user-applications",
       "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
     }

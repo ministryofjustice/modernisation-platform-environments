@@ -1,5 +1,6 @@
 locals {
   build_image_state_machine_name = "${local.application_name}-build-app-image"
+  build_instance_managed_by      = "${local.application_name}-disposable-build"
 
   core_shared_services_account_id = local.environment_management.account_ids["core-shared-services-production"]
   aws_region                      = data.aws_region.current.region
@@ -17,7 +18,7 @@ locals {
       variables = [
         { name = "S3_BUCKET", value = aws_s3_bucket.staging_bucket.id },
         { name = "S3_FOLDER", path = "$.s3_folder" },
-        { name = "S3_FILE", path = "$.s3_file" },
+        { name = "S3_FILE", path = "States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1))" },
         { name = "ECR_REPOSITORY_URI", value = local.ecr_repository_uri },
         { name = "IMAGE_TAG", path = "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1)), '.'), 0)" },
         { name = "AWS_REGION", value = local.aws_region },
@@ -44,12 +45,20 @@ module "step_functions_build_image" {
     assign_public_ip       = "DISABLED"
     execution_role_arn     = aws_iam_role.script_runner_ecs_execution.arn
     task_role_arn          = aws_iam_role.script_runner_ecs_task.arn
+    launch_type            = "EC2"
+  }
+  ec2 = {
+    launch_template_id      = aws_launch_template.script_runner.id
+    launch_template_version = tostring(aws_launch_template.script_runner.latest_version)
+    subnet_id               = data.terraform_remote_state.justice_eng_ai.outputs.private_subnet_ids[0]
+    managed_by              = local.build_instance_managed_by
+    tags                    = local.tags
   }
   tags = local.tags
 
   depends_on = [
-    aws_ecs_task_definition.script_runner,
     aws_iam_role_policy.step_functions_common,
+    aws_iam_role_policy_attachment.script_runner_ec2_instance,
     aws_iam_role_policy_attachment.script_runner_ecs_task,
     aws_iam_role_policy_attachment.script_runner_ecs_execution,
   ]
