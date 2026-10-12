@@ -1,5 +1,6 @@
 locals {
   build_image_state_machine_name = "${local.application_name}-build-app-image"
+  build_instance_managed_by      = "${local.application_name}-disposable-build"
 
   core_shared_services_account_id = local.environment_management.account_ids["core-shared-services-production"]
   aws_region                      = data.aws_region.current.region
@@ -46,12 +47,18 @@ module "step_functions_build_image" {
     task_role_arn          = aws_iam_role.script_runner_ecs_task.arn
     launch_type            = "EC2"
   }
+  ec2 = {
+    launch_template_id      = aws_launch_template.script_runner.id
+    launch_template_version = tostring(aws_launch_template.script_runner.latest_version)
+    subnet_id               = data.terraform_remote_state.justice_eng_ai.outputs.private_subnet_ids[0]
+    managed_by              = local.build_instance_managed_by
+    tags                    = local.tags
+  }
   tags = local.tags
 
   depends_on = [
-    aws_ecs_task_definition.script_runner,
-    aws_autoscaling_group.script_runner,
     aws_iam_role_policy.step_functions_common,
+    aws_iam_role_policy_attachment.script_runner_ec2_instance,
     aws_iam_role_policy_attachment.script_runner_ecs_task,
     aws_iam_role_policy_attachment.script_runner_ecs_execution,
   ]
