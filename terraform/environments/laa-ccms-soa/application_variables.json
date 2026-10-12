@@ -85,7 +85,8 @@
         "oms_platform_cidr": "10.26.60.231/32",
         "oem_db_platform_cidr": "10.26.60.169/32",
         "oem_db_name": "OEMDB"
-      }
+      },
+      "mp_azure_virtual_desktop_cidr": "10.192.64.0/21"
     },
     "test": {
       "app_name": "ccms-soa",
