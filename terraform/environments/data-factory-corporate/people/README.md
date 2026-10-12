@@ -123,15 +123,15 @@ The function code is in [modules/guardduty-lambda/src/lambda.py](modules/guarddu
 
 ### 6. CloudTrail provides the audit trail
 
-The `sherlock-cloudtrail` trail is configured as a multi-region trail and includes global service events.
+The `corporate-cloudtrail` trail is configured as a multi-region trail and includes global service events.
 
 It sends:
 
 - CloudTrail log files to the encrypted logging S3 bucket
-- event records to the `/aws/cloudtrail/sherlock-cloudtrail` CloudWatch log group
-- log delivery notifications to the `sherlock-cloudtrail-notifications` SNS topic
+- event records to the `/aws/cloudtrail/corporate-cloudtrail` CloudWatch log group
+- log delivery notifications to the `corporate-cloudtrail-notifications` SNS topic
 
-The CloudWatch log group retains records for 365 days. The S3 logging bucket is versioned and uses the Sherlock KMS key.
+The CloudWatch log group retains records for 365 days. The S3 logging bucket is versioned and uses the corporate logging KMS key.
 
 This trail records AWS management activity by default. It does not currently enable S3 object-level data events, so it will not record every individual file upload, download, or deletion. That would require an `event_selector` or `advanced_event_selector`.
 
@@ -142,7 +142,10 @@ The configuration is in [modules/logging-bucket-cloudtrail/main.tf](modules/logg
 
 | Terraform module | AWS resources or purpose |
 | --- | --- |
-| [sherlock_kms_key](modules/kms-key/README.md) | Customer-managed KMS key and alias `sherlock-landing` |
+| [sherlock_kms_key](modules/kms-key/README.md) | Customer-managed KMS key and alias `sherlock-landing` for the landing bucket, Glue storage and external role, shared with the external account |
+| `corporate_general_kms_key` | Customer-managed KMS key and alias `corporate-general` for the secrets, Lambda environment variables and dead-letter queue |
+| `corporate_quarantine_kms_key` | Customer-managed KMS key and alias `corporate-quarantine` for the quarantine bucket |
+| `corporate_logging_kms_key` | Customer-managed KMS key and alias `corporate-logging` for CloudTrail, the logging bucket, the log group and SNS topics |
 | `sherlock_landing_bucket_mp` | Encrypted, versioned S3 landing bucket |
 | `sherlock_quarantine_bucket` | Encrypted S3 quarantine bucket |
 | [corp_people_logging_bucket](modules/logging-bucket-cloudtrail/README.md) | CloudTrail, logging S3 bucket, CloudWatch log group, SNS topic |

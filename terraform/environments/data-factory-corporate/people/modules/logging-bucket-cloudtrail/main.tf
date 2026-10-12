@@ -4,7 +4,7 @@ module "log_bucket" {
   bucket_prefix      = var.bucket_prefix
   bucket_namespace   = "account-regional"
   versioning_enabled = true
-  force_destroy      = false
+  force_destroy      = true
 
   ownership_controls = "BucketOwnerEnforced"
 
@@ -65,7 +65,7 @@ resource "aws_sns_topic_policy" "cloudtrail-publish" {
   policy = data.aws_iam_policy_document.cloudtrail-publish.json
 }
 
-resource "aws_cloudtrail" "sherlock" {
+resource "aws_cloudtrail" "this" {
   name = local.cloudtrail_name
 
   s3_bucket_name = module.log_bucket.bucket.id

@@ -6,13 +6,14 @@ locals {
   eventbridge_rule_name                = "eventbridge-malware-rule"
   enable_external_iam_role             = false
   enable_guardduty_slack_notifications = false
+  cloudtrail_name                      = "corporate-cloudtrail"
 }
 
 resource "aws_secretsmanager_secret" "external_account" {
   #checkov:skip=CKV2_AWS_57: "Secret holds a static external AWS account ID — rotation not applicable"
   name        = "sherlock-external-aws-account"
   description = "AWS account permitted to assume the external role"
-  kms_key_id  = module.sherlock_kms_key.key_arn
+  kms_key_id  = module.corporate_general_kms_key.key_arn
 
   tags = {
     Environment    = local.environment
@@ -41,10 +42,11 @@ module "sherlock_kms_key" {
   }
 }
 
-module "sherlock_quarantine_kms_key" {
+# Encrypts secrets and Lambda resources, kept separate from the landing key shared with the external account.
+module "corporate_general_kms_key" {
   source = "./modules/kms-key"
 
-  alias                   = "sherlock-quarantine"
+  alias                   = "corporate-general"
   rotation_period_in_days = 365
 
   providers = {
@@ -55,16 +57,34 @@ module "sherlock_quarantine_kms_key" {
     Environment    = local.environment
     Application    = local.application
     Component      = local.component
-    Infrastructure = "sherlock-quarantine-kms-key"
+    Infrastructure = "corporate-general-kms-key"
+  }
+}
+
+module "corporate_quarantine_kms_key" {
+  source = "./modules/kms-key"
+
+  alias                   = "corporate-quarantine"
+  rotation_period_in_days = 365
+
+  providers = {
+    aws = aws
+  }
+
+  tags = {
+    Environment    = local.environment
+    Application    = local.application
+    Component      = local.component
+    Infrastructure = "corporate-quarantine-kms-key"
   }
 }
 
 # Shared by the CloudTrail bucket and the CloudWatch log group it delivers to.
-module "sherlock_logging_kms_key" {
+module "corporate_logging_kms_key" {
   source = "./modules/kms-key"
 
-  alias                      = "sherlock-logging"
-  cloudtrail_name            = "sherlock-cloudtrail"
+  alias                      = "corporate-logging"
+  cloudtrail_name            = local.cloudtrail_name
   eventbridge_sns_topic_name = "${local.eventbridge_rule_name}-alerts"
   enable_cloudwatch_logs     = true
   rotation_period_in_days    = 365
@@ -77,7 +97,7 @@ module "sherlock_logging_kms_key" {
     Environment    = local.environment
     Application    = local.application
     Component      = local.component
-    Infrastructure = "sherlock-logging-kms-key"
+    Infrastructure = "corporate-logging-kms-key"
   }
 }
 
@@ -134,7 +154,7 @@ module "sherlock_landing_bucket_mp" {
 module "sherlock_quarantine_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
-  bucket_prefix      = "sherlock-quarantine-${local.environment}"
+  bucket_prefix      = "corporate-quarantine-${local.environment}"
   bucket_namespace   = "account-regional"
   versioning_enabled = false
   force_destroy      = true
@@ -150,7 +170,7 @@ module "sherlock_quarantine_bucket" {
 
   # Default/recommended encryption mode
   sse_algorithm  = "aws:kms"
-  custom_kms_key = module.sherlock_quarantine_kms_key.key_arn
+  custom_kms_key = module.corporate_quarantine_kms_key.key_arn
 
   # Optional compatibility mode for uploaders that rely on bucket default
   # SSE-KMS encryption and do not send explicit SSE-KMS request headers.
@@ -163,7 +183,7 @@ module "sherlock_quarantine_bucket" {
     Environment    = local.environment
     Application    = local.application
     Component      = local.component
-    Infrastructure = "sherlock-quarantine-bucket-${local.environment}"
+    Infrastructure = "corporate-quarantine-bucket-${local.environment}"
   }
 }
 
@@ -172,9 +192,9 @@ module "sherlock_quarantine_bucket" {
 module "corp_people_logging_bucket" {
   source = "./modules/logging-bucket-cloudtrail"
 
-  bucket_prefix                    = "logging-sherlock-${local.environment}-mp"
-  cloudtrail_name                  = "sherlock-cloudtrail"
-  kms_key_arn                      = module.sherlock_logging_kms_key.key_arn
+  bucket_prefix                    = "logging-corporate-${local.environment}-mp"
+  cloudtrail_name                  = local.cloudtrail_name
+  kms_key_arn                      = module.corporate_logging_kms_key.key_arn
   cloudwatch_log_retention_in_days = 365
 
   providers = {
@@ -185,7 +205,7 @@ module "corp_people_logging_bucket" {
     Environment    = local.environment
     Application    = local.application
     Component      = local.component
-    Infrastructure = "sherlock-logging-bucket-${local.environment}"
+    Infrastructure = "corporate-logging-bucket-${local.environment}"
   }
 }
 
@@ -284,13 +304,13 @@ module "data_factory_guardduty_eventbridge" {
   target_lambda_name = module.data_factory_guardduty_lambda.name
 
   target_lambda_arn = module.data_factory_guardduty_lambda.arn
-  kms_key_arn       = module.sherlock_logging_kms_key.key_arn
+  kms_key_arn       = module.corporate_logging_kms_key.key_arn
 
   tags = {
     Environment    = local.environment
     Application    = local.application
     Component      = local.component
-    Infrastructure = "sherlock-eventbridge-rule"
+    Infrastructure = "corporate-eventbridge-rule"
   }
 }
 
@@ -330,7 +350,7 @@ module "data_factory_guardduty_lambda" {
 
   name = "guardduty_lambda"
 
-  lambda_kms_key_arn = module.sherlock_kms_key.key_arn
+  lambda_kms_key_arn = module.corporate_general_kms_key.key_arn
 
   tags = {
     Environment    = local.environment
@@ -345,7 +365,7 @@ module "data_factory_guardduty_lambda" {
 
   quarantine_bucket_name = module.sherlock_quarantine_bucket.bucket.bucket
   quarantine_bucket_arn  = module.sherlock_quarantine_bucket.bucket.arn
-  quarantine_kms_key_arn = module.sherlock_quarantine_kms_key.key_arn
+  quarantine_kms_key_arn = module.corporate_quarantine_kms_key.key_arn
 
   s3_bucket_name        = module.sherlock_landing_bucket_mp.bucket.bucket
   s3_bucket_arn         = module.sherlock_landing_bucket_mp.bucket.arn

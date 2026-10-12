@@ -5,5 +5,5 @@ output "log_bucket_name" {
 
 output "cloudtrail_arn" {
   description = "The ARN of the CloudTrail."
-  value       = aws_cloudtrail.sherlock.arn
+  value       = aws_cloudtrail.this.arn
 }

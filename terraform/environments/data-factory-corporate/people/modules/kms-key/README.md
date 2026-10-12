@@ -14,11 +14,11 @@ in the account to use the key. Both service grants are optional.
 ## Usage
 
 ```hcl
-module "sherlock_logging_kms_key" {
+module "corporate_logging_kms_key" {
   source = "./modules/kms-key"
 
-  alias                  = "sherlock-logging"
-  cloudtrail_name        = "sherlock-cloudtrail"
+  alias                  = "corporate-logging"
+  cloudtrail_name        = "corporate-cloudtrail"
   enable_cloudwatch_logs = true
 
   tags = {

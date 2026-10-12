@@ -20,10 +20,10 @@ module "data_factory_guardduty_lambda" {
     eventbridge_rule_arn = module.data_factory_guardduty_eventbridge.rule_arn
     quarantine_statuses  = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
 
-    lambda_kms_key_arn      = module.sherlock_kms_key.key_arn
+    lambda_kms_key_arn      = module.corporate_general_kms_key.key_arn
     quarantine_bucket_name = module.sherlock_quarantine_bucket.bucket.bucket
     quarantine_bucket_arn  = module.sherlock_quarantine_bucket.bucket.arn
-    quarantine_kms_key_arn = module.sherlock_quarantine_kms_key.key_arn
+    quarantine_kms_key_arn = module.corporate_quarantine_kms_key.key_arn
     s3_bucket_name         = module.sherlock_landing_bucket_mp.bucket.bucket
     s3_bucket_arn          = module.sherlock_landing_bucket_mp.bucket.arn
     s3_bucket_kms_key_arn  = module.sherlock_kms_key.key_arn

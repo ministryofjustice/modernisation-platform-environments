@@ -16,9 +16,9 @@ and CloudWatch Logs to use it. S3 object-level data events are not enabled by th
 module "corp_people_logging_bucket" {
   source = "./modules/logging-bucket-cloudtrail"
 
-  bucket_prefix                    = "logging-sherlock-test-mp"
-  cloudtrail_name                  = "sherlock-cloudtrail"
-  kms_key_arn                      = module.sherlock_logging_kms_key.key_arn
+  bucket_prefix                    = "logging-corporate-test-mp"
+  cloudtrail_name                  = "corporate-cloudtrail"
+  kms_key_arn                      = module.corporate_logging_kms_key.key_arn
   cloudwatch_log_retention_in_days = 365
 
   tags = {
@@ -53,7 +53,7 @@ The `log_bucket_name` and `cloudtrail_arn` outputs identify the bucket and trail
 
 | Name | Type |
 | ---- | ---- |
-| [aws_cloudtrail.sherlock](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudtrail) | resource |
+| [aws_cloudtrail.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudtrail) | resource |
 | [aws_cloudwatch_log_group.cloudtrail](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_iam_role.cloudtrail_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.cloudtrail_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
