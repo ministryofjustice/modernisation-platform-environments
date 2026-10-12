@@ -54,9 +54,6 @@ locals {
     }
 
     production = {
-      # az-noms-production-1
-      hmpps-az-gw1-rdgateway = ["hmpps-az-gw1.justice.gov.uk", true, "azure-fixngo-production-pagerduty"]
-
       # corporate-staff-rostering
       csr-r1 = ["r1.csr.service.justice.gov.uk", false, "corporate-staff-rostering-production-pagerduty"]
       csr-r2 = ["r2.csr.service.justice.gov.uk", false, "corporate-staff-rostering-production-pagerduty"]
