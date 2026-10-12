@@ -264,7 +264,7 @@ resource "aws_security_group_rule" "ingress_traffic_az_workspace_ebsapps_443" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = ["10.192.64.0/22"]
+  cidr_blocks       = ["10.192.64.0/21"]
 }
 
 ### FTP
