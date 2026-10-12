@@ -9,10 +9,95 @@ resource "aws_security_group" "oem_db_security_group" {
 }
 
 # Egress Rules for oem_db_security_group
-resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_all_0_0_cidr" {
+# Note: egress is scoped rather than 0.0.0.0/0. HTTPS/HTTP to the internet is
+# retained for OS patching (yum) and first-boot agent downloads in user data.
+resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_vpc" {
   security_group_id = aws_security_group.oem_db_security_group.id
+  description       = "Allow all outbound traffic within the VPC"
   ip_protocol       = "-1"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+
+  tags = {
+    Name = "Allow all outbound traffic within the VPC"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_s3" {
+  security_group_id = aws_security_group.oem_db_security_group.id
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_id    = data.aws_prefix_list.s3.id
+
+  tags = {
+    Name = "S3 via gateway endpoint"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_vpce_a" {
+  security_group_id = aws_security_group.oem_db_security_group.id
+  description       = "Allow HTTPS to VPC interface endpoints (SSM, Logs, Secrets Manager) AZ a"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = data.aws_subnet.protected_subnets_a.cidr_block
+
+  tags = {
+    Name = "HTTPS to VPC interface endpoints AZ a"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_vpce_b" {
+  security_group_id = aws_security_group.oem_db_security_group.id
+  description       = "Allow HTTPS to VPC interface endpoints (SSM, Logs, Secrets Manager) AZ b"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = data.aws_subnet.protected_subnets_b.cidr_block
+
+  tags = {
+    Name = "HTTPS to VPC interface endpoints AZ b"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_vpce_c" {
+  security_group_id = aws_security_group.oem_db_security_group.id
+  description       = "Allow HTTPS to VPC interface endpoints (SSM, Logs, Secrets Manager) AZ c"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = data.aws_subnet.protected_subnets_c.cidr_block
+
+  tags = {
+    Name = "HTTPS to VPC interface endpoints AZ c"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_https_internet" {
+  security_group_id = aws_security_group.oem_db_security_group.id
+  description       = "Allow HTTPS to internet for OS patching and package downloads"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
   cidr_ipv4         = "0.0.0.0/0"
+
+  tags = {
+    Name = "HTTPS to internet (patching)"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_http_internet" {
+  security_group_id = aws_security_group.oem_db_security_group.id
+  description       = "Allow HTTP to internet for OS patching (yum mirrors)"
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  cidr_ipv4         = "0.0.0.0/0"
+
+  tags = {
+    Name = "HTTP to internet (patching)"
+  }
 }
 
 # Ingress Rules for oem_db_security_group
