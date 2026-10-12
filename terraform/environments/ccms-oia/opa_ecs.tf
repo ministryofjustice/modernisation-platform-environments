@@ -1,36 +1,20 @@
-
-# # ECS Cluster
-# resource "aws_ecs_cluster" "main" {
-#   name = "${local.application_name}-cluster"
-
-#   setting {
-#     name  = "containerInsights"
-#     value = "enabled"
-#   }
-# }
-
-# resource "aws_ecs_cluster_capacity_providers" "main" {
-#   cluster_name       = aws_ecs_cluster.main.name
-#   capacity_providers = [aws_ecs_capacity_provider.capacity_provider.name]
-# }
-
 # ECS Task Definition
 
 resource "aws_ecs_task_definition" "opahub" {
   family                   = "${local.opa_app_name}-task"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  network_mode             = "bridge"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["EC2"]
 
   cpu    = local.application_data.accounts[local.environment].opa_container_cpu
   memory = local.application_data.accounts[local.environment].opa_container_memory
 
-  volume {
-    name = "opa_volume"
-    efs_volume_configuration {
-      file_system_id = aws_efs_file_system.oia-storage.id
-    }
-  }
+  # volume {
+  #   name = "opa_volume"
+  #   efs_volume_configuration {
+  #     file_system_id = aws_efs_file_system.oia-storage.id
+  #   }
+  # }
 
 
   container_definitions = templatefile(
@@ -39,6 +23,8 @@ resource "aws_ecs_task_definition" "opahub" {
       app_name          = local.opa_app_name
       app_image         = local.application_data.accounts[local.environment].opa_app_image
       server_port       = local.application_data.accounts[local.environment].opa_server_port
+      ssl_port       = local.application_data.accounts[local.environment].opa_ssl_port
+      health_check_port = local.application_data.accounts[local.environment].opa_health_check_port
       aws_region        = local.application_data.accounts[local.environment].aws_region
       container_version = local.application_data.accounts[local.environment].opa_container_version
       opahub_password   = "${aws_secretsmanager_secret.opahub_secrets.arn}:opahub_password::"
@@ -49,6 +35,8 @@ resource "aws_ecs_task_definition" "opahub" {
       wl_password       = "${aws_secretsmanager_secret.opahub_secrets.arn}:wl_password::"
       wl_mem_args       = local.application_data.accounts[local.environment].wl_mem_args
       secret_key        = "${aws_secretsmanager_secret.opahub_secrets.arn}:secret_key::"
+      keystore_password   = "${aws_secretsmanager_secret.opahub_secrets.arn}:keystore_password::"
+      truststore_password = "${aws_secretsmanager_secret.opahub_secrets.arn}:truststore_password::"
       create_database   = local.application_data.accounts[local.environment].create_database
     }
   )
@@ -61,7 +49,7 @@ resource "aws_ecs_task_definition" "opahub" {
 # ECS Service
 resource "aws_ecs_service" "opahub" {
   name            = local.opa_app_name
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = aws_ecs_cluster.opa.id
   task_definition = aws_ecs_task_definition.opahub.arn
   desired_count   = local.application_data.accounts[local.environment].opa_app_count
 
@@ -85,26 +73,31 @@ resource "aws_ecs_service" "opahub" {
 
   health_check_grace_period_seconds = 120
 
-  lifecycle {
-    ignore_changes = [
-      task_definition
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     task_definition
+  #   ]
+  # }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
   }
 
+  network_configuration {
+    security_groups = [aws_security_group.ecs_tasks_opa.id]
+    subnets         = data.aws_subnets.shared-private.ids
+  }
+
   load_balancer {
     target_group_arn = aws_lb_target_group.opahub_target_group.id
     container_name   = "${local.opa_app_name}-container"
-    container_port   = local.application_data.accounts[local.environment].opa_server_port
+    container_port   = local.application_data.accounts[local.environment].opa_ssl_port
   }
 
   depends_on = [
     aws_lb_listener.opahub_listener,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
-    aws_autoscaling_group.cluster_scaling_group
+    aws_autoscaling_group.opa_cluster_scaling_group
   ]
 }
