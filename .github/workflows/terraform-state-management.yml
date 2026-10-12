@@ -158,7 +158,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@6a78b87ea8e63646ec10701857c70cb2487738ab # v6.2.7
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@ebec2f2fda2f93172de61774b5875b9cef7462bc # v6.2.12
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -181,7 +181,7 @@ jobs:
           ref: ${{ github.event.inputs.branch_name }}
 
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b9151ad79209d53d7f738430aa6868c5b7589237 # v6.2.9
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@ebec2f2fda2f93172de61774b5875b9cef7462bc # v6.2.12
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}

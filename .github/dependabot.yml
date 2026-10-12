@@ -603,7 +603,9 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/delius-core"
+      - "terraform/environments/delius-core/modules/components/alb_logs_athena_glue"
       - "terraform/environments/delius-core/modules/components/dms"
+      - "terraform/environments/delius-core/modules/components/ecs_nightly_restart"
       - "terraform/environments/delius-core/modules/components/ecs_retirement"
       - "terraform/environments/delius-core/modules/components/fargate_graceful_retirement"
       - "terraform/environments/delius-core/modules/components/ldap"

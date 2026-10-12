@@ -1,26 +1,34 @@
-variable "sip_delivery_assistant_bedrock_guardrail_arn" {
-  description = "Optional approved sprinkler Bedrock guardrail ARN. Leave null to disable guardrail access."
-  type        = string
-  default     = null
-  nullable    = true
-
-  validation {
-    condition = (
-      var.sip_delivery_assistant_bedrock_guardrail_arn == null ||
-      can(regex(
-        "^arn:aws:bedrock:eu-west-2:348456244381:guardrail/[A-Za-z0-9-]+$",
-        var.sip_delivery_assistant_bedrock_guardrail_arn
-      ))
-    )
-    error_message = "The guardrail ARN must identify one guardrail in sprinkler account 348456244381 in eu-west-2."
-  }
-}
-
 locals {
   sip_delivery_assistant_bedrock_inference_profile_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
   sip_delivery_assistant_bedrock_model_arns = toset([
     for model in data.aws_bedrock_inference_profile.sip_delivery_assistant.models : model.model_arn
   ])
+}
+
+resource "aws_bedrock_guardrail" "sip_delivery_assistant" {
+  name                      = "modernisation-platform-sip-delivery-assistant"
+  description               = "Prompt-attack protection for untrusted SIP ticket and repository content"
+  blocked_input_messaging   = "The request was blocked by the SIP Delivery Assistant security policy."
+  blocked_outputs_messaging = "The response was blocked by the SIP Delivery Assistant security policy."
+  tags                      = local.tags
+
+  content_policy_config {
+    tier_config {
+      tier_name = "CLASSIC"
+    }
+
+    filters_config {
+      type            = "PROMPT_ATTACK"
+      input_strength  = "HIGH"
+      output_strength = "NONE"
+    }
+  }
+}
+
+resource "aws_bedrock_guardrail_version" "sip_delivery_assistant" {
+  description   = "Prompt-attack protection for adaptive SIP shadow evaluation"
+  guardrail_arn = aws_bedrock_guardrail.sip_delivery_assistant.guardrail_arn
+  skip_destroy  = true
 }
 
 data "aws_bedrock_inference_profile" "sip_delivery_assistant" {
@@ -118,15 +126,11 @@ data "aws_iam_policy_document" "sip_delivery_assistant_bedrock" {
     }
   }
 
-  dynamic "statement" {
-    for_each = var.sip_delivery_assistant_bedrock_guardrail_arn == null ? [] : [var.sip_delivery_assistant_bedrock_guardrail_arn]
-
-    content {
-      sid       = "ApplyApprovedGuardrail"
-      effect    = "Allow"
-      actions   = ["bedrock:ApplyGuardrail"]
-      resources = [statement.value]
-    }
+  statement {
+    sid       = "ApplyApprovedGuardrail"
+    effect    = "Allow"
+    actions   = ["bedrock:ApplyGuardrail"]
+    resources = [aws_bedrock_guardrail.sip_delivery_assistant.guardrail_arn]
   }
 }
 
@@ -154,4 +158,14 @@ output "sip_delivery_assistant_bedrock_inference_profile" {
     arn                   = data.aws_bedrock_inference_profile.sip_delivery_assistant.inference_profile_arn
     foundation_model_arns = sort(tolist(local.sip_delivery_assistant_bedrock_model_arns))
   }
+}
+
+output "sip_delivery_assistant_bedrock_guardrail_id" {
+  description = "Configure this non-secret ID as SIP_BEDROCK_GUARDRAIL_ID in the delivery assistant's sip-assessment and sip-generation GitHub Environments."
+  value       = aws_bedrock_guardrail.sip_delivery_assistant.guardrail_id
+}
+
+output "sip_delivery_assistant_bedrock_guardrail_version" {
+  description = "Configure this non-secret immutable version as SIP_BEDROCK_GUARDRAIL_VERSION in the delivery assistant's sip-assessment and sip-generation GitHub Environments."
+  value       = aws_bedrock_guardrail_version.sip_delivery_assistant.version
 }
