@@ -117,11 +117,43 @@ resource "aws_iam_role" "rds_artifacts" {
   tags = local.tags
 }
 
+# data "aws_iam_policy_document" "rds_artifacts" {
+#   count = local.create_rds ? 1 : 0
+
+#   statement {
+#     sid    = "ListArtifactsBucket"
+#     effect = "Allow"
+
+#     actions = [
+#       "s3:GetBucketLocation",
+#       "s3:ListBucket",
+#     ]
+
+#     resources = [
+#       module.baseline.s3_buckets["artifacts-bucket"].bucket.arn,
+#     ]
+#   }
+
+#   statement {
+#     sid    = "ReadDatabaseBackups"
+#     effect = "Allow"
+
+#     actions = [
+#       "s3:GetObject",
+#       "s3:GetObjectVersion",
+#     ]
+
+#     resources = [
+#       "${module.baseline.s3_buckets["artifacts-bucket"].bucket.arn}/*",
+#     ]
+#   }
+# }
+
 data "aws_iam_policy_document" "rds_artifacts" {
   count = local.create_rds ? 1 : 0
 
   statement {
-    sid    = "ListArtifactsBucket"
+    sid    = "ListSharedArtifactsBucket"
     effect = "Allow"
 
     actions = [
@@ -130,8 +162,18 @@ data "aws_iam_policy_document" "rds_artifacts" {
     ]
 
     resources = [
-      module.baseline.s3_buckets["artifacts-bucket"].bucket.arn,
+      "arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001",
     ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        "hmpps/london-unpaid-work/database",
+        "hmpps/london-unpaid-work/database/*",
+      ]
+    }
   }
 
   statement {
@@ -144,7 +186,21 @@ data "aws_iam_policy_document" "rds_artifacts" {
     ]
 
     resources = [
-      "${module.baseline.s3_buckets["artifacts-bucket"].bucket.arn}/*",
+      "arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001/hmpps/london-unpaid-work/database/*",
+    ]
+  }
+
+  statement {
+    sid    = "DecryptDatabaseBackups"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+    ]
+
+    resources = [
+      "arn:aws:kms:eu-west-2:374269020027:key/90121e65-c5fa-43a9-8075-6f3410d2a025",
     ]
   }
 }
@@ -161,7 +217,7 @@ resource "aws_db_option_group" "database" {
   count = local.create_rds ? 1 : 0
 
   name                     = "${local.application_name}-${local.environment}-database"
-  option_group_description = "SQL Server native backup and restore from the London Unpaid Work artifacts bucket"
+  option_group_description = "SQL Server native backup and restore from the shared artifacts bucket"
   engine_name              = "sqlserver-se"
   major_engine_version     = "15.00"
 
