@@ -162,7 +162,8 @@ locals {
         ### Production
         "54.195.74.96/32",
         "79.125.36.56/32",
-        "63.35.122.32/32"
+        "63.35.122.32/32",
+        "148.139.3.8/29" # ServiceNow Sandbox
       ]
       ai_gateway_admin_ingress_allowlist = [
         # VPN
