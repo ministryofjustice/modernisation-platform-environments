@@ -55,30 +55,15 @@ resource "aws_ssm_document" "certificate_wallet_expiry_check" {
   content = file("ssm/ccms-ssm-document-certificate-wallet-expiry-check.yaml")
 }
 
-# Wallet/keystore passwords - placeholder values, populated manually by the DBA/AppOps team
+# Wallet/keystore passwords - the value is set manually by the DBA/AppOps team. No secret version is managed
+# here, so Terraform never reads the passwords and they never reach state.
 resource "aws_secretsmanager_secret" "certificate_monitor" {
   name        = "${local.application_name}-certificate-monitor"
-  description = "Passwords for the EBS DB wallet and EBS apps keystores used by the certificate expiry check"
+  description = "Passwords for the certificate expiry check, as JSON with keys: ebsdb_wallet_password, ebsapps_keystore_password, ebsapps_cacerts_password"
 
   tags = merge(local.tags,
     { Name = "${local.application_name}-certificate-monitor-${local.environment}" }
   )
-}
-
-resource "aws_secretsmanager_secret_version" "certificate_monitor" {
-  secret_id = aws_secretsmanager_secret.certificate_monitor.id
-
-  secret_string = jsonencode({
-    "ebsdb_wallet_password"     = "",
-    "ebsapps_keystore_password" = "",
-    "ebsapps_cacerts_password"  = ""
-  })
-
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
 }
 
 resource "aws_iam_policy" "certificate_wallet_expiry_check" {
