@@ -44,7 +44,15 @@ module "weblogic_eis" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
-  ecs_service_ingress_security_group_ids = []
+  ecs_service_ingress_security_group_ids = [
+    # temporary rule to allow legacy environments to access ECS services for migration purposes
+    # this is for offloc and once offloc is moved, it should be removed
+    {
+      ip_protocol = "tcp"
+      port        = 443
+      cidr_ipv4   = var.environment_config.migration_environment_vpc_cidr
+    }
+  ]
   ecs_service_egress_security_group_ids = [
     {
       ip_protocol = "tcp"
