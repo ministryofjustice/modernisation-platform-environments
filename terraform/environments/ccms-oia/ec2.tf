@@ -82,6 +82,14 @@ resource "aws_autoscaling_group" "opa_cluster_scaling_group" {
     value               = "${local.first_cluster_name}-ecs-instance"
     propagate_at_launch = true
   }
+
+  # ECS adds this tag automatically once the capacity provider is attached;
+  # declaring it here stops Terraform from stripping it back out on every apply.
+  tag {
+    key                 = "AmazonECSManaged"
+    value               = ""
+    propagate_at_launch = true
+  }
 }
 
 resource "aws_launch_template" "ec2_launch_template_opa" {
@@ -150,6 +158,14 @@ resource "aws_autoscaling_group" "conn_saa_cluster_scaling_group" {
   tag {
     key                 = "Name"
     value               = "${local.second_cluster_name}-ecs-instance"
+    propagate_at_launch = true
+  }
+
+  # ECS adds this tag automatically once the capacity provider is attached;
+  # declaring it here stops Terraform from stripping it back out on every apply.
+  tag {
+    key                 = "AmazonECSManaged"
+    value               = ""
     propagate_at_launch = true
   }
 }
