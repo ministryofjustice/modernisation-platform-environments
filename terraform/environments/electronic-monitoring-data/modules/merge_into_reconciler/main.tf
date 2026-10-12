@@ -4,8 +4,10 @@ module "merge_into_this" {
   iam_policies = tomap({ "merge_into_${local.name}_step_function_policy" = aws_iam_policy.merge_into_this })
   variable_dictionary = tomap(
     {
-      "merge_function_name" = var.function_to_iterate.lambda_function_arn,
-      "table_name"          = local.camel_name
+      "merge_function_name"     = var.function_to_iterate.lambda_function_arn,
+      "table_name"              = local.camel_name,
+      "planner_function_name"   = var.planner_function_arn,
+      "reconciliation_consumer" = var.reconciliation_consumer
     }
   )
   type = "STANDARD"
@@ -13,9 +15,12 @@ module "merge_into_this" {
 
 data "aws_iam_policy_document" "merge_into_this" {
   statement {
-    effect    = "Allow"
-    actions   = ["lambda:InvokeFunction"]
-    resources = [var.function_to_iterate.lambda_function_arn, ]
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = compact([
+      var.function_to_iterate.lambda_function_arn,
+      var.planner_function_arn,
+    ])
   }
 }
 

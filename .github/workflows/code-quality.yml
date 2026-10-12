@@ -6,7 +6,7 @@ name: Code Quality
     branches: [main]
   pull_request:
     branches: [main]
-    types: [opened, edited, reopened, synchronize]
+    types: [opened, reopened, synchronize]
   schedule:
     - cron: "0 7 * * 1-5"
   workflow_dispatch:
@@ -21,10 +21,11 @@ jobs:
       issues: write
       pull-requests: write
       security-events: write
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/reusable-code-quality.yml@b9151ad79209d53d7f738430aa6868c5b7589237 # v6.2.9
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/reusable-code-quality.yml@ebec2f2fda2f93172de61774b5875b9cef7462bc # v6.2.12
     with:
       validate_all_codebase: ${{ github.event_name == 'schedule' && 'true' || 'false' }}
       apply_fixes: ${{ github.event_name == 'schedule' }}
+      disable_linters: ${{ github.event_name == 'pull_request' && 'REPOSITORY_GRYPE' || '' }}
       codeql_languages: '["actions","go","javascript-typescript","python"]'
       checkov_arguments: >-
         --skip-check CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
