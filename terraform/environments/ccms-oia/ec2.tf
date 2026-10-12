@@ -30,7 +30,7 @@ resource "aws_launch_template" "ec2_launch_template_opa" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [aws_security_group.first_cluster_ec2.id]
+    security_groups             = [aws_security_group.opa_cluster_ec2.id]
   }
 
   block_device_mappings {
@@ -93,7 +93,7 @@ resource "aws_autoscaling_group" "opa_cluster_scaling_group" {
 }
 
 resource "aws_launch_template" "ec2_launch_template_opa" {
-  name_prefix   = local.first_cluster_name
+  name_prefix   = local.second_cluster_name
   image_id      = local.application_data.accounts[local.environment].ami_image_id
   instance_type = local.application_data.accounts[local.environment].ec2_instance_type
   ebs_optimized = true
@@ -108,7 +108,7 @@ resource "aws_launch_template" "ec2_launch_template_opa" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [aws_security_group.first_cluster_ec2.id]
+    security_groups             = [aws_security_group.conn_saa_cluster_ec2.id]
   }
 
   block_device_mappings {
