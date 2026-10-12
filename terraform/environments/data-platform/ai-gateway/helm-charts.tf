@@ -1,3 +1,46 @@
+resource "helm_release" "litellm_openai" {
+  count = local.openai_enabled ? 1 : 0
+
+  name       = "litellm-openai"
+  repository = "oci://ghcr.io/berriai"
+  version    = local.environment_configuration.litellm_version
+  chart      = "litellm-helm"
+  namespace  = module.ai_gateway_namespace.name
+
+  values = [
+    templatefile("${path.module}/src/helm/values/litellm-openai/values.yml.tftpl", {
+      imageRepository    = local.environment_configuration.litellm_image_repository
+      imageTag           = local.environment_configuration.litellm_image_tag
+      imagePullSecret    = local.environment_configuration.litellm_image_pull_secret
+      serviceAccountName = kubernetes_service_account_v1.openai[0].metadata[0].name
+      masterkeySecret    = kubernetes_secret_v1.openai_proxy[0].metadata[0].name
+      policyConfigMap    = kubernetes_config_map_v1.openai_policy[0].metadata[0].name
+      policyChecksum     = filesha256("${path.module}/src/openai_policy.py")
+      logsBucket         = module.openai_logs[0].s3_bucket_id
+      logsRegion         = data.aws_region.current.region
+      logsKeyArn         = module.openai_logs_kms_key[0].key_arn
+      models = [
+        for model in values(local.openai_models) : {
+          model_name = model.model_id
+          litellm_params = {
+            model = "openai/${model.model_id}"
+          }
+        }
+      ]
+    })
+  ]
+
+  timeout = 700
+
+  depends_on = [
+    kubernetes_manifest.external_secret_openai_workload_identity,
+    kubernetes_manifest.external_secret_elasticache,
+    kubernetes_manifest.external_secret_litellm_license,
+    kubernetes_manifest.external_secret_litellm_registry,
+    kubernetes_network_policy_v1.openai
+  ]
+}
+
 resource "helm_release" "ai_gateway_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
@@ -59,8 +102,11 @@ resource "helm_release" "litellm_admin" {
         googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
 
         # LiteLLM
-        masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
-        masterkeySecretKey  = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        openaiEnabled        = local.openai_enabled
+        openaiApiBase        = local.openai_api_base
+        openaiPolicyChecksum = filesha256("${path.module}/src/openai_policy.py")
+        masterkeySecretName  = kubernetes_secret_v1.litellm_master_key.metadata[0].name
+        masterkeySecretKey   = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         environmentSecrets = [
           "litellm-license",
           "litellm-entra-id",
@@ -91,6 +137,8 @@ resource "helm_release" "litellm_admin" {
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
     kubernetes_manifest.external_secret_elasticache,
+    kubernetes_secret_v1.openai_proxy,
+    kubernetes_config_map_v1.openai_policy,
     kubernetes_job_v1.grant_rds_iam
   ]
 }
@@ -125,8 +173,11 @@ resource "helm_release" "litellm" {
         databaseUsername          = module.ai_gateway_aurora.cluster_master_username
 
         # LiteLLM
-        masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
-        masterkeySecretKey  = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        openaiEnabled        = local.openai_enabled
+        openaiApiBase        = local.openai_api_base
+        openaiPolicyChecksum = filesha256("${path.module}/src/openai_policy.py")
+        masterkeySecretName  = kubernetes_secret_v1.litellm_master_key.metadata[0].name
+        masterkeySecretKey   = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         environmentSecrets = [
           "litellm-license",
           "litellm-entra-id",
@@ -170,6 +221,8 @@ resource "helm_release" "litellm" {
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_registry,
     kubernetes_manifest.external_secret_litellm_salt_key,
+    kubernetes_secret_v1.openai_proxy,
+    kubernetes_config_map_v1.openai_policy,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
     kubernetes_manifest.external_secret_elasticache,

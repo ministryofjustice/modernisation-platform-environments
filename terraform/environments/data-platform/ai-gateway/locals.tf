@@ -25,6 +25,10 @@ locals {
     }
   }
 
+  openai_models   = try(local.ai_gateway_models_filtered.openai, {})
+  openai_enabled  = length(local.openai_models) > 0
+  openai_api_base = "http://litellm-openai.${local.component_name}.svc.cluster.local:4000/v1"
+
   # RDS
   has_reader = contains(keys(local.environment_configuration.aurora_instances), "reader")
   # checkov:skip=CKV_SECRET_6: Dummy placeholder for IAM auth flow, not a real secret

@@ -1,3 +1,10 @@
+resource "random_password" "openai_proxy" {
+  count = local.openai_enabled ? 1 : 0
+
+  length  = 32
+  special = false
+}
+
 resource "random_password" "litellm_secret_key" {
   length  = 32
   special = false

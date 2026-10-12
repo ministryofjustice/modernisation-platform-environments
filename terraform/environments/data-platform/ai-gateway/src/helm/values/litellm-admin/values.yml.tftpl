@@ -12,6 +12,11 @@ imagePullSecrets:
 %{ endif ~}
 nameOverride: "litellm-admin"
 
+%{ if openaiEnabled ~}
+podAnnotations:
+  checksum/openai-policy: ${openaiPolicyChecksum}
+%{ endif ~}
+
 service:
   type: NodePort
 
@@ -52,6 +57,9 @@ environmentSecrets:
   - ${secret}
 %{ endfor ~}
   - litellm-salt-key
+%{ if openaiEnabled ~}
+  - openai-proxy
+%{ endif ~}
 
 proxyConfigMap:
   create: true
@@ -78,7 +86,7 @@ proxy_config:
       s3_path: litellm-audit
     cache: false
     require_auth_for_metrics_endpoint: false
-    callbacks: ["prometheus"]
+    callbacks: ["prometheus"${openaiEnabled ? ", \"openai_policy.gateway\"" : ""}]
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
     service_callback: ["prometheus_system"]
@@ -117,6 +125,11 @@ securityContext:
     type: RuntimeDefault
 
 volumes:
+%{ if openaiEnabled ~}
+  - name: openai-policy
+    configMap:
+      name: openai-policy
+%{ endif ~}
   - name: ui
     emptyDir:
       sizeLimit: 100Mi
@@ -150,6 +163,11 @@ volumes:
             expirationSeconds: 3600
 
 volumeMounts:
+%{ if openaiEnabled ~}
+  - name: openai-policy
+    mountPath: /app/policy
+    readOnly: true
+%{ endif ~}
   - name: ui
     mountPath: /app/var/litellm/ui
   - name: assets
@@ -211,6 +229,10 @@ ingress:
   enabled: false
 
 envVars: {
+%{ if openaiEnabled ~}
+    PYTHONPATH: "/app/policy",
+    OPENAI_PROXY_API_BASE: "${openaiApiBase}",
+%{ endif ~}
     AUTO_REDIRECT_UI_LOGIN_TO_SSO: "True",
     DISABLE_LLM_API_ENDPOINTS: "True",
     DOCS_DESCRIPTION: "Administration interface for the AI Gateway.",

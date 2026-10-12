@@ -10,6 +10,7 @@ teams:
     models: ["no-default-models"]
     unified_access_groups:
       - generally-available-models
+      - openai-gpt-5.4
   justice-engineering-ai-enablement:
     alias: Justice Engineering AI Enablement
     organisation: ministryofjustice
@@ -501,3 +502,10 @@ models:
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction", "production"]
+  openai:
+    gpt-5.4:
+      model_id: "gpt-5.4"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT-5.4"
+      generally_available: false
+      environments_available: ["development"]

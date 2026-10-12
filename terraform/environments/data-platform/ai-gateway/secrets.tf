@@ -1,3 +1,17 @@
+module "openai_workload_identity_secret" {
+  count = local.openai_enabled ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name = "${local.component_name}/openai/workload-identity"
+
+  secret_string = jsonencode({
+    identity_provider_id = "CHANGEME"
+    service_account_id   = "CHANGEME"
+  })
+  ignore_secret_changes = true
+}
+
 module "litellm_registry_secret" {
   count = try(local.environment_configuration.litellm_image_pull_secret, "") != "" ? 1 : 0
 

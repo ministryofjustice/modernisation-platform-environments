@@ -76,3 +76,54 @@ Modernisation Platform
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
 
 Gary was here.
+
+## OpenAI prompt logging
+
+The internal OpenAI release enforces **fail-closed prompt logging** through
+[the OpenAI policy](ai-gateway/src/openai_policy.py). Before a request can call
+OpenAI or return a cached answer, it must receive a successful S3 `PutObject`
+acknowledgement for its prompt record. A storage/credential failure, invalid
+acknowledgement or ten-second deadline expiry rejects the request with HTTP 503.
+Health-check prompts also require persistence; clients cannot opt out of this
+logging by disabling caching or ordinary logging callbacks.
+
+Prompt records are written beneath `requests/prompts/YYYY/MM/DD/` in the
+OpenAI content-log bucket, with explicit SSE-KMS encryption. Each attempt uses a
+new UUID and a conditional write to avoid overwriting an existing record.
+Records contain the model, structured prompt, instructions, tool definitions,
+conversation references, caller hash and LiteLLM call ID when available. Proxy
+headers, credentials and internal auth objects are not copied into this record.
+The existing private bucket, IAM permissions and 30-day expiry still apply.
+
+The guarantee is that **every OpenAI request admitted through this backend's
+inference pipeline has an acknowledged prompt record first**. The record captures
+the prompt received by the backend after processing by the main gateway; URLs,
+file IDs and previous-response references are recorded as references, not fetched
+or expanded into provider-side context. Requests that never reach the backend
+cannot be recorded. A rejected write may finish after the deadline, and retries
+can produce multiple records; this is not an exactly-once transaction with OpenAI.
+
+Response logging remains the asynchronous `s3_v2` callback, including streaming
+responses. It is not a guarantee of complete response capture. Do not infer that
+an OpenAI call completed merely because a prompt record exists.
+
+An S3 or KMS outage now makes OpenAI inference unavailable even if an answer is
+cached. Look for `OpenAI prompt persistence failed` in pod logs; the entry carries
+a request ID and error type without printing prompt content. Check the pod's IRSA
+credentials, S3/KMS access and connectivity before retrying. Do not disable the
+logging hook as an outage workaround. The OpenAI federation IDs must still be
+populated before deployment.
+
+Offline tests in [the gateway tests directory](ai-gateway/tests) mock both S3 and
+OpenAI; they do not require populated secrets. With `litellm[proxy]==1.101.5`,
+PyYAML and Terraform installed, run:
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 LITELLM_LOCAL_MODEL_COST_MAP=True python -m unittest discover \
+  -s terraform/environments/data-platform/ai-gateway/tests -v
+```
+
+Set `LITELLM_CHART_PATH` to the locally downloaded `litellm-helm` chart version
+1.101.0 to include the Helm rendering test. Before admitting live traffic, verify
+that denying S3 writes prevents both cache hits and OpenAI calls, and that restoring
+access allows calls only after their encrypted prompt records have been written.

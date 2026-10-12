@@ -1,3 +1,44 @@
+module "openai_logs" {
+  count = local.openai_enabled ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
+
+  bucket        = "mojdp-${local.environment}-${local.component_name}-openai-logs"
+  force_destroy = false
+
+  block_public_acls                     = true
+  block_public_policy                   = true
+  ignore_public_acls                    = true
+  restrict_public_buckets               = true
+  attach_deny_insecure_transport_policy = true
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = module.openai_logs_kms_key[0].key_arn
+      }
+      bucket_key_enabled = true
+    }
+  }
+
+  # Avoid retaining previous versions of sensitive content beyond the retention policy.
+  versioning = {
+    status = "Disabled"
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "expire-openai-logs"
+      enabled = true
+      expiration = {
+        days = 30
+      }
+      abort_incomplete_multipart_upload_days = 1
+    }
+  ]
+}
+
 locals {
   alb_access_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-alb-logs"
   audit_logs_bucket_name      = "mojdp-${local.environment}-${local.component_name}-audit-logs"

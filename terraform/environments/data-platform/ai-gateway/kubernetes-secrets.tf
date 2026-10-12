@@ -1,3 +1,31 @@
+resource "kubernetes_secret_v1" "openai_proxy" {
+  count = local.openai_enabled ? 1 : 0
+
+  metadata {
+    namespace = module.ai_gateway_namespace.name
+    name      = "openai-proxy"
+  }
+
+  data = {
+    OPENAI_PROXY_API_KEY = "sk-${random_password.openai_proxy[0].result}"
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_config_map_v1" "openai_policy" {
+  count = local.openai_enabled ? 1 : 0
+
+  metadata {
+    namespace = module.ai_gateway_namespace.name
+    name      = "openai-policy"
+  }
+
+  data = {
+    "openai_policy.py" = file("${path.module}/src/openai_policy.py")
+  }
+}
+
 resource "kubernetes_secret_v1" "litellm_master_key" {
   metadata {
     namespace = module.ai_gateway_namespace.name

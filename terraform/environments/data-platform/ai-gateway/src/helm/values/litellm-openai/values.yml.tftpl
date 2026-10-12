@@ -1,0 +1,157 @@
+---
+fullnameOverride: litellm-openai
+replicaCount: 1
+
+image:
+  repository: ${imageRepository}
+  tag: ${imageTag}
+%{ if imagePullSecret != "" ~}
+imagePullSecrets:
+  - name: ${imagePullSecret}
+%{ endif ~}
+
+podAnnotations:
+  checksum/openai-policy: ${policyChecksum}
+
+service:
+  type: ClusterIP
+serviceAccount:
+  create: false
+  name: ${serviceAccountName}
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 2Gi
+  limits:
+    cpu: 1
+    memory: 4Gi
+
+# Authentication, authorisation and accounting remain on the public gateway.
+db:
+  deployStandalone: false
+  useExisting: false
+migrationJob:
+  enabled: false
+ingress:
+  enabled: false
+masterkeySecretName: ${masterkeySecret}
+masterkeySecretKey: OPENAI_PROXY_API_KEY
+environmentSecrets:
+  - openai-workload-identity
+  - elasticache
+  - litellm-license
+
+extraInitContainers:
+  - name: validate-workload-identity
+    image: ${imageRepository}:${imageTag}
+    command: ["python", "-c"]
+    args:
+      - |
+        import os
+        from openai.auth import WorkloadIdentityAuth
+        for name, prefix in (("OPENAI_IDENTITY_PROVIDER_ID", "idp_"), ("OPENAI_SERVICE_ACCOUNT_ID", "user-")):
+            if not os.environ.get(name, "").startswith(prefix):
+                raise ValueError(f"{name} must be configured before enabling OpenAI")
+    envFrom:
+      - secretRef:
+          name: openai-workload-identity
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 65534
+      seccompProfile:
+        type: RuntimeDefault
+
+proxyConfigMap:
+  create: true
+proxy_config:
+  model_list: ${jsonencode(models)}
+  general_settings:
+    master_key: os.environ/PROXY_MASTER_KEY
+    litellm_license: os.environ/LITELLM_LICENSE
+  litellm_settings:
+    drop_params: true
+    request_timeout: 600
+    json_logs: true
+    turn_off_message_logging: false
+    callbacks: ["openai_policy.backend"]
+    success_callback: ["s3_v2"]
+    failure_callback: ["s3_v2"]
+    s3_callback_params:
+      s3_bucket_name: ${logsBucket}
+      s3_region_name: ${logsRegion}
+      s3_path: requests
+      s3_server_side_encryption: aws:kms
+      s3_sse_kms_key_id: ${logsKeyArn}
+    cache: true
+    cache_params:
+      type: redis
+      host: os.environ/primary_endpoint_address
+      port: 6379
+      password: os.environ/auth_token
+      ssl: true
+      ttl: 300
+      namespace: openai
+      supported_call_types: ["acompletion", "aresponses"]
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node-pool
+    value: general-on-demand-arm64
+    effect: NoSchedule
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node-pool: general-on-demand-arm64
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: [ALL]
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65534
+  seccompProfile:
+    type: RuntimeDefault
+
+volumes:
+  - name: app-cache
+    emptyDir:
+      sizeLimit: 500Mi
+  - name: openai-policy
+    configMap:
+      name: ${policyConfigMap}
+  - name: openai-workload-identity-token
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: openai-identity-token
+            audience: https://api.openai.com/v1
+            expirationSeconds: 3600
+volumeMounts:
+  - name: app-cache
+    mountPath: /app/cache
+  - name: openai-policy
+    mountPath: /app/policy
+    readOnly: true
+  - name: openai-workload-identity-token
+    mountPath: /var/run/secrets/api.openai.com
+    readOnly: true
+
+envVars:
+  DISABLE_ADMIN_ENDPOINTS: "True"
+  DISABLE_ADMIN_UI: "True"
+  DISABLE_SCHEMA_UPDATE: "True"
+  STORE_MODEL_IN_DB: "False"
+  LITELLM_LOG: ERROR
+  LITELLM_MODE: PRODUCTION
+  PYTHONPATH: /app/policy
+  REDIS_SSL: "True"
+  XDG_CACHE_HOME: /app/cache
+  OPENAI_IDENTITY_TOKEN_FILE: /var/run/secrets/api.openai.com/openai-identity-token
+  OPENAI_PROMPT_LOG_BUCKET: ${logsBucket}
+  OPENAI_PROMPT_LOG_REGION: ${logsRegion}
+  OPENAI_PROMPT_LOG_KMS_KEY_ARN: ${logsKeyArn}
+  AWS_EC2_METADATA_DISABLED: "True"

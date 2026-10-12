@@ -1,3 +1,18 @@
+resource "litellm_unified_access_group" "openai" {
+  for_each = local.openai_models
+
+  access_group_name  = "openai-${each.key}"
+  access_model_names = [litellm_model.openai[each.key].model_name]
+  assigned_team_ids = [
+    for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id
+    if contains(try(team.unified_access_groups, []), "openai-${each.key}")
+  ]
+
+  lifecycle {
+    ignore_changes = [assigned_team_ids]
+  }
+}
+
 resource "litellm_unified_access_group" "amazon_bedrock" {
   for_each = try(local.ai_gateway_models_filtered.amazon_bedrock, {})
 
@@ -54,6 +69,11 @@ resource "litellm_unified_access_group" "generally_available_models" {
   ]
 
   access_model_names = concat(
+    [
+      for key in sort(keys(litellm_model.openai)) :
+      litellm_model.openai[key].model_name
+      if try(local.openai_models[key].generally_available, false)
+    ],
     [
       for key in sort(keys(litellm_model.amazon_bedrock)) :
       litellm_model.amazon_bedrock[key].model_name

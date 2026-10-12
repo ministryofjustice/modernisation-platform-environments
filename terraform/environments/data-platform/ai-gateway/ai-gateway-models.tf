@@ -1,3 +1,36 @@
+resource "litellm_model" "openai" {
+  for_each = local.openai_models
+
+  custom_llm_provider = "litellm_proxy"
+  model_name          = "openai-${each.key}"
+  base_model          = each.value.model_id
+  model_api_base      = local.openai_api_base
+  model_api_key       = "os.environ/OPENAI_PROXY_API_KEY"
+  tier                = "paid"
+  mode                = "chat"
+
+  additional_litellm_params = {
+    ai_model_provider            = "OpenAI"
+    ai_model_family              = each.value.model_family
+    ai_model_name                = each.value.model_name
+    ai_model_generally_available = each.value.generally_available
+    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_generally_available\"]"
+  }
+
+  additional_model_info = {
+    health_check_params = jsonencode({
+      metadata         = { user_api_key = "health-check" }
+      litellm_metadata = { user_api_key = "health-check" }
+    })
+  }
+
+  depends_on = [
+    helm_release.litellm_openai,
+    helm_release.litellm,
+    helm_release.litellm_admin
+  ]
+}
+
 resource "litellm_model" "amazon_bedrock" {
   for_each = try(local.ai_gateway_models_filtered.amazon_bedrock, {})
 

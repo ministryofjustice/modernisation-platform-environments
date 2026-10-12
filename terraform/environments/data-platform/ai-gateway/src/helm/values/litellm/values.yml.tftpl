@@ -10,6 +10,11 @@ imagePullSecrets:
 %{ endif ~}
 nameOverride: "litellm"
 
+%{ if openaiEnabled ~}
+podAnnotations:
+  checksum/openai-policy: ${openaiPolicyChecksum}
+%{ endif ~}
+
 service:
   type: NodePort
 
@@ -53,6 +58,9 @@ environmentSecrets:
   - ${secret}
 %{ endfor ~}
   - litellm-salt-key
+%{ if openaiEnabled ~}
+  - openai-proxy
+%{ endif ~}
 
 proxyConfigMap:
   create: true
@@ -80,7 +88,7 @@ proxy_config:
       port: 6379
       password: os.environ/auth_token
     require_auth_for_metrics_endpoint: false
-    callbacks: ["prometheus"]
+    callbacks: ["prometheus"${openaiEnabled ? ", \"openai_policy.gateway\"" : ""}]
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
     prometheus_initialize_budget_metrics: true
@@ -122,6 +130,11 @@ securityContext:
     type: RuntimeDefault
 
 volumes:
+%{ if openaiEnabled ~}
+  - name: openai-policy
+    configMap:
+      name: openai-policy
+%{ endif ~}
   - name: app-cache
     emptyDir:
       sizeLimit: 500Mi
@@ -149,6 +162,11 @@ volumes:
             expirationSeconds: 3600
 
 volumeMounts:
+%{ if openaiEnabled ~}
+  - name: openai-policy
+    mountPath: /app/policy
+    readOnly: true
+%{ endif ~}
   - name: app-cache
     mountPath: /app/cache
   - name: migrations
@@ -170,6 +188,10 @@ ingress:
   enabled: false
 
 envVars: {
+%{ if openaiEnabled ~}
+    PYTHONPATH: "/app/policy",
+    OPENAI_PROXY_API_BASE: "${openaiApiBase}",
+%{ endif ~}
     DISABLE_ADMIN_ENDPOINTS: "True",
     DISABLE_ADMIN_UI: "True",
     DOCS_DESCRIPTION: "Contact us on Slack - #ask-data-platform",

@@ -1,3 +1,21 @@
+module "openai_iam_role" {
+  count = local.openai_enabled ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=1d73bcb359419e1b41872ac5ccaf8808b8f1150e" # v6.6.0
+
+  name            = "${local.component_name}-openai"
+  use_name_prefix = false
+  policies = {
+    openai = module.openai_iam_policy[0].arn
+  }
+  oidc_providers = {
+    main = {
+      provider_arn               = data.aws_iam_openid_connect_provider.cluster.arn
+      namespace_service_accounts = ["${local.component_name}:${local.component_name}-openai"]
+    }
+  }
+}
+
 module "iam_role" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=1d73bcb359419e1b41872ac5ccaf8808b8f1150e" # v6.6.0
 

@@ -1,3 +1,42 @@
+resource "kubernetes_manifest" "external_secret_openai_workload_identity" {
+  count = local.openai_enabled ? 1 : 0
+
+  manifest = {
+    apiVersion = "external-secrets.io/v1"
+    kind       = "ExternalSecret"
+    metadata = {
+      name      = "openai-workload-identity"
+      namespace = module.ai_gateway_namespace.name
+    }
+    spec = {
+      refreshInterval = "5m"
+      secretStoreRef = {
+        name = "aws-secretsmanager"
+        kind = "ClusterSecretStore"
+      }
+      target = {
+        name = "openai-workload-identity"
+      }
+      data = [
+        {
+          secretKey = "OPENAI_IDENTITY_PROVIDER_ID"
+          remoteRef = {
+            key      = tostring(module.openai_workload_identity_secret[0].secret_id)
+            property = "identity_provider_id"
+          }
+        },
+        {
+          secretKey = "OPENAI_SERVICE_ACCOUNT_ID"
+          remoteRef = {
+            key      = tostring(module.openai_workload_identity_secret[0].secret_id)
+            property = "service_account_id"
+          }
+        }
+      ]
+    }
+  }
+}
+
 resource "kubernetes_manifest" "external_secret_litellm_registry" {
   count = try(local.environment_configuration.litellm_image_pull_secret, "") != "" ? 1 : 0
 

@@ -1,3 +1,28 @@
+data "aws_iam_policy_document" "openai" {
+  count = local.openai_enabled ? 1 : 0
+
+  statement {
+    sid       = "WriteOpenAILogs"
+    actions   = ["s3:PutObject"]
+    resources = ["${module.openai_logs[0].s3_bucket_arn}/requests/*"]
+  }
+
+  statement {
+    sid       = "EncryptOpenAILogs"
+    actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
+    resources = [module.openai_logs_kms_key[0].key_arn]
+  }
+}
+
+module "openai_iam_policy" {
+  count = local.openai_enabled ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=1d73bcb359419e1b41872ac5ccaf8808b8f1150e" # v6.6.0
+
+  name_prefix = "${local.component_name}-openai"
+  policy      = data.aws_iam_policy_document.openai[0].json
+}
+
 locals {
   ai_gateway_bedrock_assume_role_arns = distinct([
     for model in values(try(local.ai_gateway_models_filtered.amazon_bedrock, {})) :
