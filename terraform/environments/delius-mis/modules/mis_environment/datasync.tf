@@ -229,6 +229,8 @@ resource "aws_lambda_permission" "datasync_password_updater" {
 
 # Lambda alarms
 resource "aws_cloudwatch_metric_alarm" "datasync_password_updater_error" {
+  count = var.datasync_config != null ? 1 : 0
+
   alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
   alarm_description   = "Triggers if there has been a failed password updater lambda command, or the lambda didn't run,  within last 24 hours"
   alarm_name          = "${var.app_name}-${var.env_name}-datasync-password-updater-lambda-error"
@@ -244,7 +246,7 @@ resource "aws_cloudwatch_metric_alarm" "datasync_password_updater_error" {
   treat_missing_data  = "breaching"
 
   dimensions = {
-    FunctionName = "delius-mis-dev-datasync-password-updater"
+    FunctionName = "${var.app_name}-${var.env_name}-datasync-password-updater"
   }
 
   tags = local.tags
