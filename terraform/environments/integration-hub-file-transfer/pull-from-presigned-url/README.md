@@ -18,6 +18,21 @@ URL-encoded object location, not a presigned S3 URL. The development trial grant
 read-only access to `products-poc-slack-test/` in the pickup bucket. It does not
 grant upload/delete access or access to other recipient directories.
 
+The root and this component use separate Terraform states. Root owns the dispatch
+secret for `products-poc/uploads/`; this component reads its ARN to configure the
+event rule and notifier. Keep the dispatch entry in the shared
+`modules/file-dispatch-configuration/locals-development.tf` configuration.
+
+Before applying another branch to the same development environment, merge this
+configuration into `main` and update that branch from `main`. A branch without the
+entry can delete the dispatch secret even while the pickup component remains
+deployed. Rebasing the pickup branch alone does not protect against that deletion.
+
+If the secret has been deleted, review and apply a fresh root plan first, then
+plan and apply this component. The recreated secret has a new ARN, so the event
+rule and notifier configuration must also be updated. Upload a fresh test file
+after both applies; recreating the route does not replay earlier uploads.
+
 The former webhook secret is no longer read and Terraform schedules it for deletion
 with its 30-day recovery window. It does not need to be populated.
 
