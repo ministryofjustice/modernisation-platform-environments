@@ -1,3 +1,5 @@
+import csv
+import io
 import logging
 import os
 import time
@@ -90,7 +92,31 @@ def wait_for_query(query_execution_id):
     raise TimeoutError(f"Query {query_execution_id} did not complete within timeout")
 
 
-def _run_export(sql, out_key, log_label):
+def format_export_csv(csv_data, table):
+    if table != "property_cafm__acm_inspection_record":
+        return csv_data
+
+    source = io.StringIO(csv_data.decode("utf-8"), newline="")
+    rows = csv.reader(source)
+    header = next(rows)
+    date_index = header.index("inspection_date")
+    output = io.StringIO(newline="")
+    writer = csv.writer(output, quoting=csv.QUOTE_ALL, lineterminator="\n")
+    writer.writerow(header)
+    for row in rows:
+        value = row[date_index]
+        if value:
+            inspection_date = datetime.fromisoformat(value)
+            if inspection_date.tzinfo is not None:
+                raise ValueError("inspection_date must not contain a timezone")
+            if inspection_date.microsecond % 1000:
+                raise ValueError("inspection_date exceeds millisecond precision")
+            row[date_index] = inspection_date.isoformat(sep=" ", timespec="milliseconds")
+        writer.writerow(row)
+    return output.getvalue().encode("utf-8")
+
+
+def _run_export(sql, out_key, log_label, table=None):
     """
     Execute an Athena query, upload the CSV result to S3, then clean up.
 
@@ -120,6 +146,7 @@ def _run_export(sql, out_key, log_label):
     )
     response = s3.get_object(Bucket=bucket, Key=key)
     csv_data = response["Body"].read()
+    csv_data = format_export_csv(csv_data, table)
 
     row_count = csv_data.count(b"\n") - 1  # subtract header
 
@@ -164,7 +191,7 @@ def run_lot_export(table, lot):
     )
 
     logger.info(f"Running query for table={table} lot={lot}")
-    _run_export(sql, out_key, f"{lot_dir}/{table}")
+    _run_export(sql, out_key, f"{lot_dir}/{table}", table=table)
 
 
 def run_wsm_export(table):
@@ -188,7 +215,7 @@ def run_wsm_export(table):
     )
 
     logger.info(f"Running WSM query for table={table}")
-    _run_export(sql, out_key, f"WSM/{table}")
+    _run_export(sql, out_key, f"WSM/{table}", table=table)
 
 
 def run_table_export(table):
