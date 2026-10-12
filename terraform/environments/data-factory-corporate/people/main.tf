@@ -10,7 +10,7 @@ locals {
 
 resource "aws_secretsmanager_secret" "external_account" {
   #checkov:skip=CKV2_AWS_57: "Secret holds a static external AWS account ID — rotation not applicable"
-  name        = "external-aws-account"
+  name        = "sherlock-external-aws-account"
   description = "AWS account permitted to assume the external role"
   kms_key_id  = module.sherlock_kms_key.key_arn
 
@@ -83,7 +83,7 @@ module "sherlock_logging_kms_key" {
 
 data "aws_secretsmanager_secret" "external_account_id" {
   count = local.enable_external_iam_role ? 1 : 0
-  name  = "external-aws-account"
+  name  = "sherlock-external-aws-account"
 }
 
 data "aws_secretsmanager_secret_version" "external_account_id" {
