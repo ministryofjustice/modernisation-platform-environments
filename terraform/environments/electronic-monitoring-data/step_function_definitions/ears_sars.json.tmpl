@@ -1,10 +1,20 @@
 {
-  "StartAt": "EarsSars",
+  "StartAt": "CaptureInitialRequest",
   "States": {
+    "CaptureInitialRequest": {
+      "Type": "Pass",
+      "Parameters": {
+        "initialRequest.$": "$"
+      },
+      "Next": "EarsSars"
+    },
     "EarsSars": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "OutputPath": "$.Payload",
+      "ResultSelector": {
+        "result.$": "$.Payload"
+      },
+      "ResultPath": "$.earsSars",
       "Parameters": {
         "FunctionName": "${ears_sars_request}",
         "Payload": {
@@ -25,7 +35,7 @@
             }
           },
           "isBase64Encoded": false,
-          "body.$": "States.JsonToString($)"
+          "body.$": "States.JsonToString($.initialRequest)"
         }
       },
       "Retry": [
@@ -41,10 +51,13 @@
     "WriteToSharepoint": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "OutputPath": "$.Payload",
+      "ResultSelector": {
+        "result.$": "$.Payload"
+      },
+      "ResultPath": "$.sharepoint",
       "Parameters": {
         "FunctionName": "${write_to_sharepoint}",
-        "Payload.$": "$"
+        "Payload.$": "$.earsSars.result"
       },
       "Retry": [
           {
@@ -62,9 +75,12 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "FunctionName": "${send_email}",
-        "Payload.$": "$",
-        "body.$": "States.JsonToString($)"
-
+        "Payload": {
+          "originalRequest.$": "$.initialRequest",
+          "earsSarsResult.$": "$.earsSars.result",
+          "sharepointResult.$": "$.sharepoint.result",
+          "body.$": "States.JsonToString($)"
+        }
       },
       "Retry": [
           {

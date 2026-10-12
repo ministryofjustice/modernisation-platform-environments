@@ -69,6 +69,97 @@ data "aws_iam_policy_document" "step_functions_common" {
   }
 
   statement {
+    sid       = "LaunchDisposableBuildInstances"
+    effect    = "Allow"
+    actions   = ["ec2:RunInstances"]
+    resources = ["arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:instance/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/ManagedBy"
+      values   = [local.build_instance_managed_by]
+    }
+  }
+
+  statement {
+    sid     = "UseBuildLaunchResources"
+    effect  = "Allow"
+    actions = ["ec2:RunInstances"]
+    resources = concat([
+      aws_launch_template.script_runner.arn,
+      aws_security_group.script_runner_task.arn,
+      "arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}::image/${data.aws_ssm_parameter.ecs_optimized_ami.value}",
+      "arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:volume/*",
+      "arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:network-interface/*",
+      ], [for subnet in data.terraform_remote_state.justice_eng_ai.outputs.private_subnet_ids :
+      "arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:subnet/${subnet}"
+    ])
+  }
+
+  statement {
+    sid       = "TagDisposableBuildInstances"
+    effect    = "Allow"
+    actions   = ["ec2:CreateTags"]
+    resources = ["arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:instance/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:CreateAction"
+      values   = ["RunInstances"]
+    }
+  }
+
+  statement {
+    sid       = "TerminateDisposableBuildInstances"
+    effect    = "Allow"
+    actions   = ["ec2:TerminateInstances"]
+    resources = ["arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:instance/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:ResourceTag/ManagedBy"
+      values   = [local.build_instance_managed_by]
+    }
+  }
+
+  statement {
+    sid       = "DescribeDisposableBuildInstances"
+    effect    = "Allow"
+    actions   = ["ec2:DescribeInstances"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "ListBuildContainerInstances"
+    effect    = "Allow"
+    actions   = ["ecs:ListContainerInstances"]
+    resources = [aws_ecs_cluster.script_runner.arn]
+  }
+
+  statement {
+    sid     = "DeregisterBuildContainerInstances"
+    effect  = "Allow"
+    actions = ["ecs:DeregisterContainerInstance"]
+    resources = [
+      aws_ecs_cluster.script_runner.arn,
+      "arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:container-instance/${local.application_name}-script-runner/*",
+    ]
+  }
+
+  statement {
+    sid       = "PassBuildInstanceRole"
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = [aws_iam_role.script_runner_ec2_instance.arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["ec2.amazonaws.com"]
+    }
+  }
+
+  statement {
     sid       = "StartChildStateMachines"
     effect    = "Allow"
     actions   = ["states:StartExecution"]
@@ -130,4 +221,82 @@ resource "aws_iam_role_policy" "step_functions_common" {
   name   = "${local.application_name}-step-functions-common"
   role   = aws_iam_role.step_functions_common.id
   policy = data.aws_iam_policy_document.step_functions_common.json
+}
+
+data "aws_iam_policy_document" "script_runner_common" {
+  statement {
+    sid       = "AuthenticateToEcr"
+    effect    = "Allow"
+    actions   = ["ecr:GetAuthorizationToken"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "PullForgeRuntimeBaseImage"
+    effect = "Allow"
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
+      "ecr:GetDownloadUrlForLayer",
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:ecr:${data.aws_region.current.region}:${local.environment_management.account_ids["core-shared-services-production"]}:repository/${local.application_data.accounts[local.environment].forge_runtime_base_ecr_repository_name}"]
+  }
+
+  statement {
+    sid    = "PushPrototypeImagesToSharedRepository"
+    effect = "Allow"
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:InitiateLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:CompleteLayerUpload",
+      "ecr:PutImage",
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:ecr:${data.aws_region.current.region}:${local.environment_management.account_ids["core-shared-services-production"]}:repository/${local.application_data.accounts[local.environment].ecr_repository_name}"]
+  }
+}
+
+data "aws_iam_policy_document" "step_functions_upload_trigger_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.staging_bucket_root_upload.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+resource "aws_iam_role" "step_functions_upload_trigger" {
+  name               = "${local.application_name}-upload-trigger"
+  assume_role_policy = data.aws_iam_policy_document.step_functions_upload_trigger_assume_role.json
+  tags               = local.tags
+}
+
+data "aws_iam_policy_document" "step_functions_upload_trigger" {
+  statement {
+    sid       = "StartRootWorkflow"
+    effect    = "Allow"
+    actions   = ["states:StartExecution"]
+    resources = [module.step_functions_root.arn]
+  }
+}
+
+resource "aws_iam_role_policy" "step_functions_upload_trigger" {
+  name   = "${local.application_name}-upload-trigger"
+  role   = aws_iam_role.step_functions_upload_trigger.id
+  policy = data.aws_iam_policy_document.step_functions_upload_trigger.json
 }

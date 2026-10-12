@@ -9,6 +9,7 @@ module "weblogic" {
   name              = "weblogic"
   create_service    = "false"
   env_name          = var.env_name
+  desired_count     = data.aws_ssm_parameter.weblogic_task_count.value
   account_config    = var.account_config
   account_info      = var.account_info
   capacity_provider = aws_ecs_capacity_provider.weblogic.name
@@ -71,39 +72,10 @@ module "weblogic" {
   tags          = var.tags
 }
 
-# Search for ami id
-data "aws_ami" "ecs_ami" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  # Amazon Linux 2023 optimised ECS instance
-  filter {
-    name   = "name"
-    values = ["al2023-ami-ecs-hvm-*"]
-  }
-
-  # correct arch
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  # Owned by Amazon
-  filter {
-    name   = "owner-alias"
-    values = ["amazon"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 resource "aws_launch_template" "weblogic" {
   #checkov:skip=CKV_AWS_341: "To Do: Test required hop limit"
   name_prefix   = "weblogic-${var.env_name}-ecs-"
-  image_id      = data.aws_ami.ecs_ami.id
+  image_id      = var.delius_microservice_configs.weblogic.ami_id
   instance_type = var.delius_microservice_configs.weblogic.ec2_instance_type
 
   user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", { ecs_cluster_name = module.ecs.ecs_cluster_name }))
@@ -225,21 +197,23 @@ resource "aws_ecs_capacity_provider" "weblogic" {
       target_capacity = 100
     }
 
-    managed_termination_protection = "ENABLED"
+    managed_termination_protection = var.enable_autoscaling_schedule ? "DISABLED" : "ENABLED"
   }
 }
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 61
+  priority     = 62
+
   condition {
     host_header {
       values = [
-        "ndelius.${var.env_name}.${var.account_config.dns_suffix}",
-        "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        var.env_name == "prod" ? "ndelius.probation.service.justice.gov.uk" : "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "ndelius.${var.env_name}.${var.account_config.dns_suffix}"
       ]
     }
   }
+
   condition {
     path_pattern {
       values = [
@@ -248,12 +222,12 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
       ]
     }
   }
+
   action {
     type             = "forward"
     target_group_arn = module.weblogic.target_group_arn
   }
 }
-
 
 locals {
   weblogic_cutover_envs = ["dev", "test", "stage", "preprod", "prod"]
@@ -314,13 +288,6 @@ resource "aws_lb_listener_certificate" "legacy_prod" {
 
 locals {
   weblogic_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic"
-  weblogic_task_count = {
-    dev     = 1
-    test    = 4
-    stage   = 2
-    preprod = 20
-    prod    = 30
-  }
 }
 
 module "ecs_nightly_restart_weblogic" {
@@ -330,5 +297,5 @@ module "ecs_nightly_restart_weblogic" {
   cluster_name = module.ecs.ecs_cluster_arn
   service_name = "${var.env_name}-weblogic"
   service_arn  = local.weblogic_service_arn
-  task_count   = local.weblogic_task_count[var.env_name]
+  task_count   = data.aws_ssm_parameter.weblogic_task_count.value
 }

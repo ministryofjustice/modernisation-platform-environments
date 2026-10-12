@@ -69,9 +69,13 @@ resource "aws_iam_policy" "data_cutback_step_function_policy" {
 data "aws_iam_policy_document" "ears_sars_policy_document" {
   count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   statement {
-    effect    = "Allow"
-    actions   = ["lambda:InvokeFunction"]
-    resources = [module.ears_sars_request[0].lambda_function_arn, module.write_to_sharepoint[0].lambda_function_arn, ]
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [
+      module.ears_sars_request[0].lambda_function_arn,
+      module.write_to_sharepoint[0].lambda_function_arn,
+      module.send_ear_sar_response[0].lambda_function_arn,
+    ]
   }
 }
 

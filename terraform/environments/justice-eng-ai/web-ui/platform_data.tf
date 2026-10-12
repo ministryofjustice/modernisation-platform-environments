@@ -86,6 +86,21 @@ data "terraform_remote_state" "core_network_services" {
   }
 }
 
+# Staging bucket exported by the sibling backend-processing root (same
+# account, same workspace), consumed as the var.forge_package_s3_bucket
+# fallback -- see local.forge_package_s3_bucket in locals.tf.
+data "terraform_remote_state" "backend_processing" {
+  backend   = "s3"
+  workspace = terraform.workspace
+
+  config = {
+    bucket               = "modernisation-platform-terraform-state"
+    key                  = "terraform.tfstate"
+    region               = "eu-west-2"
+    workspace_key_prefix = "environments/members/justice-eng-ai/backend-processing"
+  }
+}
+
 data "aws_organizations_organization" "root_account" {}
 
 # Retrieve information about the modernisation platform account
