@@ -1,6 +1,6 @@
 # Shared prototype edge
 
-The `justice-eng-ai/web-ui` component owns one CloudFront distribution and one
+The `justice-eng-ai/prototypes-infra` component owns one CloudFront distribution and one
 CloudFront-scope WAF web ACL per workspace as the default edge for static AI
 prototype builds. Static prototypes use separate subdomains and object prefixes
 in one private S3 bucket. Creating a prototype does not create another distribution,
@@ -8,16 +8,17 @@ ACL, certificate or DNS record.
 
 ## Configuration and Ownership
 
-The `web-ui` root uses the public
+The `prototypes-infra` root uses the public
 `modernisation-platform.service.justice.gov.uk` hosted zone already looked up
 through the `core-network-services` provider. It issues a wildcard ACM certificate
-in `us-east-1` in the `web-ui` account, where CloudFront is deployed, and writes
+in `us-east-1` in the `prototypes-infra` account, where CloudFront is deployed, and writes
 the DNS validation records and `*.ai-prototype` alias into the parent zone via
 `core-network-services`. The role must be able to change that zone's records. No
 hosted-zone ID or certificate ARN is copied into component config.
 
-The edge WAF reuses `var.allowed_ingress_cidrs` from the same `web-ui` root. There
-is no second CIDR list or cross-state output dependency. This means the prototypes
+The edge WAF uses this component's `allowed_ingress_cidrs` variable, which defaults
+to the same list as the `web-ui` builder ALB; keep the two in step. There
+is no cross-state output dependency. This means the prototypes
 share the Builder and Forge UI's existing MoJ GlobalProtect / Prisma Access access
 policy. Prototype IDs may begin with digits, as in `336344bc`.
 
@@ -28,15 +29,19 @@ subdomains, and exact DNS records take precedence. Static prototypes use separat
 subdomains and object prefixes in the private shared bucket.
 
 Run a reviewed plan and apply through the environments repository workflow in the
-matching `justice-eng-ai` `web-ui` workspace. The existing component backend
+matching `justice-eng-ai` `prototypes-infra` workspace. The existing component backend
 provides remote state and locking. The `shared_prototype_edge` output provides the shared bucket,
 distribution ID, WAF ARN, KeyValueStore ARN, and URL/prefix templates. Prototype
 IDs are not a Terraform list: the publishing workflow registers each build in the
 KeyValueStore using the full hostname as the key and its S3 prefix as the value.
 This allows hundreds of prototypes without growing or redeploying the routing
-function. Publishing those identifiers to SSM and granting scoped Application
-Builder permissions to update the KeyValueStore and its own S3 prefix remain
-follow-up integration work.
+function. In production only, the `ai-prototype-shared-edge-publisher` role lets the
+development `justice-eng-ai-script-runner-ecs-task` role write one tagged S3 prefix,
+register hostnames in the KeyValueStore and invalidate the distribution; its
+configuration is in the SSM parameter `/justice-eng-ai/shared-prototype-edge/publisher-config`.
+Granting the script-runner role permission to assume it, and calling it from the
+pipeline, remain follow-up integration work. The role's KeyValueStore write is not
+scoped to a single hostname, so only trusted pipeline code may use it.
 
 The bucket uses the Modernisation Platform S3 module with account-regional naming,
 BucketOwnerEnforced ownership, versioning and SSE-S3 (AES256), matching the existing
@@ -146,7 +151,7 @@ No AWS resources are created by these checks. Mock-provider tests require Terraf
 1.7 or later. Routing tests require Node.js and no additional packages.
 
 ```bash
-cd terraform/environments/justice-eng-ai/web-ui/shared-prototype-edge
+cd terraform/environments/justice-eng-ai/prototypes-infra/shared-prototype-edge
 terraform init -backend=false
 terraform test
 node tests/routing.js
@@ -159,7 +164,7 @@ engine:
 docker run --rm -v "$PWD:/work:ro" -w /work node:22-alpine node tests/routing.js /work
 ```
 
-Validate the actual component caller from `terraform/environments/justice-eng-ai/web-ui`
+Validate the actual component caller from `terraform/environments/justice-eng-ai/prototypes-infra`
 with `terraform init -backend=false` and `terraform validate`. Standalone module
 validation needs a caller to configure the aliased provider; the Terraform tests
 above supply mock providers and create no AWS resources.

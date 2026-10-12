@@ -1,7 +1,17 @@
+data "aws_partition" "current" {}
+
 locals {
   prototype_domain_name   = "ai-prototype.modernisation-platform.service.justice.gov.uk"
   prototype_bucket_prefix = "justice-eng-ai-prototypes"
   prototype_edge_enabled  = local.is-production
+
+  # ACM issues one validation CNAME shared by the apex and wildcard names.
+  prototype_validation_records = local.prototype_edge_enabled ? {
+    (local.prototype_domain_name) = one([
+      for option in aws_acm_certificate.prototypes[0].domain_validation_options : option
+      if option.domain_name == local.prototype_domain_name
+    ])
+  } : {}
 }
 
 resource "aws_acm_certificate" "prototypes" {
@@ -20,22 +30,13 @@ resource "aws_acm_certificate" "prototypes" {
 
 resource "aws_route53_record" "prototype_certificate_validation" {
   provider = aws.core-network-services
-  for_each = local.prototype_edge_enabled ? toset([local.prototype_domain_name]) : toset([])
+  for_each = local.prototype_validation_records
 
   zone_id         = data.aws_route53_zone.network-services.zone_id
-  name = one([
-    for option in aws_acm_certificate.prototypes[0].domain_validation_options :
-    option.resource_record_name if option.domain_name == each.key
-  ])
-  type = one([
-    for option in aws_acm_certificate.prototypes[0].domain_validation_options :
-    option.resource_record_type if option.domain_name == each.key
-  ])
+  name            = each.value.resource_record_name
+  type            = each.value.resource_record_type
   ttl             = 60
-  records = [one([
-    for option in aws_acm_certificate.prototypes[0].domain_validation_options :
-    option.resource_record_value if option.domain_name == each.key
-  ])]
+  records         = [each.value.resource_record_value]
   allow_overwrite = true
 }
 
@@ -76,7 +77,7 @@ data "aws_iam_policy_document" "prototype_publisher_trust" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["justice-eng-ai-development"]}:role/ai-prototype-deployment-publisher"
+        "arn:aws:iam::${local.environment_management.account_ids["justice-eng-ai-development"]}:role/justice-eng-ai-script-runner-ecs-task"
       ]
     }
     condition {
