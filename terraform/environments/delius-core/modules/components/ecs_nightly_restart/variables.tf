@@ -26,5 +26,5 @@ variable "task_count" {
 variable "restart_schedule" {
   description = "The cron expression for the nightly restart schedule"
   type        = string
-  default     = "cron(15 02 * * *)" # 02:15 every day
+  default     = "cron(15 02 * * ? *)" # 02:15 every day
 }
