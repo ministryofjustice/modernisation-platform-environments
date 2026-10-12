@@ -1,5 +1,17 @@
 locals {
   development = {
+    products-poc = {
+      "/uploads/" = {
+        # The notification component retains the clean copy for this API trial.
+        action = null
+        notifications = {
+          email = null
+          slack = "products-poc-slack-test"
+          teams = null
+        }
+      }
+    }
+
     dms1981 = {
       "/" = {
         action = {
