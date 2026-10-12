@@ -4,7 +4,7 @@
 resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
   family             = "${local.adaptor_app_name}-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "bridge"
+  network_mode       = "awsvpc"
   requires_compatibilities = [
     "EC2",
   ]
@@ -76,6 +76,11 @@ resource "aws_ecs_service" "ecs_adaptor_service" {
     type  = "spread"
   }
 
+  network_configuration {
+    security_groups = [aws_security_group.ecs_tasks_adaptor.id]
+    subnets         = data.aws_subnets.shared-private.ids
+  }
+  
   load_balancer {
     target_group_arn = aws_lb_target_group.adaptor_target_group.id
     container_name   = "${local.adaptor_app_name}-container"
