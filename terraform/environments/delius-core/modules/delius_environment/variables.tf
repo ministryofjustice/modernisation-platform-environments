@@ -134,3 +134,9 @@ variable "enable_autoscaling_schedule" {
   type        = bool
   default     = false
 }
+
+variable "restart_schedule" {
+  description = "The cron expression for the nightly restart schedule"
+  type        = string
+  default     = "cron(15 02 * * ? *)" # 02:15 every day
+}

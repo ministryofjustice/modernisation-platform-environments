@@ -350,6 +350,27 @@ resource "aws_cloudwatch_metric_alarm" "ecs_desired-task-count-warning" {
   tags = merge(var.tags, { "app" = var.name })
 }
 
+# Mute Alarm during nightly refresh of Weblogic ECS tasks
+resource "aws_cloudwatch_alarm_mute_rule" "ecs_refresh" {
+  count = contains(["weblogic", "weblogic-eis"], var.name) ? 1 : 0
+  name        = "${var.name}-${var.env_name}-desired-task-count-warning-mute"
+  description = "Mute ECS task-count alarms during nightly refresh"
+
+  rule {
+    schedule {
+      expression = var.restart_schedule
+      duration = "PT30M" # Mute for 30 minutes
+      timezone = "Europe/London"
+    }
+  }
+
+  mute_targets {
+    alarm_names = [
+      aws_cloudwatch_metric_alarm.ecs_desired-task-count-warning.alarm_name
+    ]
+  }
+}
+
 ######################################
 ###      Target Group Alarms       ###
 ######################################

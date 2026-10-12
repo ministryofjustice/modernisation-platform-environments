@@ -22,3 +22,9 @@ variable "task_count" {
   description = "The desired task count for the ECS service"
   type        = number
 }
+
+variable "restart_schedule" {
+  description = "The cron expression for the nightly restart schedule"
+  type        = string
+  default     = "cron(15 02 * * ? *)" # 02:15 every day
+}

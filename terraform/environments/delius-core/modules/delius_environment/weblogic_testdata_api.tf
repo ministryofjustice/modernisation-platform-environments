@@ -210,4 +210,5 @@ module "ecs_nightly_restart_weblogic_data" {
   service_name = "${var.env_name}-weblogic-data"
   service_arn  = local.weblogic_data_service_arn
   task_count   = data.aws_ssm_parameter.weblogic_data_task_count[0].value
+  restart_schedule = var.restart_schedule
 }
