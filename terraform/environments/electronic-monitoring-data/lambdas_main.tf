@@ -1627,7 +1627,7 @@ module "poll_dlt_iceberg_maintenance" {
     CATALOG_ID              = data.aws_caller_identity.current.account_id
     ENVIRONMENT_NAME        = local.env_name
     ATHENA_WORKGROUP        = aws_athena_workgroup.default.name
-    MAX_WAIT_SECONDS        = "1800"
+    MAX_WAIT_SECONDS        = "2700"
     MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
     MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
