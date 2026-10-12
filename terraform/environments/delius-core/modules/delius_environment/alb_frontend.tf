@@ -85,6 +85,20 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   tags              = merge(local.tags, { Name = "legacy-env-443" })
 }
 
+resource "aws_vpc_security_group_ingress_rule" "prod_alb_legacy_natgw_ing" {
+  for_each = var.env_name == "prod" ? {
+    for cidr in local.legacy_natgw_ips[var.env_name] : cidr => cidr
+  } : {}
+
+  description       = "allow ingress from legacy prod nat gateway to delius core frontend alb"
+  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+  cidr_ipv4         = each.value
+  from_port         = "443"
+  to_port           = "443"
+  ip_protocol       = "tcp"
+  tags              = merge(local.tags, { Name = "legacy-natgw-443" })
+}
+
 # Rule for uservision access in test
 resource "aws_vpc_security_group_ingress_rule" "test_alb_uservision_ingress" {
   count = var.env_name == "test" ? 1 : 0

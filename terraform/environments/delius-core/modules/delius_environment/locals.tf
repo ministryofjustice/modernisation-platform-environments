@@ -80,7 +80,11 @@ locals {
       "18.130.110.168/32",
       "35.178.44.184/32"
     ]
-    prod = null
+    prod = [
+      "52.56.115.146/32",
+      "35.178.104.253/32",
+      "35.177.47.45/32"
+    ]
   }
 
   secret_prefix           = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}"
