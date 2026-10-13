@@ -217,7 +217,7 @@ resource "aws_db_option_group" "database" {
   count = local.create_rds ? 1 : 0
 
   name                     = "${local.application_name}-${local.environment}-database"
-  option_group_description = "SQL Server native backup and restore from the shared artifacts bucket"
+  option_group_description = "SQL Server native backup and restore from the London Unpaid Work artifacts bucket"
   engine_name              = "sqlserver-se"
   major_engine_version     = "15.00"
 
