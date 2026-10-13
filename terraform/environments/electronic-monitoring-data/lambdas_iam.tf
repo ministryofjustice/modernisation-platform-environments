@@ -4150,3 +4150,88 @@ resource "aws_iam_role_policy" "dlt_iceberg_maintenance_start" {
   role   = aws_iam_role.dlt_iceberg_maintenance_events.id
   policy = data.aws_iam_policy_document.dlt_iceberg_maintenance_start.json
 }
+
+# register athena role
+
+resource "aws_iam_role" "register_athena" {
+  count              = local.is-production ? 0 : 1
+  name               = "register_athena_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "register_athena_policy_document" {
+  count = local.is-production ? 0 : 1
+  statement {
+    sid       = "ListS3Bucket"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [module.raw_formatted_data_bucket.bucket.arn]
+
+  }
+  statement {
+    sid    = "ReadS3"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = ["${module.raw_formatted_data_bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid     = "GetDbs"
+    effect  = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:CreateTable",
+    ]
+    resources = [
+      aws_glue_catalog_database.person_record.arn,
+      aws_glue_catalog_database.cemo.arn,
+    ]
+  }
+  statement {
+    sid      = "UpdateGlue"
+    effect   = "Allow"
+    actions  = [
+      "glue:GetTable",
+      "glue:UpdateTable",
+    ]
+    resources = [
+      "${replace(aws_glue_catalog_database.person_record.arn, ":database/", ":table/")}/*",
+      "${replace(aws_glue_catalog_database.cemo.arn, ":database/", ":table/")}/*",
+    ]
+  }
+}
+
+
+resource "aws_iam_policy" "register_athena" {
+  count  = local.is-test ? 0 : 1
+  name   = "register_athena_policy"
+  policy = data.aws_iam_policy_document.register_athena_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "register_athena" {
+  count      = local.is-test ? 0 : 1
+  role       = aws_iam_role.register_athena[0].name
+  policy_arn = aws_iam_policy.register_athena[0].arn
+}
+
+resource "aws_lakeformation_permissions" "api_int_db_level_perms" {
+  for_each = tomap([aws_glue_catalog_database.person_record.name, aws_glue_catalog_database.cemo.name])
+  permissions = ["DESCRIBE", "CREATE_TABLE"]
+  principal = aws_iam_role.register_athena.arn
+
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
+  for_each = tomap([aws_glue_catalog_database.person_record.name, aws_glue_catalog_database.cemo.name])
+  permissions = ["ALTER", "DESCRIBE"]
+  principal = aws_iam_role.register_athena.arn
+
+  table {
+    database_name = each.value
+    wildcard = true
+  }
+}
