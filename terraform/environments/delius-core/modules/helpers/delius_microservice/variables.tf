@@ -686,3 +686,9 @@ variable "log_retention" {
   description = "Number of days to retain the logs"
   default     = 7
 }
+
+variable "restart_schedule" {
+  description = "The cron expression for the nightly restart schedule"
+  type        = string
+  default     = "cron(15 02 * * *)" # 02:15 every day
+}
