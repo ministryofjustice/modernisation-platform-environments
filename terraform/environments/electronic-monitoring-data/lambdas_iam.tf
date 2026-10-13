@@ -3949,7 +3949,7 @@ data "aws_iam_policy_document" "trigger_dlt_iceberg_maintenance" {
       "athena:StartQueryExecution",
       "athena:GetWorkGroup",
     ]
-    resources = [aws_athena_workgroup.default.arn]
+    resources = [aws_athena_workgroup.dlt_iceberg_maintenance.arn]
   }
 
   statement {
@@ -3974,7 +3974,7 @@ data "aws_iam_policy_document" "trigger_dlt_iceberg_maintenance" {
   }
 
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["s3:GetBucketLocation"]
     resources = [
       module.s3-create-a-derived-table-bucket.bucket.arn,
@@ -4017,7 +4017,7 @@ data "aws_iam_policy_document" "trigger_dlt_iceberg_maintenance" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["output", "output/*"]
+      values   = ["output/dlt_iceberg_maintenance", "output/dlt_iceberg_maintenance/*"]
     }
   }
 
@@ -4029,7 +4029,7 @@ data "aws_iam_policy_document" "trigger_dlt_iceberg_maintenance" {
       "s3:GetObject",
       "s3:PutObject",
     ]
-    resources = ["${module.s3-athena-bucket.bucket.arn}/output/*"]
+    resources = ["${module.s3-athena-bucket.bucket.arn}/output/dlt_iceberg_maintenance/*"]
   }
 
   statement {
@@ -4064,7 +4064,7 @@ data "aws_iam_policy_document" "poll_dlt_iceberg_maintenance" {
       "athena:BatchGetQueryExecution",
       "athena:StopQueryExecution",
     ]
-    resources = [aws_athena_workgroup.default.arn]
+    resources = [aws_athena_workgroup.dlt_iceberg_maintenance.arn]
   }
 }
 
