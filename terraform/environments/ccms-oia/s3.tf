@@ -14,7 +14,7 @@ module "s3_ccms_oia" {
   }
   manage_log_bucket_policy = false
 
-  log_prefix = "s3access/${local.application_name}-${local.environment}/"
+  log_prefix                = "s3access/${local.application_name}-${local.environment}/"
   log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
@@ -164,7 +164,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         "Principal" : "*",
         "Action" : "s3:*",
         "Resource" : [
-          "${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        "${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
         "Condition" : {
           "Bool" : {
             "aws:SecureTransport" : "false"
@@ -255,7 +255,7 @@ module "s3-bucket-shared" {
   }
   manage_log_bucket_policy = false
 
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared/"
+  log_prefix                = "s3access/${local.application_name}-${local.environment}-shared/"
   log_partition_date_source = "EventTime"
 
   # Refer to the below section "Replication" before enabling replication
@@ -301,7 +301,7 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         "Effect" : "Deny",
         "Principal" : "*",
         "Action" : "s3:*",
-        "Resource" : ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        "Resource" : ["${module.s3-bucket-shared.bucket.arn}/*", module.s3-bucket-shared.bucket.arn],
         "Condition" : {
           "Bool" : {
             "aws:SecureTransport" : "false"
@@ -315,7 +315,7 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
           AWS = "*"
         },
         Action   = "s3:*",
-        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", module.s3-bucket-shared.bucket.arn],
         Condition = {
           Bool = {
             "aws:SecureTransport" = "false"
