@@ -121,7 +121,7 @@ resource "aws_launch_template" "ec2_launch_template_conn_saa" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template-conn_saa.rendered)
+  user_data = base64encode(data.template_file.launch-template-conn-saa.rendered)
 
   tag_specifications {
     resource_type = "instance"

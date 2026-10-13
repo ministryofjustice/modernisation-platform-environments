@@ -31,7 +31,7 @@ resource "aws_ecs_capacity_provider" "capacity_provider_conn_saa" {
   name = "${local.first_cluster_name}-capacity-provider"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn         = aws_autoscaling_group.conn_saa_opa_cluster_scaling_group.arn
+    auto_scaling_group_arn         = aws_autoscaling_group.conn_saa_cluster_scaling_group.arn
     managed_termination_protection = "ENABLED"
 
     # Lets ECS automatically scale the ASG out (up to ec2_max_size) when

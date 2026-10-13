@@ -75,7 +75,7 @@ resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_vpce" {
     data.aws_subnet.vpce_subnets_b.cidr_block,
     data.aws_subnet.vpce_subnets_c.cidr_block,
   ])
-  security_group_id = aws_security_group.cluster_ec2.id
+  security_group_id = aws_security_group.opa_cluster_ec2.id
   description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
   ip_protocol       = "tcp"
   from_port         = 443
@@ -84,7 +84,7 @@ resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_vpce" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "opa_cluster_oia_ec2_egress_s3" {
-  security_group_id = aws_security_group.cluster_ec2.id
+  security_group_id = aws_security_group.opa_cluster_ec2.id
   description       = "Allow S3 access via gateway endpoint (prefix list)"
   ip_protocol       = "tcp"
   from_port         = 443
@@ -98,7 +98,7 @@ resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_443" {
     data.aws_subnet.private_subnets_b.cidr_block,
     data.aws_subnet.private_subnets_c.cidr_block,
   ])
-  security_group_id = aws_security_group.cluster_ec2.id
+  security_group_id = aws_security_group.opa_cluster_ec2.id
   description       = "HTTPS"
   ip_protocol       = "tcp"
   from_port         = 443
@@ -108,7 +108,7 @@ resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_443" {
 
 resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_cp_443" {
 
-  security_group_id = aws_security_group.cluster_ec2.id
+  security_group_id = aws_security_group.opa_cluster_ec2.id
   description       = "EC2 egress to CP BC"
   ip_protocol       = "tcp"
   from_port         = 443
@@ -122,7 +122,7 @@ resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_mysql" {
     data.aws_subnet.data_subnets_b.cidr_block,
     data.aws_subnet.data_subnets_c.cidr_block,
   ])
-  security_group_id = aws_security_group.cluster_ec2.id
+  security_group_id = aws_security_group.opa_cluster_ec2.id
   description       = "MySQL"
   ip_protocol       = "tcp"
   from_port         = 3306
@@ -136,7 +136,7 @@ resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_1521" {
     data.aws_subnet.data_subnets_b.cidr_block,
     data.aws_subnet.data_subnets_c.cidr_block,
   ])
-  security_group_id = aws_security_group.cluster_ec2.id
+  security_group_id = aws_security_group.opa_cluster_ec2.id
   description       = "Allow egress to protected subnets"
   ip_protocol       = "tcp"
   from_port         = 1521
@@ -150,7 +150,7 @@ resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_1522" {
     data.aws_subnet.data_subnets_b.cidr_block,
     data.aws_subnet.data_subnets_c.cidr_block,
   ])
-  security_group_id = aws_security_group.cluster_ec2.id
+  security_group_id = aws_security_group.opa_cluster_ec2.id
   description       = "Allow egress to protected subnets on port 1522"
   ip_protocol       = "tcp"
   from_port         = 1522
@@ -189,7 +189,7 @@ resource "aws_vpc_security_group_egress_rule" "conn_saa_cluster_ec2_egress_vpce"
     data.aws_subnet.vpce_subnets_b.cidr_block,
     data.aws_subnet.vpce_subnets_c.cidr_block,
   ])
-  security_group_id = aws_security_group.second_cluster_ec2.id
+  security_group_id = aws_security_group.conn_saa_cluster_ec2.id
   description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
   ip_protocol       = "tcp"
   from_port         = 443
