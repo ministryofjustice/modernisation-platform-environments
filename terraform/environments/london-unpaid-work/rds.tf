@@ -153,11 +153,23 @@ data "aws_iam_policy_document" "rds_artifacts" {
   count = local.create_rds ? 1 : 0
 
   statement {
-    sid    = "ListSharedArtifactsBucket"
+    sid    = "GetSharedArtifactsBucketLocation"
     effect = "Allow"
 
     actions = [
       "s3:GetBucketLocation",
+    ]
+
+    resources = [
+      "arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001",
+    ]
+  }
+
+  statement {
+    sid    = "ListSharedDatabaseArtifacts"
+    effect = "Allow"
+
+    actions = [
       "s3:ListBucket",
     ]
 
