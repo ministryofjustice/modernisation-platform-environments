@@ -111,7 +111,9 @@ def format_export_csv(csv_data, table):
                 raise ValueError("inspection_date must not contain a timezone")
             if inspection_date.microsecond % 1000:
                 raise ValueError("inspection_date exceeds millisecond precision")
-            row[date_index] = inspection_date.isoformat(sep=" ", timespec="milliseconds")
+            row[date_index] = inspection_date.isoformat(
+                sep=" ", timespec="milliseconds"
+            )
         writer.writerow(row)
     return output.getvalue().encode("utf-8")
 
@@ -183,7 +185,7 @@ def run_lot_export(table, lot):
     lot_dir = LOT_DIR_MAP[lot]
     _, output_prefix = parse_s3_uri(S3_OUTPUT_PATH)
     export_date = datetime.now(timezone.utc).strftime("%Y%m%d")
-    
+
     out_key = (
         f"{output_prefix}/{lot_dir}/{table}_{export_date}.csv"
         if output_prefix
