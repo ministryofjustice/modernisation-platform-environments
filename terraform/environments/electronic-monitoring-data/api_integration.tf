@@ -193,7 +193,7 @@ resource "aws_lakeformation_permissions" "cemo_integration_curated_fms" {
   }
 }
 
-resource "aws_lakeformation_permissions" "cpr_integration_int_fms_tables" {
+resource "aws_lakeformation_permissions" "cemo_integration_curated_fms_tables" {
   principal   = module.emd_api_integration_role.iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
