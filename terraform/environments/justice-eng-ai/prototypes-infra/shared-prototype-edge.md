@@ -14,10 +14,11 @@ static prototypes at `<prototype-id>.ai-builder.modernisation-platform.service.j
 The `prototypes-infra` production workspace looks up the existing public
 `ai-builder.modernisation-platform.service.justice.gov.uk` zone owned by `web-ui`
 in the same account. It issues an ACM certificate in `us-east-1` for that zone
-and `*.ai-builder`, and writes the validation CNAME and wildcard alias directly
-into the delegated zone. Exact Builder and Forge records remain authoritative
-for their hostnames. No additional DNS delegation or copied hosted-zone ID is
-required.
+and `*.ai-builder`, reuses the validation CNAME maintained by `web-ui`, and
+writes the wildcard alias into the delegated zone. ACM validation CNAMEs are
+reusable across regions, and the `web-ui` Terraform state remains their owner.
+Exact Builder and Forge records remain authoritative for their hostnames. No
+additional DNS delegation or copied hosted-zone ID is required.
 
 The edge WAF uses this component's `allowed_ingress_cidrs` variable, which defaults
 to the same list as the `web-ui` builder ALB; keep the two in step. There

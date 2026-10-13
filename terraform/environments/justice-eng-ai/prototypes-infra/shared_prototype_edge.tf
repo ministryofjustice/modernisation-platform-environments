@@ -5,7 +5,7 @@ locals {
   prototype_bucket_prefix = "justice-eng-ai-prototypes"
   prototype_edge_enabled  = local.is-production
 
-  # ACM issues one validation CNAME shared by the apex and wildcard names.
+  # Reuse the stable validation CNAME already managed by web-ui.
   prototype_validation_records = local.prototype_edge_enabled ? {
     (local.prototype_domain_name) = one([
       for option in aws_acm_certificate.prototypes[0].domain_validation_options : option
@@ -28,23 +28,12 @@ resource "aws_acm_certificate" "prototypes" {
   }
 }
 
-resource "aws_route53_record" "prototype_certificate_validation" {
-  for_each = local.prototype_validation_records
-
-  zone_id         = data.aws_route53_zone.ai_builder[0].zone_id
-  name            = each.value.resource_record_name
-  type            = each.value.resource_record_type
-  ttl             = 60
-  records         = [each.value.resource_record_value]
-  allow_overwrite = true
-}
-
 resource "aws_acm_certificate_validation" "prototypes" {
   count = local.prototype_edge_enabled ? 1 : 0
 
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.prototypes[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.prototype_certificate_validation : record.fqdn]
+  validation_record_fqdns = [for option in values(local.prototype_validation_records) : option.resource_record_name]
 }
 
 module "shared-prototype-edge" {
