@@ -3,7 +3,9 @@ import os
 from datetime import datetime, timezone
 
 import boto3
-from aws_lambda_powertools import Logger
+from botocore.config import Config
+from aws_lambda_powertools import Logger, Metrics
+from aws_lambda_powertools.metrics import MetricUnit
 from aws_lambda_powertools.utilities.idempotency import (
     DynamoDBPersistenceLayer,
     IdempotencyConfig,
@@ -20,8 +22,14 @@ from dispatcher import (
 
 
 eventbridge = boto3.client("events")
+# Bounded so a DynamoDB stall in the best-effort latency lookup can't run into the Lambda timeout.
+dynamodb = boto3.client(
+    "dynamodb",
+    config=Config(connect_timeout=2, read_timeout=2, retries={"max_attempts": 2}),
+)
 secretsmanager = boto3.client("secretsmanager")
 logger = Logger(service="file-action-execution-requested-adapter")
+metrics = Metrics(service="file-action-execution-requested-adapter")
 persistence_layer = DynamoDBPersistenceLayer(
     table_name=os.environ["IDEMPOTENCY_TABLE"]
 )
@@ -48,6 +56,41 @@ def _eventbridge_entry(routed_file, detail, requested_at):
     }
 
 
+def _received_at(correlation_id):
+    """Return the time the file landed in incoming, from its STAGE record."""
+    item = dynamodb.get_item(
+        TableName=os.environ["WORKFLOW_IDEMPOTENCY_TABLE"],
+        ConsistentRead=True,
+        Key={
+            "concurrencyId": {"S": correlation_id},
+            "operation": {"S": "STAGE"},
+        },
+    ).get("Item")
+    if not item:
+        return None
+    if "received_at" in item:
+        return datetime.fromisoformat(item["received_at"]["S"].replace("Z", "+00:00"))
+    # Records written before received_at was stored: the claim time is within
+    # moments of the landing time.
+    if "created_at" in item:
+        return datetime.fromtimestamp(int(item["created_at"]["N"]), timezone.utc)
+    return None
+
+
+def _record_end_to_end_latency(correlation_id, published_at, log_context):
+    try:
+        received_at = _received_at(correlation_id)
+        if received_at is None:
+            logger.warning("No landing time found for latency", extra=log_context)
+            return
+        latency_seconds = max((published_at - received_at).total_seconds(), 0)
+        metrics.add_metric(
+            name="EndToEndLatency", unit=MetricUnit.Seconds, value=latency_seconds
+        )
+    except Exception:
+        logger.exception("Failed to record end-to-end latency", extra=log_context)
+
+
 def _publish(entry):
     response = eventbridge.put_events(Entries=[entry])
     if response.get("FailedEntryCount", 0) > 0:
@@ -59,6 +102,7 @@ def _publish(entry):
 
 
 @logger.inject_lambda_context(clear_state=True, log_event=False)
+@metrics.log_metrics
 @idempotent(
     persistence_store=persistence_layer,
     config=idempotency_config,
@@ -92,6 +136,9 @@ def lambda_handler(event, _context):
                 "No file action configuration matched",
                 extra=log_context,
             )
+            _record_end_to_end_latency(
+                routed_file.correlation_id, datetime.now(timezone.utc), log_context
+            )
             return {"eventId": None, "status": "NO_MATCH"}
 
         log_context.update(
@@ -109,6 +156,9 @@ def lambda_handler(event, _context):
                 "Matched file action configuration has no configured work",
                 extra=log_context,
             )
+            _record_end_to_end_latency(
+                routed_file.correlation_id, requested_at, log_context
+            )
             return {"eventId": None, "status": "NO_ACTIONS"}
 
         entry = _eventbridge_entry(routed_file, detail, requested_at)
@@ -120,6 +170,9 @@ def lambda_handler(event, _context):
         log_context["action_request"] = action_request
         event_id = _publish(entry)
         action_request["destination_event_id"] = event_id
+        _record_end_to_end_latency(
+            routed_file.correlation_id, requested_at, log_context
+        )
         logger.info(
             "Published file action execution request",
             extra=log_context,
