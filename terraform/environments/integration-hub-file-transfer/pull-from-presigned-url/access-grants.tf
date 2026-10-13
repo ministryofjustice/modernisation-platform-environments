@@ -1,9 +1,9 @@
 locals {
   access_grants_instance_arn = "arn:aws:s3:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:access-grants/default"
   pickup_grants = merge({}, [for id, recipient in local.recipients : {
-    for group in recipient.groups : "${id}/${group}" => {
+    for group, group_id in recipient.authorised_groups : "${id}/${group}" => {
       recipient_id = id
-      group_id     = module.pickup_configuration.assigned_groups[group]
+      group_id     = group_id
     }
   }]...)
 }

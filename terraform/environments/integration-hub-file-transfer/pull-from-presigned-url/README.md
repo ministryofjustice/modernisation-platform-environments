@@ -10,6 +10,13 @@ in Amazon Q Developer in chat applications (formerly AWS Chatbot). This is a
 one-time account setup; the Terraform module cannot perform the Slack OAuth step.
 AWS commands are disabled for this notification integration.
 
+Pickup recipients are configured beside their source prefixes in
+`modules/file-dispatch-configuration/locals-<environment>.tf`. The `pickup` block
+contains the recipient ID, authorised group IDs and Slack destination. Root keeps
+the existing Transfer web app identity configuration and application assignments.
+This component adds a `READ` grant for each configured group to its recipient's
+pickup directory; it does not expand the existing incoming-folder grant.
+
 Apply the root dispatch configuration before this component. After applying, upload
 a fresh harmless file through the API. Check the retained S3 copy, SNS publication
 and the actual Slack message. A `published` worker outcome confirms SNS accepted
