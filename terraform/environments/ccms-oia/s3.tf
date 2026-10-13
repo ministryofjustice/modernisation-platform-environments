@@ -339,5 +339,5 @@ resource "aws_s3_object" "folder" {
 
 moved {
   from = aws_s3_bucket_policy.lb_access_logs
-  to   = module.s3-bucket-logging.bucket_policy
+  to   = module.s3-bucket-logging.bucket_policy.policy
 }
