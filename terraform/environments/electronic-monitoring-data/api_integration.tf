@@ -157,18 +157,18 @@ resource "aws_glue_catalog_database" "cemo" {
   }
 }
 
-resource "aws_iam_policy" "emd_cpr_integration_policy" {
+resource "aws_iam_policy" "emd_api_integration_policy" {
   name_prefix = "emd-cpr-integrations"
   description = "Permissions for cpr integration."
-  policy      = data.aws_iam_policy_document.cpr_integration.json
+  policy      = data.aws_iam_policy_document.api_integration.json
 }
 
-resource "aws_iam_role_policy_attachment" "emd_cpr_integration_permissions" {
-  policy_arn = aws_iam_policy.emd_cpr_integration_policy.arn
+resource "aws_iam_role_policy_attachment" "emd_api_integration_permissions" {
+  policy_arn = aws_iam_policy.emd_api_integration_policy.arn
   role       = module.emd_api_integration_role.iam_role_name
 }
 
-resource "aws_lakeformation_permissions" "cpr_integration_int_fms" {
+resource "aws_lakeformation_permissions" "api_integration_int_fms" {
   principal   = module.emd_api_integration_role.iam_role_arn
   permissions = ["DESCRIBE"]
   database {
@@ -176,7 +176,7 @@ resource "aws_lakeformation_permissions" "cpr_integration_int_fms" {
   }
 }
 
-resource "aws_lakeformation_permissions" "cpr_integration_int_fms_tables" {
+resource "aws_lakeformation_permissions" "api_integration_int_fms_tables" {
   principal   = module.emd_api_integration_role.iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
