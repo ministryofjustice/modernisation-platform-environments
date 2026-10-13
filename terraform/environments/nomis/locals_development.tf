@@ -171,6 +171,10 @@ locals {
       })
 
       qa12c-nomis-web = merge(local.ec2_autoscaling_groups.qa12c-nomis-web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.autoscaling_group, {
+          desired_capacity = 0
+          max_size         = 0
+        })
         autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
@@ -407,6 +411,7 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.qa11g-nomis-web12.tags, {
+          instance-scheduling    = "skip-scheduling"
           nomis-environment      = "dev"
           oracle-db-name         = "qa11g"
           oracle-db-hostname-a   = "dev-nomis-db19c-1-a"

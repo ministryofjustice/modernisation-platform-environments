@@ -42,7 +42,7 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:soa-secrets*"]
+      "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:soa-secrets*"]
     }
   ]
 }
@@ -244,7 +244,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "secretsmanager:PutSecretValue",
                 "secretsmanager:CreateSecret"
           ],
-          "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:soa-secrets*"]
+          "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:soa-secrets*"]
         }
     ]
 }
@@ -419,7 +419,7 @@ data "aws_iam_policy_document" "rds_publish_to_sns" {
       test     = "ArnLike"
       variable = "aws:SourceArn"
       values = [
-        "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:${aws_db_instance.soa_db.identifier}"
+        "arn:aws:rds:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:db:${aws_db_instance.soa_db.identifier}"
       ]
     }
   }
