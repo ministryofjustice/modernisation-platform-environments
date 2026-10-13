@@ -11,12 +11,14 @@ terraform {
 }
 
 variable "configuration" {
-  description = "Shared static hosting configuration. Prototype hostnames are registered in the associated CloudFront KeyValueStore by the publishing workflow."
+  description = "Shared prototype edge configuration for CloudFront, WAF, and the private ALB origin."
   type = object({
     domain_name        = string
     hosted_zone_id     = string
     certificate_arn    = string
-    bucket_prefix      = string
+    name_prefix        = string
+    vpc_id             = string
+    private_subnet_ids = list(string)
     allowed_ipv4_cidrs = set(string)
   })
   nullable = false
@@ -27,11 +29,13 @@ variable "configuration" {
       length(split(".", var.configuration.domain_name)) > 1 &&
       alltrue([for label in split(".", var.configuration.domain_name) : can(regex("^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$", label))]) &&
       can(regex("^arn:aws:acm:us-east-1:[0-9]{12}:certificate/", var.configuration.certificate_arn)) &&
-      can(regex("^[a-z0-9]([a-z0-9-]{1,34}[a-z0-9])$", var.configuration.bucket_prefix)) &&
+      can(regex("^[a-z0-9]([a-z0-9-]{1,34}[a-z0-9])$", var.configuration.name_prefix)) &&
+      length(var.configuration.vpc_id) > 0 &&
+      length(var.configuration.private_subnet_ids) >= 2 &&
       length(var.configuration.allowed_ipv4_cidrs) > 0 &&
       alltrue([for cidr in var.configuration.allowed_ipv4_cidrs : can(cidrnetmask(cidr)) && try(tonumber(split("/", cidr)[1]) > 0, false)])
     )
-    error_message = "Supply a lowercase domain, a us-east-1 ACM certificate, a 3-36 character account-regional bucket prefix, and nonempty IPv4 CIDRs excluding 0.0.0.0/0."
+    error_message = "Supply a lowercase domain, a us-east-1 ACM certificate, a valid name prefix, a VPC with at least two private subnets, and nonempty IPv4 CIDRs excluding 0.0.0.0/0."
   }
 }
 
@@ -40,72 +44,123 @@ variable "tags" {
 }
 
 locals {
-  name = var.configuration.bucket_prefix
+  name = var.configuration.name_prefix
 }
 
-module "prototypes" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.2.0"
+resource "aws_security_group" "alb" {
+  name        = "${local.name}-prototype-alb"
+  description = "Allow the CloudFront VPC origin to reach the prototype ALB"
+  vpc_id      = var.configuration.vpc_id
+  tags        = var.tags
 
-  providers = {
-    aws                    = aws
-    aws.bucket-replication = aws
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_lb" "shared" {
+  name               = substr("${local.name}-alb", 0, 32)
+  internal           = true
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb.id]
+  subnets            = var.configuration.private_subnet_ids
+  tags               = var.tags
+}
+
+resource "aws_lb_listener" "shared" {
+  load_balancer_arn = aws_lb.shared.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "No prototype route found"
+      status_code  = "404"
+    }
+  }
+}
+
+resource "aws_cloudfront_vpc_origin" "shared" {
+  provider = aws.us_east_1
+
+  vpc_origin_endpoint_config {
+    name                   = "${local.name}-prototype-origin"
+    arn                    = aws_lb.shared.arn
+    http_port              = 80
+    https_port             = 443
+    origin_protocol_policy = "http-only"
+
+    origin_ssl_protocols {
+      items    = ["TLSv1.2"]
+      quantity = 1
+    }
   }
 
-  bucket_prefix      = local.name
-  bucket_namespace   = "account-regional"
-  ownership_controls = "BucketOwnerEnforced"
-  versioning_enabled = true
-  sse_algorithm      = "AES256"
-  force_destroy      = false
-
-  lifecycle_rule = [{
-    id      = "expire-noncurrent-prototype-versions"
-    enabled = "Enabled"
-    prefix  = ""
-    noncurrent_version_expiration = {
-      days = 30
-    }
-  }]
-
-  bucket_policy_v2 = [{
-    effect  = "Allow"
-    actions = ["s3:GetObject"]
-    principals = {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
-    conditions = [{
-      test     = "StringEquals"
-      variable = "AWS:SourceArn"
-      values   = [aws_cloudfront_distribution.shared.arn]
-    }]
-  }]
-
-  tags = var.tags
+  depends_on = [aws_lb_listener.shared]
 }
 
-resource "aws_cloudfront_origin_access_control" "prototypes" {
-  provider                          = aws.us_east_1
-  name                              = local.name
-  description                       = "Private shared static prototype origin"
-  origin_access_control_origin_type = "s3"
-  signing_behavior                  = "always"
-  signing_protocol                  = "sigv4"
+data "aws_security_group" "cloudfront_vpc_origin" {
+  filter {
+    name   = "group-name"
+    values = ["CloudFront-VPCOrigins-Service-SG"]
+  }
+
+  vpc_id = var.configuration.vpc_id
+
+  depends_on = [aws_cloudfront_vpc_origin.shared]
 }
 
-resource "aws_cloudfront_key_value_store" "prototypes" {
+resource "aws_vpc_security_group_ingress_rule" "cloudfront_vpc_origin" {
+  security_group_id            = aws_security_group.alb.id
+  referenced_security_group_id = data.aws_security_group.cloudfront_vpc_origin.id
+  description                  = "Allow the AWS-managed CloudFront VPC origin security group"
+  ip_protocol                  = "tcp"
+  from_port                    = 80
+  to_port                      = 80
+}
+
+resource "aws_cloudfront_cache_policy" "dynamic" {
   provider = aws.us_east_1
-  name     = "${local.name}-prototypes"
-  comment  = "Registered AI prototype hostnames and S3 prefixes"
+  name     = "${local.name}-dynamic"
+  comment  = "Disable caching for dynamic prototype applications"
+
+  min_ttl     = 0
+  default_ttl = 0
+  max_ttl     = 0
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    cookies_config {
+      cookie_behavior = "none"
+    }
+    headers_config {
+      header_behavior = "none"
+    }
+    query_strings_config {
+      query_string_behavior = "none"
+    }
+  }
 }
 
-resource "aws_cloudfront_function" "route" {
-  provider                     = aws.us_east_1
-  name                         = "${local.name}-route"
-  runtime                      = "cloudfront-js-2.0"
-  publish                      = true
-  code                         = file("${path.module}/route.js")
-  key_value_store_associations = [aws_cloudfront_key_value_store.prototypes.arn]
+resource "aws_cloudfront_origin_request_policy" "all_viewer" {
+  provider = aws.us_east_1
+  name     = "${local.name}-all-viewer"
+  comment  = "Forward host, headers, cookies, and query strings to prototype services"
+
+  cookies_config {
+    cookie_behavior = "all"
+  }
+  headers_config {
+    header_behavior = "allViewer"
+  }
+  query_strings_config {
+    query_string_behavior = "all"
+  }
 }
 
 resource "aws_wafv2_ip_set" "allowed" {
@@ -267,38 +322,39 @@ resource "aws_cloudfront_distribution" "shared" {
   enabled         = true
   is_ipv6_enabled = false
   aliases         = ["*.${var.configuration.domain_name}"]
-  comment         = "Shared static prototype edge"
+  comment         = "Shared dynamic prototype edge"
   price_class     = "PriceClass_100"
   web_acl_id      = aws_wafv2_web_acl.shared.arn
   tags            = var.tags
 
   origin {
-    domain_name              = module.prototypes.bucket.bucket_regional_domain_name
-    origin_id                = "shared-static"
-    origin_access_control_id = aws_cloudfront_origin_access_control.prototypes.id
+    domain_name = aws_lb.shared.dns_name
+    origin_id   = "prototype-alb"
+
+    vpc_origin_config {
+      vpc_origin_id            = aws_cloudfront_vpc_origin.shared.id
+      origin_keepalive_timeout = 5
+      origin_read_timeout      = 30
+    }
   }
 
   default_cache_behavior {
-    target_origin_id           = "shared-static"
+    target_origin_id           = "prototype-alb"
     viewer_protocol_policy     = "redirect-to-https"
-    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    allowed_methods            = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods             = ["GET", "HEAD"]
     compress                   = true
-    min_ttl                    = 0
-    default_ttl                = 300
-    max_ttl                    = 86400
+    cache_policy_id            = aws_cloudfront_cache_policy.dynamic.id
+    origin_request_policy_id   = aws_cloudfront_origin_request_policy.all_viewer.id
     response_headers_policy_id = aws_cloudfront_response_headers_policy.security.id
+  }
 
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
+  dynamic "custom_error_response" {
+    for_each = toset([400, 403, 404, 500, 502, 503, 504])
 
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.route.arn
+    content {
+      error_code            = custom_error_response.value
+      error_caching_min_ttl = 0
     }
   }
 
@@ -331,11 +387,10 @@ output "hosting" {
     distribution_id        = aws_cloudfront_distribution.shared.id
     distribution_arn       = aws_cloudfront_distribution.shared.arn
     web_acl_arn            = aws_wafv2_web_acl.shared.arn
-    bucket_name            = module.prototypes.bucket.id
-    bucket_arn             = module.prototypes.bucket.arn
+    load_balancer_arn      = aws_lb.shared.arn
+    listener_arn           = aws_lb_listener.shared.arn
+    vpc_origin_id          = aws_cloudfront_vpc_origin.shared.id
     domain_name            = var.configuration.domain_name
     prototype_url_template = "https://{prototype-id}.${var.configuration.domain_name}"
-    upload_prefix_template = "{prototype-id}/"
-    key_value_store_arn    = aws_cloudfront_key_value_store.prototypes.arn
   }
 }

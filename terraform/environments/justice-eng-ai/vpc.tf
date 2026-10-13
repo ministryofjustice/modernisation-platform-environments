@@ -39,7 +39,9 @@ locals {
   nacl_deny_vpc     = { rule_number = 900, rule_action = "deny", protocol = "-1", from_port = 0, to_port = 0, cidr_block = local.vpc_cidr }
   nacl_https        = { rule_number = 1000, rule_action = "allow", protocol = "tcp", from_port = 443, to_port = 443, cidr_block = "0.0.0.0/0" }
   nacl_ephemeral_in = { rule_number = 1000, rule_action = "allow", protocol = "tcp", from_port = 1024, to_port = 65535, cidr_block = "0.0.0.0/0" }
-  nacl_all_out      = { rule_number = 1000, rule_action = "allow", protocol = "-1", from_port = 0, to_port = 0, cidr_block = "0.0.0.0/0" }
+  # CloudFront VPC origins require stateless return traffic on ephemeral ports.
+  nacl_cloudfront_origin_return = { rule_number = 1000, rule_action = "allow", protocol = "tcp", from_port = 1024, to_port = 65535, cidr_block = "0.0.0.0/0" }
+  nacl_all_out                  = { rule_number = 1000, rule_action = "allow", protocol = "-1", from_port = 0, to_port = 0, cidr_block = "0.0.0.0/0" }
 
   # The NAT Gateway lives in the public subnets and re-maps outbound connections to
   # ephemeral source ports, so return traffic needs the ephemeral range allowed inbound
@@ -57,7 +59,7 @@ locals {
     private            = concat(local.nacl_peer_rules.private, [local.nacl_deny_vpc, local.nacl_https])
     data               = local.nacl_peer_rules.data
     public_prototypes  = concat(local.nacl_peer_rules.public_prototypes, [local.nacl_deny_vpc, local.nacl_all_out])
-    private_prototypes = local.nacl_peer_rules.private_prototypes
+    private_prototypes = concat(local.nacl_peer_rules.private_prototypes, [local.nacl_cloudfront_origin_return])
   }
 
   prototype_tiers = ["public_prototypes", "private_prototypes"]

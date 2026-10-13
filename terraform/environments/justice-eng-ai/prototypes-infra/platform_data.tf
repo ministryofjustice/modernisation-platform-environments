@@ -3,11 +3,32 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-# The production web-ui root owns this delegated zone in the same AWS account.
-data "aws_route53_zone" "ai_builder" {
-  count = local.is-production ? 1 : 0
+data "aws_vpc" "prototype" {
+  count = local.prototype_edge_enabled ? 1 : 0
 
-  name         = "ai-builder.modernisation-platform.service.justice.gov.uk."
+  tags = {
+    Name = "${local.application_name}-${local.environment}"
+  }
+}
+
+data "aws_subnets" "private_prototypes" {
+  count = local.prototype_edge_enabled ? 1 : 0
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.prototype[0].id]
+  }
+
+  tags = {
+    Name = "${local.application_name}-${local.environment}-private-prototypes-*"
+  }
+}
+
+# Each environment's web-ui root owns its ai-builder hosted zone in the same account.
+data "aws_route53_zone" "ai_builder" {
+  count = local.prototype_edge_enabled ? 1 : 0
+
+  name         = "${local.prototype_domain_name}."
   private_zone = false
 }
 

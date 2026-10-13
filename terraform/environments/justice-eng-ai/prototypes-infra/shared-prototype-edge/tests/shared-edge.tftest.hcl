@@ -10,7 +10,9 @@ variables {
     domain_name        = "ai-builder.modernisation-platform.service.justice.gov.uk"
     hosted_zone_id     = "Z123456789"
     certificate_arn    = "arn:aws:acm:us-east-1:123456789012:certificate/test"
-    bucket_prefix      = "shared-prototype-edge-test"
+    name_prefix        = "shared-prototype-edge-test"
+    vpc_id             = "vpc-0123456789abcdef0"
+    private_subnet_ids = ["subnet-a", "subnet-b", "subnet-c"]
     allowed_ipv4_cidrs = ["192.0.2.0/24"]
   }
 }
@@ -19,13 +21,8 @@ run "shared_hosting" {
   command = plan
 
   assert {
-    condition     = output.hosting.prototype_url_template == "https://{prototype-id}.ai-builder.modernisation-platform.service.justice.gov.uk" && output.hosting.upload_prefix_template == "{prototype-id}/"
-    error_message = "The shared edge must provide a URL and upload-prefix template for arbitrarily many registered prototypes."
-  }
-
-  assert {
-    condition     = length(aws_cloudfront_function.route.key_value_store_associations) == 1
-    error_message = "The stable routing function must read its prototype registry from CloudFront KeyValueStore."
+    condition     = output.hosting.prototype_url_template == "https://{prototype-id}.ai-builder.modernisation-platform.service.justice.gov.uk"
+    error_message = "The shared edge must provide the ai-builder preview URL template."
   }
 }
 
@@ -36,18 +33,24 @@ run "reject_unconfigured_hosting" {
       domain_name        = ""
       hosted_zone_id     = ""
       certificate_arn    = ""
-      bucket_prefix      = ""
+      name_prefix        = ""
+      vpc_id             = ""
+      private_subnet_ids = []
       allowed_ipv4_cidrs = []
     }
   }
   expect_failures = [var.configuration]
 }
 
-run "shared_registry_store" {
+run "shared_private_alb_origin" {
   command = plan
   assert {
-    condition     = aws_cloudfront_key_value_store.prototypes.name == "shared-prototype-edge-test-prototypes"
-    error_message = "The environment must provide one shared registry independent of the number of prototype builds."
+    condition = (
+      aws_lb.shared.internal &&
+      one(aws_lb_listener.shared.default_action).fixed_response[0].status_code == "404" &&
+      length(one(aws_cloudfront_distribution.shared.origin).vpc_origin_config) == 1
+    )
+    error_message = "CloudFront must use a private ALB VPC origin with a 404 default until a prototype host rule is installed."
   }
 }
 
@@ -58,7 +61,9 @@ run "reject_public_allowlist" {
       domain_name        = "ai-builder.modernisation-platform.service.justice.gov.uk"
       hosted_zone_id     = "Z123456789"
       certificate_arn    = "arn:aws:acm:us-east-1:123456789012:certificate/test"
-      bucket_prefix      = "shared-prototype-edge-test"
+      name_prefix        = "shared-prototype-edge-test"
+      vpc_id             = "vpc-0123456789abcdef0"
+      private_subnet_ids = ["subnet-a", "subnet-b", "subnet-c"]
       allowed_ipv4_cidrs = ["0.0.0.0/0"]
     }
   }
@@ -82,18 +87,13 @@ run "shared_security" {
     condition = (
       aws_cloudfront_distribution.shared.aliases == toset(["*.ai-builder.modernisation-platform.service.justice.gov.uk"]) &&
       length(aws_cloudfront_distribution.shared.origin) == 1 &&
-      length(aws_cloudfront_distribution.shared.custom_error_response) == 0 &&
-      one(aws_cloudfront_distribution.shared.default_cache_behavior[0].function_association).event_type == "viewer-request"
+      aws_cloudfront_vpc_origin.shared.vpc_origin_endpoint_config[0].origin_protocol_policy == "http-only"
     )
-    error_message = "All prototype subdomains must share one origin and rewrite before cache lookup, without a global error fallback."
+    error_message = "All prototype subdomains must share the CloudFront distribution and private ALB origin."
   }
 
   assert {
-    condition = (
-      module.prototypes.bucket.force_destroy == false &&
-      one(module.prototypes.bucket_server_side_encryption.rule).apply_server_side_encryption_by_default[0].sse_algorithm == "AES256" &&
-      aws_cloudfront_origin_access_control.prototypes.signing_behavior == "always"
-    )
-    error_message = "Prototype content must use the shared bucket module with SSE-S3 and non-destructive lifecycle settings."
+    condition     = aws_security_group.alb.vpc_id == var.configuration.vpc_id
+    error_message = "The private ALB must be created in the environment VPC."
   }
 }

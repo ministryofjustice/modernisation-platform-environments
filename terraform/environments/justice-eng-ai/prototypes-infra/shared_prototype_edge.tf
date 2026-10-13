@@ -1,9 +1,7 @@
-data "aws_partition" "current" {}
-
 locals {
-  prototype_domain_name   = "ai-builder.modernisation-platform.service.justice.gov.uk"
-  prototype_bucket_prefix = "justice-eng-ai-prototypes"
-  prototype_edge_enabled  = local.is-production
+  prototype_edge_enabled = local.is-production || local.is-development
+  prototype_domain_name  = local.is-production ? "ai-builder.modernisation-platform.service.justice.gov.uk" : "ai-builder-dev.modernisation-platform.service.justice.gov.uk"
+  prototype_name_prefix  = "justice-eng-ai-prototypes"
 
   # Reuse the stable validation CNAME already managed by web-ui.
   prototype_validation_records = local.prototype_edge_enabled ? {
@@ -49,116 +47,15 @@ module "shared-prototype-edge" {
     domain_name        = local.prototype_domain_name
     hosted_zone_id     = data.aws_route53_zone.ai_builder[0].zone_id
     certificate_arn    = aws_acm_certificate_validation.prototypes[0].certificate_arn
-    bucket_prefix      = local.prototype_bucket_prefix
+    name_prefix        = local.prototype_name_prefix
+    vpc_id             = data.aws_vpc.prototype[0].id
+    private_subnet_ids = data.aws_subnets.private_prototypes[0].ids
     allowed_ipv4_cidrs = toset(var.allowed_ingress_cidrs)
   }
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "prototype_publisher_trust" {
-  count = local.prototype_edge_enabled ? 1 : 0
-
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole", "sts:TagSession"]
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["justice-eng-ai-development"]}:role/justice-eng-ai-script-runner-ecs-task"
-      ]
-    }
-    condition {
-      test     = "ForAllValues:StringEquals"
-      variable = "aws:TagKeys"
-      values   = ["prototype-id"]
-    }
-    condition {
-      test     = "Null"
-      variable = "aws:RequestTag/prototype-id"
-      values   = ["false"]
-    }
-  }
-}
-
-resource "aws_iam_role" "prototype_publisher" {
-  count              = local.prototype_edge_enabled ? 1 : 0
-  name               = "ai-prototype-shared-edge-publisher"
-  assume_role_policy = data.aws_iam_policy_document.prototype_publisher_trust[0].json
-  tags               = local.tags
-}
-
-data "aws_iam_policy_document" "prototype_publisher" {
-  count = local.prototype_edge_enabled ? 1 : 0
-
-  statement {
-    sid       = "ListOnlyPrototypePrefix"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = ["arn:${data.aws_partition.current.partition}:s3:::${module.shared-prototype-edge[0].hosting.bucket_name}"]
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-      values   = ["&{aws:PrincipalTag/prototype-id}/", "&{aws:PrincipalTag/prototype-id}/*"]
-    }
-  }
-
-  statement {
-    sid       = "PublishToPrototypePrefix"
-    effect    = "Allow"
-    actions   = ["s3:PutObject", "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts"]
-    resources = ["${module.shared-prototype-edge[0].hosting.bucket_arn}/&{aws:PrincipalTag/prototype-id}/*"]
-  }
-
-  statement {
-    sid       = "RegisterPrototypeHostname"
-    effect    = "Allow"
-    actions   = ["cloudfront-keyvaluestore:DescribeKeyValueStore", "cloudfront-keyvaluestore:PutKey"]
-    resources = [module.shared-prototype-edge[0].hosting.key_value_store_arn]
-  }
-
-  statement {
-    sid       = "ReadPublisherConfiguration"
-    effect    = "Allow"
-    actions   = ["ssm:GetParameter"]
-    resources = [aws_ssm_parameter.prototype_publisher_config[0].arn]
-  }
-
-  statement {
-    sid       = "InvalidatePrototypePrefix"
-    effect    = "Allow"
-    actions   = ["cloudfront:CreateInvalidation"]
-    resources = [module.shared-prototype-edge[0].hosting.distribution_arn]
-  }
-}
-
-resource "aws_iam_role_policy" "prototype_publisher" {
-  count  = local.prototype_edge_enabled ? 1 : 0
-  name   = "publish-ai-prototypes"
-  role   = aws_iam_role.prototype_publisher[0].id
-  policy = data.aws_iam_policy_document.prototype_publisher[0].json
-}
-
-resource "aws_ssm_parameter" "prototype_publisher_config" {
-  count = local.prototype_edge_enabled ? 1 : 0
-
-  name        = "/justice-eng-ai/shared-prototype-edge/publisher-config"
-  description = "Non-secret shared edge values read by the static prototype publisher."
-  type        = "String"
-  value = jsonencode({
-    bucket_name         = module.shared-prototype-edge[0].hosting.bucket_name
-    domain_name         = module.shared-prototype-edge[0].hosting.domain_name
-    distribution_id     = module.shared-prototype-edge[0].hosting.distribution_id
-    key_value_store_arn = module.shared-prototype-edge[0].hosting.key_value_store_arn
-  })
-  tags = local.tags
-}
-
 output "shared_prototype_edge" {
-  description = "Shared CloudFront and WAF hosting details; only populated in the production workspace."
+  description = "Shared CloudFront, WAF and private ALB details for prototype routing; populated in development and production."
   value       = local.prototype_edge_enabled ? module.shared-prototype-edge[0].hosting : null
-}
-
-output "shared_prototype_publisher_role_arn" {
-  description = "Role assumed by the development prototype deployment workflow to publish a single registered prototype."
-  value       = local.prototype_edge_enabled ? aws_iam_role.prototype_publisher[0].arn : null
 }

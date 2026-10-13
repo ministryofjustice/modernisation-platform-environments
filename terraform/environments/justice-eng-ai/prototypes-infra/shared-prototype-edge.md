@@ -1,24 +1,23 @@
 # Shared prototype edge
 
-The `justice-eng-ai/prototypes-infra` component owns one CloudFront distribution and one
-CloudFront-scope WAF web ACL per workspace as the default edge for static AI
-prototype builds. Static prototypes use separate subdomains and object prefixes
-in one private S3 bucket. Creating a prototype does not create another distribution,
-ACL, certificate or DNS record.
+The `justice-eng-ai/prototypes-infra` component owns one CloudFront distribution,
+CloudFront-scope WAF web ACL, and private ALB in each development and production
+workspace. Prototype subdomains route through the ALB to independently deployed
+ECS/Fargate services. Creating a prototype does not create another distribution,
+WAF ACL, or ALB.
 
 ## Configuration and Ownership
 
 The Builder is served at `ai-builder.modernisation-platform.service.justice.gov.uk`,
 Forge at `forge.ai-builder.modernisation-platform.service.justice.gov.uk`, and
-static prototypes at `<prototype-id>.ai-builder.modernisation-platform.service.justice.gov.uk`.
-The `prototypes-infra` production workspace looks up the existing public
-`ai-builder.modernisation-platform.service.justice.gov.uk` zone owned by `web-ui`
-in the same account. It issues an ACM certificate in `us-east-1` for that zone
-and `*.ai-builder`, reuses the validation CNAME maintained by `web-ui`, and
-writes the wildcard alias into the delegated zone. ACM validation CNAMEs are
-reusable across regions, and the `web-ui` Terraform state remains their owner.
-Exact Builder and Forge records remain authoritative for their hostnames. No
-additional DNS delegation or copied hosted-zone ID is required.
+dynamic prototypes at `<prototype-id>.ai-builder.modernisation-platform.service.justice.gov.uk`.
+Each workspace uses its existing public hosted zone: `ai-builder-dev...` in
+development and `ai-builder...` in production. The component issues a wildcard
+ACM certificate in `us-east-1`, reuses the validation CNAME already maintained
+by that workspace's `web-ui` component, and writes the wildcard alias into the
+same delegated zone. Exact Builder and Forge records remain authoritative for
+their hostnames. The ALB is internal and receives traffic through a CloudFront
+VPC origin; this requires no VPC RAM share or networking tfvars configuration.
 
 The edge WAF uses this component's `allowed_ingress_cidrs` variable, which defaults
 to the same list as the `web-ui` builder ALB; keep the two in step. There
@@ -26,49 +25,32 @@ is no cross-state output dependency. This means the prototypes
 share the Builder and Forge UI's existing MoJ GlobalProtect / Prisma Access access
 policy. Prototype IDs may begin with digits, as in `336344bc`.
 
-The bucket prefix is `justice-eng-ai-prototypes`; the bucket module appends the
-AWS account and region to make the final name unique. Builder and Forge keep their
-existing exact DNS records; the wildcard record serves registered prototype
-subdomains, and exact DNS records take precedence. Static prototypes use separate
-subdomains and object prefixes in the private shared bucket.
+Builder remains at `ai-builder-dev...` / `ai-builder...`; Forge remains at
+`forge.ai-builder-dev...` / `forge.ai-builder...`. Prototype previews use
+`<AppID>.ai-builder-dev...` or `<AppID>.ai-builder...`. Exact Builder and Forge
+records take precedence over the wildcard. CloudFront forwards the viewer host,
+cookies, query strings, and headers to the ALB with caching disabled.
 
 Run a reviewed plan and apply through the environments repository workflow in the
 matching `justice-eng-ai` `prototypes-infra` workspace. The existing component backend
-provides remote state and locking. The `shared_prototype_edge` output provides the shared bucket,
-distribution ID, WAF ARN, KeyValueStore ARN, and URL/prefix templates. Prototype
-IDs are not a Terraform list: the publishing workflow registers each build in the
-KeyValueStore using the full hostname as the key and its S3 prefix as the value.
-This allows hundreds of prototypes without growing or redeploying the routing
-function. In production only, the `ai-prototype-shared-edge-publisher` role lets the
-development `justice-eng-ai-script-runner-ecs-task` role write one tagged S3 prefix,
-register hostnames in the KeyValueStore and invalidate the distribution; its
-configuration is in the SSM parameter `/justice-eng-ai/shared-prototype-edge/publisher-config`.
-Granting the script-runner role permission to assume it, and calling it from the
-pipeline, remain follow-up integration work. The role's KeyValueStore write is not
-scoped to a single hostname, so only trusted pipeline code may use it.
-
-The bucket uses the Modernisation Platform S3 module with account-regional naming,
-BucketOwnerEnforced ownership, versioning and SSE-S3 (AES256), matching the existing
-static-origin encryption. Its policy allows object reads only from this
-CloudFront distribution's OAC and enforces TLS. Noncurrent object versions expire
-after 30 days; current prototype files are not expired automatically. Destroying
-the module does not delete bucket contents.
+provides remote state and locking. The `shared_prototype_edge` output exposes the
+CloudFront distribution/WAF and shared ALB/listener details needed by per-prototype
+infrastructure. The common ALB returns 404 until a prototype-specific host rule
+and target group are installed.
 
 ## Routing and isolation
 
-- Wildcard Route53 DNS points to the shared distribution. The bare parent domain
+- Wildcard Route 53 DNS points preview subdomains to CloudFront. The base zone
   is not published. Exact Builder and Forge records in the same zone take
-  precedence over this wildcard.
-- A viewer-request CloudFront function accepts only registered hostnames and
-  rewrites `/assets/main.css` on
-  `336344bc.ai-builder.modernisation-platform.service.justice.gov.uk` to
-  `/336344bc/assets/main.css` before cache lookup. Prototype prefixes therefore
-  separate cache entries, even though viewer Host is not in the cache key.
-- `/` and directory URLs map to `index.html` within that prototype's prefix.
-  There is no global SPA fallback; missing objects retain their error status.
-- Unknown hosts and malformed or traversal paths return 404 without reaching S3.
-- S3 has public access blocked and grants read access only to this distribution
-  through signed origin access control. Deployment roles still need scoped writes.
+  precedence over the wildcard.
+- The CloudFront VPC origin connects to the private ALB. The ALB security group
+  accepts traffic from AWS's CloudFront VPC-origin security group only.
+- CloudFront disables caching and forwards viewer headers, cookies, and query
+  strings so dynamic application sessions and host-based routing work.
+- The ALB default listener returns 404 for unmatched hosts. Per-prototype
+  listener rules forward each `<AppID>` host to its ECS target group.
+- CloudFront does not cache 4xx/5xx responses, so deployment and application
+  failures are returned to the caller rather than masked by the shared edge.
 - Only IPv4 access is published. WAF blocks clients outside the allowed CIDRs
   before applying common-threat and known-bad-input managed rules. Allowed IPs do
   not bypass those security rules. A shared per-IP limit is 2,000 requests per
@@ -82,91 +64,41 @@ authentication. Keep prototype cookies host-only; never set a shared parent-doma
 cookie. Do not host sensitive data or untrusted multi-tenant workloads here without
 the appropriate authentication, authorisation, retention and content policies.
 
-The hostname registry lives in CloudFront KeyValueStore, separate from function
-code. Register a prototype by writing
-`336344bc.ai-builder.modernisation-platform.service.justice.gov.uk` as the key
-and `336344bc` as the value. Retire it by deleting that key. KVS updates propagate
-to CloudFront edge locations, so the publisher must handle propagation before
-reporting a new preview as ready. Adding or removing hostnames does not redeploy
-the function or distribution. Never manage this distribution from multiple
-Terraform states.
+## Per-prototype deployment
 
-## Publish and retire
-
-1. The publishing workflow registers the approved hostname in the shared
-   KeyValueStore through its authenticated AWS API. Do not derive S3 prefixes from
-   untrusted viewer headers or let builds change other infrastructure.
-2. Upload the static bundle, with an `index.html` at its root, to the registered
-   output prefix:
-
-   ```bash
-   aws s3 sync ./build/application/ s3://YOUR-SHARED-BUCKET/336344bc/
-   aws cloudfront create-invalidation \
-     --distribution-id YOUR-SHARED-DISTRIBUTION-ID \
-    --paths '/336344bc/*'
-   ```
-
-   Restrict the publisher's S3 permissions to its assigned prefix. Serve assets
-   from the prototype hostname, not the bucket URL. Cookies and query strings are
-   not forwarded to S3; this is static hosting, not a backend or authenticated API.
-
-3. Verify the subdomain, assets, denied networks, direct S3 denial and separation
-   between two prototype hostnames before sharing the URL.
-4. Retire a prototype by removing its hostname from the registry first. The
-   viewer-request rejection also runs before serving cached objects. Then delete
-   its objects and versions according to retention policy. This module retains
-   bucket contents and does not force-delete them on destroy.
-
-For migration, publish and verify content on the shared edge before moving users.
-An exact existing DNS record takes precedence over the wildcard; remove or update
-it deliberately. An alias already attached to an old CloudFront distribution must
-be transferred using AWS's supported alternate-domain migration process before
-cutover. Retain old endpoints for rollback until the new route is verified, then
-remove per-prototype edge resources from their owning Terraform states.
+The shared edge is only the common front door. Follow-up deployment infrastructure
+will create an ECS/Fargate cluster and service, target group, and host-based ALB
+listener rule for each AppID. The deployment workflow must allocate unique listener
+priorities, test the generated infrastructure and app, and remove a prototype's
+rule and compute resources when retired. The common CloudFront/WAF/ALB resources
+remain in `prototypes-infra` and must not be managed by generated per-prototype
+Terraform.
 
 ## Generation and Forge integration gates
 
-This change provides shared **static hosting**, not an automatic migration of the
-inherited deployment pipeline. The legacy infrastructure generation prompt and
-example still request per-prototype CloudFront and WAF. All AI prototype builds
-must use the shared edge; the legacy per-prototype edge flow is not a supported
-fallback. The build handoff must publish bundles to the assigned S3 prefix and
-register approved hostnames in KVS, while policy validation rejects generated edge
-resources. That integration remains outstanding; this infrastructure alone does
-not redirect existing builds. Keep generated application state separate from the
-shared edge state.
+This PR creates the shared dynamic edge foundation, not the per-prototype ECS
+deployment pipeline. Follow-up tickets cover per-AppID ECS/Fargate and ALB
+listener-rule Terraform, isolated state/S3 management, generated-infrastructure
+tests and SCA, Step Functions orchestration/retries, and GOV.UK Notify status and
+completion messages. Keep the common edge state separate from generated
+per-prototype infrastructure state.
 
-Forge is not connected to this distribution. Its current private runtime requires
-a server-side service token and has process-local build/session state. Do not put
-that token into CloudFront code, public headers, browser URLs, or this Terraform
-configuration. Connecting it requires an authenticated server-side preview gateway,
-an explicit hostname-to-build registry, private runtime access, durable build/session
-storage, and a separate uncached dynamic behaviour or platform router. Review the
-runtime deployment gates in the Application Builder repository's Forge README
-before exposing it. Static output
-from any generator can use this S3 hosting once packaged as a static bundle.
+Forge remains on its existing exact `forge.ai-builder...` URL; prototype preview
+hostnames are separate AppID subdomains and route to their own ECS services.
 
-Sharing WAF reduces duplicated ACL and rule charges. Standard usage-based
-CloudFront distributions do not each have a fixed monthly charge; traffic,
-CloudFront function invocations, logging, storage and invalidations still cost money.
+Sharing CloudFront and WAF reduces duplicated edge resources. Costs still include
+two environment distributions/WAFs, ALBs, per-prototype ECS/Fargate, logging, and
+traffic.
 
 ## Local checks
 
 No AWS resources are created by these checks. Mock-provider tests require Terraform
-1.7 or later. Routing tests require Node.js and no additional packages.
+1.7 or later.
 
 ```bash
 cd terraform/environments/justice-eng-ai/prototypes-infra/shared-prototype-edge
 terraform init -backend=false
 terraform test
-node tests/routing.js
-```
-
-On macOS without Node.js, run the same routing checks with the system JavaScript
-engine:
-
-```bash
-docker run --rm -v "$PWD:/work:ro" -w /work node:22-alpine node tests/routing.js /work
 ```
 
 Validate the actual component caller from `terraform/environments/justice-eng-ai/prototypes-infra`
