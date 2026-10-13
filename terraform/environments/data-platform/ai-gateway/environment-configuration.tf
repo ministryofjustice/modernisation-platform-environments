@@ -135,6 +135,8 @@ locals {
       litellm_image_tag         = "1.101.5-enterprise"
       litellm_image_pull_secret = "litellm-enterprise-pull"
       ai_gateway_hostname       = "ai-gateway.justice.gov.uk"
+      # Keep the ALB open slightly longer than LiteLLM's 600-second request timeout.
+      ai_gateway_alb_idle_timeout_seconds = 660
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
@@ -164,7 +166,8 @@ locals {
         ### Production
         "54.195.74.96/32",
         "79.125.36.56/32",
-        "63.35.122.32/32"
+        "63.35.122.32/32",
+        "148.139.3.8/29" # ServiceNow Sandbox
       ]
       ai_gateway_admin_ingress_allowlist = [
         # VPN

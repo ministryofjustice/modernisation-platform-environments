@@ -71,6 +71,34 @@ resource "aws_vpc_security_group_ingress_rule" "preprod_alb_legacy_natgw_ing" {
   tags              = merge(local.tags, { Name = "legacy-natgw-443" })
 }
 
+# temporary rule to allow legacy environments to access ECS services for migration purposes
+# this is for offloc and once offloc is moved, it should be removed
+# since dss is only in prod, only do this only if environment is prod
+resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_https_from_legacy_env" {
+  count             = var.env_name == "prod" ? 1 : 0
+  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+  description       = "allow dss access into delius core frontend alb over https"
+  from_port         = "443"
+  to_port           = "443"
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.environment_config.migration_environment_vpc_cidr
+  tags              = merge(local.tags, { Name = "legacy-env-443" })
+}
+
+resource "aws_vpc_security_group_ingress_rule" "prod_alb_legacy_natgw_ing" {
+  for_each = var.env_name == "prod" ? {
+    for cidr in local.legacy_natgw_ips[var.env_name] : cidr => cidr
+  } : {}
+
+  description       = "allow ingress from legacy prod nat gateway to delius core frontend alb"
+  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+  cidr_ipv4         = each.value
+  from_port         = "443"
+  to_port           = "443"
+  ip_protocol       = "tcp"
+  tags              = merge(local.tags, { Name = "legacy-natgw-443" })
+}
+
 # Rule for uservision access in test
 resource "aws_vpc_security_group_ingress_rule" "test_alb_uservision_ingress" {
   count = var.env_name == "test" ? 1 : 0
