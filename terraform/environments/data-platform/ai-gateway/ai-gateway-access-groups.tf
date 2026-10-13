@@ -23,6 +23,11 @@ resource "litellm_unified_access_group" "amazon_bedrock_batch" {
     for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id
     if contains(try(team.unified_access_groups, []), "bedrock-batch-${each.key}")
   ]
+
+  # Teams can be assigned to access groups out-of-band via the LiteLLM UI/API; don't revoke those.
+  lifecycle {
+    ignore_changes = [assigned_team_ids]
+  }
 }
 
 resource "litellm_unified_access_group" "google_gemini_enterprise_agent_platform" {
