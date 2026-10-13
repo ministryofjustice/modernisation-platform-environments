@@ -43,6 +43,13 @@ locals {
   # Detect if this cluster is an ArgoCD hub by checking the cluster tag.
   is_argocd_hub = lookup(data.aws_eks_cluster.cluster.tags, "argocd-role", "") == "hub"
 
+  # The hub's own cluster ARN. The platform-appprojects-<env> bootstrap projects
+  # permit creating AppProjects only in the hub's own argocd namespace (the
+  # per-product AppProjects are namespaced objects on the hub), so their
+  # destination is the hub cluster, not the spoke ARNs the other platform
+  # projects iterate.
+  hub_cluster_arn = data.aws_eks_cluster.cluster.arn
+
   # CodeConnection ARN for the GitHub connection (looked up in data.tf, hub-only).
   argocd_codeconnection_arn = length(data.aws_codestarconnections_connection.github) > 0 ? data.aws_codestarconnections_connection.github[0].arn : ""
 
