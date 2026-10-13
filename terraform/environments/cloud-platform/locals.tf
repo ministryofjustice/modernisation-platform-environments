@@ -52,4 +52,7 @@ locals {
 
   # CloudWatch audit-group retention (not OpenSearch's own data retention — that's per-index ISM).
   opensearch_audit_retention_days = lookup(local.environment_configuration, "opensearch_audit_retention_days", 30)
+
+  # Native Identity Center SSO for Dashboards. See ADR-017.
+  opensearch_idc_enabled = local.enable_opensearch
 }
