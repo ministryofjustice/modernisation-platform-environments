@@ -87,19 +87,6 @@ resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_https_internet" 
   }
 }
 
-resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_http_internet" {
-  security_group_id = aws_security_group.oem_db_security_group.id
-  description       = "Allow HTTP to internet for OS patching (yum mirrors)"
-  ip_protocol       = "tcp"
-  from_port         = 80
-  to_port           = 80
-  cidr_ipv4         = "0.0.0.0/0"
-
-  tags = {
-    Name = "HTTP to internet (patching)"
-  }
-}
-
 # Ingress Rules for oem_db_security_group
 resource "aws_vpc_security_group_ingress_rule" "oem_db_sg_ingress_tcp_22_22_cidr_1" {
   security_group_id = aws_security_group.oem_db_security_group.id
