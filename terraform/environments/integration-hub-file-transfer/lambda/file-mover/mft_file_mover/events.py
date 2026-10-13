@@ -17,6 +17,7 @@ class FileMoverEvent:
     source_size_bytes: int
     scan_result_status: str = None
     scan_result_status_matches_tag: bool = None
+    received_at: str = None
 
 
 def parse_file_mover_event(event, operation, account_id, expected_bucket):
@@ -63,6 +64,7 @@ def parse_file_mover_event(event, operation, account_id, expected_bucket):
         source_size_bytes=source_size_bytes,
         scan_result_status=data.get("scanResultStatus"),
         scan_result_status_matches_tag=data.get("scanResultStatusMatchesTag"),
+        received_at=event.get("time") if operation == "STAGE" else None,
     )
     if operation == "ROUTE":
         if parsed.scan_result_status not in SUPPORTED_SCAN_RESULTS:
