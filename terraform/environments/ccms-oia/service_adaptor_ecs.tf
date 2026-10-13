@@ -41,7 +41,7 @@ resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
 
 resource "aws_ecs_service" "ecs_adaptor_service" {
   name            = local.adaptor_app_name
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = aws_ecs_cluster.conn_saa.id
   task_definition = aws_ecs_task_definition.ecs_adaptor_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].adaptor_app_count
 
