@@ -4215,7 +4215,7 @@ resource "aws_lakeformation_permissions" "api_int_db_level_perms" {
   principal = aws_iam_role.register_athena[0].arn
 
   database {
-    name = each.value
+    name = each.value.name
   }
 }
 
@@ -4225,7 +4225,7 @@ resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
   principal = aws_iam_role.register_athena[0].arn
 
   table {
-    database_name = each.value
+    database_name = each.value.name
     wildcard = true
   }
 }
