@@ -65,6 +65,19 @@ resource "aws_security_group_rule" "ingress_traffic_ebsalb_internal_443_mp_v1_wo
   cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
 }
 
+# The following rule is to allo Azure Virtual Desktop (AVD) to access EBS Apps HTTPS.
+resource "aws_security_group_rule" "ingress_traffic_ebsalb_443_azure_virtual_destop_workspace" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.sg_ebsapps_internal_alb.id
+  type              = "ingress"
+  description       = "HTTPS from Azure Virtual Desktop (AVD) users to use EBS Apps in 443 - DEV only"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr]
+}
+
+
 # EGRESS Rules
 
 ### All
