@@ -22,8 +22,8 @@ resource "aws_lb" "PPUD-internal-ALB" {
   internal           = true
   idle_timeout       = 240
   load_balancer_type = "application"
-  # security_groups    = [aws_security_group.PPUD-ALB.id]
-  security_groups = [aws_security_group.all["PPUD-ALB-Load-Balancer-Security-Group"].id]
+  security_groups    = [aws_security_group.PPUD-ALB.id]
+  # security_groups = [aws_security_group.all["PPUD-ALB-Load-Balancer-Security-Group"].id]
   subnets         = [data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
 
   enable_deletion_protection = true
