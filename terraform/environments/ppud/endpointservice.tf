@@ -31,7 +31,8 @@ resource "aws_lb" "ppud_internal_nlb" {
   internal                   = true
   load_balancer_type         = "network"
   subnets                    = [data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
-  security_groups            = [aws_security_group.PPUD-ALB.id]
+# security_groups            = [aws_security_group.PPUD-ALB.id]
+  security_groups            = [aws_security_group.all["PPUD-ALB-Load-Balancer-Security-Group"].id]
   enable_deletion_protection = true
 
   tags = {
