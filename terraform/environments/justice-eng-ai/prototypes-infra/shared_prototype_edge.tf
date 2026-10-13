@@ -1,7 +1,7 @@
 data "aws_partition" "current" {}
 
 locals {
-  prototype_domain_name   = "ai-prototype.modernisation-platform.service.justice.gov.uk"
+  prototype_domain_name   = "ai-builder.modernisation-platform.service.justice.gov.uk"
   prototype_bucket_prefix = "justice-eng-ai-prototypes"
   prototype_edge_enabled  = local.is-production
 
@@ -29,10 +29,9 @@ resource "aws_acm_certificate" "prototypes" {
 }
 
 resource "aws_route53_record" "prototype_certificate_validation" {
-  provider = aws.core-network-services
   for_each = local.prototype_validation_records
 
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  zone_id         = data.aws_route53_zone.ai_builder[0].zone_id
   name            = each.value.resource_record_name
   type            = each.value.resource_record_type
   ttl             = 60
@@ -53,14 +52,13 @@ module "shared-prototype-edge" {
   source = "./shared-prototype-edge"
 
   providers = {
-    aws                       = aws
-    aws.us_east_1             = aws.us-east-1
-    aws.core_network_services = aws.core-network-services
+    aws           = aws
+    aws.us_east_1 = aws.us-east-1
   }
 
   configuration = {
     domain_name        = local.prototype_domain_name
-    hosted_zone_id     = data.aws_route53_zone.network-services.zone_id
+    hosted_zone_id     = data.aws_route53_zone.ai_builder[0].zone_id
     certificate_arn    = aws_acm_certificate_validation.prototypes[0].certificate_arn
     bucket_prefix      = local.prototype_bucket_prefix
     allowed_ipv4_cidrs = toset(var.allowed_ingress_cidrs)

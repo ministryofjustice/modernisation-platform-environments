@@ -4,14 +4,10 @@ mock_provider "aws" {
   alias = "us_east_1"
 }
 
-mock_provider "aws" {
-  alias = "core_network_services"
-}
-
 variables {
   tags = { environment = "test" }
   configuration = {
-    domain_name        = "ai-prototype.modernisation-platform.service.justice.gov.uk"
+    domain_name        = "ai-builder.modernisation-platform.service.justice.gov.uk"
     hosted_zone_id     = "Z123456789"
     certificate_arn    = "arn:aws:acm:us-east-1:123456789012:certificate/test"
     bucket_prefix      = "shared-prototype-edge-test"
@@ -23,7 +19,7 @@ run "shared_hosting" {
   command = plan
 
   assert {
-    condition     = output.hosting.prototype_url_template == "https://{prototype-id}.ai-prototype.modernisation-platform.service.justice.gov.uk" && output.hosting.upload_prefix_template == "{prototype-id}/"
+    condition     = output.hosting.prototype_url_template == "https://{prototype-id}.ai-builder.modernisation-platform.service.justice.gov.uk" && output.hosting.upload_prefix_template == "{prototype-id}/"
     error_message = "The shared edge must provide a URL and upload-prefix template for arbitrarily many registered prototypes."
   }
 
@@ -59,7 +55,7 @@ run "reject_public_allowlist" {
   command = plan
   variables {
     configuration = {
-      domain_name        = "ai-prototype.modernisation-platform.service.justice.gov.uk"
+      domain_name        = "ai-builder.modernisation-platform.service.justice.gov.uk"
       hosted_zone_id     = "Z123456789"
       certificate_arn    = "arn:aws:acm:us-east-1:123456789012:certificate/test"
       bucket_prefix      = "shared-prototype-edge-test"
@@ -84,7 +80,7 @@ run "shared_security" {
 
   assert {
     condition = (
-      aws_cloudfront_distribution.shared.aliases == toset(["*.ai-prototype.modernisation-platform.service.justice.gov.uk"]) &&
+      aws_cloudfront_distribution.shared.aliases == toset(["*.ai-builder.modernisation-platform.service.justice.gov.uk"]) &&
       length(aws_cloudfront_distribution.shared.origin) == 1 &&
       length(aws_cloudfront_distribution.shared.custom_error_response) == 0 &&
       one(aws_cloudfront_distribution.shared.default_cache_behavior[0].function_association).event_type == "viewer-request"

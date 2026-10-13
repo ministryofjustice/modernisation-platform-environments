@@ -8,13 +8,16 @@ ACL, certificate or DNS record.
 
 ## Configuration and Ownership
 
-The `prototypes-infra` root uses the public
-`modernisation-platform.service.justice.gov.uk` hosted zone already looked up
-through the `core-network-services` provider. It issues a wildcard ACM certificate
-in `us-east-1` in the `prototypes-infra` account, where CloudFront is deployed, and writes
-the DNS validation records and `*.ai-prototype` alias into the parent zone via
-`core-network-services`. The role must be able to change that zone's records. No
-hosted-zone ID or certificate ARN is copied into component config.
+The Builder is served at `ai-builder.modernisation-platform.service.justice.gov.uk`,
+Forge at `forge.ai-builder.modernisation-platform.service.justice.gov.uk`, and
+static prototypes at `<prototype-id>.ai-builder.modernisation-platform.service.justice.gov.uk`.
+The `prototypes-infra` production workspace looks up the existing public
+`ai-builder.modernisation-platform.service.justice.gov.uk` zone owned by `web-ui`
+in the same account. It issues an ACM certificate in `us-east-1` for that zone
+and `*.ai-builder`, and writes the validation CNAME and wildcard alias directly
+into the delegated zone. Exact Builder and Forge records remain authoritative
+for their hostnames. No additional DNS delegation or copied hosted-zone ID is
+required.
 
 The edge WAF uses this component's `allowed_ingress_cidrs` variable, which defaults
 to the same list as the `web-ui` builder ALB; keep the two in step. There
@@ -53,10 +56,11 @@ the module does not delete bucket contents.
 ## Routing and isolation
 
 - Wildcard Route53 DNS points to the shared distribution. The bare parent domain
-  is not published.
+  is not published. Exact Builder and Forge records in the same zone take
+  precedence over this wildcard.
 - A viewer-request CloudFront function accepts only registered hostnames and
   rewrites `/assets/main.css` on
-  `336344bc.ai-prototype.modernisation-platform.service.justice.gov.uk` to
+  `336344bc.ai-builder.modernisation-platform.service.justice.gov.uk` to
   `/336344bc/assets/main.css` before cache lookup. Prototype prefixes therefore
   separate cache entries, even though viewer Host is not in the cache key.
 - `/` and directory URLs map to `index.html` within that prototype's prefix.
@@ -79,7 +83,7 @@ the appropriate authentication, authorisation, retention and content policies.
 
 The hostname registry lives in CloudFront KeyValueStore, separate from function
 code. Register a prototype by writing
-`336344bc.ai-prototype.modernisation-platform.service.justice.gov.uk` as the key
+`336344bc.ai-builder.modernisation-platform.service.justice.gov.uk` as the key
 and `336344bc` as the value. Retire it by deleting that key. KVS updates propagate
 to CloudFront edge locations, so the publisher must handle propagation before
 reporting a new preview as ready. Adding or removing hostnames does not redeploy
