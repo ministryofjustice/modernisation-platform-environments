@@ -8,7 +8,7 @@
 # Set these up in there and make sure the local points to that location
 
 
-resource "aws_db_instance" "example-rds" {
+resource "aws_db_instance" "example-rds-name" {
   #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
   #checkov:skip=CKV_AWS_157: "multi-az enabled, but optional"
   #checkov:skip=CKV_AWS_133: "backup_retention enabled, can be edited it application_variables.json"
