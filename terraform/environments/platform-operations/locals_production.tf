@@ -17,6 +17,26 @@ locals {
   github_actions_lambda_production = {
     enable_outbound_federation = true
     github_workflows = {
+      dso-certificates-cert-renewal-prod = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-certificates"
+        schedule = "cron(00 5 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "cert-renewal-prod.yml"
+      }
+      dso-certificates-stale = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-certificates"
+        schedule = "cron(30 1 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "stale.yml"
+      }
       dso-repositories-stale = {
         identity = "platops"
         inputs   = {}
