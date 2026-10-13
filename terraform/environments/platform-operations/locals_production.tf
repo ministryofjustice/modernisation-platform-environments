@@ -23,7 +23,7 @@ locals {
 
         ref      = "main"
         repo     = "dso-certificates"
-        schedule = "cron(00 5 ? * MON-FRI *)"
+        schedule = "cron(00 5 ? * TUE-THU *)"
         timezone = "Europe/London"
         workflow = "cert-renewal-prod.yml"
       }
