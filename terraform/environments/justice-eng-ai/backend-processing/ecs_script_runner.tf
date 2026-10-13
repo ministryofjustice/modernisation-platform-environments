@@ -17,7 +17,7 @@ locals {
 
   script_runner_environment_variables = []
 
-  # Fargate task capacity; adjust after the script requirements are known.
+  # Task capacity; adjust after the script requirements are known.
   script_runner_task_cpu    = 1024
   script_runner_task_memory = 2048
 }
@@ -283,23 +283,120 @@ resource "aws_iam_role_policy_attachment" "script_runner_ecs_task" {
   policy_arn = aws_iam_policy.script_runner_ecs_task.arn
 }
 
+# ---------- EC2 capacity: gives the task access to a Docker daemon ----------
+# Fargate cannot run docker, and the prototype image build needs docker/buildx,
+# so each script runner build runs on a disposable ECS-optimised EC2 instance and
+# use its Docker daemon via the mounted socket.
+
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended/image_id"
+}
+
+data "aws_iam_policy_document" "script_runner_ec2_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "script_runner_ec2_instance" {
+  name               = "${local.script_runner_role_name_prefix}-ec2-instance"
+  assume_role_policy = data.aws_iam_policy_document.script_runner_ec2_assume_role.json
+  tags               = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "script_runner_ec2_instance" {
+  for_each = toset([
+    "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
+    "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore",
+  ])
+
+  role       = aws_iam_role.script_runner_ec2_instance.name
+  policy_arn = each.value
+}
+
+resource "aws_iam_instance_profile" "script_runner_ec2_instance" {
+  name = "${local.script_runner_role_name_prefix}-ec2-instance"
+  role = aws_iam_role.script_runner_ec2_instance.name
+  tags = local.tags
+}
+
+resource "aws_launch_template" "script_runner" {
+  name_prefix                          = "${local.application_name}-script-runner-"
+  image_id                             = data.aws_ssm_parameter.ecs_optimized_ami.value
+  instance_type                        = "t3.medium"
+  instance_initiated_shutdown_behavior = "terminate"
+  vpc_security_group_ids               = [aws_security_group.script_runner_task.id]
+  user_data                            = base64encode("#!/bin/bash\necho ECS_CLUSTER=${aws_ecs_cluster.script_runner.name} >> /etc/ecs/ecs.config\n")
+  tags                                 = local.tags
+
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.script_runner_ec2_instance.arn
+  }
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      volume_size           = 50
+      volume_type           = "gp3"
+      encrypted             = true
+      kms_key_id            = aws_kms_key.script_runner_ebs.arn
+      delete_on_termination = true
+    }
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = merge(local.tags, { Name = "${local.application_name}-script-runner" })
+  }
+}
+
 resource "aws_ecs_task_definition" "script_runner" {
   family                   = local.script_runner_task_definition_family
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  cpu                      = local.script_runner_task_cpu
-  memory                   = local.script_runner_task_memory
-  execution_role_arn       = aws_iam_role.script_runner_ecs_execution.arn
-  task_role_arn            = aws_iam_role.script_runner_ecs_task.arn
-  tags                     = local.tags
+  requires_compatibilities = ["EC2"]
+  # Host networking so the build script can reach containers it publishes on
+  # the instance's Docker daemon (the image smoke test hits 127.0.0.1).
+  network_mode       = "host"
+  cpu                = local.script_runner_task_cpu
+  memory             = local.script_runner_task_memory
+  execution_role_arn = aws_iam_role.script_runner_ecs_execution.arn
+  task_role_arn      = aws_iam_role.script_runner_ecs_task.arn
+  tags               = local.tags
+
+  volume {
+    name      = "docker-socket"
+    host_path = "/var/run/docker.sock"
+  }
 
   container_definitions = jsonencode([
     {
       name      = "script-runner"
       image     = "${local.script_runner_ecr_repository_url}:${local.script_runner_image_tag}"
       essential = true
+      # The docker socket is root-owned; the image's default user cannot use it.
+      user = "root"
 
       environment = local.script_runner_environment_variables
+
+      mountPoints = [
+        {
+          sourceVolume  = "docker-socket"
+          containerPath = "/var/run/docker.sock"
+          readOnly      = false
+        }
+      ]
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -312,4 +409,67 @@ resource "aws_ecs_task_definition" "script_runner" {
       }
     }
   ])
+}
+
+data "aws_iam_policy_document" "script_runner_ebs" {
+  statement {
+    sid       = "EnableAccountIAMPermissions"
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+
+  statement {
+    sid    = "AllowBuildOrchestrationKeyUse"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+    ]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.step_functions_common.arn]
+    }
+  }
+
+  statement {
+    sid       = "AllowBuildOrchestrationResourceGrants"
+    effect    = "Allow"
+    actions   = ["kms:CreateGrant"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.step_functions_common.arn]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "kms:GrantIsForAWSResource"
+      values   = ["true"]
+    }
+  }
+}
+
+resource "aws_kms_key" "script_runner_ebs" {
+  description             = "Encrypt EBS volumes for the script runner EC2 instances"
+  enable_key_rotation     = true
+  deletion_window_in_days = 30
+  policy                  = data.aws_iam_policy_document.script_runner_ebs.json
+  tags                    = local.tags
+}
+
+resource "aws_kms_alias" "script_runner_ebs" {
+  name          = "alias/${local.application_name}-script-runner-ebs"
+  target_key_id = aws_kms_key.script_runner_ebs.key_id
 }

@@ -34,6 +34,21 @@ module "dms_validation_step_function" {
   type = "STANDARD"
 }
 
+# ------------------------------------------
+# DLT Iceberg Maintenance Step Function
+# ------------------------------------------
+
+module "dlt_iceberg_maintenance" {
+  source       = "./modules/step_function"
+  name         = "dlt-iceberg-maintenance"
+  type         = "STANDARD"
+  iam_policies = tomap({ "invoke_maintenance_lambdas" = aws_iam_policy.dlt_iceberg_maintenance_invoke })
+  variable_dictionary = tomap({
+    "trigger_arn" = module.trigger_dlt_iceberg_maintenance.lambda_function_arn,
+    "poll_arn"    = module.poll_dlt_iceberg_maintenance.lambda_function_arn,
+  })
+}
+
 
 # ------------------------------------------
 # Data Cut Back Step Function

@@ -17,6 +17,52 @@ locals {
   github_actions_lambda_production = {
     enable_outbound_federation = true
     github_workflows = {
+      azure-fixngo-platops-drift-check = {
+        identity = "platops"
+        inputs = {
+          projects = "resource_locks log_analytics dso-terraform-state"
+          action   = "driftcheck"
+        }
+
+        ref      = "main"
+        repo     = "dso-infra-azure-fixngo"
+        schedule = "cron(00 9 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "terragrunt-PlatformOperations.yml"
+      }
+      azure-fixngo-platops-resource-locks = {
+        identity = "platops"
+        inputs = {
+          projects = "resource_locks"
+          action   = "apply"
+        }
+
+        ref      = "main"
+        repo     = "dso-infra-azure-fixngo"
+        schedule = "cron(00 6 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "terragrunt-PlatformOperations.yml"
+      }
+      dso-certificates-cert-renewal-prod = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-certificates"
+        schedule = "cron(00 5 ? * TUE-THU *)"
+        timezone = "Europe/London"
+        workflow = "cert-renewal-prod.yml"
+      }
+      dso-certificates-stale = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-certificates"
+        schedule = "cron(30 1 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "stale.yml"
+      }
       dso-repositories-stale = {
         identity = "platops"
         inputs   = {}

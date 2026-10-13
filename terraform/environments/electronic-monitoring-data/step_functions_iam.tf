@@ -69,8 +69,8 @@ resource "aws_iam_policy" "data_cutback_step_function_policy" {
 data "aws_iam_policy_document" "ears_sars_policy_document" {
   count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   statement {
-    effect    = "Allow"
-    actions   = ["lambda:InvokeFunction"]
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
     resources = [
       module.ears_sars_request[0].lambda_function_arn,
       module.write_to_sharepoint[0].lambda_function_arn,
@@ -304,6 +304,26 @@ data "aws_iam_policy_document" "trigger_cadt_step_function_policy_document" {
 resource "aws_iam_policy" "trigger_cadt_step_function_policy" {
   name   = "trigger_cadt_step_function_role"
   policy = data.aws_iam_policy_document.trigger_cadt_step_function_policy_document.json
+}
+
+# ------------------------------------------------------------------------------
+# DLT Iceberg maintenance trigger policy
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "dlt_iceberg_maintenance_invoke" {
+  statement {
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [
+      module.trigger_dlt_iceberg_maintenance.lambda_function_arn,
+      module.poll_dlt_iceberg_maintenance.lambda_function_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "dlt_iceberg_maintenance_invoke" {
+  name   = "dlt-iceberg-maintenance-invoke"
+  policy = data.aws_iam_policy_document.dlt_iceberg_maintenance_invoke.json
 }
 
 # ------------------------------------------------------------------------------

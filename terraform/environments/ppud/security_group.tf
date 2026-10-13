@@ -1542,6 +1542,10 @@ resource "aws_security_group_rule" "wam_portal_alb_ingress" {
   security_group_id        = aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id
 }
 
+# Removing these two legacy rules as they won't be required on the new SG code.
+
+/*
+
 # Temporary rule - allows health checks from the old WAM-ALB SG until the ALB is migrated to the new WAM-ALB-Load-Balancer-Security-Group
 resource "aws_security_group_rule" "wam_portal_alb_ingress_legacy" {
   description              = "Allow port 443 inbound from legacy WAM-ALB security group"
@@ -1563,6 +1567,8 @@ resource "aws_security_group_rule" "ppud_portal_alb_ingress_legacy" {
   source_security_group_id = aws_security_group.PPUD-ALB.id
   security_group_id        = aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id
 }
+
+*/
 
 # -------------------------------------------------------------------
 # Conditional security groups

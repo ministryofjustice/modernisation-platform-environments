@@ -16,6 +16,7 @@ module "weblogic_testdata_api" {
   name              = "weblogic-data"
   create_service    = "false"
   env_name          = var.env_name
+  desired_count     = data.aws_ssm_parameter.weblogic_data_task_count[0].value
   account_config    = var.account_config
   account_info      = var.account_info
   capacity_provider = aws_ecs_capacity_provider.weblogic_testdata_api[0].name
@@ -82,7 +83,7 @@ resource "aws_launch_template" "weblogic_testdata_api" {
   count = var.env_name == "test" ? 1 : 0
 
   name_prefix   = "weblogic-testdata-api-${var.env_name}-ecs-"
-  image_id      = data.aws_ami.ecs_ami.id
+  image_id      = var.delius_microservice_configs.weblogic_testdata_api.ami_id
   instance_type = var.delius_microservice_configs.weblogic_testdata_api.ec2_instance_type
 
   user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", { ecs_cluster_name = module.ecs.ecs_cluster_name }))
@@ -208,5 +209,5 @@ module "ecs_nightly_restart_weblogic_data" {
   cluster_name = module.ecs.ecs_cluster_arn
   service_name = "${var.env_name}-weblogic-data"
   service_arn  = local.weblogic_data_service_arn
-  task_count   = 1
+  task_count   = data.aws_ssm_parameter.weblogic_data_task_count[0].value
 }

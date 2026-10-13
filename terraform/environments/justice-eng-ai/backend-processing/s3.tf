@@ -7,6 +7,8 @@ data "aws_iam_role" "account" {
 }
 
 locals {
+  s3_folder = trim(local.application_data.accounts[local.environment].s3_folder, "/")
+
   ecs_task_roles = {
     for name, role in data.aws_iam_role.account : name => role
     if anytrue([
@@ -195,4 +197,47 @@ resource "aws_iam_role_policy" "ecs_staging_bucket_kms" {
   name   = "${local.application_name}-ecs-staging-bucket-kms"
   role   = each.value.name
   policy = data.aws_iam_policy_document.ecs_staging_bucket_kms.json
+}
+
+resource "aws_s3_bucket_notification" "staging_bucket" {
+  bucket      = aws_s3_bucket.staging_bucket.id
+  eventbridge = true
+}
+
+resource "aws_cloudwatch_event_rule" "staging_bucket_root_upload" {
+  name        = "${local.application_name}-staging-root-upload"
+  description = "Start the root workflow when an object is created under ${local.s3_folder}/ in the staging bucket"
+
+  event_pattern = jsonencode({
+    source        = ["aws.s3"]
+    "detail-type" = ["Object Created"]
+    detail = {
+      bucket = {
+        name = [aws_s3_bucket.staging_bucket.id]
+      }
+      object = {
+        key = [{ prefix = local.s3_folder == "" ? "" : "${local.s3_folder}/" }]
+      }
+    }
+  })
+
+  tags = local.tags
+}
+
+resource "aws_cloudwatch_event_target" "staging_bucket_root_upload" {
+  rule      = aws_cloudwatch_event_rule.staging_bucket_root_upload.name
+  target_id = "start-root-workflow"
+  arn       = module.step_functions_root.arn
+  role_arn  = aws_iam_role.step_functions_upload_trigger.arn
+
+  input_transformer {
+    input_paths = {
+      s3_file = "$.detail.object.key"
+    }
+    input_template = <<-JSON
+      {"s3_folder": ${jsonencode(local.s3_folder)}, "s3_file": <s3_file>}
+    JSON
+  }
+
+  depends_on = [aws_iam_role_policy.step_functions_upload_trigger]
 }
