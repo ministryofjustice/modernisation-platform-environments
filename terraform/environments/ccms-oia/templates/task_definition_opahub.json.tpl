@@ -54,6 +54,10 @@
         "value": "true"
       },
       {
+        "name": "ADMINISTRATION_PORT",
+        "value": "${health_check_port}"
+      },
+      {
         "name": "CREATE_DATABASE",
         "value": "${create_database}"
       }
