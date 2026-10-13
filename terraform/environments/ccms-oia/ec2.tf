@@ -17,7 +17,7 @@ data "template_file" "launch-template-conn-saa" {
 resource "aws_launch_template" "ec2_launch_template_opa" {
   name_prefix   = local.first_cluster_name
   image_id      = local.application_data.accounts[local.environment].ami_image_id
-  instance_type = local.application_data.accounts[local.environment].ec2_instance_type
+  instance_type = local.application_data.accounts[local.environment].opa_ec2_instance_type
   ebs_optimized = true
 
   monitoring {
@@ -92,10 +92,10 @@ resource "aws_autoscaling_group" "opa_cluster_scaling_group" {
   }
 }
 
-resource "aws_launch_template" "ec2_launch_template_opa" {
+resource "aws_launch_template" "ec2_launch_template_conn_saa" {
   name_prefix   = local.second_cluster_name
   image_id      = local.application_data.accounts[local.environment].ami_image_id
-  instance_type = local.application_data.accounts[local.environment].ec2_instance_type
+  instance_type = local.application_data.accounts[local.environment].conn_saa_ec2_instance_type
   ebs_optimized = true
 
   monitoring {
@@ -121,24 +121,24 @@ resource "aws_launch_template" "ec2_launch_template_opa" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template-opa.rendered)
+  user_data = base64encode(data.template_file.launch-template-conn_saa.rendered)
 
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s-ecs-cluster", local.first_cluster_name, local.environment)) }
+      { Name = lower(format("%s-%s-ecs-cluster", local.second_cluster_name, local.environment)) }
     )
   }
 
   tag_specifications {
     resource_type = "volume"
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s-ecs-cluster", local.first_cluster_name, local.environment)) }
+      { Name = lower(format("%s-%s-ecs-cluster", local.second_cluster_name, local.environment)) }
     )
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-ecs-cluster-template", local.first_cluster_name, local.environment)) }
+    { Name = lower(format("%s-%s-ecs-cluster-template", local.second_cluster_name, local.environment)) }
   )
 }
 
