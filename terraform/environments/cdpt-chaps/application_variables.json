@@ -1,0 +1,10 @@
+{
+  "accounts": {
+    "development": {
+    },
+    "preproduction": {
+    },
+    "production": {
+    }
+  }
+}
