@@ -58,7 +58,7 @@ resource "aws_db_parameter_group" "opahub_db_parameter_group" {
 
   parameter {
     name  = "require_secure_transport"
-    value = "ON"
+    value = "1"
   }
 
   tags = merge(local.tags, {
