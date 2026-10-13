@@ -59,7 +59,7 @@
       "Catch": [{"ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "MaintenanceFailed"}],
       "Next": "WaitVacuum"
     },
-    "WaitVacuum": {"Type": "Wait", "Seconds": 30, "Next": "PollVacuum"},
+    "WaitVacuum": {"Type": "Wait", "Seconds": 300, "Next": "PollVacuum"},
     "PollVacuum": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
