@@ -217,7 +217,7 @@ module "fms_fan_out_event_queue" {
 module "register_athena_event_queue" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
-  lambda_function_name = module.register_athena.lambda_function_name
+  lambda_function_name = module.register_athena[0].lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
   max_receive_count    = local.load_sqs_max_receive_count
