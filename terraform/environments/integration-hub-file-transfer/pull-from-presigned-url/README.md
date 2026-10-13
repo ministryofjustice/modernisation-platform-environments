@@ -14,7 +14,9 @@ Apply the root dispatch configuration before this component. After applying, upl
 a fresh harmless file through the API. Check the retained S3 copy, SNS publication
 and the actual Slack message. A `published` worker outcome confirms SNS accepted
 it; it does not prove Slack delivery. The message includes the portal link and a
-URL-encoded object location, not a presigned S3 URL. The development trial grants the existing `integration-hub` Identity Center group
+URL-encoded pickup folder/file path, without the S3 scheme or bucket name. Keep the
+recipient folder and execution subfolder in the path so users can locate the file
+in the portal. The development trial grants the existing `integration-hub` Identity Center group
 read-only access to `products-poc-slack-test/` in the pickup bucket. It does not
 grant upload/delete access or access to other recipient directories.
 

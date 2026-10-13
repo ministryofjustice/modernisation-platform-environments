@@ -58,7 +58,7 @@ def validate(record, config, now):
 
 def message(data, portal, receipt):
     # Encode the key so user-controlled names cannot inject Slack mentions or links.
-    location = f"s3://{receipt['bucket']}/{quote(receipt['key'], safe='/')}"
+    location = quote(receipt['key'], safe='/')
     return {
         "version": "1.0",
         "source": "custom",
@@ -66,7 +66,7 @@ def message(data, portal, receipt):
         "content": {
             "textType": "client-markdown",
             "title": "A clean file is ready for pickup",
-            "description": f"Location (URL-encoded): {location}\n<{portal}|Open file-transfer pickup>",
+            "description": f"Pickup path (URL-encoded): {location}\n<{portal}|Open file-transfer pickup>",
             "nextSteps": ["Sign in with your organisational account and locate the file. Access requires an authorised group.",
                           "Files have seven-day lifecycle expiry; collect promptly."],
         },

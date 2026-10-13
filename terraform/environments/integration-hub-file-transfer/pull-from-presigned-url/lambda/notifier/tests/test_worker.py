@@ -47,7 +47,7 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(self.secrets.get_secret_value.call_count, 1)
         self.assertEqual(payload["source"], "custom")
         self.assertEqual(payload["version"], "1.0")
-        self.assertIn("pickup/products/execution/test.txt", payload["content"]["description"])
+        self.assertIn("Pickup path (URL-encoded): products/execution/test.txt", payload["content"]["description"])
         self.retainer.prepare.assert_called_once()
         self.assertNotIn("X-Amz", json.dumps(payload))
         self.assertNotIn("credential", json.dumps(payload))
@@ -115,6 +115,15 @@ class WorkerTests(unittest.TestCase):
         config=copy.deepcopy(CONFIG); config["portal_url"]="https://evil.invalid/"
         with self.assertRaises(InvalidNotification): self.run_record(config=config)
 
+    def test_notification_shows_pickup_path_without_storage_details(self):
+        key = "products-poc-slack-test/execution-hash/file.txt"
+        bucket = "integration-hub-file-transfer-pickup-development-346568122691"
+        payload = message(DATA, CONFIG["portal_url"], {"bucket": bucket, "key": key})
+        description = payload["content"]["description"]
+        self.assertEqual(description, f"Pickup path (URL-encoded): {key}\n<{CONFIG['portal_url']}|Open file-transfer pickup>")
+        self.assertNotIn(bucket, description)
+        self.assertNotIn("s3://", description)
+
     def test_filename_cannot_inject_slack_markup(self):
         key = "products-poc/uploads/<https://evil.invalid|click> <!channel> `name` &test"
         payload = message(DATA, CONFIG["portal_url"], {"bucket": "pickup", "key": key})
@@ -123,7 +132,7 @@ class WorkerTests(unittest.TestCase):
         self.assertNotIn("<https://evil.invalid", description)
         self.assertIn("%3C%21channel%3E", description)
         from urllib.parse import unquote
-        self.assertEqual(unquote(description.split("s3://pickup/", 1)[1].split("\n", 1)[0]), key)
+        self.assertEqual(unquote(description.split("Pickup path (URL-encoded): ", 1)[1].split("\n", 1)[0]), key)
         self.assertFalse(payload["metadata"]["enableCustomActions"])
 
     def test_store_retries_in_progress_but_acknowledges_sent(self):
