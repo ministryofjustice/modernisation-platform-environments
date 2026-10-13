@@ -3,6 +3,8 @@ module "ecs" {
 
   name = "delius-core-${var.env_name}-cluster"
 
+  enable_container_insights = var.env_name == "prod" ? "enhanced" : "enabled"
+
   tags = local.tags
 }
 
