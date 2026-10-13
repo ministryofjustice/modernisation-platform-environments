@@ -28,7 +28,7 @@ resource "aws_ecs_capacity_provider" "capacity_provider_opa" {
 }
 
 resource "aws_ecs_capacity_provider" "capacity_provider_conn_saa" {
-  name = "${local.first_cluster_name}-capacity-provider"
+  name = "${local.second_cluster_name}-capacity-provider"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn         = aws_autoscaling_group.conn_saa_cluster_scaling_group.arn
