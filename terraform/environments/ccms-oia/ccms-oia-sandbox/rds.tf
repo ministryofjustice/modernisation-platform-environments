@@ -39,6 +39,7 @@ resource "aws_db_instance" "opahub_db" {
   snapshot_identifier = null
   maintenance_window  = local.application_data.accounts[local.environment].maintenance_window
   backup_window       = "03:00-06:00"
+  parameter_group_name = aws_db_parameter_group.opahub_db_parameter_group.name
 
   tags = merge(local.tags, {
     Name = "${local.opa_app_name}-db"
@@ -48,4 +49,19 @@ resource "aws_db_instance" "opahub_db" {
   #      username
   #    ]
   #  }
+}
+
+resource "aws_db_parameter_group" "opahub_db_parameter_group" {
+  name        = "${local.opa_app_name}-db-parameter-group"
+  family      = "mysql8.4"
+  description = "Parameter group for OPAHUB MySQL RDS instance"
+
+  parameter {
+    name  = "require_secure_transport"
+    value = "ON"
+  }
+
+  tags = merge(local.tags, {
+    Name = "${local.opa_app_name}-db-parameter-group"
+  })
 }
