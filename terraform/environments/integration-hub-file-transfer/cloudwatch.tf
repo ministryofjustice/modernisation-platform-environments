@@ -74,3 +74,20 @@ module "cloudwatch_transfer" {
 
   tags = local.tags
 }
+
+resource "aws_cloudwatch_dashboard" "this" {
+  dashboard_name = "${local.application_name}-${local.environment}"
+  dashboard_body = jsonencode({
+    widgets = [
+      for widget in local.cloudwatch_dashboard_widgets : {
+        type  = "metric"
+        width = 6
+        properties = merge({
+          region = data.aws_region.current.region
+          stat   = "Sum"
+          period = 300
+        }, widget)
+      }
+    ]
+  })
+}
