@@ -1,6 +1,6 @@
 ---
 name: integration-hub-file-transfer
-on:
+'on':
   push:
     branches:
       - main
@@ -21,7 +21,7 @@ on:
         description: 'Set either [deploy|destroy].'
         default: 'deploy'
         required: true
-        type: string
+        type: choice
         options:
           - deploy
           - destroy
@@ -32,7 +32,6 @@ on:
         type: string
 
 permissions:
-  id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
 jobs:
@@ -45,6 +44,9 @@ jobs:
   terraform:
     needs: strategy
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
+    permissions:
+      id-token: write
+      contents: read
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
@@ -142,6 +144,9 @@ jobs:
 
   destroy-development:
     if: inputs.action == 'destroy'
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
