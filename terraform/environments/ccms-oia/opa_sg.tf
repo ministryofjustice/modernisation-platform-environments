@@ -233,25 +233,25 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_1522" {
 
 # RDS Security Group
 
-# resource "aws_security_group" "opahub_db" {
-#   name        = "${local.opa_app_name}-mysql-db"
-#   description = "Allow MySQL DB inbound traffic"
-#   vpc_id      = data.aws_vpc.shared.id
+resource "aws_security_group" "opahub_db" {
+  name        = "${local.opa_app_name}-mysql-db"
+  description = "Allow MySQL DB inbound traffic"
+  vpc_id      = data.aws_vpc.shared.id
 
-#   tags = merge(local.tags,
-#     { Name = lower(format("%s-mysql-sg", local.opa_app_name)) }
-#   )
-# }
+  tags = merge(local.tags,
+    { Name = lower(format("%s-mysql-sg", local.opa_app_name)) }
+  )
+}
 
-# # Ingress from AWS Workspaces
-# resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_workspaces" {
-#   security_group_id = aws_security_group.opahub_db.id
-#   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
-#   ip_protocol       = "tcp"
-#   from_port         = 3306
-#   to_port           = 3306
-#   description       = "Allow MySQL access from Workspaces"
-# }
+# Ingress from AWS Workspaces
+resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_workspaces" {
+  security_group_id = aws_security_group.opahub_db.id
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+  ip_protocol       = "tcp"
+  from_port         = 3306
+  to_port           = 3306
+  description       = "Allow MySQL access from Workspaces"
+}
 
 # Ingress from ECS Cluster
 # resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ec2" {
