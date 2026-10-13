@@ -164,7 +164,7 @@ resource "aws_cloudwatch_metric_alarm" "Conn_Saa_Status_Check_Failure" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.conn_saa_opa_cluster_scaling_group.name
+    AutoScalingGroupName = aws_autoscaling_group.conn_saa_cluster_scaling_group.name
   }
   alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions    = [aws_sns_topic.cloudwatch_alerts.arn]
@@ -295,7 +295,7 @@ resource "aws_cloudwatch_metric_alarm" "opa_alb_healthyhosts" {
   alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
   dimensions = {
-    TargetGroup  = aws_lb_target_group.opahub_target_group.arn_suffix
+    TargetGroup  = aws_lb_target_group.opahub_ssl_target_group.arn_suffix
     LoadBalancer = aws_lb.opahub.arn_suffix
   }
 }
