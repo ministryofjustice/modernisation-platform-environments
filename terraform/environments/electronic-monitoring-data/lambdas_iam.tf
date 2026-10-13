@@ -4183,10 +4183,7 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
       "glue:GetDatabase",
       "glue:CreateTable",
     ]
-    resources = [
-      aws_glue_catalog_database.person_record.arn,
-      aws_glue_catalog_database.cemo.arn,
-    ]
+    resources = [for db in local.api_integration_databases : db.arn]
   }
   statement {
     sid      = "UpdateGlue"
@@ -4195,28 +4192,25 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
       "glue:GetTable",
       "glue:UpdateTable",
     ]
-    resources = [
-      "${replace(aws_glue_catalog_database.person_record.arn, ":database/", ":table/")}/*",
-      "${replace(aws_glue_catalog_database.cemo.arn, ":database/", ":table/")}/*",
-    ]
+    resources = [for db in local.api_integration_databases : "${replace(db.arn, ":database/", ":table/")}/*"]
   }
 }
 
 
 resource "aws_iam_policy" "register_athena" {
-  count  = local.is-test ? 0 : 1
+  count  = local.is-production ? 0 : 1
   name   = "register_athena_policy"
   policy = data.aws_iam_policy_document.register_athena_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "register_athena" {
-  count      = local.is-test ? 0 : 1
+  count      = local.is-production ? 0 : 1
   role       = aws_iam_role.register_athena[0].name
   policy_arn = aws_iam_policy.register_athena[0].arn
 }
 
 resource "aws_lakeformation_permissions" "api_int_db_level_perms" {
-  for_each = tomap([aws_glue_catalog_database.person_record.name, aws_glue_catalog_database.cemo.name])
+  for_each    = local.is-production ? {} : local.api_integration_databases
   permissions = ["DESCRIBE", "CREATE_TABLE"]
   principal = aws_iam_role.register_athena.arn
 
@@ -4226,7 +4220,7 @@ resource "aws_lakeformation_permissions" "api_int_db_level_perms" {
 }
 
 resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
-  for_each = tomap([aws_glue_catalog_database.person_record.name, aws_glue_catalog_database.cemo.name])
+  for_each    = local.is-production ? {} : local.api_integration_databases
   permissions = ["ALTER", "DESCRIBE"]
   principal = aws_iam_role.register_athena.arn
 
