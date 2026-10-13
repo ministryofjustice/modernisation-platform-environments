@@ -1641,8 +1641,8 @@ module "register_athena" {
   is_image                       = true
   function_name                  = "register_athena"
   image_name                     = "register_athena"
-  role_name                      = aws_iam_role.register_athena.name
-  role_arn                       = aws_iam_role.register_athena.arn
+  role_name                      = aws_iam_role.register_athena[0].name
+  role_arn                       = aws_iam_role.register_athena[0].arn
   memory_size                    = 1024
   timeout                        = 60
   reserved_concurrent_executions = 1

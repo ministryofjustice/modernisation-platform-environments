@@ -4165,7 +4165,7 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
     sid       = "ListS3Bucket"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = [module.raw_formatted_data_bucket.bucket.arn]
+    resources = [module.s3-raw-formatted-data-bucket.bucket.arn]
 
   }
   statement {
@@ -4174,7 +4174,7 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
     actions = [
       "s3:GetObject",
     ]
-    resources = ["${module.raw_formatted_data_bucket.bucket.arn}/*"]
+    resources = ["${module.s3-raw-formatted-data-bucket.bucket.arn}/*"]
   }
   statement {
     sid     = "GetDbs"
@@ -4212,7 +4212,7 @@ resource "aws_iam_role_policy_attachment" "register_athena" {
 resource "aws_lakeformation_permissions" "api_int_db_level_perms" {
   for_each    = local.is-production ? {} : local.api_integration_databases
   permissions = ["DESCRIBE", "CREATE_TABLE"]
-  principal = aws_iam_role.register_athena.arn
+  principal = aws_iam_role.register_athena[0].arn
 
   database {
     name = each.value
@@ -4222,7 +4222,7 @@ resource "aws_lakeformation_permissions" "api_int_db_level_perms" {
 resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
   for_each    = local.is-production ? {} : local.api_integration_databases
   permissions = ["ALTER", "DESCRIBE"]
-  principal = aws_iam_role.register_athena.arn
+  principal = aws_iam_role.register_athena[0].arn
 
   table {
     database_name = each.value
