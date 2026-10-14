@@ -76,3 +76,13 @@ You must be a Ministry of Justice service. You may request access on behalf of a
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
 
 See [file action dispatch](./docs/file-action-dispatch.md) for dispatch configuration, matching and failure behaviour.
+
+### **How to trigger the deploy workflow for Lambda changes:**
+
+The Lambda code under `lambda/` is packaged by Terraform (`lambda.tf`), so it only deploys through the `integration-hub-file-transfer` workflow.
+
+The workflow only plans and applies `root` when a file directly in this folder changes. Changes under `lambda/`, `docs/` or `schemas/` alone are skipped, so they would not deploy.
+
+When you change Lambda code, also update the date below so the workflow runs and deploys the new code:
+
+Lambda last changed: 2026-10-13
