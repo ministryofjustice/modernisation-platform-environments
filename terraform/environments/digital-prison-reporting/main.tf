@@ -809,7 +809,17 @@ module "glue_raw_archive_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
   name           = "raw_archive"
-  description    = "Glue Data Catalog - Raw Archive"
+  description    = "Glue Data Catalog - Raw Archive Prisons"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for Raw Archive Probation
+module "glue_raw_archive_probation_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "raw_archive_probation"
+  description    = "Glue Data Catalog - Raw Archive Probation"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }
@@ -840,6 +850,16 @@ module "glue_prisons_database" {
   create_db      = local.create_db
   name           = "prisons"
   description    = "Glue Data Catalog - Prisons Fabric"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for Probation
+module "glue_probation_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "probation"
+  description    = "Glue Data Catalog - Probation"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }
