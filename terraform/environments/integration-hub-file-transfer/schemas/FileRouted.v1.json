@@ -100,7 +100,7 @@
             },
             "scanResultStatusMatchesTag": {
               "type": "boolean",
-              "description": "Whether scanResultStatus matched the exact object's GuardDutyMalwareScanStatus tag. A mismatch routes the object to investigation."
+              "description": "Whether scanResultStatus matched the exact object's GuardDutyMalwareScanStatus tag. False only when the tag was present and differed. A mismatch routes the object to investigation."
             },
             "sourceDeleted": { "type": "boolean", "enum": [true] }
           }
