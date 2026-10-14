@@ -2,8 +2,7 @@
 # USED BY: moj-analytical-services runners ONLY (21 runners: airflow, cadet, dpr, emds, ...)
 # K8s secret "actions-runners-token-apc-self-hosted-runners" (key "token")
 # -> GITHUB_TOKEN in the runner pod, used to REGISTER the runner (chart default tokenSecretName).
-#   OLD: PAT 4282353 (module.actions_runners_token_apc_self_hosted_runners_secret).
-#   NEW: GitHub App installation token minted by actions_runners_mojas_registration_token_generator
+#    GitHub App installation token minted by actions_runners_mojas_registration_token_generator
 #        (re-minted every 30 min; tokens are valid 60 min).
 # =============================================================================
 resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_secret" {
@@ -45,9 +44,8 @@ resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_se
 # K8s secret "actions-runners-token-moj-apc-self-hosted-runners" (key "token")
 # -> GITHUB_TOKEN in the runner pod, used to REGISTER the runner
 #    (set via tokenSecretName in src/helm/values/actions-runners/data-catalogue/values.yml.tftpl).
-#   OLD: PAT 5605162 (module.actions_runners_token_moj_apc_self_hosted_runners_secret).
-#   NEW: GitHub App installation token minted by actions_runners_moj_registration_token_generator
-#        (re-minted every 30 min; tokens are valid 60 min).
+#  GitHub App installation token minted by actions_runners_moj_registration_token_generator
+#     (re-minted every 30 min; tokens are valid 60 min).
 # =============================================================================
 resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runners_secret" {
   #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
