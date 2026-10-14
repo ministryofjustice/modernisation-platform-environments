@@ -96,28 +96,42 @@ mainSteps:
               echo "$KEYTOOL_OUT"
               exit 1
             fi
+            # Private key entries list their whole chain (cert, intermediate, root), so each certificate is
+            # labelled with its own Owner and checked once, even if it also appears as a separate entry
+            declare -A SEEN
             ALIAS=""
+            OWNER=""
             while IFS= read -r line; do
               case "$line" in
                 "Alias name: "*) ALIAS="${line#Alias name: }" ;;
+                "Owner: "*) OWNER="${line#Owner: }" ;;
                 *"until: "*)
                   END_DATE="${line##*until: }"
                   # Root certificates shipped with the JDK are tagged [jdk] - not ours to renew
                   case "$ALIAS" in
                     *"[jdk]") echo "$ALIAS is a JDK root certificate ($END_DATE) - ignored" ;;
-                    *) check_expiry "$ALIAS" "$END_DATE" ;;
+                    *)
+                      if [ -z "${SEEN["$OWNER|$END_DATE"]+x}" ]; then
+                        SEEN["$OWNER|$END_DATE"]=1
+                        check_expiry "$ALIAS: $OWNER" "$END_DATE"
+                      fi
+                      ;;
                   esac
                   ;;
               esac
             done <<< "$KEYTOOL_OUT"
           else
-            # orapki wallet display/export invocation is unverified against a live wallet - validate before relying on it
             if ! ORAPKI_OUT=$("$ORAPKI" wallet display -wallet "{{ keystorePath }}" -pwd "$PASSWORD" 2>&1); then
               echo "orapki failed for {{ keystorePath }}:"
               echo "$ORAPKI_OUT"
               exit 1
             fi
-            SUBJECTS=$(awk -F'Subject:[[:space:]]*' '/Subject:/ {print $2}' <<< "$ORAPKI_OUT")
+            # Certificates are listed under User and Trusted Certificates; Requested Certificates are CSRs with nothing
+            # to check. A certificate can be listed in both sections, so each DN is checked once.
+            SUBJECTS=$(awk -F'Subject:[[:space:]]*' '
+              /^Requested Certificates/ { skip = 1 }
+              /^(User|Trusted) Certificates/ { skip = 0 }
+              /Subject:/ && !skip && !seen[$2]++ { print $2 }' <<< "$ORAPKI_OUT")
             while IFS= read -r dn; do
               [ -z "$dn" ] && continue
               CERT_FILE="$WORKDIR/cert.pem"
