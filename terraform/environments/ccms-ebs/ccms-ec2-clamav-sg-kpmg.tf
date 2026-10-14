@@ -1,4 +1,5 @@
 resource "aws_security_group" "clamav_sg_kpmg" {
+  count       = local.is-preproduction ? 1 : 0
   name        = "clamav_sg_kpmg"
   description = "Additional rules to allow KPMG access ClamAV"
   vpc_id      = data.aws_vpc.shared.id
@@ -10,7 +11,7 @@ resource "aws_security_group" "clamav_sg_kpmg" {
 
 resource "aws_vpc_security_group_ingress_rule" "clamav_workspaces_22_ingress_kpmg" {
   count             = local.is-preproduction ? 1 : 0
-  security_group_id = aws_security_group.clamav_sg_kpmg.id
+  security_group_id = aws_security_group.clamav_sg_kpmg[0].id
   description       = "[KPMG] AWS Workspaces to ClamAV:22"
   ip_protocol       = "tcp"
   from_port         = 22
@@ -20,4 +21,10 @@ resource "aws_vpc_security_group_ingress_rule" "clamav_workspaces_22_ingress_kpm
   tags = merge(local.tags,
     { Name = "[KPMG] AWS Workspaces to ClamAV:22" }
   )
+}
+
+# Only created in preproduction, where KPMG are testing - keep the existing preproduction SG rather than recreating it
+moved {
+  from = aws_security_group.clamav_sg_kpmg
+  to   = aws_security_group.clamav_sg_kpmg[0]
 }
