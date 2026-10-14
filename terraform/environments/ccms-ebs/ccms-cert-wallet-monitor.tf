@@ -25,8 +25,9 @@ locals {
   # ccms-ebs-secrets under secret_key - those keys are added to the secret manually by the DBA/AppOps team.
   certificate_wallet_expiry_checks = {
     ebsdb-wallet = {
-      cert_type     = "orapki"
-      keystore_path = "$ORACLE_HOME/owm/wallets/oracle"
+      cert_type = "orapki"
+      # The dev DB wallet was loaded under rptest, unlike the other environments
+      keystore_path = local.is-development ? "$ORACLE_HOME/owm/wallets/oracle/rptest" : "$ORACLE_HOME/owm/wallets/oracle"
       env_file      = local.ebsdb_env_files[local.environment]
       secret_key    = "ebsdb_wallet_password"
       target_names  = [lower(format("ec2-%s-%s-ebsdb", local.application_name, local.environment))]
