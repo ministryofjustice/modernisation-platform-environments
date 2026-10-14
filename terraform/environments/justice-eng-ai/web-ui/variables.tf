@@ -19,7 +19,7 @@ variable "bedrock_model_id" {
     Kept in sync with app/policy/schema.py MODEL_DEFAULT and every other
     reference in this repo.
   EOT
-  default     = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+  default     = "eu.anthropic.claude-sonnet-5-5"
 }
 
 variable "enable_oidc_auth" {

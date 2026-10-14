@@ -177,6 +177,43 @@ class S3CopyEngineTest(unittest.TestCase):
         self.store.transition.assert_called_once()
         self.assertEqual(self.store.transition.call_args.args[3], "MULTIPART_ABORTED")
 
+    def _inspect(self, operation, tag_set, scan_result_status="NO_THREATS_FOUND"):
+        self.s3.head_object.return_value = {
+            "ContentLength": 10,
+            "Metadata": {"mft-correlation-id": "correlation-id"} if operation == "ROUTE" else {},
+        }
+        self.s3.get_object_tagging.return_value = {"TagSet": tag_set}
+        operation_event = SimpleNamespace(
+            source_bucket="processing",
+            source_key="report.csv",
+            source_version_id="source-version",
+            source_size_bytes=10,
+            correlation_id="correlation-id",
+            scan_result_status=scan_result_status,
+        )
+        return self.engine.inspect_source(operation_event, operation)
+
+    def test_route_stamps_scan_status_tag_from_event_when_source_is_untagged(self):
+        snapshot = self._inspect("ROUTE", [{"Key": "Classification", "Value": "OFFICIAL"}])
+
+        self.assertIn(
+            {"Key": "GuardDutyMalwareScanStatus", "Value": "NO_THREATS_FOUND"},
+            snapshot.tags,
+        )
+        self.assertIn({"Key": "Classification", "Value": "OFFICIAL"}, snapshot.tags)
+
+    def test_route_keeps_an_existing_scan_status_tag(self):
+        tags = [{"Key": "GuardDutyMalwareScanStatus", "Value": "THREATS_FOUND"}]
+
+        snapshot = self._inspect("ROUTE", tags)
+
+        self.assertEqual(snapshot.tags, tags)
+
+    def test_stage_does_not_add_a_scan_status_tag(self):
+        snapshot = self._inspect("STAGE", [], scan_result_status=None)
+
+        self.assertEqual(snapshot.tags, [])
+
     def test_verification_failure_prevents_exact_source_deletion(self):
         copied = {
             **self.item,

@@ -21,6 +21,12 @@ locals {
   opensearch_master_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
 }
 
+# Identity Center lives in the org management account, so read via sso-readonly.
+data "aws_ssoadmin_instances" "opensearch" {
+  count    = local.opensearch_idc_enabled ? 1 : 0
+  provider = aws.sso-readonly
+}
+
 # Audit log group. Under /aws/vendedlogs/ so one prefix-wide resource policy
 # (below) covers it — CloudWatch allows only 10 resource policies per Region.
 resource "aws_cloudwatch_log_group" "opensearch_audit" {
@@ -116,6 +122,17 @@ resource "aws_opensearch_domain" "logs" {
     internal_user_database_enabled = false
     master_user_options {
       master_user_arn = local.opensearch_master_role_arn
+    }
+  }
+
+  # Identity Center SSO. GroupName so group membership drives FGAC roles (#8592).
+  dynamic "identity_center_options" {
+    for_each = local.opensearch_idc_enabled ? [1] : []
+    content {
+      enabled_api_access           = true
+      identity_center_instance_arn = data.aws_ssoadmin_instances.opensearch[0].arns[0]
+      roles_key                    = "GroupName"
+      subject_key                  = "Email"
     }
   }
 
