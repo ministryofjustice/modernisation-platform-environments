@@ -725,17 +725,17 @@ module "s3_artifacts_store" {
   create_s3           = local.setup_buckets
   name                = "${local.project}-artifact-store-${local.environment}"
   custom_kms_key      = local.s3_kms_arn
-  enable_notification = true #
+  enable_notification = local.enable_dbuilder_flyway_lambda # Notification trigger is only valid while the Flyway Lambda exists
 
   # Dynamic, supports multiple notifications blocks
-  bucket_notifications = {
+  bucket_notifications = local.enable_dbuilder_flyway_lambda ? {
     "lambda_function_arn" = module.domain_builder_flyway_Lambda.lambda_function
     "events"              = ["s3:ObjectCreated:*"]
     "filter_prefix"       = "build-artifacts/domain-builder/jars/"
     "filter_suffix"       = ".jar"
-  }
+  } : null
 
-  dependency_lambda = [module.domain_builder_flyway_Lambda.lambda_function] # Required if bucket_notications is enabled
+  dependency_lambda = local.enable_dbuilder_flyway_lambda ? [module.domain_builder_flyway_Lambda.lambda_function] : [] # Required if bucket_notications is enabled
 
   tags = merge(
     local.all_tags,
