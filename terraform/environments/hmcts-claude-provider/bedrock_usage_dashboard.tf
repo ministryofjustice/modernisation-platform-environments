@@ -31,14 +31,100 @@ locals {
              input.cacheReadInputTokenCount * r_cr as c_cr,
              output.outputTokenCount * r_out as c_out
   QUERY
+
+  # A Logs Insights query cannot span regions, so each logged region gets its own column of
+  # widgets and the regions have to be added up by eye. Columns run left to right in region order.
+  bedrock_dashboard_columns = {
+    for index, region in local.bedrock_logging_regions : region => index * 12
+  }
+
+  bedrock_dashboard_widgets = flatten([
+    for region, x in local.bedrock_dashboard_columns : [
+      {
+        type   = "log"
+        x      = x
+        y      = 3
+        width  = 12
+        height = 9
+        properties = {
+          region = region
+          title  = "Tokens by user, ${region} (30 days)"
+          view   = "table"
+          start  = "-P30D"
+          query = join("\n", [
+            "SOURCE '${aws_cloudwatch_log_group.bedrock_logs[region].name}'",
+            "| fields coalesce(requestMetadata.user, identity.arn) as user, requestMetadata.team as team",
+            "| stats count(*) as calls, sum(input.inputTokenCount) as input_tokens, sum(input.cacheReadInputTokenCount) as cache_read, sum(input.cacheWriteInputTokenCount) as cache_write, sum(output.outputTokenCount) as output_tokens by user, team",
+            "| sort calls desc",
+          ])
+        }
+      },
+      {
+        type   = "log"
+        x      = x
+        y      = 12
+        width  = 12
+        height = 9
+        properties = {
+          region = region
+          title  = "Estimated cost by user, USD, ${region} (30 days)"
+          view   = "table"
+          start  = "-P30D"
+          query = join("\n", [
+            "SOURCE '${aws_cloudwatch_log_group.bedrock_logs[region].name}'",
+            trimspace(local.bedrock_cost_fields),
+            "| stats (sum(c_in) + sum(c_cw) + sum(c_cr) + sum(c_out)) / 1000000 as est_usd, count(*) as calls by user",
+            "| sort est_usd desc",
+          ])
+        }
+      },
+      {
+        type   = "log"
+        x      = x
+        y      = 21
+        width  = 12
+        height = 9
+        properties = {
+          region = region
+          title  = "Estimated cost by model, USD, ${region} (30 days)"
+          view   = "table"
+          start  = "-P30D"
+          query = join("\n", [
+            "SOURCE '${aws_cloudwatch_log_group.bedrock_logs[region].name}'",
+            trimspace(local.bedrock_cost_fields),
+            "| stats (sum(c_in) + sum(c_cw) + sum(c_cr) + sum(c_out)) / 1000000 as est_usd, count(*) as calls by modelId",
+            "| sort est_usd desc",
+          ])
+        }
+      },
+      {
+        type   = "log"
+        x      = x
+        y      = 30
+        width  = 12
+        height = 7
+        properties = {
+          region = region
+          title  = "Estimated daily cost by user, USD, ${region} (14 days)"
+          view   = "bar"
+          start  = "-P14D"
+          query = join("\n", [
+            "SOURCE '${aws_cloudwatch_log_group.bedrock_logs[region].name}'",
+            trimspace(local.bedrock_cost_fields),
+            "| stats (sum(c_in) + sum(c_cw) + sum(c_cr) + sum(c_out)) / 1000000 as est_usd by bin(1d), user",
+          ])
+        }
+      },
+    ]
+  ])
 }
 
 resource "aws_cloudwatch_dashboard" "bedrock_usage" {
-  region         = local.bedrock_logging_region
+  region         = local.bedrock_logging_regions[0]
   dashboard_name = "hmcts-claude-bedrock-usage"
 
   dashboard_body = jsonencode({
-    widgets = [
+    widgets = concat([
       {
         type   = "text"
         x      = 0
@@ -49,90 +135,16 @@ resource "aws_cloudwatch_dashboard" "bedrock_usage" {
           markdown = <<-MD
             ## Claude on Bedrock: usage and estimated cost
 
-            Sourced from Bedrock model invocation logs in ${local.bedrock_logging_region}, retained for ${local.bedrock_log_retention_days} days.
+            Sourced from Bedrock model invocation logs, retained for ${local.bedrock_log_retention_days} days.
+            **One column per region** — ${join(", ", local.bedrock_logging_regions)} — because a Logs Insights query cannot span regions. Add the columns together for an account total.
 
             **User** is the `user` field Claude Code sends in request metadata, falling back to the IAM principal for keys that send none —
-            those rows are shared `BedrockAPIKey-*` pool keys, so they attribute to a key rather than a person.
+            those rows attribute to a key rather than a person.
             **Costs are estimates**: Anthropic list prices plus the 10% EU regional endpoint premium, not Bedrock's own rate card. Reconcile against the bill before charging anyone.
             A model with no rate configured costs $0 — if the by-model table shows calls with no cost, its rate is missing from `bedrock_usage_dashboard.tf`.
           MD
         }
       },
-      {
-        type   = "log"
-        x      = 0
-        y      = 3
-        width  = 24
-        height = 9
-        properties = {
-          region = local.bedrock_logging_region
-          title  = "Tokens by user (30 days)"
-          view   = "table"
-          start  = "-P30D"
-          query  = join("\n", [
-            "SOURCE '${aws_cloudwatch_log_group.bedrock_logs.name}'",
-            "| fields coalesce(requestMetadata.user, identity.arn) as user, requestMetadata.team as team",
-            "| stats count(*) as calls, sum(input.inputTokenCount) as input_tokens, sum(input.cacheReadInputTokenCount) as cache_read, sum(input.cacheWriteInputTokenCount) as cache_write, sum(output.outputTokenCount) as output_tokens by user, team",
-            "| sort calls desc",
-          ])
-        }
-      },
-      {
-        type   = "log"
-        x      = 0
-        y      = 12
-        width  = 12
-        height = 9
-        properties = {
-          region = local.bedrock_logging_region
-          title  = "Estimated cost by user, USD (30 days)"
-          view   = "table"
-          start  = "-P30D"
-          query  = join("\n", [
-            "SOURCE '${aws_cloudwatch_log_group.bedrock_logs.name}'",
-            trimspace(local.bedrock_cost_fields),
-            "| stats (sum(c_in) + sum(c_cw) + sum(c_cr) + sum(c_out)) / 1000000 as est_usd, count(*) as calls by user",
-            "| sort est_usd desc",
-          ])
-        }
-      },
-      {
-        type   = "log"
-        x      = 12
-        y      = 12
-        width  = 12
-        height = 9
-        properties = {
-          region = local.bedrock_logging_region
-          title  = "Estimated cost by model, USD (30 days)"
-          view   = "table"
-          start  = "-P30D"
-          query  = join("\n", [
-            "SOURCE '${aws_cloudwatch_log_group.bedrock_logs.name}'",
-            trimspace(local.bedrock_cost_fields),
-            "| stats (sum(c_in) + sum(c_cw) + sum(c_cr) + sum(c_out)) / 1000000 as est_usd, count(*) as calls by modelId",
-            "| sort est_usd desc",
-          ])
-        }
-      },
-      {
-        type   = "log"
-        x      = 0
-        y      = 21
-        width  = 24
-        height = 7
-        properties = {
-          region = local.bedrock_logging_region
-          title  = "Estimated daily cost by user, USD (14 days)"
-          view   = "bar"
-          start  = "-P14D"
-          query  = join("\n", [
-            "SOURCE '${aws_cloudwatch_log_group.bedrock_logs.name}'",
-            trimspace(local.bedrock_cost_fields),
-            "| stats (sum(c_in) + sum(c_cw) + sum(c_cr) + sum(c_out)) / 1000000 as est_usd by bin(1d), user",
-          ])
-        }
-      },
-    ]
+    ], local.bedrock_dashboard_widgets)
   })
 }

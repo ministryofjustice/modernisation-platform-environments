@@ -74,9 +74,27 @@ These EU inference profiles route requests across multiple EU regions (eu-west-1
 
 ## Model Invocation Logging
 
-Bedrock model invocation logging is enabled in eu-west-1, the region Claude Code calls. Prompts and responses are delivered to the S3 bucket `hmcts-claude-provider-bedrock-logs-<account-id>` under `invocation-logs/`, and expire after 90 days.
+Bedrock model invocation logging is enabled in both eu-west-1 and eu-west-2. eu-west-1 is the region
+this README tells people to use, but eu-west-2 is the account default and the Bedrock policy admits
+inference profiles in any region, so traffic arrives at both. Until October 2026 only eu-west-1 was
+logged, and about 39% of that month's spend could not be attributed to anyone.
 
-Logging is configured per region, so invocations sent to any other region are not captured.
+Logging is configured per region and Bedrock only accepts a destination in its own region, so each
+region has its own bucket, KMS key and log group:
+
+| Region | S3 bucket | CloudWatch log group |
+| --- | --- | --- |
+| eu-west-1 | `hmcts-claude-provider-bedrock-logs-<account-id>` | `/aws/bedrock/modelinvocations` |
+| eu-west-2 | `hmcts-claude-provider-bedrock-logs-<account-id>-eu-west-2` | `/aws/bedrock/modelinvocations` |
+
+Prompts and responses land under `invocation-logs/` and expire after 90 days. Any region not in that
+table is still uncaptured; add it to `bedrock_log_buckets` in `bedrock_logging.tf` to start logging it.
+
+### Usage dashboard
+
+The `hmcts-claude-bedrock-usage` dashboard in eu-west-1 reports calls, tokens and estimated cost by
+user and by model. A Logs Insights query cannot span regions, so the dashboard carries one column of
+widgets per region and the columns have to be added together for an account total.
 
 ## Troubleshooting
 
