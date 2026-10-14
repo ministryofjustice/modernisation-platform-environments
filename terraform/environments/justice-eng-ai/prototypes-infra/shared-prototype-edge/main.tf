@@ -7,19 +7,24 @@ terraform {
       version               = "~> 6.0"
       configuration_aliases = [aws.us_east_1]
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 }
 
 variable "configuration" {
-  description = "Shared prototype edge configuration for CloudFront, WAF, and the private ALB origin."
+  description = "Shared prototype edge configuration for CloudFront, WAF, and the public ALB origin protected by CloudFront ingress and a secret header."
   type = object({
-    domain_name        = string
-    hosted_zone_id     = string
-    certificate_arn    = string
-    name_prefix        = string
-    vpc_id             = string
-    private_subnet_ids = list(string)
-    allowed_ipv4_cidrs = set(string)
+    domain_name            = string
+    hosted_zone_id         = string
+    certificate_arn        = string
+    origin_certificate_arn = string
+    name_prefix            = string
+    vpc_id                 = string
+    public_subnet_ids      = list(string)
+    allowed_ipv4_cidrs     = set(string)
   })
   nullable = false
 
@@ -29,13 +34,14 @@ variable "configuration" {
       length(split(".", var.configuration.domain_name)) > 1 &&
       alltrue([for label in split(".", var.configuration.domain_name) : can(regex("^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$", label))]) &&
       can(regex("^arn:aws:acm:us-east-1:[0-9]{12}:certificate/", var.configuration.certificate_arn)) &&
+      can(regex("^arn:aws:acm:eu-west-2:[0-9]{12}:certificate/", var.configuration.origin_certificate_arn)) &&
       can(regex("^[a-z0-9]([a-z0-9-]{1,34}[a-z0-9])$", var.configuration.name_prefix)) &&
       length(var.configuration.vpc_id) > 0 &&
-      length(var.configuration.private_subnet_ids) >= 2 &&
+      length(var.configuration.public_subnet_ids) >= 2 &&
       length(var.configuration.allowed_ipv4_cidrs) > 0 &&
       alltrue([for cidr in var.configuration.allowed_ipv4_cidrs : can(cidrnetmask(cidr)) && try(tonumber(split("/", cidr)[1]) > 0, false)])
     )
-    error_message = "Supply a lowercase domain, a us-east-1 ACM certificate, a valid name prefix, a VPC with at least two private subnets, and nonempty IPv4 CIDRs excluding 0.0.0.0/0."
+    error_message = "Supply a lowercase domain, us-east-1 and eu-west-2 ACM certificates, a valid name prefix, a VPC with at least two public subnets, and nonempty IPv4 CIDRs excluding 0.0.0.0/0."
   }
 }
 
@@ -44,14 +50,43 @@ variable "tags" {
 }
 
 locals {
-  name = var.configuration.name_prefix
+  name                = var.configuration.name_prefix
+  origin_token_header = "X-Origin-Verify-${upper(replace(local.name, "-", ""))}"
+}
+
+resource "random_password" "origin_token" {
+  length  = 48
+  special = false
+}
+
+resource "aws_secretsmanager_secret" "origin_token" {
+  name        = "${local.name}/cloudfront-origin-token"
+  description = "Shared secret header used to authenticate CloudFront requests at the prototype ALB."
+  tags        = var.tags
+}
+
+resource "aws_secretsmanager_secret_version" "origin_token" {
+  secret_id     = aws_secretsmanager_secret.origin_token.id
+  secret_string = random_password.origin_token.result
+}
+
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
 resource "aws_security_group" "alb" {
   name        = "${local.name}-prototype-alb"
-  description = "Allow the CloudFront VPC origin to reach the prototype ALB"
+  description = "Allow CloudFront origin-facing addresses to reach the prototype ALB"
   vpc_id      = var.configuration.vpc_id
   tags        = var.tags
+
+  ingress {
+    description     = "CloudFront origin-facing prefix list only"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+  }
 
   egress {
     from_port   = 0
@@ -63,66 +98,29 @@ resource "aws_security_group" "alb" {
 
 resource "aws_lb" "shared" {
   name               = substr("${local.name}-alb", 0, 32)
-  internal           = true
+  internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
-  subnets            = var.configuration.private_subnet_ids
+  subnets            = var.configuration.public_subnet_ids
   tags               = var.tags
 }
 
 resource "aws_lb_listener" "shared" {
   load_balancer_arn = aws_lb.shared.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = var.configuration.origin_certificate_arn
 
   default_action {
     type = "fixed-response"
 
     fixed_response {
       content_type = "text/plain"
-      message_body = "No prototype route found"
-      status_code  = "404"
+      message_body = "Access denied - requests must come through CloudFront with a valid origin token and prototype host rule"
+      status_code  = "403"
     }
   }
-}
-
-resource "aws_cloudfront_vpc_origin" "shared" {
-  provider = aws.us_east_1
-
-  vpc_origin_endpoint_config {
-    name                   = "${local.name}-prototype-origin"
-    arn                    = aws_lb.shared.arn
-    http_port              = 80
-    https_port             = 443
-    origin_protocol_policy = "http-only"
-
-    origin_ssl_protocols {
-      items    = ["TLSv1.2"]
-      quantity = 1
-    }
-  }
-
-  depends_on = [aws_lb_listener.shared]
-}
-
-data "aws_security_group" "cloudfront_vpc_origin" {
-  filter {
-    name   = "group-name"
-    values = ["CloudFront-VPCOrigins-Service-SG"]
-  }
-
-  vpc_id = var.configuration.vpc_id
-
-  depends_on = [aws_cloudfront_vpc_origin.shared]
-}
-
-resource "aws_vpc_security_group_ingress_rule" "cloudfront_vpc_origin" {
-  security_group_id            = aws_security_group.alb.id
-  referenced_security_group_id = data.aws_security_group.cloudfront_vpc_origin.id
-  description                  = "Allow the AWS-managed CloudFront VPC origin security group"
-  ip_protocol                  = "tcp"
-  from_port                    = 80
-  to_port                      = 80
 }
 
 resource "aws_cloudfront_cache_policy" "dynamic" {
@@ -328,13 +326,21 @@ resource "aws_cloudfront_distribution" "shared" {
   tags            = var.tags
 
   origin {
-    domain_name = aws_lb.shared.dns_name
+    domain_name = aws_route53_record.origin.fqdn
     origin_id   = "prototype-alb"
 
-    vpc_origin_config {
-      vpc_origin_id            = aws_cloudfront_vpc_origin.shared.id
-      origin_keepalive_timeout = 5
+    custom_origin_config {
+      http_port                = 80
+      https_port               = 443
+      origin_protocol_policy   = "https-only"
+      origin_ssl_protocols     = ["TLSv1.2"]
       origin_read_timeout      = 30
+      origin_keepalive_timeout = 60
+    }
+
+    custom_header {
+      name  = local.origin_token_header
+      value = aws_secretsmanager_secret_version.origin_token.secret_string
     }
   }
 
@@ -382,15 +388,29 @@ resource "aws_route53_record" "prototypes" {
   }
 }
 
+resource "aws_route53_record" "origin" {
+  zone_id = var.configuration.hosted_zone_id
+  name    = "origin.${var.configuration.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.shared.dns_name
+    zone_id                = aws_lb.shared.zone_id
+    evaluate_target_health = true
+  }
+}
+
 output "hosting" {
   value = {
-    distribution_id        = aws_cloudfront_distribution.shared.id
-    distribution_arn       = aws_cloudfront_distribution.shared.arn
-    web_acl_arn            = aws_wafv2_web_acl.shared.arn
-    load_balancer_arn      = aws_lb.shared.arn
-    listener_arn           = aws_lb_listener.shared.arn
-    vpc_origin_id          = aws_cloudfront_vpc_origin.shared.id
-    domain_name            = var.configuration.domain_name
-    prototype_url_template = "https://{prototype-id}.${var.configuration.domain_name}"
+    distribution_id         = aws_cloudfront_distribution.shared.id
+    distribution_arn        = aws_cloudfront_distribution.shared.arn
+    web_acl_arn             = aws_wafv2_web_acl.shared.arn
+    load_balancer_arn       = aws_lb.shared.arn
+    listener_arn            = aws_lb_listener.shared.arn
+    origin_domain_name      = aws_route53_record.origin.fqdn
+    origin_token_secret_arn = aws_secretsmanager_secret.origin_token.arn
+    origin_token_header     = local.origin_token_header
+    domain_name             = var.configuration.domain_name
+    prototype_url_template  = "https://{prototype-id}.${var.configuration.domain_name}"
   }
 }

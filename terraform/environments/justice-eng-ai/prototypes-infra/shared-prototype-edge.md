@@ -1,7 +1,7 @@
 # Shared prototype edge
 
 The `justice-eng-ai/prototypes-infra` component owns one CloudFront distribution,
-CloudFront-scope WAF web ACL, and private ALB in each development and production
+CloudFront-scope WAF web ACL, and public ALB in each development and production
 workspace. Prototype subdomains route through the ALB to independently deployed
 ECS/Fargate services. Creating a prototype does not create another distribution,
 WAF ACL, or ALB.
@@ -16,8 +16,11 @@ development and `ai-builder...` in production. The component issues a wildcard
 ACM certificate in `us-east-1`, reuses the validation CNAME already maintained
 by that workspace's `web-ui` component, and writes the wildcard alias into the
 same delegated zone. Exact Builder and Forge records remain authoritative for
-their hostnames. The ALB is internal and receives traffic through a CloudFront
-VPC origin; this requires no VPC RAM share or networking tfvars configuration.
+their hostnames. The internet-facing ALB uses the existing public prototype
+subnets. Its security group allows HTTPS only from CloudFront's origin-facing
+managed prefix list. CloudFront authenticates to the origin with a secret header
+whose value is stored in Secrets Manager. This requires no VPC RAM share or
+networking tfvars configuration.
 
 The edge WAF uses this component's `allowed_ingress_cidrs` variable, which defaults
 to the same list as the `web-ui` builder ALB; keep the two in step. There
@@ -35,7 +38,7 @@ Run a reviewed plan and apply through the environments repository workflow in th
 matching `justice-eng-ai` `prototypes-infra` workspace. The existing component backend
 provides remote state and locking. The `shared_prototype_edge` output exposes the
 CloudFront distribution/WAF and shared ALB/listener details needed by per-prototype
-infrastructure. The common ALB returns 404 until a prototype-specific host rule
+infrastructure. The common ALB returns 403 until a prototype-specific host rule
 and target group are installed.
 
 ## Routing and isolation
@@ -43,12 +46,16 @@ and target group are installed.
 - Wildcard Route 53 DNS points preview subdomains to CloudFront. The base zone
   is not published. Exact Builder and Forge records in the same zone take
   precedence over the wildcard.
-- The CloudFront VPC origin connects to the private ALB. The ALB security group
-  accepts traffic from AWS's CloudFront VPC-origin security group only.
+- CloudFront connects to the public ALB over HTTPS and adds the secret origin
+  header. The ALB security group accepts traffic only from CloudFront's
+  origin-facing managed prefix list; future AppID listener rules must also
+  match the expected origin header before forwarding to a target group.
 - CloudFront disables caching and forwards viewer headers, cookies, and query
   strings so dynamic application sessions and host-based routing work.
-- The ALB default listener returns 404 for unmatched hosts. Per-prototype
-  listener rules forward each `<AppID>` host to its ECS target group.
+- The ALB default listener returns 403. No per-prototype listener rules are
+  installed by this shared-edge foundation; follow-up work must add rules that
+  match each `<AppID>` host and the origin header before forwarding to its ECS
+  target group.
 - CloudFront does not cache 4xx/5xx responses, so deployment and application
   failures are returned to the caller rather than masked by the shared edge.
 - Only IPv4 access is published. WAF blocks clients outside the allowed CIDRs

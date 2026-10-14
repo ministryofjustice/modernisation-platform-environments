@@ -11,7 +11,7 @@ data "aws_vpc" "prototype" {
   }
 }
 
-data "aws_subnets" "private_prototypes" {
+data "aws_subnets" "public_prototypes" {
   count = local.prototype_edge_enabled ? 1 : 0
 
   filter {
@@ -20,7 +20,7 @@ data "aws_subnets" "private_prototypes" {
   }
 
   tags = {
-    Name = "${local.application_name}-${local.environment}-private-prototypes-*"
+    Name = "${local.application_name}-${local.environment}-public-prototypes-*"
   }
 }
 
