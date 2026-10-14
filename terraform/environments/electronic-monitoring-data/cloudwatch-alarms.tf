@@ -146,6 +146,29 @@ resource "aws_cloudwatch_metric_alarm" "sqs_dlq_has_messages" {
   ]
 }
 
+resource "aws_cloudwatch_metric_alarm" "fms_audit_write_failed" {
+  alarm_name        = "fms_audit_write_failed"
+  alarm_description = "Triggered when load_fms cannot write FMS validation audit data"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  # Use EventBridge -> cloudwatch_alarm_threader -> SNS custom notifications.
+  # Disable direct alarm actions to avoid duplicate Slack messages.
+  actions_enabled = false
+
+  metric_name = "FmsAuditWriteFailedCount"
+  namespace   = "EMDS/FMS"
+  period      = 300
+  statistic   = "Sum"
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
 resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   count               = 1
   alarm_name          = "mdss_reconciler_errors"
