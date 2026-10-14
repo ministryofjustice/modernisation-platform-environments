@@ -79,13 +79,9 @@ class S3CopyEngine:
             if "mft-route-copy-token" in metadata:
                 raise ValueError("Processing object contains reserved ROUTE metadata")
         tags = tag_response.get("TagSet", [])
-        # GuardDuty applies its tag after publishing the scan result, so it may not exist yet.
-        # Stamp the destination with the scan result from the event so the audit tag is never lost.
-        if operation == "ROUTE" and not any(
-            tag["Key"] == SCAN_STATUS_TAG_KEY for tag in tags
-        ):
+        if operation == "ROUTE":
             tags = [
-                *tags,
+                *(tag for tag in tags if tag["Key"] != SCAN_STATUS_TAG_KEY),
                 {"Key": SCAN_STATUS_TAG_KEY, "Value": operation_event.scan_result_status},
             ]
         return SourceSnapshot(

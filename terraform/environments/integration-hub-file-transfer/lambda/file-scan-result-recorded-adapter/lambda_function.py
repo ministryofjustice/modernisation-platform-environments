@@ -68,41 +68,6 @@ def _attribute(item, name, attribute_type="S"):
     return _required(value, f"workflow record {name}")
 
 
-def _scan_result_status_matches_tag(scan):
-    # GuardDuty applies the tag separately from publishing the scan result event, so it can lag.
-    # An absent tag or a failed read is logged and treated as no contradiction; only a tag that is
-    # present and differs from the event is reported as a mismatch.
-    try:
-        response = s3.get_object_tagging(
-            Bucket=scan["bucket"],
-            Key=scan["key"],
-            VersionId=scan["versionId"],
-            ExpectedBucketOwner=os.environ["AWS_ACCOUNT_ID"],
-        )
-    except Exception:
-        logger.exception("Unable to read GuardDuty scan tag from object")
-        return True
-    tag_status = next(
-        (
-            tag["Value"]
-            for tag in response.get("TagSet", [])
-            if tag["Key"] == "GuardDutyMalwareScanStatus"
-        ),
-        None,
-    )
-    matches = tag_status is None or tag_status == scan["scanResultStatus"]
-    log = logger.info if tag_status == scan["scanResultStatus"] else logger.warning
-    log(
-        "Compared scan result event with object tag",
-        extra={
-            "scan_result_status": scan["scanResultStatus"],
-            "tag_status": tag_status,
-            "matches_tag": matches,
-        },
-    )
-    return matches
-
-
 def _workflow_record(scan):
     response = s3.head_object(
         Bucket=scan["bucket"],
@@ -143,12 +108,11 @@ def _workflow_record(scan):
     }
 
 
-def _build_detail(scan, workflow, scan_result_status_matches_tag, recorded_at):
+def _build_detail(scan, workflow, recorded_at):
     data = {
         "fileId": workflow["fileId"],
         "object": workflow["object"],
         "scanResultStatus": scan["scanResultStatus"],
-        "scanResultStatusMatchesTag": scan_result_status_matches_tag,
         "recordedAt": recorded_at.isoformat().replace("+00:00", "Z"),
     }
     if scan["statusReasons"]:
@@ -176,7 +140,6 @@ def _build_detail(scan, workflow, scan_result_status_matches_tag, recorded_at):
 def lambda_handler(event, _context):
     scan = _scan(event)
     workflow = _workflow_record(scan)
-    scan_result_status_matches_tag = _scan_result_status_matches_tag(scan)
     recorded_at = _event_time(event)
     response = eventbridge.put_events(
         Entries=[
@@ -184,12 +147,7 @@ def lambda_handler(event, _context):
                 "Source": "uk.gov.justice.service.managed-file-transfer",
                 "DetailType": "FileScanResultRecorded.v1",
                 "Detail": json.dumps(
-                    _build_detail(
-                        scan,
-                        workflow,
-                        scan_result_status_matches_tag,
-                        recorded_at,
-                    ),
+                    _build_detail(scan, workflow, recorded_at),
                     separators=(",", ":"),
                 ),
                 "EventBusName": os.environ["EVENT_BUS_ARN"],
