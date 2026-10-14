@@ -20,12 +20,7 @@ locals {
       azure-fixngo-dso-devtest-drift-check = {
         identity = "platops"
         inputs = {
-          projects = join("$${IFS:0:1}", [
-            "resource_locks",
-            "log_analytics",
-            "dso-terraform-state",
-          ])
-          action   = "driftcheck"
+          scheduled_run = "driftcheck"
         }
 
         ref      = "main"
@@ -37,8 +32,7 @@ locals {
       azure-fixngo-dso-devtest-resource-locks = {
         identity = "platops"
         inputs = {
-          projects = "resource_locks"
-          action   = "apply"
+          scheduled_run = "resource_locks"
         }
 
         ref      = "main"
@@ -50,14 +44,7 @@ locals {
       azure-fixngo-noms-dso-prod1-drift-check = {
         identity = "platops"
         inputs = {
-          projects = join("$${IFS:0:1}", [
-            "nomisapi-preprod",
-            "resource_locks",
-            "dso-terraform-state",
-            "webops-prod",
-            "nomisapi-prod",
-          ])
-          action   = "driftcheck"
+          scheduled_run = "driftcheck"
         }
 
         ref      = "main"
@@ -69,8 +56,7 @@ locals {
       azure-fixngo-noms-dso-prod1-resource-locks = {
         identity = "platops"
         inputs = {
-          projects = "resource_locks"
-          action   = "apply"
+          scheduled_run = "resource_locks"
         }
 
         ref      = "main"
@@ -82,27 +68,7 @@ locals {
       azure-fixngo-noms-prod1-drift-check = {
         identity = "platops"
         inputs = {
-          projects = join("$${IFS:0:1}", [
-            "noms-prod-alert-rules",
-            "automation_account",
-            "Network-NOMS-Live",
-            "dso-passwords-prod",
-            "dso-boot-diagnostics",
-            "Network-NOMS-Routes",
-            "noms-prod-azure-monitor",
-            "dso-certs",
-            "resource_locks",
-            "NetworkWatcher",
-            "log_analytics",
-            "dso-terraform-state",
-            "Network-NOMS-Transit-Live",
-            "noms-live",
-            "noms-mgmt-live",
-            "dso-passwords-devtest-backup",
-            "Network-NOMS-Mgmt-Live",
-            "pd-noncoreapps",
-          ])
-          action   = "driftcheck"
+          scheduled_run = "driftcheck"
         }
 
         ref      = "main"
@@ -114,8 +80,7 @@ locals {
       azure-fixngo-noms-prod1-resource-locks = {
         identity = "platops"
         inputs = {
-          projects = "resource_locks"
-          action   = "apply"
+          scheduled_run = "resource_locks"
         }
 
         ref      = "main"
@@ -127,12 +92,7 @@ locals {
       azure-fixngo-platops-drift-check = {
         identity = "platops"
         inputs = {
-          projects = join("$${IFS:0:1}", [
-            "resource_locks",
-            "log_analytics",
-            "dso-terraform-state",
-          ])
-          action   = "driftcheck"
+          scheduled_run = "driftcheck"
         }
 
         ref      = "main"
@@ -144,8 +104,7 @@ locals {
       azure-fixngo-platops-resource-locks = {
         identity = "platops"
         inputs = {
-          projects = "resource_locks"
-          action   = "apply"
+          scheduled_run = "resource_locks"
         }
 
         ref      = "main"
