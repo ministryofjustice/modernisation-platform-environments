@@ -244,6 +244,15 @@ resource "aws_vpc_security_group_ingress_rule" "efs_from_ecs_tasks_managed" {
   referenced_security_group_id = aws_security_group.ecs_tasks_managed.id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "efs_from_cluster_ec2" {
+  security_group_id            = aws_security_group.efs.id
+  description                  = "NFS from the ECS cluster EC2 hosts (user-data mounts EFS on the host)"
+  ip_protocol                  = "tcp"
+  from_port                    = 2049
+  to_port                      = 2049
+  referenced_security_group_id = aws_security_group.cluster_ec2.id
+}
+
 resource "aws_vpc_security_group_egress_rule" "efs_egress_all" {
   security_group_id = aws_security_group.efs.id
   description       = "Allow all outbound traffic"
