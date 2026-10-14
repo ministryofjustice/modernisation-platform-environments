@@ -1,3 +1,10 @@
+# =============================================================================
+# USED BY: moj-analytical-services runners ONLY (21 runners: airflow, airflow-create-a-pipeline, create-a-derived-table).
+# K8s secret "actions-runners-token-apc-self-hosted-runners" (key "token")
+# -> GITHUB_TOKEN in the runner pod, used to REGISTER the runner (chart default tokenSecretName).
+# GitHub App installation token minted by actions_runners_mojas_registration_token_generator
+# (re-minted every 30 min; tokens are valid 60 min)
+# =============================================================================
 resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_secret" {
   #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
@@ -10,29 +17,37 @@ resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_se
       "namespace" = kubernetes_namespace_v1.actions_runners[0].metadata[0].name
     }
     "spec" = {
-      "refreshInterval" = "1m"
-      "secretStoreRef" = {
-        "kind" = "ClusterSecretStore"
-        "name" = "aws-secretsmanager"
-      }
+      "refreshInterval" = "30m"
       "target" = {
         "name" = "actions-runners-token-apc-self-hosted-runners"
       }
-      "data" = [
+      "dataFrom" = [
         {
-          "remoteRef" = {
-            "key" = module.actions_runners_token_apc_self_hosted_runners_secret[0].secret_id
+          "sourceRef" = {
+            "generatorRef" = {
+              "apiVersion" = "generators.external-secrets.io/v1alpha1"
+              "kind"       = "GithubAccessToken"
+              "name"       = "actions-runners-mojas-registration-token"
+            }
           }
-          "secretKey" = "token"
         }
       ]
     }
   }
+
+  depends_on = [kubernetes_manifest.actions_runners_mojas_registration_token_generator]
 }
 
+# =============================================================================
+# USED BY: data-catalogue runner ONLY (ministryofjustice/data-catalogue).
+# K8s secret "actions-runners-token-moj-apc-self-hosted-runners" (key "token")
+# -> GITHUB_TOKEN in the runner pod, used to REGISTER the runner
+#    (tokenSecretName in src/helm/values/actions-runners/data-catalogue/values.yml.tftpl).
+# GitHub App installation token minted by actions_runners_moj_registration_token_generator
+# (re-minted every 30 min; tokens are valid 60 min).
+# =============================================================================
 resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runners_secret" {
   #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
-
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   manifest = {
@@ -43,24 +58,25 @@ resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runner
       "namespace" = kubernetes_namespace_v1.actions_runners[0].metadata[0].name
     }
     "spec" = {
-      "refreshInterval" = "1m"
-      "secretStoreRef" = {
-        "kind" = "ClusterSecretStore"
-        "name" = "aws-secretsmanager"
-      }
+      "refreshInterval" = "30m"
       "target" = {
         "name" = "actions-runners-token-moj-apc-self-hosted-runners"
       }
-      "data" = [
+      "dataFrom" = [
         {
-          "remoteRef" = {
-            "key" = module.actions_runners_token_moj_apc_self_hosted_runners_secret[0].secret_id
+          "sourceRef" = {
+            "generatorRef" = {
+              "apiVersion" = "generators.external-secrets.io/v1alpha1"
+              "kind"       = "GithubAccessToken"
+              "name"       = "actions-runners-moj-registration-token"
+            }
           }
-          "secretKey" = "token"
         }
       ]
     }
   }
+
+  depends_on = [kubernetes_manifest.actions_runners_moj_registration_token_generator]
 }
 
 # =============================================================================
@@ -70,9 +86,7 @@ resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runner
 # =============================================================================
 resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runners_secret" {
   #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
-
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
-
   manifest = {
     "apiVersion" = "external-secrets.io/v1"
     "kind"       = "ExternalSecret"
@@ -268,80 +282,4 @@ resource "kubernetes_manifest" "actions_runners_moj_registration_token_generator
     }
   }
   depends_on = [kubernetes_manifest.actions_runners_github_app_moj_registration_secret]
-}
-
-# =============================================================================
-# USED BY: moj-analytical-services runners ONLY (21 runners).
-# K8s secret "actions-runners-app-token-mojas" (key "token")
-# -> GITHUB_TOKEN in the runner pod, used to REGISTER the runner
-#    (selected via tokenSecretName in the runner helm values).
-# GitHub App installation token minted by actions_runners_mojas_registration_token_generator
-# (re-minted every 30 min; tokens are valid 60 min).
-# =============================================================================
-resource "kubernetes_manifest" "actions_runners_app_token_mojas_secret" {
-  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
-  manifest = {
-    "apiVersion" = "external-secrets.io/v1"
-    "kind"       = "ExternalSecret"
-    "metadata" = {
-      "name"      = "actions-runners-app-token-mojas"
-      "namespace" = kubernetes_namespace_v1.actions_runners[0].metadata[0].name
-    }
-    "spec" = {
-      "refreshInterval" = "30m"
-      "target" = {
-        "name" = "actions-runners-app-token-mojas"
-      }
-      "dataFrom" = [
-        {
-          "sourceRef" = {
-            "generatorRef" = {
-              "apiVersion" = "generators.external-secrets.io/v1alpha1"
-              "kind"       = "GithubAccessToken"
-              "name"       = "actions-runners-mojas-registration-token"
-            }
-          }
-        }
-      ]
-    }
-  }
-  depends_on = [kubernetes_manifest.actions_runners_mojas_registration_token_generator]
-}
-
-# =============================================================================
-# USED BY: data-catalogue runner ONLY (ministryofjustice/data-catalogue).
-# K8s secret "actions-runners-app-token-moj" (key "token")
-# -> GITHUB_TOKEN in the runner pod, used to REGISTER the runner
-#    (selected via tokenSecretName in the runner helm values).
-# GitHub App installation token minted by actions_runners_moj_registration_token_generator
-# (re-minted every 30 min; tokens are valid 60 min).
-# =============================================================================
-resource "kubernetes_manifest" "actions_runners_app_token_moj_secret" {
-  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
-  manifest = {
-    "apiVersion" = "external-secrets.io/v1"
-    "kind"       = "ExternalSecret"
-    "metadata" = {
-      "name"      = "actions-runners-app-token-moj"
-      "namespace" = kubernetes_namespace_v1.actions_runners[0].metadata[0].name
-    }
-    "spec" = {
-      "refreshInterval" = "30m"
-      "target" = {
-        "name" = "actions-runners-app-token-moj"
-      }
-      "dataFrom" = [
-        {
-          "sourceRef" = {
-            "generatorRef" = {
-              "apiVersion" = "generators.external-secrets.io/v1alpha1"
-              "kind"       = "GithubAccessToken"
-              "name"       = "actions-runners-moj-registration-token"
-            }
-          }
-        }
-      ]
-    }
-  }
-  depends_on = [kubernetes_manifest.actions_runners_moj_registration_token_generator]
 }

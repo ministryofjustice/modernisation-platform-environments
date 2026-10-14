@@ -44,3 +44,4 @@ data "aws_secretsmanager_secret_version" "actions_runners_github_app_moj_registr
 
   secret_id = module.actions_runners_github_app_moj_registration_secret[0].secret_id
 }
+
