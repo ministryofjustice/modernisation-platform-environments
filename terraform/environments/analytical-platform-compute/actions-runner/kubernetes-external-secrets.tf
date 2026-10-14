@@ -1,9 +1,3 @@
-# =============================================================================
-# USED BY: moj-analytical-services runners (PAT 4282353).
-# K8s secret "actions-runners-token-apc-self-hosted-runners" (key "token") from PAT (module.actions_runners_token_apc_self_hosted_runners_secret).
-# UNCHANGED - kept for rollback. Runners now use the App token secrets below
-# (via tokenSecretName in the helm values). Remove in the PAT cleanup PR.
-# =============================================================================
 resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_secret" {
   #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
@@ -36,12 +30,6 @@ resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_se
   }
 }
 
-# =============================================================================
-# USED BY: data-catalogue runner (PAT 5605162).
-# K8s secret "actions-runners-token-moj-apc-self-hosted-runners" (key "token") from PAT (module.actions_runners_token_moj_apc_self_hosted_runners_secret).
-# UNCHANGED - kept for rollback. Runners now use the App token secrets below
-# (via tokenSecretName in the helm values). Remove in the PAT cleanup PR.
-# =============================================================================
 resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runners_secret" {
   #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
 
@@ -121,7 +109,7 @@ resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runne
             "key"      = module.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_id
             "property" = "installation_id"
           }
-          "secretKey" = "installation-id"
+          "secretKey" = "installation-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         },
         {
           "remoteRef" = {
