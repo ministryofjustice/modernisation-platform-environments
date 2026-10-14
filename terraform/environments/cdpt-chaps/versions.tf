@@ -8,13 +8,13 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
-    random = { 
-      source = "hashicorp/random"
-      version = "~> 3.0" 
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
     }
-    external = { 
-      source = "hashicorp/external"
-      version = "~> 2.0" 
+    external = {
+      source  = "hashicorp/external"
+      version = "~> 2.0"
     }
   }
   required_version = "~> 1.10"
