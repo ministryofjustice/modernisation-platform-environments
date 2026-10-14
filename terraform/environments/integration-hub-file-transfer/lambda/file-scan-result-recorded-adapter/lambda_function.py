@@ -162,7 +162,6 @@ def lambda_handler(event, _context):
         raise RuntimeError(
             f"Failed to publish FileScanResultRecorded.v1 event: {response['Entries']}"
         )
-
     destination_event_id = response["Entries"][0]["EventId"]
     logger.info(
         "Published FileScanResultRecorded.v1 event",

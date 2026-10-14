@@ -7,12 +7,12 @@ module "lambda_custom_idp_layer" {
   create_function = false
   create_layer    = true
 
+  ignore_source_code_hash = true
+
   layer_name          = "${local.application_name}-custom-idp"
   description         = "Shared code for the AWS Transfer custom identity provider"
   compatible_runtimes = ["python3.12"]
   source_path         = "lambda/custom-idp/layer"
-
-  trigger_on_package_timestamp = false
 
   tags = local.tags
 }
@@ -26,6 +26,7 @@ module "lambda_custom_idp" {
   architectures                  = ["arm64"]
   description                    = "Authenticates AWS Transfer users with Secrets Manager"
   handler                        = "app.lambda_handler"
+  ignore_source_code_hash        = true
   layers                         = [module.lambda_custom_idp_layer.lambda_layer_arn]
   memory_size                    = 256
   reserved_concurrent_executions = 5
@@ -33,7 +34,6 @@ module "lambda_custom_idp" {
   source_path                    = "lambda/custom-idp/idp_handler"
   timeout                        = 30
   tracing_mode                   = "Active"
-  trigger_on_package_timestamp   = false
 
   environment_variables = {
     LOGLEVEL                = local.custom_idp_configuration.log_level

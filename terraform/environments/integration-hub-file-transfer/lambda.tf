@@ -13,6 +13,7 @@ module "lambda_file_received_adapter" {
   description                       = "Transforms incoming S3 Object Created notifications into FileReceived.v1 events"
   function_name                     = "${local.application_name}-file-received-adapter"
   handler                           = "lambda_function.lambda_handler"
+  ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
   memory_size                       = 128
@@ -21,7 +22,6 @@ module "lambda_file_received_adapter" {
   source_path                       = "lambda/file-received-adapter"
   timeout                           = 30
   tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
 
   environment_variables = {
     EVENT_BUS_ARN              = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
@@ -80,6 +80,7 @@ module "lambda_file_scan_result_recorded_adapter" {
   description                       = "Transforms GuardDuty malware scan results into FileScanResultRecorded.v1 events"
   function_name                     = "${local.application_name}-file-scan-result-recorded-adapter"
   handler                           = "lambda_function.lambda_handler"
+  ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
   memory_size                       = 128
@@ -88,7 +89,6 @@ module "lambda_file_scan_result_recorded_adapter" {
   source_path                       = "lambda/file-scan-result-recorded-adapter"
   timeout                           = 30
   tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
 
   environment_variables = {
     AWS_ACCOUNT_ID             = data.aws_caller_identity.current.account_id
@@ -159,6 +159,8 @@ module "lambda_stage" {
   description                       = "Copies exact incoming object versions to processing for malware scanning"
   function_name                     = "${local.application_name}-stage"
   handler                           = "stage_lambda.lambda_handler"
+  hash_extra                        = "stage"
+  ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
   memory_size                       = 1024
@@ -167,7 +169,6 @@ module "lambda_stage" {
   source_path                       = "lambda/file-mover"
   timeout                           = 900
   tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
 
   environment_variables = {
     AWS_ACCOUNT_ID               = data.aws_caller_identity.current.account_id
@@ -284,6 +285,8 @@ module "lambda_route" {
   description                       = "Routes exact processing object versions according to the current malware scan result"
   function_name                     = "${local.application_name}-route"
   handler                           = "route_lambda.lambda_handler"
+  hash_extra                        = "route"
+  ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
   memory_size                       = 1024
@@ -292,7 +295,6 @@ module "lambda_route" {
   source_path                       = "lambda/file-mover"
   timeout                           = 900
   tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
 
   environment_variables = {
     AWS_ACCOUNT_ID               = data.aws_caller_identity.current.account_id
@@ -408,6 +410,7 @@ module "lambda_file_action_execution_requested_adapter" {
   description                       = "Transforms configured FileRouted.v1 events into FileActionExecutionRequested.v1 events"
   function_name                     = "file-action-execution-requested-adapter"
   handler                           = "lambda_function.lambda_handler"
+  ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
   memory_size                       = 128
@@ -416,7 +419,6 @@ module "lambda_file_action_execution_requested_adapter" {
   source_path                       = "lambda/file-action-execution-requested-adapter"
   timeout                           = 30
   tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
 
   environment_variables = {
     DISPATCH_SECRET_NAME_PREFIX  = local.file_dispatch_secret_name_prefix
