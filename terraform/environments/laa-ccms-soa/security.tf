@@ -68,18 +68,6 @@ resource "aws_security_group_rule" "alb_admin_mp_v1_workspaces_ingress_7002" {
   cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
 }
 
-# The following ingress rule is added for Azure Virtual Desktop access Users.
-resource "aws_security_group_rule" "alb_admin_azure_virtual_desktop_ingress" {
-  count             = local.environment == "development" ? 1 : 0
-  security_group_id = aws_security_group.alb_admin.id
-  type              = "ingress"
-  description       = "Azure Virtual Desktop user access to SOA Weblogic Admin"
-  protocol          = "TCP"
-  from_port         = 443
-  to_port           = 443
-  cidr_blocks       = [local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr]
-}
-
 #-- Tightened: ALB Admin egress restricted to ECS target port only (was 0.0.0.0/0 all-protocols)
 resource "aws_security_group_rule" "alb_admin_egress_ecs_targets" {
   security_group_id = aws_security_group.alb_admin.id
@@ -200,18 +188,6 @@ resource "aws_security_group_rule" "alb_managed_ingress_nec443" {
   from_port         = 443
   to_port           = 443
   cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
-}
-
-# The following ingress rule is added for Azure Virtual Desktop access Users.
-resource "aws_security_group_rule" "alb_managed_azure_virtual_desktop_ingress" {
-  count             = local.environment == "development" ? 1 : 0
-  security_group_id = aws_security_group.alb_managed.id
-  type              = "ingress"
-  description       = "Azure Virtual Desktop user access to SOA Weblogic Managed"
-  protocol          = "TCP"
-  from_port         = 443
-  to_port           = 443
-  cidr_blocks       = [local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr]
 }
 
 #-- Tightened: ALB Managed egress restricted to ECS target port only (was 0.0.0.0/0 all-protocols)
