@@ -90,20 +90,34 @@ mainSteps:
           }
 
           if [ "{{ certType }}" = "keytool" ]; then
-            KEYTOOL_OUT=$("$KEYTOOL" -list -v -keystore "{{ keystorePath }}" -storepass "$PASSWORD")
+            # keytool reports errors on stdout, so print its output if it fails
+            if ! KEYTOOL_OUT=$("$KEYTOOL" -list -v -keystore "{{ keystorePath }}" -storepass "$PASSWORD" 2>&1); then
+              echo "keytool failed for {{ keystorePath }}:"
+              echo "$KEYTOOL_OUT"
+              exit 1
+            fi
             ALIAS=""
             while IFS= read -r line; do
               case "$line" in
                 "Alias name: "*) ALIAS="${line#Alias name: }" ;;
                 *"until: "*)
                   END_DATE="${line##*until: }"
-                  check_expiry "$ALIAS" "$END_DATE"
+                  # Root certificates shipped with the JDK are tagged [jdk] - not ours to renew
+                  case "$ALIAS" in
+                    *"[jdk]") echo "$ALIAS is a JDK root certificate ($END_DATE) - ignored" ;;
+                    *) check_expiry "$ALIAS" "$END_DATE" ;;
+                  esac
                   ;;
               esac
             done <<< "$KEYTOOL_OUT"
           else
             # orapki wallet display/export invocation is unverified against a live wallet - validate before relying on it
-            SUBJECTS=$("$ORAPKI" wallet display -wallet "{{ keystorePath }}" -pwd "$PASSWORD" | awk -F'Subject:[[:space:]]*' '/Subject:/ {print $2}')
+            if ! ORAPKI_OUT=$("$ORAPKI" wallet display -wallet "{{ keystorePath }}" -pwd "$PASSWORD" 2>&1); then
+              echo "orapki failed for {{ keystorePath }}:"
+              echo "$ORAPKI_OUT"
+              exit 1
+            fi
+            SUBJECTS=$(awk -F'Subject:[[:space:]]*' '/Subject:/ {print $2}' <<< "$ORAPKI_OUT")
             while IFS= read -r dn; do
               [ -z "$dn" ] && continue
               CERT_FILE="$WORKDIR/cert.pem"
