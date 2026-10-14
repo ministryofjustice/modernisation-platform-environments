@@ -104,3 +104,21 @@ output "generation_sources" {
     }
   } : null
 }
+
+output "validation_ecr_repository_name" {
+  description = "ECR repository for schema-validation images."
+  value = (
+    local.contract_management_enabled
+    ? aws_ecr_repository.schema_validation[0].name
+    : null
+  )
+}
+
+output "validation_ecr_repository_url" {
+  description = "ECR repository URL used to publish schema-validation images."
+  value = (
+    local.contract_management_enabled
+    ? aws_ecr_repository.schema_validation[0].repository_url
+    : null
+  )
+}

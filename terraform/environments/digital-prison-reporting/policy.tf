@@ -814,6 +814,8 @@ data "aws_iam_policy_document" "glue_catalog_readonly" {
     resources = [
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw_archive",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/raw_archive/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw_archive_probation",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/raw_archive_probation/*",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/curated",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/curated/*",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw",
