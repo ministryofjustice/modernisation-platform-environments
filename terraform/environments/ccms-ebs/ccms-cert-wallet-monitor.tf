@@ -21,7 +21,8 @@ locals {
     lower(format("ec2-%s-%s-ebsapps-%s", local.application_name, local.environment, i + 1))
   ]
 
-  # Keystores to check, resolved on the host from the variables set by the env file
+  # Keystores to check, resolved on the host from the variables set by the env file. Passwords are read from
+  # ccms-ebs-secrets under secret_key - those keys are added to the secret manually by the DBA/AppOps team.
   certificate_wallet_expiry_checks = {
     ebsdb-wallet = {
       cert_type     = "orapki"
@@ -55,20 +56,9 @@ resource "aws_ssm_document" "certificate_wallet_expiry_check" {
   content = file("ssm/ccms-ssm-document-certificate-wallet-expiry-check.yaml")
 }
 
-# Wallet/keystore passwords - the value is set manually by the DBA/AppOps team. No secret version is managed
-# here, so Terraform never reads the passwords and they never reach state.
-resource "aws_secretsmanager_secret" "certificate_monitor" {
-  name        = "${local.application_name}-certificate-monitor"
-  description = "Passwords for the certificate expiry check, as JSON with keys: ebsdb_wallet_password, ebsapps_keystore_password, ebsapps_cacerts_password"
-
-  tags = merge(local.tags,
-    { Name = "${local.application_name}-certificate-monitor-${local.environment}" }
-  )
-}
-
 resource "aws_iam_policy" "certificate_wallet_expiry_check" {
   name        = "certificate-wallet-expiry-check-${local.environment}"
-  description = "Allows EC2 instances to read the certificate monitor secret and publish expiry alerts to the cw_alerts SNS topic"
+  description = "Allows EC2 instances to read the keystore passwords from ccms-ebs-secrets and publish expiry alerts to the cw_alerts SNS topic"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -76,7 +66,7 @@ resource "aws_iam_policy" "certificate_wallet_expiry_check" {
       {
         Effect   = "Allow"
         Action   = ["secretsmanager:GetSecretValue"]
-        Resource = [aws_secretsmanager_secret.certificate_monitor.arn]
+        Resource = [aws_secretsmanager_secret.ebs_secrets.arn]
       },
       {
         Effect   = "Allow"
@@ -108,7 +98,7 @@ resource "aws_ssm_association" "certificate_wallet_expiry_check" {
     certType      = each.value.cert_type
     keystorePath  = each.value.keystore_path
     envFile       = each.value.env_file
-    secretId      = aws_secretsmanager_secret.certificate_monitor.name
+    secretId      = aws_secretsmanager_secret.ebs_secrets.name
     secretKey     = each.value.secret_key
     snsTopicArn   = aws_sns_topic.cw_alerts.arn
     thresholdDays = "90"
