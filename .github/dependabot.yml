@@ -330,38 +330,6 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
-      - "terraform/environments/cloud-platform-live"
-      - "terraform/environments/cloud-platform-live/cluster"
-      - "terraform/environments/cloud-platform-live/cluster-components"
-      - "terraform/environments/cloud-platform-live/cluster-core"
-      - "terraform/environments/cloud-platform-live/network"
-    schedule:
-      interval: "daily"
-    groups:
-      cloud-platform-live:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
-      - "terraform/environments/cloud-platform-non-live"
-      - "terraform/environments/cloud-platform-non-live/cluster"
-      - "terraform/environments/cloud-platform-non-live/cluster-components"
-      - "terraform/environments/cloud-platform-non-live/cluster-core"
-      - "terraform/environments/cloud-platform-non-live/network"
-    schedule:
-      interval: "daily"
-    groups:
-      cloud-platform-non-live:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
       - "terraform/environments/coat"
     schedule:
       interval: "daily"
