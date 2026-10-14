@@ -6,6 +6,26 @@ workspace. Prototype subdomains route through the ALB to independently deployed
 ECS/Fargate services. Creating a prototype does not create another distribution,
 WAF ACL, or ALB.
 
+## Request flow
+
+```mermaid
+flowchart LR
+  viewer["Prototype viewer"] -->|"HTTPS to AppID hostname"| dns["Route 53 wildcard alias"]
+  dns --> cloudfront["CloudFront distribution<br/>Wildcard certificate"]
+  cloudfront --> waf{"Attached WAF<br/>IP allow-list, managed rules, rate limit"}
+  waf -->|"Blocked"| denied["Blocked at edge"]
+  waf -->|"Allowed"| behavior["Caching disabled<br/>Forward viewer host, headers, cookies, query"]
+  behavior -->|"HTTPS + secret origin header"| sg{"Public ALB security group<br/>CloudFront origin-facing prefix list only"}
+  sg -->|"Rejected"| rejected["Connection rejected"]
+  sg -->|"Allowed"| listener["HTTPS ALB listener"]
+  listener --> default["Current default: 403<br/>No AppID rules installed"]
+  listener -. "Future rule: match AppID host and secret header" .-> target["AppID target group"]
+  target -. "Future per-AppID deployment" .-> service["ECS/Fargate service"]
+```
+
+Exact Builder and Forge DNS records remain separate from the preview wildcard.
+The dashed routes are not provisioned by this shared-edge foundation.
+
 ## Configuration and Ownership
 
 The Builder is served at `ai-builder.modernisation-platform.service.justice.gov.uk`,
