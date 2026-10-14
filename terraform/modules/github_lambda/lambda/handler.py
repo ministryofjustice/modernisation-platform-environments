@@ -71,11 +71,17 @@ def get_github_token(audience, github_org, identity, repo, web_identity_token):
         raise RuntimeError(f"STS exchange response did not contain a valid token: {e}")
 
 
-def trigger_github_workflow_dispatch(github_org, github_token, ref, repo, workflow):
+def trigger_github_workflow_dispatch(
+    github_org, github_token, ref, repo, workflow, inputs=None
+):
     url = (
         f"https://api.github.com/repos/{github_org}/{repo}"
         f"/actions/workflows/{workflow}/dispatches"
     )
+
+    payload = {"ref": ref}
+    if isinstance(inputs, dict) and inputs:
+        payload["inputs"] = inputs
 
     try:
         response = requests.post(
@@ -84,7 +90,7 @@ def trigger_github_workflow_dispatch(github_org, github_token, ref, repo, workfl
                 "Authorization": f"Bearer {github_token}",
                 "Accept": "application/vnd.github+json",
             },
-            json={"ref": ref},
+            json=payload,
             timeout=10,
         )
         if response.status_code != 204:
@@ -111,6 +117,7 @@ def lambda_handler(event, context):
     )
     github_org = event.get("github_org") or os.getenv("GITHUB_ORG")
     identity = event.get("identity")
+    inputs = event.get("inputs") or {}
     ref = event.get("ref")
     repo = event.get("repo")
     workflow = event.get("workflow")
@@ -151,6 +158,7 @@ def lambda_handler(event, context):
         ref=ref,
         repo=repo,
         workflow=workflow,
+        inputs=inputs,
     )
 
     return {

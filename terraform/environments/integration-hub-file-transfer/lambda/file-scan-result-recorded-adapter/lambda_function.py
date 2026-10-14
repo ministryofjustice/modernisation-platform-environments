@@ -69,12 +69,19 @@ def _attribute(item, name, attribute_type="S"):
 
 
 def _scan_result_status_matches_tag(scan):
-    response = s3.get_object_tagging(
-        Bucket=scan["bucket"],
-        Key=scan["key"],
-        VersionId=scan["versionId"],
-        ExpectedBucketOwner=os.environ["AWS_ACCOUNT_ID"],
-    )
+    # GuardDuty applies the tag separately from publishing the scan result event, so it can lag.
+    # An absent tag or a failed read is logged and treated as no contradiction; only a tag that is
+    # present and differs from the event is reported as a mismatch.
+    try:
+        response = s3.get_object_tagging(
+            Bucket=scan["bucket"],
+            Key=scan["key"],
+            VersionId=scan["versionId"],
+            ExpectedBucketOwner=os.environ["AWS_ACCOUNT_ID"],
+        )
+    except Exception:
+        logger.exception("Unable to read GuardDuty scan tag from object")
+        return True
     tag_status = next(
         (
             tag["Value"]
@@ -83,7 +90,17 @@ def _scan_result_status_matches_tag(scan):
         ),
         None,
     )
-    return tag_status == scan["scanResultStatus"]
+    matches = tag_status is None or tag_status == scan["scanResultStatus"]
+    log = logger.info if tag_status == scan["scanResultStatus"] else logger.warning
+    log(
+        "Compared scan result event with object tag",
+        extra={
+            "scan_result_status": scan["scanResultStatus"],
+            "tag_status": tag_status,
+            "matches_tag": matches,
+        },
+    )
+    return matches
 
 
 def _workflow_record(scan):

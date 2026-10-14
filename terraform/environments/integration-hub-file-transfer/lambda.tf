@@ -421,12 +421,14 @@ module "lambda_file_action_execution_requested_adapter" {
   trigger_on_package_timestamp      = false
 
   environment_variables = {
-    DISPATCH_SECRET_NAME_PREFIX = local.file_dispatch_secret_name_prefix
-    EVENT_BUS_ARN               = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
-    IDEMPOTENCY_EXPIRY_SECONDS  = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
-    IDEMPOTENCY_TABLE           = module.dynamodb_adapter_idempotency.dynamodb_table_id
-    POWERTOOLS_LOG_LEVEL        = "INFO"
-    POWERTOOLS_SERVICE_NAME     = "file-action-execution-requested-adapter"
+    DISPATCH_SECRET_NAME_PREFIX  = local.file_dispatch_secret_name_prefix
+    EVENT_BUS_ARN                = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
+    IDEMPOTENCY_EXPIRY_SECONDS   = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE            = module.dynamodb_adapter_idempotency.dynamodb_table_id
+    POWERTOOLS_LOG_LEVEL         = "INFO"
+    POWERTOOLS_METRICS_NAMESPACE = "IntegrationHubFileTransfer"
+    POWERTOOLS_SERVICE_NAME      = "file-action-execution-requested-adapter"
+    WORKFLOW_IDEMPOTENCY_TABLE   = module.dynamodb_file_transfer_idempotency.dynamodb_table_id
   }
 
   attach_policy_statements = true
@@ -445,6 +447,11 @@ module "lambda_file_action_execution_requested_adapter" {
         "dynamodb:UpdateItem",
       ]
       resources = [module.dynamodb_adapter_idempotency.dynamodb_table_arn]
+    }
+    read_staging_record = {
+      effect    = "Allow"
+      actions   = ["dynamodb:GetItem"]
+      resources = [module.dynamodb_file_transfer_idempotency.dynamodb_table_arn]
     }
     read_dispatch_configuration = {
       effect  = "Allow"

@@ -62,7 +62,7 @@
             },
             "scanResultStatusMatchesTag": {
               "type": "boolean",
-              "description": "Whether scanResultStatus matches the GuardDutyMalwareScanStatus tag on the exact object version. False when the tag is absent or differs."
+              "description": "Whether scanResultStatus matches the GuardDutyMalwareScanStatus tag on the exact object version. False only when the tag is present and differs. An absent tag is logged and reported as true."
             },
             "statusReasons": {
               "type": "array",
