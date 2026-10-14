@@ -43,13 +43,9 @@ profile in front of it. Four Claude models support this in eu-west-2:
 eu-west-2 is the only region offering in-region inference for Opus 5.5 at all.
 
 Opus 5.5, Sonnet 4.6 and Opus 4.6 are in-region in eu-west-2 and nowhere else, so an unprefixed ID
-sent to the wrong region fails rather than quietly running abroad. Sonnet 5 is the exception - it is
-also in-region in ap-northeast-2 and ap-southeast-1 - so `HMCTSClaudeBedrockPolicy` pins its
-foundation model ARN to eu-west-2 and grants neither the global ARN nor an EU profile. Widening that
-ARN would make an unprefixed Sonnet 5 request servable outside the UK.
-
-One consequence: `eu.anthropic.claude-sonnet-5`, which this README recommended until October 2026,
-now returns AccessDenied. Anyone still holding it in their shell should copy the model IDs above.
+sent to the wrong region fails rather than running abroad. Sonnet 5 is also in-region in
+ap-northeast-2 and ap-southeast-1, so `HMCTSClaudeBedrockPolicy` admits its foundation model ARN
+only under `eu-*`, and neither globally nor in any non-EU region.
 
 To check whether another model has gained in-region support:
 

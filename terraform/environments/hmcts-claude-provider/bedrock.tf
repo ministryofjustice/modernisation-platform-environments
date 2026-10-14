@@ -18,9 +18,7 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
         Resource = [
           # Regional foundation models
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-5-5",
-          # Sonnet 5 also supports in-region inference in ap-northeast-2 and ap-southeast-1, so an
-          # unprefixed model ID would be served outside the UK under a wider region wildcard.
-          "arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-sonnet-5",
+          "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-5",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-fable-5",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-opus-5-5",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-opus-5",
@@ -54,6 +52,7 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
         Resource = [
           # EU inference profiles (routes only within EU regions)
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-sonnet-5-5",
+          "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-sonnet-5",
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-fable-5",
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-5-5",
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-5",
