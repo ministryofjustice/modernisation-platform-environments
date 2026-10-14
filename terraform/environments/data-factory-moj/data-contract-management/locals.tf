@@ -14,6 +14,12 @@ locals {
     {}
   ) : {}
 
+  validation_deployments = local.contract_management_enabled ? lookup(
+    var.validation_deployments_by_environment,
+    local.environment,
+    {}
+  ) : {}
+
   registration_image_uri = lookup(
     var.registration_image_uris,
     local.environment,

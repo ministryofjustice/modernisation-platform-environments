@@ -122,3 +122,20 @@ output "validation_ecr_repository_url" {
     : null
   )
 }
+
+output "validation_deployments" {
+  description = "Schema-validation resources by configured deployment."
+  value = {
+    for key, deployment in module.schema_validation : key => {
+      function_name         = deployment.function_name
+      function_arn          = deployment.function_arn
+      execution_role_arn    = deployment.execution_role_arn
+      validation_table_name = deployment.validation_table_name
+      validation_table_arn  = deployment.validation_table_arn
+      log_group_name        = deployment.log_group_name
+      failure_queue_arn     = deployment.failure_queue_arn
+      failure_queue_url     = deployment.failure_queue_url
+      alarm_arns            = deployment.alarm_arns
+    }
+  }
+}
