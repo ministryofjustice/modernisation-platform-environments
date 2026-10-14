@@ -7,8 +7,9 @@ locals {
 }
 
 resource "aws_acm_certificate" "soa" {
-  domain_name               = local.admin_fqdn
-  subject_alternative_names = [local.managed_fqdn]
+  # CN is capped at 64 chars, so use the zone apex and carry the long FQDNs as SANs
+  domain_name               = trim(data.aws_route53_zone.external.name, ".")
+  subject_alternative_names = [local.admin_fqdn, local.managed_fqdn]
   validation_method         = "DNS"
 
   tags = local.tags
