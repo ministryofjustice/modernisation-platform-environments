@@ -11,7 +11,7 @@ module "nlb_admin" {
   subnet_ids         = data.aws_subnets.shared-private.ids
   security_group_ids = [aws_security_group.nlb_admin.id]
   vpc_id             = data.aws_vpc.shared.id
-  certificate_arn    = data.aws_acm_certificate.wildcard.arn
+  certificate_arn    = aws_acm_certificate_validation.soa.certificate_arn
   target_port        = local.application_data.accounts[local.environment].admin_ssl_port
 
   target_group_protocol   = "TLS"
@@ -44,7 +44,7 @@ module "nlb_managed" {
   subnet_ids         = data.aws_subnets.shared-private.ids
   security_group_ids = [aws_security_group.nlb_managed.id]
   vpc_id             = data.aws_vpc.shared.id
-  certificate_arn    = data.aws_acm_certificate.wildcard.arn
+  certificate_arn    = aws_acm_certificate_validation.soa.certificate_arn
   target_port        = local.application_data.accounts[local.environment].managed_ssl_port
 
   target_group_protocol   = "TLS"
