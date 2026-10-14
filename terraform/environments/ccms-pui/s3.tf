@@ -1,5 +1,5 @@
 module "s3_pui_docs" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_name        = "${local.application_name}-docs-${local.environment}"
   versioning_enabled = true
@@ -86,8 +86,7 @@ module "s3_pui_docs" {
 
 # S3 Bucket - Logging
 module "s3-bucket-logging" {
-  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_name        = "${local.application_name}-${local.environment}-logging"
   versioning_enabled = true
@@ -118,29 +117,9 @@ module "s3-bucket-logging" {
         autoclean = "true"
       }
 
-      transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
-          storage_class = "GLACIER"
-        }
-      ]
-
       expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
       }
-
-      noncurrent_version_transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
-          storage_class = "GLACIER"
-        }
-      ]
 
       noncurrent_version_expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
@@ -236,10 +215,9 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
   })
 }
 
-# S3 Bucket - Logging
+# S3 Bucket - Shared
 module "s3-bucket-shared" {
-  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_name        = "${local.application_name}-${local.environment}-shared"
   versioning_enabled = true
