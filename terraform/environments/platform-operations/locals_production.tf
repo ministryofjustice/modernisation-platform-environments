@@ -20,7 +20,7 @@ locals {
       azure-fixngo-dso-devtest-drift-check = {
         identity = "platops"
         inputs = {
-          project       = "driftcheck"
+          projects      = "driftcheck"
           scheduled_run = "driftcheck"
         }
 
@@ -33,7 +33,7 @@ locals {
       azure-fixngo-dso-devtest-resource-locks = {
         identity = "platops"
         inputs = {
-          project       = "resource_locks"
+          projects      = "resource_locks"
           scheduled_run = "resource_locks"
         }
 
@@ -46,7 +46,7 @@ locals {
       azure-fixngo-noms-dso-prod1-drift-check = {
         identity = "platops"
         inputs = {
-          project       = "driftcheck"
+          projects      = "driftcheck"
           scheduled_run = "driftcheck"
         }
 
@@ -59,7 +59,7 @@ locals {
       azure-fixngo-noms-dso-prod1-resource-locks = {
         identity = "platops"
         inputs = {
-          project       = "resource_locks"
+          projects      = "resource_locks"
           scheduled_run = "resource_locks"
         }
 
@@ -72,7 +72,7 @@ locals {
       azure-fixngo-noms-prod1-drift-check = {
         identity = "platops"
         inputs = {
-          project       = "driftcheck"
+          projects      = "driftcheck"
           scheduled_run = "driftcheck"
         }
 
@@ -85,7 +85,7 @@ locals {
       azure-fixngo-noms-prod1-resource-locks = {
         identity = "platops"
         inputs = {
-          project       = "resource_locks"
+          projects      = "resource_locks"
           scheduled_run = "resource_locks"
         }
 
@@ -98,7 +98,7 @@ locals {
       azure-fixngo-platops-drift-check = {
         identity = "platops"
         inputs = {
-          project       = "driftcheck"
+          projects      = "driftcheck"
           scheduled_run = "driftcheck"
         }
 
@@ -111,7 +111,7 @@ locals {
       azure-fixngo-platops-resource-locks = {
         identity = "platops"
         inputs = {
-          project       = "resource_locks"
+          projects      = "resource_locks"
           scheduled_run = "resource_locks"
         }
 
