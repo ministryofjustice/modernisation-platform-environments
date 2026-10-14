@@ -20,7 +20,11 @@ locals {
       azure-fixngo-dso-devtest-drift-check = {
         identity = "platops"
         inputs = {
-          projects = "nomisapi-t3 resource_locks dso-terraform-state"
+          projects = join("$${IFS:0:1}", [
+            "resource_locks",
+            "log_analytics",
+            "dso-terraform-state",
+          ])
           action   = "driftcheck"
         }
 
@@ -46,7 +50,13 @@ locals {
       azure-fixngo-noms-dso-prod1-drift-check = {
         identity = "platops"
         inputs = {
-          projects = "nomisapi-preprod resource_locks dso-terraform-state webops-prod nomisapi-prod"
+          projects = join("$${IFS:0:1}", [
+            "nomisapi-preprod",
+            "resource_locks",
+            "dso-terraform-state",
+            "webops-prod",
+            "nomisapi-prod",
+          ])
           action   = "driftcheck"
         }
 
@@ -72,7 +82,26 @@ locals {
       azure-fixngo-noms-prod1-drift-check = {
         identity = "platops"
         inputs = {
-          projects = "noms-prod-alert-rules automation_account Network-NOMS-Live dso-passwords-prod dso-boot-diagnostics Network-NOMS-Routes noms-prod-azure-monitor dso-certs resource_locks NetworkWatcher log_analytics dso-terraform-state Network-NOMS-Transit-Live noms-live noms-mgmt-live dso-passwords-devtest-backup Network-NOMS-Mgmt-Live pd-noncoreapps"
+          projects = join("$${IFS:0:1}", [
+            "noms-prod-alert-rules",
+            "automation_account",
+            "Network-NOMS-Live",
+            "dso-passwords-prod",
+            "dso-boot-diagnostics",
+            "Network-NOMS-Routes",
+            "noms-prod-azure-monitor",
+            "dso-certs",
+            "resource_locks",
+            "NetworkWatcher",
+            "log_analytics",
+            "dso-terraform-state",
+            "Network-NOMS-Transit-Live",
+            "noms-live",
+            "noms-mgmt-live",
+            "dso-passwords-devtest-backup",
+            "Network-NOMS-Mgmt-Live",
+            "pd-noncoreapps",
+          ])
           action   = "driftcheck"
         }
 
@@ -98,7 +127,11 @@ locals {
       azure-fixngo-platops-drift-check = {
         identity = "platops"
         inputs = {
-          projects = "resource_locks log_analytics dso-terraform-state"
+          projects = join("$${IFS:0:1}", [
+            "resource_locks",
+            "log_analytics",
+            "dso-terraform-state",
+          ])
           action   = "driftcheck"
         }
 
