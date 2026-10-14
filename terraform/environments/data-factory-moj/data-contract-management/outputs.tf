@@ -125,7 +125,8 @@ output "validation_ecr_repository_url" {
 
 output "validation_deployments" {
   description = "Schema-validation resources by configured deployment."
-  value = {
+
+  value = local.contract_management_enabled ? {
     for key, deployment in module.schema_validation : key => {
       function_name         = deployment.function_name
       function_arn          = deployment.function_arn
@@ -137,5 +138,5 @@ output "validation_deployments" {
       failure_queue_url     = deployment.failure_queue_url
       alarm_arns            = deployment.alarm_arns
     }
-  }
+  } : null
 }
