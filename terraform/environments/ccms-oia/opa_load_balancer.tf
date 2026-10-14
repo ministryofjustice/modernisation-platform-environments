@@ -98,40 +98,40 @@ resource "aws_lb_listener" "opahub_listener" {
 }
 
 # Temp only for DEV OIA
-resource "aws_lb_listener" "opahub_listener_7002" {
-  count             = local.is-development ? 1 : 0
-  load_balancer_arn = aws_lb.opahub.id
-  port              = "7002"
-  protocol          = "HTTP"
+# resource "aws_lb_listener" "opahub_listener_7002" {
+#   count             = local.is-development ? 1 : 0
+#   load_balancer_arn = aws_lb.opahub.id
+#   port              = "7002"
+#   protocol          = "HTTP"
 
-  default_action {
-    target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
-    type             = "forward"
-  }
-}
+#   default_action {
+#     target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
+#     type             = "forward"
+#   }
+# }
 
-# Temp only for TEST OIA
-resource "aws_lb_listener" "opahub_listener_7002_test" {
-  count             = local.is-test ? 1 : 0
-  load_balancer_arn = aws_lb.opahub.id
-  port              = "7002"
-  protocol          = "HTTP"
+# # Temp only for TEST OIA
+# resource "aws_lb_listener" "opahub_listener_7002_test" {
+#   count             = local.is-test ? 1 : 0
+#   load_balancer_arn = aws_lb.opahub.id
+#   port              = "7002"
+#   protocol          = "HTTP"
 
-  default_action {
-    target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
-    type             = "forward"
-  }
-}
+#   default_action {
+#     target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
+#     type             = "forward"
+#   }
+# }
 
-# Temp only for DEV OIA
-resource "aws_lb_listener" "opahub_listener_preproduction_7002" {
-  count             = local.is-preproduction ? 1 : 0
-  load_balancer_arn = aws_lb.opahub.id
-  port              = "7002"
-  protocol          = "HTTP"
+# # Temp only for DEV OIA
+# resource "aws_lb_listener" "opahub_listener_preproduction_7002" {
+#   count             = local.is-preproduction ? 1 : 0
+#   load_balancer_arn = aws_lb.opahub.id
+#   port              = "7002"
+#   protocol          = "HTTP"
 
-  default_action {
-    target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
-    type             = "forward"
-  }
-}
+#   default_action {
+#     target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
+#     type             = "forward"
+#   }
+# }
