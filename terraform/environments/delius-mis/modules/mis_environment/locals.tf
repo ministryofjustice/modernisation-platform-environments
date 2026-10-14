@@ -56,39 +56,27 @@ locals {
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
         namespace           = "CWAgent"
-        metric_name         = "collectd_textfile_monitoring_value"
+        metric_name         = "collectd_textfile_monitoring_rclone_sync_value"
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if rclone-sync metric collected via /opt/textfile_monitoring is in error, e.g. rclone-sync to sharepoint is failing"
-        alarm_actions       = []
-        ok_actions          = []
-        #alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
-        #ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
-        dimensions = {
-          type          = "gauge"
-          type_instance = "rclone_sync_status"
-        }
+        alarm_description   = "Triggers if any metric collected via /opt/textfile_monitoring/rclone_sync is in error, See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/6319178819"
+        alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
+        ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
       }
       rclone-sync-metric-not-updated = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "1"
         datapoints_to_alarm = "1"
         namespace           = "CWAgent"
-        metric_name         = "collectd_textfile_monitoring_seconds"
-        period              = "600"
-        statistic           = "Maximum"
+        metric_name         = "collectd_textfile_monitoring_rclone_sync_seconds"
+        period              = "300"
+        statistic           = "Minimum"
         threshold           = "7200"
         treat_missing_data  = "breaching"
-        alarm_description   = "Triggers if rclone-sync metric in /opt/textfile_monitoring hasn't been updated for over 2 hours, e.g. rclone-sync to sharepoint isn't running"
-        alarm_actions       = []
-        ok_actions          = []
-        #alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
-        #ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
-        dimensions = {
-          type          = "duration"
-          type_instance = "rclone_sync_status"
-        }
+        alarm_description   = "Triggers if no metrics in /opt/textfile_monitoring/rclone_sync have been updated in the last 2 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/6319572194"
+        alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
+        ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
       }
     }
   }

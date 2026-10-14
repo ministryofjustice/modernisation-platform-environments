@@ -1431,7 +1431,11 @@ module "merge_redrive_planner" {
     "core-shared-services-production"
   ]
 
-  production_dev = local.env_name
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
 
   security_group_ids = [aws_security_group.lambda_generic.id]
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -1439,10 +1443,12 @@ module "merge_redrive_planner" {
   environment_variables = {
     POWERTOOLS_LOG_LEVEL = "INFO"
 
-    ENVIRONMENT_NAME      = local.environment_shorthand
-    ATHENA_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
-    ATHENA_WORKGROUP      = aws_athena_workgroup.downstream_reconciliation.name
-    SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT_NAME            = local.environment_shorthand
+    ATHENA_RESULTS_BUCKET       = module.s3-athena-bucket.bucket.id
+    ATHENA_WORKGROUP            = aws_athena_workgroup.downstream_reconciliation.name
+    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+    SNS_TOPIC_ARN               = aws_sns_topic.emds_alerts.arn
 
     POSITION_LOOKBACK_HOURS            = "24"
     ACTIVATION_LOOKBACK_HOURS          = "24"
@@ -1450,6 +1456,181 @@ module "merge_redrive_planner" {
     MAX_AUTOMATIC_REPLAY_ROWS_PER_DATE = "50000"
     MAX_AUTOMATIC_REPLAY_ROWS          = "250000"
     MAX_AUTOMATIC_REPLAY_DATES         = "20"
+    MAX_REPLAY_ROWS_PER_CHUNK          = "50000"
+    MAX_AUTOMATIC_REPLAY_CHUNKS        = "20"
     ATHENA_MAX_POLL_SECONDS            = "840"
   }
+}
+
+module "merge_redrive_approval" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_redrive_approval"
+  image_name                     = "merge_redrive_approval"
+  role_name                      = aws_iam_role.merge_redrive_approval.name
+  role_arn                       = aws_iam_role.merge_redrive_approval.arn
+  handler                        = "merge_redrive_approval.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    ENVIRONMENT_NAME            = local.environment_shorthand
+    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Rota channel notifier
+# ------------------------------------------------------------------------------
+
+module "rota_channel_notifier" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "rota_channel_notifier"
+  role_name                      = aws_iam_role.rota_channel_notifier.name
+  role_arn                       = aws_iam_role.rota_channel_notifier.arn
+  handler                        = "rota_channel_notifier.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    ENVIRONMENT             = local.environment_shorthand
+    POWERTOOLS_LOG_LEVEL    = "INFO"
+    POWERTOOLS_SERVICE_NAME = "rota-channel-notifier"
+
+    PAGERDUTY_SECRET_ARN       = module.live_feed_github_app.secret_arn
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
+
+    SLACK_SECRET_ARN = module.rota_channel_notifier_slack.secret_arn
+    SLACK_CHANNEL_ID = local.rota_channel_notifier_slack_channels[
+      local.environment_shorthand
+    ]
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Auto email ears/sars
+# ------------------------------------------------------------------------------
+
+module "send_ear_sar_response" {
+  count                          = local.is-test ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "send_ear_sar_response"
+  role_name                      = aws_iam_role.send_ear_sar_response[0].name
+  role_arn                       = aws_iam_role.send_ear_sar_response[0].arn
+  handler                        = "send_ear_sar_response.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  security_group_ids = [
+    aws_security_group.lambda_gov_notify_access.id,
+  ]
+
+  subnet_ids = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    GOV_NOTIFY_API_KEY          = jsondecode(data.aws_secretsmanager_secret_version.gov_notify_details[0].secret_string)["api_key"]
+    GOV_NOTIFY_EAR_SAR_TEMPLATE = jsondecode(data.aws_secretsmanager_secret_version.gov_notify_details[0].secret_string)["ear_sar_template"]
+    EAR_SAR_REPLY_EMAILS        = jsondecode(data.aws_secretsmanager_secret_version.gov_notify_details[0].secret_string)["emails"]
+    GOV_NOTIFY_REPLY_KEY        = jsondecode(data.aws_secretsmanager_secret_version.gov_notify_details[0].secret_string)["reply_key"]
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Trigger DLT Iceberg Maintenance
+#-----------------------------------------------------------------------------------
+
+module "trigger_dlt_iceberg_maintenance" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "trigger_dlt_iceberg_maintenance"
+  image_name                     = "trigger_dlt_iceberg_maintenance"
+  role_name                      = aws_iam_role.trigger_dlt_iceberg_maintenance.name
+  role_arn                       = aws_iam_role.trigger_dlt_iceberg_maintenance.arn
+  memory_size                    = 2048
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    CATALOG_ID              = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME        = local.env_name
+    ATHENA_WORKGROUP        = aws_athena_workgroup.dlt_iceberg_maintenance.name
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+
+  depends_on = [
+    aws_iam_role_policy.trigger_dlt_iceberg_maintenance,
+    aws_lakeformation_permissions.dlt_iceberg_maintenance_database_access,
+    aws_lakeformation_permissions.dlt_iceberg_maintenance_table_access,
+    aws_lakeformation_permissions.dlt_iceberg_maintenance_data_location,
+  ]
+}
+
+module "poll_dlt_iceberg_maintenance" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "poll_dlt_iceberg_maintenance"
+  image_name                     = "poll_dlt_iceberg_maintenance"
+  role_name                      = aws_iam_role.poll_dlt_iceberg_maintenance.name
+  role_arn                       = aws_iam_role.poll_dlt_iceberg_maintenance.arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    CATALOG_ID              = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME        = local.env_name
+    ATHENA_WORKGROUP        = aws_athena_workgroup.dlt_iceberg_maintenance.name
+    MAX_WAIT_SECONDS        = "2700"
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+
+  depends_on = [aws_iam_role_policy.poll_dlt_iceberg_maintenance]
 }

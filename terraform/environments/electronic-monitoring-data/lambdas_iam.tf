@@ -17,6 +17,16 @@ locals {
     "data_insights${local.dbt_suffix}"
   ]
 
+  dlt_iceberg_maintenance_databases = [
+    "allied_mdss${local.db_suffix}",
+    "serco_fms${local.db_suffix}"
+  ]
+
+  dlt_iceberg_maintenance_table_prefixes = toset([
+    for database in local.dlt_iceberg_maintenance_databases :
+    "staging/${database}_pipeline/${database}/_dlt_loads"
+  ])
+
 }
 
 # ------------------------------------------
@@ -1260,29 +1270,12 @@ resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
 
 data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document" {
   statement {
-    sid    = "AthenaQueryPermissionsForCleanup"
-    effect = "Allow"
-    actions = [
-      "athena:StartQueryExecution",
-      "athena:GetQueryExecution",
-      "athena:GetQueryResults",
-      "athena:GetDataCatalog",
-      "athena:GetWorkGroup"
-    ]
-    resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:workgroup/*",
-      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:datacatalog/*"
-    ]
-  }
-
-  statement {
     sid    = "GluePermissionsForCleanup"
     effect = "Allow"
     actions = [
       "glue:GetTables",
       "glue:GetTable",
       "glue:GetDatabase",
-      "glue:UpdateTable",
       "glue:DeleteTable",
       "glue:DeleteDatabase",
     ]
@@ -1299,8 +1292,6 @@ data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document
     effect = "Allow"
     actions = [
       "s3:ListBucket",
-      "s3:GetObject",
-      "s3:PutObject",
       "s3:DeleteObject",
       "s3:DeleteObjectVersion",
       "s3:GetBucketLocation",
@@ -1308,8 +1299,6 @@ data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document
     resources = [
       module.s3-create-a-derived-table-bucket.bucket.arn,
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
-      module.s3-athena-bucket.bucket.arn,
-      "${module.s3-athena-bucket.bucket.arn}/*",
     ]
   }
 
@@ -3720,6 +3709,32 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
       aws_kms_key.emds_alerts.arn,
     ]
   }
+  statement {
+    sid    = "ReconciliationStateAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid    = "StoreReconciliationApprovalToken"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation-approval-tokens/${local.environment_shorthand}/*",
+    ]
+  }
 }
 
 resource "aws_iam_policy" "merge_redrive_planner" {
@@ -3730,4 +3745,408 @@ resource "aws_iam_policy" "merge_redrive_planner" {
 resource "aws_iam_role_policy_attachment" "merge_redrive_planner" {
   role       = aws_iam_role.merge_redrive_planner.name
   policy_arn = aws_iam_policy.merge_redrive_planner.arn
+}
+
+resource "aws_iam_role" "merge_redrive_approval" {
+  name               = "merge_redrive_approval_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "merge_redrive_approval_policy_document" {
+  statement {
+    sid    = "ReadReconciliationApprovalState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid    = "ConsumeReconciliationApprovalToken"
+    effect = "Allow"
+
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation-approval-tokens/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid       = "CompleteReconciliationApprovalCallback"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "merge_redrive_approval" {
+  name   = "merge_redrive_approval_lambda_policy"
+  policy = data.aws_iam_policy_document.merge_redrive_approval_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "merge_redrive_approval" {
+  role       = aws_iam_role.merge_redrive_approval.name
+  policy_arn = aws_iam_policy.merge_redrive_approval.arn
+}
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation approval access
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "downstream_reconciliation_chatbot_approval" {
+  statement {
+    sid    = "InvokeReconciliationApprovalLambda"
+    effect = "Allow"
+
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+
+    resources = [
+      module.merge_redrive_approval.lambda_function_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "downstream_reconciliation_chatbot_approval" {
+  name = "downstream_reconciliation_chatbot_approval"
+
+  policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_chatbot_approval.json
+  )
+}
+
+data "aws_iam_policy_document" "downstream_reconciliation_approver_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["chatbot.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "downstream_reconciliation_approver" {
+  name = "downstream_reconciliation_approver"
+
+  assume_role_policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_approver_assume.json
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "downstream_reconciliation_approver" {
+  role       = aws_iam_role.downstream_reconciliation_approver.name
+  policy_arn = aws_iam_policy.downstream_reconciliation_chatbot_approval.arn
+}
+
+# ------------------------------------------------------------------------------
+# IAM role and policy for the rota channel notifier Lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rota_channel_notifier" {
+  name               = "rota_channel_notifier_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "rota_channel_notifier_policy_document" {
+  statement {
+    sid    = "ReadRotaChannelNotifierSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+      module.rota_channel_notifier_slack.secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "rota_channel_notifier" {
+  name   = "rota_channel_notifier_lambda_policy"
+  policy = data.aws_iam_policy_document.rota_channel_notifier_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "rota_channel_notifier_attach" {
+  role       = aws_iam_role.rota_channel_notifier.name
+  policy_arn = aws_iam_policy.rota_channel_notifier.arn
+}
+
+# ------------------------------------------------------------------------------
+# send_ear_sar_response
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "send_ear_sar_response" {
+  count              = local.is-test ? 0 : 1
+  name               = "send_ear_sar_response_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "send_ear_sar_response_policy_document" {
+  count = local.is-test ? 0 : 1
+  statement {
+    sid    = "ReadGovNotifySecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.gov_notify_details[0].secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "send_ear_sar_response" {
+  count  = local.is-test ? 0 : 1
+  name   = "send_ear_sar_response_lambda_policy"
+  policy = data.aws_iam_policy_document.send_ear_sar_response_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "send_ear_sar_response_attach" {
+  count      = local.is-test ? 0 : 1
+  role       = aws_iam_role.send_ear_sar_response[0].name
+  policy_arn = aws_iam_policy.send_ear_sar_response[0].arn
+}
+
+
+# ------------------------------------------------------------------------------
+# Trigger DLT Iceberg Maintenance
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "trigger_dlt_iceberg_maintenance" {
+  name               = "trigger-dlt-iceberg-maintenance"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "trigger_dlt_iceberg_maintenance" {
+  statement {
+    sid       = "DiscoverS3Buckets"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets"]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetWorkGroup",
+    ]
+    resources = [aws_athena_workgroup.dlt_iceberg_maintenance.arn]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["athena:GetDataCatalog"]
+    resources = ["arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:datacatalog/AwsDataCatalog"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "glue:GetPartitions",
+      "glue:UpdateTable",
+    ]
+    resources = concat(
+      ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog"],
+      [for database in local.dlt_iceberg_maintenance_databases : "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/${database}"],
+      [for database in local.dlt_iceberg_maintenance_databases : "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/${database}/_dlt_loads"],
+    )
+  }
+
+  statement {
+    effect  = "Allow"
+    actions = ["s3:GetBucketLocation"]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      module.s3-athena-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [module.s3-create-a-derived-table-bucket.bucket.arn]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values = concat(
+        tolist(local.dlt_iceberg_maintenance_table_prefixes),
+        [for prefix in local.dlt_iceberg_maintenance_table_prefixes : "${prefix}/*"],
+      )
+    }
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload",
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+    resources = [for prefix in local.dlt_iceberg_maintenance_table_prefixes : "${module.s3-create-a-derived-table-bucket.bucket.arn}/${prefix}/*"]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [module.s3-athena-bucket.bucket.arn]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["output/dlt_iceberg_maintenance", "output/dlt_iceberg_maintenance/*"]
+    }
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload",
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = ["${module.s3-athena-bucket.bucket.arn}/output/dlt_iceberg_maintenance/*"]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "trigger_dlt_iceberg_maintenance" {
+  name   = "trigger-dlt-iceberg-maintenance"
+  role   = aws_iam_role.trigger_dlt_iceberg_maintenance.id
+  policy = data.aws_iam_policy_document.trigger_dlt_iceberg_maintenance.json
+}
+
+resource "aws_iam_role" "poll_dlt_iceberg_maintenance" {
+  name               = "poll-dlt-iceberg-maintenance"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "poll_dlt_iceberg_maintenance" {
+  statement {
+    sid       = "DiscoverS3Buckets"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets"]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "athena:BatchGetQueryExecution",
+      "athena:StopQueryExecution",
+    ]
+    resources = [aws_athena_workgroup.dlt_iceberg_maintenance.arn]
+  }
+}
+
+resource "aws_iam_role_policy" "poll_dlt_iceberg_maintenance" {
+  name   = "poll-dlt-iceberg-maintenance"
+  role   = aws_iam_role.poll_dlt_iceberg_maintenance.id
+  policy = data.aws_iam_policy_document.poll_dlt_iceberg_maintenance.json
+}
+
+resource "aws_lakeformation_permissions" "dlt_iceberg_maintenance_database_access" {
+  for_each = toset(local.dlt_iceberg_maintenance_databases)
+
+  principal   = aws_iam_role.trigger_dlt_iceberg_maintenance.arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "dlt_iceberg_maintenance_table_access" {
+  for_each = toset(local.dlt_iceberg_maintenance_databases)
+
+  principal   = aws_iam_role.trigger_dlt_iceberg_maintenance.arn
+  permissions = ["SELECT", "DESCRIBE", "ALTER", "INSERT", "DELETE"]
+
+  table {
+    database_name = each.value
+    name          = "_dlt_loads"
+  }
+}
+
+resource "aws_lakeformation_permissions" "dlt_iceberg_maintenance_data_location" {
+  for_each = local.dlt_iceberg_maintenance_table_prefixes
+
+  principal   = aws_iam_role.trigger_dlt_iceberg_maintenance.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+
+  data_location {
+    arn = "${aws_lakeformation_resource.data_bucket.arn}/${each.value}"
+  }
+}
+
+data "aws_iam_policy_document" "dlt_iceberg_maintenance_events_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.dlt_iceberg_maintenance.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+resource "aws_iam_role" "dlt_iceberg_maintenance_events" {
+  name               = "dlt-iceberg-maintenance-events"
+  assume_role_policy = data.aws_iam_policy_document.dlt_iceberg_maintenance_events_assume.json
+}
+
+data "aws_iam_policy_document" "dlt_iceberg_maintenance_start" {
+  statement {
+    effect    = "Allow"
+    actions   = ["states:StartExecution"]
+    resources = [module.dlt_iceberg_maintenance.arn]
+  }
+}
+
+resource "aws_iam_role_policy" "dlt_iceberg_maintenance_start" {
+  name   = "dlt-iceberg-maintenance-start"
+  role   = aws_iam_role.dlt_iceberg_maintenance_events.id
+  policy = data.aws_iam_policy_document.dlt_iceberg_maintenance_start.json
 }

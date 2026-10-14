@@ -1,7 +1,7 @@
 # PUI application secrets stored as key-value pairs. Values are populated manually after creation.
 
 resource "aws_secretsmanager_secret" "pui" {
-  name        = "${local.component_name}-secrets"
+  name        = local.component_name
   description = "Application secrets for PUI"
 }
 

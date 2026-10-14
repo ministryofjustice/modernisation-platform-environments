@@ -14,6 +14,7 @@ module "dynamodb_idempotency" {
 
   server_side_encryption_enabled = true
   point_in_time_recovery_enabled = true
+  deletion_protection_enabled    = true
   table_class                    = "STANDARD"
   ttl_attribute_name             = "expiration"
   ttl_enabled                    = true

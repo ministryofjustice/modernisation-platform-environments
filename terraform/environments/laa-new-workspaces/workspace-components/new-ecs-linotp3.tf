@@ -11,7 +11,7 @@
 ##############################################
 
 data "aws_secretsmanager_secret" "ad_admin_password" {
-  name  = "${local.application_name}/${local.environment}/ad-admin-password"
+  name = "${local.application_name}/${local.environment}/ad-admin-password"
 }
 
 ##############################################

@@ -29,7 +29,7 @@ direct connection between them.
 ## Key facts
 
 | | |
-|---|---|
+| --- | --- |
 | **Shared VPC** | Both apps sit in the same Modernisation Platform shared VPC, `eu-west-2` |
 | **Only real link today** | None — the OAS↔EDW security group rules exist in Terraform but are commented out on both sides |
 | **oas compute** | EC2 r5a.large (WebLogic + Analytics), ALB |

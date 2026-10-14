@@ -19,7 +19,7 @@ resource "aws_security_group" "ecs_service" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(local.tags, { Name = "vcms-ecs"})
+  tags = merge(local.tags, { Name = "vcms-ecs" })
 }
 
 # Security group for ALB
@@ -56,24 +56,24 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(local.tags, { Name = "alb-sg"})
+  tags = merge(local.tags, { Name = "alb-sg" })
 }
 
 resource "aws_security_group_rule" "ecs_from_alb" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
+  type      = "ingress"
+  from_port = 80
+  to_port   = 80
+  protocol  = "tcp"
 
   security_group_id        = aws_security_group.ecs_service.id
   source_security_group_id = aws_security_group.alb_sg.id
 }
 
 resource "aws_security_group_rule" "alb_from_ecs" {
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
+  type      = "ingress"
+  from_port = 443
+  to_port   = 443
+  protocol  = "tcp"
 
   security_group_id        = aws_security_group.alb_sg.id
   source_security_group_id = aws_security_group.ecs_service.id

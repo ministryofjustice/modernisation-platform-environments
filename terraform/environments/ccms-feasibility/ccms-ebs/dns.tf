@@ -21,7 +21,7 @@ resource "aws_route53_record" "ebsdb" {
 }
 
 resource "aws_route53_record" "ebsapps_instance" {
-  count    = 2
+  count    = local.ebsapps_count
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "${local.component_name}-a${count.index + 1}-${local.env_label}"

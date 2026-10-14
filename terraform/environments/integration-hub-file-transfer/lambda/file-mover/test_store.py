@@ -23,6 +23,7 @@ class OperationStoreTest(unittest.TestCase):
             source_size_bytes=10,
             scan_result_status=None,
             scan_result_status_matches_tag=None,
+            received_at="2026-07-10T14:00:00Z",
         )
         self.existing_input = {
             "file_id": "file-id",
@@ -39,6 +40,7 @@ class OperationStoreTest(unittest.TestCase):
         self.assertEqual(claim.state, "CLAIMED")
         self.assertEqual(claim.item["status"], "IN_PROGRESS")
         self.assertEqual(claim.item["expiration"], 3700)
+        self.assertEqual(claim.item["received_at"], "2026-07-10T14:00:00Z")
 
     def test_reports_an_active_operation(self):
         self.table.put_item.side_effect = ConditionalFailure()

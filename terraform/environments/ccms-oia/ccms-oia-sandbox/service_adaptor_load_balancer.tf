@@ -46,7 +46,7 @@ resource "aws_lb_target_group" "adaptor_target_group" {
   lifecycle {
     create_before_destroy = true
   }
-  
+
   tags = merge(local.tags,
     { Name = lower(format("%s-tg", local.adaptor_app_name)) }
   )

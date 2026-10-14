@@ -99,7 +99,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Principal = {
           AWS = "*"
         },
-        Action   = "s3:*",
+        Action = "s3:*",
         Resource = [
           "${module.s3-bucket-logging.bucket.arn}/*",
           module.s3-bucket-logging.bucket.arn
@@ -129,7 +129,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
-      }, 
+      },
       {
         Sid    = "AllowS3Logging Shared Bucket"
         Effect = "Allow"
@@ -140,9 +140,9 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Resource = "${module.s3-bucket-logging.bucket.arn}/*"
         Condition = {
           ArnLike = {
-           "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+            "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
           }
-       }
+        }
       }
     ]
   })
@@ -159,13 +159,13 @@ module "s3-bucket-shared" {
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
-   log_buckets = {
-    log_bucket_name = module.s3-bucket-logging.bucket.id
-    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  log_buckets = {
+    log_bucket_name   = module.s3-bucket-logging.bucket.id
+    log_bucket_arn    = module.s3-bucket-logging.bucket.arn
     log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
-     }
+  }
   manage_log_bucket_policy = false
-  
+
   log_prefix = "s3access/${local.application_name}-${local.environment}-shared/${local.application_name}-${local.environment}-shared"
 
   # Refer to the below section "Replication" before enabling replication
@@ -227,7 +227,7 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         Principal = {
           AWS = "*"
         },
-        Action   = "s3:*",
+        Action = "s3:*",
         Resource = [
           "${module.s3-bucket-shared.bucket.arn}/*",
           module.s3-bucket-shared.bucket.arn

@@ -119,6 +119,11 @@ locals {
   dpr_rds_parameter_group_family = local.application_data.accounts[local.environment].dpr_rds_db.parameter_group_family
   dpr_rds_parameter_group_name   = local.application_data.accounts[local.environment].dpr_rds_db.parameter_group_name
 
+
+  # Operational Data Store (ODS)
+  ods_engine_version = local.application_data.accounts[local.environment].dpr_ods_db.engine_version
+
+
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
   dpr_subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
@@ -132,6 +137,7 @@ locals {
   rds_dbuilder_init_size         = 10
   rds_dbuilder_max_size          = 50
   rds_dbuilder_parameter_group   = local.application_data.accounts[local.environment].domain_builder_rds_parameter_group
+  rds_dbuilder_engine_version    = local.application_data.accounts[local.environment].domain_builder_rds_engine_version
   rds_dbuilder_port              = 5432
   rds_dbuilder_user              = "domain_builder"
   enable_dbuilder_lambda         = local.application_data.accounts[local.environment].enable_domain_builder_lambda

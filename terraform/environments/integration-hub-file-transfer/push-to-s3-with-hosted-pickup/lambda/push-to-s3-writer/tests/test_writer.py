@@ -10,10 +10,12 @@ from threading import Barrier
 import boto3
 import pytest
 import runtime
+from aws_lambda_powertools import Metrics
 from boto3.dynamodb.types import TypeSerializer
 from botocore.exceptions import ClientError
 from botocore.stub import Stubber
 from mft_writer import copy as copy_module
+from mft_writer import worker as worker_module
 from runtime import (
     ActionStore,
     InvalidMessage,
@@ -291,8 +293,8 @@ class FakeServices:
         return self.s3
 
 
-def writer_config(monkeypatch, *, reporter=False):
-    values = environment(reporter=reporter)
+def writer_config(monkeypatch, *, reporter=False, action_name="push-to-s3"):
+    values = environment(action_name=action_name, reporter=reporter)
     for key, value in values.items():
         monkeypatch.setenv(key, value)
     return runtime.WriterConfig.from_environment(os.environ, reporter=reporter)
@@ -898,6 +900,83 @@ def test_reporter_retries_failed_completion_without_changing_terminal_state(monk
     assert process_reporter_record(record(queue_arn=DLQ_ARN), config, services, Context()) == "failed-republished"
     assert services.eventbridge.calls[1]["Entries"][0]["Detail"] == first_detail
     assert services.table.items[action_id]["state"] == "FAILED"
+
+
+@pytest.mark.parametrize("action_name", ["push-to-s3", "push-to-s3-with-hosted-pickup"])
+@pytest.mark.parametrize("fail_publish_first", [False, True], ids=["first-publication", "retry"])
+def test_reporter_emits_delivery_failed_only_after_publishing(monkeypatch, action_name, fail_publish_first):
+    writer_config(monkeypatch, reporter=True, action_name=action_name)
+    services = FakeServices(fail_publish_first=fail_publish_first)
+    event = requested_event()
+    event["detail"]["data"]["action"]["name"] = action_name
+    dlq_event = {"Records": [record(event, queue_arn=DLQ_ARN)]}
+    service_name = f"integration-hub-file-transfer-{action_name}-dlq-reporter"
+    metrics = Metrics(namespace="ManagedFileTransfer", service=service_name)
+    metrics.clear_metrics()
+    monkeypatch.setattr(worker_module, "metrics", metrics)
+
+    first_result = runtime.process_reporter_event(dlq_event, Context(), services)
+    if fail_publish_first:
+        assert first_result == {"batchItemFailures": [{"itemIdentifier": "sqs-message-id"}]}
+        retry_metric_set = metrics.serialize_metric_set()
+        assert retry_metric_set["_aws"]["CloudWatchMetrics"][0]["Dimensions"] == [["ActionName", "service"]]
+        assert retry_metric_set["service"] == service_name
+        assert retry_metric_set["ReporterRecordFailed"] == [1.0]
+        assert "DeliveryFailed" not in retry_metric_set
+        metrics.clear_metrics()
+        assert runtime.process_reporter_event(dlq_event, Context(), services) == {"batchItemFailures": []}
+    else:
+        assert first_result == {"batchItemFailures": []}
+
+    metric_set = metrics.serialize_metric_set()
+    assert metric_set["_aws"]["CloudWatchMetrics"][0]["Namespace"] == "ManagedFileTransfer"
+    assert metric_set["_aws"]["CloudWatchMetrics"][0]["Dimensions"] == [["ActionName", "service"]]
+    assert {"Name": "DeliveryFailed", "Unit": "Count"} in metric_set["_aws"]["CloudWatchMetrics"][0]["Metrics"]
+    assert metric_set["ActionName"] == action_name
+    assert metric_set["service"] == service_name
+    assert metric_set["DeliveryFailed"] == [1.0]
+    assert json.loads(services.eventbridge.calls[-1]["Entries"][0]["Detail"])["data"]["status"] == "failed"
+    metrics.clear_metrics()
+
+
+@pytest.mark.parametrize("terminal_state", ["COPIED", "SUCCEEDED"])
+def test_reporter_does_not_emit_delivery_failed_for_success(monkeypatch, terminal_state):
+    config = writer_config(monkeypatch, reporter=True)
+    services = FakeServices()
+    seed_state(config, services.table, terminal_state, lease_until=0)
+    emitted = []
+    metrics = Metrics(namespace="ManagedFileTransfer")
+    metrics.clear_metrics()
+    monkeypatch.setattr(worker_module, "metrics", metrics)
+    monkeypatch.setattr(metrics, "add_metric", lambda **metric: emitted.append(metric))
+
+    assert runtime.process_reporter_event(
+        {"Records": [record(queue_arn=DLQ_ARN)]}, Context(), services
+    ) == {"batchItemFailures": []}
+    assert not [metric for metric in emitted if metric["name"] == "DeliveryFailed"]
+    metrics.clear_metrics()
+
+
+@pytest.mark.parametrize("action_name", ["push-to-s3", "push-to-s3-with-hosted-pickup"])
+def test_writer_failure_metric_has_service_dimension(monkeypatch, action_name):
+    writer_config(monkeypatch, action_name=action_name)
+    services = FakeServices()
+    malformed = record()
+    malformed["body"] = "not-json"
+    service_name = f"integration-hub-file-transfer-{action_name}"
+    metrics = Metrics(namespace="ManagedFileTransfer", service=service_name)
+    metrics.clear_metrics()
+    monkeypatch.setattr(worker_module, "metrics", metrics)
+
+    assert runtime.process_writer_event({"Records": [malformed]}, Context(), services) == {
+        "batchItemFailures": [{"itemIdentifier": "sqs-message-id"}]
+    }
+    metric_set = metrics.serialize_metric_set()
+    assert metric_set["_aws"]["CloudWatchMetrics"][0]["Dimensions"] == [["ActionName", "service"]]
+    assert metric_set["ActionName"] == action_name
+    assert metric_set["service"] == service_name
+    assert metric_set["WriterRecordFailed"] == [1.0]
+    metrics.clear_metrics()
 
 
 def test_writer_returns_partial_batch_failures(monkeypatch):

@@ -1,6 +1,6 @@
 module "ecs_cluster" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b08a04f9346b56b005fdff6fcd595dc04a60fb8a
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=b08a04f9346b56b005fdff6fcd595dc04a60fb8a"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=10d2292"
 
   cluster_name = "${local.component_name}-${local.env_label}-cluster"
   tags         = local.tags
@@ -18,18 +18,22 @@ module "ecs_cluster" {
       subnet_ids            = data.aws_subnets.shared-private.ids
       ebs_encrypted         = true
       kms_key_id            = data.aws_kms_key.ebs_shared.arn
-      user_data             = base64encode(templatefile("${path.module}/templates/user-data.sh", {
+      user_data = base64encode(templatefile("${path.module}/templates/user-data.sh", {
         cluster_name       = "${local.component_name}-${local.env_label}-cluster"
         efs_id             = module.efs.file_system_id
         deploy_environment = local.environment
       }))
     }
   }
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
 }
 
 module "ecs_service_opahub" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b08a04f9346b56b005fdff6fcd595dc04a60fb8a
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=b08a04f9346b56b005fdff6fcd595dc04a60fb8a"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.opahub_name}-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -70,6 +74,10 @@ module "ecs_service_opahub" {
     container_port   = local.application_data.accounts[local.environment].opa_server_port
   }
 
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
+
   depends_on = [
     module.alb_opahub,
     aws_iam_role_policy_attachment.ecs_task_execution,
@@ -79,8 +87,8 @@ module "ecs_service_opahub" {
 }
 
 module "ecs_service_connector" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b08a04f9346b56b005fdff6fcd595dc04a60fb8a
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=b08a04f9346b56b005fdff6fcd595dc04a60fb8a"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.connector_name}-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -137,6 +145,10 @@ module "ecs_service_connector" {
     container_port   = local.application_data.accounts[local.environment].connector_server_port
   }
 
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
+
   depends_on = [
     module.alb_connector,
     aws_iam_role_policy_attachment.ecs_task_execution,
@@ -145,8 +157,8 @@ module "ecs_service_connector" {
 }
 
 module "ecs_service_adaptor" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b08a04f9346b56b005fdff6fcd595dc04a60fb8a
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=b08a04f9346b56b005fdff6fcd595dc04a60fb8a"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.adaptor_name}-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -181,6 +193,10 @@ module "ecs_service_adaptor" {
     target_group_arn = module.alb_adaptor.target_group_arn
     container_name   = "${local.adaptor_name}-container"
     container_port   = local.application_data.accounts[local.environment].adaptor_server_port
+  }
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
   }
 
   depends_on = [

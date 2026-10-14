@@ -7,8 +7,8 @@ resource "helm_release" "cilium" {
   version    = local.cluster_configuration.helm_chart_versions.cilium
   namespace  = "kube-system"
 
-  wait = false
-  timeout    = local.helm_timeout
+  wait    = false
+  timeout = local.helm_timeout
 
   values = [
     templatefile(
@@ -35,8 +35,8 @@ resource "helm_release" "coredns" {
   version    = local.cluster_configuration.helm_chart_versions.coredns
   namespace  = "kube-system"
 
-  wait = false
-  timeout    = local.helm_timeout
+  wait    = false
+  timeout = local.helm_timeout
 
   values = [
     templatefile(
@@ -55,8 +55,8 @@ resource "helm_release" "kyverno" {
   version    = local.cluster_configuration.helm_chart_versions.kyverno
   namespace  = module.kyverno_namespace.name
 
-  wait = false
-  timeout    = local.helm_timeout
+  wait    = false
+  timeout = local.helm_timeout
 
   values = [
     templatefile(
@@ -389,7 +389,7 @@ resource "helm_release" "external_secrets_secret_stores" {
   name      = "external-secrets-secret-stores"
   chart     = "./src/helm/charts/external-secrets-secret-stores"
   namespace = module.external_secrets_namespace.name
-  timeout    = local.helm_timeout
+  timeout   = local.helm_timeout
 
   depends_on = [helm_release.external_secrets]
 }

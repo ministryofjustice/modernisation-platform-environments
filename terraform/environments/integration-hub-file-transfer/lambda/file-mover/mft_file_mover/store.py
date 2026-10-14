@@ -37,6 +37,9 @@ class OperationStore:
             item["scan_result_status_matches_tag"] = (
                 operation_event.scan_result_status_matches_tag
             )
+        if operation_event.received_at:
+            # S3 landing time, used to measure end-to-end latency at dispatch.
+            item["received_at"] = operation_event.received_at
         try:
             self.table.put_item(
                 Item=item,

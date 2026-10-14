@@ -339,6 +339,8 @@ def _process_event(
             with structured_record_context(fields):
                 result = process_record(record, config, services, context, fields)
                 metrics.add_metric(name=f"{metric_prefix}Record{result.title()}", unit=MetricUnit.Count, value=1)
+                if reporter and result in {"failed-reported", "failed-republished"}:
+                    metrics.add_metric(name="DeliveryFailed", unit=MetricUnit.Count, value=1)
                 logger.info(
                     f"{metric_prefix.lower()} record processed",
                     result=result,

@@ -29,6 +29,11 @@ resource "aws_iam_role_policy_attachment" "clamav_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_role_policy_attachment" "clamav_cloudwatch_agent" {
+  role       = aws_iam_role.clamav.name
+  policy_arn = module.cloudwatch_agent.agent_policy_arn
+}
+
 resource "aws_iam_instance_profile" "clamav" {
   name = "${local.application_name}-clamav-ec2-instance-profile"
   role = aws_iam_role.clamav.name

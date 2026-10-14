@@ -1,26 +1,3 @@
-resource "aws_secretsmanager_secret" "oia" {
-  name        = local.component_name
-  description = "Shared credentials for the ${local.component_name} component"
-}
-
-resource "aws_secretsmanager_secret_version" "oia" {
-  secret_id = aws_secretsmanager_secret.oia.id
-  secret_string = jsonencode({
-    guardduty_slack_channel_id      = ""
-    cloudwatch_slack_channel_id     = ""
-    slack_channel_webhook           = ""
-    slack_channel_webhook_guardduty = ""
-  })
-
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
-data "aws_secretsmanager_secret_version" "oia" {
-  secret_id = aws_secretsmanager_secret.oia.id
-}
-
 resource "aws_secretsmanager_secret" "opahub" {
   name        = local.opahub_name
   description = "OPAHub Application Secrets"

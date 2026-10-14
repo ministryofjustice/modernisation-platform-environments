@@ -17,7 +17,7 @@ In addition, this module deploys the baseline monitoring stack for all component
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ------ | --------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5.0 |
 | <a name="provider_aws.core-vpc"></a> [aws.core-vpc](#provider\_aws.core-vpc) | ~> 5.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | n/a |
@@ -25,7 +25,7 @@ In addition, this module deploys the baseline monitoring stack for all component
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ------ | -------- | --------- |
 | <a name="module_container_definition"></a> [container\_definition](#module\_container\_definition) | git::<https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container> | v4.3.0 |
 | <a name="module_ecs_policies"></a> [ecs\_policies](#module\_ecs\_policies) | ../ecs_policies | n/a |
 | <a name="module_ecs_service"></a> [ecs\_service](#module\_ecs\_service) | git::<https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service> | v4.3.0 |
@@ -33,7 +33,7 @@ In addition, this module deploys the baseline monitoring stack for all component
 ## Resources
 
 | Name | Type |
-|------|------|
+| ------ | ------ |
 | [aws_cloudwatch_dashboard.ecs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_dashboard) | resource |
 | [aws_cloudwatch_dashboard.ecs_rds](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_dashboard) | resource |
 | [aws_cloudwatch_log_group.ecs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
@@ -89,7 +89,7 @@ In addition, this module deploys the baseline monitoring stack for all component
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ------ | ------------- | ------ | --------- | :--------: |
 | <a name="input_account_config"></a> [account\_config](#input\_account\_config) | Account config to pass to the instance | `any` | n/a | yes |
 | <a name="input_account_info"></a> [account\_info](#input\_account\_info) | Account info to pass to the instance | `any` | n/a | yes |
 | <a name="input_alb_listener_rule_host_header"></a> [alb\_listener\_rule\_host\_header](#input\_alb\_listener\_rule\_host\_header) | Host header to use for the alb listener rule | `string` | `null` | no |
@@ -184,7 +184,7 @@ In addition, this module deploys the baseline monitoring stack for all component
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ------ | ------------- |
 | <a name="output_elasticache_endpoint"></a> [elasticache\_endpoint](#output\_elasticache\_endpoint) | n/a |
 | <a name="output_elasticache_port"></a> [elasticache\_port](#output\_elasticache\_port) | n/a |
 | <a name="output_rds_endpoint"></a> [rds\_endpoint](#output\_rds\_endpoint) | n/a |

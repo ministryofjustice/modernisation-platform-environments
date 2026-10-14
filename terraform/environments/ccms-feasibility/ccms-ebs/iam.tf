@@ -35,6 +35,12 @@ resource "aws_iam_role_policy_attachment" "ebsdb_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+# CloudWatch agent (installed via SSM by the cloudwatch-agent module in the ccms-feasibility root stack)
+resource "aws_iam_role_policy_attachment" "ebsdb_cloudwatch_agent" {
+  role       = aws_iam_role.ebsdb.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
 resource "aws_iam_policy" "ebsdb_cw_logging" {
   name        = "${local.component_name}-${local.env_label}-ebsdb-cw-logging"
   description = "Allow EBS DB instance to write CloudWatch logs"
@@ -117,6 +123,12 @@ resource "aws_iam_instance_profile" "ebsapps" {
 resource "aws_iam_role_policy_attachment" "ebsapps_ssm" {
   role       = aws_iam_role.ebsapps.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+# CloudWatch agent (installed via SSM by the cloudwatch-agent module in the ccms-feasibility root stack)
+resource "aws_iam_role_policy_attachment" "ebsapps_cloudwatch_agent" {
+  role       = aws_iam_role.ebsapps.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 resource "aws_iam_policy" "ebsapps_cw_logging" {
@@ -255,6 +267,12 @@ resource "aws_iam_instance_profile" "ftp" {
 resource "aws_iam_role_policy_attachment" "ftp_ssm" {
   role       = aws_iam_role.ftp.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+# CloudWatch agent (installed via SSM by the cloudwatch-agent module in the ccms-feasibility root stack)
+resource "aws_iam_role_policy_attachment" "ftp_cloudwatch_agent" {
+  role       = aws_iam_role.ftp.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 resource "aws_iam_policy" "ftp_cw_logging" {

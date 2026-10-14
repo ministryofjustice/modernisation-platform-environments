@@ -3,7 +3,9 @@
     "development": {
       "clamav_ami_id": "ami-002aab1cab5a08e35",
       "clamav_ec2_instance_type": "c5d.large",
-      "clamav_instance_role": "clamav"
+      "clamav_instance_role": "clamav",
+      "lb_access_logs_retention_days": 90,
+      "athena_results_retention_days": 30
     }
   }
 }

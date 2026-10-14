@@ -58,6 +58,7 @@ module "cloudwatch_metric_alarms" {
   threshold           = each.value.threshold
   treat_missing_data  = "notBreaching"
   alarm_actions       = local.cloudwatch_alarm_actions[each.key]
+  ok_actions          = local.cloudwatch_alarm_actions[each.key]
 
   tags = local.tags
 }
@@ -72,4 +73,21 @@ module "cloudwatch_transfer" {
   retention_in_days = local.cloudwatch_retention_days
 
   tags = local.tags
+}
+
+resource "aws_cloudwatch_dashboard" "this" {
+  dashboard_name = "${local.application_name}-${local.environment}"
+  dashboard_body = jsonencode({
+    widgets = [
+      for widget in local.cloudwatch_dashboard_widgets : {
+        type  = "metric"
+        width = 6
+        properties = merge({
+          region = data.aws_region.current.region
+          stat   = "Sum"
+          period = 300
+        }, widget)
+      }
+    ]
+  })
 }

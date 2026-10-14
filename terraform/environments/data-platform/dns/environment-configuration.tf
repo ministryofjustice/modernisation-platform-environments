@@ -119,12 +119,6 @@ locals {
               ttl     = 300
               records = ["a0a17e7f4aa71bec7357a6ed2efd5e"]
             },
-            manual-github-pages-cname = {
-              type    = "CNAME"
-              name    = "manual"
-              ttl     = 300
-              records = ["ministryofjustice.github.io."]
-            },
             docs-hub-github-pages-cname = {
               type    = "CNAME"
               name    = "docs-hub"

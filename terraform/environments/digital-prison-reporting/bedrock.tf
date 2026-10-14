@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "ai_gateway_bedrock_assume" {
   #checkov:skip=CKV_AWS_108
 
   statement {
-    effect  = "Allow"
+    effect = "Allow"
     actions = [
       "sts:AssumeRole",
       "sts:TagSession",

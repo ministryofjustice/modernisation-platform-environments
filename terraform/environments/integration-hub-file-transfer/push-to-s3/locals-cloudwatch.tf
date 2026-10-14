@@ -28,13 +28,30 @@ locals {
     "writer-record-failures" = {
       alarm_description   = "The push-to-s3 writer returned one or more failed SQS records"
       comparison_operator = "GreaterThanThreshold"
-      dimensions          = { ActionName = "push-to-s3" }
-      evaluation_periods  = 1
-      metric_name         = "WriterRecordFailed"
-      namespace           = "ManagedFileTransfer"
-      period              = 300
-      statistic           = "Sum"
-      threshold           = 0
+      dimensions = {
+        ActionName = "push-to-s3"
+        service    = local.pattern_name
+      }
+      evaluation_periods = 1
+      metric_name        = "WriterRecordFailed"
+      namespace          = "ManagedFileTransfer"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "delivery-failed" = {
+      alarm_description   = "The push-to-s3 reporter published a failed delivery completion; investigate and resolve the incident manually"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        ActionName = "push-to-s3"
+        service    = "${local.pattern_name}-dlq-reporter"
+      }
+      evaluation_periods = 1
+      metric_name        = "DeliveryFailed"
+      namespace          = "ManagedFileTransfer"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
     }
     "file-mover-throttles" = {
       alarm_description   = "The push-to-s3 mover has been throttled"
@@ -73,13 +90,16 @@ locals {
     "reporter-record-failures" = {
       alarm_description   = "The push-to-s3 DLQ reporter returned one or more failed SQS records"
       comparison_operator = "GreaterThanThreshold"
-      dimensions          = { ActionName = "push-to-s3" }
-      evaluation_periods  = 1
-      metric_name         = "ReporterRecordFailed"
-      namespace           = "ManagedFileTransfer"
-      period              = 300
-      statistic           = "Sum"
-      threshold           = 0
+      dimensions = {
+        ActionName = "push-to-s3"
+        service    = "${local.pattern_name}-dlq-reporter"
+      }
+      evaluation_periods = 1
+      metric_name        = "ReporterRecordFailed"
+      namespace          = "ManagedFileTransfer"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
     }
     "dlq-reporter-throttles" = {
       alarm_description   = "The push-to-s3 DLQ reporter has been throttled"
@@ -116,4 +136,29 @@ locals {
       threshold           = 900
     }
   })
+
+  high_priority_alarm_names = toset(concat(
+    [for stage, queue_arn in local.push_to_s3_dlq_arns : "${stage}-dlq-backlog"],
+    ["delivery-failed"],
+  ))
+
+  low_priority_alarm_names = toset([
+    "file-mover-errors",
+    "writer-record-failures",
+    "file-mover-throttles",
+    "file-mover-duration",
+    "dlq-reporter-errors",
+    "reporter-record-failures",
+    "dlq-reporter-throttles",
+    "dlq-reporter-duration",
+    "processing-oldest-message-age",
+  ])
+
+  high_priority_alarm_actions = local.is-production ? [data.aws_sns_topic.pagerduty["high-priority"].arn] : [data.aws_sns_topic.pagerduty["low-priority"].arn]
+  low_priority_alarm_actions  = local.is-production ? [data.aws_sns_topic.pagerduty["low-priority"].arn] : []
+
+  cloudwatch_alarm_actions = merge(
+    { for alarm_name in local.high_priority_alarm_names : alarm_name => local.high_priority_alarm_actions },
+    { for alarm_name in local.low_priority_alarm_names : alarm_name => local.low_priority_alarm_actions },
+  )
 }

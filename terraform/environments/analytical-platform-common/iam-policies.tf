@@ -202,6 +202,7 @@ data "aws_iam_policy_document" "analytical_platform_github_actions" {
     actions = ["secretsmanager:GetSecretValue"]
     resources = [
       module.analytical_platform_compute_cluster_data_secret.secret_arn,
+      module.data_platform_cluster_data_secret.secret_arn,
       module.airflow_github_app_secret.secret_arn
     ]
   }

@@ -33,25 +33,39 @@ locals {
   # data.aws_identitystore_groups below. product.yaml carries names, and AMG
   # team sync needs IDs, so resolving here avoids hardcoding IDs.
   #
-  # cloud-platform-development currently holds the #8509 isolation PoC: two
-  # simulated BUs backed by two ephemeral clusters' AMP workspaces. Production
-  # (cloud-platform-live) is populated once per-BU-account AMP exists (#8517).
-  bus_by_workspace = {
-    cloud-platform-development = {
-      bu1 = {
-        amp_workspace_alias = "cp-1609-0059-bu1-metrics"
-        idc_group_names     = ["cloud-platform-engineers"] # simulated BU A
-      }
-      bu2 = {
-        amp_workspace_alias = "cp-1609-0059-bu2-metrics"
-        # simulated BU B. Uses container-platform-user-testing, a Viewer group
-        # deliberately NOT granted workspace ADMIN (cf. amg.tf), so the isolation
-        # control can actually be tested: data-source permissions are default-deny
-        # for Viewers but bypassed for Admins. A member of this group (team
-        # bu-bu2) must be able to query amp-bu2 but denied amp-bu1.
-        idc_group_names = ["container-platform-user-testing"]
-      }
+  # Shared BU -> parent IdC group mapping, sourced from the single
+  # business-units.json consumed by this component, cluster/ and cluster-core/
+  # (cloud-platform#8558). Real production BUs ONLY — simulated BUs for the
+  # #8509 ephemeral-cluster PoC are kept out of this file (see
+  # grafana_simulated_bus_dev below) so the ArgoCD components, which read the
+  # same file, never see them.
+  business_units = jsondecode(file("${path.module}/business-units.json")).business_units
+
+  # Real-BU Grafana map for cloud-platform-live, derived from the shared file.
+  # idc_group_names stays a LIST (a BU has many delivery teams); here it holds
+  # the BU's single parent group. Gated OFF on live by grafana_objects_enabled
+  # (see environment-configuration.tf) until per-BU AMP workspaces exist (#8517).
+  grafana_bus_real = {
+    for k, bu in local.business_units : k => {
+      amp_workspace_alias = bu.amp_workspace_alias
+      idc_group_names     = [bu.parent_group]
     }
+  }
+
+  # Dev-only simulated BUs for the #8509 ephemeral-cluster isolation PoC. Merged
+  # into bus_by_workspace ONLY on cloud-platform-development, and NEVER read by
+  # the ArgoCD components (they consume business-units.json, which this map is
+  # deliberately not part of). To run the PoC, paste the ephemeral cluster's AMP
+  # workspace alias and the real IdC group names here, e.g.:
+  #   "bu1" = { amp_workspace_alias = "cp-DDMM-HHMM-bu1-metrics", idc_group_names = ["cloud-platform-engineers"] }
+  # Left empty on commit so no stale alias can fail a plan.
+  grafana_simulated_bus_dev = {}
+
+  # Per-workspace BU map. Live carries the real BUs (but is gated OFF, see
+  # above); development carries only the dev simulated BUs.
+  bus_by_workspace = {
+    "cloud-platform-live"        = local.grafana_bus_real
+    "cloud-platform-development" = local.grafana_simulated_bus_dev
   }
 
   # Phase-2 gate. The Grafana provider authenticates with a token minted from

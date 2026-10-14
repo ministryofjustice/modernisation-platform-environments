@@ -525,7 +525,7 @@ local.application_data.accounts[local.environment] = {
 ---
 
 | File | Purpose | Key Components | Status |
-|------|---------|----------------|--------|
+| ------ | --------- | ---------------- | -------- |
 | ssogen-ec2.tf | Launch templates, instances, ASGs | User data templates, launch configs, ASGs (primary/secondary) | Active |
 | ssogen-storage.tf | EFS file system | File system, mount targets (3 AZs) | Active |
 | ssogen-load-balancer.tf | ALBs, target groups, listeners | 2 ALBs, 2 TGs, 2 listeners, HTTPS, sticky sessions | Active |

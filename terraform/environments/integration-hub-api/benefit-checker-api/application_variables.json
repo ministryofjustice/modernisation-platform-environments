@@ -27,15 +27,27 @@
     },
     "test": {
       "api_configuration": {},
-      "auth_configuration": { "roles": {}, "users": {}, "system_principals": {} }
+      "auth_configuration": {
+        "roles": {},
+        "users": {},
+        "system_principals": {}
+      }
     },
     "preproduction": {
       "api_configuration": {},
-      "auth_configuration": { "roles": {}, "users": {}, "system_principals": {} }
+      "auth_configuration": {
+        "roles": {},
+        "users": {},
+        "system_principals": {}
+      }
     },
     "production": {
       "api_configuration": {},
-      "auth_configuration": { "roles": {}, "users": {}, "system_principals": {} }
+      "auth_configuration": {
+        "roles": {},
+        "users": {},
+        "system_principals": {}
+      }
     }
   }
 }

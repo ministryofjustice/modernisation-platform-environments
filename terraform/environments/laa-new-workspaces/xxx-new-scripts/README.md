@@ -245,7 +245,7 @@ terraform destroy -target=aws_iam_role.user_creation_ec2_role
 ## Comparison: ds-data vs EC2+PowerShell
 
 | Feature | ds-data API | EC2+PowerShell |
-|---------|-------------|----------------|
+| --------- | ------------- | ---------------- |
 | AD user created | ✅ | ✅ |
 | AD has email/name | ✅ | ✅ |
 | WorkSpaces metadata | ❌ Empty | ✅ Populated |

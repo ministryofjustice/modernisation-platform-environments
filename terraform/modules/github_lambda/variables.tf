@@ -9,6 +9,12 @@ variable "aws_region" {
   default     = "eu-west-2"
 }
 
+variable "enable_outbound_federation" {
+  description = "Enable outbound web identity federation"
+  type        = bool
+  default     = true
+}
+
 variable "github_org" {
   description = "The name of the github organization"
   type        = string

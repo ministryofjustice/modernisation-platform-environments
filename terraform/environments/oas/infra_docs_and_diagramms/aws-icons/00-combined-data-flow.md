@@ -72,7 +72,7 @@ sequenceDiagram
 ## Key facts
 
 | | |
-|---|---|
+| --- | --- |
 | **oas↔edw-19c direct link** | Declared in Terraform on both sides but commented out — not active traffic today, shown as the dashed red edge above |
 | **Only shared consumer** | LZ Workspaces, which connects independently to each RDS instance over SQL Developer 1521 |
 | **edw-19c automation** | None — no Lambdas, no CloudWatch alarms, no SNS topic; it's a passive RDS-only workload |

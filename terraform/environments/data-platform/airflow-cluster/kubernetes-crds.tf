@@ -82,9 +82,9 @@ data "http" "aws_load_balancer_controller_gateway_crd" {
 }
 
 resource "terraform_data" "cluster_api_ready" {
-  input  = {
-   endpoint = module.eks.cluster_endpoint
-   access = module.eks.access_policy_associations
+  input = {
+    endpoint = module.eks.cluster_endpoint
+    access   = module.eks.access_policy_associations
   }
 }
 
@@ -104,7 +104,7 @@ resource "helm_release" "aws_load_balancer_controller_crds" {
   namespace = "kube-system"
 
   values = [yamlencode({
-    keep      = true
+    keep = true
     manifests = merge(
       local.aws_load_balancer_controller_crd_manifests,
       local.aws_load_balancer_controller_gateway_crd_manifests
