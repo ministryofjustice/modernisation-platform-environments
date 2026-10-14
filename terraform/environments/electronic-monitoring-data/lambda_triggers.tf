@@ -636,14 +636,17 @@ locals {
     staged = {
       consumer            = "STAGED"
       schedule_expression = "cron(0,30 * * * ? *)"
+      target_arn          = module.merge_into_mdss_staged_position.arn
     }
     ac = {
       consumer            = "AC"
       schedule_expression = "cron(10,40 * * * ? *)"
+      target_arn          = module.merge_into_mdss_ac_position.arn
     }
     emdi = {
       consumer            = "EMDI"
       schedule_expression = "cron(20,50 * * * ? *)"
+      target_arn          = module.merge_into_emdi_position.arn
     }
   })
 }
@@ -666,12 +669,11 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
   schedule_expression = each.value.schedule_expression
 
   target {
-    arn      = aws_sfn_state_machine.downstream_reconciliation.arn
+    arn      = each.value.target_arn
     role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
 
     input = jsonencode({
-      consumer = each.value.consumer
-      mode     = "rolling"
+      mode = "rolling"
     })
   }
 }

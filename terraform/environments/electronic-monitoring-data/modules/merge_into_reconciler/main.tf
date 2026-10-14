@@ -28,3 +28,7 @@ resource "aws_iam_policy" "merge_into_this" {
   name   = "insert_into_${local.name}"
   policy = data.aws_iam_policy_document.merge_into_this.json
 }
+
+output "arn" {
+  value = module.merge_into_this.arn
+}
