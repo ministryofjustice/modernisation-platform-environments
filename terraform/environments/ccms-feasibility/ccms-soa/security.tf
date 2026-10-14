@@ -21,6 +21,15 @@ resource "aws_vpc_security_group_ingress_rule" "nlb_admin_https_private" {
   cidr_ipv4         = each.value
 }
 
+resource "aws_vpc_security_group_ingress_rule" "nlb_admin_https_lz_aws_workspace" {
+  security_group_id = aws_security_group.nlb_admin.id
+  description       = "HTTPS from LZ AWS Workspaces"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
+}
+
 resource "aws_vpc_security_group_ingress_rule" "nlb_admin_ssl_port_private" {
   for_each = toset(local.private_subnets_cidr_blocks)
 
