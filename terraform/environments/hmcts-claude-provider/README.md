@@ -1,82 +1,70 @@
 # HMCTS Claude Provider
 
-This environment provides AWS Bedrock access for Claude AI models in the eu-west-1 (Ireland) region.
+This environment provides AWS Bedrock access for Claude AI models in the eu-west-2 (London) region.
 
 ## AWS Bedrock Setup
 
-This environment is configured to use AWS Bedrock with Claude models. The following manual setup steps are required:
+### 1. Issue a Bedrock API Key
 
-### 1. Request Model Access
-
-First, request access to Claude models in the AWS Bedrock console:
-
-1. Go to the [Bedrock Model Access page](https://eu-west-1.console.aws.amazon.com/bedrock/home?region=eu-west-1#/modelaccess)
-2. Request access to:
-   - Claude Opus 4.5 (uses global inference profile)
-   - Claude Sonnet 4.5
-   - Claude Haiku 4.5
-   - Claude Sonnet 4 (optional - requires marketplace subscription)
-
-**Note:** Claude Opus 4.5 uses a global inference profile which routes requests across all supported AWS regions worldwide. There is no EU-only profile available for Opus 4.5.
-
-### 2. Create Bedrock API Key
-
-Run the provided script to create a Bedrock API key with 90-day expiry:
+Keys are issued per person, so invocation logs attribute usage to an individual:
 
 ```bash
-./create-bedrock-api-key.sh
+./issue-bedrock-key.sh linus.norton
 ```
 
-This script will:
-- Assume the BedrockAPIKeyCreator role (which bypasses the common_policy deny)
-- Create the IAM user if needed
-- Generate a service-specific credential (bearer token)
-- Output the configuration for Claude Code
+This assumes the BedrockAPIKeyCreator role, creates the IAM user `BedrockAPIKey-<name>` if needed,
+attaches `HMCTSClaudeBedrockPolicy`, and issues a credential that expires after 90 days.
 
-**Important:** Save the bearer token shown in the output - it cannot be retrieved again!
+- `--rotate` replaces an existing credential, for expiry or a suspected leak
+- `--revoke` removes a person's credentials, keeping the IAM user so past usage stays attributable
 
-### 3. Configure Claude Code
+The token is shown once and cannot be retrieved again.
 
-Add the environment variables from the script output to your `~/.bashrc` or `~/.zshrc`:
+### 2. Configure Claude Code
 
-```bash
-# Claude Code Bedrock Configuration
-# IMPORTANT: AWS_REGION must be set - Claude Code doesn't read ~/.aws/config
-export AWS_REGION=eu-west-1
-export CLAUDE_CODE_USE_BEDROCK=1
-export ANTHROPIC_MODEL='eu.anthropic.claude-sonnet-4-5-20250929-v1:0'
-export ANTHROPIC_SMALL_FAST_MODEL='eu.anthropic.claude-haiku-4-5-20251001-v1:0'
-export AWS_BEARER_TOKEN_BEDROCK='<your-bearer-token>'
-```
+Add the environment variables from the script output to your `~/.bashrc` or `~/.zshrc`, then reload
+your shell.
 
-Then reload your shell:
-
-```bash
-source ~/.bashrc  # or source ~/.zshrc
-```
+Model access does not need requesting per region - the account's marketplace subscriptions already
+cover eu-west-2.
 
 ## Available Models
 
-### Global Inference Profile (cross-region worldwide)
+### In-region, UK only (eu-west-2)
 
-- **Claude Opus 4.5**: `global.anthropic.claude-opus-4-5-20251101-v1:0`
-  - Routes requests globally across all supported AWS regions
-  - Best for complex, long-running workflows and agentic tasks
-  - No EU-only profile available
+An unprefixed model ID called against the eu-west-2 endpoint is served from London with no inference
+profile in front of it. Four Claude models support this in eu-west-2:
 
-### EU Inference Profiles (cross-region within EU)
+- **Claude Opus 5.5**: `anthropic.claude-opus-5-5` (Claude Code Opus slot)
+- **Claude Sonnet 5**: `anthropic.claude-sonnet-5` (Claude Code Sonnet slot)
+- **Claude Sonnet 4.6**: `anthropic.claude-sonnet-4-6`
+- **Claude Opus 4.6**: `anthropic.claude-opus-4-6-v1`
 
-- **Claude Sonnet 4.5**: `eu.anthropic.claude-sonnet-4-5-20250929-v1:0` (recommended for most use cases)
-- **Claude Sonnet 4**: `eu.anthropic.claude-sonnet-4-20250514-v1:0`
-- **Claude Haiku 4.5**: `eu.anthropic.claude-haiku-4-5-20251001-v1:0` (fast, cost-effective)
+eu-west-2 is the only region offering in-region inference for Opus 5.5 at all.
 
-These EU inference profiles route requests across multiple EU regions (eu-west-1, eu-central-1, eu-north-1, eu-west-3, etc.) for optimal availability while keeping data within the EU.
+To check whether another model has gained in-region support:
+
+```bash
+aws bedrock list-foundation-models --region eu-west-2 --by-provider anthropic \
+  | jq -r '.modelSummaries[] | select(.inferenceTypesSupported|index("ON_DEMAND")) | .modelId'
+```
+
+A model listing only `INFERENCE_PROFILE` cannot be pinned to London. Sonnet 5.5, Haiku 5.5, Opus 5,
+Opus 4.8, Opus 4.7, Fable 5 and Fable 5.1 are all in that group.
+
+### EU inference profiles (cross-region within the EU)
+
+- **Claude Haiku 4.5**: `eu.anthropic.claude-haiku-4-5-20251001-v1:0`
+
+No Haiku has in-region support in any region, so the Claude Code Haiku slot is the one part of this
+environment that is not UK only. Called from eu-west-2 this profile routes across eu-central-1,
+eu-north-1, eu-south-1, eu-south-2, eu-west-1, eu-west-2 and eu-west-3.
 
 ## Model Invocation Logging
 
-Bedrock model invocation logging is enabled in both eu-west-1 and eu-west-2. eu-west-1 is the region
-this README tells people to use, but eu-west-2 is the account default and the Bedrock policy admits
-inference profiles in any region, so traffic arrives at both. Until October 2026 only eu-west-1 was
+Bedrock model invocation logging is enabled in both eu-west-1 and eu-west-2. eu-west-2 is the region
+this README tells people to use and the account default, but the Bedrock policy admits inference
+profiles in any region, so traffic can still arrive at eu-west-1. Until October 2026 only eu-west-1 was
 logged, and about 39% of that month's spend could not be attributed to anyone.
 
 Logging is configured per region and Bedrock only accepts a destination in its own region, so each
