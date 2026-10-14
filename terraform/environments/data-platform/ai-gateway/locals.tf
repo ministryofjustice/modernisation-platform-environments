@@ -31,7 +31,7 @@ locals {
   ai_gateway_bedrock_batch_models = {
     for model_key, model in try(local.ai_gateway_models_filtered.amazon_bedrock, {}) :
     model_key => model
-    if try(model.batch_available, false) && !can(model.aws_account_name)
+    if try(model.batch_available, false) && !can(model.aws_account_name) && local.ai_gateway_batch_storage != null
   }
 
   # RDS

@@ -35,21 +35,22 @@ resource "litellm_model" "amazon_bedrock_batch" {
   tier                = "paid"
   mode                = "batch"
 
-  aws_region_name = each.value.region
+  aws_region_name = local.ai_gateway_bedrock_batch_region
   aws_role_name   = module.iam_role.arn
 
-  additional_litellm_params = {
-    s3_bucket_name       = module.batch_inference.s3_bucket_id
-    s3_region_name       = each.value.region
-    aws_batch_role_arn   = aws_iam_role.bedrock_batch_execution.arn
-    s3_encryption_key_id = module.ai_gateway_batch_inference_kms_key.key_arn
+  additional_litellm_params_json = jsonencode({
+    s3_bucket_name        = local.ai_gateway_batch_storage.input_bucket_name
+    s3_output_bucket_name = local.ai_gateway_batch_storage.output_bucket_name
+    s3_bucket_owner       = local.ai_gateway_batch_storage.bucket_owner
+    s3_region_name        = local.ai_gateway_batch_storage.region
+    aws_batch_role_arn    = aws_iam_role.bedrock_batch_execution.arn
 
     ai_model_provider            = try(each.value.model_provider, "Amazon Bedrock")
     ai_model_family              = each.value.model_family
     ai_model_name                = each.value.model_name
     ai_model_generally_available = each.value.generally_available
-    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_generally_available\"]"
-  }
+    additional_drop_params       = ["ai_model_provider", "ai_model_family", "ai_model_name", "ai_model_generally_available"]
+  })
 
   depends_on = [
     helm_release.ai_gateway_configuration,

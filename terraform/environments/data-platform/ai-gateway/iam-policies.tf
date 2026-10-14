@@ -1,4 +1,7 @@
 locals {
+  ai_gateway_bedrock_batch_region  = try(local.ai_gateway_batch_storage.region, data.aws_region.current.region)
+  ai_gateway_bedrock_batch_job_arn = "arn:aws:bedrock:${local.ai_gateway_bedrock_batch_region}:${data.aws_caller_identity.current.account_id}:model-invocation-job/*"
+
   ai_gateway_bedrock_assume_role_arns = distinct([
     for model in values(try(local.ai_gateway_models_filtered.amazon_bedrock, {})) :
     "arn:aws:iam::${local.environment_management.account_ids[model.aws_account_name]}:role/${model.aws_role_name}"
@@ -49,7 +52,7 @@ data "aws_iam_policy_document" "ai_gateway" {
     resources = concat(
       formatlist("arn:aws:bedrock:%s:${data.aws_caller_identity.current.account_id}:inference-profile/*", ["eu-west-1", "eu-west-2"]),
       ["arn:aws:bedrock:eu-*::foundation-model/*"],
-      ["arn:aws:bedrock:eu-west-2:${data.aws_caller_identity.current.account_id}:model-invocation-job/*"]
+      [local.ai_gateway_bedrock_batch_job_arn]
     )
   }
 
@@ -60,7 +63,7 @@ data "aws_iam_policy_document" "ai_gateway" {
       "bedrock:GetModelInvocationJob",
       "bedrock:StopModelInvocationJob"
     ]
-    resources = ["arn:aws:bedrock:eu-west-2:${data.aws_caller_identity.current.account_id}:model-invocation-job/*"]
+    resources = [local.ai_gateway_bedrock_batch_job_arn]
   }
 
   # ListModelInvocationJobs/TagResource/etc. don't support resource-level scoping
@@ -89,28 +92,28 @@ data "aws_iam_policy_document" "ai_gateway" {
     }
   }
 
-  statement {
-    sid    = "BatchInferenceS3Access"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket"
-    ]
-    resources = [
-      module.batch_inference.s3_bucket_arn,
-      "${module.batch_inference.s3_bucket_arn}/*"
-    ]
-  }
+  dynamic "statement" {
+    for_each = local.ai_gateway_batch_storage == null ? {} : {
+      BatchInferenceListBuckets = {
+        actions   = ["s3:ListBucket"]
+        resources = values(local.ai_gateway_batch_bucket_arns)
+      }
+      BatchInferenceReadWriteInput = {
+        actions   = ["s3:GetObject", "s3:PutObject"]
+        resources = [local.ai_gateway_batch_object_arns.input]
+      }
+      BatchInferenceReadOutput = {
+        actions   = ["s3:GetObject"]
+        resources = [local.ai_gateway_batch_object_arns.output]
+      }
+    }
 
-  statement {
-    sid    = "BatchInferenceKMSAccess"
-    effect = "Allow"
-    actions = [
-      "kms:GenerateDataKey",
-      "kms:Decrypt"
-    ]
-    resources = [module.ai_gateway_batch_inference_kms_key.key_arn]
+    content {
+      sid       = statement.key
+      effect    = "Allow"
+      actions   = statement.value.actions
+      resources = statement.value.resources
+    }
   }
 
   statement {

@@ -18,6 +18,7 @@ resource "litellm_unified_access_group" "amazon_bedrock_batch" {
   for_each = local.ai_gateway_bedrock_batch_models
 
   access_group_name  = "bedrock-batch-${each.key}"
+  description        = "Batch inference access for ${litellm_model.amazon_bedrock_batch[each.key].model_name} (${litellm_model.amazon_bedrock_batch[each.key].id})"
   access_model_names = [litellm_model.amazon_bedrock_batch[each.key].model_name]
   assigned_team_ids = [
     for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id

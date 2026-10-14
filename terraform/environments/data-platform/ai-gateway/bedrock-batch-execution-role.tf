@@ -1,5 +1,5 @@
 # Service role that Bedrock (not the AI Gateway pod) assumes while a batch inference job runs,
-# to read the input file from and write results to the batch inference bucket.
+# to read from the input bucket and write results to the output bucket.
 data "aws_iam_policy_document" "bedrock_batch_execution_trust" {
   statement {
     sid     = "AllowBedrockAssumeRole"
@@ -20,34 +20,34 @@ data "aws_iam_policy_document" "bedrock_batch_execution_trust" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = ["arn:aws:bedrock:eu-west-2:${data.aws_caller_identity.current.account_id}:model-invocation-job/*"]
+      values   = [local.ai_gateway_bedrock_batch_job_arn]
     }
   }
 }
 
 data "aws_iam_policy_document" "bedrock_batch_execution_permissions" {
-  statement {
-    sid    = "BatchInferenceS3Access"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket"
-    ]
-    resources = [
-      module.batch_inference.s3_bucket_arn,
-      "${module.batch_inference.s3_bucket_arn}/*"
-    ]
-  }
+  dynamic "statement" {
+    for_each = local.ai_gateway_batch_storage == null ? {} : {
+      BatchInferenceListBuckets = {
+        actions   = ["s3:ListBucket"]
+        resources = values(local.ai_gateway_batch_bucket_arns)
+      }
+      BatchInferenceReadInput = {
+        actions   = ["s3:GetObject"]
+        resources = [local.ai_gateway_batch_object_arns.input]
+      }
+      BatchInferenceWriteOutput = {
+        actions   = ["s3:PutObject"]
+        resources = [local.ai_gateway_batch_object_arns.output]
+      }
+    }
 
-  statement {
-    sid    = "BatchInferenceKMSAccess"
-    effect = "Allow"
-    actions = [
-      "kms:GenerateDataKey",
-      "kms:Decrypt"
-    ]
-    resources = [module.ai_gateway_batch_inference_kms_key.key_arn]
+    content {
+      sid       = statement.key
+      effect    = "Allow"
+      actions   = statement.value.actions
+      resources = statement.value.resources
+    }
   }
 
   # Bedrock invokes the model using this role during the job, mirroring the invoke
