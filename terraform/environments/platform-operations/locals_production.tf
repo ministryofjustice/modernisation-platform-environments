@@ -28,7 +28,7 @@ locals {
         repo     = "dso-infra-azure-fixngo"
         schedule = "cron(00 9 ? * MON-FRI *)"
         timezone = "Europe/London"
-        workflow = "terragrunt-PlatformOperations.yml"
+        workflow = "terragrunt-PlatformOperations.yaml"
       }
       azure-fixngo-platops-resource-locks = {
         identity = "platops"
@@ -41,7 +41,7 @@ locals {
         repo     = "dso-infra-azure-fixngo"
         schedule = "cron(00 6 ? * MON-FRI *)"
         timezone = "Europe/London"
-        workflow = "terragrunt-PlatformOperations.yml"
+        workflow = "terragrunt-PlatformOperations.yaml"
       }
       dso-certificates-cert-renewal-prod = {
         identity = "platops"
