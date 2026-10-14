@@ -198,6 +198,15 @@ resource "aws_vpc_security_group_ingress_rule" "rds_from_ecs_tasks_admin" {
   referenced_security_group_id = aws_security_group.ecs_tasks_admin.id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "rds_from_lz_aws_workspace" {
+  security_group_id = aws_security_group.rds.id
+  description       = "Oracle from LZ AWS Workspaces"
+  ip_protocol       = "tcp"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
+}
+
 resource "aws_vpc_security_group_egress_rule" "rds_egress_all" {
   security_group_id = aws_security_group.rds.id
   description       = "Allow all outbound traffic"

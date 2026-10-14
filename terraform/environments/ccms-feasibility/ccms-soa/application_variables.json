@@ -40,7 +40,9 @@
       "soa_db_deletion_protection": true,
       "db_log_retention_days": 7,
 
-      "nlb_deletion_protection": true
+      "nlb_deletion_protection": true,
+
+      "lz_aws_workspace_nonprod_prod": "10.200.0.0/19"
     }
   }
 }
