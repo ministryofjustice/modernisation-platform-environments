@@ -489,6 +489,7 @@ updates:
       - "terraform/environments/data-factory-laa/modules/airflow-data-ingestion-role"
       - "terraform/environments/data-factory-laa/modules/airflow-oidc"
       - "terraform/environments/data-factory-laa/modules/cadet-role"
+      - "terraform/environments/data-factory-laa/modules/file-ingestion"
     schedule:
       interval: "daily"
     groups:
@@ -973,6 +974,7 @@ updates:
       - "terraform/environments/justice-eng-ai/backend-processing"
       - "terraform/environments/justice-eng-ai/modules/step_function_builder"
       - "terraform/environments/justice-eng-ai/prototypes-infra"
+      - "terraform/environments/justice-eng-ai/prototypes-infra/shared-prototype-edge"
       - "terraform/environments/justice-eng-ai/web-ui"
     schedule:
       interval: "daily"
