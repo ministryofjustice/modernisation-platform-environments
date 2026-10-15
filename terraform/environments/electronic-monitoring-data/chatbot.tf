@@ -12,7 +12,7 @@ module "chatbot_alerts" {
   slack_team_id  = "T02DYEB3A"
   sns_topic_arns = [aws_sns_topic.emds_alerts.arn]
 
-  user_authorization_required = local.is-preproduction
+  user_authorization_required = local.is-development || local.is-test || local.is-preproduction || local.is-production
 
   guardrail_policies = [
     "arn:aws:iam::aws:policy/ReadOnlyAccess",

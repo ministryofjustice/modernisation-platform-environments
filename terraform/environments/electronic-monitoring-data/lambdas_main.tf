@@ -1266,7 +1266,7 @@ module "live_feed_incident_manager" {
 # Trigger cpr integration
 #-----------------------------------------------------------------------------------
 
-module "trigger_cpr_integration" {
+module "trigger_api_integration" {
   count                   = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
@@ -1633,4 +1633,31 @@ module "poll_dlt_iceberg_maintenance" {
   }
 
   depends_on = [aws_iam_role_policy.poll_dlt_iceberg_maintenance]
+}
+
+module "register_athena" {
+  count = local.is-production ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "register_athena"
+  image_name                     = "register_athena"
+  role_name                      = aws_iam_role.register_athena[0].name
+  role_arn                       = aws_iam_role.register_athena[0].arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    ENVIRONMENT_NAME        = local.env_name
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.register_athena,
+    aws_lakeformation_permissions.api_int_db_level_perms,
+    aws_lakeformation_permissions.api_int_table_level_perms,
+  ]
 }
