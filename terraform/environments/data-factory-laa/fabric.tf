@@ -41,7 +41,7 @@ module "fabric_iam_role" {
   bucket_arn = (
     local.environment == "development"
     ? module.fabric_curated_bucket[0].bucket.arn
-    : "arn:aws:s3:::laa-data-factory-processedraw-766696030771-eu-west-2-an"
+    : local.fabric_processedraw_bucket_arn
   )
   role_name        = "fabric-s3-access"
   role_policy_name = "fabric-s3-read-policy"

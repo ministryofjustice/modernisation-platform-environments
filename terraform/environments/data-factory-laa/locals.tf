@@ -13,8 +13,10 @@ locals {
     local.environment
   )
 
-  # Curated bucket is only created in development; other environments reuse existing buckets.
   fabric_curated_bucket_enabled = local.environment == "development"
+
+  # Existing processedraw buckets follow an account-specific naming convention.
+  fabric_processedraw_bucket_arn = "arn:aws:s3:::laa-data-factory-processedraw-${local.current_account_id}-eu-west-2-an"
 
   fabric_tenant_id = (
     local.fabric_oidc_enabled
