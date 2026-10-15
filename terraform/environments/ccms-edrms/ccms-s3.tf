@@ -144,7 +144,7 @@ module "s3-bucket-shared" {
   }
   manage_log_bucket_policy = false
 
-  log_prefix = "s3access/"
+  log_prefix                = "s3access/"
   log_partition_date_source = "EventTime"
 
   # Refer to the below section "Replication" before enabling replication
