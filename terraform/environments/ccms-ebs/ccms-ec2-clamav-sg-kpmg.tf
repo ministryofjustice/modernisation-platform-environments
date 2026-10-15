@@ -7,6 +7,11 @@ resource "aws_security_group" "clamav_sg_kpmg" {
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-ClamAV-KPMG", local.application_name, local.environment)) }
   )
+
+  # Detach the SG from the instances before deleting it (outside preproduction, where count is 0)
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "clamav_workspaces_22_ingress_kpmg" {
