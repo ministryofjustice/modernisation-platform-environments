@@ -680,6 +680,10 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
 
   description = "Runs ${each.value.consumer} downstream position reconciliation every 30 minutes"
 
+  # Temporarily pause rolling reconciliation in production while
+  # Slack notification threading is updated.
+  state = local.is-production ? "DISABLED" : "ENABLED"
+
   flexible_time_window {
     mode = "OFF"
   }
