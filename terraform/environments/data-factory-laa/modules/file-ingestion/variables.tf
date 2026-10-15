@@ -1,5 +1,5 @@
 variable "kms_key_arn" {
-  description = "KMS key for data lake encryption." 
+  description = "KMS key for data lake encryption."
   type        = string
   default     = null
 }
