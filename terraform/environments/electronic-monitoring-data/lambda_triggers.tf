@@ -662,21 +662,25 @@ resource "aws_lambda_permission" "allow_eventbridge_specials_remediation" {
 
 # ------------------------------------------------------------------------------
 # Rolling downstream position reconciliation
+# Run each consumer every four hours through its existing merge orchestration.
 # ------------------------------------------------------------------------------
 
 locals {
   downstream_reconciliation_rolling_schedules = tomap({
     staged = {
       consumer            = "STAGED"
-      schedule_expression = "cron(0,30 * * * ? *)"
+      schedule_expression = "cron(0 0/4 * * ? *)"
+      state_machine_arn   = module.merge_into_mdss_staged_position.arn
     }
     ac = {
       consumer            = "AC"
-      schedule_expression = "cron(10,40 * * * ? *)"
+      schedule_expression = "cron(10 0/4 * * ? *)"
+      state_machine_arn   = module.merge_into_mdss_ac_position.arn
     }
     emdi = {
       consumer            = "EMDI"
-      schedule_expression = "cron(20,50 * * * ? *)"
+      schedule_expression = "cron(20 0/4 * * ? *)"
+      state_machine_arn   = module.merge_into_emdi_position.arn
     }
   })
 }
@@ -690,7 +694,7 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
 
   name = "downstream_reconciliation_${each.key}_rolling"
 
-  description = "Runs ${each.value.consumer} downstream position reconciliation every 30 minutes"
+  description = "Runs ${each.value.consumer} downstream position reconciliation every 4 hours"
 
   flexible_time_window {
     mode = "OFF"
@@ -699,12 +703,11 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
   schedule_expression = each.value.schedule_expression
 
   target {
-    arn      = aws_sfn_state_machine.downstream_reconciliation.arn
+    arn      = each.value.state_machine_arn
     role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
 
     input = jsonencode({
-      consumer = each.value.consumer
-      mode     = "rolling"
+      mode = "rolling"
     })
   }
 }
