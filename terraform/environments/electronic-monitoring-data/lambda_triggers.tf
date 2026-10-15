@@ -214,6 +214,15 @@ module "fms_fan_out_event_queue" {
   max_receive_count    = local.load_sqs_max_receive_count
 }
 
+module "register_athena_event_queue" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.register_athena[0].lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 100
+  max_receive_count    = local.load_sqs_max_receive_count
+}
+
 resource "aws_s3_bucket_notification" "load_mdss_event" {
   bucket = module.s3-raw-formatted-data-bucket.bucket.id
 
@@ -236,7 +245,19 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     filter_prefix = "serco/fms/validation_rejected"
   }
 
-  depends_on = [module.load_mdss_event_queue, module.load_fms_event_queue]
+  queue {
+    queue_arn = module.register_athena_event_queue.sqs_queue.arn
+    events = ["s3:ObjectCreated:*"]
+    filter_prefix = "person_record/"
+  }
+
+  queue {
+    queue_arn = module.register_athena_event_queue.sqs_queue.arn
+    events = ["s3:ObjectCreated:*"]
+    filter_prefix = "cemo/"
+  }
+
+  depends_on = [module.load_mdss_event_queue, module.load_fms_event_queue, module.register_athena_event_queue]
 }
 
 # ----------------------------------------------
@@ -658,6 +679,10 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
   name = "downstream_reconciliation_${each.key}_rolling"
 
   description = "Runs ${each.value.consumer} downstream position reconciliation every 30 minutes"
+
+  # Temporarily pause rolling reconciliation in production while
+  # Slack notification threading is updated.
+  state = local.is-production ? "DISABLED" : "ENABLED"
 
   flexible_time_window {
     mode = "OFF"
