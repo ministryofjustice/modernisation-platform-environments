@@ -215,6 +215,8 @@ module "fms_fan_out_event_queue" {
 }
 
 module "register_athena_event_queue" {
+  count = local.is-production ? 0 : 1
+
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
   lambda_function_name = module.register_athena[0].lambda_function_name
