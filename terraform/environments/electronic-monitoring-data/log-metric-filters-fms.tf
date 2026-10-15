@@ -33,3 +33,15 @@ resource "aws_cloudwatch_log_metric_filter" "fms_file_rejected_validation" {
     value     = "1"
   }
 }
+
+resource "aws_cloudwatch_log_metric_filter" "fms_audit_write_failed" {
+  name           = "fms-audit-write-failed"
+  log_group_name = module.load_fms_lambda.cloudwatch_log_group.name
+  pattern        = "{ $.message.event = \"FMS_AUDIT_WRITE_FAILED\" }"
+
+  metric_transformation {
+    name      = "FmsAuditWriteFailedCount"
+    namespace = "EMDS/FMS"
+    value     = "1"
+  }
+}
