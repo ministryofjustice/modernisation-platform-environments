@@ -710,6 +710,12 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
       mode = "rolling"
     })
   }
+
+  depends_on = [
+    aws_lakeformation_permissions.merge_redrive_planner_database_access,
+    aws_lakeformation_permissions.merge_redrive_planner_table_access,
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+  ]
 }
 
 # ------------------------------------------------------------------------------
