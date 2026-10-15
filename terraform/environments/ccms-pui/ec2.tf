@@ -68,11 +68,11 @@ resource "aws_launch_template" "ec2-launch-template" {
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
-  name                = "${local.application_name}-auto-scaling-group"
-  vpc_zone_identifier = data.aws_subnets.shared-private.ids
-  desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
-  max_size            = local.application_data.accounts[local.environment].ec2_max_capacity
-  min_size            = local.application_data.accounts[local.environment].ec2_min_capacity
+  name                  = "${local.application_name}-auto-scaling-group"
+  vpc_zone_identifier   = data.aws_subnets.shared-private.ids
+  desired_capacity      = local.application_data.accounts[local.environment].ec2_desired_capacity
+  max_size              = local.application_data.accounts[local.environment].ec2_max_capacity
+  min_size              = local.application_data.accounts[local.environment].ec2_min_capacity
   protect_from_scale_in = true
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
@@ -81,8 +81,8 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
 
   # AWS Automatically applies this tag but if you don't add it here, members running pipeline can destroy that.
   tag {
-    key = "AmazonECSManaged"
-    value = ""
+    key                 = "AmazonECSManaged"
+    value               = ""
     propagate_at_launch = true
   }
 

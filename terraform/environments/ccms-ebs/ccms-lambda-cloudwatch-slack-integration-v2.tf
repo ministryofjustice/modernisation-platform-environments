@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_cloudwatch_slack_integration_v2_role" {
-  name  = "${local.application_name}-${local.environment}-lambda_cw_slack_integration_v2_role"
+  name = "${local.application_name}-${local.environment}-lambda_cw_slack_integration_v2_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -17,8 +17,8 @@ resource "aws_iam_role" "lambda_cloudwatch_slack_integration_v2_role" {
 }
 
 resource "aws_iam_role_policy" "lambda_cloudwatch_slack_integration_v2_policy" {
-  name  = "${local.application_name}-${local.environment}-lambda_cw_slack_integration_v2_role_policy"
-  role  = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role.id
+  name = "${local.application_name}-${local.environment}-lambda_cw_slack_integration_v2_role_policy"
+  role = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -174,8 +174,8 @@ resource "aws_lambda_function_event_invoke_config" "cloudwatch_sns" {
 }
 
 resource "aws_iam_role_policy" "cloudwatch_sns_dlq" {
-  name  = "${local.application_name}-${local.environment}-cloudwatch-sns-dlq-policy"
-  role  = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role.id
+  name = "${local.application_name}-${local.environment}-cloudwatch-sns-dlq-policy"
+  role = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -205,9 +205,9 @@ resource "aws_cloudwatch_metric_alarm" "cloudwatch_sns_dlq_not_empty" {
 }
 
 resource "aws_sns_topic" "notifier_dlq_alerts" {
-  name  = "${local.application_name}-${local.environment}-notifier-dlq-alerts"
+  name              = "${local.application_name}-${local.environment}-notifier-dlq-alerts"
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags  = local.tags
+  tags              = local.tags
 }
 
 resource "aws_sns_topic_subscription" "notifier_dlq_email" {

@@ -284,6 +284,11 @@ variable "certificate_arn" {
   default     = null
 }
 
+variable "deregistration_delay" {
+  type    = string
+  default = "30"
+}
+
 variable "microservice_lb" {
   description = "load balancer to use for the target group"
   type        = any

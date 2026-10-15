@@ -1,7 +1,7 @@
 locals {
-  nodeclass_name = "${local.workspace_slug}-nodeclass"
-  default_nodepool_name  = "${local.workspace_slug}-default-nodepool"
-  system_nodepool_name   = "${local.workspace_slug}-system-nodepool"
+  nodeclass_name        = "${local.workspace_slug}-nodeclass"
+  default_nodepool_name = "${local.workspace_slug}-default-nodepool"
+  system_nodepool_name  = "${local.workspace_slug}-system-nodepool"
 }
 
 resource "kubectl_manifest" "default_nodeclass" {
@@ -136,7 +136,7 @@ resource "kubectl_manifest" "system_nodepool" {
       limits:
         nodes: 10
   YAML
-  
+
   depends_on = [kubectl_manifest.default_nodeclass]
 }
 

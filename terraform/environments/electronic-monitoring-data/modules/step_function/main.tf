@@ -2,7 +2,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  step_function_definition = startswith(var.name, "merge_into_") ? "step_function_definitions/merge_into.json.tmpl"  : "step_function_definitions/${var.name}.json.tmpl" 
+  step_function_definition = startswith(var.name, "merge_into_") ? "step_function_definitions/merge_into.json.tmpl" : "step_function_definitions/${var.name}.json.tmpl"
 }
 
 resource "aws_sfn_state_machine" "this" {

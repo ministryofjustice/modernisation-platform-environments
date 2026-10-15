@@ -11,7 +11,8 @@ locals {
     "52.56.212.11/32",   # Workspace
     "35.177.173.197/32", # Workspace
     "10.200.0.0/16",     # Internal network
-    "10.200.16.0/20"     # LZ Prod Shared-Service Workspaces
+    "10.200.16.0/20",    # LZ Prod Shared-Service Workspaces
+    "10.26.130.0/23"     # MP non-prod Workspaces
   ]
 
   loadbalancer_ingress_rules = {

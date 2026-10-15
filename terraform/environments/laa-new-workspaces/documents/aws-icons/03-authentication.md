@@ -15,7 +15,7 @@ order requests travel in.
 ## Key facts
 
 | | |
-|---|---|
+| --- | --- |
 | **Primary auth** | AD username/password, validated by the WorkSpaces Directory against `laa-workspaces.local` |
 | **MFA transport** | RADIUS PAP over UDP 1812, shared secret held in Secrets Manager, 3 retries / 5s timeout |
 | **Portal access control** | ALB only accepts 443/80 from the Global Protect Alpha VPN CIDR range — not open to the internet |

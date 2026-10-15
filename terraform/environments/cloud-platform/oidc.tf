@@ -226,7 +226,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "s3:PutLifecycleConfiguration",
       "s3:PutBucketOwnershipControls",
       "s3:PutObject",
-      "s3:DeleteObject"
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion"
     ]
     resources = [
       "arn:aws:s3:::container-platform-*-fluentbit",

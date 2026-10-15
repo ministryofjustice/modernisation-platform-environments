@@ -105,14 +105,14 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_3872_3872_cid
 
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_3872_3872_cidr_any" {
   security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Oracle EM Console HTTP from internet (public access)"
+  description       = "Oracle EM Console HTTP from all LZ workspaces"
   ip_protocol       = "tcp"
   from_port         = 3872
   to_port           = 3872
   cidr_ipv4         = local.cidr_lz_workspaces_all
 
   tags = {
-    Name = "Oracle EM Console HTTP from anywhere"
+    Name = "Oracle EM Console HTTP from all LZ workspaces"
   }
 }
 
@@ -157,14 +157,14 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_4903_4903_cid
 
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_4903_4903_cidr_any" {
   security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Oracle EM Console HTTPS from internet (public access)"
+  description       = "Oracle EM Console HTTPS from all LZ workspaces"
   ip_protocol       = "tcp"
   from_port         = 4903
   to_port           = 4903
   cidr_ipv4         = local.cidr_lz_workspaces_all
 
   tags = {
-    Name = "Oracle EM Console HTTPS from anywhere"
+    Name = "Oracle EM Console HTTPS from all LZ workspaces"
   }
 }
 
@@ -248,13 +248,13 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_7803_7803_cid
 
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_7803_7803_cidr_any" {
   security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Oracle EM additional port from internet (public access)"
+  description       = "Oracle EM additional port from all LZ workspaces"
   ip_protocol       = "tcp"
   from_port         = 7803
   to_port           = 7803
   cidr_ipv4         = local.cidr_lz_workspaces_all
 
   tags = {
-    Name = "Oracle EM port 7803 from anywhere"
+    Name = "Oracle EM port 7803 from all LZ workspaces"
   }
 }

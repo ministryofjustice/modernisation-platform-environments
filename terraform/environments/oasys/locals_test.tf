@@ -59,7 +59,7 @@ locals {
     ec2_autoscaling_groups = {
       t1-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
-          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
+          scale_up = { recurrence = "0 5 * * Mon-Fri" }
           # scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -84,7 +84,7 @@ locals {
       t2-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 5 * * Mon-Fri" }
-          # scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+          scale_down = { recurrence = "30 22 * * Mon-Fri", desired_capacity = 0 }
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
@@ -250,6 +250,7 @@ locals {
       })
 
       t2-onr-db-a = merge(local.ec2_instances.db11g, { # needs the terraform aws provider/user-data fix + resize
+        cloudwatch_metric_alarms = {}                  # instance is ear marked for deletion
         config = merge(local.ec2_instances.db11g.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
@@ -271,7 +272,7 @@ locals {
         tags = merge(local.ec2_instances.db11g.tags, {
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "t2"
-          oracle-sids         = "T2BOSYS T2BOAUD"
+          oracle-sids         = "T2BOSYS T2BOAUD" # these DBs are on t2-oasys host
         })
       })
     }
@@ -369,7 +370,7 @@ locals {
               "kms:Decrypt",
             ]
             resources = [
-              aws_kms_key.arns_integration[0].arn,
+              length(aws_kms_key.arns_integration) == 1 ? aws_kms_key.arns_integration[0].arn : null
             ]
             condition = {
               test     = "StringEquals"

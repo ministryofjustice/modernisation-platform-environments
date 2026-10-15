@@ -3,6 +3,11 @@ image:
   repository: ${imageRepository}
   tag: ${imageTag}
 
+%{ if imagePullSecret != "" ~}
+imagePullSecrets:
+  - name: ${imagePullSecret}
+
+%{ endif ~}
 nameOverride: "litellm"
 
 service:

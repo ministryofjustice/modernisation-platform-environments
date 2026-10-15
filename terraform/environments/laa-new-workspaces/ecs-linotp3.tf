@@ -87,10 +87,10 @@ resource "aws_ecs_task_definition" "linotp3" {
       ]
 
       secrets = [
-        { name = "LINOTP_ENC_KEY_VALUE",   valueFrom = data.terraform_remote_state.workspace_components.outputs.linotp3_enc_key_secret_arn },
-        { name = "LINOTP_DB_PASSWORD",     valueFrom = data.terraform_remote_state.workspace_components.outputs.linotp3_db_password_secret_arn },
-        { name = "LINOTP_ADMIN_PASSWORD",  valueFrom = data.terraform_remote_state.workspace_components.outputs.linotp_admin_password_arn },
-        { name = "AD_BIND_PASSWORD",       valueFrom = data.terraform_remote_state.workspace_components.outputs.ad_admin_password_secret_arn }
+        { name = "LINOTP_ENC_KEY_VALUE", valueFrom = data.terraform_remote_state.workspace_components.outputs.linotp3_enc_key_secret_arn },
+        { name = "LINOTP_DB_PASSWORD", valueFrom = data.terraform_remote_state.workspace_components.outputs.linotp3_db_password_secret_arn },
+        { name = "LINOTP_ADMIN_PASSWORD", valueFrom = data.terraform_remote_state.workspace_components.outputs.linotp_admin_password_arn },
+        { name = "AD_BIND_PASSWORD", valueFrom = data.terraform_remote_state.workspace_components.outputs.ad_admin_password_secret_arn }
       ]
 
       healthCheck = {
@@ -121,7 +121,7 @@ resource "aws_ecs_task_definition" "linotp3" {
       ]
 
       environment = [
-        { name = "VPC_CIDR",   value = data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block },
+        { name = "VPC_CIDR", value = data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block },
         { name = "LINOTP_URL", value = "http://localhost/validate/simplecheck" }
       ]
 

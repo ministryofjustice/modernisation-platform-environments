@@ -21,7 +21,6 @@ resource "aws_secretsmanager_secret_version" "soa" {
     keystorePassword                      = ""
     truststorePassword                    = ""
     extra_java_properties                 = ""
-    slack_channel_webhook                 = ""
     admin_ebs_ds_url                      = ""
     admin_ebs_ds_username                 = ""
     admin_ebssms_ds_url                   = ""

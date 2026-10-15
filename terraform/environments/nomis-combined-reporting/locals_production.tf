@@ -40,6 +40,7 @@ locals {
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
           local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.rclone,
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.cms,
           local.cloudwatch_dashboard_widget_groups.app,
@@ -150,26 +151,50 @@ locals {
       })
 
       pd-ncr-cms-1 = merge(local.ec2_instances.bip_cms, {
-        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
+        cloudwatch_metric_alarms = merge(
+          local.cloudwatch_metric_alarms.bip_app_prod,
+          local.cloudwatch_metric_alarms.rclone,
+        )
         config = merge(local.ec2_instances.bip_cms.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
             "Ec2PDReportingPolicy",
+            "Ec2PDSharepointPolicy",
           ])
         })
+
+        ebs_volumes = merge(local.ec2_instances.bip_cms.ebs_volumes, {
+          "/dev/sdc" = {
+            type = "gp3"
+            size = 150
+          }
+        })
+
         tags = merge(local.ec2_instances.bip_cms.tags, {
           nomis-combined-reporting-environment = "pd"
         })
       })
 
       pd-ncr-cms-2 = merge(local.ec2_instances.bip_cms, {
-        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
+        cloudwatch_metric_alarms = merge(
+          local.cloudwatch_metric_alarms.bip_app_prod,
+          local.cloudwatch_metric_alarms.rclone,
+        )
         config = merge(local.ec2_instances.bip_cms.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
             "Ec2PDReportingPolicy",
+            "Ec2PDSharepointPolicy",
           ])
         })
+
+        ebs_volumes = merge(local.ec2_instances.bip_cms.ebs_volumes, {
+          "/dev/sdc" = {
+            type = "gp3"
+            size = 150
+          }
+        })
+
         tags = merge(local.ec2_instances.bip_cms.tags, {
           nomis-combined-reporting-environment = "pd"
         })
@@ -325,6 +350,20 @@ locals {
               "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
             ]
           }
+        ]
+      }
+      Ec2PDSharepointPolicy = {
+        description = "Permissions required for syncing files to sharepoint"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/microsoft/sharepoint/*",
+            ]
+          },
         ]
       }
     }
@@ -498,6 +537,7 @@ locals {
       "/oracle/database/DRBISYS"  = local.secretsmanager_secrets.db
       "/oracle/database/DRBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/pd"               = local.secretsmanager_secrets.bip
+      "/microsoft/sharepoint/1"   = local.secretsmanager_secrets.sharepoint
     }
   }
 }

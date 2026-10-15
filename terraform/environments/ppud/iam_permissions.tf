@@ -354,7 +354,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
         Resource = ["arn:aws:logs:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
-        } : each.value.policy_name == "get_cloudwatch_metrics" ? {  ## Tighten this down at a later date
+        } : each.value.policy_name == "get_cloudwatch_metrics" ? { ## Tighten this down at a later date
         Effect   = "Allow"
         Action   = ["cloudwatch:*"]
         Resource = ["arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
@@ -364,7 +364,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Resource = ["arn:aws:ses:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "start_stop_ec2_instances" ? {
         Effect   = "Allow"
-        Action   = ["ec2:DescribeInstances","ec2:StartInstances","ec2:StopInstances"]
+        Action   = ["ec2:DescribeInstances", "ec2:StartInstances", "ec2:StopInstances"]
         Resource = ["*"]
         } : each.value.policy_name == "ssm_patch_notification" ? {
         Effect   = "Allow"
@@ -459,8 +459,8 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Action   = ["secretsmanager:GetSecretValue", "secretsmanager:PutSecretValue", "secretsmanager:UpdateSecret"]
         Resource = ["arn:aws:secretsmanager:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:secret:${local.ses_secret_name}-*"]
         } : each.value.policy_name == "ssm_send_command" ? {
-        Effect = "Allow"
-        Action = ["ssm:SendCommand"]
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand"]
         Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:command/*"]
         } : each.value.policy_name == "ssm_read_command" ? {
         Effect   = "Allow"
@@ -491,8 +491,8 @@ resource "aws_iam_policy" "ssm_ec2_send_command" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = ["ec2:DescribeInstances"]
+        Effect   = "Allow"
+        Action   = ["ec2:DescribeInstances"]
         Resource = "*"
       },
       {

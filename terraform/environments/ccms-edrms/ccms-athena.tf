@@ -33,7 +33,7 @@ resource "aws_athena_named_query" "main_table_edrmsapp_internal" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = local.lb_log_prefix_edrmsapp_internal
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }
@@ -49,7 +49,7 @@ resource "aws_athena_named_query" "http_requests_edrmsapp_internal" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = local.lb_log_prefix_edrmsapp_internal
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }

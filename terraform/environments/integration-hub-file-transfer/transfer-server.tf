@@ -7,6 +7,7 @@ resource "aws_transfer_server" "this" {
   logging_role                = module.iam_role_transfer.arn
   protocols                   = ["FTPS", "SFTP"]
   security_policy_name        = "TransferSecurityPolicy-2025-03"
+  sftp_authentication_methods = "PUBLIC_KEY"
   structured_log_destinations = ["${module.cloudwatch_transfer.cloudwatch_log_group_arn}:*"]
 
   endpoint_details {
@@ -30,4 +31,17 @@ resource "aws_transfer_server" "this" {
   )
 
   depends_on = [aws_acm_certificate_validation.ftps]
+
+  # Recreating the server generates a new host key, breaking every partner's
+  # known_hosts entry.
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "aws_transfer_host_key" "this" {
+  count            = local.create_transfer_host_key
+  description      = "Host key for the ${local.environment} transfer server"
+  host_key_body_wo = data.aws_secretsmanager_secret_version.transfer_host_key.secret_string
+  server_id        = aws_transfer_server.this.id
 }

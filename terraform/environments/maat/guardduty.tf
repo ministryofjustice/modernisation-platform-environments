@@ -186,7 +186,7 @@ resource "aws_iam_role_policy" "lambda_guardduty_sns_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.guardduty_slack_notify.function_name}:*"
+        Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.guardduty_slack_notify.function_name}:*"
       },
       {
         Effect = "Allow"

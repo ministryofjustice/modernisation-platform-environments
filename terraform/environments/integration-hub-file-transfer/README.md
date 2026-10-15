@@ -49,8 +49,7 @@ We expect to make regular changes until October 1st, 2026.
 
 ### **Automatic alerts:**
 
-You can see the CloudWatch alarms configured for the service [here](./locals-cloudwatch.tf).
-As the service matures we will integrate alarms with PagerDuty to ensure that the right people are notified when an alarm is triggered.
+The [parent CloudWatch alarms](./locals-cloudwatch.tf) and the [push-to-s3](./push-to-s3/locals-cloudwatch.tf) and [hosted pickup](./push-to-s3-with-hosted-pickup/locals-cloudwatch.tf) delivery alarms publish to encrypted SNS topics connected to PagerDuty. In production, dead-letter backlogs and terminal delivery failures go to `#integration-hub-high-priority-alerts`; other delivery alarms go to `#integration-hub-low-priority-alerts`. Outside production, high-priority alarms go to the low-priority channel and low-priority alarms do not notify. Connected infrastructure alarms notify PagerDuty when they return to OK. Terminal delivery failure alarms do not send OK notifications: a quiet metric does not mean the file was delivered, so resolve those PagerDuty incidents after investigation. Both PagerDuty services currently share the same member escalation policy; the channel names do not imply different paging cover or out-of-hours support.
 
 ### **Impact of an outage:**
 
@@ -77,3 +76,13 @@ You must be a Ministry of Justice service. You may request access on behalf of a
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
 
 See [file action dispatch](./docs/file-action-dispatch.md) for dispatch configuration, matching and failure behaviour.
+
+### **How to trigger the deploy workflow for Lambda changes:**
+
+The Lambda code under `lambda/` is packaged by Terraform (`lambda.tf`), so it only deploys through the `integration-hub-file-transfer` workflow.
+
+The workflow only plans and applies `root` when a file directly in this folder changes. Changes under `lambda/`, `docs/` or `schemas/` alone are skipped, so they would not deploy.
+
+When you change Lambda code, also update the date below so the workflow runs and deploys the new code:
+
+Lambda last changed: 2026-10-13

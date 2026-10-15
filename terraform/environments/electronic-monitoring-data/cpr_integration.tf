@@ -1,5 +1,5 @@
 locals {
-    irsa_name = local.is-development || local.is-test ? "cloud-platform-irsa-8d7b7a42d840ce59-live" : local.is-preproduction ? "cloud-platform-irsa-91f1480099494185-live" : ""
+  irsa_name = local.is-development || local.is-test ? "cloud-platform-irsa-8d7b7a42d840ce59-live" : local.is-preproduction ? "cloud-platform-irsa-91f1480099494185-live" : ""
 }
 
 module "emd_cpr_integration_role" {
@@ -66,7 +66,7 @@ data "aws_iam_policy_document" "cpr_integration" {
       "s3:PutObject",
       "s3:GetObjectAttributes",
       "s3:GetObject",
-      "s3:DeleteObject"    
+      "s3:DeleteObject"
     ]
     resources = ["${module.s3-raw-formatted-data-bucket.bucket.arn}/staging/"]
   }
@@ -137,16 +137,16 @@ data "aws_iam_policy_document" "cpr_integration" {
 }
 
 resource "aws_glue_catalog_database" "person_record" {
-    name = "person_record${local.db_suffix}"
-    lifecycle {
-        prevent_destroy = true
-        ignore_changes = [
-        description,
-        location_uri,
-        parameters,
-        target_database
-        ]
-    }
+  name = "person_record${local.db_suffix}"
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [
+      description,
+      location_uri,
+      parameters,
+      target_database
+    ]
+  }
 }
 
 resource "aws_iam_policy" "emd_cpr_integration_policy" {
@@ -196,7 +196,7 @@ resource "aws_lakeformation_permissions" "cpr_integration_db_tables" {
 
 
 resource "aws_lakeformation_permissions" "cpr_integration_create_dbs" {
-  principal   = module.emd_cpr_integration_role.iam_role_arn
-  permissions = ["CREATE_DATABASE"]
+  principal        = module.emd_cpr_integration_role.iam_role_arn
+  permissions      = ["CREATE_DATABASE"]
   catalog_resource = true
 }

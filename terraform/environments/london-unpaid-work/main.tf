@@ -85,5 +85,17 @@ module "baseline" {
     lookup(local.baseline_all_environments, "ec2_autoscaling_groups", {}),
     lookup(local.baseline_environment_specific, "ec2_autoscaling_groups", {}),
   )
+
+  ec2_instances = merge(
+    lookup(local.baseline_all_environments, "ec2_instances", {}),
+    lookup(local.baseline_environment_specific, "ec2_instances", {}),
+  )
 }
 
+module "github_workflow_scheduler" {
+  source                     = "../../modules/github_lambda"
+  aws_account_id             = data.aws_caller_identity.current.id
+  project_name               = "london-unpaid-work-github-trigger"
+  enable_outbound_federation = false # Already set in this account
+  github_workflows           = local.github_workflows
+}

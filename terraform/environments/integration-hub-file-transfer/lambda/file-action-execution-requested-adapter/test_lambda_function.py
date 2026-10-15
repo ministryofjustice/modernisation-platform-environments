@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import unittest
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -12,6 +13,7 @@ CLEAN_BUCKET = "integration-hub-file-transfer-development-clean"
 IDEMPOTENCY_CACHE = {}
 IDEMPOTENCY_DECORATORS = []
 LOGS = []
+METRICS = []
 
 
 class FakeLogger:
@@ -21,11 +23,25 @@ class FakeLogger:
     def info(self, *_args, **_kwargs):
         LOGS.append(("info", _args, _kwargs))
 
+    def warning(self, *_args, **_kwargs):
+        LOGS.append(("warning", _args, _kwargs))
+
     def exception(self, *_args, **_kwargs):
         LOGS.append(("exception", _args, _kwargs))
 
     def inject_lambda_context(self, **_kwargs):
         return lambda function: function
+
+
+class FakeMetrics:
+    def __init__(self, **_kwargs):
+        pass
+
+    def add_metric(self, name, unit, value):
+        METRICS.append((name, unit, value))
+
+    def log_metrics(self, function):
+        return function
 
 
 class FakeIdempotencyConfig:
@@ -56,13 +72,18 @@ class FileActionExecutionRequestedAdapterHandlerTest(unittest.TestCase):
     def setUpClass(cls):
         cls.events_client = MagicMock()
         cls.secrets_client = MagicMock()
+        cls.dynamodb_client = MagicMock()
         boto3 = MagicMock()
-        boto3.client.side_effect = lambda service: {
+        boto3.client.side_effect = lambda service, **_kwargs: {
+            "dynamodb": cls.dynamodb_client,
             "events": cls.events_client,
             "secretsmanager": cls.secrets_client,
         }[service]
 
-        powertools = SimpleNamespace(Logger=FakeLogger)
+        powertools = SimpleNamespace(Logger=FakeLogger, Metrics=FakeMetrics)
+        powertools_metrics = SimpleNamespace(
+            MetricUnit=SimpleNamespace(Seconds="Seconds")
+        )
         powertools_idempotency = SimpleNamespace(
             DynamoDBPersistenceLayer=lambda **_kwargs: SimpleNamespace(),
             IdempotencyConfig=FakeIdempotencyConfig,
@@ -72,8 +93,11 @@ class FileActionExecutionRequestedAdapterHandlerTest(unittest.TestCase):
             sys.modules,
             {
                 "aws_lambda_powertools": powertools,
+                "aws_lambda_powertools.metrics": powertools_metrics,
                 "aws_lambda_powertools.utilities.idempotency": powertools_idempotency,
                 "boto3": boto3,
+                "botocore": MagicMock(),
+                "botocore.config": MagicMock(),
             },
         )
         cls.modules_patch.start()
@@ -83,6 +107,7 @@ class FileActionExecutionRequestedAdapterHandlerTest(unittest.TestCase):
                 "EVENT_BUS_ARN": "arn:aws:events:eu-west-2:123456789012:event-bus/file-transfer",
                 "IDEMPOTENCY_EXPIRY_SECONDS": "2592000",
                 "IDEMPOTENCY_TABLE": "adapter-idempotency",
+                "WORKFLOW_IDEMPOTENCY_TABLE": "workflow-idempotency",
             }
         )
         cls.handler = importlib.import_module("lambda_function")
@@ -94,6 +119,10 @@ class FileActionExecutionRequestedAdapterHandlerTest(unittest.TestCase):
     def setUp(self):
         IDEMPOTENCY_CACHE.clear()
         LOGS.clear()
+        METRICS.clear()
+        self.dynamodb_client.reset_mock()
+        self.dynamodb_client.get_item.side_effect = None
+        self.dynamodb_client.get_item.return_value = {}
         self.events_client.reset_mock()
         self.secrets_client.reset_mock()
         self.events_client.put_events.side_effect = None
@@ -168,6 +197,52 @@ class FileActionExecutionRequestedAdapterHandlerTest(unittest.TestCase):
         )
         self.assertNotIn("sensitive-queue-arn", json.dumps(log_entry))
         self.assertNotIn("sensitive-recipient", json.dumps(log_entry))
+
+    def test_records_end_to_end_latency_from_the_stage_record(self):
+        received_at = datetime.now(timezone.utc) - timedelta(hours=1)
+        self.dynamodb_client.get_item.return_value = {
+            "Item": {"received_at": {"S": received_at.isoformat()}}
+        }
+
+        self.handler.lambda_handler(self.event, None)
+
+        name, unit, value = METRICS[0]
+        self.assertEqual((name, unit), ("EndToEndLatency", "Seconds"))
+        self.assertAlmostEqual(value, 3600, delta=30)
+        self.assertEqual(len(METRICS), 1)
+        self.dynamodb_client.get_item.assert_called_once_with(
+            TableName="workflow-idempotency",
+            ConsistentRead=True,
+            Key={
+                "concurrencyId": {"S": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1"},
+                "operation": {"S": "STAGE"},
+            },
+        )
+
+    def test_falls_back_to_the_stage_claim_time(self):
+        self.dynamodb_client.get_item.return_value = {
+            "Item": {"created_at": {"N": "1783692000"}}
+        }
+
+        self.handler.lambda_handler(self.event, None)
+
+        self.assertEqual(len(METRICS), 1)
+
+    def test_dispatch_succeeds_when_the_landing_time_is_unavailable(self):
+        self.dynamodb_client.get_item.side_effect = Exception("dynamodb unavailable")
+
+        result = self.handler.lambda_handler(self.event, None)
+
+        self.assertEqual(result["status"], "PUBLISHED")
+        self.assertEqual(METRICS, [])
+
+    def test_skips_latency_when_there_is_no_stage_record(self):
+        self.dynamodb_client.get_item.return_value = {}
+
+        result = self.handler.lambda_handler(self.event, None)
+
+        self.assertEqual(result["status"], "PUBLISHED")
+        self.assertEqual(METRICS, [])
 
     def test_uses_source_logical_idempotency_key(self):
         self.assertEqual(

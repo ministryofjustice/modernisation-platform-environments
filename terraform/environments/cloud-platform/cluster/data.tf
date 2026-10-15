@@ -33,9 +33,29 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
-# ArgoCD RBAC group IDs (cloud_platform_engineers_group_id,
-# container_platform_aws_group_id) and the assembled argocd_rbac_role_mappings
-# are defined in locals.tf alongside the other ArgoCD configuration.
+# ArgoCD RBAC group IDs and the assembled argocd_rbac_role_mappings are defined
+# in locals.tf alongside the other ArgoCD configuration.
+#
+# BU parent group IDs for the VIEWER mappings are resolved from group NAMES via
+# the plural aws_identitystore_groups (ListGroups) data source below. The
+# ListGroups path works under the ModernisationPlatformSSOReadOnly role, unlike
+# the singular data.aws_identitystore_group (GetGroupId), which returns
+# ResourceNotFoundException for this role. This mirrors the working pattern in
+# the root component's grafana-objects.tf (cloud-platform#8509).
+#
+# Only fetched on hub clusters (where ArgoCD — and therefore the RBAC mapping —
+# is enabled); spokes create no ArgoCD RBAC and do not need the lookup.
+data "aws_ssoadmin_instances" "this" {
+  count    = local.enable_argocd ? 1 : 0
+  provider = aws.sso-readonly
+}
+
+data "aws_identitystore_groups" "all" {
+  count    = local.enable_argocd ? 1 : 0
+  provider = aws.sso-readonly
+
+  identity_store_id = tolist(data.aws_ssoadmin_instances.this[0].identity_store_ids)[0]
+}
 
 # Auth token for the kubernetes/helm providers (providers.tf).
 # aws_eks_cluster_auth generates a token from the cluster name and the caller's

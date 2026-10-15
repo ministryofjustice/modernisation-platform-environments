@@ -55,6 +55,7 @@
       "maintenance_window_target_description": "This is the production patch maintenance window target",
       "maintenance_window_task_name": "Prod-Instance-Patch",
       "lin_patch_group": "prod_lin_patch",
+      "lin_patch_group_al2023": "lin_patch_group_al2023",
       "patch_lin_maintenance_window_name": "prod_lin_patch_maintenance_window",
       "patch_lin_maintenance_schedule_cron": "cron(0 20 ? * 4#4 *)",
       "patch_lin_maintenance_window_duration": 4,

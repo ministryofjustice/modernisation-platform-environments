@@ -88,6 +88,14 @@ module "eks" {
     }
   }
 
+  # Hardcode the KMS principals otherwise they fall back to current identity
+  kms_key_administrators = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
+  ]
+  kms_key_users = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
+  ]
+
   tags = merge(
     local.tags,
     null_resource.created_by_tag.triggers.created_by == "__unset__" ? {} : { "created-by" = null_resource.created_by_tag.triggers.created_by },
@@ -120,10 +128,10 @@ resource "aws_cloudwatch_log_group" "auto_mode" {
 
   for_each = local.auto_mode_log_types
 
-  name              = "/aws/vendedlogs/eks/cluster/${each.key}/${local.cluster_name}"
+  name              = "/aws/eks/${local.cluster_name}/vendedlogs/${each.key}"
   retention_in_days = 30
 
-  tags = merge(local.tags, { Name = "/aws/vendedlogs/eks/cluster/${each.key}/${local.cluster_name}" })
+  tags = merge(local.tags, { Name = "/aws/eks/${local.cluster_name}/vendedlogs/${each.key}" })
 }
 
 ## Allows the delivery service to write to the vendedlogs log groups.
@@ -143,7 +151,7 @@ data "aws_iam_policy_document" "auto_mode_vendedlogs" {
     ]
 
     resources = [
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/vendedlogs/*:log-stream:*",
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${local.cluster_name}/vendedlogs/*:log-stream:*",
     ]
 
     condition {

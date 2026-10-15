@@ -1291,6 +1291,20 @@ locals {
         { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
+    "Dev-Ops-Server-Security-Group" = {
+      name        = "Dev-Ops-Server-Security-Group"
+      description = "Dev Ops Server security group for the development environment"
+      ingress = [
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
+        { port = 443, cidr = "vpc", description = "Allow port 443 inbound" },
+      ]
+      egress = [
+        { port = 0, to_port = 0, protocol = "-1", cidr = "vpc", description = "Allow all outbound (VPC)" },
+        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+      ]
+    }
     "Development-Servers-Standard-Security-Group" = {
       name        = "Development-Servers-Standard-Security-Group"
       description = "Development servers standard security group for the development environment"
@@ -1528,6 +1542,10 @@ resource "aws_security_group_rule" "wam_portal_alb_ingress" {
   security_group_id        = aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id
 }
 
+# Removing these two legacy rules as they won't be required on the new SG code.
+
+/*
+
 # Temporary rule - allows health checks from the old WAM-ALB SG until the ALB is migrated to the new WAM-ALB-Load-Balancer-Security-Group
 resource "aws_security_group_rule" "wam_portal_alb_ingress_legacy" {
   description              = "Allow port 443 inbound from legacy WAM-ALB security group"
@@ -1549,6 +1567,8 @@ resource "aws_security_group_rule" "ppud_portal_alb_ingress_legacy" {
   source_security_group_id = aws_security_group.PPUD-ALB.id
   security_group_id        = aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id
 }
+
+*/
 
 # -------------------------------------------------------------------
 # Conditional security groups

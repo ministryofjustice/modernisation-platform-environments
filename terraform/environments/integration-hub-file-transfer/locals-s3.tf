@@ -1,4 +1,6 @@
 locals {
+  cloudtrail_retention_days = local.is-production ? 400 : 30
+
   s3_bucket_keys = [
     "incoming",
     "processing",
@@ -17,6 +19,22 @@ locals {
 
   s3_bucket_lifecycle_defaults = {
     development = {
+      default = [
+        {
+          id     = "expire-objects-after-1-day"
+          status = "Enabled"
+          filter = {}
+          expiration = {
+            days = 1
+          }
+          abort_incomplete_multipart_upload_days = 1
+          noncurrent_version_expiration = {
+            noncurrent_days = 1
+          }
+        },
+      ]
+    }
+    test = {
       default = [
         {
           id     = "expire-objects-after-1-day"
@@ -54,6 +72,11 @@ locals {
   s3_bucket_lifecycle_per_prefix = {
     development = {
       default = local.s3_bucket_lifecycle_defaults.development.default
+      buckets = {}
+    }
+
+    test = {
+      default = local.s3_bucket_lifecycle_defaults.test.default
       buckets = {}
     }
 

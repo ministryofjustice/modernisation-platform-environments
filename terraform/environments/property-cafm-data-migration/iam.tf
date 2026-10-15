@@ -117,7 +117,7 @@ resource "aws_iam_policy" "staging_replication" {
 resource "aws_iam_role" "staging_replication" {
   count = local.is-production ? 1 : 0
 
-  name               = "property-datahub-staging-replication"
+  name = "property-datahub-staging-replication"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

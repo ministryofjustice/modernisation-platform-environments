@@ -26,7 +26,7 @@ resource "aws_secretsmanager_secret" "linotp_ad_bind_password" {
   tags = merge(
     local.tags,
     {
-      "Name" = "${local.application_name}/${local.environment}/linotp-ad-bind-password",
+      "Name"         = "${local.application_name}/${local.environment}/linotp-ad-bind-password",
       "MirroredFrom" = "SSM:/laa-workspaces/${local.environment}/ad-service-account-password"
     }
   )
@@ -76,12 +76,12 @@ resource "aws_iam_role_policy" "ecs_task_execution_ad_secret" {
 output "linotp_ad_service_account_info" {
   description = "LinOTP AD service account configuration"
   value = local.environment == "development" ? {
-    status       = "✅ Using existing lambda.workspace service account"
-    username     = "lambda.workspace"
-    domain       = "LAAWORKSPACES"
-    bind_dn      = "CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local"
-    ssm_source   = "/laa-workspaces/development/ad-service-account-password"
-    secrets_mgr  = aws_secretsmanager_secret.linotp_ad_bind_password[0].name
-    note         = "No additional AD account creation required - reusing existing service account"
+    status      = "✅ Using existing lambda.workspace service account"
+    username    = "lambda.workspace"
+    domain      = "LAAWORKSPACES"
+    bind_dn     = "CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local"
+    ssm_source  = "/laa-workspaces/development/ad-service-account-password"
+    secrets_mgr = aws_secretsmanager_secret.linotp_ad_bind_password[0].name
+    note        = "No additional AD account creation required - reusing existing service account"
   } : null
 }

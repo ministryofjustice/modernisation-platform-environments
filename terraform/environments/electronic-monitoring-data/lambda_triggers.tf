@@ -572,3 +572,192 @@ resource "aws_scheduler_schedule" "fms_validation_reporter_catch_up" {
     })
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Live feed specials remediation schedules
+# Automated cleanup runs only where downstream specials are excluded.
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "specials_remediation_schedule" {
+  for_each = local.specials_remediation_active_consumers
+
+  name = (
+    "live_feed_specials_remediation_${each.key}_schedule"
+  )
+
+  description = (
+    "Checks ${each.value.consumer} position for downstream specials"
+  )
+
+  schedule_expression = each.value.schedule_expression
+}
+
+resource "aws_cloudwatch_event_target" "specials_remediation" {
+  for_each = local.specials_remediation_active_consumers
+
+  rule = aws_cloudwatch_event_rule.specials_remediation_schedule[
+    each.key
+  ].name
+
+  arn = module.live_feed_specials_remediator.lambda_function_arn
+
+  input = jsonencode({
+    consumer = each.value.consumer
+  })
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_specials_remediation" {
+  for_each = local.specials_remediation_active_consumers
+
+  statement_id = format(
+    "AllowExecutionFromEventBridgeSpecialsRemediation%s",
+    title(each.key),
+  )
+
+  action = "lambda:InvokeFunction"
+
+  function_name = (
+    module.live_feed_specials_remediator.lambda_function_name
+  )
+
+  principal = "events.amazonaws.com"
+
+  source_arn = aws_cloudwatch_event_rule.specials_remediation_schedule[
+    each.key
+  ].arn
+}
+
+# ------------------------------------------------------------------------------
+# Rolling downstream position reconciliation
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_rolling_schedules = tomap({
+    staged = {
+      consumer            = "STAGED"
+      schedule_expression = "cron(0,30 * * * ? *)"
+    }
+    ac = {
+      consumer            = "AC"
+      schedule_expression = "cron(10,40 * * * ? *)"
+    }
+    emdi = {
+      consumer            = "EMDI"
+      schedule_expression = "cron(20,50 * * * ? *)"
+    }
+  })
+}
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_rolling_schedules
+    : tomap({})
+  )
+
+  name = "downstream_reconciliation_${each.key}_rolling"
+
+  description = "Runs ${each.value.consumer} downstream position reconciliation every 30 minutes"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = each.value.schedule_expression
+
+  target {
+    arn      = aws_sfn_state_machine.downstream_reconciliation.arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      consumer = each.value.consumer
+      mode     = "rolling"
+    })
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Rota channel notifier schedule
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rota_channel_notifier_scheduler" {
+  count = local.is-production ? 1 : 0
+
+  name = "rota_channel_notifier_scheduler_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = { Service = "scheduler.amazonaws.com" }
+        Action    = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "rota_channel_notifier_scheduler_invoke" {
+  count = local.is-production ? 1 : 0
+
+  name = "rota_channel_notifier_scheduler_invoke_policy"
+  role = aws_iam_role.rota_channel_notifier_scheduler[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["lambda:InvokeFunction"]
+        Resource = [module.rota_channel_notifier.lambda_function_arn]
+      }
+    ]
+  })
+}
+
+resource "aws_scheduler_schedule" "rota_channel_notifier" {
+  count = local.is-production ? 1 : 0
+
+  name        = "rota_channel_notifier_0830"
+  description = "Runs the rota channel notifier at 08:30 on weekdays"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(30 8 ? * MON-FRI *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.rota_channel_notifier.lambda_function_arn
+    role_arn = aws_iam_role.rota_channel_notifier_scheduler[0].arn
+  }
+}
+
+
+#-----------------------------------------------------------------------------------
+# Trigger DLT Iceberg Maintenance
+# Runs sequential OPTIMIZE and VACUUM on dlt Iceberg load tables.
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "dlt_iceberg_maintenance" {
+  name        = "dlt-iceberg-maintenance"
+  description = "Run sequential OPTIMIZE and VACUUM on dlt Iceberg load tables."
+  # Keep scheduled starts further apart than the state machine's 3000-second timeout.
+  schedule_expression = "rate(1 hour)"
+}
+
+resource "aws_cloudwatch_event_target" "dlt_iceberg_maintenance" {
+  rule      = aws_cloudwatch_event_rule.dlt_iceberg_maintenance.name
+  target_id = "dlt-iceberg-maintenance"
+  arn       = module.dlt_iceberg_maintenance.arn
+  role_arn  = aws_iam_role.dlt_iceberg_maintenance_events.arn
+  input     = jsonencode({})
+
+  retry_policy {
+    maximum_event_age_in_seconds = 300
+    maximum_retry_attempts       = 2
+  }
+
+  depends_on = [aws_iam_role_policy.dlt_iceberg_maintenance_start]
+}

@@ -1,6 +1,13 @@
 locals {
   bu_accounts = jsondecode(file("${path.module}/../accounts.json"))
 
+  # Shared BU -> parent IdC group mapping, sourced from the single
+  # business-units.json consumed by this component, the root grafana component
+  # and cluster-core/ (cloud-platform#8558). octo->office-of-the-cto and
+  # cd->central-digital are inferred from child-team naming; hmpps/laa are exact
+  # (see ADR-002 "Groups in use"). JSON cannot carry this note, so it lives here.
+  business_units = jsondecode(file("${path.module}/../business-units.json")).business_units
+
   mp_environments = concat(
     [
       "cloud-platform-preproduction",
@@ -65,23 +72,53 @@ locals {
   argocd_idc_region = "eu-west-2"
 
   #-----------------------------------------------------------------------------
-  # ArgoCD RBAC role mappings.
+  # ArgoCD RBAC role mappings (layer 1 of the BU-user access model — ADR-002).
   #
-  # The ADMIN mapping is always present and grants two IDC groups:
+  # This layer controls who can LOG IN to the ArgoCD UI. It does not, on its
+  # own, make any Applications visible: global VIEWER gates ArgoCD itself, not
+  # project-scoped resources. Application visibility is layer 2, the per-BU
+  # AppProject `roles` grant in cluster-core/argocd-gitops.tf. Both layers key
+  # on the same BU parent group. See ADR-002 "BU-User ArgoCD UI Access".
+  #
+  # ADMIN — always present, grants two IDC groups:
   #   - cloud-platform-engineers: the platform team.
-  #   - container-platform-aws: the AWS ProServe team, so they can access the
-  #     ArgoCD portal on hub clusters.
-  # Additional per-tier mappings (EDITOR/VIEWER for BU teams) come from the
-  # environment_configurations map, keyed ADMIN/EDITOR/VIEWER -> list of
-  # { id, type } IDC identities.
+  #   - container-platform-aws: the AWS ProServe team.
+  # These two IDs stay HARDCODED on purpose: ADMIN is the lock-out-prevention
+  # path, so it must not depend on the sso-readonly data source resolving at
+  # plan time.
   #
-  # Group IDs are hardcoded because the ModernisationPlatformSSOReadOnly role
-  # returns ResourceNotFoundException when calling GetGroupId despite having
-  # identitystore:Get*. TODO: switch back to a data.aws_identitystore_group
-  # lookup.
+  # VIEWER — the onboarded BU parent groups (cloud-platform#8548). Keyed on
+  # group NAME; IDs are resolved from data.aws_identitystore_groups (ListGroups,
+  # see data.tf) so no BU group ID is hardcoded and the reviewable source of
+  # truth is the name. A name that does not resolve is dropped rather than
+  # failing the plan, so a renamed/removed group cannot break the hub.
+  #
+  # Static by design: these are BU PARENT groups (children of the GitHub
+  # `business-units` team). Squad teams nest under their BU parent and inherit
+  # membership, so onboarding a new squad needs no change here — only onboarding
+  # a brand-new BU does.
   #-----------------------------------------------------------------------------
   cloud_platform_engineers_group_id = "664252b4-7021-701e-49b9-6c46ccc7899e"
   container_platform_aws_group_id   = "7682a204-00f1-7031-257e-713bb28289c6"
+
+  # BU parent group NAMES that receive read-only ArgoCD UI access, one per
+  # onboarded BU (matches local.bu_configs in cluster-core). Derived from the
+  # shared business-units.json (see local.business_units) so there is a single
+  # source of truth for the BU -> parent group mapping.
+  argocd_viewer_bu_group_names = [for bu in local.business_units : bu.parent_group]
+
+  # Resolve group name -> IDC group ID (only on hubs, where the lookup runs).
+  argocd_idc_group_id_by_name = local.enable_argocd ? {
+    for g in data.aws_identitystore_groups.all[0].groups : g.display_name => g.group_id
+  } : {}
+
+  # VIEWER identities: resolved BU parent groups. Names that do not resolve are
+  # skipped (defensive — a mistyped/removed group must not fail the hub plan).
+  argocd_viewer_identities = [
+    for name in local.argocd_viewer_bu_group_names :
+    { id = local.argocd_idc_group_id_by_name[name], type = "SSO_GROUP" }
+    if contains(keys(local.argocd_idc_group_id_by_name), name)
+  ]
 
   argocd_rbac_role_mappings = merge(
     {
@@ -89,7 +126,13 @@ locals {
         { id = local.cloud_platform_engineers_group_id, type = "SSO_GROUP" },
         { id = local.container_platform_aws_group_id, type = "SSO_GROUP" },
       ]
+      VIEWER = local.argocd_viewer_identities
     },
+    # Optional per-tier override. No tier sets this key today, so the lookup
+    # returns {} and the baseline above stands. NOTE: merge is shallow — if a
+    # tier ever sets a role key here (e.g. VIEWER), it REPLACES the baseline
+    # list for that role, it does not append. Add to argocd_viewer_bu_group_names
+    # for BU access; reserve this override for genuine per-tier exceptions.
     lookup(local.environment_configuration, "argocd_rbac_role_mappings", {})
   )
 
@@ -145,6 +188,13 @@ locals {
     var.argocd_hub_capability_role_arn != "" ? var.argocd_hub_capability_role_arn :
     local.is_argocd_ephemeral_spoke ? local.argocd_ephemeral_hub_capability_role_arn :
     local.argocd_hub_capability_convention_role_arn
+  )
+
+  # Permanent spoke workspaces follow container-platform-<bu>-<tier>; matching
+  # greedily before the tier also supports BU names containing hyphens.
+  # Ephemeral spokes use the dedicated ephemeral BU label in baseline namespaces.
+  argocd_spoke_bu_name = local.is_argocd_ephemeral_spoke ? "ephemeral" : (
+    local.is_argocd_permanent_spoke ? try(regex("^container-platform-(.+)-(nonlive|live)$", terraform.workspace)[0], "") : ""
   )
 
   # Kubernetes RBAC group that the hub capability role is placed into on this spoke.

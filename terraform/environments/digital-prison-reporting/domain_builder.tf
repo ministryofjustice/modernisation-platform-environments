@@ -42,7 +42,7 @@ module "domain_builder_backend_Lambda" {
   log_retention_in_days = local.lambda_log_retention_in_days
 
   env_vars = {
-    "DOMAIN_API_KEY"       = module.domain_builder_api_key[0].secret
+    "DOMAIN_API_KEY"       = try(module.domain_builder_api_key[0].secret, "")
     "DOMAIN_REGISTRY_NAME" = local.domain_registry
     "JAVA_TOOL_OPTIONS"    = "-XX:MetaspaceSize=32m"
     "POSTGRES_DB_NAME"     = local.rds_dbuilder_db_identifier
@@ -88,6 +88,7 @@ module "domain_builder_backend_db" {
   db_instance_class  = local.rds_dbuilder_inst_class
   master_user        = local.rds_dbuilder_user
   storage_type       = local.rds_dbuilder_store_type
+  engine_version     = local.rds_dbuilder_engine_version
   parameter_group    = local.rds_dbuilder_parameter_group
   ca_cert_identifier = "rds-ca-rsa2048-g1" # Updated on 29th July 2024
 
@@ -129,9 +130,9 @@ module "domain_builder_cli_agent" {
   app_key                     = "domain-builder"
 
   env_vars = {
-    DOMAIN_API_KEY    = tostring(try(module.domain_builder_api_key[0].secret, null))
-    REST_API_EXEC_ARN = tostring(try(module.domain_builder_api_gateway[0].rest_api_execution_arn, null))
-    REST_API_ID       = tostring(try(module.domain_builder_api_gateway[0].rest_api_id, null))
+    DOMAIN_API_KEY    = tostring(try(module.domain_builder_api_key[0].secret, ""))
+    REST_API_EXEC_ARN = tostring(try(module.domain_builder_api_gateway[0].rest_api_execution_arn, ""))
+    REST_API_ID       = tostring(try(module.domain_builder_api_gateway[0].rest_api_id, ""))
     ENV               = local.env
   }
 

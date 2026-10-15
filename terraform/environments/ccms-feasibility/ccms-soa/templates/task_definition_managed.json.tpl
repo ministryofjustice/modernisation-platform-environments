@@ -52,7 +52,7 @@
       { "name": "EXTRA_JAVA_PROPERTIES", "valueFrom": "${soa_secret_arn}:extra_java_properties::" },
       { "name": "KEYSTORE_PASSWORD", "valueFrom": "${soa_secret_arn}:keystorePassword::" },
       { "name": "TRUSTSTORE_PASSWORD", "valueFrom": "${soa_secret_arn}:truststorePassword::" },
-      { "name": "SLACK_CHANNEL_WEBHOOK", "valueFrom": "${soa_secret_arn}:slack_channel_webhook::" }
+      { "name": "SLACK_CHANNEL_WEBHOOK", "valueFrom": "${slack_secret_arn}:slack_channel_webhook::" }
     ]
   }
 ]

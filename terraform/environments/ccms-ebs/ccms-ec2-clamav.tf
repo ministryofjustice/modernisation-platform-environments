@@ -2,7 +2,7 @@ resource "aws_instance" "ec2_clamav" {
   instance_type               = local.application_data.accounts[local.environment].ec2_instance_type_clamav
   ami                         = local.application_data.accounts[local.environment].clamav_ami_id
   key_name                    = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg_clamav.id]
+  vpc_security_group_ids      = [aws_security_group.ec2_sg_clamav.id, aws_security_group.clamav_sg_kpmg.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   monitoring                  = true
   ebs_optimized               = true

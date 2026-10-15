@@ -26,4 +26,4 @@ flow diagrams are plain Mermaid in the markdown — edit them directly.
 
 ---
 Derived from Terraform in `terraform/environments/oas`, development environment, as of
-2026-07-24. Diagrams reflect declared infrastructure, not a live account read.
+2026-09-24. Diagrams reflect declared infrastructure, not a live account read.

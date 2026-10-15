@@ -12,19 +12,19 @@ resource "aws_security_group" "ec2_sg_clamav" {
 
 ### ClamAV
 
-resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_clamav_3310" {
-  security_group_id = aws_security_group.ec2_sg_clamav.id
-
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  description = "Allow ClamAV from VPC"
-  ip_protocol = "tcp"
-  from_port   = 3310
-  to_port     = 3310
+resource "aws_security_group_rule" "ingress_traffic_clamav_3310" {
+  security_group_id        = aws_security_group.ec2_sg_clamav.id
+  type                     = "ingress"
+  description              = "Allow ClamAV from ECS tasks security group"
+  protocol                 = "tcp"
+  from_port                = 3310
+  to_port                  = 3310
+  source_security_group_id = aws_security_group.ecs_tasks_pui.id
 }
 
 # EGRESS Rules
 
-### HTTPS
+# ### HTTPS
 resource "aws_vpc_security_group_egress_rule" "egress_traffic_clamav_443" {
   security_group_id = aws_security_group.ec2_sg_clamav.id
   description       = "Outbound HTTPS"
