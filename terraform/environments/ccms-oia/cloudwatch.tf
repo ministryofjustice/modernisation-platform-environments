@@ -132,7 +132,7 @@ resource "aws_cloudwatch_metric_alarm" "container_adaptor_count" {
 
 # Underlying EC2 Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "Opa_Status_Check_Failure" {
-  alarm_name          = "${local.application_name}-${local.environment}-status-check-failure"
+  alarm_name          = "${local.application_name}-${local.environment}-opa-status-check-failure"
   alarm_description   = "A oia cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = "StatusCheckFailed"
@@ -153,7 +153,7 @@ resource "aws_cloudwatch_metric_alarm" "Opa_Status_Check_Failure" {
 
 # Underlying EC2 Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "Conn_Saa_Status_Check_Failure" {
-  alarm_name          = "${local.application_name}-${local.environment}-status-check-failure"
+  alarm_name          = "${local.application_name}-${local.environment}-conn-saa-status-check-failure"
   alarm_description   = "A oia cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = "StatusCheckFailed"
