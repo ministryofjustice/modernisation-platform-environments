@@ -144,7 +144,8 @@ module "s3-bucket-shared" {
   }
   manage_log_bucket_policy = false
 
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared/${local.application_name}-${local.environment}-shared"
+  log_prefix = "s3access/"
+  log_partition_date_source = "EventTime"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
