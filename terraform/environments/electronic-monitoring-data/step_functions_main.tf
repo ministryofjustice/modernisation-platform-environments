@@ -469,6 +469,11 @@ resource "aws_sfn_state_machine" "downstream_reconciliation" {
           Default = "UnsupportedMode"
         }
 
+        # ----------------------------------------------------------------------
+        # Discover rolling reconciliation work
+        # Open one Slack thread when replay work is available.
+        # ----------------------------------------------------------------------
+
         DiscoverRolling = {
           Type     = "Task"
           Resource = "arn:aws:states:::lambda:invoke"
@@ -477,8 +482,10 @@ resource "aws_sfn_state_machine" "downstream_reconciliation" {
             FunctionName = module.merge_redrive_planner.lambda_function_arn
 
             Payload = {
-              action       = "discover_rolling"
-              "consumer.$" = "$.consumer"
+              action                  = "discover_rolling"
+              aggregate_notifications = true
+              "consumer.$"            = "$.consumer"
+              "execution_id.$"        = "$$.Execution.Id"
             }
           }
 
@@ -526,11 +533,16 @@ resource "aws_sfn_state_machine" "downstream_reconciliation" {
           Default = "UnexpectedRollingResult"
         }
 
+        # ----------------------------------------------------------------------
+        # Replay rolling reconciliation candidates
+        # Keep verification results for one aggregate completion message.
+        # ----------------------------------------------------------------------
+
         ReplayRollingCandidates = {
           Type           = "Map"
           ItemsPath      = "$.candidates"
           MaxConcurrency = 1
-          ResultPath     = null
+          ResultPath     = "$.results"
 
           ItemProcessor = {
             ProcessorConfig = {
@@ -727,11 +739,115 @@ resource "aws_sfn_state_machine" "downstream_reconciliation" {
             }
           }
 
+          Catch = [
+            {
+              ErrorEquals = ["States.ALL"]
+              ResultPath  = "$.failure"
+              Next        = "NotifyRollingFailure"
+            }
+          ]
+
+          Next = "CompleteRolling"
+        }
+
+        # ----------------------------------------------------------------------
+        # Complete rolling reconciliation
+        # Publish one aggregate completion reply in the existing Slack thread.
+        # ----------------------------------------------------------------------
+
+        CompleteRolling = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action           = "complete_rolling"
+              "consumer.$"     = "$.consumer"
+              "execution_id.$" = "$.execution_id"
+              "results.$"      = "$.results"
+              "thread_id.$"    = "$.thread_id"
+            }
+          }
+
+          OutputPath = "$.Payload"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Catch = [
+            {
+              ErrorEquals = ["States.ALL"]
+              ResultPath  = "$.failure"
+              Next        = "NotifyRollingFailure"
+            }
+          ]
+
           Next = "RollingComplete"
+        }
+
+        # ----------------------------------------------------------------------
+        # Report rolling reconciliation failure
+        # Publish one failure reply before ending the execution as failed.
+        # ----------------------------------------------------------------------
+
+        NotifyRollingFailure = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+
+            Payload = {
+              action           = "fail_rolling"
+              "consumer.$"     = "$.consumer"
+              "execution_id.$" = "$.execution_id"
+              "failure.$"      = "$.failure"
+              "thread_id.$"    = "$.thread_id"
+            }
+          }
+
+          OutputPath = "$.Payload"
+
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+
+          Next = "RollingFailed"
         }
 
         RollingComplete = {
           Type = "Succeed"
+        }
+
+        RollingFailed = {
+          Type  = "Fail"
+          Error = "RollingReconciliationFailed"
+          Cause = "Rolling reconciliation failed after the Slack thread was updated."
         }
 
         RollingManualReviewRequired = {
