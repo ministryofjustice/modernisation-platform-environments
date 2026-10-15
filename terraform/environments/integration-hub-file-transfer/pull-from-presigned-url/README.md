@@ -4,7 +4,7 @@ After retaining a clean file, the notifier publishes a custom notification to a
 recipient-specific encrypted SNS topic. The Modernisation Platform Chatbot module
 connects that topic to Slack. No incoming webhook or new Slack app is needed.
 
-Development targets `#integration-hub-team` (`C0ARA0C101L`) in the Justice Digital
+Development targets `#integration-hub-alerts` (`C0CAB9Q6S2U`) in the Justice Digital
 workspace (`T02DYEB3A`). The AWS account must first be connected to that workspace
 in Amazon Q Developer in chat applications (formerly AWS Chatbot). This is a
 one-time account setup; the Terraform module cannot perform the Slack OAuth step.

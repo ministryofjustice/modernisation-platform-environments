@@ -15,7 +15,7 @@ locals {
           authorised_groups = {
             integration-hub = "8662e2b4-3021-7017-56ba-8794aa2047cd"
           }
-          slack_channel_id = "C0ARA0C101L" # integration-hub-team
+          slack_channel_id = "C0CAB9Q6S2U" # integration-hub-alerts
           slack_team_id    = "T02DYEB3A"   # Justice Digital
         }
       }
