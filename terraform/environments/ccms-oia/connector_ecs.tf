@@ -103,14 +103,14 @@ resource "aws_ecs_service" "ecs_connector_service" {
     security_groups = [aws_security_group.ecs_tasks_connector.id]
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.connector_target_group.id
-    container_name   = "${local.connector_app_name}-container"
-    container_port   = local.application_data.accounts[local.environment].connector_server_port
-  }
+  # load_balancer {
+    # target_group_arn = aws_lb_target_group.connector_target_group.id
+  #   container_name   = "${local.connector_app_name}-container"
+  #   container_port   = local.application_data.accounts[local.environment].connector_server_port
+  # }
 
   depends_on = [
-    aws_lb_listener.connector_listener,
+    # aws_lb_listener.connector_listener,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
   ]
 

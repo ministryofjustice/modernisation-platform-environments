@@ -89,14 +89,14 @@ resource "aws_ecs_service" "opahub" {
     subnets         = data.aws_subnets.shared-private.ids
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
-    container_name   = "${local.opa_app_name}-container"
-    container_port   = local.application_data.accounts[local.environment].opa_ssl_port
-  }
+  # load_balancer {
+  #   target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
+  #   container_name   = "${local.opa_app_name}-container"
+  #   container_port   = local.application_data.accounts[local.environment].opa_ssl_port
+  # }
 
   depends_on = [
-    aws_lb_listener.opahub_listener,
+    # aws_lb_listener.opahub_listener,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_autoscaling_group.opa_cluster_scaling_group
   ]
