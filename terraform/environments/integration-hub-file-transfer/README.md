@@ -81,10 +81,6 @@ See [file action dispatch](./docs/file-action-dispatch.md) for dispatch configur
 
 The Lambda code under `lambda/` is packaged by Terraform (`lambda.tf`), so it only deploys through the `integration-hub-file-transfer` workflow.
 
-Keep the Lambda module's default `recreate_missing_package = true` and `trigger_on_package_timestamp = true` in this Terraform root. Each GitHub Actions job starts without local ZIP artefacts, even when Terraform state records a successful build from an earlier failed apply. Disabling timestamp triggers prevents those missing packages from being rebuilt. STAGE and ROUTE use distinct `hash_extra` values because concurrent builds from the same source directory must not write to the same ZIP.
-
-These modules build their own packages and use `ignore_source_code_hash = true`: their generated ZIP filenames already contain a hash of the source and packaging inputs, and changes to those filenames trigger deployments. This avoids recalculating a ZIP hash that can change from an old planned value to a new value when a missing package is rebuilt during apply. Keep missing-package recovery enabled; ignoring the ZIP hash does not recreate a missing file by itself. This relies on changes being reflected in the hashed inputs, so dependency updates must also update the relevant dependency manifests.
-
 The workflow only plans and applies `root` when a file directly in this folder changes. Changes under `lambda/`, `docs/` or `schemas/` alone are skipped, so they would not deploy.
 
 When you change Lambda code, also update the date below so the workflow runs and deploys the new code:
