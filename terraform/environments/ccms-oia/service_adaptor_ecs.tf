@@ -81,14 +81,14 @@ resource "aws_ecs_service" "ecs_adaptor_service" {
     subnets         = data.aws_subnets.shared-private.ids
   }
   
-  load_balancer {
-    target_group_arn = aws_lb_target_group.adaptor_target_group.id
-    container_name   = "${local.adaptor_app_name}-container"
-    container_port   = local.application_data.accounts[local.environment].adaptor_server_port
-  }
+  # load_balancer {
+  #   target_group_arn = aws_lb_target_group.adaptor_target_group.id
+  #   container_name   = "${local.adaptor_app_name}-container"
+  #   container_port   = local.application_data.accounts[local.environment].adaptor_server_port
+  # }
 
   depends_on = [
-    aws_lb_listener.adaptor_listener,
+    # aws_lb_listener.adaptor_listener,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
   ]
 
