@@ -4,14 +4,15 @@ data "aws_s3_bucket" "lb_access_logs" {
 }
 
 module "nlb_admin" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/9504352
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=9504352"
 
   name               = "${local.component_name}-admin-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
   security_group_ids = [aws_security_group.nlb_admin.id]
   vpc_id             = data.aws_vpc.shared.id
   certificate_arn    = aws_acm_certificate_validation.soa.certificate_arn
+  ssl_policy         = "ELBSecurityPolicy-TLS-1-2-2017-01"
   target_port        = local.application_data.accounts[local.environment].admin_ssl_port
 
   target_group_protocol   = "TLS"
@@ -37,14 +38,15 @@ module "nlb_admin" {
 }
 
 module "nlb_managed" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/9504352
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/nlb?ref=9504352"
 
   name               = "${local.component_name}-managed-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
   security_group_ids = [aws_security_group.nlb_managed.id]
   vpc_id             = data.aws_vpc.shared.id
   certificate_arn    = aws_acm_certificate_validation.soa.certificate_arn
+  ssl_policy         = "ELBSecurityPolicy-TLS-1-2-2017-01"
   target_port        = local.application_data.accounts[local.environment].managed_ssl_port
 
   target_group_protocol   = "TLS"
