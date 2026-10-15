@@ -54,6 +54,10 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
           value = "cadet-em-${local.environment_shorthand}"
         },
         {
+          name  = "IMPORT_WORKFLOW_NAME"
+          value = "cadet-em-${local.environment_shorthand}"
+        },
+        {
           name  = "EM_REMOVE_HISTORIC"
           value = local.is-production ? "False" : "True"
         },
