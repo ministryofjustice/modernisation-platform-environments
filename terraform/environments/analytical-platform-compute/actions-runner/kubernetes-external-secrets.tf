@@ -197,7 +197,7 @@ resource "kubernetes_manifest" "actions_runners_mojas_registration_token_generat
     "spec" = {
       "appID"        = tostring(jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_mojas_registration_secret[0].secret_string)["app_id"])
       "installID"    = tostring(jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_mojas_registration_secret[0].secret_string)["installation_id"])
-      "repositories" = ["airflow", "airflow-create-a-pipeline", "create-a-derived-table"]
+      "repositories" = ["airflow-create-a-pipeline", "create-a-derived-table"]
       "auth" = {
         "privateKey" = {
           "secretRef" = {
