@@ -29,7 +29,7 @@
       "managed_container_cpu": 2048,
       "managed_container_memory": 6144,
       "managed_wl_mem_args": "-Xms1024m -Xmx4096m",
-      "managed_app_count": 0,
+      "managed_app_count": 1,
 
       "root_volume_size": 30,
 
