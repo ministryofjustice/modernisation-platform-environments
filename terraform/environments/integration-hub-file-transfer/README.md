@@ -77,6 +77,10 @@ You must be a Ministry of Justice service. You may request access on behalf of a
 
 See [file action dispatch](./docs/file-action-dispatch.md) for dispatch configuration, matching and failure behaviour.
 
+#### AWS provider version `6.69.0` is excluded
+
+`versions.tf` excludes HashiCorp AWS provider `6.69.0` (released on 14 October 2026). Upstream reports describe Lambda code and layer uploads failing with `decomposing request: bufio.Scanner: token too long` on this release, while the same deployments work on `6.68.0`: [#50474](https://github.com/hashicorp/terraform-provider-aws/issues/50474) and [#50472](https://github.com/hashicorp/terraform-provider-aws/issues/50472#issuecomment-6176965419). Remove the exclusion only after a later release is confirmed to fix this.
+
 ### **How to trigger the deploy workflow for Lambda changes:**
 
 The Lambda code under `lambda/` is packaged by Terraform (`lambda.tf`), so it only deploys through the `integration-hub-file-transfer` workflow.
