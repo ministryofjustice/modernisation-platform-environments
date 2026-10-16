@@ -85,4 +85,4 @@ The workflow only plans and applies `root` when a file directly in this folder c
 
 When you change Lambda code, also update the date below so the workflow runs and deploys the new code:
 
-Lambda last changed: 2026-10-13
+Lambda last changed: 2026-10-16
