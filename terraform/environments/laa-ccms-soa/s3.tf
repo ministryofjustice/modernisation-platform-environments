@@ -5,7 +5,72 @@ module "s3-bucket-logging" {
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
-  bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
+  bucket_policy = [
+    jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Sid    = "EnforceTLSv12orHigher",
+          Effect = "Deny",
+          Principal = {
+            AWS = "*"
+          },
+          Action = "s3:*",
+          Resource = [
+            "${module.s3-bucket-logging.bucket.arn}/*",
+            module.s3-bucket-logging.bucket.arn
+          ],
+          Condition = {
+            NumericLessThan = {
+              "s3:TlsVersion" = "1.2"
+            }
+          }
+        },
+        {
+          Sid    = "AWSLogDeliveryWrite",
+          Effect = "Allow",
+          Principal = {
+            Service = "delivery.logs.amazonaws.com"
+          },
+          Action   = "s3:PutObject",
+          Resource = "${module.s3-bucket-logging.bucket.arn}/*",
+          Condition = {
+            StringEquals = {
+              "s3:x-amz-acl"      = "bucket-owner-full-control",
+              "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            }
+          }
+        },
+        {
+          Sid    = "AWSLogDeliveryAclCheck",
+          Effect = "Allow",
+          Principal = {
+            Service = "delivery.logs.amazonaws.com"
+          },
+          Action   = "s3:GetBucketAcl",
+          Resource = module.s3-bucket-logging.bucket.arn,
+          Condition = {
+            StringEquals = {
+              "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            }
+          }
+        },
+        {
+          Sid    = "AllowS3Logging Shared Bucket"
+          Effect = "Allow"
+          Principal = {
+            Service = "logging.s3.amazonaws.com"
+          }
+          Action   = "s3:PutObject"
+          Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+          Condition = {
+            ArnLike = {
+              "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+            }
+          }
+        }
+      ]
+  })]
   manage_log_bucket_policy = false
 
 
@@ -22,7 +87,7 @@ module "s3-bucket-logging" {
     # Platform team to add a new provider for the additional Region.
     aws.bucket-replication = aws
   }
-
+  # No transitions as log files < 128Kb generally, so not supported
   lifecycle_rule = [
     {
       id      = "main"
@@ -34,32 +99,12 @@ module "s3-bucket-logging" {
         autoclean = "true"
       }
 
-      transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
-          storage_class = "GLACIER"
-        }
-      ]
-
       expiration = {
-        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current_logs
       }
 
-      noncurrent_version_transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
-          storage_class = "GLACIER"
-        }
-      ]
-
       noncurrent_version_expiration = {
-        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent_logs
       }
 
       abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
@@ -69,74 +114,4 @@ module "s3-bucket-logging" {
   tags = merge(local.tags,
     { Name = lower(format("s3-%s-%s-logging", local.application_data.accounts[local.environment].app_name, local.environment)) }
   )
-}
-
-resource "aws_s3_bucket_policy" "lb_access_logs" {
-  bucket = module.s3-bucket-logging.bucket.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid    = "EnforceTLSv12orHigher",
-        Effect = "Deny",
-        Principal = {
-          AWS = "*"
-        },
-        Action = "s3:*",
-        Resource = [
-          "${module.s3-bucket-logging.bucket.arn}/*",
-          module.s3-bucket-logging.bucket.arn
-        ],
-        Condition = {
-          NumericLessThan = {
-            "s3:TlsVersion" = "1.2"
-          }
-        }
-      },
-      {
-        Sid    = "AWSLogDeliveryWrite",
-        Effect = "Allow",
-        Principal = {
-          Service = "delivery.logs.amazonaws.com"
-        },
-        Action   = "s3:PutObject",
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
-        Condition = {
-          StringEquals = {
-            "s3:x-amz-acl"      = "bucket-owner-full-control",
-            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
-        }
-      },
-      {
-        Sid    = "AWSLogDeliveryAclCheck",
-        Effect = "Allow",
-        Principal = {
-          Service = "delivery.logs.amazonaws.com"
-        },
-        Action   = "s3:GetBucketAcl",
-        Resource = module.s3-bucket-logging.bucket.arn,
-        Condition = {
-          StringEquals = {
-            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
-        }
-      },
-      {
-        Sid    = "AllowS3Logging Shared Bucket"
-        Effect = "Allow"
-        Principal = {
-          Service = "logging.s3.amazonaws.com"
-        }
-        Action   = "s3:PutObject"
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
-        Condition = {
-          ArnLike = {
-           "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
-          }
-       }
-      }
-    ]
-  })
 }
