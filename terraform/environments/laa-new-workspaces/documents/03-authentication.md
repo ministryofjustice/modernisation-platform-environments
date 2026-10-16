@@ -42,7 +42,7 @@ sequenceDiagram
     participant AD as Microsoft AD
     participant DB as RDS MySQL
 
-    U->>ALB: HTTPS request, Global Protect VPN CIDR only
+    U->>ALB: HTTPS request, Global Protect Alpha or Prisma VPN CIDR
     ALB->>LOTP: forward :5000
     U->>LOTP: log in with AD credentials
     LOTP->>AD: LDAP bind (ad-resolver)
