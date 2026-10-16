@@ -174,7 +174,8 @@ resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   alarm_name          = "mdss_reconciler_errors"
   alarm_description   = "Triggered when the mdss_reconciler Lambda records errors"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
@@ -182,7 +183,7 @@ resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
 
   metric_name = "Errors"
   namespace   = "AWS/Lambda"
-  period      = 60
+  period      = 300
   statistic   = "Sum"
 
   dimensions = {
@@ -311,7 +312,8 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_slow_execution" {
   unit                = "Milliseconds"
   period              = 180
   statistic           = "Maximum"
-  evaluation_periods  = 1
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
   treat_missing_data  = "notBreaching"
 
   actions_enabled = false
@@ -332,13 +334,14 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_long_queue" {
   for_each = local.merge_lambdas
 
   alarm_name          = "${each.key}_long_queue"
-  alarm_description   = "Detects when average queue time over 15 minutes is slow."
+  alarm_description   = "Detects persistent high query queue time over 15 minutes."
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = 60000
   unit                = "Milliseconds"
-  period              = 900
+  period              = 300
   statistic           = "Average"
-  evaluation_periods  = 1
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
   treat_missing_data  = "notBreaching"
 
   actions_enabled = false
@@ -391,6 +394,39 @@ resource "aws_cloudwatch_metric_alarm" "live_feed_incident_events_dlq" {
   ]
 
   ok_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Alarm debounce automation DLQ
+# Notify directly if delayed confirmation processing itself cannot recover.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "cloudwatch_alarm_debounce_dlq" {
+  alarm_name = "cloudwatch_alarm_debounce_dlq_has_messages"
+
+  alarm_description = (
+    "Triggered when CloudWatch alarm debounce confirmations reach the DLQ"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+  period      = 60
+  statistic   = "Maximum"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.name
+  }
+
+  alarm_actions = [
     aws_sns_topic.emds_alerts.arn,
   ]
 }
@@ -476,6 +512,10 @@ resource "aws_cloudwatch_metric_alarm" "specials_guard_heartbeat_missing" {
   period      = 900
   statistic   = "Sum"
 
+  warm_up_configuration {
+    warm_up_period_duration_in_minutes = 15
+  }
+
   dimensions = {
     Consumer    = each.value.consumer
     Environment = local.environment_shorthand
@@ -493,7 +533,8 @@ resource "aws_cloudwatch_metric_alarm" "specials_guard_lambda_errors" {
   alarm_description = "Triggered when the specials remediation Lambda records errors"
 
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
