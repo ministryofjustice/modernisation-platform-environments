@@ -6,7 +6,6 @@ locals {
 
   access_log_source_arns = concat(
     [for bucket in module.data_lake_buckets : bucket.bucket.arn],
-    [module.s3-bucket.bucket.arn],
     [for bucket in module.fabric_curated_bucket : bucket.bucket.arn],
     [for bucket in module.data_claims_mapping_bucket : bucket.bucket.arn],
     flatten([for ingestion in module.file_ingestion : ingestion.access_log_source_arns])

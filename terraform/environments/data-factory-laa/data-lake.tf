@@ -112,6 +112,7 @@ module "data_lake_buckets" {
 
   manage_log_bucket_policy = false
   log_buckets              = local.access_log_destination
+  log_prefix               = each.key
 
   bucket_prefix       = each.key == "aws-athena-query-results" ? "aws-athena-query-results" : "${local.name}-${each.key}"
   bucket_namespace    = "account-regional"
