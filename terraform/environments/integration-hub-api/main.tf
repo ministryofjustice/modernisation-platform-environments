@@ -1,3 +1,4 @@
+# Legacy root module call; see integration-hub#254
 module "integration_hub_file_transfer_api" {
   source = "./modules/integration-hub-file-transfer-api"
 
