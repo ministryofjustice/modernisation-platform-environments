@@ -27,6 +27,27 @@ data "aws_ssoadmin_instances" "opensearch" {
   provider = aws.sso-readonly
 }
 
+# Resolve IdC group names -> IDs (same pattern as grafana-objects.tf). The UI
+# app's dashboardAdmin check matches on group ID, so we map the admin group
+# names to their IDs here rather than hardcoding GUIDs.
+data "aws_identitystore_groups" "opensearch" {
+  count             = local.opensearch_idc_enabled ? 1 : 0
+  provider          = aws.sso-readonly
+  identity_store_id = tolist(data.aws_ssoadmin_instances.opensearch[0].identity_store_ids)[0]
+}
+
+locals {
+  opensearch_idc_group_id_by_name = local.opensearch_idc_enabled ? {
+    for g in data.aws_identitystore_groups.opensearch[0].groups : g.display_name => g.group_id
+  } : {}
+
+  # Admin groups (same as Grafana), resolved to IDs for the dashboardAdmin check.
+  opensearch_ui_admin_group_ids = local.opensearch_idc_enabled ? join(",", [
+    local.opensearch_idc_group_id_by_name["cloud-platform-engineers"],
+    local.opensearch_idc_group_id_by_name["container-platform-aws"],
+  ]) : ""
+}
+
 # Audit log group. Under /aws/vendedlogs/ so one prefix-wide resource policy
 # (below) covers it — CloudWatch allows only 10 resource policies per Region.
 resource "aws_cloudwatch_log_group" "opensearch_audit" {
@@ -253,10 +274,11 @@ resource "aws_opensearch_application" "logs" {
     iam_role_for_identity_center_application_arn = aws_iam_role.opensearch_ui_app[0].arn
   }
 
-  # UI admin by Identity Center group — same admin groups as Grafana.
+  # UI admin by Identity Center group — same admin groups as Grafana. The
+  # dashboardAdmin check matches on group ID, resolved from the names above.
   app_config {
     key   = "opensearchDashboards.dashboardAdmin.groups"
-    value = "cloud-platform-engineers,container-platform-aws"
+    value = local.opensearch_ui_admin_group_ids
   }
 
   tags = merge(local.tags, { component = "observability" })
