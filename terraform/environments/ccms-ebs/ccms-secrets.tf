@@ -85,6 +85,7 @@ resource "aws_secretsmanager_secret_version" "ebs_secrets" {
       "${local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod}",
       "${local.application_data.accounts[local.environment].mojo_devices}",
       "${local.application_data.accounts[local.environment].dom1_devices}",
+      "${local.application_data.accounts[local.environment].mp_v1_workspaces_cidr}",
     "${local.application_data.accounts[local.environment].moj_wifi}"]
   })
 
