@@ -235,7 +235,7 @@ resource "aws_ssm_parameter" "placeholder" {
   }
 }
 
-resource "aws_ssm_patch_baseline" "patch_manager" {
+resource "aws_ssm_patch_baseline" "this" {
   for_each = var.ssm_patch_baselines
 
   description      = each.value.description
@@ -272,16 +272,16 @@ locals {
   }
 }
 
-resource "aws_ssm_default_patch_baseline" "patch_manager" {
+resource "aws_ssm_default_patch_baseline" "this" {
   for_each = local.ssm_default_patch_baselines
 
-  baseline_id      = aws_ssm_patch_baseline.patch_manager[each.key].id
+  baseline_id      = aws_ssm_patch_baseline.this[each.key].id
   operating_system = each.value.operating_system
 }
 
-resource "aws_ssm_patch_group" "patch_manager" {
+resource "aws_ssm_patch_group" "this" {
   for_each = local.ssm_patch_groups
 
-  baseline_id = aws_ssm_patch_baseline.patch_manager[each.key].id
+  baseline_id = aws_ssm_patch_baseline.this[each.key].id
   patch_group = each.value.patch_group
 }
