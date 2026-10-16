@@ -231,6 +231,12 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "ssm_documents", {}),
   )
 
+  ssm_maintenance_window_run_commands = merge(
+    module.baseline_presets.ssm_maintenance_window_run_commands,
+    lookup(local.baseline_all_environments, "ssm_maintenance_window_run_commands", {}),
+    lookup(local.baseline_environment_specific, "ssm_maintenance_window_run_commands", {}),
+  )
+
   ssm_parameters = merge(
     module.baseline_presets.ssm_parameters,
     lookup(local.baseline_all_environments, "ssm_parameters", {}),
