@@ -35,7 +35,7 @@ variable "enable_amp_rules_logging" {
   # off by default and intended for production once rule groups exist.
   #
   # Known limitation (ministryofjustice/cloud-platform#8611): the hashicorp/aws
-  # provider (v6.68.0) has no standalone rules-logging resource, so Terraform
+  # provider (v6.69.1) has no standalone rules-logging resource, so Terraform
   # cannot delete the logging configuration before the workspace on destroy.
   # Destroying a workspace with this flag ON fails with a misleading
   # 403 AccessDenied on DeleteWorkspace. Manual pre-destroy workaround:
