@@ -110,6 +110,93 @@ resource "kubectl_manifest" "argocd_project_platform_live" {
 
 
 #------------------------------------------------------------------------------
+# Bootstrap AppProjects for the per-product AppProject generator — the ONLY
+# projects permitted to create AppProject resources. The argocd_appproject_products
+# ApplicationSet runs its generated Applications under these, so creating an
+# AppProject is scoped away from every BU/workload project. AppProjects are
+# namespaced objects in the hub's argocd namespace, so the destination is the
+# hub cluster and the grant is namespace-scoped (argoproj.io/AppProject only).
+#------------------------------------------------------------------------------
+resource "kubectl_manifest" "argocd_project_platform_appprojects_nonlive" {
+  count = local.is_argocd_hub && local.hub_tier == "nonlive" ? 1 : 0
+
+  yaml_body = yamlencode({
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "AppProject"
+    metadata = {
+      name      = "platform-appprojects-nonlive"
+      namespace = "argocd"
+    }
+    spec = {
+      description = "Bootstrap project permitted to create per-product AppProjects on the non-live hub"
+      # Generated Applications live in the argocd namespace (apps-in-any-namespace).
+      sourceNamespaces = ["argocd"]
+      sourceRepos = [
+        local.environments_repo,
+        "${local.environments_repo}.git",
+      ]
+      # AppProjects are created in the hub's own argocd namespace.
+      destinations = [
+        {
+          server    = local.hub_cluster_arn
+          namespace = "argocd"
+        }
+      ]
+      # This project may only create AppProjects — nothing else.
+      namespaceResourceWhitelist = [
+        { group = "argoproj.io", kind = "AppProject" }
+      ]
+      clusterResourceBlacklist = [
+        { group = "*", kind = "Namespace" },
+        { group = "rbac.authorization.k8s.io", kind = "ClusterRole" },
+        { group = "rbac.authorization.k8s.io", kind = "ClusterRoleBinding" },
+        { group = "apiextensions.k8s.io", kind = "CustomResourceDefinition" },
+      ]
+    }
+  })
+}
+
+resource "kubectl_manifest" "argocd_project_platform_appprojects_live" {
+  count = local.is_argocd_hub && local.hub_tier == "live" ? 1 : 0
+
+  yaml_body = yamlencode({
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "AppProject"
+    metadata = {
+      name      = "platform-appprojects-live"
+      namespace = "argocd"
+    }
+    spec = {
+      description = "Bootstrap project permitted to create per-product AppProjects on the live hub"
+      # Generated Applications live in the argocd namespace (apps-in-any-namespace).
+      sourceNamespaces = ["argocd"]
+      sourceRepos = [
+        local.environments_repo,
+        "${local.environments_repo}.git",
+      ]
+      # AppProjects are created in the hub's own argocd namespace.
+      destinations = [
+        {
+          server    = local.hub_cluster_arn
+          namespace = "argocd"
+        }
+      ]
+      # This project may only create AppProjects — nothing else.
+      namespaceResourceWhitelist = [
+        { group = "argoproj.io", kind = "AppProject" }
+      ]
+      clusterResourceBlacklist = [
+        { group = "*", kind = "Namespace" },
+        { group = "rbac.authorization.k8s.io", kind = "ClusterRole" },
+        { group = "rbac.authorization.k8s.io", kind = "ClusterRoleBinding" },
+        { group = "apiextensions.k8s.io", kind = "CustomResourceDefinition" },
+      ]
+    }
+  })
+}
+
+
+#------------------------------------------------------------------------------
 # Per-BU AppProjects — isolates each BU's workloads to their own cluster and repos
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_project_bu" {
@@ -136,10 +223,16 @@ resource "kubectl_manifest" "argocd_project_bu" {
         each.value.source_repo,
         "${each.value.source_repo}.git",
       ]
+      # Workloads moved to the per-product AppProjects (<bu>-<product>-<env>),
+      # which bound each workload to its product's declared namespaces. This
+      # project no longer hosts workload Applications; it is retained only for
+      # the bu-viewer read-only role below. A no-op destination (argocd, not
+      # "*") keeps destinations non-empty without granting any workload scope —
+      # the namespaceResourceWhitelist still limits what could ever be created.
       destinations = [
         {
           server    = each.value.cluster_arn
-          namespace = "*"
+          namespace = "argocd"
         }
       ]
       # BU workload projects can only create workload-level resources
@@ -183,8 +276,14 @@ resource "kubectl_manifest" "argocd_project_bu" {
         {
           name        = "bu-viewer"
           description = "Read-only Application access for ${upper(each.value.bu_name)} (${each.value.environment})"
+          # Workload Applications now live under the per-product projects
+          # (<bu>-<product>-<env>), so the applications grant widens from this
+          # project to all of this BU's per-product projects for the tier. The
+          # glob is built from bu_name + environment (octo-*-nonlive/*), NOT
+          # each.key (which already is <bu>-<env> and would wrongly yield
+          # <bu>-<env>-*/*). The clusters,get line is kept verbatim.
           policies = [
-            "p, proj:${each.key}:bu-viewer, applications, get, ${each.key}/*, allow",
+            "p, proj:${each.key}:bu-viewer, applications, get, ${each.value.bu_name}-*-${each.value.environment}/*, allow",
             "p, proj:${each.key}:bu-viewer, clusters, get, *, allow",
           ]
           groups = [each.value.viewer_group_id]
@@ -196,10 +295,10 @@ resource "kubectl_manifest" "argocd_project_bu" {
 
 
 #------------------------------------------------------------------------------
-# Per-BU Workload ApplicationSets — git-directory-generator creates Applications
-# automatically when new app deployment directories appear in the monorepo.
-# Path: namespaces/<bu>/<product>/<app>/deployment/<env>
-# Segments: [namespaces, <bu>, <product>, <app>, deployment, <env>]
+# Per-BU Workload ApplicationSets — git-file-generator creates Applications
+# automatically when new values files appear in the monorepo.
+# Path: namespaces/<bu>/<product>/<service>/deployment/values/<tier>/<env>.yaml
+# Segments: [namespaces, bu, product, service, deployment, values, tier]
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_applicationset_bu" {
   for_each = local.is_argocd_hub ? local.hub_registered_spokes : {}
@@ -246,7 +345,13 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
           }
         }
         spec = {
-          project = each.key
+          # Per-product AppProject (<bu>-<productDir>-<env>). The product segment
+          # is index .path.segments 2 — the same product directory the
+          # argocd_appproject_products generator uses for productDir, so the
+          # reference and the generated project name share one source and cannot
+          # diverge. The per-product project's destinations bound the free-form
+          # destination.namespace below to this product's declared namespaces.
+          project = "${each.value.bu_name}-{{ index .path.segments 2 }}-${each.value.environment}"
           source = {
             repoURL        = each.value.source_repo
             targetRevision = "main"
@@ -281,7 +386,112 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
     }
   })
 
-  depends_on = [kubectl_manifest.argocd_project_bu]
+  # Manifest-apply ordering only: ensures the per-product AppProject generator
+  # and the per-BU project manifests are applied before this ApplicationSet.
+  # It does NOT order ArgoCD runtime reconciliation — the first-sync window
+  # (workload Application reconciling before its per-product project exists)
+  # self-heals via auto-sync, not depends_on.
+  depends_on = [
+    kubectl_manifest.argocd_project_bu,
+    kubectl_manifest.argocd_appproject_products,
+  ]
+}
+
+
+#------------------------------------------------------------------------------
+# Per-product AppProject generator — git-file-generator reads each product.yaml
+# and renders charts/appproject-per-product to create one AppProject per
+# product/tier, scoped to that product's declared namespaces. Runs under the
+# platform-appprojects-<env> bootstrap project (the only project allowed to
+# create AppProjects). Mirrors the baseline ApplicationSet wiring.
+#------------------------------------------------------------------------------
+resource "kubectl_manifest" "argocd_appproject_products" {
+  for_each = local.is_argocd_hub ? local.hub_registered_spokes : {}
+
+  yaml_body = yamlencode({
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "ApplicationSet"
+    metadata = {
+      name      = "${each.key}-appprojects"
+      namespace = "argocd"
+      labels = {
+        "argocd.argoproj.io/managed-by"  = "terraform"
+        "container-platform/bu"          = each.value.bu_name
+        "container-platform/environment" = each.value.environment
+        "container-platform/type"        = "appproject"
+      }
+    }
+    spec = {
+      goTemplate        = true
+      goTemplateOptions = ["missingkey=error"]
+      generators = [
+        {
+          git = {
+            repoURL  = each.value.source_repo
+            revision = "main"
+            files = [
+              { path = "${each.value.path_prefix}/*/product.yaml" }
+            ]
+          }
+        }
+      ]
+      template = {
+        metadata = {
+          # Named from the product directory segment, matching the project it
+          # produces (<bu>-<productDir>-<env>).
+          name = "appproject-${each.value.bu_name}-{{ index .path.segments 2 }}-${each.value.environment}"
+          labels = {
+            "container-platform/bu"          = each.value.bu_name
+            "container-platform/environment" = each.value.environment
+            "container-platform/type"        = "appproject"
+            "container-platform/product"     = "{{ index .path.segments 2 }}"
+          }
+        }
+        spec = {
+          project = "platform-appprojects-${each.value.environment}"
+          source = {
+            repoURL        = each.value.source_repo
+            targetRevision = "main"
+            path           = "charts/appproject-per-product"
+            helm = {
+              # product.yaml delivered as a valueFile (not valuesObject) exactly
+              # like the baseline ApplicationSet; scalars drive name/scope.
+              valueFiles = [
+                "../../${each.value.path_prefix}/{{ index .path.segments 2 }}/product.yaml"
+              ]
+              parameters = [
+                { name = "targetCluster", value = each.value.cluster_workspace },
+                { name = "productDir", value = "{{ index .path.segments 2 }}" },
+                { name = "bu", value = each.value.bu_name },
+                { name = "environment", value = each.value.environment },
+                { name = "server", value = each.value.cluster_arn },
+                { name = "sourceRepo", value = each.value.source_repo },
+              ]
+            }
+          }
+          destination = {
+            server    = each.value.cluster_arn
+            namespace = "argocd"
+          }
+          syncPolicy = {
+            automated = {
+              prune    = true
+              selfHeal = true
+            }
+            syncOptions = [
+              "CreateNamespace=false",
+              "ServerSideApply=true",
+            ]
+          }
+        }
+      }
+    }
+  })
+
+  depends_on = [
+    kubectl_manifest.argocd_project_platform_appprojects_nonlive,
+    kubectl_manifest.argocd_project_platform_appprojects_live,
+  ]
 }
 
 
