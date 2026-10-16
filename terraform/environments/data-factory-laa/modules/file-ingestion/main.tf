@@ -3,7 +3,7 @@ module "file_uploads_bucket" {
 
   manage_log_bucket_policy = false
   log_buckets              = var.access_log_destination
-  log_prefix               = "file-uploads"
+  log_prefix               = "file-uploads/"
 
   bucket_prefix       = "file-uploads"
   bucket_namespace    = "account-regional"
@@ -25,7 +25,7 @@ module "processed_file_uploads_bucket" {
 
   manage_log_bucket_policy = false
   log_buckets              = var.access_log_destination
-  log_prefix               = "processed-file-uploads"
+  log_prefix               = "processed-file-uploads/"
 
   bucket_prefix       = "processed-file-uploads"
   bucket_namespace    = "account-regional"

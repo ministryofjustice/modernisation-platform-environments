@@ -6,7 +6,7 @@
 # Refs: https://docs.aws.amazon.com/dms/latest/userguide/security-iam.APIRole.html
 # ---------------------------------------------------------------------------
 resource "aws_iam_role" "dms_vpc_role" {
-  name  = "dms-vpc-role"
+  name = "dms-vpc-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
