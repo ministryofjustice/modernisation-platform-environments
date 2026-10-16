@@ -11,8 +11,17 @@ resource "aws_prometheus_workspace" "this" {
 
   alias = local.amp_workspace_alias
 
-  logging_configuration {
-    log_group_arn = "${aws_cloudwatch_log_group.amp[0].arn}:*"
+  # Inline rules/alerting logging is opt-in via enable_amp_rules_logging. When
+  # off, the workspace has no logging_configuration and no log group, which is
+  # the shape that destroys cleanly. Enabling it reintroduces the destroy
+  # limitation documented on the variable (cloud-platform#8611): the provider
+  # has no standalone rules-logging resource to delete the config first.
+  dynamic "logging_configuration" {
+    for_each = local.enable_amp_rules_logging ? [1] : []
+
+    content {
+      log_group_arn = "${aws_cloudwatch_log_group.amp[0].arn}:*"
+    }
   }
 
   tags = merge(local.tags, {
@@ -22,7 +31,7 @@ resource "aws_prometheus_workspace" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "amp" {
-  count = local.enable_amp_adot ? 1 : 0
+  count = local.enable_amp_rules_logging ? 1 : 0
 
   name              = "/aws/prometheus/${local.amp_workspace_alias}"
   retention_in_days = 30

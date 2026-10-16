@@ -29,4 +29,9 @@ locals {
   # lives in the standalone `observability` component.
   enable_amp_adot                 = var.enable_amp_adot
   enable_cloudwatch_observability = var.enable_cloudwatch_observability
+
+  # Inline AMP rules/alerting logging is opt-in and only applies when AMP itself
+  # is enabled. Off by default so ephemeral clusters destroy cleanly (see
+  # ministryofjustice/cloud-platform#8611).
+  enable_amp_rules_logging = local.enable_amp_adot && var.enable_amp_rules_logging
 }
