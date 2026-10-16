@@ -1,7 +1,7 @@
 module "dynamodb_transfer_clients" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.2"
 
   name         = "${local.resource_name_prefix}-transfer-clients"
   billing_mode = "PAY_PER_REQUEST"
@@ -15,7 +15,7 @@ module "dynamodb_transfer_clients" {
 module "dynamodb_auth_roles" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.2"
 
   name         = "${local.resource_name_prefix}-auth-roles"
   billing_mode = "PAY_PER_REQUEST"
@@ -29,7 +29,7 @@ module "dynamodb_auth_roles" {
 module "dynamodb_auth_principals" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.2"
 
   name         = "${local.resource_name_prefix}-auth-principals"
   billing_mode = "PAY_PER_REQUEST"
@@ -43,7 +43,7 @@ module "dynamodb_auth_principals" {
 module "dynamodb_multipart_uploads" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.2"
 
   name               = "${local.resource_name_prefix}-multipart-uploads"
   billing_mode       = "PAY_PER_REQUEST"
