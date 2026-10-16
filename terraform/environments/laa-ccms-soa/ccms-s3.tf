@@ -2,23 +2,46 @@
 # S3 Bucket - CCMS SOA Shared
 ############################
 module "s3-bucket-shared" {
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
 
   bucket_name        = "${local.application_name}-${local.environment}-shared"
   versioning_enabled = true
-  bucket_policy      = [aws_s3_bucket_policy.shared_bucket_policy.policy]
-  sse_algorithm      = "AES256"
-  custom_kms_key     = ""
+  bucket_policy = [
+    jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Sid    = "EnforceTLSv12orHigher",
+          Effect = "Deny",
+          Principal = {
+            AWS = "*"
+          },
+          Action = "s3:*",
+          Resource = [
+            module.s3-bucket-shared.bucket.arn,
+            "${module.s3-bucket-shared.bucket.arn}/*"
+          ],
+          Condition = {
+            NumericLessThan = {
+              "s3:TlsVersion" = "1.2"
+            }
+          }
+        }
+      ]
+  })]
+  sse_algorithm  = "AES256"
+  custom_kms_key = ""
 
   # Access logging into the existing logging bucket
   log_buckets = {
     log_bucket_name = module.s3-bucket-logging.bucket.id
     log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-    log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
-     }
+  }
   manage_log_bucket_policy = false
-  
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared/${local.application_name}-${local.environment}-shared"
+
+  log_prefix                = "s3access/"
+  log_partition_date_source = "EventTime"
 
   # Replication disabled, same as EDRMS
   replication_enabled = false
@@ -46,36 +69,6 @@ module "s3-bucket-shared" {
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-shared" }
   )
-}
-
-############################
-# Policy for Shared Bucket
-############################
-resource "aws_s3_bucket_policy" "shared_bucket_policy" {
-  bucket = module.s3-bucket-shared.bucket.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid    = "EnforceTLSv12orHigher",
-        Effect = "Deny",
-        Principal = {
-          AWS = "*"
-        },
-        Action = "s3:*",
-        Resource = [
-          module.s3-bucket-shared.bucket.arn,
-          "${module.s3-bucket-shared.bucket.arn}/*"
-        ],
-        Condition = {
-          NumericLessThan = {
-            "s3:TlsVersion" = "1.2"
-          }
-        }
-      }
-    ]
-  })
 }
 
 ############################
