@@ -1,7 +1,7 @@
 # Separate output topics prevent formatted notifications re-entering the worker queue.
 module "sns_slack" {
   source   = "terraform-aws-modules/sns/aws"
-  version  = "7.1.1"
+  version  = "7.2.0"
   for_each = local.recipients
 
   name              = "${local.pattern_name}-${each.key}-slack"
