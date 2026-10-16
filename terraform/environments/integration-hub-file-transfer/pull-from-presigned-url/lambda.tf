@@ -1,7 +1,7 @@
 module "lambda_notifier" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source        = "terraform-aws-modules/lambda/aws"
-  version       = "8.9.0"
+  version       = "8.12.0"
   function_name = local.pattern_name
   role_name     = local.pattern_name
   description   = "Notify recipients in Slack with an authenticated file-transfer portal link"
