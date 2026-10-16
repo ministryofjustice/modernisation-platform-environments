@@ -71,6 +71,7 @@ module "s3-bucket-logging" {
         }
       ]
   })]
+
   manage_log_bucket_policy = false
 
 
