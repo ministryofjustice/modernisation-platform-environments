@@ -108,7 +108,11 @@ resource "aws_kms_alias" "data_lake_kms_alias" {
 
 module "data_lake_buckets" {
   for_each = toset(local.databases)
-  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4f72896323ec7f06e293f1f75732549b3248f841"
+  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=0294b1a1303028f91707fdc67f1e4bba63d34ea6"
+
+  manage_log_bucket_policy = false
+  log_buckets              = local.access_log_destination
+  log_prefix               = "${each.key}/"
 
   bucket_prefix       = each.key == "aws-athena-query-results" ? "aws-athena-query-results" : "${local.name}-${each.key}"
   bucket_namespace    = "account-regional"

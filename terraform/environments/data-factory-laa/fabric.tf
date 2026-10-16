@@ -13,7 +13,7 @@ module "fabric_oidc_provider" {
 # TODO: Use KMS key for encryption.
 module "fabric_curated_bucket" {
   count  = local.fabric_curated_bucket_enabled ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=ce9c0c07489e393ce80441aed0fd5bf7798956a3"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=0294b1a1303028f91707fdc67f1e4bba63d34ea6"
 
   bucket_prefix      = "laa-data-factory-curated"
   versioning_enabled = true
