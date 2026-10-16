@@ -54,6 +54,10 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
           value = "cadet-em-${local.environment_shorthand}"
         },
         {
+          name  = "GITHUB_STATE_WORKFLOW_REF"
+          value = "cadet-em-${local.environment_shorthand}"
+        },
+        {
           name  = "EM_REMOVE_HISTORIC"
           value = local.is-production ? "False" : "True"
         },
