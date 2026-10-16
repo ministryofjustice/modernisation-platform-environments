@@ -69,14 +69,14 @@ module "s3-bucket-sftp-bc" {
 
   #log_bucket     = local.logging_bucket_name
   log_buckets = {
-   log_bucket_name = local.logging_bucket_name
-   log_bucket_arn  = "arn:aws:s3:::${local.logging_bucket_name}"
-   log_bucket_policy = jsonencode({
-  Version   = "2012-10-17"
-  Statement = []
-})
+    log_bucket_name = local.logging_bucket_name
+    log_bucket_arn  = "arn:aws:s3:::${local.logging_bucket_name}"
+    log_bucket_policy = jsonencode({
+      Version   = "2012-10-17"
+      Statement = []
+    })
 
-     }
+  }
   log_prefix     = "s3access/${local.sftp_bc_bucket_name}"
   custom_kms_key = aws_kms_key.s3_sftp_kms_key.arn
   sse_algorithm  = "aws:kms"
