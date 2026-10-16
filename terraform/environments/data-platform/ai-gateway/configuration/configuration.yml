@@ -50,12 +50,17 @@ models:
       region: eu-west-2
       generally_available: true
     # Anthropic
+    # batch_available is deliberately set on claude-haiku-4-5 only, to keep the initial batch
+    # inference rollout scoped to a single model for testing. Other models here are confirmed
+    # against AWS's "Supported Regions and models for batch inference" table for the eu
+    # cross-region inference profile used here and can be flagged on once validated end-to-end.
     claude-haiku-4-5:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_family: "Anthropic Claude"
       model_name: "Anthropic Claude Haiku 4.5 (EU)"
       region: eu-west-2
       generally_available: true
+      batch_available: true
     claude-opus-4-5:
       model_id: "eu.anthropic.claude-opus-4-5-20251101-v1:0"
       model_family: "Anthropic Claude"
