@@ -682,6 +682,11 @@ module "cloudwatch_alarm_threader" {
     INCLUDE_REASON        = "true"
     ENABLE_CUSTOM_ACTIONS = "false"
     INCIDENT_QUEUE_URL    = aws_sqs_queue.live_feed_incident_events.id
+    DEBOUNCE_QUEUE_URL    = aws_sqs_queue.cloudwatch_alarm_debounce.id
+    DEBOUNCE_SECONDS      = tostring(local.alarm_debounce_seconds)
+    DEBOUNCE_BYPASS_ALARM_NAMES = jsonencode(
+      local.alarm_debounce_bypass_names
+    )
 
     GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
       aws_sfn_state_machine.staging_db_janitor.arn
