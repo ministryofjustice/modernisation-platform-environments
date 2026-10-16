@@ -6,8 +6,11 @@ resource "aws_secretsmanager_secret" "data_claims_database" {
 }
 
 module "data_claims_mapping_bucket" {
-  count               = local.is-test ? 1 : 0
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
+  count                    = local.is-test ? 1 : 0
+  source                   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=0294b1a1303028f91707fdc67f1e4bba63d34ea6"
+  manage_log_bucket_policy = false
+  log_buckets              = local.access_log_destination
+
   bucket_prefix       = "data-claims-mapping"
   bucket_namespace    = "account-regional"
   versioning_enabled  = false

@@ -1,5 +1,8 @@
 module "file_uploads_bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4f72896323ec7f06e293f1f75732549b3248f841"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=0294b1a1303028f91707fdc67f1e4bba63d34ea6"
+
+  manage_log_bucket_policy = false
+  log_buckets              = var.access_log_destination
 
   bucket_prefix       = "file-uploads"
   bucket_namespace    = "account-regional"
@@ -17,7 +20,10 @@ module "file_uploads_bucket" {
 }
 
 module "processed_file_uploads_bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4f72896323ec7f06e293f1f75732549b3248f841"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=0294b1a1303028f91707fdc67f1e4bba63d34ea6"
+
+  manage_log_bucket_policy = false
+  log_buckets              = var.access_log_destination
 
   bucket_prefix       = "processed-file-uploads"
   bucket_namespace    = "account-regional"
