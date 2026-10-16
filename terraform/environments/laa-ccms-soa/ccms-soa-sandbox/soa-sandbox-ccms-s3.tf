@@ -6,13 +6,35 @@ module "s3-bucket-shared" {
 
   bucket_name        = "${local.component_name}-${local.environment}-shared"
   versioning_enabled = true
-  bucket_policy      = [aws_s3_bucket_policy.soa-sandbox-shared_bucket_policy.policy]
-  sse_algorithm      = "AES256"
-  custom_kms_key     = ""
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action = "s3:*",
+        Resource = [
+          module.s3-bucket-shared.bucket.arn,
+          "${module.s3-bucket-shared.bucket.arn}/*"
+        ],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
+      }
+    ]
+  })]
+  sse_algorithm  = "AES256"
+  custom_kms_key = ""
 
-  # Access logging into the existing logging bucket
-  log_bucket = local.logging_bucket_name
-  log_prefix = "s3access/${local.component_name}-${local.environment}-shared"
+  manage_log_bucket_policy = false
+
+  log_prefix                = "s3access/"
+  log_partition_date_source = "EventTime"
 
   # Replication disabled, same as EDRMS
   replication_enabled = false
@@ -40,36 +62,6 @@ module "s3-bucket-shared" {
   tags = merge(local.tags,
     { Name = "${local.component_name}-${local.environment}-shared" }
   )
-}
-
-############################
-# Policy for Shared Bucket
-############################
-resource "aws_s3_bucket_policy" "soa-sandbox-shared_bucket_policy" {
-  bucket = module.s3-bucket-shared.bucket.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid    = "EnforceTLSv12orHigher",
-        Effect = "Deny",
-        Principal = {
-          AWS = "*"
-        },
-        Action = "s3:*",
-        Resource = [
-          "${module.s3-bucket-shared.bucket.arn}",
-          "${module.s3-bucket-shared.bucket.arn}/*"
-        ],
-        Condition = {
-          NumericLessThan = {
-            "s3:TlsVersion" = "1.2"
-          }
-        }
-      }
-    ]
-  })
 }
 
 ############################
