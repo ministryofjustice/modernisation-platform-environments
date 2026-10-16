@@ -13,14 +13,68 @@ resource "aws_security_group" "load_balancer_internal" {
 }
 
 # EGRESS
-resource "aws_vpc_security_group_egress_rule" "lb_int_egress_all_0_0_cidr" {
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_3872_app" {
   security_group_id = aws_security_group.load_balancer_internal.id
   description       = "Allow all outbound traffic"
-  ip_protocol       = "-1"
-  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "tcp"
+  from_port         = 3872
+  to_port           = 3872
+  referenced_security_group_id = aws_security_group.oem_app_security_group.id
 
   tags = {
-    Name = "Allow all outbound traffic"
+    Name = "Allow access to app on 3872"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_8000_app" {
+  security_group_id = aws_security_group.load_balancer_internal.id
+  description       = "Allow all outbound traffic"
+  ip_protocol       = "tcp"
+  from_port         = 8000
+  to_port           = 8000
+  referenced_security_group_id = aws_security_group.oem_app_security_group.id
+
+  tags = {
+    Name = "Allow access to app on 8000"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_7803_app" {
+  security_group_id = aws_security_group.load_balancer_internal.id
+  description       = "Allow all outbound traffic"
+  ip_protocol       = "tcp"
+  from_port         = 7803
+  to_port           = 7803
+  referenced_security_group_id = aws_security_group.oem_app_security_group.id
+
+  tags = {
+    Name = "Allow access to app on 7803"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_4903_app" {
+  security_group_id = aws_security_group.load_balancer_internal.id
+  description       = "Allow all outbound traffic"
+  ip_protocol       = "tcp"
+  from_port         = 4903
+  to_port           = 4903
+  referenced_security_group_id = aws_security_group.oem_app_security_group.id
+
+  tags = {
+    Name = "Allow access to app on 4903"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_7102_app" {
+  security_group_id = aws_security_group.load_balancer_internal.id
+  description       = "Allow all outbound traffic"
+  ip_protocol       = "tcp"
+  from_port         = 7102
+  to_port           = 7102
+  referenced_security_group_id = aws_security_group.oem_app_security_group.id
+
+  tags = {
+    Name = "Allow access to app on 7102"
   }
 }
 
