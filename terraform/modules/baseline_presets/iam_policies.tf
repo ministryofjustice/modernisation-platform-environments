@@ -13,7 +13,7 @@ locals {
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_vmimport ? ["vmimportPolicy"] : [],
     var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessPolicy"] : [],
-    var.options.ssm_patch_manager_os != null ? ["SSMPatchManagerTaskPolicy"] : [],
+    length(var.options.ssm_maintenance_window_run_commands) != 0 ? ["SSMPatchManagerTaskPolicy"] : [],
     "EC2Default",
     "EC2Db",
   ]))

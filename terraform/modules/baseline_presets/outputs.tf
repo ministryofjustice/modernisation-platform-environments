@@ -190,7 +190,7 @@ output "ssm_documents" {
 output "ssm_maintenance_window_run_commands" {
   description = "Map of ssm maintenance window with associated run command to create"
   value = {
-    for key, value in local.ssm_maintenance_window_run_commands : key => value if contains(local.ssm_maintenance_window_run_commands_filter, key)
+    for key, value in local.ssm_maintenance_window_run_commands : key => value if contains(var.options.ssm_maintenance_window_run_commands, key)
   }
 }
 
@@ -198,6 +198,13 @@ output "ssm_parameters" {
   description = "Map of common ssm parameters to create"
   value = {
     for key, value in local.ssm_parameters : key => value if contains(local.ssm_parameters_filter, key)
+  }
+}
+
+output "ssm_patch_baselines" {
+  description = "Map of ssm patch baselines to create"
+  value = {
+    for key, value in local.ssm_patch_baselines : key => value if contains(var.options.ssm_patch_baselines, key)
   }
 }
 

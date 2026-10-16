@@ -148,7 +148,7 @@ resource "aws_ssm_maintenance_window_target" "run_command" {
 resource "aws_ssm_maintenance_window_task" "run_command" {
   for_each = var.ssm_maintenance_window_run_commands
 
-  cutoff_behavior = each.value.cutoff_behavior
+  cutoff_behavior  = each.value.cutoff_behavior
   description      = each.value.description
   max_errors       = each.value.max_errors
   max_concurrency  = each.value.max_concurrency
@@ -171,8 +171,8 @@ resource "aws_ssm_maintenance_window_task" "run_command" {
       dynamic "parameter" {
         for_each = each.value.run_command_parameters
         content {
-          name   = parameter.value.name
-          values = parameter.value.values
+          name   = parameter.key
+          values = parameter.value
         }
       }
     }
@@ -233,4 +233,55 @@ resource "aws_ssm_parameter" "placeholder" {
   lifecycle {
     ignore_changes = [value]
   }
+}
+
+resource "aws_ssm_patch_baseline" "patch_manager" {
+  for_each = var.ssm_patch_baselines
+
+  description      = each.value.description
+  name             = each.key
+  operating_system = each.value.operating_system
+  rejected_patches = each.value.rejected_patches
+
+  approval_rule {
+    approve_after_days = each.value.rule1_approve_after_days
+    approve_until_date = each.value.rule1_approve_until_date
+    compliance_level   = each.value.rule1_compliance_level
+
+    dynamic "patch_filter" {
+      for_each = each.value.rule1_patch_filters
+
+      content {
+        key    = patch_filter.key
+        values = patch_filter.value
+      }
+    }
+  }
+
+  tags = merge(local.tags, each.value.tags, {
+    Name = each.key
+  })
+}
+
+locals {
+  ssm_default_patch_baselines = {
+    for key, value in var.ssm_patch_baselines : key => value if value.is_default == true
+  }
+  ssm_patch_groups = {
+    for key, value in var.ssm_patch_baselines : key => value if value.patch_group != null
+  }
+}
+
+resource "aws_ssm_default_patch_baseline" "patch_manager" {
+  for_each = local.ssm_default_patch_baselines
+
+  baseline_id      = aws_ssm_patch_baseline.patch_manager[each.key].id
+  operating_system = each.value.operating_system
+}
+
+resource "aws_ssm_patch_group" "patch_manager" {
+  for_each = local.ssm_patch_groups
+
+  baseline_id = aws_ssm_patch_baseline.patch_manager[each.key].id
+  patch_group = each.value.patch_group
 }

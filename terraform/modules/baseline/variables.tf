@@ -1164,16 +1164,13 @@ variable "ssm_maintenance_window_run_commands" {
     targets_by_tag    = map(list(string))
 
     # task settings
-    cutoff_behavior = optional(string) # CONTINUE_TASK if not set
-    command_arn      = string
-    max_concurrency  = optional(number) # 1 if not set
-    max_errors       = optional(number) # 1 if not set
-    priority         = optional(number) # 1 if not set
-    service_role_arn = optional(string)
-    run_command_parameters = optional(list(object({
-      name   = string
-      values = list(string)
-    })), [])
+    cutoff_behavior        = optional(string) # CONTINUE_TASK if not set
+    command_arn            = string
+    max_concurrency        = optional(number) # 1 if not set
+    max_errors             = optional(number) # 1 if not set
+    priority               = optional(number) # 1 if not set
+    service_role_arn       = optional(string)
+    run_command_parameters = optional(map(list(string)), {})
 
     tags = optional(map(string), {})
   }))
@@ -1219,6 +1216,26 @@ variable "ssm_parameters" {
       value                = optional(string)
       value_s3_bucket_name = optional(string) # lookup from module.s3_bucket
     }))
+  }))
+  default = {}
+}
+
+variable "ssm_patch_baselines" {
+  description = "A map of SSM patch baselines to create where name is the map key"
+  type = map(object({
+    description               = optional(string)
+    operating_system          = string
+    rejected_patches          = optional(list(string))
+    rule1_approve_after_days  = optional(number)
+    rule1_approve_until_date  = optional(string)
+    rule1_compliance_level    = optional(string)
+    rule1_enable_non_security = optional(bool)
+    rule1_patch_filters       = optional(map(list(string)), {})
+
+    is_default  = optional(bool, false) # optionally set as default for given OS
+    patch_group = optional(string)      # optionally assign to a patch group
+
+    tags = optional(map(string), {})
   }))
   default = {}
 }
