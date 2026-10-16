@@ -40,7 +40,6 @@
             "fileId",
             "object",
             "scanResultStatus",
-            "scanResultStatusMatchesTag",
             "recordedAt"
           ],
           "properties": {
@@ -59,10 +58,6 @@
                 "ACCESS_DENIED",
                 "FAILED"
               ]
-            },
-            "scanResultStatusMatchesTag": {
-              "type": "boolean",
-              "description": "Whether scanResultStatus matches the GuardDutyMalwareScanStatus tag on the exact object version. False only when the tag is present and differs. An absent tag is logged and reported as true."
             },
             "statusReasons": {
               "type": "array",
@@ -123,7 +118,6 @@
             "sizeBytes": 4096
           },
           "scanResultStatus": "NO_THREATS_FOUND",
-          "scanResultStatusMatchesTag": true,
           "recordedAt": "2026-07-10T14:02:00Z"
         }
       }
