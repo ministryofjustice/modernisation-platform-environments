@@ -2,6 +2,9 @@ locals {
 
   ssm_schedule_expressions = {
     development = {
+      install-windows-definition-updates          = "cron(00 8 ? * * *)"
+      patch-manager-run-patch-baseline-group1     = "cron(05 7 ? * MON *)"
+      patch-manager-run-patch-baseline-group2     = "cron(05 7 ? * WED *)"
       update-ssm-agent-patchgroup1                = "cron(30 7 ? * MON *)"
       update-ssm-agent-patchgroup2                = "cron(30 7 ? * WED *)"
       update-configuration-management-daily       = "cron(00 8 ? * * *)"
@@ -9,6 +12,9 @@ locals {
       update-configuration-management-patchgroup2 = "cron(00 8 ? * WED *)"
     }
     test = {
+      install-windows-definition-updates          = "cron(00 8 ? * * *)"
+      patch-manager-run-patch-baseline-group1     = "cron(05 7 ? * MON *)"
+      patch-manager-run-patch-baseline-group2     = "cron(05 7 ? * WED *)"
       update-ssm-agent-patchgroup1                = "cron(30 7 ? * MON *)"
       update-ssm-agent-patchgroup2                = "cron(30 7 ? * WED *)"
       update-configuration-management-daily       = "cron(00 8 ? * * *)"
@@ -16,6 +22,9 @@ locals {
       update-configuration-management-patchgroup2 = "cron(00 8 ? * WED *)"
     }
     preproduction = {
+      install-windows-definition-updates          = "cron(00 8 ? * * *)"
+      patch-manager-run-patch-baseline-group1     = "cron(30 7 ? * TUE *)"
+      patch-manager-run-patch-baseline-group2     = "cron(30 7 ? * WED *)"
       update-ssm-agent-patchgroup1                = "cron(00 12 ? * TUE *)"
       update-ssm-agent-patchgroup2                = "cron(00 12 ? * WED *)"
       update-configuration-management-daily       = "cron(30 12 ? * * *)"
@@ -23,6 +32,9 @@ locals {
       update-configuration-management-patchgroup2 = "cron(30 12 ? * WED *)"
     }
     production = {
+      install-windows-definition-updates          = "cron(00 5 ? * * *)"
+      patch-manager-run-patch-baseline-group1     = "cron(30 05 ? * WED *)"
+      patch-manager-run-patch-baseline-group2     = "cron(30 05 ? * THU *)"
       update-ssm-agent-patchgroup1                = "cron(00 18 ? * WED *)"
       update-ssm-agent-patchgroup2                = "cron(00 18 ? * THU *)"
       update-configuration-management-daily       = "cron(30 18 ? * * *)"
@@ -153,6 +165,81 @@ locals {
     ]
   ])
   ssm_documents = { for item in local.ssm_documents_list : item.key => item.value }
+
+  ssm_maintenance_window_run_commands_filter = flatten([
+    var.options.ssm_patch_manager_os != null && contains(var.options.ssm_patch_manager_os, "WINDOWS") ? ["install-windows-definition-updates"] : [],
+    var.options.ssm_patch_manager_os != null ? ["patch-manager-run-patch-baseline-group1", "patch-manager-run-patch-baseline-group2"] : [],
+  ])
+
+  ssm_maintenance_window_run_commands = {
+    "patch-manager-run-patch-baseline-group1" = {
+      schedule          = local.ssm_schedule_expressions[var.environment.environment].patch-manager-run-patch-baseline-group1
+      schedule_timezone = "Europe/London"
+      duration          = 3 # hours
+      cutoff            = 1 # hour
+      description       = "Automated PatchManager patching via AWS-RunPatchBaseline for instances with tag:patch-manager=group1"
+      targets_by_tag = {
+        "patch-manager" = ["group1"]
+      }
+      command_arn = "AWS-RunPatchBaseline"
+      run_command_parameters = [
+        {
+          name   = "Operation"
+          values = ["Install"]
+        },
+        {
+          name   = "RebootOption"
+          values = ["RebootIfNeeded"]
+        }
+      ]
+    }
+    "patch-manager-run-patch-baseline-group2" = {
+      schedule          = local.ssm_schedule_expressions[var.environment.environment].patch-manager-run-patch-baseline-group2
+      schedule_timezone = "Europe/London"
+      duration          = 3 # hours
+      cutoff            = 1 # hour
+      description       = "Automated PatchManager patching via AWS-RunPatchBaseline for instances with tag:patch-manager=group2"
+      targets_by_tag = {
+        "patch-manager" = ["group2"]
+      }
+      command_arn = "AWS-RunPatchBaseline"
+      run_command_parameters = [
+        {
+          name   = "Operation"
+          values = ["Install"]
+        },
+        {
+          name   = "RebootOption"
+          values = ["RebootIfNeeded"]
+        }
+      ]
+    }
+    "install-windows-definition-updates" = {
+      schedule          = local.ssm_schedule_expressions[var.environment.environment].install-windows-definition-updates
+      schedule_timezone = "Europe/London"
+      duration          = 3 # hours
+      cutoff            = 1 # hour
+      description       = "Automated installation of Microsoft definition updates (antivirus, antimalware, and security signatures) via AWS-InstallWindowsUpdates for instances with tag:os-type=Windows"
+      targets_by_tag = {
+        "os-type" = ["Windows"]
+      }
+      command_arn = "AWS-InstallWindowsUpdates"
+      run_command_parameters = [
+        {
+          name   = "Action"
+          values = ["Install"]
+        },
+        {
+          name   = "AllowReboot"
+          values = ["False"]
+        },
+        {
+          name   = "Categories"
+          values = ["DefinitionUpdates"]
+        }
+      ]
+    }
+  }
 
   ssm_parameters_filter = flatten([
     length(local.account_names_for_account_ids_ssm_parameter) != 0 ? ["account"] : [],
