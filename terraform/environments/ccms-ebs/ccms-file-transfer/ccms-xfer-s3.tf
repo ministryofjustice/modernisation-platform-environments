@@ -3,6 +3,7 @@
 # ---------------------------------------------
 
 module "s3-bucket-sftp-bc" {
+  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
   source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
   bucket_name        = local.sftp_bc_bucket_name
   versioning_enabled = true
@@ -67,7 +68,6 @@ module "s3-bucket-sftp-bc" {
     ]
   })]
 
-  #log_bucket     = local.logging_bucket_name
   log_buckets = {
     log_bucket_name = local.logging_bucket_name
     log_bucket_arn  = "arn:aws:s3:::${local.logging_bucket_name}"
