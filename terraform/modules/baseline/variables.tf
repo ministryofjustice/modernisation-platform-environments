@@ -1151,6 +1151,35 @@ variable "ssm_documents" {
   default = {}
 }
 
+variable "ssm_maintenance_window_run_commands" {
+  description = "A map of maintenance window run commands where map key is the window and task name"
+  type = map(object({
+    description = optional(string)
+
+    # window settings
+    cutoff            = number # hours
+    duration          = number # hours
+    schedule          = string # cron format
+    schedule_timezone = optional(string)
+    targets_by_tag    = map(list(string))
+
+    # task settings
+    cutoff_behavior = optional(string) # CONTINUE_TASK if not set
+    command_arn      = string
+    max_concurrency  = optional(number) # 1 if not set
+    max_errors       = optional(number) # 1 if not set
+    priority         = optional(number) # 1 if not set
+    service_role_arn = optional(string)
+    run_command_parameters = optional(list(object({
+      name   = string
+      values = list(string)
+    })), [])
+
+    tags = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "ssm_parameters" {
   # Example usage:
   # my_ec2_params = {

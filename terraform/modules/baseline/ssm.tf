@@ -113,6 +113,72 @@ resource "aws_ssm_document" "this" {
   })
 }
 
+resource "aws_ssm_maintenance_window" "run_command" {
+  for_each = var.ssm_maintenance_window_run_commands
+
+  cutoff            = each.value.cutoff
+  description       = each.value.description
+  duration          = each.value.duration
+  name              = each.key
+  schedule          = each.value.schedule
+  schedule_timezone = each.value.schedule_timezone
+
+  tags = merge(local.tags, each.value.tags, {
+    Name = each.key
+  })
+}
+
+resource "aws_ssm_maintenance_window_target" "run_command" {
+  for_each = var.ssm_maintenance_window_run_commands
+
+  description   = each.value.description
+  name          = each.key
+  resource_type = "INSTANCE"
+  window_id     = aws_ssm_maintenance_window.run_command[each.key].id
+
+  dynamic "targets" {
+    for_each = each.value.targets_by_tag
+    content {
+      key    = "tag:${targets.key}"
+      values = targets.value
+    }
+  }
+}
+
+resource "aws_ssm_maintenance_window_task" "run_command" {
+  for_each = var.ssm_maintenance_window_run_commands
+
+  cutoff_behavior = each.value.cutoff_behavior
+  description      = each.value.description
+  max_errors       = each.value.max_errors
+  max_concurrency  = each.value.max_concurrency
+  name             = each.key
+  priority         = each.value.priority
+  task_type        = "RUN_COMMAND"
+  task_arn         = each.value.command_arn
+  service_role_arn = try(aws_iam_role.this[each.value.service_role_arn].arn, each.value.service_role_arn)
+  window_id        = aws_ssm_maintenance_window.run_command[each.key].id
+
+  targets {
+    key    = "WindowTargetIds"
+    values = [aws_ssm_maintenance_window_target.run_command[each.key].id]
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+      document_version = "$LATEST"
+
+      dynamic "parameter" {
+        for_each = each.value.run_command_parameters
+        content {
+          name   = parameter.value.name
+          values = parameter.value.values
+        }
+      }
+    }
+  }
+}
+
 resource "random_password" "this" {
   for_each = local.ssm_random_passwords
 
