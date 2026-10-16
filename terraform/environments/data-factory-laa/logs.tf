@@ -9,15 +9,8 @@ locals {
     [module.s3-bucket.bucket.arn],
     [for bucket in module.fabric_curated_bucket : bucket.bucket.arn],
     [for bucket in module.data_claims_mapping_bucket : bucket.bucket.arn],
-    [for bucket in aws_s3_bucket.dms_config : bucket.arn],
     flatten([for ingestion in module.file_ingestion : ingestion.access_log_source_arns])
   )
-}
-
-resource "aws_s3_bucket_logging" "dms_config" {
-  bucket        = aws_s3_bucket.dms_config[0].id
-  target_bucket = module.access_logs.bucket.id
-  target_prefix = "${aws_s3_bucket.dms_config[0].id}/"
 }
 
 module "access_logs" {
