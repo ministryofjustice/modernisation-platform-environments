@@ -926,6 +926,7 @@ updates:
       - "terraform/environments/integration-hub-file-transfer/pull-from-presigned-url"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup"
+      - "terraform/environments/integration-hub-file-transfer/push-to-sftp"
       - "terraform/environments/integration-hub-file-transfer/test-harness"
     schedule:
       interval: "daily"
