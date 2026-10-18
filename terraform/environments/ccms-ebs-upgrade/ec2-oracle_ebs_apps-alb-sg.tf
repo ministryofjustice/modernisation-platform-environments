@@ -28,7 +28,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebslb_443" {
 
 resource "aws_security_group_rule" "ingress_traffic_ebsalb_internal_443_mp_v1_workspaces" {
   count             = local.environment == "development" || local.environment == "test" ? 1 : 0
-  security_group_id = aws_security_group.sg_ebsapps.id
+  security_group_id = aws_security_group.sg_ebsapps_lb.id
   type              = "ingress"
   description       = "HTTPS from MP Workspaces (V1) - DEV only"
   protocol          = "TCP"
