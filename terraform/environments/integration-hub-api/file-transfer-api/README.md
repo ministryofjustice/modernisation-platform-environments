@@ -148,3 +148,49 @@ before testing.
 
 The OpenAPI contract, Lambda unit tests, Bruno collection and example API calls are in
 the companion repository `integration-hub-file-transfer-api`.
+
+
+## Entra OAuth2 cutover (configuration required before apply)
+
+Upload routes now use the API Gateway JWT authorizer. Configure `accounts.<environment>.entra`
+in `application_variables.json` with approved, real IDs:
+
+```json
+{
+  "tenant_id": "<MoJ tenant UUID>",
+  "api_audience": "<file-transfer API application UUID>",
+  "application_clients": {
+    "<products-poc consumer application UUID>": ["products-poc"]
+  }
+}
+```
+
+The API application and consumer registration must be distinct. Request v2 access tokens,
+add the `idtyp` optional access-token claim, expose the application-only role
+`FileTransfer.Upload`, require assignment and grant/admin-consent that role to the consumer.
+Entra application roles are checked in the upload Lambda; they are not OAuth delegated
+scopes, so API Gateway `authorization_scopes` is deliberately not configured.
+
+Missing IDs/mappings block the Terraform plan. No tenant or consumer identity has been
+invented. Add production-specific registrations and grants before production deployment.
+
+Coordinate this change with the companion application's OAuth2 PR: deploy the new
+application first (it rejects legacy authorizer contexts), then apply this component.
+There is an intentional deny-all interval; schedule it. Do not restore the old application
+while JWT routes are active. A rollback must be coordinated and must not silently restore
+Basic access. Docs retain their separate Basic credentials.
+
+The retired authorizer is replaced with a deny-only bootstrap and loses credential/table
+read permissions and gateway invocation permission. Existing credential containers and
+auth tables are retained to avoid destructive credential/state cleanup in this cutover;
+none authorises an upload route. Delete these separately after acceptance.
+
+Validate with real Entra tokens before merge/deployment approval: valid application,
+wrong audience/issuer, expired/invalid signature, delegated user, missing application role,
+unmapped application, and cross-client access on all multipart operations. Unit tests in
+the application cover handler authorisation, not AWS cryptographic token validation.
+
+Production acceptance additionally needs payload/encryption/connectivity evidence,
+zero-critical-error smoke results and Buyer SecOps/Infra sign-off. This authentication
+change alone does not complete D07. Existing alarm actions are not wired; agree the
+operational alert destinations before production activation.
