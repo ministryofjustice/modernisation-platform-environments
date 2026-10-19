@@ -164,7 +164,7 @@ data "aws_iam_policy_document" "s3_bucket_policy_dp_prod" {
       test     = "StringNotLike"
       variable = "aws:PrincipalArn"
       values = [
-        module.data_platform_access_iam_role[0].arn,
+        module.openai_management_iam_role[0].arn,
         "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*",
         "arn:aws:iam::*:role/MemberInfrastructureAccess",
         "arn:aws:iam::*:role/github-actions-plan",
@@ -178,9 +178,9 @@ data "aws_iam_policy_document" "s3_bucket_policy_dp_prod" {
     }
   }
 
-  # Allow bucket-level actions for data platform access role
+  # Allow bucket-level actions for the openai-management role
   statement {
-    sid    = "AllowDataPlatformAccessBucket"
+    sid    = "AllowOpenAIManagementBucket"
     effect = "Allow"
     actions = [
       "s3:ListBucket",
@@ -190,23 +190,23 @@ data "aws_iam_policy_document" "s3_bucket_policy_dp_prod" {
     resources = ["arn:aws:s3:::mojdp-${local.environment}-${local.component_name}"]
     principals {
       type        = "AWS"
-      identifiers = [module.data_platform_access_iam_role[0].arn]
+      identifiers = [module.openai_management_iam_role[0].arn]
     }
   }
 
-  # Allow object-level actions for data platform access role
+  # Allow object-level actions for the openai-management role
   statement {
-    sid    = "AllowDataPlatformAccessObjects"
+    sid    = "AllowOpenAIManagementObjects"
     effect = "Allow"
     actions = [
       "s3:DeleteObject",
       "s3:GetObject",
       "s3:PutObject"
     ]
-    resources = ["arn:aws:s3:::mojdp-${local.environment}-${local.component_name}/*"]
+    resources = ["arn:aws:s3:::mojdp-${local.environment}-${local.component_name}/openai-management/*"]
     principals {
       type        = "AWS"
-      identifiers = [module.data_platform_access_iam_role[0].arn]
+      identifiers = [module.openai_management_iam_role[0].arn]
     }
   }
 
@@ -273,7 +273,7 @@ module "s3_bucket_dp_prod" {
   force_destroy = false
 
   attach_policy = true
-  policy        = data.aws_iam_policy_document.s3_bucket_policy[0].json
+  policy        = data.aws_iam_policy_document.s3_bucket_policy_dp_prod[0].json
 
   server_side_encryption_configuration = {
     rule = {
