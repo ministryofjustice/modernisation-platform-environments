@@ -8,8 +8,8 @@ locals {
       script_path = "scripts/deployment/root.py"
       shell_type  = "python3"
       variables = [
-        { name = "AppID", path = "$.AppID" },
-        { name = "forge_runtime_version", path = "$.forge_runtime_version" },
+        { name = "AppID", path = local.script_runner_app_id_path },
+        { name = "forge_runtime_version", value = local.script_runner_forge_runtime_version },
       ]
       result_path = "$.build_infra_task"
     }

@@ -34,6 +34,15 @@ In justice-eng-ai, set `accounts.<environment>.step_function_retry_attempts` in
 `application_variables.json`. The backend-processing workflows pass this setting
 to the module, falling back to 3 when the key is absent.
 
+The justice-eng-ai control-plane and infrastructure workflows derive `AppID`
+from the uploaded `s3_file` basename (`<AppID>.json`, with no dots in the ID),
+using the same expression as the image-build tag. They do not require `AppID`
+or `forge_runtime_version` in execution input. Both pass the pinned
+runtime tag from `accounts.<environment>.forge_runtime_version` in
+`application_variables.json` as the `forge_runtime_version` environment variable.
+The version lookup and filename expression are shared locals in the backend
+script-runner configuration.
+
 ## Parent fallback cleanup for EC2 children
 
 On a `step_function` step, set

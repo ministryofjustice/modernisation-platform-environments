@@ -20,7 +20,7 @@ locals {
         { name = "S3_FOLDER", path = "$.s3_folder" },
         { name = "S3_FILE", path = "States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1))" },
         { name = "ECR_REPOSITORY_URI", value = local.ecr_repository_uri },
-        { name = "IMAGE_TAG", path = "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1)), '.'), 0)" },
+        { name = "IMAGE_TAG", path = local.script_runner_app_id_path },
         { name = "AWS_REGION", value = local.aws_region },
         { name = "FORGE_RUNTIME_BASE_ECR_REPOSITORY_URI", value = local.forge_runtime_base_ecr_repository_uri },
       ]

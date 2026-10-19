@@ -10,8 +10,8 @@ locals {
       variables = [
         { name = "s3_folder", path = "$.s3_folder" },
         { name = "s3_file", path = "$.s3_file" },
-        { name = "AppID", path = "$.AppID" },
-        { name = "forge_runtime_version", path = "$.forge_runtime_version" },
+        { name = "AppID", path = local.script_runner_app_id_path },
+        { name = "forge_runtime_version", value = local.script_runner_forge_runtime_version },
       ]
       result_path = "$.control_plane_task"
     }
