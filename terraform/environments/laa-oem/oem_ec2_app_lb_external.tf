@@ -4,7 +4,7 @@ resource "aws_lb" "oem_app" {
   internal                   = false
   security_groups            = [aws_security_group.load_balancer_security_group.id]
   subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = true
+  enable_deletion_protection = false
   tags                       = local.tags
 }
 
