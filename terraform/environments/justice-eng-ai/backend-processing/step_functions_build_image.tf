@@ -61,5 +61,6 @@ module "step_functions_build_image" {
     aws_iam_role_policy_attachment.script_runner_ec2_instance,
     aws_iam_role_policy_attachment.script_runner_ecs_task,
     aws_iam_role_policy_attachment.script_runner_ecs_execution,
+    aws_ecs_task_definition.script_runner,
   ]
 }
