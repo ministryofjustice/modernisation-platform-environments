@@ -52,9 +52,12 @@ locals {
       tags = {
         ami_name               = "hmpps_windows_server_2022"
         backup                 = "false"
+        backup-plan            = "daily-and-weekly"
         description            = "Windows Server 2022 jumpserver for Hmpps"
         instance-access-policy = "full"
         os-type                = "Windows"
+        "Patch Group"          = "patchgroup1"
+        run-patch-baseline     = "weekly"
         server-type            = "HmppsJump2022"
         update-ssm-agent       = "patchgroup1"
       }
@@ -98,7 +101,10 @@ locals {
       }
       tags = {
         backup                 = "false"
+        backup-plan            = "daily-and-weekly"
         os-type                = "Windows"
+        "Patch Group"          = "patchgroup2"
+        run-patch-baseline     = "weekly"
         server-type            = "RDGateway"
         update-ssm-agent       = "patchgroup2"
         instance-access-policy = "none"
@@ -143,7 +149,10 @@ locals {
       }
       tags = {
         backup                 = "false"
+        backup-plan            = "daily-and-weekly"
         os-type                = "Windows"
+        "Patch Group"          = "patchgroup2"
+        run-patch-baseline     = "weekly"
         server-type            = "RDServices"
         update-ssm-agent       = "patchgroup2"
         instance-access-policy = "none"
@@ -151,4 +160,3 @@ locals {
     }
   }
 }
-
