@@ -276,9 +276,14 @@ resource "aws_opensearch_application" "logs" {
 
   # UI admin by Identity Center group — same admin groups as Grafana. The
   # dashboardAdmin check matches on group ID, resolved from the names above.
-  app_config {
-    key   = "opensearchDashboards.dashboardAdmin.groups"
-    value = local.opensearch_ui_admin_group_ids
+  # dynamic so the block is omitted (not sent empty) if the IDs don't resolve —
+  # app_config value must be 1+ chars.
+  dynamic "app_config" {
+    for_each = local.opensearch_ui_admin_group_ids != "" ? [1] : []
+    content {
+      key   = "opensearchDashboards.dashboardAdmin.groups"
+      value = local.opensearch_ui_admin_group_ids
+    }
   }
 
   tags = merge(local.tags, { component = "observability" })
