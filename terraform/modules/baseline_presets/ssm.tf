@@ -30,7 +30,7 @@ locals {
       update-ssm-agent-patchgroup1                = "cron(30 7 ? * MON *)"
       update-ssm-agent-patchgroup2                = "cron(30 7 ? * WED *)"
       update-configuration-management-daily       = "cron(00 8 ? * * *)"
-      update-configuration-management-patchgroup1 = "cron(00 8 ? * M§ON *)"
+      update-configuration-management-patchgroup1 = "cron(00 8 ? * MON *)"
       update-configuration-management-patchgroup2 = "cron(00 8 ? * WED *)"
     }
     test = {
