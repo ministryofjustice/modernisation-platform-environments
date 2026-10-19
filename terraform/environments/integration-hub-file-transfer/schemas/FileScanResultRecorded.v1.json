@@ -36,12 +36,7 @@
         "data": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "fileId",
-            "object",
-            "scanResultStatus",
-            "recordedAt"
-          ],
+          "required": ["fileId", "object", "scanResultStatus", "recordedAt"],
           "properties": {
             "fileId": {
               "type": "string",
