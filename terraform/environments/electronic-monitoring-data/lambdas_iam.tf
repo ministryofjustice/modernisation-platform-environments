@@ -4177,8 +4177,8 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
     resources = ["${module.s3-raw-formatted-data-bucket.bucket.arn}/*"]
   }
   statement {
-    sid     = "GetDbs"
-    effect  = "Allow"
+    sid    = "GetDbs"
+    effect = "Allow"
     actions = [
       "glue:GetDatabase",
       "glue:CreateTable",
@@ -4186,9 +4186,9 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
     resources = [for db in local.api_integration_databases : db.arn]
   }
   statement {
-    sid      = "UpdateGlue"
-    effect   = "Allow"
-    actions  = [
+    sid    = "UpdateGlue"
+    effect = "Allow"
+    actions = [
       "glue:GetTable",
       "glue:UpdateTable",
     ]
@@ -4212,7 +4212,7 @@ resource "aws_iam_role_policy_attachment" "register_athena" {
 resource "aws_lakeformation_permissions" "api_int_db_level_perms" {
   for_each    = local.is-production ? {} : local.api_integration_databases
   permissions = ["DESCRIBE", "CREATE_TABLE"]
-  principal = aws_iam_role.register_athena[0].arn
+  principal   = aws_iam_role.register_athena[0].arn
 
   database {
     name = each.value.name
@@ -4222,10 +4222,10 @@ resource "aws_lakeformation_permissions" "api_int_db_level_perms" {
 resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
   for_each    = local.is-production ? {} : local.api_integration_databases
   permissions = ["ALTER", "DESCRIBE"]
-  principal = aws_iam_role.register_athena[0].arn
+  principal   = aws_iam_role.register_athena[0].arn
 
   table {
     database_name = each.value.name
-    wildcard = true
+    wildcard      = true
   }
 }
