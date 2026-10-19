@@ -9,6 +9,11 @@ Each step is either:
 
 The first list item starts the process; subsequent items run in list order. Both step types support optional `retry`, `timeout_seconds`, and `result_path` attributes. Set `result_path` when a step should preserve the current input while storing its result.
 
+Choose a `script_runner.task_definition_family` that matches `launch_type`.
+Fargate task definitions must use `awsvpc` networking and cannot use host
+volumes; EC2 task definitions can use host networking and host volumes. Supply
+the `ec2` host configuration only for EC2 workflows.
+
 ## Example 1: ECS Script
 
 ```hcl
