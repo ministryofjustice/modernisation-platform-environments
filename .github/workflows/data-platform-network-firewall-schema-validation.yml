@@ -1,7 +1,7 @@
 ---
 name: Data Platform Network Firewall Schema Validation
 
-on:
+"on":
   pull_request:
     branches:
       - main
@@ -39,7 +39,7 @@ jobs:
         uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           activate-environment: true
-      
+
       - name: Run Schema Validation
         id: validate_schema
         env:
