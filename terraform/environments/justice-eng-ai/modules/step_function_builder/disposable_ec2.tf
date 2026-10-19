@@ -104,6 +104,7 @@ locals {
         Parameters = {
           "client_token.$" = "States.UUID()"
           poll             = { attempts = 0 }
+          retry            = { attempts = 0 }
         }
         ResultPath = "$.script_runner_host"
         Next       = "${step.name}_launch_instance"
@@ -170,23 +171,6 @@ locals {
       "${step.name}_registration_timed_out" = {
         Type       = "Pass"
         Result     = { Error = "InstanceRegistrationTimeout", Cause = "The dedicated instance did not register a connected ECS agent within the polling limit." }
-        ResultPath = "$.script_runner_host.failure"
-        Next       = "${step.name}_terminate_instance"
-      }
-      "${step.name}_check_exit_code" = {
-        Type = "Choice"
-        Choices = [{
-          And = [
-            { Variable = "$.script_runner_host.task_result.Containers[0].ExitCode", IsPresent = true },
-            { Variable = "$.script_runner_host.task_result.Containers[0].ExitCode", NumericEquals = 0 },
-          ]
-          Next = "${step.name}_terminate_instance"
-        }]
-        Default = "${step.name}_record_exit_failure"
-      }
-      "${step.name}_record_exit_failure" = {
-        Type       = "Pass"
-        Result     = { Error = "ScriptRunnerFailed", Cause = "The script runner did not report a successful container exit code; inspect its CloudWatch logs." }
         ResultPath = "$.script_runner_host.failure"
         Next       = "${step.name}_terminate_instance"
       }

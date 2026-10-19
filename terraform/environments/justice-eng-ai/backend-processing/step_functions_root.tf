@@ -13,14 +13,14 @@ locals {
       name               = "build_test_deploy_app_image"
       type               = "step_function"
       state_machine_name = local.build_image_state_machine_name
-      input_path         = "$.control_plane"
+      input_path         = "$.control_plane.Output"
       result_path        = "$.build_test_deploy_app_image"
     },
     {
       name               = "build_app_infra"
       type               = "step_function"
       state_machine_name = local.build_infra_state_machine_name
-      input_path         = "$.build_test_deploy_app_image"
+      input_path         = "$.build_test_deploy_app_image.Output"
       result_path        = "$.build_app_infra"
     },
 

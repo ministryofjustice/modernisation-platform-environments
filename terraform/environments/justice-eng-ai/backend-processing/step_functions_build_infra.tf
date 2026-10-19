@@ -5,7 +5,7 @@ locals {
     {
       name        = "build_app_infra"
       type        = "script_runner"
-      script_path = "scripts/deploy/root.py"
+      script_path = "scripts/deployment/root.py"
       shell_type  = "python3"
       variables = [
         { name = "AppID", path = "$.AppID" },
@@ -18,6 +18,8 @@ locals {
 
 module "step_functions_build_infra" {
   source = "../modules/step_function_builder"
+
+  step_function_retry_attempts = local.step_function_retry_attempts
 
   name               = local.build_infra_state_machine_name
   steps              = local.build_infra_steps

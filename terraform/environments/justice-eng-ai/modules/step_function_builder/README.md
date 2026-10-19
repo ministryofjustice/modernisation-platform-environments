@@ -14,6 +14,26 @@ Fargate task definitions must use `awsvpc` networking and cannot use host
 volumes; EC2 task definitions can use host networking and host volumes. Supply
 the `ec2` host configuration only for EC2 workflows.
 
+## Script runtime failures and retries
+
+Both Fargate and EC2 script steps inspect the completed container's exit code.
+A non-zero or missing exit code reruns only that script step, waiting 15 seconds
+between executions. `step_function_retry_attempts` defaults to 3 additional executions
+(four executions in total); set it to 0 to disable reruns. The counter resets
+for each script step. EC2 retries reuse the dedicated host and clean it up after
+success or exhausted retries. Exhaustion fails the workflow with
+`ScriptRunnerFailed` and includes the final ECS task result in the failure cause.
+
+Scripts must propagate failures as a non-zero process exit status (for example,
+uncaught Python exceptions or explicit Bash `exit 1`). Printed error messages or
+JSON on stdout alone are not interpreted as failures. Scripts must be safe to
+rerun after partial work. Existing step-level `retry` settings handle ECS/API
+task failures separately; they do not override the script exit-code retry limit.
+
+In justice-eng-ai, set `accounts.<environment>.step_function_retry_attempts` in
+`application_variables.json`. The backend-processing workflows pass this setting
+to the module, falling back to 3 when the key is absent.
+
 ## Example 1: ECS Script
 
 ```hcl

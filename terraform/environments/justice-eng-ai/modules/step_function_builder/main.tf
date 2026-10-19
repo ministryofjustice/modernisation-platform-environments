@@ -10,7 +10,7 @@ locals {
 
   transitions = {
     for index, step in var.steps : step.name => index < length(var.steps) - 1 ? {
-      Next = local.ec2_mode && var.steps[index + 1].type == "script_runner" ? "${var.steps[index + 1].name}_prepare_host" : var.steps[index + 1].name
+      Next = var.steps[index + 1].type == "script_runner" ? "${var.steps[index + 1].name}_prepare_host" : var.steps[index + 1].name
       } : {
       End = true
     }
@@ -60,14 +60,12 @@ locals {
             }
         })
       },
-      { for key, value in local.transitions[step.name] : key => value if !local.ec2_mode },
-      { for key, value in {
+      {
         Next       = "${step.name}_check_exit_code"
         ResultPath = "$.script_runner_host.task_result"
-        Catch      = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.script_runner_host.failure", Next = "${step.name}_terminate_instance" }]
-      } : key => value if local.ec2_mode },
+        Catch      = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.script_runner_host.failure", Next = local.ec2_mode ? "${step.name}_terminate_instance" : "${step.name}_failed" }]
+      },
       local.ec2_mode ? { TimeoutSeconds = try(step.timeout_seconds, 3600) } : try(step.timeout_seconds, null) == null ? {} : { TimeoutSeconds = step.timeout_seconds },
-      local.ec2_mode || try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
       length(try(step.retry, [])) > 0 ? { Retry = step.retry } : !local.ec2_mode ? {} : {
         Retry                                   = [{ ErrorEquals = ["AmazonECS.Unknown"], IntervalSeconds = 15, BackoffRate = 2, MaxAttempts = 3 }]
       }
@@ -93,8 +91,8 @@ locals {
 
   definition = {
     Comment = "Runs an ordered process using ECS script runner tasks and nested Step Functions."
-    StartAt = local.ec2_mode && var.steps[0].type == "script_runner" ? "${var.steps[0].name}_prepare_host" : var.steps[0].name
-    States  = merge(local.task_states, local.step_function_states, local.disposable_lifecycle_states)
+    StartAt = var.steps[0].type == "script_runner" ? "${var.steps[0].name}_prepare_host" : var.steps[0].name
+    States  = merge(local.task_states, local.step_function_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states)
   }
 
 }

@@ -33,6 +33,8 @@ locals {
 module "step_functions_build_image" {
   source = "../modules/step_function_builder"
 
+  step_function_retry_attempts = local.step_function_retry_attempts
+
   name               = local.build_image_state_machine_name
   steps              = local.build_image_steps
   execution_role_arn = aws_iam_role.step_functions_common.arn

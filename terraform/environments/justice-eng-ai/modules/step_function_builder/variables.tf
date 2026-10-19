@@ -80,6 +80,18 @@ variable "tags" {
   default     = {}
 }
 
+variable "step_function_retry_attempts" {
+  description = "Additional script executions after a non-zero or missing container exit code. Zero disables script retries."
+  type        = number
+  default     = 3
+  nullable    = false
+
+  validation {
+    condition     = var.step_function_retry_attempts >= 0 && var.step_function_retry_attempts <= 99999999 && floor(var.step_function_retry_attempts) == var.step_function_retry_attempts
+    error_message = "step_function_retry_attempts must be an integer between 0 and 99999999."
+  }
+}
+
 variable "ec2" {
   description = "Host settings required for EC2 mode and not allowed in Fargate mode. The supplied execution role must permit instance launch and cleanup."
   type = object({
