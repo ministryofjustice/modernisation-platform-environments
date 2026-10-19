@@ -11,8 +11,10 @@ locals {
     }
   }
 
+  enable_aws_health_lambda_development = true
+
   github_actions_lambda_development = {
-    enable_outbound_federation = false
+    enable_outbound_federation = true
     github_workflows           = {}
   }
 }
