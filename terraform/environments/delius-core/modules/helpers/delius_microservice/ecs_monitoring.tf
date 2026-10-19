@@ -361,7 +361,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_time_critical" {
   statistic           = "Average"
   metric_name         = "TargetResponseTime"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  threshold           = 5
+  threshold           = 10
   treat_missing_data  = "notBreaching"
   evaluation_periods  = 1
   period              = 300

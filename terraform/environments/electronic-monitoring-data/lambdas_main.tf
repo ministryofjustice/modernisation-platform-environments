@@ -1636,7 +1636,7 @@ module "poll_dlt_iceberg_maintenance" {
 }
 
 module "register_athena" {
-  count = local.is-production ? 0 : 1
+  count                          = local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "register_athena"
@@ -1652,7 +1652,7 @@ module "register_athena" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    ENVIRONMENT_NAME        = local.env_name
+    ENVIRONMENT_NAME = local.env_name
   }
 
   depends_on = [

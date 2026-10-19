@@ -79,6 +79,10 @@ resource "aws_workspaces_ip_group" "workspaces" {
     source      = "18.169.147.172/32"
     description = "Global Protect 2nd Gateway"
   }
+  rules {
+    source      = "128.77.75.64/26"
+    description = "Prisma VPN"
+  }
 
   tags = merge(
     local.tags,
