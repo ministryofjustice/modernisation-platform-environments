@@ -56,77 +56,77 @@ models:
     claude-haiku-4-5:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      model_name: "Anthropic Claude Haiku 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
     claude-opus-4-5:
       model_id: "eu.anthropic.claude-opus-4-5-20251101-v1:0"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.5 (EU)"
+      model_name: "Anthropic Claude Opus 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
     claude-opus-4-6:
       model_id: eu.anthropic.claude-opus-4-6-v1
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.6 (EU)"
+      model_name: "Anthropic Claude Opus 4.6"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
     claude-opus-4-7:
       model_id: eu.anthropic.claude-opus-4-7
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.7 (EU)"
+      model_name: "Anthropic Claude Opus 4.7"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
     claude-opus-4-8:
       model_id: eu.anthropic.claude-opus-4-8
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.8 (EU)"
+      model_name: "Anthropic Claude Opus 4.8"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
     claude-opus-5:
       model_id: eu.anthropic.claude-opus-5
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 5 (EU)"
+      model_name: "Anthropic Claude Opus 5"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
     claude-opus-5-5:
       model_id: eu.anthropic.claude-opus-5-5
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 5.5 (EU)"
+      model_name: "Anthropic Claude Opus 5.5"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
     claude-sonnet-4-5:
       model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      model_name: "Anthropic Claude Sonnet 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
     claude-sonnet-4-6:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      model_name: "Anthropic Claude Sonnet 4.6"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
     claude-sonnet-5:
       model_id: eu.anthropic.claude-sonnet-5
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      model_name: "Anthropic Claude Sonnet 5"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
     claude-sonnet-5-5:
       model_id: eu.anthropic.claude-sonnet-5-5
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 5.5 (EU)"
+      model_name: "Anthropic Claude Sonnet 5.5"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
@@ -148,7 +148,7 @@ models:
     cohere-embed-v4:
       model_id: "eu.cohere.embed-v4:0"
       model_family: "Cohere Embed"
-      model_name: "Cohere Embed v4 (EU)"
+      model_name: "Cohere Embed v4"
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
@@ -248,7 +248,7 @@ models:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_provider: "Amazon Bedrock (Justice Engineering AI Enablement)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      model_name: "Anthropic Claude Haiku 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: octo-engineering-ai-enablement-production
@@ -259,7 +259,7 @@ models:
       model_id: eu.anthropic.claude-opus-5
       model_provider: "Amazon Bedrock (Justice Engineering AI Enablement)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 5 (EU)"
+      model_name: "Anthropic Claude Opus 5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: octo-engineering-ai-enablement-production
@@ -270,7 +270,7 @@ models:
       model_id: eu.anthropic.claude-sonnet-5
       model_provider: "Amazon Bedrock (Justice Engineering AI Enablement)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      model_name: "Anthropic Claude Sonnet 5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: octo-engineering-ai-enablement-production
@@ -282,7 +282,7 @@ models:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      model_name: "Anthropic Claude Haiku 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-development
@@ -293,7 +293,7 @@ models:
       model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
       model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      model_name: "Anthropic Claude Sonnet 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-development
@@ -304,7 +304,7 @@ models:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      model_name: "Anthropic Claude Sonnet 4.6"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-development
@@ -315,7 +315,7 @@ models:
       model_id: eu.anthropic.claude-sonnet-5
       model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      model_name: "Anthropic Claude Sonnet 5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-development
@@ -326,7 +326,7 @@ models:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_provider: "Amazon Bedrock (Digital Prison Reporting Test)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      model_name: "Anthropic Claude Haiku 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-test
@@ -337,7 +337,7 @@ models:
       model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
       model_provider: "Amazon Bedrock (Digital Prison Reporting Test)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      model_name: "Anthropic Claude Sonnet 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-test
@@ -348,7 +348,7 @@ models:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_provider: "Amazon Bedrock (Digital Prison Reporting Test)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      model_name: "Anthropic Claude Sonnet 4.6"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-test
@@ -359,7 +359,7 @@ models:
       model_id: eu.anthropic.claude-sonnet-5
       model_provider: "Amazon Bedrock (Digital Prison Reporting Test)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      model_name: "Anthropic Claude Sonnet 5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-test
@@ -370,7 +370,7 @@ models:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_provider: "Amazon Bedrock (Digital Prison Reporting Preproduction)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      model_name: "Anthropic Claude Haiku 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-preproduction
@@ -381,7 +381,7 @@ models:
       model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
       model_provider: "Amazon Bedrock (Digital Prison Reporting Preproduction)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      model_name: "Anthropic Claude Sonnet 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-preproduction
@@ -392,7 +392,7 @@ models:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_provider: "Amazon Bedrock (Digital Prison Reporting Preproduction)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      model_name: "Anthropic Claude Sonnet 4.6"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-preproduction
@@ -403,7 +403,7 @@ models:
       model_id: eu.anthropic.claude-sonnet-5
       model_provider: "Amazon Bedrock (Digital Prison Reporting Preproduction)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      model_name: "Anthropic Claude Sonnet 5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-preproduction
@@ -414,7 +414,7 @@ models:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      model_name: "Anthropic Claude Haiku 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-production
@@ -425,7 +425,7 @@ models:
       model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
       model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      model_name: "Anthropic Claude Sonnet 4.5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-production
@@ -436,7 +436,7 @@ models:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      model_name: "Anthropic Claude Sonnet 4.6"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-production
@@ -447,7 +447,7 @@ models:
       model_id: eu.anthropic.claude-sonnet-5
       model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      model_name: "Anthropic Claude Sonnet 5"
       model_location: "United Kingdom"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-production
@@ -467,7 +467,7 @@ models:
     gemini-2-5-pro:
       model_id: "gemini-2.5-pro"
       model_family: "Google Gemini"
-      model_name: "Google Gemini 2.5 Pro (EU)"
+      model_name: "Google Gemini 2.5 Pro"
       model_location: "Belgium"
       location: "europe-west1"
       generally_available: false
@@ -491,7 +491,7 @@ models:
     gemini-3-6-flash:
       model_id: "gemini-3.6-flash"
       model_family: "Google Gemini"
-      model_name: "Google Gemini 3.6 Flash (EU)"
+      model_name: "Google Gemini 3.6 Flash"
       model_location: "European Union"
       location: "eu"
       generally_available: false
@@ -499,7 +499,7 @@ models:
     gemini-3-7-flash:
       model_id: "gemini-3.7-flash"
       model_family: "Google Gemini"
-      model_name: "Google Gemini 3.7 Flash (EU)"
+      model_name: "Google Gemini 3.7 Flash"
       model_location: "European Union"
       location: "eu"
       generally_available: false
@@ -507,7 +507,7 @@ models:
     gemini-3-8-flash:
       model_id: "gemini-3.8-flash"
       model_family: "Google Gemini"
-      model_name: "Google Gemini 3.8 Flash (EU)"
+      model_name: "Google Gemini 3.8 Flash"
       model_location: "European Union"
       location: "eu"
       generally_available: false
@@ -517,7 +517,7 @@ models:
     gpt-5-4:
       model_id: "gpt-5.4"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.4 (EU)"
+      model_name: "OpenAI GPT 5.4"
       model_location: "European Union"
       model_provider: "azure"
       generally_available: false
@@ -525,7 +525,7 @@ models:
     gpt-5-4-mini:
       model_id: "gpt-5.4-mini"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.4 Mini (EU)"
+      model_name: "OpenAI GPT 5.4 Mini"
       model_location: "European Union"
       model_provider: "azure"
       generally_available: false
@@ -533,7 +533,7 @@ models:
     gpt-5-5:
       model_id: "gpt-5.5"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.5 (EU)"
+      model_name: "OpenAI GPT 5.5"
       model_location: "European Union"
       model_provider: "azure"
       generally_available: false
@@ -541,7 +541,7 @@ models:
     gpt-5-6-luna:
       model_id: "gpt-5.6-luna"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.6 Luna (EU)"
+      model_name: "OpenAI GPT 5.6 Luna"
       model_location: "European Union"
       model_provider: "azure"
       generally_available: false
@@ -549,7 +549,7 @@ models:
     gpt-5-6-sol:
       model_id: "gpt-5.6-sol"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.6 Sol (EU)"
+      model_name: "OpenAI GPT 5.6 Sol"
       model_location: "European Union"
       model_provider: "azure"
       generally_available: false
@@ -557,7 +557,7 @@ models:
     gpt-5-6-terra:
       model_id: "gpt-5.6-terra"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.6 Terra (EU)"
+      model_name: "OpenAI GPT 5.6 Terra"
       model_location: "European Union"
       model_provider: "azure"
       generally_available: false
