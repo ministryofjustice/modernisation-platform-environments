@@ -1,4 +1,6 @@
 locals {
+  step_function_retry_attempts = try(local.application_data.accounts[local.environment].step_function_retry_attempts, 3)
+
   step_functions_child_state_machine_arns = [
     "arn:${data.aws_partition.current.partition}:states:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${local.application_name}-*"
   ]
