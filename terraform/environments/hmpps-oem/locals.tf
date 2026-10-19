@@ -37,9 +37,7 @@ locals {
       enable_ssm_command_monitoring               = true
       enable_ssm_missing_metric_monitoring        = true
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-      ssm_maintenance_window_run_commands         = ["patch-manager-run-patch-baseline-group1", "patch-manager-run-patch-baseline-group2", "install-windows-definition-updates"]
-      ssm_patch_baselines                         = ["OracleLinuxPatchGroup1Baseline", "OracleLinuxPatchGroup2Baseline", "RedHatPatchGroup1Baseline", "RedHatPatchGroup2Baseline", "WindowsPatchGroup1Baseline", "WindowsPatchGroup2Baseline"]
-      #ssm_patch_baselines = ["OracleLinuxPatchGroup1Baseline"]
+      ssm_patch_baselines                         = ["OracleLinuxPatchGroup1Baseline"]
     }
   }
 
