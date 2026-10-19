@@ -190,51 +190,57 @@ locals {
 
   ssm_maintenance_window_run_commands = {
     "patch-manager-run-patch-baseline-group1" = {
+      cutoff            = 1 # hour
+      command_arn       = "AWS-RunPatchBaseline"
+      description       = "Automated patching via AWS-RunPatchBaseline for instances with tag:patch-manager=group1"
+      duration          = 3 # hours
+      max_concurrency   = 1
+      max_errors        = 1
       schedule          = local.ssm_schedule_expressions[var.environment.environment].patch-manager-run-patch-baseline-group1
       schedule_timezone = "Europe/London"
-      duration          = 3 # hours
-      cutoff            = 1 # hour
-      description       = "Automated patching via AWS-RunPatchBaseline for instances with tag:patch-manager=group1"
+      run_command_parameters = {
+        Operation    = ["Install"]
+        RebootOption = ["RebootIfNeeded"]
+      }
       targets_by_tag = {
         "Patch Group"        = ["patchgroup1"]
         "run-patch-baseline" = ["weekly"]
       }
-      command_arn = "AWS-RunPatchBaseline"
+    }
+    "patch-manager-run-patch-baseline-group2" = {
+      cutoff            = 1 # hour
+      command_arn       = "AWS-RunPatchBaseline"
+      description       = "Automated patching via AWS-RunPatchBaseline for instances with tag:patch-manager=group2"
+      duration          = 3 # hours
+      max_concurrency   = 1
+      max_errors        = 1
+      schedule          = local.ssm_schedule_expressions[var.environment.environment].patch-manager-run-patch-baseline-group2
+      schedule_timezone = "Europe/London"
       run_command_parameters = {
         Operation    = ["Install"]
         RebootOption = ["RebootIfNeeded"]
       }
-    }
-    "patch-manager-run-patch-baseline-group2" = {
-      schedule          = local.ssm_schedule_expressions[var.environment.environment].patch-manager-run-patch-baseline-group2
-      schedule_timezone = "Europe/London"
-      duration          = 3 # hours
-      cutoff            = 1 # hour
-      description       = "Automated patching via AWS-RunPatchBaseline for instances with tag:patch-manager=group2"
       targets_by_tag = {
         "Patch Group"        = ["patchgroup2"]
         "run-patch-baseline" = ["weekly"]
       }
-      command_arn = "AWS-RunPatchBaseline"
-      run_command_parameters = {
-        Operation    = ["Install"]
-        RebootOption = ["RebootIfNeeded"]
-      }
     }
     "install-windows-definition-updates" = {
+      cutoff            = 1 # hour
+      command_arn       = "AWS-InstallWindowsUpdates"
+      description       = "Automated Microsoft definition updates (antivirus etc) via AWS-InstallWindowsUpdates for instances with tag:os-type=Windows"
+      duration          = 2 # hours
+      max_concurrency   = 1
+      max_errors        = 1
       schedule          = local.ssm_schedule_expressions[var.environment.environment].install-windows-definition-updates
       schedule_timezone = "Europe/London"
-      duration          = 2 # hours
-      cutoff            = 1 # hour
-      description       = "Automated Microsoft definition updates (antivirus etc) via AWS-InstallWindowsUpdates for instances with tag:os-type=Windows"
-      targets_by_tag = {
-        "os-type" = ["Windows"]
-      }
-      command_arn = "AWS-InstallWindowsUpdates"
       run_command_parameters = {
         Action      = ["Install"]
         AllowReboot = ["False"]
         Categories  = ["DefinitionUpdates"]
+      }
+      targets_by_tag = {
+        "os-type" = ["Windows"]
       }
     }
   }
