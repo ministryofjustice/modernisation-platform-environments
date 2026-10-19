@@ -15,6 +15,7 @@ locals {
       state_machine_name = local.build_image_state_machine_name
       input_path         = "$.control_plane.Output"
       result_path        = "$.build_test_deploy_app_image"
+      ec2_cleanup        = { managed_by = local.build_instance_managed_by }
     },
     {
       name               = "build_app_infra"

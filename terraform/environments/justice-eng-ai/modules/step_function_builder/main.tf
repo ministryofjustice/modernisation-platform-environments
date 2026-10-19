@@ -7,10 +7,14 @@ locals {
 
   task_steps          = [for step in var.steps : step if step.type == "script_runner"]
   step_function_steps = [for step in var.steps : step if step.type == "step_function"]
+  child_cleanup_steps = [for step in local.step_function_steps : step if try(step.ec2_cleanup, null) != null]
+  step_entrypoints = {
+    for step in var.steps : step.name => step.type == "script_runner" ? "${step.name}_prepare_host" : try(step.ec2_cleanup, null) != null ? "${step.name}_prepare_child" : step.name
+  }
 
   transitions = {
     for index, step in var.steps : step.name => index < length(var.steps) - 1 ? {
-      Next = var.steps[index + 1].type == "script_runner" ? "${var.steps[index + 1].name}_prepare_host" : var.steps[index + 1].name
+      Next = local.step_entrypoints[var.steps[index + 1].name]
       } : {
       End = true
     }
@@ -79,20 +83,23 @@ locals {
         Resource = "arn:${data.aws_partition.current.partition}:states:::states:startExecution.sync:2"
         Parameters = {
           StateMachineArn = "arn:${data.aws_partition.current.partition}:states:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${step.state_machine_name}"
-          "Input.$"       = try(step.input_path, "$")
+          "Input.$"       = try(step.ec2_cleanup, null) == null ? try(step.input_path, "$") : "States.JsonMerge($.__script_runner_child.input, $.__script_runner_child.context, false)"
         }
       },
       local.transitions[step.name],
       try(step.timeout_seconds, null) == null ? {} : { TimeoutSeconds = step.timeout_seconds },
       try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
-      length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry }
+      length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry },
+      try(step.ec2_cleanup, null) == null ? {} : {
+        Catch = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.__script_runner_child.failure", Next = "${step.name}_cleanup_settle" }]
+      }
     )
   }
 
   definition = {
     Comment = "Runs an ordered process using ECS script runner tasks and nested Step Functions."
-    StartAt = var.steps[0].type == "script_runner" ? "${var.steps[0].name}_prepare_host" : var.steps[0].name
-    States  = merge(local.task_states, local.step_function_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states)
+    StartAt = local.step_entrypoints[var.steps[0].name]
+    States  = merge(local.task_states, local.step_function_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states, local.child_cleanup_states)
   }
 
 }
