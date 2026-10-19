@@ -15,7 +15,7 @@
 
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "ccms-oia-dev-bf589eb-SNAPSHOT",
-      "opa_app_count": 0,
+      "opa_app_count": 1,
       "opa_server_port": 7001,
       "opa_container_cpu": 2048,
       "opa_container_memory": 6144,
