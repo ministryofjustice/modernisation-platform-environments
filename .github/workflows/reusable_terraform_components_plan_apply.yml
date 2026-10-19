@@ -172,6 +172,16 @@ jobs:
         run: |
           terraform workspace select "${WORKSPACE_NAME}"
 
+      - name: Validate Tags
+        id: validate
+        if: github.event.ref != 'refs/heads/main' && (startsWith(env.WORKSPACE_NAME, 'ccms') || startsWith(env.WORKSPACE_NAME, 'laa-ccms-soa'))
+        uses: ministryofjustice/coat-tag-validator@de273090c5e2f13995d0cc60fe0b87dcb326bdb3 # v2.2.4
+        continue-on-error: true
+        with:
+          terraform_directory: ${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}
+          terraform_workspace: ${{ env.WORKSPACE_NAME || 'default' }}
+          terraform_plan_backend: 'remote'
+
       #
       # Mint AMG Service Account Token (Optional)
       #
