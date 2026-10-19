@@ -15,7 +15,8 @@ module "alb_opahub" {
   target_port        = local.application_data.accounts[local.environment].opa_server_port
 
   health_check = {
-    path = "/"
+    path                = "/opa/opa-hub/manager"
+    unhealthy_threshold = 5
   }
 
   enable_deletion_protection = local.application_data.accounts[local.environment].alb_deletion_protection
@@ -33,6 +34,20 @@ module "alb_opahub" {
   tags = local.tags
 }
 
+# Direct WebLogic access from AWS Workspaces, as on the original ccms-oia non-prod ALBs
+resource "aws_lb_listener" "opahub_7001" {
+  load_balancer_arn = module.alb_opahub.alb_arn
+  port              = 7001
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = module.alb_opahub.target_group_arn
+  }
+
+  tags = local.tags
+}
+
 module "alb_connector" {
   # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
   source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=10d2292"
@@ -45,7 +60,8 @@ module "alb_connector" {
   target_port        = local.application_data.accounts[local.environment].connector_server_port
 
   health_check = {
-    path = "/actuator/health"
+    path                = "/service-tds/actuator/health"
+    unhealthy_threshold = 5
   }
 
   enable_deletion_protection = local.application_data.accounts[local.environment].alb_deletion_protection
@@ -75,7 +91,9 @@ module "alb_adaptor" {
   target_port        = local.application_data.accounts[local.environment].adaptor_server_port
 
   health_check = {
-    path = "/actuator/health"
+    path                = "/actuator/health"
+    unhealthy_threshold = 5
+    interval            = 30
   }
 
   enable_deletion_protection = local.application_data.accounts[local.environment].alb_deletion_protection

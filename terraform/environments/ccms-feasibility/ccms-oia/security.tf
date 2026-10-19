@@ -25,6 +25,24 @@ resource "aws_vpc_security_group_ingress_rule" "alb_opahub_https_private" {
   cidr_ipv4         = each.value
 }
 
+resource "aws_vpc_security_group_ingress_rule" "alb_opahub_https_workspace" {
+  security_group_id = aws_security_group.alb_opahub.id
+  description       = "HTTPS from AWS Workspaces"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+}
+
+resource "aws_vpc_security_group_ingress_rule" "alb_opahub_7001_workspace" {
+  security_group_id = aws_security_group.alb_opahub.id
+  description       = "7001 from AWS Workspaces"
+  ip_protocol       = "tcp"
+  from_port         = 7001
+  to_port           = 7001
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+}
+
 resource "aws_vpc_security_group_egress_rule" "alb_opahub_egress_ec2" {
   security_group_id            = aws_security_group.alb_opahub.id
   description                  = "Allow LB to reach EC2 cluster ephemeral ports"
@@ -165,6 +183,15 @@ resource "aws_vpc_security_group_ingress_rule" "rds_from_private_subnets" {
   from_port         = 3306
   to_port           = 3306
   cidr_ipv4         = each.value
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rds_from_workspace" {
+  security_group_id = aws_security_group.rds.id
+  description       = "MySQL from AWS Workspaces"
+  ip_protocol       = "tcp"
+  from_port         = 3306
+  to_port           = 3306
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_from_cluster_ec2" {

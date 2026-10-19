@@ -1,6 +1,6 @@
 module "gh_runner" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/66b1d90
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=66b1d90"
 
   name                  = "${local.component_name}-${local.env_label}-gh-runner"
   instance_profile_name = aws_iam_instance_profile.github_runner_instance_profile.name
@@ -11,6 +11,10 @@ module "gh_runner" {
   security_group_ids = [aws_security_group.ec2_sg_gh_runner.id]
   monitoring         = true
   ebs_optimized      = true
+
+  root_volume = {
+    size = local.application_data.accounts[local.environment].gh_runner_root_volume_size
+  }
 
   user_data = base64encode(templatefile("./templates/user_data_gh_runner.sh", {
     hostname = "github-runner"

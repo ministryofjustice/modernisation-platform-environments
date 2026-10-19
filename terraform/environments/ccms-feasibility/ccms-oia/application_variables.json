@@ -7,6 +7,7 @@
       "ec2_instance_type": "m5.xlarge",
       "ec2_instance_type_gh_runner": "t2.small",
       "instance_role_gh_runner": "gh-runner",
+      "gh_runner_root_volume_size": 30,
       "ec2_min_capacity": 1,
       "ec2_max_capacity": 2,
       "ec2_desired_capacity": 1,
@@ -59,7 +60,8 @@
       "db_storage_gb": 100,
       "db_deletion_protection": true,
       "db_log_retention_days": 30,
-      "alb_deletion_protection": true
+      "alb_deletion_protection": true,
+      "aws_workspace": "10.200.0.0/19"
     }
   }
 }
