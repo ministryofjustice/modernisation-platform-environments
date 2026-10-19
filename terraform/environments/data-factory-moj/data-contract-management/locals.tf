@@ -5,9 +5,17 @@ locals {
   generation_name_prefix = "${local.application_name}-${local.environment}-contract-generation"
 
   generation_function_prefix = "df-moj-${local.environment}-gen"
+  validation_name_prefix     = "${local.application_name}-${local.environment}-contract-validation"
+  validation_function_prefix = "df-moj-${local.environment}-val"
 
   generation_sources = local.contract_management_enabled ? lookup(
     var.generation_sources_by_environment,
+    local.environment,
+    {}
+  ) : {}
+
+  validation_deployments = local.contract_management_enabled ? lookup(
+    var.validation_deployments_by_environment,
     local.environment,
     {}
   ) : {}

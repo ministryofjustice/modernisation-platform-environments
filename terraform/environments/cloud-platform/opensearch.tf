@@ -21,6 +21,33 @@ locals {
   opensearch_master_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
 }
 
+# Identity Center lives in the org management account, so read via sso-readonly.
+data "aws_ssoadmin_instances" "opensearch" {
+  count    = local.opensearch_idc_enabled ? 1 : 0
+  provider = aws.sso-readonly
+}
+
+# Resolve IdC group names -> IDs (same pattern as grafana-objects.tf). The UI
+# app's dashboardAdmin check matches on group ID, so we map the admin group
+# names to their IDs here rather than hardcoding GUIDs.
+data "aws_identitystore_groups" "opensearch" {
+  count             = local.opensearch_idc_enabled ? 1 : 0
+  provider          = aws.sso-readonly
+  identity_store_id = tolist(data.aws_ssoadmin_instances.opensearch[0].identity_store_ids)[0]
+}
+
+locals {
+  opensearch_idc_group_id_by_name = local.opensearch_idc_enabled ? {
+    for g in data.aws_identitystore_groups.opensearch[0].groups : g.display_name => g.group_id
+  } : {}
+
+  # Admin groups (same as Grafana), resolved to IDs for the dashboardAdmin check.
+  opensearch_ui_admin_group_ids = local.opensearch_idc_enabled ? join(",", [
+    local.opensearch_idc_group_id_by_name["cloud-platform-engineers"],
+    local.opensearch_idc_group_id_by_name["container-platform-aws"],
+  ]) : ""
+}
+
 # Audit log group. Under /aws/vendedlogs/ so one prefix-wide resource policy
 # (below) covers it — CloudWatch allows only 10 resource policies per Region.
 resource "aws_cloudwatch_log_group" "opensearch_audit" {
@@ -119,6 +146,17 @@ resource "aws_opensearch_domain" "logs" {
     }
   }
 
+  # Identity Center SSO. GroupName so group membership drives FGAC roles (#8592).
+  dynamic "identity_center_options" {
+    for_each = local.opensearch_idc_enabled ? [1] : []
+    content {
+      enabled_api_access           = true
+      identity_center_instance_arn = data.aws_ssoadmin_instances.opensearch[0].arns[0]
+      roles_key                    = "GroupName"
+      subject_key                  = "Email"
+    }
+  }
+
   # Allow the master role; FGAC does the fine-grained part.
   access_policies = jsonencode({
     Version = "2012-10-17"
@@ -152,4 +190,106 @@ output "opensearch_domain_endpoint" {
 output "opensearch_dashboards_endpoint" {
   description = "OpenSearch Dashboards endpoint."
   value       = local.enable_opensearch ? aws_opensearch_domain.logs[0].dashboard_endpoint : null
+}
+
+#------------------------------------------------------------------------------
+# OpenSearch UI application — the browser sign-in surface. identity_center_options
+# above only enables IdC; it does not create a UI to log into. This is that UI,
+# with the domain as its data source and Identity Center sign-in. See ADR-017.
+#------------------------------------------------------------------------------
+
+# Role the UI application assumes to reach the domain and resolve IdC groups.
+resource "aws_iam_role" "opensearch_ui_app" {
+  count = local.opensearch_idc_enabled ? 1 : 0
+
+  name = "${terraform.workspace}-opensearch-ui-app"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = { Service = "application.opensearchservice.amazonaws.com" }
+        Action    = "sts:AssumeRole"
+      },
+      {
+        # Scopes the SSO context to this account's portal OIDC provider.
+        Effect    = "Allow"
+        Principal = { Service = "application.opensearchservice.amazonaws.com" }
+        Action    = "sts:SetContext"
+        Condition = {
+          "ForAllValues:ArnEquals" = {
+            "sts:RequestContextProviders" = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/portal.sso.${data.aws_region.current.region}.amazonaws.com/apl/*"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = merge(local.tags, { component = "observability" })
+}
+
+resource "aws_iam_role_policy" "opensearch_ui_app" {
+  count = local.opensearch_idc_enabled ? 1 : 0
+
+  name = "opensearch-ui-app"
+  role = aws_iam_role.opensearch_ui_app[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        # Resolve the signed-in user's IdC groups, only when called via OpenSearch.
+        Sid      = "IdentityStoreLookup"
+        Effect   = "Allow"
+        Action   = ["identitystore:DescribeUser", "identitystore:ListGroupMembershipsForMember", "identitystore:DescribeGroup"]
+        Resource = "*"
+        Condition = {
+          "ForAnyValue:StringEquals" = { "aws:CalledViaLast" = "es.amazonaws.com" }
+        }
+      },
+      {
+        Sid      = "OpenSearchDomainAccess"
+        Effect   = "Allow"
+        Action   = ["es:ESHttp*"]
+        Resource = "${aws_opensearch_domain.logs[0].arn}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_opensearch_application" "logs" {
+  count = local.opensearch_idc_enabled ? 1 : 0
+
+  name = local.opensearch_domain_name # <=30 chars, lowercase/nums/hyphens — the domain name already fits
+
+  data_source {
+    data_source_arn         = aws_opensearch_domain.logs[0].arn
+    data_source_description = "Cloud Platform shared log domain"
+  }
+
+  iam_identity_center_options {
+    enabled                                      = true
+    iam_identity_center_instance_arn             = data.aws_ssoadmin_instances.opensearch[0].arns[0]
+    iam_role_for_identity_center_application_arn = aws_iam_role.opensearch_ui_app[0].arn
+  }
+
+  # UI admin by Identity Center group — same admin groups as Grafana. The
+  # dashboardAdmin check matches on group ID, resolved from the names above.
+  # dynamic so the block is omitted (not sent empty) if the IDs don't resolve —
+  # app_config value must be 1+ chars.
+  dynamic "app_config" {
+    for_each = local.opensearch_ui_admin_group_ids != "" ? [1] : []
+    content {
+      key   = "opensearchDashboards.dashboardAdmin.groups"
+      value = local.opensearch_ui_admin_group_ids
+    }
+  }
+
+  tags = merge(local.tags, { component = "observability" })
+}
+
+output "opensearch_ui_app_endpoint" {
+  description = "OpenSearch UI application URL for browser sign-in (null when IdC not enabled)."
+  value       = local.opensearch_idc_enabled ? aws_opensearch_application.logs[0].endpoint : null
 }

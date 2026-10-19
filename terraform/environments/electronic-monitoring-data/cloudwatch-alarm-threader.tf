@@ -34,7 +34,8 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
         "alarmName" : concat(
           [
             aws_cloudwatch_metric_alarm.glue_database_count_high.alarm_name,
-            aws_cloudwatch_metric_alarm.mdss_reconciler_errors_alarm[0].alarm_name
+            aws_cloudwatch_metric_alarm.mdss_reconciler_errors_alarm[0].alarm_name,
+            aws_cloudwatch_metric_alarm.fms_audit_write_failed.alarm_name
           ],
           [
             for _, alarm in aws_cloudwatch_metric_alarm.sqs_dlq_has_messages :

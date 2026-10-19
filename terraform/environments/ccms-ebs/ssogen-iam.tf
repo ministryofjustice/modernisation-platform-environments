@@ -58,6 +58,33 @@ resource "aws_kms_key" "ssogen_kms_key" {
         "Resource" : "*"
       },
       {
+        "Sid" : "AllowRootAccountAdminForDevAccount",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${jsondecode(data.aws_secretsmanager_secret_version.dev_account_secret[count.index].secret_string).dev_account_id}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "AllowRootAccountAdminForDevAccount",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${jsondecode(data.aws_secretsmanager_secret_version.dev_account_secret[count.index].secret_string).preprod_account_id}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "AllowRootAccountAdminForDevAccount",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${jsondecode(data.aws_secretsmanager_secret_version.dev_account_secret[count.index].secret_string).prod_account_id}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
         "Sid" : "Allow service-linked role use of the customer managed key",
         "Effect" : "Allow",
         "Principal" : {

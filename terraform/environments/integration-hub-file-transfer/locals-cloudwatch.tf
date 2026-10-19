@@ -758,4 +758,109 @@ locals {
   )
 
   cloudwatch_retention_days = local.is-production ? 400 : 30
+
+  # Positional IDs are always unique and valid metric-math identifiers, whatever characters the client IDs contain.
+  api_metric_ids = { for index, client_id in sort(keys(local.api_client_prefixes)) : client_id => "api_${index}" }
+
+  # Each channel writes to a distinct S3 key prefix (see s3-request-metrics.tf),
+  # so PutRequests (object writes only) can be split by channel with metric math:
+  #   web          = PutRequests under "group/"
+  #   api          = sum of PutRequests under each API client's prefix
+  #   sftp + ftps  = EntireBucket - web - api
+  traffic_by_channel_metrics = concat(
+    [
+      ["AWS/S3", "PutRequests", "BucketName", module.s3_bucket["incoming"].s3_bucket_id, "FilterId", "EntireBucket", { id = "total", visible = false }],
+      ["AWS/S3", "PutRequests", "BucketName", module.s3_bucket["incoming"].s3_bucket_id, "FilterId", "web", { id = "web", label = "Web" }],
+    ],
+    [
+      for client_id, metric_id in local.api_metric_ids :
+      ["AWS/S3", "PutRequests", "BucketName", module.s3_bucket["incoming"].s3_bucket_id, "FilterId", "api-${client_id}", { id = metric_id, visible = false }]
+    ],
+    # A lone constant is not a valid metric-math expression, so "api" only exists when there are API clients.
+    length(local.api_metric_ids) > 0 ? [[{ id = "api", label = "API", expression = join("+", values(local.api_metric_ids)) }]] : [],
+    [
+      [{ id = "transfer", label = "SFTP + FTPS (combined)", expression = length(local.api_metric_ids) > 0 ? "total - web - api" : "total - web" }],
+    ]
+  )
+
+  # Short label => Lambda function name, for every Lambda in the workflow.
+  dashboard_lambda_functions = {
+    "Custom IdP"                    = module.lambda_custom_idp.lambda_function_name
+    "File received adapter"         = module.lambda_file_received_adapter.lambda_function_name
+    "File scan result adapter"      = module.lambda_file_scan_result_recorded_adapter.lambda_function_name
+    "Stage"                         = module.lambda_stage.lambda_function_name
+    "Route"                         = module.lambda_route.lambda_function_name
+    "File action execution adapter" = module.lambda_file_action_execution_requested_adapter.lambda_function_name
+  }
+
+  # Short label => dead-letter queue name.
+  dashboard_dlqs = {
+    "EventBridge default"                = module.sqs_eventbridge_default_dlq.queue_name
+    "EventBridge file transfer workflow" = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_name
+    "File received adapter"              = module.sqs_lambda_file_received_adapter_dlq.queue_name
+    "File scan result adapter"           = module.sqs_lambda_file_scan_result_recorded_adapter_dlq.queue_name
+    "Stage"                              = module.sqs_lambda_stage_dlq.queue_name
+    "Route"                              = module.sqs_lambda_route_dlq.queue_name
+    "File action execution adapter"      = module.sqs_lambda_file_action_execution_requested_adapter_dlq.queue_name
+  }
+
+  # Short label => DynamoDB table name.
+  dashboard_dynamodb_tables = {
+    "Adapter idempotency"       = module.dynamodb_adapter_idempotency.dynamodb_table_id
+    "File transfer idempotency" = module.dynamodb_file_transfer_idempotency.dynamodb_table_id
+  }
+
+  # Order matters: widgets flow left to right, then down, so this is a list
+  # rather than a map (map keys iterate alphabetically).
+  cloudwatch_dashboard_widgets = [
+    {
+      title   = "Traffic: PUT requests to incoming (approximate objects), by channel"
+      stacked = true
+      metrics = local.traffic_by_channel_metrics
+    },
+    {
+      title = "Latency: landing in incoming to dispatch (clean files)"
+      metrics = [
+        for percentile in ["p50", "p90", "p99"] :
+        ["IntegrationHubFileTransfer", "EndToEndLatency", "service", "file-action-execution-requested-adapter", { label = percentile, stat = percentile }]
+      ]
+      yAxis = { left = { label = "Seconds", min = 0 } }
+    },
+    {
+      title = "Errors: Lambda errors"
+      metrics = [
+        for label, function_name in local.dashboard_lambda_functions :
+        ["AWS/Lambda", "Errors", "FunctionName", function_name, { label = label }]
+      ]
+    },
+    {
+      title   = "Errors: custom IdP authentication failures"
+      metrics = [["IntegrationHubFileTransfer", "CustomIdPAuthenticationFailures", { label = "Authentication failures" }]]
+    },
+    {
+      title = "Errors: dead-letter queue size (messages visible)"
+      stat  = "Maximum"
+      metrics = [
+        for label, queue_name in local.dashboard_dlqs :
+        ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", queue_name, { label = label }]
+      ]
+    },
+    {
+      title = "Saturation: Lambda throttles"
+      metrics = [
+        for label, function_name in local.dashboard_lambda_functions :
+        ["AWS/Lambda", "Throttles", "FunctionName", function_name, { label = label }]
+      ]
+    },
+    {
+      title = "Saturation: DynamoDB throttled requests"
+      # concat (not flatten, which is recursive) keeps each metric row as its own array.
+      metrics = concat([
+        for label, table_name in local.dashboard_dynamodb_tables : [
+          ["AWS/DynamoDB", "ReadThrottleEvents", "TableName", table_name, { label = "${label} (read)" }],
+          ["AWS/DynamoDB", "WriteThrottleEvents", "TableName", table_name, { label = "${label} (write)" }],
+        ]
+      ]...)
+    },
+  ]
 }
