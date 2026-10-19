@@ -1,13 +1,16 @@
 module "lambda_upload_ticket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
   function_name                = "${local.resource_name_prefix}-upload-ticket"
+  role_name                    = "${local.resource_name_prefix}-upload-ticket"
   description                  = "Generates presigned S3 upload URLs for managed file transfer clients"
   handler                      = "lambda_function.lambda_handler"
   runtime                      = "python3.12"
   source_path                  = "${local.bootstrap_code_root}/request-upload-ticket"
   trigger_on_package_timestamp = false
+  ignore_source_code_hash      = true
 
   environment_variables = {
     MAX_PRESIGNED_URL_EXPIRY_SECONDS  = tostring(local.api_configuration.max_presigned_url_expiry_seconds)
@@ -18,8 +21,8 @@ module "lambda_upload_ticket" {
     PRESIGNED_URL_EXPIRY_SECONDS      = tostring(local.api_configuration.presigned_url_expiry_seconds)
     SINGLE_PUT_LIMIT_BYTES            = tostring(local.multipart_configuration.single_put_limit_bytes)
     TRANSFER_CLIENTS_TABLE            = module.dynamodb_transfer_clients.dynamodb_table_id
-    UPLOAD_BUCKET_KMS_KEY_ARN         = var.upload_bucket.kms_key_arn
-    UPLOAD_BUCKET_NAME                = var.upload_bucket.name
+    UPLOAD_BUCKET_KMS_KEY_ARN         = local.upload_bucket.kms_key_arn
+    UPLOAD_BUCKET_NAME                = local.upload_bucket.name
   }
 
   attach_policy_statements = true
@@ -46,7 +49,7 @@ module "lambda_upload_ticket" {
         "s3:ListMultipartUploadParts",
         "s3:PutObject",
       ]
-      resources = ["${var.upload_bucket.arn}/*"]
+      resources = [for client_id, client in local.transfer_clients : "${local.upload_bucket.arn}/${trim(coalesce(client.key_prefix, client_id), "/")}/*" if client.enabled]
     }
     upload_bucket_kms_access = {
       effect = "Allow"
@@ -56,15 +59,16 @@ module "lambda_upload_ticket" {
         "kms:Encrypt",
         "kms:GenerateDataKey*",
       ]
-      resources = [var.upload_bucket.kms_key_arn]
+      resources = [local.upload_bucket.kms_key_arn]
     }
   }
 
   cloudwatch_logs_retention_in_days = 30
-  tags                              = var.tags
+  tags                              = local.tags
 }
 
 module "lambda_api_authorizer" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
@@ -74,6 +78,7 @@ module "lambda_api_authorizer" {
   runtime                      = "python3.12"
   source_path                  = "${local.bootstrap_code_root}/request-authorizer"
   trigger_on_package_timestamp = false
+  ignore_source_code_hash      = true
 
   environment_variables = {
     AUTH_PRINCIPALS_TABLE = module.dynamodb_auth_principals.dynamodb_table_id
@@ -111,10 +116,11 @@ module "lambda_api_authorizer" {
   )
 
   cloudwatch_logs_retention_in_days = 30
-  tags                              = var.tags
+  tags                              = local.tags
 }
 
 module "lambda_api_docs" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
@@ -124,6 +130,7 @@ module "lambda_api_docs" {
   runtime                      = "python3.12"
   source_path                  = "${local.bootstrap_code_root}/request-docs"
   trigger_on_package_timestamp = false
+  ignore_source_code_hash      = true
   environment_variables = {
     DOCS_BASIC_AUTH_SECRET_ID = module.api_docs_basic_auth_secret.secret_name
   }
@@ -138,5 +145,5 @@ module "lambda_api_docs" {
   }
 
   cloudwatch_logs_retention_in_days = 30
-  tags                              = var.tags
+  tags                              = local.tags
 }

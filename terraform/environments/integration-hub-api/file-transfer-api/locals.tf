@@ -1,12 +1,28 @@
 locals {
+  # Existing resource names and the KMS alias use the original "api-platform" naming, so keep it.
   resource_application_name = "integration-hub"
-  component_name            = "api-platform"
-  resource_name_prefix      = "${local.resource_application_name}-${local.component_name}"
+  resource_component_name   = "api-platform"
+  resource_name_prefix      = "${local.resource_application_name}-${local.resource_component_name}"
   account_id                = data.aws_caller_identity.current.account_id
   region                    = data.aws_region.current.region
   bootstrap_code_root       = "${path.module}/bootstrap-lambdas"
 
-  application_configuration = try(jsondecode(file("${path.module}/application_variables.json")).accounts[var.environment], {})
+  incoming_bucket_name = "integration-hub-file-transfer-${local.environment}-incoming"
+  mft_account_id       = local.environment_management.account_ids["integration-hub-file-transfer-${local.environment}"]
+
+  upload_bucket = {
+    name        = local.incoming_bucket_name
+    arn         = "arn:aws:s3:::${local.incoming_bucket_name}"
+    kms_key_arn = data.aws_kms_key.incoming.arn
+  }
+
+  # No MFT alarm topics are wired to this component, so alarms have no actions.
+  alarm_topic_arns = {
+    high_priority = null
+    low_priority  = null
+  }
+
+  application_configuration = try(jsondecode(file("${path.module}/application_variables.json")).accounts[local.environment], {})
 
   api_configuration = {
     cors_allowed_origins             = try(local.application_configuration.api_configuration.cors_allowed_origins, [])
@@ -56,8 +72,8 @@ locals {
     lambda_duration_evaluation_periods     = try(local.application_configuration.observability_configuration.lambda_duration_evaluation_periods, 2)
   }
 
-  cloudwatch_alarm_actions_high_priority = var.alarm_topic_arns.high_priority != null ? [var.alarm_topic_arns.high_priority] : []
-  cloudwatch_alarm_actions_low_priority  = var.alarm_topic_arns.low_priority != null ? [var.alarm_topic_arns.low_priority] : []
+  cloudwatch_alarm_actions_high_priority = local.alarm_topic_arns.high_priority != null ? [local.alarm_topic_arns.high_priority] : []
+  cloudwatch_alarm_actions_low_priority  = local.alarm_topic_arns.low_priority != null ? [local.alarm_topic_arns.low_priority] : []
 
   cloudwatch_lambda_alarms = {
     "upload-ticket" = {
