@@ -1,4 +1,5 @@
 module "dynamodb_transfer_clients" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
@@ -8,10 +9,11 @@ module "dynamodb_transfer_clients" {
   attributes   = [{ name = "client_id", type = "S" }]
   table_class  = "STANDARD"
   timeouts     = { create = "60m", delete = "60m", update = "60m" }
-  tags         = var.tags
+  tags         = local.tags
 }
 
 module "dynamodb_auth_roles" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
@@ -21,10 +23,11 @@ module "dynamodb_auth_roles" {
   attributes   = [{ name = "role_name", type = "S" }]
   table_class  = "STANDARD"
   timeouts     = { create = "60m", delete = "60m", update = "60m" }
-  tags         = var.tags
+  tags         = local.tags
 }
 
 module "dynamodb_auth_principals" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
@@ -34,10 +37,11 @@ module "dynamodb_auth_principals" {
   attributes   = [{ name = "auth_lookup_key", type = "S" }]
   table_class  = "STANDARD"
   timeouts     = { create = "60m", delete = "60m", update = "60m" }
-  tags         = var.tags
+  tags         = local.tags
 }
 
 module "dynamodb_multipart_uploads" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
@@ -49,7 +53,7 @@ module "dynamodb_multipart_uploads" {
   timeouts           = { create = "60m", delete = "60m", update = "60m" }
   ttl_enabled        = true
   ttl_attribute_name = "expires_at_epoch"
-  tags               = var.tags
+  tags               = local.tags
 }
 
 resource "aws_dynamodb_table_item" "transfer_client" {

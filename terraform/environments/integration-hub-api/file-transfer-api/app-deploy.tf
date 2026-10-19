@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "app_deploy_assume_role" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/integration-hub-file-transfer-api:environment:integration-hub-api-file-transfer-api-${var.environment}"]
+      values   = ["repo:ministryofjustice/integration-hub-file-transfer-api:environment:integration-hub-api-file-transfer-api-${local.environment}"]
     }
   }
 }
@@ -46,7 +46,7 @@ module "app_deploy" {
 
   name            = "${local.resource_name_prefix}-app-deploy"
   use_name_prefix = false
-  tags            = var.tags
+  tags            = local.tags
 
   source_trust_policy_documents = [data.aws_iam_policy_document.app_deploy_assume_role.json]
 
