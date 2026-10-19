@@ -27,10 +27,13 @@ resource "aws_iam_role" "step_functions_common" {
 
 data "aws_iam_policy_document" "step_functions_common" {
   statement {
-    sid       = "RunScriptRunnerTasks"
-    effect    = "Allow"
-    actions   = ["ecs:RunTask"]
-    resources = ["arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${local.script_runner_task_definition_family}:*"]
+    sid     = "RunScriptRunnerTasks"
+    effect  = "Allow"
+    actions = ["ecs:RunTask"]
+    resources = [
+      for family in local.script_runner_task_definition_families :
+      "arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${family}:*"
+    ]
 
     condition {
       test     = "ArnEquals"
