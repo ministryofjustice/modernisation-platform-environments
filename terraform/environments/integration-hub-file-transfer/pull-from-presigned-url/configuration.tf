@@ -33,7 +33,7 @@ data "aws_secretsmanager_secret" "dispatch" {
 module "dynamodb_notifications" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source                             = "terraform-aws-modules/dynamodb-table/aws"
-  version                            = "5.5.0"
+  version                            = "5.5.2"
   name                               = local.pattern_name
   hash_key                           = "id"
   attributes                         = [{ name = "id", type = "S" }]
