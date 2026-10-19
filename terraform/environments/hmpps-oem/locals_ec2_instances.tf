@@ -91,6 +91,7 @@ locals {
         component            = "data"
         instance-scheduling  = "skip-scheduling"
         licence-requirements = "Oracle Enterprise Management"
+        "Patch Group"        = "patchgroup1"
         os-major-version     = 8
         os-type              = "Linux"
         os-version           = "OL 8.5"

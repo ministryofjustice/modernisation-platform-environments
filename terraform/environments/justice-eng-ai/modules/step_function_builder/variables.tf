@@ -15,6 +15,8 @@ variable "steps" {
     or {name, path}. A step_function item has state_machine_name and optional
     input_path. Optional retry, timeout_seconds, and result_path fields apply
     to either type.
+    A step_function step may set ec2_cleanup = { managed_by = "..." } to
+    terminate its disposable hosts when the child fails after task retries.
 
     Scope input_path to the specific prior result a step_function step needs
     (e.g. "$.previous_step_name") rather than "$", to avoid forwarding the
@@ -22,6 +24,15 @@ variable "steps" {
     See the README for details.
   EOT
   type        = any
+
+  validation {
+    condition = alltrue([
+      for step in var.steps : try(step.ec2_cleanup, null) == null ? true : (
+        step.type == "step_function" && try(length(trimspace(step.ec2_cleanup.managed_by)) > 0, false)
+      )
+    ])
+    error_message = "ec2_cleanup requires a step_function step and a non-empty managed_by tag value."
+  }
 
   validation {
     condition     = length(var.steps) > 0 && length(distinct([for step in var.steps : try(step.name, "")])) == length(var.steps)
@@ -78,6 +89,18 @@ variable "tags" {
   description = "Tags applied to the state machine role and log group."
   type        = map(string)
   default     = {}
+}
+
+variable "step_function_retry_attempts" {
+  description = "Additional script executions after a non-zero or missing container exit code. Zero disables script retries."
+  type        = number
+  default     = 3
+  nullable    = false
+
+  validation {
+    condition     = var.step_function_retry_attempts >= 0 && var.step_function_retry_attempts <= 99999999 && floor(var.step_function_retry_attempts) == var.step_function_retry_attempts
+    error_message = "step_function_retry_attempts must be an integer between 0 and 99999999."
+  }
 }
 
 variable "ec2" {

@@ -1,14 +1,16 @@
 module "api_access_log_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
   version = "5.7.2"
 
   name              = "/aws/apigateway/${local.resource_name_prefix}"
   kms_key_id        = module.kms_cloudwatch_logs.key_arn
   retention_in_days = 30
-  tags              = var.tags
+  tags              = local.tags
 }
 
 module "cloudwatch_api_gateway_5xx" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
   version = "5.7.2"
 
@@ -30,10 +32,11 @@ module "cloudwatch_api_gateway_5xx" {
     Stage = aws_apigatewayv2_stage.default.name
   }
 
-  tags = var.tags
+  tags = local.tags
 }
 
 module "cloudwatch_api_gateway_latency" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
   version = "5.7.2"
 
@@ -55,10 +58,11 @@ module "cloudwatch_api_gateway_latency" {
     Stage = aws_apigatewayv2_stage.default.name
   }
 
-  tags = var.tags
+  tags = local.tags
 }
 
 module "cloudwatch_lambda_errors" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   for_each = local.cloudwatch_lambda_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
@@ -77,10 +81,11 @@ module "cloudwatch_lambda_errors" {
   alarm_actions       = local.cloudwatch_alarm_actions_high_priority
   ok_actions          = local.cloudwatch_alarm_actions_high_priority
   dimensions          = { FunctionName = each.value.function_name }
-  tags                = var.tags
+  tags                = local.tags
 }
 
 module "cloudwatch_lambda_throttles" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   for_each = local.cloudwatch_lambda_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
@@ -99,10 +104,11 @@ module "cloudwatch_lambda_throttles" {
   alarm_actions       = local.cloudwatch_alarm_actions_high_priority
   ok_actions          = local.cloudwatch_alarm_actions_high_priority
   dimensions          = { FunctionName = each.value.function_name }
-  tags                = var.tags
+  tags                = local.tags
 }
 
 module "cloudwatch_lambda_duration" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   for_each = local.cloudwatch_lambda_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
@@ -121,11 +127,11 @@ module "cloudwatch_lambda_duration" {
   alarm_actions       = local.cloudwatch_alarm_actions_low_priority
   ok_actions          = local.cloudwatch_alarm_actions_low_priority
   dimensions          = { FunctionName = each.value.function_name }
-  tags                = var.tags
+  tags                = local.tags
 }
 
 resource "aws_cloudwatch_dashboard" "api_platform" {
-  dashboard_name = "${local.resource_name_prefix}-${var.environment}-overview"
+  dashboard_name = "${local.resource_name_prefix}-${local.environment}-overview"
   dashboard_body = jsonencode({
     widgets = [
       {
