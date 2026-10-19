@@ -3,7 +3,7 @@ module "kms_cloudwatch_logs" {
   source  = "terraform-aws-modules/kms/aws"
   version = "4.2.0"
 
-  aliases                 = ["integration-hub-api/logs/${local.resource_component_name}"]
+  aliases                 = ["integration-hub-api/logs/${local.component_name}"]
   description             = "KMS CMK for Integration Hub API CloudWatch Logs encryption"
   enable_default_policy   = true
   enable_key_rotation     = true
