@@ -85,6 +85,7 @@ resource "aws_lambda_function" "nightly_restart_lambda" {
       CLUSTER       = var.cluster_name
       SERVICE       = var.service_name
       DESIRED_COUNT = var.task_count
+      ALARM_NAMES   = join(",", var.nightly_muted_alarm_names)
     }
   }
 }
