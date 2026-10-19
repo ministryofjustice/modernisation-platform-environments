@@ -171,8 +171,8 @@ module "s3-bucket-shared" {
   custom_kms_key = ""
 
   log_buckets = {
-    log_bucket_name   = module.s3-bucket-logging.bucket.id
-    log_bucket_arn    = module.s3-bucket-logging.bucket.arn
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
   }
   manage_log_bucket_policy = false
 

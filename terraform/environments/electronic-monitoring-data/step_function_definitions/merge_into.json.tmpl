@@ -42,7 +42,9 @@
         "FunctionName": "${planner_function_name}",
         "Payload": {
           "action": "discover_rolling",
-          "consumer": "${reconciliation_consumer}"
+          "consumer": "${reconciliation_consumer}",
+          "execution_id.$": "$$.Execution.Id",
+          "aggregate_notifications": true
         }
       },
       "OutputPath": "$.Payload",
@@ -76,21 +78,108 @@
         },
         {
           "Variable": "$.status",
-          "StringEquals": "replay_ready",
-          "Next": "PreparePlannedDates"
+          "StringEquals": "approval_required",
+          "Next": "WaitForRollingApproval"
         }
       ],
       "Default": "UnexpectedPlanningResult"
     },
+    "WaitForRollingApproval": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "park_rolling_approval",
+          "consumer": "${reconciliation_consumer}",
+          "execution_id.$": "$.execution_id",
+          "plan_id.$": "$.plan_id",
+          "task_token.$": "$$.Task.Token"
+        }
+      },
+      "ResultPath": "$.approval",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "RecordRollingApproval"
+    },
+    "RecordRollingApproval": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "record_rolling_approval",
+          "consumer": "${reconciliation_consumer}",
+          "execution_id.$": "$.execution_id",
+          "plan_id.$": "$.plan_id",
+          "decision.$": "$.approval.decision"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "CheckRollingApproval"
+    },
+    "CheckRollingApproval": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "replay_ready",
+          "Next": "PreparePlannedDates"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "rejected",
+          "Next": "RollingRejected"
+        }
+      ],
+      "Default": "UnexpectedRollingApprovalResult"
+    },
     "PreparePlannedDates": {
       "Type": "Pass",
       "Parameters": {
+        "mode": "rolling",
+        "consumer": "${reconciliation_consumer}",
+        "execution_id.$": "$.execution_id",
+        "plan_id.$": "$.plan_id",
+        "thread_id.$": "$.thread_id",
         "filter_dates.$": "$.candidates"
       },
       "Next": "ProcessDates"
     },
     "PlanningComplete": {
       "Type": "Succeed"
+    },
+    "RollingRejected": {
+      "Type": "Succeed"
+    },
+    "UnexpectedRollingApprovalResult": {
+      "Type": "Fail",
+      "Error": "UnexpectedRollingApprovalResult",
+      "Cause": "The rolling approval callback returned an unexpected result."
     },
     "UnexpectedPlanningResult": {
       "Type": "Fail",
@@ -530,7 +619,9 @@
             },
             "Retry": [
               {
-                "ErrorEquals": ["States.ALL"],
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
                 "IntervalSeconds": 2,
                 "BackoffRate": 2,
                 "MaxAttempts": 2
@@ -538,7 +629,9 @@
             ],
             "Catch": [
               {
-                "ErrorEquals": ["States.ALL"],
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
                 "ResultPath": "$.error",
                 "Next": "MarkPlannedFailed"
               }
@@ -567,6 +660,15 @@
                 "IntervalSeconds": 2,
                 "BackoffRate": 2,
                 "MaxAttempts": 3
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
+                "ResultPath": "$.error",
+                "Next": "MarkPlannedFailed"
               }
             ],
             "Next": "CheckRollingVerification"
@@ -606,14 +708,29 @@
             "End": true
           },
           "RollingVerificationFailed": {
-            "Type": "Fail",
-            "Error": "RollingReconciliationVerificationFailed",
-            "Cause": "Stale positions remain after rolling replay."
+            "Type": "Pass",
+            "Parameters": {
+              "filter_date.$": "$.filter_date.date",
+              "status": "FAILED",
+              "error": {
+                "Error": "RollingReconciliationVerificationFailed",
+                "Cause": "Stale positions remain after rolling replay."
+              },
+              "result.$": "$.verification.Payload"
+            },
+            "End": true
           },
           "UnexpectedRollingVerificationResult": {
-            "Type": "Fail",
-            "Error": "UnexpectedRollingVerificationResult",
-            "Cause": "The planner returned an unexpected rolling verification status."
+            "Type": "Pass",
+            "Parameters": {
+              "filter_date.$": "$.filter_date.date",
+              "status": "FAILED",
+              "error": {
+                "Error": "UnexpectedRollingVerificationResult",
+                "Cause": "The planner returned an unexpected rolling verification status."
+              }
+            },
+            "End": true
           },
 %{ endif }
           "MergeInto${table_name}": {
@@ -645,7 +762,9 @@
             },
             "Retry": [
               {
-                "ErrorEquals": ["States.ALL"],
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
                 "IntervalSeconds": 2,
                 "BackoffRate": 2,
                 "MaxAttempts": 2
@@ -653,7 +772,9 @@
             ],
             "Catch": [
               {
-                "ErrorEquals": ["States.ALL"],
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
                 "ResultPath": "$.error",
                 "Next": "MarkFailed"
               }
@@ -680,7 +801,84 @@
           }
         }
       },
+%{ if planner_function_name != "" && reconciliation_consumer != "" }
+      "Next": "CheckProcessDatesCompletion"
+%{ else }
       "End": true
+%{ endif }
+    }%{ if planner_function_name != "" && reconciliation_consumer != "" },
+    "CheckProcessDatesCompletion": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.mode",
+          "StringEquals": "rolling",
+          "Next": "CompleteRolling"
+        }
+      ],
+      "Default": "MergeComplete"
+    },
+    "CompleteRolling": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "complete_rolling",
+          "consumer": "${reconciliation_consumer}",
+          "execution_id.$": "$.execution_id",
+          "thread_id.$": "$.thread_id",
+          "results.$": "$.date_results"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "CheckRollingCompletion"
+    },
+    "CheckRollingCompletion": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "completed",
+          "Next": "RollingComplete"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "failed",
+          "Next": "RollingFailed"
+        }
+      ],
+      "Default": "UnexpectedRollingCompletionResult"
+    },
+    "RollingComplete": {
+      "Type": "Succeed"
+    },
+    "RollingFailed": {
+      "Type": "Fail",
+      "Error": "RollingReconciliationFailed",
+      "Cause": "One or more rolling replay work items failed."
+    },
+    "UnexpectedRollingCompletionResult": {
+      "Type": "Fail",
+      "Error": "UnexpectedRollingCompletionResult",
+      "Cause": "The planner returned an unexpected rolling completion status."
+    },
+    "MergeComplete": {
+      "Type": "Succeed"
     }
+%{ endif }
   }
 }
