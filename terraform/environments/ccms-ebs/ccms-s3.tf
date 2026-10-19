@@ -354,8 +354,8 @@ resource "aws_s3_bucket_versioning" "lambda_payment_load" {
 
 # Lifecycle configuration - see ADR "Payment Load S3 Bucket Retention" (SRE-25): no retention after a successful
 # load into CCMS. The payment load Lambda moves a file to completed/ only when every payment loaded, so that prefix
-# is the success signal. Pending files (bucket root) and failed/ files are not expired: a file must not be deleted
-# just because it was uploaded, and failed files stay until resolved.
+# is the success signal. Pending files (bucket root) are not expired, so a file is never deleted just because it was
+# uploaded. Failed files are kept for a short period to investigate the error - the business fixes and resends them.
 resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle" {
   bucket = aws_s3_bucket.lambda_payment_load.id
 
@@ -369,6 +369,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle"
 
     expiration {
       days = local.application_data.accounts[local.environment].payment_load_s3_days_expiration_completed
+    }
+  }
+
+  rule {
+    id     = "expire-failed-after-investigation"
+    status = "Enabled"
+
+    filter {
+      prefix = "failed/"
+    }
+
+    expiration {
+      days = local.application_data.accounts[local.environment].payment_load_s3_days_expiration_failed
     }
   }
 
