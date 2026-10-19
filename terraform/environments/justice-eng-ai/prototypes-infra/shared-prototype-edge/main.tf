@@ -124,9 +124,8 @@ resource "aws_lb_listener" "shared" {
 }
 
 resource "aws_cloudfront_cache_policy" "dynamic" {
-  provider = aws.us_east_1
-  name     = "${local.name}-dynamic"
-  comment  = "Disable caching for dynamic prototype applications"
+  name    = "${local.name}-dynamic"
+  comment = "Disable caching for dynamic prototype applications"
 
   min_ttl     = 0
   default_ttl = 0
@@ -146,9 +145,8 @@ resource "aws_cloudfront_cache_policy" "dynamic" {
 }
 
 resource "aws_cloudfront_origin_request_policy" "all_viewer" {
-  provider = aws.us_east_1
-  name     = "${local.name}-all-viewer"
-  comment  = "Forward host, headers, cookies, and query strings to prototype services"
+  name    = "${local.name}-all-viewer"
+  comment = "Forward host, headers, cookies, and query strings to prototype services"
 
   cookies_config {
     cookie_behavior = "all"
@@ -293,8 +291,7 @@ resource "aws_wafv2_web_acl_logging_configuration" "shared" {
 }
 
 resource "aws_cloudfront_response_headers_policy" "security" {
-  provider = aws.us_east_1
-  name     = "${local.name}-security"
+  name = "${local.name}-security"
   security_headers_config {
     content_type_options {
       override = true
@@ -316,7 +313,6 @@ resource "aws_cloudfront_response_headers_policy" "security" {
 }
 
 resource "aws_cloudfront_distribution" "shared" {
-  provider        = aws.us_east_1
   enabled         = true
   is_ipv6_enabled = false
   aliases         = ["*.${var.configuration.domain_name}"]
