@@ -9,6 +9,74 @@ Each step is either:
 
 The first list item starts the process; subsequent items run in list order. Both step types support optional `retry`, `timeout_seconds`, and `result_path` attributes. Set `result_path` when a step should preserve the current input while storing its result.
 
+Choose a `script_runner.task_definition_family` that matches `launch_type`.
+Fargate task definitions must use `awsvpc` networking and cannot use host
+volumes; EC2 task definitions can use host networking and host volumes. Supply
+the `ec2` host configuration only for EC2 workflows.
+
+## Script runtime failures and retries
+
+Both Fargate and EC2 script steps inspect the completed container's exit code.
+A non-zero or missing exit code reruns only that script step, waiting 15 seconds
+between executions. `step_function_retry_attempts` defaults to 3 additional executions
+(four executions in total); set it to 0 to disable reruns. The counter resets
+for each script step. EC2 retries reuse the dedicated host and clean it up after
+success or exhausted retries. Exhaustion fails the workflow with
+`ScriptRunnerFailed` and includes the final ECS task result in the failure cause.
+
+Scripts must propagate failures as a non-zero process exit status (for example,
+uncaught Python exceptions or explicit Bash `exit 1`). Printed error messages or
+JSON on stdout alone are not interpreted as failures. Scripts must be safe to
+rerun after partial work. Existing step-level `retry` settings handle ECS/API
+task failures separately; they do not override the script exit-code retry limit.
+
+In justice-eng-ai, set `accounts.<environment>.step_function_retry_attempts` in
+`application_variables.json`. The backend-processing workflows pass this setting
+to the module, falling back to 3 when the key is absent.
+
+The justice-eng-ai control-plane and infrastructure workflows derive `AppID`
+from the uploaded `s3_file` basename (`<AppID>.json`, with no dots in the ID),
+using the same expression as the image-build tag. They do not require `AppID`
+or `forge_runtime_version` in execution input. Both pass the pinned
+runtime tag from `accounts.<environment>.forge_runtime_version` in
+`application_variables.json` as the `forge_runtime_version` environment variable.
+The version lookup and filename expression are shared locals in the backend
+script-runner configuration.
+
+## Parent fallback cleanup for EC2 children
+
+On a `step_function` step, set
+`ec2_cleanup = { managed_by = "your-disposable-host-tag" }` when its child uses
+this module's disposable EC2 runtime. The justice-eng-ai root enables this for
+the image-build child only.
+
+The parent adds the reserved `__script_runner_root_execution_arn` field to the
+selected child input, which must be a JSON object. Application fields are
+otherwise preserved. The child tags its instances with `RootExecutionArn`
+alongside the existing `BuildExecutionArn` and `ManagedBy` tags. Standalone
+EC2 executions use their own execution ARN as the root tag. The parent reserves
+`script_runner_child` in its own state for input preparation and cleanup.
+This helper starts with a letter to avoid leading-underscore JSONPath parsing
+issues in intrinsic function arguments.
+
+After the nested Task's configured retries are exhausted, its `Catch` waits
+30 seconds for in-flight launches to become visible and discovers hosts matching
+both the root execution ARN and the configured `ManagedBy` tag. It terminates
+them, polling every 30 seconds for up to 40 checks per host, then queries again
+for remaining hosts. Empty results are safe, including when the child already
+cleaned up. Successful cleanup fails the parent with the original child error;
+cleanup failure reports `ChildInstanceCleanupFailed` with both errors.
+Normal child cleanup also polls until termination before continuing.
+
+This fallback covers a child failing before reaching its own cleanup, including
+child runtime errors. It cannot run if the parent itself is stopped or times
+out, and is not an external orphan-instance sweeper. Previously launched hosts
+without the new root tag are not discovered. EC2 API errors and visibility
+delays can still prevent cleanup and must be investigated when reported.
+The shared execution role needs `ec2:DescribeInstances` and tag-scoped
+`ec2:TerminateInstances`; justice-eng-ai already grants these in
+`step_functions_common.tf`. No Lambda or additional execution role is needed.
+
 ## Example 1: ECS Script
 
 ```hcl

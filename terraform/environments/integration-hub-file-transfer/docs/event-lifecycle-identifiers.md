@@ -44,9 +44,7 @@ The ROUTE Lambda mover consumes that event and claims a separate `(correlationId
 - `THREATS_FOUND` routes to `quarantine`; and
 - `UNSUPPORTED`, `ACCESS_DENIED` or `FAILED` routes to `investigation`.
 
-`scanResultStatusMatchesTag` is retained as diagnostic provenance from the adapter. A mismatch overrides the reported scan result and routes the object to `investigation`.
-
-ROUTE copies and verifies the exact processing version with destination SSE-KMS encryption before deleting that exact source version. It then publishes `FileRouted.v1` with an idempotency key of `route:{route}:{destinationBucket}:{key}:{destinationVersionId}`.
+ROUTE copies and verifies the exact processing version with destination SSE-KMS encryption before deleting that exact source version. GuardDuty applies its `GuardDutyMalwareScanStatus` tag after publishing the scan result event, so the tag can lag or, for an uploader-supplied tag, differ. The event is the single source of truth: ROUTE sets the tag on the destination copy from the event's `scanResultStatus`, replacing any existing value. It then publishes `FileRouted.v1` with an idempotency key of `route:{route}:{destinationBucket}:{key}:{destinationVersionId}`.
 
 ## Action dispatch
 

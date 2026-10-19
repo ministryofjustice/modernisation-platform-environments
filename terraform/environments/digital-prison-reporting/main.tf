@@ -725,17 +725,17 @@ module "s3_artifacts_store" {
   create_s3           = local.setup_buckets
   name                = "${local.project}-artifact-store-${local.environment}"
   custom_kms_key      = local.s3_kms_arn
-  enable_notification = true #
+  enable_notification = local.enable_dbuilder_flyway_lambda # Notification trigger is only valid while the Flyway Lambda exists
 
   # Dynamic, supports multiple notifications blocks
-  bucket_notifications = {
+  bucket_notifications = local.enable_dbuilder_flyway_lambda ? {
     "lambda_function_arn" = module.domain_builder_flyway_Lambda.lambda_function
     "events"              = ["s3:ObjectCreated:*"]
     "filter_prefix"       = "build-artifacts/domain-builder/jars/"
     "filter_suffix"       = ".jar"
-  }
+  } : null
 
-  dependency_lambda = [module.domain_builder_flyway_Lambda.lambda_function] # Required if bucket_notications is enabled
+  dependency_lambda = local.enable_dbuilder_flyway_lambda ? [module.domain_builder_flyway_Lambda.lambda_function] : [] # Required if bucket_notications is enabled
 
   tags = merge(
     local.all_tags,
@@ -809,7 +809,17 @@ module "glue_raw_archive_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
   name           = "raw_archive"
-  description    = "Glue Data Catalog - Raw Archive"
+  description    = "Glue Data Catalog - Raw Archive Prisons"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for Raw Archive Probation
+module "glue_raw_archive_probation_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "raw_archive_probation"
+  description    = "Glue Data Catalog - Raw Archive Probation"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }
@@ -840,6 +850,16 @@ module "glue_prisons_database" {
   create_db      = local.create_db
   name           = "prisons"
   description    = "Glue Data Catalog - Prisons Fabric"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for Probation
+module "glue_probation_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "probation"
+  description    = "Glue Data Catalog - Probation"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }

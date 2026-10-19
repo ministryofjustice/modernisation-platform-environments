@@ -150,15 +150,8 @@ class FileMoverService:
             return self.config.destinations["processing"], item
         if "route" in item:
             return self.config.destinations[item["route"]], item
-        route = select_route(
-            operation_event.scan_result_status,
-            operation_event.scan_result_status_matches_tag,
-        )
-        item = self.store.update_fields(
-            item,
-            owner,
-            {"route": route},
-        )
+        route = select_route(operation_event.scan_result_status)
+        item = self.store.update_fields(item, owner, {"route": route})
         return self.config.destinations[route], item
 
     def _completion_event(self, item):
@@ -200,9 +193,6 @@ class FileMoverService:
                 "destinationObject": destination_object,
                 "route": item["route"],
                 "scanResultStatus": item["scan_result_status"],
-                "scanResultStatusMatchesTag": item[
-                    "scan_result_status_matches_tag"
-                ],
                 "sourceDeleted": True,
             }
         return (
