@@ -1,11 +1,8 @@
 locals {
-  # Existing resource names and the KMS alias use the original "api-platform" naming, so keep it.
-  resource_application_name = "integration-hub"
-  resource_component_name   = "api-platform"
-  resource_name_prefix      = "${local.resource_application_name}-${local.resource_component_name}"
-  account_id                = data.aws_caller_identity.current.account_id
-  region                    = data.aws_region.current.region
-  bootstrap_code_root       = "${path.module}/bootstrap-lambdas"
+  resource_name_prefix = "${local.application_name}-${local.component_name}"
+  account_id           = data.aws_caller_identity.current.account_id
+  region               = data.aws_region.current.region
+  bootstrap_code_root  = "${path.module}/bootstrap-lambdas"
 
   incoming_bucket_name = "integration-hub-file-transfer-${local.environment}-incoming"
   mft_account_id       = local.environment_management.account_ids["integration-hub-file-transfer-${local.environment}"]
