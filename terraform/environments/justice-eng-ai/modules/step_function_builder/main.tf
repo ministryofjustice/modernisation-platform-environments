@@ -83,7 +83,7 @@ locals {
         Resource = "arn:${data.aws_partition.current.partition}:states:::states:startExecution.sync:2"
         Parameters = {
           StateMachineArn = "arn:${data.aws_partition.current.partition}:states:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${step.state_machine_name}"
-          "Input.$"       = try(step.ec2_cleanup, null) == null ? try(step.input_path, "$") : "States.JsonMerge($.__script_runner_child.input, $.__script_runner_child.context, false)"
+          "Input.$"       = try(step.ec2_cleanup, null) == null ? try(step.input_path, "$") : "States.JsonMerge($.script_runner_child.input, $.script_runner_child.context, false)"
         }
       },
       local.transitions[step.name],
@@ -91,7 +91,7 @@ locals {
       try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
       length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry },
       try(step.ec2_cleanup, null) == null ? {} : {
-        Catch = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.__script_runner_child.failure", Next = "${step.name}_cleanup_settle" }]
+        Catch = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.script_runner_child.failure", Next = "${step.name}_cleanup_settle" }]
       }
     )
   }

@@ -6,7 +6,7 @@ locals {
         "input.$" = try(step.input_path, "$")
         context   = { "__script_runner_root_execution_arn.$" = "$$.Execution.Id" }
       }
-      ResultPath = "$.__script_runner_child"
+      ResultPath = "$.script_runner_child"
       Next       = step.name
     }
     # Allow in-flight EC2 launches to become visible before discovering orphaned hosts.
@@ -25,15 +25,15 @@ locals {
           { Name = "instance-state-name", Values = ["pending", "running", "stopping", "stopped", "shutting-down"] },
         ]
       }
-      ResultPath = "$.__script_runner_child.hosts"
+      ResultPath = "$.script_runner_child.hosts"
       Retry      = local.disposable_api_retry
-      Catch      = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.__script_runner_child.cleanup_failure", Next = "${step.name}_record_cleanup_failure" }]
+      Catch      = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.script_runner_child.cleanup_failure", Next = "${step.name}_record_cleanup_failure" }]
       Next       = "${step.name}_check_orphaned_hosts"
     }
     "${step.name}_check_orphaned_hosts" = {
       Type = "Choice"
       Choices = [{
-        Variable  = "$.__script_runner_child.hosts.Reservations[0]"
+        Variable  = "$.script_runner_child.hosts.Reservations[0]"
         IsPresent = true
         Next      = "${step.name}_clean_orphaned_hosts"
       }]
@@ -41,7 +41,7 @@ locals {
     }
     "${step.name}_clean_orphaned_hosts" = {
       Type      = "Map"
-      ItemsPath = "$.__script_runner_child.hosts.Reservations"
+      ItemsPath = "$.script_runner_child.hosts.Reservations"
       ItemProcessor = {
         ProcessorConfig = { Mode = "INLINE" }
         StartAt         = "clean_instances"
@@ -109,27 +109,27 @@ locals {
         }
       }
       ResultPath = null
-      Catch      = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.__script_runner_child.cleanup_failure", Next = "${step.name}_record_cleanup_failure" }]
+      Catch      = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.script_runner_child.cleanup_failure", Next = "${step.name}_record_cleanup_failure" }]
       # Query again so pagination cannot leave hosts behind after processing a page.
       Next = "${step.name}_find_orphaned_hosts"
     }
     "${step.name}_child_failed" = {
       Type      = "Fail"
-      ErrorPath = "$.__script_runner_child.failure.Error"
-      CausePath = "$.__script_runner_child.failure.Cause"
+      ErrorPath = "$.script_runner_child.failure.Error"
+      CausePath = "$.script_runner_child.failure.Cause"
     }
     "${step.name}_parent_cleanup_failed" = {
       Type      = "Fail"
       Error     = "ChildInstanceCleanupFailed"
-      CausePath = "States.JsonToString($.__script_runner_child.cleanup_context)"
+      CausePath = "States.JsonToString($.script_runner_child.cleanup_context)"
     }
     "${step.name}_record_cleanup_failure" = {
       Type = "Pass"
       Parameters = {
-        "child_failure.$"   = "$.__script_runner_child.failure"
-        "cleanup_failure.$" = "$.__script_runner_child.cleanup_failure"
+        "child_failure.$"   = "$.script_runner_child.failure"
+        "cleanup_failure.$" = "$.script_runner_child.cleanup_failure"
       }
-      ResultPath = "$.__script_runner_child.cleanup_context"
+      ResultPath = "$.script_runner_child.cleanup_context"
       Next       = "${step.name}_parent_cleanup_failed"
     }
   }]...)

@@ -46,7 +46,9 @@ selected child input, which must be a JSON object. Application fields are
 otherwise preserved. The child tags its instances with `RootExecutionArn`
 alongside the existing `BuildExecutionArn` and `ManagedBy` tags. Standalone
 EC2 executions use their own execution ARN as the root tag. The parent reserves
-`__script_runner_child` in its own state for input preparation and cleanup.
+`script_runner_child` in its own state for input preparation and cleanup.
+This helper starts with a letter to avoid leading-underscore JSONPath parsing
+issues in intrinsic function arguments.
 
 After the nested Task's configured retries are exhausted, its `Catch` waits
 30 seconds for in-flight launches to become visible and discovers hosts matching

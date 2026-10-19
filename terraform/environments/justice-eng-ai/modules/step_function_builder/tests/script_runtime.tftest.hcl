@@ -176,7 +176,7 @@ run "root_child_cleanup" {
       local.definition.States.build_prepare_child.Parameters["input.$"] == "$.control.Output" &&
       local.definition.States.build_prepare_child.Parameters.context["__script_runner_root_execution_arn.$"] == "$$.Execution.Id" &&
       local.definition.States.build_prepare_child.Next == "build" &&
-      local.definition.States.build.Parameters["Input.$"] == "States.JsonMerge($.__script_runner_child.input, $.__script_runner_child.context, false)" &&
+      local.definition.States.build.Parameters["Input.$"] == "States.JsonMerge($.script_runner_child.input, $.script_runner_child.context, false)" &&
       local.definition.States.build.ResultPath == "$.build" &&
       local.definition.States.build.Next == "deploy" &&
       local.definition.States.build.Retry[0].MaxAttempts == 2 &&
@@ -193,11 +193,12 @@ run "root_child_cleanup" {
       local.definition.States.build_find_orphaned_hosts.Parameters.Filters[1]["Values.$"] == "States.Array($$.Execution.Id)" &&
       local.definition.States.build_check_orphaned_hosts.Default == "build_child_failed" &&
       local.definition.States.build_clean_orphaned_hosts.Next == "build_find_orphaned_hosts" &&
-      local.definition.States.build_child_failed.ErrorPath == "$.__script_runner_child.failure.Error" &&
-      local.definition.States.build_child_failed.CausePath == "$.__script_runner_child.failure.Cause" &&
+      local.definition.States.build_child_failed.ErrorPath == "$.script_runner_child.failure.Error" &&
+      local.definition.States.build_child_failed.CausePath == "$.script_runner_child.failure.Cause" &&
       local.definition.States.build_clean_orphaned_hosts.Catch[0].Next == "build_record_cleanup_failure" &&
-      local.definition.States.build_record_cleanup_failure.Parameters["child_failure.$"] == "$.__script_runner_child.failure" &&
-      local.definition.States.build_record_cleanup_failure.Parameters["cleanup_failure.$"] == "$.__script_runner_child.cleanup_failure"
+      local.definition.States.build_record_cleanup_failure.Parameters["child_failure.$"] == "$.script_runner_child.failure" &&
+      local.definition.States.build_record_cleanup_failure.Parameters["cleanup_failure.$"] == "$.script_runner_child.cleanup_failure" &&
+      local.definition.States.build_parent_cleanup_failed.CausePath == "States.JsonToString($.script_runner_child.cleanup_context)"
     )
     error_message = "Fallback cleanup must isolate this root's managed hosts, handle empty results/pages, and preserve both child and cleanup errors."
   }
