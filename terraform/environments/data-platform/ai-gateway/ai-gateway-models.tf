@@ -49,8 +49,9 @@ resource "litellm_model" "amazon_bedrock_batch" {
     ai_model_provider            = try(each.value.model_provider, "Amazon Bedrock")
     ai_model_family              = each.value.model_family
     ai_model_name                = "${each.value.model_name} (Batch)"
+    ai_model_location            = each.value.model_location
     ai_model_generally_available = each.value.generally_available
-    additional_drop_params       = ["ai_model_provider", "ai_model_family", "ai_model_name", "ai_model_generally_available"]
+    additional_drop_params       = ["ai_model_provider", "ai_model_family", "ai_model_name", "ai_model_location", "ai_model_generally_available"]
   })
 
   depends_on = [
