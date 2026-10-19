@@ -308,5 +308,12 @@ locals {
       "/oracle/database/EMREP"   = local.secretsmanager_secrets.oem
       "/oracle/database/PRCVCAT" = local.secretsmanager_secrets.oem
     }
+
+    ssm_patch_baselines = {
+      OracleLinuxPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["OracleLinuxPatchGroup1Baseline"], {
+        rule1_approve_after_days = null
+        rule1_approve_until_date = "2026-09-17"
+      })
+    }
   }
 }
