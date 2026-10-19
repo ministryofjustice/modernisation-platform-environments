@@ -20,6 +20,14 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
     actions   = ["ecs:UpdateService"]
     resources = [var.service_arn]
   }
+  statement {
+    effect = "Allow"
+    actions = ["cloudwatch:DisableAlarmActions", "cloudwatch:EnableAlarmActions"]
+    resources = [
+      for alarm_name in var.nightly_muted_alarm_names :
+      "arn:aws:cloudwatch:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:alarm:${alarm_name}"
+    ] 
+  }
 }
 
 resource "aws_cloudwatch_event_rule" "rule" {
