@@ -560,6 +560,52 @@ resource "aws_lambda_event_source_mapping" "live_feed_incident_events" {
   ]
 }
 
+# ------------------------------------------------------------------------------
+# CloudWatch alarm debounce queue
+# Delay non-critical alarms before the alarm threader confirms current state.
+# ------------------------------------------------------------------------------
+
+resource "aws_sqs_queue" "cloudwatch_alarm_debounce_dlq" {
+  name = "cloudwatch-alarm-debounce-dlq"
+
+  message_retention_seconds = 1209600
+  sqs_managed_sse_enabled   = true
+}
+
+resource "aws_sqs_queue" "cloudwatch_alarm_debounce" {
+  name = "cloudwatch-alarm-debounce"
+
+  visibility_timeout_seconds = 365
+  message_retention_seconds  = 86400
+  sqs_managed_sse_enabled    = true
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+resource "aws_sqs_queue_redrive_allow_policy" "cloudwatch_alarm_debounce" {
+  queue_url = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.id
+
+  redrive_allow_policy = jsonencode({
+    redrivePermission = "byQueue"
+    sourceQueueArns = [
+      aws_sqs_queue.cloudwatch_alarm_debounce.arn,
+    ]
+  })
+}
+
+resource "aws_lambda_event_source_mapping" "cloudwatch_alarm_debounce" {
+  event_source_arn = aws_sqs_queue.cloudwatch_alarm_debounce.arn
+  function_name    = module.cloudwatch_alarm_threader.lambda_function_name
+  batch_size       = 1
+
+  depends_on = [
+    aws_iam_role_policy_attachment.cloudwatch_alarm_threader_attach,
+  ]
+}
+
 #-----------------------------------------------------------------------------------
 # FMS validation reporter schedules
 #-----------------------------------------------------------------------------------
