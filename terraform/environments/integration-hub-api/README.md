@@ -3,7 +3,7 @@
 This account (`integration-hub-api-development`) is split into components, each with its own Terraform state:
 
 | Component | Purpose |
-|---|---|
+| --- | --- |
 | [`file-transfer-api`](file-transfer-api/README.md) | Managed File Transfer upload-ticket API: API Gateway, Lambdas, DynamoDB, authentication secrets and observability |
 | [`benefit-checker-api`](benefit-checker-api/README.md) | Benefit checker API |
 
