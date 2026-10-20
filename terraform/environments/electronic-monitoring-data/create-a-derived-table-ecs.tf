@@ -76,6 +76,10 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         {
           name = "ARTEFACT_TARGET"
           value = local.environment_shorthand
+        },
+        {
+          name = "VARS"
+          value = jsonencode({"state": "./state"})
         }
       ]
     }
