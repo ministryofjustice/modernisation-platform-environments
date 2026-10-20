@@ -118,7 +118,7 @@ locals {
 module "sherlock_landing_bucket_mp" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
-  bucket_prefix      = "landing-sherlock-${local.environment}-"
+  bucket_prefix      = "landing-sherlock-${local.environment}"
   bucket_namespace   = "account-regional"
   versioning_enabled = true
   force_destroy      = true

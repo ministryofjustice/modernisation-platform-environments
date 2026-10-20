@@ -94,9 +94,9 @@ resource "aws_iam_role_policy" "cloudtrail_logs" {
   policy = data.aws_iam_policy_document.cloudtrail_cloudwatch_logs.json
 }
 
-data "aws_iam_policy_document" "cloudtrail_sns_publish" {
+data "aws_iam_policy_document" "cloudtrail-publish" {
   statement {
-    sid    = "AllowCloudTrailToPublishToSNS"
+    sid    = "AllowCloudTrailPublish"
     effect = "Allow"
 
     principals {
@@ -104,13 +104,18 @@ data "aws_iam_policy_document" "cloudtrail_sns_publish" {
       identifiers = ["cloudtrail.amazonaws.com"]
     }
 
-    actions = ["sns:Publish"]
-
+    actions   = ["sns:Publish"]
     resources = [aws_sns_topic.cloudtrail.arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = [local.cloudtrail_arn]
+    }
   }
 }
 
-resource "aws_sns_topic_policy" "cloudtrail" {
+resource "aws_sns_topic_policy" "cloudtrail-publish" {
   arn    = aws_sns_topic.cloudtrail.arn
-  policy = data.aws_iam_policy_document.cloudtrail_sns_publish.json
+  policy = data.aws_iam_policy_document.cloudtrail-publish.json
 }
