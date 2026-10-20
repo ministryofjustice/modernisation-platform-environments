@@ -10,8 +10,10 @@ locals {
       variables = [
         { name = "s3_folder", path = "$.s3_folder" },
         { name = "s3_file", path = "$.s3_file" },
+        { name = "S3_BUCKET", value = aws_s3_bucket.staging_bucket.id },
         { name = "AppID", path = local.script_runner_app_id_path },
         { name = "BuildID", path = "$.latest.BuildID" },
+        { name = "BEDROCK_MODEL_ID", value = local.bedrock_model_id },
         { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
         { name = "AWS_REGION", value = data.aws_region.current.region },
       ]
