@@ -24,3 +24,14 @@ resource "aws_lambda_permission" "aws_health" {
   source_arn     = aws_cloudwatch_event_rule.aws_health.arn
   source_account = var.aws_account_id
 }
+
+resource "aws_lambda_permission" "allow_external_aws_accounts_eventbridge" {
+  for_each      = nonsensitive(toset(keys(local.aws_accounts)))
+
+  statement_id  = "AllowHealthEvents${each.key}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.github_workflow_trigger.function_name
+  principal     = "events.amazonaws.com"
+
+  source_arn = "arn:aws:events:${var.aws_region}:${local.aws_accounts[each.key]}:rule/ForwardAllHealthEvents"
+}
