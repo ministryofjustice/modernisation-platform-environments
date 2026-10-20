@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 module "merge_into_this" {
   source       = "../step_function"
   name         = "merge_into_${local.name}"
@@ -21,6 +24,18 @@ data "aws_iam_policy_document" "merge_into_this" {
       var.function_to_iterate.lambda_function_arn,
       var.planner_function_arn,
     ])
+  }
+
+  dynamic "statement" {
+    for_each = var.reconciliation_consumer != "" ? [1] : []
+
+    content {
+      effect  = "Allow"
+      actions = ["states:StartExecution"]
+      resources = [
+        "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:merge_into_${local.name}",
+      ]
+    }
   }
 }
 
