@@ -22,6 +22,13 @@ class SecretNotFoundError(Exception):
         self.response = {"Error": {"Code": "ResourceNotFoundException"}}
 
 
+class SecretValidationError(Exception):
+    def __init__(self, message):
+        self.response = {
+            "Error": {"Code": "ValidationException", "Message": message}
+        }
+
+
 class DispatcherTest(unittest.TestCase):
     def setUp(self):
         self.event = {
@@ -97,6 +104,77 @@ class DispatcherTest(unittest.TestCase):
             ],
         )
 
+    def test_invalid_secret_name_falls_back_to_matching_parent_secret(self):
+        object_key = (
+            "test-harness/push-to-s3/run-123/special chars + (1).txt"
+        )
+        secret_name_prefix = "integration-hub-file-transfer/file-dispatch/"
+        secret_client = MagicMock()
+        secret_client.get_secret_value.side_effect = [
+            SecretValidationError(
+                "Invalid name. Must be a valid name containing alphanumeric characters."
+            ),
+            SecretNotFoundError(),
+            self.secret_response,
+        ]
+
+        configuration = find_dispatch_configuration(
+            secret_client, secret_name_prefix, object_key
+        )
+
+        self.assertEqual(configuration.secret_version_id, "secret-version")
+        self.assertEqual(
+            [call.kwargs["SecretId"] for call in secret_client.get_secret_value.call_args_list],
+            [
+                f"{secret_name_prefix}{object_key}",
+                f"{secret_name_prefix}test-harness/push-to-s3/run-123/",
+                f"{secret_name_prefix}test-harness/push-to-s3/",
+            ],
+        )
+
+        self.event["detail"]["data"]["destinationObject"]["key"] = object_key
+        detail = build_requested_event_detail(
+            parse_file_routed_event(self.event), configuration
+        )
+        self.assertEqual(detail["data"]["object"]["key"], object_key)
+
+    def test_invalid_prefixed_secret_name_falls_back_to_shorter_candidate(self):
+        secret_name_prefix = "p" * 500
+        secret_client = MagicMock()
+        secret_client.get_secret_value.side_effect = [
+            SecretValidationError("Invalid name. Name is too long."),
+            self.secret_response,
+        ]
+
+        configuration = find_dispatch_configuration(
+            secret_client, secret_name_prefix, "folder/abcdefghij"
+        )
+
+        self.assertEqual(configuration.secret_version_id, "secret-version")
+        self.assertEqual(
+            [call.kwargs["SecretId"] for call in secret_client.get_secret_value.call_args_list],
+            [
+                f"{secret_name_prefix}folder/abcdefghij",
+                f"{secret_name_prefix}folder/",
+            ],
+        )
+
+    def test_most_specific_matching_secret_wins(self):
+        specific_response = dict(self.secret_response, VersionId="specific-version")
+        parent_response = dict(self.secret_response, VersionId="parent-version")
+        secret_client = MagicMock()
+        secret_client.get_secret_value.side_effect = [
+            specific_response,
+            parent_response,
+        ]
+
+        configuration = find_dispatch_configuration(
+            secret_client, "application/file-dispatch/", "identity/reports/test.csv"
+        )
+
+        self.assertEqual(configuration.secret_version_id, "specific-version")
+        self.assertEqual(secret_client.get_secret_value.call_count, 1)
+
     def test_root_prefix_can_request_hosted_pickup(self):
         secret_client = MagicMock()
         self.event["detail"]["data"]["destinationObject"]["key"] = "dms1981/file.pdf"
@@ -146,6 +224,17 @@ class DispatcherTest(unittest.TestCase):
         secret_client.get_secret_value.side_effect = PermissionError("denied")
 
         with self.assertRaises(PermissionError):
+            find_dispatch_configuration(
+                secret_client, "application/file-dispatch/", "identity/report.csv"
+            )
+
+    def test_propagates_other_validation_errors(self):
+        secret_client = MagicMock()
+        secret_client.get_secret_value.side_effect = SecretValidationError(
+            "A different validation error."
+        )
+
+        with self.assertRaises(SecretValidationError):
             find_dispatch_configuration(
                 secret_client, "application/file-dispatch/", "identity/report.csv"
             )
