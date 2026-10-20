@@ -39,7 +39,7 @@ locals {
   nacl_deny_vpc     = { rule_number = 900, rule_action = "deny", protocol = "-1", from_port = 0, to_port = 0, cidr_block = local.vpc_cidr }
   nacl_https        = { rule_number = 1000, rule_action = "allow", protocol = "tcp", from_port = 443, to_port = 443, cidr_block = "0.0.0.0/0" }
   nacl_ephemeral_in = { rule_number = 1000, rule_action = "allow", protocol = "tcp", from_port = 1024, to_port = 65535, cidr_block = "0.0.0.0/0" }
-  nacl_all_out                  = { rule_number = 1000, rule_action = "allow", protocol = "-1", from_port = 0, to_port = 0, cidr_block = "0.0.0.0/0" }
+  nacl_all_out      = { rule_number = 1000, rule_action = "allow", protocol = "-1", from_port = 0, to_port = 0, cidr_block = "0.0.0.0/0" }
 
   # The NAT Gateway lives in the public subnets and re-maps outbound connections to
   # ephemeral source ports, so return traffic needs the ephemeral range allowed inbound
