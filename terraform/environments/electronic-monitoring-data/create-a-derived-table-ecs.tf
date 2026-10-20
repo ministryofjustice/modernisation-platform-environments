@@ -79,7 +79,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         },
         {
           name = "VARS"
-          value = jsonencode({"state": "./state"})
+          value = jsonencode({"state": "./target"})
         }
       ]
     }
