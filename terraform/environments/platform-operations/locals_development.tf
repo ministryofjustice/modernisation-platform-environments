@@ -6,17 +6,15 @@ locals {
   }
 
   baseline_development = {
-    cloudwatch_metric_alarms = local.lambda_alarms.development
-
     options = {
       enable_ec2_session_manager_cloudwatch_logs = true
     }
   }
 
-  enable_aws_health_lambda_development = true
+  enable_aws_health_lambda_development = false
 
   github_actions_lambda_development = {
-    enable_outbound_federation = true
+    enable_outbound_federation = false
     github_workflows           = {}
   }
 }
