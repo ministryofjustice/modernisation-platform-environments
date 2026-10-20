@@ -267,3 +267,112 @@ run "fractional_retry_limit" {
   }
   expect_failures = [var.step_function_retry_attempts]
 }
+
+run "review_gate_steps" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name        = "first"
+        type        = "script_runner"
+        script_path = "scripts/test.sh"
+        shell_type  = "bash"
+        result_path = "$.first"
+      },
+      {
+        name              = "read_decision"
+        type              = "dynamodb_get_item"
+        table_name        = "review-queue"
+        key               = { AppID = "$.app_id" }
+        result_attributes = ["AppID", "status"]
+        result_path       = "$"
+      },
+      {
+        name     = "gate"
+        type     = "choice"
+        variable = "$.status"
+        equals   = "approved"
+      },
+      {
+        name               = "child"
+        type               = "step_function"
+        state_machine_name = "child-machine"
+      },
+    ]
+  }
+
+  assert {
+    condition = (
+      local.definition.States.first_finish.Next == "read_decision" &&
+      endswith(local.definition.States.read_decision.Resource, ":states:::dynamodb:getItem") &&
+      local.definition.States.read_decision.Parameters.Key.AppID["S.$"] == "$.app_id" &&
+      local.definition.States.read_decision.ResultSelector["status.$"] == "$.Item.status.S" &&
+      local.definition.States.read_decision.ResultPath == "$" &&
+      local.definition.States.read_decision.Next == "gate"
+    )
+    error_message = "dynamodb_get_item must read the item natively and flatten the requested attributes."
+  }
+
+  assert {
+    condition = (
+      local.definition.States.gate.Choices[0].StringEquals == "approved" &&
+      local.definition.States.gate.Choices[0].Next == "child" &&
+      local.definition.States.gate.Default == "gate_stop" &&
+      local.definition.States.gate_stop.Type == "Succeed"
+    )
+    error_message = "choice must continue when matched and otherwise succeed without running later steps."
+  }
+}
+
+run "choice_cannot_be_last" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name     = "gate"
+        type     = "choice"
+        variable = "$.status"
+        equals   = "approved"
+      },
+    ]
+  }
+  expect_failures = [var.steps]
+}
+
+run "review_gate_when_absent" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name        = "read_record"
+        type        = "dynamodb_get_item"
+        table_name  = "review-queue"
+        key         = { AppID = "$.app_id" }
+        result_path = "$.review"
+      },
+      {
+        name        = "gate"
+        type        = "choice"
+        variable    = "$.review.Item"
+        when_absent = true
+      },
+      {
+        name               = "child"
+        type               = "step_function"
+        state_machine_name = "child-machine"
+      },
+    ]
+  }
+
+  assert {
+    condition = (
+      !contains(keys(local.definition.States.read_record), "ResultSelector") &&
+      local.definition.States.read_record.ResultPath == "$.review" &&
+      local.definition.States.gate.Choices[0].Not.Variable == "$.review.Item" &&
+      local.definition.States.gate.Choices[0].Not.IsPresent == true &&
+      local.definition.States.gate.Choices[0].Next == "child" &&
+      local.definition.States.gate.Default == "gate_stop"
+    )
+    error_message = "when_absent must continue only when the variable is missing, and the raw item must be returned without a ResultSelector."
+  }
+}

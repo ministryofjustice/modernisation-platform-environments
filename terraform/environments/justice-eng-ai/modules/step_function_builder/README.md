@@ -7,6 +7,9 @@ Each step is either:
 - `script_runner`: requires `name`, `type = "script_runner"`, `script_path`, and `shell_type`. Optional `variables` is a list of `{ name, value }` or `{ name, path }` objects. `path` reads from the current Step Functions input.
 - `step_function`: requires `name`, `type = "step_function"`, and `state_machine_name`. Optional `input_path` selects the input passed to the child workflow. The module builds the ARN using the current account and region.
 
+- `dynamodb_get_item`: requires `name`, `type = "dynamodb_get_item"`, `table_name` and `key` (attribute name => JSONPath or intrinsic function giving its string value). Optional `result_attributes` returns those string attributes at the top level of the result; without it the raw `{ Item = {...} }` result is returned, with no `Item` when nothing exists. Reads natively through Step Functions, with no Lambda.
+- `choice`: requires `name`, `type = "choice"`, `variable`, and either `equals` or `when_absent = true`. Execution continues to the next step when the string at `variable` equals `equals` (or, with `when_absent`, when `variable` is absent); otherwise it ends successfully at `<name>_stop` (optional `stop_comment`). It cannot be the last step.
+
 The first list item starts the process; subsequent items run in list order. Both step types support optional `retry`, `timeout_seconds`, and `result_path` attributes. Set `result_path` when a step should preserve the current input while storing its result.
 
 Choose a `script_runner.task_definition_family` that matches `launch_type`.
@@ -34,14 +37,17 @@ In justice-eng-ai, set `accounts.<environment>.step_function_retry_attempts` in
 `application_variables.json`. The backend-processing workflows pass this setting
 to the module, falling back to 3 when the key is absent.
 
-The justice-eng-ai control-plane and infrastructure workflows derive `AppID`
-from the uploaded `s3_file` basename (`<AppID>.json`, with no dots in the ID),
-using the same expression as the image-build tag. They do not require `AppID`
-or `forge_runtime_version` in execution input. Both pass the pinned
-runtime tag from `accounts.<environment>.forge_runtime_version` in
-`application_variables.json` as the `forge_runtime_version` environment variable.
-The version lookup and filename expression are shared locals in the backend
-script-runner configuration.
+The justice-eng-ai control-plane workflow runs `scripts/control/root.py`. The
+script writes a record to the build review DynamoDB table (`dynamodb.tf`), keyed
+by `AppID` (the `s3_file` basename), only when the automated assessment flags the
+request for review. The workflow then looks the record up. The root workflow
+continues to the post-approval workflow (image build, then infrastructure) only
+when no record exists, i.e. the request was approved automatically. A request
+with a record waits in the table with status `not approved`; when a reviewer sets
+it to `approved`, an EventBridge Pipe on the table's stream
+(`eventbridge_pipes.tf`) starts the post-approval workflow with the record's
+`AppID`, `s3_folder` and `s3_file`. `AppID` and `forge_runtime_version` for the
+later steps are derived in Terraform, not returned by the script.
 
 ## Parent fallback cleanup for EC2 children
 

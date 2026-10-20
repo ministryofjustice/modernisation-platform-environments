@@ -134,6 +134,13 @@ data "aws_iam_policy_document" "script_runner_ecs_task" {
   source_policy_documents = [data.aws_iam_policy_document.script_runner_common.json]
 
   statement {
+    sid       = "ReadWriteBuildReviewQueue"
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem"]
+    resources = [aws_dynamodb_table.build_review.arn]
+  }
+
+  statement {
     sid       = "ListBucketsOwnedByCurrentAccount"
     effect    = "Allow"
     actions   = ["s3:ListAllMyBuckets"]
