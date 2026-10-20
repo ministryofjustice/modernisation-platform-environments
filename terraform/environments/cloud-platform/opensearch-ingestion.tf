@@ -6,7 +6,13 @@
 # See ADR-017 (OpenSearch section).
 
 locals {
-  enable_opensearch_ingestion = local.enable_opensearch
+  # Phase-2 gate (same as opensearch-objects.tf). Off until deliberately enabled,
+  # because: the source bucket is owned by the `cluster` component and named per
+  # ephemeral cluster (cp-DDMM-HHMM), so it does NOT exist as
+  # <root-workspace>-fluentbit — the data source below can't resolve it from root
+  # yet, and the cross-account forwarding (ADR Option B) isn't built. Enabling
+  # this is phase 2, alongside the OpenSearch provider / FGAC mapping (#8592).
+  enable_opensearch_ingestion = local.opensearch_objects_enabled
 
   opensearch_ingestion_bucket        = "${terraform.workspace}-fluentbit"
   opensearch_ingestion_index         = "cp-${local.opensearch_env_label}-logs"
