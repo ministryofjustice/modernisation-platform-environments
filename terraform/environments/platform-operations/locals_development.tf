@@ -6,6 +6,8 @@ locals {
   }
 
   baseline_development = {
+    cloudwatch_metric_alarms = local.lambda_alarms.development
+
     options = {
       enable_ec2_session_manager_cloudwatch_logs = true
     }
