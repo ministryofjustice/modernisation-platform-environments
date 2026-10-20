@@ -28,6 +28,11 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
       "arn:aws:cloudwatch:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:alarm:${alarm_name}"
     ]
   }
+  statement {
+    effect    = "Allow"
+    actions   = ["ecs:DescribeServices"]
+    resources = [var.service_arn]
+  }
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch" {

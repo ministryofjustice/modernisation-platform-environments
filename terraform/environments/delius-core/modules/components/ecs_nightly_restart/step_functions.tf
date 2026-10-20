@@ -33,7 +33,7 @@ resource "aws_iam_role_policy" "step_functions_invoke_lambda" {
 }
 
 resource "aws_sfn_state_machine" "ecs_restart" {
-  name     = "${local.lambda_name}-ecs-restart-workflow"
+  name     = "${local.lambda_name}-state-machine"
   role_arn = aws_iam_role.step_functions.arn
   type     = "STANDARD"
 
