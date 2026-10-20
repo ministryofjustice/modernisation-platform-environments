@@ -7,6 +7,8 @@ locals {
 
   task_steps          = [for step in var.steps : step if step.type == "script_runner"]
   step_function_steps = [for step in var.steps : step if step.type == "step_function"]
+  dynamodb_steps      = [for step in var.steps : step if step.type == "dynamodb_get_item"]
+  choice_steps        = [for step in var.steps : step if step.type == "choice"]
   child_cleanup_steps = [for step in local.step_function_steps : step if try(step.ec2_cleanup, null) != null]
   step_entrypoints = {
     for step in var.steps : step.name => step.type == "script_runner" ? "${step.name}_prepare_host" : try(step.ec2_cleanup, null) != null ? "${step.name}_prepare_child" : step.name
@@ -96,10 +98,51 @@ locals {
     )
   }
 
+  # Native DynamoDB read (no Lambda). key maps attribute name => JSONPath/intrinsic
+  # giving the string key value. Without result_attributes the raw result
+  # ({Item = {...}}, with no Item when nothing exists) is returned.
+  dynamodb_states = {
+    for step in local.dynamodb_steps : step.name => merge(
+      {
+        Type     = "Task"
+        Resource = "arn:${data.aws_partition.current.partition}:states:::dynamodb:getItem"
+        Parameters = {
+          TableName      = step.table_name
+          ConsistentRead = true
+          Key            = { for name, expression in step.key : name => { "S.$" = expression } }
+        }
+      },
+      length(try(step.result_attributes, [])) == 0 ? {} : {
+        ResultSelector = { for name in step.result_attributes : "${name}.$" => "$.Item.${name}.S" }
+      },
+      local.transitions[step.name],
+      try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
+      length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry }
+    )
+  }
+
+  # Continues to the next step when the string at variable equals the given
+  # value (or, with when_absent, when variable is absent); otherwise the execution ends successfully at <name>_stop.
+  choice_states = merge({}, [for step in local.choice_steps : {
+    (step.name) = {
+      Type = "Choice"
+      Choices = [merge(
+        { Next = local.transitions[step.name].Next },
+        try(step.when_absent, false) ? { Not = { Variable = step.variable, IsPresent = true } } : {},
+        try(step.when_absent, false) ? {} : { Variable = step.variable, StringEquals = step.equals },
+      )]
+      Default = "${step.name}_stop"
+    }
+    "${step.name}_stop" = {
+      Type    = "Succeed"
+      Comment = try(step.stop_comment, "Condition not met; execution ends successfully.")
+    }
+  }]...)
+
   definition = {
     Comment = "Runs an ordered process using ECS script runner tasks and nested Step Functions."
     StartAt = local.step_entrypoints[var.steps[0].name]
-    States  = merge(local.task_states, local.step_function_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states, local.child_cleanup_states)
+    States  = merge(local.task_states, local.step_function_states, local.dynamodb_states, local.choice_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states, local.child_cleanup_states)
   }
 
 }

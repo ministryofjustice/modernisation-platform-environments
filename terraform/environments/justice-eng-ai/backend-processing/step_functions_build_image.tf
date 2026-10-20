@@ -22,6 +22,7 @@ locals {
         { name = "ECR_REPOSITORY_URI", value = local.ecr_repository_uri },
         { name = "IMAGE_TAG", path = local.script_runner_app_id_path },
         { name = "AWS_REGION", value = local.aws_region },
+        { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
         { name = "FORGE_RUNTIME_BASE_ECR_REPOSITORY_URI", value = local.forge_runtime_base_ecr_repository_uri },
       ]
       result_path     = "$.image_build_task"

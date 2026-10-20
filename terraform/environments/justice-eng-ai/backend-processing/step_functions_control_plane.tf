@@ -10,11 +10,19 @@ locals {
       variables = [
         { name = "s3_folder", path = "$.s3_folder" },
         { name = "s3_file", path = "$.s3_file" },
-        { name = "AppID", path = local.script_runner_app_id_path },
-        { name = "forge_runtime_version", value = local.script_runner_forge_runtime_version },
+        { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
+        { name = "AWS_REGION", value = data.aws_region.current.region },
       ]
       result_path = "$.control_plane_task"
-    }
+    },
+    {
+      # A record exists only when the script flagged the request for review.
+      name        = "check_review_required"
+      type        = "dynamodb_get_item"
+      table_name  = aws_dynamodb_table.build_review.name
+      key         = { AppID = local.script_runner_app_id_path, SK = "States.Format('APPROVAL')" }
+      result_path = "$.review"
+    },
   ]
 }
 

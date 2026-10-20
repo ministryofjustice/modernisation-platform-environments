@@ -10,21 +10,21 @@ locals {
       result_path        = "$.control_plane"
     },
     {
-      name               = "build_test_deploy_app_image"
-      type               = "step_function"
-      state_machine_name = local.build_image_state_machine_name
-      input_path         = "$.control_plane.Output"
-      result_path        = "$.build_test_deploy_app_image"
-      ec2_cleanup        = { managed_by = local.build_instance_managed_by }
+      # Requests needing review have a record in the review queue and wait there;
+      # approval later starts the post-approval workflow through the EventBridge pipe.
+      name         = "approval_gate"
+      type         = "choice"
+      variable     = "$.control_plane.Output.review.Item"
+      when_absent  = true
+      stop_comment = "Awaiting review; the post-approval workflow starts when the request is approved."
     },
     {
-      name               = "build_app_infra"
+      name               = "post_approval"
       type               = "step_function"
-      state_machine_name = local.build_infra_state_machine_name
-      input_path         = "$.build_test_deploy_app_image.Output"
-      result_path        = "$.build_app_infra"
+      state_machine_name = local.post_approval_state_machine_name
+      input_path         = "$.control_plane.Output"
+      result_path        = "$.post_approval"
     },
-
   ]
 }
 
@@ -38,8 +38,7 @@ module "step_functions_root" {
 
   depends_on = [
     aws_iam_role_policy.step_functions_common,
-    module.step_functions_build_image,
-    module.step_functions_build_infra,
+    module.step_functions_post_approval,
     module.step_functions_control_plane,
   ]
 }
