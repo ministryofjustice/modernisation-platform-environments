@@ -1151,6 +1151,32 @@ variable "ssm_documents" {
   default = {}
 }
 
+variable "ssm_maintenance_window_run_commands" {
+  description = "A map of maintenance window run commands where map key is the window and task name"
+  type = map(object({
+    description = optional(string)
+
+    # window settings
+    cutoff            = number # hours
+    duration          = number # hours
+    schedule          = string # cron format
+    schedule_timezone = optional(string)
+    targets_by_tag    = map(list(string))
+
+    # task settings
+    cutoff_behavior        = optional(string) # CONTINUE_TASK if not set
+    command_arn            = string
+    max_concurrency        = optional(number) # 1 if not set
+    max_errors             = optional(number) # 1 if not set
+    priority               = optional(number) # 1 if not set
+    service_role_arn       = optional(string)
+    run_command_parameters = optional(map(list(string)), {})
+
+    tags = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "ssm_parameters" {
   # Example usage:
   # my_ec2_params = {
@@ -1190,6 +1216,26 @@ variable "ssm_parameters" {
       value                = optional(string)
       value_s3_bucket_name = optional(string) # lookup from module.s3_bucket
     }))
+  }))
+  default = {}
+}
+
+variable "ssm_patch_baselines" {
+  description = "A map of SSM patch baselines to create where name is the map key"
+  type = map(object({
+    description               = optional(string)
+    operating_system          = string
+    rejected_patches          = optional(list(string))
+    rule1_approve_after_days  = optional(number)
+    rule1_approve_until_date  = optional(string)
+    rule1_compliance_level    = optional(string)
+    rule1_enable_non_security = optional(bool)
+    rule1_patch_filters       = optional(map(list(string)), {})
+
+    is_default  = optional(bool, false) # optionally set as default for given OS
+    patch_group = optional(string)      # optionally assign to a patch group
+
+    tags = optional(map(string), {})
   }))
   default = {}
 }

@@ -20,8 +20,9 @@ locals {
         { name = "S3_FOLDER", path = "$.s3_folder" },
         { name = "S3_FILE", path = "States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1))" },
         { name = "ECR_REPOSITORY_URI", value = local.ecr_repository_uri },
-        { name = "IMAGE_TAG", path = "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1)), '.'), 0)" },
+        { name = "IMAGE_TAG", path = local.script_runner_app_id_path },
         { name = "AWS_REGION", value = local.aws_region },
+        { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
         { name = "FORGE_RUNTIME_BASE_ECR_REPOSITORY_URI", value = local.forge_runtime_base_ecr_repository_uri },
       ]
       result_path     = "$.image_build_task"
@@ -32,6 +33,8 @@ locals {
 
 module "step_functions_build_image" {
   source = "../modules/step_function_builder"
+
+  step_function_retry_attempts = local.step_function_retry_attempts
 
   name               = local.build_image_state_machine_name
   steps              = local.build_image_steps
@@ -61,5 +64,6 @@ module "step_functions_build_image" {
     aws_iam_role_policy_attachment.script_runner_ec2_instance,
     aws_iam_role_policy_attachment.script_runner_ecs_task,
     aws_iam_role_policy_attachment.script_runner_ecs_execution,
+    aws_ecs_task_definition.script_runner,
   ]
 }

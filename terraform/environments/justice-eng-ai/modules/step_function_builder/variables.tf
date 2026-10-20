@@ -15,6 +15,16 @@ variable "steps" {
     or {name, path}. A step_function item has state_machine_name and optional
     input_path. Optional retry, timeout_seconds, and result_path fields apply
     to either type.
+    A step_function step may set ec2_cleanup = { managed_by = "..." } to
+    terminate its disposable hosts when the child fails after task retries.
+
+    A dynamodb_get_item step has table_name, key (attribute name => JSONPath or
+    intrinsic for its string value), optional result_attributes (string
+    attributes returned at the top level of the result) and optional
+    result_path. A choice step has variable plus equals, or when_absent = true;
+    execution continues to the next step when the string matches (or the
+    variable is absent) and otherwise ends successfully (optional
+    stop_comment). A choice step cannot be last.
 
     Scope input_path to the specific prior result a step_function step needs
     (e.g. "$.previous_step_name") rather than "$", to avoid forwarding the
@@ -24,15 +34,24 @@ variable "steps" {
   type        = any
 
   validation {
+    condition = alltrue([
+      for step in var.steps : try(step.ec2_cleanup, null) == null ? true : (
+        step.type == "step_function" && try(length(trimspace(step.ec2_cleanup.managed_by)) > 0, false)
+      )
+    ])
+    error_message = "ec2_cleanup requires a step_function step and a non-empty managed_by tag value."
+  }
+
+  validation {
     condition     = length(var.steps) > 0 && length(distinct([for step in var.steps : try(step.name, "")])) == length(var.steps)
     error_message = "Provide at least one step and give every step a unique name."
   }
 
   validation {
     condition = alltrue([
-      for step in var.steps : contains(["script_runner", "step_function"], try(step.type, ""))
+      for step in var.steps : contains(["script_runner", "step_function", "dynamodb_get_item", "choice"], try(step.type, ""))
     ])
-    error_message = "Each step type must be script_runner or step_function."
+    error_message = "Each step type must be script_runner, step_function, dynamodb_get_item or choice."
   }
 
   validation {
@@ -40,9 +59,29 @@ variable "steps" {
       for step in var.steps : try(step.type, "") == "script_runner" ? (
         try(step.script_path, "") != "" &&
         try(step.shell_type, "") != ""
-      ) : try(step.state_machine_name, "") != "" && !startswith(try(step.state_machine_name, ""), "arn:")
+        ) : try(step.type, "") == "step_function" ? (
+        try(step.state_machine_name, "") != "" && !startswith(try(step.state_machine_name, ""), "arn:")
+      ) : true
     ])
     error_message = "Script runner steps require script_path and shell_type; step_function steps require a state_machine_name, not an ARN."
+  }
+
+  validation {
+    condition = alltrue([
+      for step in var.steps : try(step.type, "") == "dynamodb_get_item" ? (
+        try(step.table_name, "") != "" && try(length(step.key) > 0, false)
+      ) : true
+    ])
+    error_message = "dynamodb_get_item steps require table_name and a non-empty key."
+  }
+
+  validation {
+    condition = alltrue([
+      for index, step in var.steps : try(step.type, "") == "choice" ? (
+        try(step.variable, "") != "" && (try(step.equals, null) != null || try(step.when_absent, false)) && index < length(var.steps) - 1
+      ) : true
+    ])
+    error_message = "choice steps require variable and either equals or when_absent, and cannot be the last step."
   }
 }
 
@@ -78,6 +117,18 @@ variable "tags" {
   description = "Tags applied to the state machine role and log group."
   type        = map(string)
   default     = {}
+}
+
+variable "step_function_retry_attempts" {
+  description = "Additional script executions after a non-zero or missing container exit code. Zero disables script retries."
+  type        = number
+  default     = 3
+  nullable    = false
+
+  validation {
+    condition     = var.step_function_retry_attempts >= 0 && var.step_function_retry_attempts <= 99999999 && floor(var.step_function_retry_attempts) == var.step_function_retry_attempts
+    error_message = "step_function_retry_attempts must be an integer between 0 and 99999999."
+  }
 }
 
 variable "ec2" {

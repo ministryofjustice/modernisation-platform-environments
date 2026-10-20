@@ -53,6 +53,8 @@ variable "options" {
     iam_service_linked_roles                      = optional(list(string))          # create iam service linked roles; list of map keys to filter local.iam_service_linked_roles; default is to create all
     s3_bucket_name                                = optional(string)                # override default general purpose bucket name
     s3_iam_policies                               = optional(list(string))          # create default iam policies for bucket access, list of map keys to filter local.s3_iam_policies
+    ssm_maintenance_window_run_commands           = optional(list(string), [])      # create SSM maintenance window tasks for run commands, see local.ssm_maintenance_window_run_commands
+    ssm_patch_baselines                           = optional(list(string), [])      # create SSM patch baselines, see local.ssm_patch_baselines
     software_bucket_name                          = optional(string)                # override default software/artefacts bucket name
 
     sns_topics = optional(object({

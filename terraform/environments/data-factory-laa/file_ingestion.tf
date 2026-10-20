@@ -5,8 +5,9 @@ module "file_ingestion" {
     aws.bucket-replication = aws
   }
 
-  database_name = "raw"
-  kms_key_arn   = aws_kms_key.data_lake_kms_key.arn
+  access_log_destination = local.access_log_destination
+  database_name          = "raw"
+  kms_key_arn            = aws_kms_key.data_lake_kms_key.arn
 }
 
 # Role to allow uploading of files to the file uploads bucket

@@ -1437,9 +1437,6 @@ module "merge_redrive_planner" {
     )
   )
 
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-
   environment_variables = {
     POWERTOOLS_LOG_LEVEL = "INFO"
 
@@ -1448,6 +1445,7 @@ module "merge_redrive_planner" {
     ATHENA_WORKGROUP            = aws_athena_workgroup.downstream_reconciliation.name
     RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
     RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+    RECONCILIATION_CONTROL_TABLE = aws_dynamodb_table.downstream_reconciliation_control.name
     SNS_TOPIC_ARN               = aws_sns_topic.emds_alerts.arn
 
     POSITION_LOOKBACK_HOURS            = "24"
@@ -1458,6 +1456,10 @@ module "merge_redrive_planner" {
     MAX_AUTOMATIC_REPLAY_DATES         = "20"
     MAX_REPLAY_ROWS_PER_CHUNK          = "50000"
     MAX_AUTOMATIC_REPLAY_CHUNKS        = "20"
+    ROLLING_REVIEW_THRESHOLD_ROWS      = "2000000"
+    ROLLING_RECOVERY_EXIT_ROWS         = "250000"
+    MAX_ROLLING_ITERATIONS_PER_EXECUTION = "20"
+    RECOVERY_LEASE_SECONDS             = "1800"
     ATHENA_MAX_POLL_SECONDS            = "840"
   }
 }
@@ -1489,6 +1491,8 @@ module "merge_redrive_approval" {
     ENVIRONMENT_NAME            = local.environment_shorthand
     RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
     RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+    RECONCILIATION_CONTROL_TABLE = aws_dynamodb_table.downstream_reconciliation_control.name
+    RECOVERY_LEASE_SECONDS       = "1800"
   }
 }
 
@@ -1636,7 +1640,7 @@ module "poll_dlt_iceberg_maintenance" {
 }
 
 module "register_athena" {
-  count = local.is-production ? 0 : 1
+  count                          = local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "register_athena"
@@ -1652,7 +1656,7 @@ module "register_athena" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    ENVIRONMENT_NAME        = local.env_name
+    ENVIRONMENT_NAME = local.env_name
   }
 
   depends_on = [

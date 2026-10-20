@@ -3735,6 +3735,22 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
       "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation-approval-tokens/${local.environment_shorthand}/*",
     ]
   }
+
+  statement {
+    sid    = "ReconciliationRecoveryControl"
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:DeleteItem",
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+    ]
+
+    resources = [
+      aws_dynamodb_table.downstream_reconciliation_control.arn,
+    ]
+  }
 }
 
 resource "aws_iam_policy" "merge_redrive_planner" {
@@ -3785,6 +3801,32 @@ data "aws_iam_policy_document" "merge_redrive_approval_policy_document" {
     effect    = "Allow"
     actions   = ["states:SendTaskSuccess"]
     resources = ["*"]
+  }
+
+  statement {
+    sid    = "ReconciliationRecoveryControl"
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:UpdateItem",
+    ]
+
+    resources = [
+      aws_dynamodb_table.downstream_reconciliation_control.arn,
+    ]
+  }
+
+  statement {
+    sid     = "StartApprovedRollingRecovery"
+    effect  = "Allow"
+    actions = ["states:StartExecution"]
+
+    resources = [
+      module.merge_into_mdss_staged_position.arn,
+      module.merge_into_mdss_ac_position.arn,
+      module.merge_into_emdi_position.arn,
+    ]
   }
 }
 
@@ -4177,8 +4219,8 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
     resources = ["${module.s3-raw-formatted-data-bucket.bucket.arn}/*"]
   }
   statement {
-    sid     = "GetDbs"
-    effect  = "Allow"
+    sid    = "GetDbs"
+    effect = "Allow"
     actions = [
       "glue:GetDatabase",
       "glue:CreateTable",
@@ -4186,9 +4228,9 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
     resources = [for db in local.api_integration_databases : db.arn]
   }
   statement {
-    sid      = "UpdateGlue"
-    effect   = "Allow"
-    actions  = [
+    sid    = "UpdateGlue"
+    effect = "Allow"
+    actions = [
       "glue:GetTable",
       "glue:UpdateTable",
     ]
@@ -4212,7 +4254,7 @@ resource "aws_iam_role_policy_attachment" "register_athena" {
 resource "aws_lakeformation_permissions" "api_int_db_level_perms" {
   for_each    = local.is-production ? {} : local.api_integration_databases
   permissions = ["DESCRIBE", "CREATE_TABLE"]
-  principal = aws_iam_role.register_athena[0].arn
+  principal   = aws_iam_role.register_athena[0].arn
 
   database {
     name = each.value.name
@@ -4222,10 +4264,10 @@ resource "aws_lakeformation_permissions" "api_int_db_level_perms" {
 resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
   for_each    = local.is-production ? {} : local.api_integration_databases
   permissions = ["ALTER", "DESCRIBE"]
-  principal = aws_iam_role.register_athena[0].arn
+  principal   = aws_iam_role.register_athena[0].arn
 
   table {
     database_name = each.value.name
-    wildcard = true
+    wildcard      = true
   }
 }

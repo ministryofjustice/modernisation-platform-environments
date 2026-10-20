@@ -3,25 +3,27 @@ locals {
 
   root_process_steps = [
     {
-      name               = "build_test_deploy_app_image"
+      name               = "control_plane"
       type               = "step_function"
-      state_machine_name = local.build_image_state_machine_name
+      state_machine_name = local.control_plane_state_machine_name
       input_path         = "$"
-      result_path        = "$.build_test_deploy_app_image"
+      result_path        = "$.control_plane"
     },
     {
-      name               = "build_app_infra"
-      type               = "step_function"
-      state_machine_name = "${local.application_name}-build-app-infra"
-      input_path         = "$.build_test_deploy_app_image"
-      result_path        = "$.build_app_infra"
+      # Requests needing review have a record in the review queue and wait there;
+      # approval later starts the post-approval workflow through the EventBridge pipe.
+      name         = "approval_gate"
+      type         = "choice"
+      variable     = "$.control_plane.Output.review.Item"
+      when_absent  = true
+      stop_comment = "Awaiting review; the post-approval workflow starts when the request is approved."
     },
     {
-      name               = "deploy_to_infra"
+      name               = "post_approval"
       type               = "step_function"
-      state_machine_name = "${local.application_name}-deploy-to-infra"
-      input_path         = "$.build_app_infra"
-      result_path        = "$.deploy_to_infra"
+      state_machine_name = local.post_approval_state_machine_name
+      input_path         = "$.control_plane.Output"
+      result_path        = "$.post_approval"
     },
   ]
 }
@@ -36,6 +38,7 @@ module "step_functions_root" {
 
   depends_on = [
     aws_iam_role_policy.step_functions_common,
-    module.step_functions_build_image,
+    module.step_functions_post_approval,
+    module.step_functions_control_plane,
   ]
 }

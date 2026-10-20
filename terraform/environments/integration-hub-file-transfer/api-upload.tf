@@ -1,6 +1,6 @@
 locals {
   # Match the server-managed API client configuration; never accept caller prefixes.
-  api_clients = try(jsondecode(file("${path.module}/../integration-hub-api/modules/file-transfer-api/application_variables.json")).accounts[local.environment].transfer_clients, {})
+  api_clients = try(jsondecode(file("${path.module}/../integration-hub-api/file-transfer-api/application_variables.json")).accounts[local.environment].transfer_clients, {})
   api_client_prefixes = {
     for client_id, client in local.api_clients : client_id => trim(coalesce(try(client.key_prefix, null), client_id), "/")
     if try(client.enabled, true)
@@ -11,7 +11,7 @@ locals {
   # Environments without API clients do not require an API account or grants.
   api_upload_enabled  = length(local.api_upload_resources) > 0
   api_account_id      = local.api_upload_enabled ? local.environment_management.account_ids["integration-hub-api-${local.environment}"] : null
-  api_upload_role_arn = local.api_upload_enabled ? "arn:aws:iam::${local.api_account_id}:role/integration-hub-api-platform-upload-ticket" : null
+  api_upload_role_arn = local.api_upload_enabled ? "arn:aws:iam::${local.api_account_id}:role/integration-hub-api-file-transfer-api-upload-ticket" : null
   api_deployment_role_arns = local.api_upload_enabled ? [
     for role in ["github-actions-plan", "github-actions-apply", "MemberInfrastructureAccess", var.collaborator_access] :
     "arn:aws:iam::${local.api_account_id}:role/${role}"

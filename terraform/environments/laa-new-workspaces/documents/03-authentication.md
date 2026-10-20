@@ -42,7 +42,7 @@ sequenceDiagram
     participant AD as Microsoft AD
     participant DB as RDS MySQL
 
-    U->>ALB: HTTPS request, Global Protect VPN CIDR only
+    U->>ALB: HTTPS request, Global Protect Alpha or Prisma VPN CIDR
     ALB->>LOTP: forward :5000
     U->>LOTP: log in with AD credentials
     LOTP->>AD: LDAP bind (ad-resolver)
@@ -59,7 +59,7 @@ sequenceDiagram
 | --- | --- |
 | **Primary auth** | AD username/password, validated by the WorkSpaces Directory against `laa-workspaces.local` |
 | **MFA transport** | RADIUS PAP over UDP 1812, shared secret held in Secrets Manager, 3 retries / 5s timeout |
-| **Portal access control** | ALB only accepts 443/80 from the Global Protect Alpha VPN CIDR range — not open to the internet |
+| **Portal access control** | ALB only accepts 443/80 from the Global Protect Alpha and Prisma VPN CIDR ranges — not open to the internet |
 | **NLB health check quirk** | NLB can't health-check UDP directly, so it polls LinOTP's HTTP port 5000 instead |
 
 [← Data Flow](02-data-flow.md) · [Back to index](README.md)
