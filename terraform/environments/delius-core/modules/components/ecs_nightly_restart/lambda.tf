@@ -30,16 +30,6 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
   }
 }
 
-resource "aws_cloudwatch_event_rule" "rule" {
-  name                = "${local.lambda_name}-rule"
-  schedule_expression = local.schedule_expression
-}
-
-resource "aws_cloudwatch_event_target" "target" {
-  rule = aws_cloudwatch_event_rule.rule.name
-  arn  = aws_lambda_function.nightly_restart_lambda.arn
-}
-
 resource "aws_lambda_permission" "allow_cloudwatch" {
   action        = "lambda:InvokeFunction"
   principal     = "events.amazonaws.com"
