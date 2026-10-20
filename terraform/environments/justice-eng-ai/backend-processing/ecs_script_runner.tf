@@ -134,9 +134,9 @@ data "aws_iam_policy_document" "script_runner_ecs_task" {
   source_policy_documents = [data.aws_iam_policy_document.script_runner_common.json]
 
   statement {
-    sid       = "ReadWriteBuildReviewQueue"
+    sid       = "ReadWriteBuildEvents"
     effect    = "Allow"
-    actions   = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem"]
+    actions   = ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem"]
     resources = [aws_dynamodb_table.build_review.arn]
   }
 
