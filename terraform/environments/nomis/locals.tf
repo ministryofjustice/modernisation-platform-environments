@@ -42,6 +42,8 @@ locals {
       route53_resolver_rules                      = { outbound-data-and-private-subnets = ["azure-fixngo-domain"] }
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
       software_bucket_name                        = "ec2-image-builder-nomis"
+      ssm_maintenance_window_run_commands         = ["install-windows-definition-updates", "patch-manager-run-patch-baseline-group1"]
+      ssm_patch_baselines                         = ["WindowsPatchGroup1Baseline"]
     }
   }
 
