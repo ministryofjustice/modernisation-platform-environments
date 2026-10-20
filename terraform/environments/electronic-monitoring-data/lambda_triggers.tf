@@ -224,7 +224,7 @@ module "register_athena_event_queue" {
   bucket               = module.s3-raw-formatted-data-bucket.bucket
   lambda_function_name = module.register_athena[0].lambda_function_name
   bucket_prefix        = local.bucket_prefix
-  maximum_concurrency  = 100
+  maximum_concurrency  = 1
   max_receive_count    = local.load_sqs_max_receive_count
 }
 
