@@ -5,6 +5,7 @@
       "s3_folder": "forge-builds",
       "step_function_retry_attempts": 3,
       "forge_runtime_version": "forge-runtime-v0.4.2",
+      "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
       "ecr_repository_name": "modernisation-platform-ai-builder-user-applications",
       "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
     },
@@ -13,6 +14,7 @@
       "s3_folder": "forge-builds",
       "step_function_retry_attempts": 3,
       "forge_runtime_version": "forge-runtime-v0.4.2",
+      "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
       "ecr_repository_name": "",
       "forge_runtime_base_ecr_repository_name": ""
     },
@@ -21,6 +23,7 @@
       "s3_folder": "forge-builds",
       "step_function_retry_attempts": 3,
       "forge_runtime_version": "forge-runtime-v0.4.2",
+      "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
       "ecr_repository_name": "",
       "forge_runtime_base_ecr_repository_name": ""
     },
@@ -29,6 +32,7 @@
       "s3_folder": "forge-builds",
       "step_function_retry_attempts": 3,
       "forge_runtime_version": "forge-runtime-v0.4.2",
+      "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
       "ecr_repository_name": "modernisation-platform-ai-builder-user-applications",
       "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
     }
