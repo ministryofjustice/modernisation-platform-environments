@@ -1,13 +1,13 @@
 # AWS Health Lambda Module
 
-### Overview
+## Overview
 TBC
 
-### Running Tests
+## Running Tests
 
 Set up local requirements in a virtualenv
 
-```
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install boto3 -r requirements.txt
