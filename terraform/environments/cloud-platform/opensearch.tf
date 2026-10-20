@@ -35,10 +35,11 @@ locals {
   # groups) used for AMG RBAC in amg.tf and for ArgoCD RBAC in cluster/locals.tf.
   # TODO: switch back to a data.aws_identitystore_group lookup once the read role
   # permissions are fixed.
-  opensearch_ui_admin_group_ids = join(",", [
+  opensearch_ui_admin_group_ids_list = [
     "664252b4-7021-701e-49b9-6c46ccc7899e", # cloud-platform-engineers
     "7682a204-00f1-7031-257e-713bb28289c6", # container-platform-aws
-  ])
+  ]
+  opensearch_ui_admin_group_ids = join(",", local.opensearch_ui_admin_group_ids_list)
 }
 
 # Audit log group. Under /aws/vendedlogs/ so one prefix-wide resource policy
@@ -279,6 +280,17 @@ resource "aws_opensearch_application" "logs" {
   }
 
   tags = merge(local.tags, { component = "observability" })
+}
+
+# Assign the admin groups to the IdC application. The app requires assignment, so
+# without this Identity Center passes no group claims and every sign-in fails with
+# "not authorized to access dashboards" — even with the groups set in app_config.
+resource "aws_ssoadmin_application_assignment" "opensearch_ui_admin" {
+  for_each = local.opensearch_idc_enabled ? toset(local.opensearch_ui_admin_group_ids_list) : []
+
+  application_arn = aws_opensearch_application.logs[0].iam_identity_center_options[0].iam_identity_center_application_arn
+  principal_id    = each.value
+  principal_type  = "GROUP"
 }
 
 output "opensearch_ui_app_endpoint" {
