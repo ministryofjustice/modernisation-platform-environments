@@ -45,7 +45,13 @@ variable "enable_in_app_oidc" {
   description = <<-EOT
     Whether the UI container performs its own Entra OIDC handshake
     instead of relying on the ALB ``authenticate-oidc`` listener action.
-    When true:
+
+    NOTE: this is now only the FALLBACK. An account's
+    ``builder_auth_mode`` in application_variables.json ("in-app" or
+    "alb") takes precedence; this variable applies only to accounts
+    without that key (true -> "in-app", false -> "alb"). See oidc.tf.
+
+    When in-app is selected:
 
       * the ALB listener drops ``authenticate-oidc`` and forwards plainly
         to the container (the app owns login / session / logout);

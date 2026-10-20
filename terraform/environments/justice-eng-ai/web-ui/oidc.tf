@@ -1,19 +1,41 @@
 
 # Microsoft Entra ID OIDC wiring.
 #
-# Decision for this MVP: the UI container performs its own Entra OIDC
-# handshake (var.enable_in_app_oidc), not the ALB's ``authenticate-oidc``
-# listener action. The ALB-owned path is kept available behind
-# `local.oidc_wired` in case that decision changes later, but the two are
-# mutually exclusive -- running both at once would double-authenticate.
+# Two mutually exclusive ways to sign users in to the builder UI -- running
+# both at once would double-authenticate:
+#
+#   "in-app" -- the UI container performs its own Entra OIDC handshake
+#               (MPAPB_ENTRA_ENABLED=true); the ALB forwards plainly.
+#   "alb"    -- the ALB's ``authenticate-oidc`` listener action signs the
+#               user in; the UI verifies the ALB-signed X-Amzn-Oidc-Data
+#               token on every request (MPAPB_TRUST_ALB_OIDC=true plus
+#               MPAPB_ALB_SIGNER_ARN, see ecs.tf).
+#
+# Chosen per account via ``builder_auth_mode`` in application_variables.json
+# so development can move to "alb" ahead of production. Accounts without the
+# key fall back to var.enable_in_app_oidc (true -> "in-app").
+#
+# Forge Journey Lab is NOT covered by the ALB action yet: its host-header
+# listener rule (forge-journey-lab.tf) forwards without authenticating, so
+# Forge keeps its own in-app Entra login in both modes.
 locals {
-  # Both accounts now have their Entra callback URIs registered and
-  # secrets populated, so no further per-environment gating is needed here
-  # beyond the three var.enable_*/oidc_configured flags themselves.
-  in_app_oidc_enabled = var.enable_in_app_oidc && var.enable_oidc_auth && var.oidc_configured
+  builder_auth_mode = try(
+    local.application_data.accounts[local.environment].builder_auth_mode,
+    var.enable_in_app_oidc ? "in-app" : "alb",
+  )
+  # Validated by the precondition on aws_lb_listener.https (load-balancer.tf).
+  in_app_oidc_requested = local.builder_auth_mode == "in-app"
+
+  # Both accounts have their in-app Entra callback URIs
+  # (https://<host>/auth/callback) registered and secrets populated.
+  # Before switching an account to "alb", ALSO register the ALB callback
+  # https://<builder_hostname>/oauth2/idpresponse on the same Entra app
+  # registration -- otherwise sign-in fails at Entra with a redirect URI
+  # mismatch.
+  in_app_oidc_enabled = local.in_app_oidc_requested && var.enable_oidc_auth && var.oidc_configured
   in_app_oidc_count   = local.in_app_oidc_enabled ? 1 : 0
 
-  oidc_wired       = var.enable_oidc_auth && var.oidc_configured && !var.enable_in_app_oidc
+  oidc_wired       = var.enable_oidc_auth && var.oidc_configured && !local.in_app_oidc_requested
   oidc_wired_count = local.oidc_wired ? 1 : 0
 }
 
