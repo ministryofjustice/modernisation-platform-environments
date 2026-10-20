@@ -4,9 +4,6 @@ locals {
   # The counter is an item in the table: AppID plus this SysKey, holding the latest SysKey in this attribute.
   build_counter_sys_key   = 0
   build_counter_attribute = "LastSysKey"
-
-  # Attributes the control plane script writes; the pipe maps them into the post-approval input.
-  build_review_attributes = ["AppID", "s3_folder", "s3_file", "status"]
 }
 
 # Build events. Each status change is a new item and nothing is updated in place.
@@ -17,6 +14,10 @@ locals {
 # (AppID, SysKey = 0, attribute LastSysKey) with UpdateItem ADD, then PutItem the event
 # with UserName, AppID, BuildID, JobStage, JobStatus and Date. Queries listing events
 # should filter SysKey > 0 to skip the counter item.
+# The awaiting_approval event also holds a TaskToken, used to resume the paused
+# execution. It must not be exposed to the UI: grant the UI role only the display
+# attributes (dynamodb:Attributes with dynamodb:Select = SPECIFIC_ATTRIBUTES) and have
+# its queries use ProjectionExpression.
 resource "aws_dynamodb_table" "build_review" {
   name         = local.build_review_table_name
   billing_mode = "PAY_PER_REQUEST"

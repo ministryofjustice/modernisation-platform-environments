@@ -21,7 +21,15 @@ variable "steps" {
     A dynamodb_get_item step has table_name, key (attribute name => JSONPath or
     intrinsic for its string value), optional result_attributes (string
     attributes returned at the top level of the result) and optional
-    result_path. A choice step has variable plus equals, or when_absent = true;
+    result_path. A dynamodb_query_latest step has table_name, hash_key (JSONPath
+    or intrinsic for the string hash key value), result_attributes (attribute
+    name => "S" or "N", returned as strings at the top level of the result),
+    optional hash_key_name (default AppID), range_key_name (default SysKey) and
+    result_path; it reads the newest item with a range key above 0. A
+    wait_for_approval step has table_name, app_id and build_id (JSONPaths),
+    job_stage, and optional job_status (default awaiting_approval), user_name
+    (JSONPath), timeout_seconds (default 31536000) and result_path; it appends
+    an event holding the task token and pauses until the token is sent back. A choice step has variable plus equals, or when_absent = true;
     execution continues to the next step when the string matches (or the
     variable is absent) and otherwise ends successfully (optional
     stop_comment). A choice step cannot be last.
@@ -49,9 +57,9 @@ variable "steps" {
 
   validation {
     condition = alltrue([
-      for step in var.steps : contains(["script_runner", "step_function", "dynamodb_get_item", "choice"], try(step.type, ""))
+      for step in var.steps : contains(["script_runner", "step_function", "dynamodb_get_item", "dynamodb_query_latest", "wait_for_approval", "choice"], try(step.type, ""))
     ])
-    error_message = "Each step type must be script_runner, step_function, dynamodb_get_item or choice."
+    error_message = "Each step type must be script_runner, step_function, dynamodb_get_item, dynamodb_query_latest, wait_for_approval or choice."
   }
 
   validation {
@@ -73,6 +81,29 @@ variable "steps" {
       ) : true
     ])
     error_message = "dynamodb_get_item steps require table_name and a non-empty key."
+  }
+
+  validation {
+    condition = alltrue([
+      for step in var.steps : try(step.type, "") == "dynamodb_query_latest" ? (
+        try(step.table_name, "") != "" && try(step.hash_key, "") != "" && try(length(step.result_attributes) > 0, false)
+      ) : true
+    ])
+    error_message = "dynamodb_query_latest steps require table_name, hash_key and a non-empty result_attributes map."
+  }
+
+  validation {
+    condition = alltrue([
+      for step in var.steps : try(step.type, "") == "wait_for_approval" ? (
+        try(step.table_name, "") != "" && try(step.app_id, "") != "" && try(step.build_id, "") != "" && try(step.job_stage, "") != ""
+      ) : true
+    ])
+    error_message = "wait_for_approval steps require table_name, app_id, build_id and job_stage."
+  }
+
+  validation {
+    condition     = length([for step in var.steps : step if try(step.type, "") == "wait_for_approval"]) <= 1
+    error_message = "A state machine can have at most one wait_for_approval step."
   }
 
   validation {

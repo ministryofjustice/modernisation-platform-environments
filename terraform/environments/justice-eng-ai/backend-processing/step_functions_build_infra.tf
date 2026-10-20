@@ -9,6 +9,7 @@ locals {
       shell_type  = "python3"
       variables = [
         { name = "AppID", path = local.script_runner_app_id_path },
+        { name = "BuildID", path = "$.latest.BuildID" },
         { name = "forge_runtime_version", value = local.script_runner_forge_runtime_version },
         { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
         { name = "AWS_REGION", value = local.aws_region },
