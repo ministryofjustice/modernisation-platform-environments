@@ -33,13 +33,13 @@ resource "aws_iam_role_policy" "step_functions_invoke_lambda" {
 }
 
 resource "aws_sfn_state_machine" "ecs_restart" {
-  name     = "ecs-restart-workflow"
+  name     = "${local.lambda_name}-ecs-restart-workflow"
   role_arn = aws_iam_role.step_functions.arn
   type     = "STANDARD"
 
   definition = jsonencode({
-    Comment       = "Disable alarm actions, restart ECS, wait for stability, then re-enable alarm actions"
-    StartAt       = "Initialize"
+    Comment        = "Disable alarm actions, restart ECS, wait for stability, then re-enable alarm actions"
+    StartAt        = "Initialize"
     TimeoutSeconds = 2400
 
     States = {
@@ -132,7 +132,7 @@ resource "aws_sfn_state_machine" "ecs_restart" {
         Parameters = {
           FunctionName = aws_lambda_function.nightly_restart_lambda.arn
           Payload = {
-            action   = "check_stability"
+            action      = "check_stability"
             "attempt.$" = "$.attempt"
           }
         }
@@ -208,7 +208,7 @@ resource "aws_sfn_state_machine" "ecs_restart" {
         ResultPath = "$.enableResult"
 
         Retry = [{
-          ErrorEquals = ["States.ALL"]
+          ErrorEquals     = ["States.ALL"]
           IntervalSeconds = 5
           MaxAttempts     = 5
           BackoffRate     = 2
@@ -235,7 +235,7 @@ resource "aws_sfn_state_machine" "ecs_restart" {
         }
 
         Retry = [{
-          ErrorEquals    = ["States.ALL"]
+          ErrorEquals     = ["States.ALL"]
           IntervalSeconds = 5
           MaxAttempts     = 5
           BackoffRate     = 2

@@ -50,5 +50,5 @@ output "nlb_service_r53_record" {
 }
 
 output "nightly_muted_alarm_names" {
-  value = concat([aws_cloudwatch_metric_alarm.ecs_desired_task_count_warning.alarm_name], length(aws_cloudwatch_metric_alarm.ecs_healthy_hosts_fatal) > 0? [aws_cloudwatch_metric_alarm.ecs_healthy_hosts_fatal[0].alarm_name]: [])
+  value = concat([aws_cloudwatch_metric_alarm.ecs_desired_task_count_warning.alarm_name], length(aws_cloudwatch_metric_alarm.ecs_healthy_hosts_fatal) > 0 ? [aws_cloudwatch_metric_alarm.ecs_healthy_hosts_fatal[0].alarm_name] : [])
 }
