@@ -106,15 +106,15 @@ resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_443" {
   cidr_ipv4         = each.value
 }
 
-resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_cp_443" {
+# resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_cp_443" {
 
-  security_group_id = aws_security_group.opa_cluster_ec2.id
-  description       = "EC2 egress to CP BC"
-  ip_protocol       = "tcp"
-  from_port         = 443
-  to_port           = 443
-  cidr_ipv4         = "0.0.0.0/0"
-}
+#   security_group_id = aws_security_group.opa_cluster_ec2.id
+#   description       = "EC2 egress to CP BC"
+#   ip_protocol       = "tcp"
+#   from_port         = 443
+#   to_port           = 443
+#   cidr_ipv4         = "0.0.0.0/0"
+# }
 
 resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_mysql" {
   for_each = toset([
