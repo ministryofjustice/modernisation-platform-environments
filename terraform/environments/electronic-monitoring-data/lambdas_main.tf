@@ -1437,9 +1437,6 @@ module "merge_redrive_planner" {
     )
   )
 
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-
   environment_variables = {
     POWERTOOLS_LOG_LEVEL = "INFO"
 
