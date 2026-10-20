@@ -18,6 +18,8 @@ locals {
   script_runner_role_name_prefix = substr("${local.application_name}-script-runner", 0, 47)
 
   script_runner_environment_variables = []
+  script_runner_app_id_path           = "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1)), '.'), 0)"
+  script_runner_forge_runtime_version = local.application_data.accounts[local.environment].forge_runtime_version
 
   # Task capacity; adjust after the script requirements are known.
   script_runner_task_cpu    = 1024

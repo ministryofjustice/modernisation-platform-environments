@@ -5,11 +5,11 @@ locals {
     {
       name        = "build_app_infra"
       type        = "script_runner"
-      script_path = "scripts/deploy/root.py"
+      script_path = "scripts/deployment/root.py"
       shell_type  = "python3"
       variables = [
-        { name = "AppID", path = "$.AppID" },
-        { name = "forge_runtime_version", path = "$.forge_runtime_version" },
+        { name = "AppID", path = local.script_runner_app_id_path },
+        { name = "forge_runtime_version", value = local.script_runner_forge_runtime_version },
       ]
       result_path = "$.build_infra_task"
     }
@@ -18,6 +18,8 @@ locals {
 
 module "step_functions_build_infra" {
   source = "../modules/step_function_builder"
+
+  step_function_retry_attempts = local.step_function_retry_attempts
 
   name               = local.build_infra_state_machine_name
   steps              = local.build_infra_steps
