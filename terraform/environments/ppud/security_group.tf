@@ -2,6 +2,9 @@
 # Security Groups for EC2 instances and load balancers
 ######################################################
 
+/*
+# Soft Decommission of old security groups - final removal in 10 working days.
+
 # Production, UAT and Development
 
 # PPUD Web Portal Group
@@ -971,6 +974,8 @@ resource "aws_security_group_rule" "PPUD-Database-Egress-2" {
   security_group_id = aws_security_group.PPUD-PROD-Database[0].id
 }
 
+*/
+
 resource "aws_security_group" "PPUD-Mail-Server" {
   # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-production == true ? 1 : 0
@@ -1280,7 +1285,6 @@ locals {
       name        = "Team-Foundation-Server-Security-Group"
       description = "Team Foundation Server security group for the development environment"
       ingress = [
-        { port = 8080, cidr = "vpc", description = "Allow port 8080 inbound" }, # Port 8080 no longer used, to be removed soon
         { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
         { port = 443, cidr = "vpc", description = "Allow port 443 inbound" },
@@ -1310,7 +1314,6 @@ locals {
       description = "Development servers standard security group for the development environment"
       ingress = [
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
-        { port = 445, cidr = "vpc", description = "Allow port 445 inbound" }, #Temporarily allowed for development/testing purposes
         { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
       ]
       egress = [
@@ -1324,7 +1327,6 @@ locals {
       description = "PPUD Database server security group for the development environment"
       ingress = [
         { port = 1433, cidr = "vpc", description = "Allow port 1433 inbound" },
-        { port = 445, cidr = "vpc", description = "Allow port 445 inbound" }, #Temporarily allowed for development/testing purposes
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
@@ -1541,34 +1543,6 @@ resource "aws_security_group_rule" "wam_portal_alb_ingress" {
   source_security_group_id = aws_security_group.all["WAM-ALB-Load-Balancer-Security-Group"].id
   security_group_id        = aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id
 }
-
-# Removing these two legacy rules as they won't be required on the new SG code.
-
-/*
-
-# Temporary rule - allows health checks from the old WAM-ALB SG until the ALB is migrated to the new WAM-ALB-Load-Balancer-Security-Group
-resource "aws_security_group_rule" "wam_portal_alb_ingress_legacy" {
-  description              = "Allow port 443 inbound from legacy WAM-ALB security group"
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.WAM-ALB.id
-  security_group_id        = aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id
-}
-
-# Temporary rule - allows health checks from the old PPUD-ALB SG until the ALB is migrated to the new PPUD-ALB-Load-Balancer-Security-Group
-resource "aws_security_group_rule" "ppud_portal_alb_ingress_legacy" {
-  description              = "Allow port 443 inbound from legacy PPUD-ALB security group"
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.PPUD-ALB.id
-  security_group_id        = aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id
-}
-
-*/
 
 # -------------------------------------------------------------------
 # Conditional security groups
