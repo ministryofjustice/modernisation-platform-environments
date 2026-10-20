@@ -66,3 +66,11 @@ module "github_workflow_scheduler" {
   project_name               = local.github_actions_project_name
   github_workflows           = local.github_actions_lambda_environment_specific.github_workflows
 }
+
+module "aws_health_lambda" {
+  count = local.enable_aws_health_lambda ? 1 : 0
+
+  source         = "../../modules/aws_health_lambda"
+  aws_account_id = data.aws_caller_identity.current.id
+  github_repo    = "platform-operations"
+}
