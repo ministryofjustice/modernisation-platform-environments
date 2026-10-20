@@ -102,9 +102,6 @@ locals {
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
           instance_type = "t3.large"
-          tags = {
-            patch-manager = "group1"
-          }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name              = "azure.noms.root"
@@ -133,19 +130,6 @@ locals {
           })
         })
       })
-    }
-
-    patch_manager = {
-      patch_schedules = {
-        group1 = "cron(50 06 ? * WED *)" # 6:50am wed to work around the overnight shutdown
-        group2 = "cron(50 06 ? * THU *)" # 6:50am thu, see patch-manager.tf for approval_days config
-      }
-      maintenance_window_duration = 2 # 4 for prod
-      maintenance_window_cutoff   = 1 # 2 for prod
-      patch_classifications = {
-        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
-      }
     }
 
     route53_zones = {

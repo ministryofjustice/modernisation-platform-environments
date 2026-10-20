@@ -132,9 +132,6 @@ locals {
         }
         instance = merge(local.ec2_instances.jumpserver.instance, {
           instance_type = "r6i.xlarge"
-          tags = {
-            patch-manager = "group2"
-          }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name              = "azure.hmpp.root"
@@ -147,12 +144,6 @@ locals {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
         })
-        instance = merge(local.ec2_instances.rdgw.instance, {
-          tags = {
-            backup-plan   = "daily-and-weekly"
-            patch-manager = "group1"
-          }
-        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description              = "Remote Desktop Gateway for azure.hmpp.root domain"
           domain-name              = "azure.hmpp.root"
@@ -164,11 +155,6 @@ locals {
       pp-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           availability_zone = "eu-west-2a"
-        })
-        instance = merge(local.ec2_instances.rds.instance, {
-          tags = {
-            patch-manager = "group2"
-          }
         })
         tags = merge(local.ec2_instances.rds.tags, {
           description              = "Remote Desktop Services for azure.hmpp.root domain"
@@ -255,19 +241,6 @@ locals {
           })
         })
       })
-    }
-
-    patch_manager = {
-      patch_schedules = {
-        group1 = "cron(50 06 ? * WED *)" # 6:50am wed to work around the overnight shutdown
-        group2 = "cron(50 06 ? * THU *)" # 6:50am thu, see patch-manager.tf for approval_days config
-      }
-      maintenance_window_duration = 2 # 4 for prod
-      maintenance_window_cutoff   = 1 # 2 for prod
-      patch_classifications = {
-        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
-      }
     }
 
     schedule_alarms_lambda = {
