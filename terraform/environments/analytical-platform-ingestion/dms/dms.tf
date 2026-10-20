@@ -10,7 +10,7 @@ locals {
       short_resource_name = "tempus-sppfj-${local.environment}"
       resource_name       = "cica-ap-tempus-spp-finished-jobs-${local.environment}"
       # r5.large (16GB, memory-optimized): t3.large (8GB) OOM-crashed full load mid-unload of the large LOB tables
-      instance_size       = "dms.r5.large"
+      instance_size = "dms.r5.large"
     }
     SPPProcessPlatform = {
       database_name       = "SPPProcessPlatform"
