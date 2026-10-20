@@ -72,6 +72,10 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         {
           name  = "DEPLOY_ENV"
           value = local.environment_shorthand
+        },
+        {
+          name = "ARTEFACT_TARGET"
+          value = local.environment_shorthand
         }
       ]
     }
