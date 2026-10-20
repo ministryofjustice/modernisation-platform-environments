@@ -72,6 +72,15 @@ resource "aws_eks_pod_identity_association" "fluent_bit" {
   tags = local.tags
 }
 
+resource "time_sleep" "fluent_bit_pod_identity" {
+  create_duration = "30s"
+  triggers = {
+    association_id = aws_eks_pod_identity_association.fluent_bit.id
+  }
+
+  depends_on = [aws_eks_pod_identity_association.fluent_bit]
+}
+
 #------------------------------------------------------------------------------
 # Namespace — privileged PSA is required for the hostPath mounts of /var/log
 #------------------------------------------------------------------------------
@@ -104,7 +113,7 @@ resource "helm_release" "fluent_bit" {
     }
 
     podAnnotations = {
-      "platform.justice.gov.uk/pod-identity-association" = aws_eks_pod_identity_association.fluent_bit.id
+      "platform.justice.gov.uk/pod-identity-association" = "${aws_eks_pod_identity_association.fluent_bit.id}-${time_sleep.fluent_bit_pod_identity.id}"
     }
 
     # Required by the Gatekeeper lockprivcapabilities constraint
@@ -218,7 +227,7 @@ resource "helm_release" "fluent_bit" {
   })]
 
   depends_on = [
-    aws_eks_pod_identity_association.fluent_bit,
+    time_sleep.fluent_bit_pod_identity,
     aws_iam_role_policy.fluent_bit_logs,
   ]
 }
