@@ -53,6 +53,7 @@ models:
       region: eu-west-2
       generally_available: true
     # Anthropic
+    # Batch inference is explicitly enabled per model for the configured batch Region.
     claude-haiku-4-5:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_family: "Anthropic Claude"
@@ -60,6 +61,7 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      batch_available: true
     claude-opus-4-5:
       model_id: "eu.anthropic.claude-opus-4-5-20251101-v1:0"
       model_family: "Anthropic Claude"
@@ -241,7 +243,8 @@ models:
       model_name: "Qwen 3 32B"
       model_location: "United Kingdom"
       region: eu-west-2
-      generally_available: false
+      generally_available: true
+      batch_available: true
       environments_available: ["development"]
     # Justice Engineering AI Enablement
     jeaie-claude-haiku-4-5:
