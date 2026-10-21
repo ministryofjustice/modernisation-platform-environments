@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "ai_gateway" {
         actions   = ["bedrock:ListModelInvocationJobs", "bedrock:TagResource", "bedrock:UntagResource", "bedrock:ListTagsForResource"]
         resources = ["*"]
       }
-    } : sid => permissions if terraform.workspace == "data-platform-development" }
+    } : sid => permissions if local.ai_gateway_batch_storage != null }
 
     content {
       sid       = statement.key
@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "ai_gateway" {
   }
 
   dynamic "statement" {
-    for_each = terraform.workspace == "data-platform-development" ? [1] : []
+    for_each = local.ai_gateway_batch_storage != null ? [1] : []
 
     content {
       sid       = "PassBedrockBatchExecutionRole"
