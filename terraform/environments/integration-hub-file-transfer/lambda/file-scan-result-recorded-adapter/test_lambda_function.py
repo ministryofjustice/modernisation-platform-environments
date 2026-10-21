@@ -19,12 +19,6 @@ class FakeLogger:
     def info(self, *_args, **_kwargs):
         return None
 
-    def exception(self, *_args, **_kwargs):
-        return None
-
-    def warning(self, *_args, **_kwargs):
-        return None
-
     def inject_lambda_context(self, **_kwargs):
         return lambda function: function
 
@@ -94,7 +88,7 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
         IDEMPOTENCY_CACHE.clear()
         self.events_client.reset_mock()
         self.dynamodb_client.reset_mock()
-        self.s3_client.reset_mock(side_effect=True)
+        self.s3_client.reset_mock()
         self.events_client.put_events.return_value = {
             "FailedEntryCount": 0,
             "Entries": [{"EventId": "scan-result-event-id"}],
@@ -104,14 +98,6 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
             "Metadata": {
                 "mft-correlation-id": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1"
             },
-        }
-        self.s3_client.get_object_tagging.return_value = {
-            "TagSet": [
-                {
-                    "Key": "GuardDutyMalwareScanStatus",
-                    "Value": "NO_THREATS_FOUND",
-                }
-            ]
         }
         self.dynamodb_client.get_item.return_value = {
             "Item": {
@@ -180,7 +166,6 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
             detail["metadata"]["causationId"], "6dce6b40-6e43-49f0-a2cf-1da1d43bce22"
         )
         self.assertEqual(detail["data"]["scanResultStatus"], "NO_THREATS_FOUND")
-        self.assertTrue(detail["data"]["scanResultStatusMatchesTag"])
         self.assertEqual(detail["data"]["object"]["sizeBytes"], 4096)
         self.assertEqual(entry["Time"], datetime(2026, 7, 10, 14, 2, tzinfo=timezone.utc))
         self.assertEqual(result, {"eventId": "scan-result-event-id"})
@@ -248,40 +233,6 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
             json.loads(entry["Detail"])["data"]["statusReasons"],
             ["PASSWORD_PROTECTED"],
         )
-
-    def test_only_a_present_and_different_tag_is_reported_as_a_mismatch(self):
-        for tag_set, expected_matches, expected_log in [
-            ([], True, "warning"),
-            ([{"Key": "Other", "Value": "x"}], True, "warning"),
-            ([{"Key": "GuardDutyMalwareScanStatus", "Value": "THREATS_FOUND"}], False, "warning"),
-            ([{"Key": "GuardDutyMalwareScanStatus", "Value": "NO_THREATS_FOUND"}], True, "info"),
-        ]:
-            with self.subTest(tag_set=tag_set):
-                self.s3_client.get_object_tagging.return_value = {"TagSet": tag_set}
-                with patch.object(self.adapter.logger, "warning") as warning, patch.object(
-                    self.adapter.logger, "info"
-                ) as info:
-                    self.adapter.lambda_handler(self.event, None)
-
-                logged = warning if expected_log == "warning" else info
-                self.assertTrue(
-                    any(c.args[0].startswith("Compared") for c in logged.call_args_list)
-                )
-                entry = self.events_client.put_events.call_args.kwargs["Entries"][0]
-                data = json.loads(entry["Detail"])["data"]
-                self.assertEqual(data["scanResultStatus"], "NO_THREATS_FOUND")
-                self.assertEqual(data["scanResultStatusMatchesTag"], expected_matches)
-                IDEMPOTENCY_CACHE.clear()
-
-    def test_tag_read_failure_does_not_block_publishing(self):
-        self.s3_client.get_object_tagging.side_effect = RuntimeError("AccessDenied")
-
-        with patch.object(self.adapter.logger, "exception") as log_exception:
-            self.adapter.lambda_handler(self.event, None)
-
-        log_exception.assert_called_once()
-        entry = self.events_client.put_events.call_args.kwargs["Entries"][0]
-        self.assertTrue(json.loads(entry["Detail"])["data"]["scanResultStatusMatchesTag"])
 
     def test_rejects_processing_object_without_correlation_metadata(self):
         self.s3_client.head_object.return_value["Metadata"] = {}

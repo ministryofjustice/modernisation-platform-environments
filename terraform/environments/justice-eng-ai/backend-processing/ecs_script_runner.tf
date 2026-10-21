@@ -1,9 +1,11 @@
 # This template creates the ECS infrastructure required to host the script runner container.
 
 locals {
-  script_runner_task_definition_family = "${local.application_name}-script-runner"
-  script_runner_ecr_repository_name    = "modernisation-platform-ai-builder-core"
-  script_runner_ecr_repository_url     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.${data.aws_region.current.region}.${data.aws_partition.current.dns_suffix}/${local.script_runner_ecr_repository_name}"
+  script_runner_task_definition_family         = "${local.application_name}-script-runner"
+  script_runner_fargate_task_definition_family = "${local.application_name}-script-runner-fargate"
+  script_runner_task_definition_families       = [local.script_runner_task_definition_family, local.script_runner_fargate_task_definition_family]
+  script_runner_ecr_repository_name            = "modernisation-platform-ai-builder-core"
+  script_runner_ecr_repository_url             = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.${data.aws_region.current.region}.${data.aws_partition.current.dns_suffix}/${local.script_runner_ecr_repository_name}"
   # The workflow stores the full prefixed tag; normalize the bootstrap SHA too.
   script_runner_image_tag = format(
     "%s%s",
@@ -16,10 +18,43 @@ locals {
   script_runner_role_name_prefix = substr("${local.application_name}-script-runner", 0, 47)
 
   script_runner_environment_variables = []
+  script_runner_app_id_path           = "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1)), '.'), 0)"
+  script_runner_forge_runtime_version = local.application_data.accounts[local.environment].forge_runtime_version
 
+  # Cross-region inference profile (e.g. eu.anthropic.claude-...); the underlying foundation model has no geography prefix.
+  bedrock_model_id            = local.application_data.accounts[local.environment].bedrock_model_id
+  bedrock_foundation_model_id = join(".", slice(split(".", local.bedrock_model_id), 1, length(split(".", local.bedrock_model_id))))
   # Task capacity; adjust after the script requirements are known.
   script_runner_task_cpu    = 1024
   script_runner_task_memory = 2048
+
+  script_runner_container_definition = {
+    name      = "script-runner"
+    image     = "${local.script_runner_ecr_repository_url}:${local.script_runner_image_tag}"
+    essential = true
+    # Runtime scripts may install tools; the EC2 task also needs root for the Docker socket.
+    user = "root"
+
+    environment = local.script_runner_environment_variables
+
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        awslogs-group         = aws_cloudwatch_log_group.script_runner.name
+        awslogs-region        = data.aws_region.current.region
+        awslogs-stream-prefix = "script-runner"
+        mode                  = "blocking"
+      }
+    }
+  }
+
+  script_runner_ec2_container_definition = merge(local.script_runner_container_definition, {
+    mountPoints = [{
+      sourceVolume  = "docker-socket"
+      containerPath = "/var/run/docker.sock"
+      readOnly      = false
+    }]
+  })
 }
 
 data "aws_partition" "current" {}
@@ -140,6 +175,78 @@ data "aws_iam_policy_document" "script_runner_ecs_task" {
     effect    = "Allow"
     actions   = ["ecs:ListClusters"]
     resources = ["*"]
+  }
+
+  statement {
+    sid    = "CreateEcsServicesInCurrentAccount"
+    effect = "Allow"
+    actions = [
+      "ecs:CreateService",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:ecs:*:${data.aws_caller_identity.current.account_id}:service/*/*",
+      "arn:${data.aws_partition.current.partition}:ecs:*:${data.aws_caller_identity.current.account_id}:cluster/*",
+    ]
+  }
+
+  statement {
+    sid    = "ManageEcsServicesInCurrentAccount"
+    effect = "Allow"
+    actions = [
+      "ecs:DeleteService",
+      "ecs:DescribeServices",
+      "ecs:TagResource",
+      "ecs:UntagResource",
+      "ecs:UpdateService",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:ecs:*:${data.aws_caller_identity.current.account_id}:service/*/*",
+    ]
+  }
+
+  statement {
+    sid       = "ListEcsServices"
+    effect    = "Allow"
+    actions   = ["ecs:ListServices"]
+    resources = ["arn:${data.aws_partition.current.partition}:ecs:*:${data.aws_caller_identity.current.account_id}:cluster/*"]
+  }
+
+  statement {
+    sid    = "ManageEcsTaskDefinitionsInCurrentAccount"
+    effect = "Allow"
+    actions = [
+      "ecs:DeregisterTaskDefinition",
+      "ecs:DescribeTaskDefinition",
+      "ecs:RegisterTaskDefinition",
+      "ecs:TagResource",
+      "ecs:UntagResource",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:ecs:*:${data.aws_caller_identity.current.account_id}:task-definition/*",
+    ]
+  }
+
+  statement {
+    sid       = "ListEcsTaskDefinitions"
+    effect    = "Allow"
+    actions   = ["ecs:ListTaskDefinitions"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid     = "PassEcsTaskAndExecutionRoles"
+    effect  = "Allow"
+    actions = ["iam:PassRole"]
+    resources = [
+      aws_iam_role.script_runner_ecs_task.arn,
+      aws_iam_role.script_runner_ecs_execution.arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["ecs-tasks.amazonaws.com"]
+    }
   }
 
   # RunInstances authorizes several resource types; scope each created or
@@ -264,6 +371,7 @@ data "aws_iam_policy_document" "script_runner_ecs_task" {
       "elasticloadbalancing:DescribeListeners",
       "elasticloadbalancing:DescribeLoadBalancers",
       "elasticloadbalancing:DescribeRules",
+      "elasticloadbalancing:DescribeTags",
       "elasticloadbalancing:DescribeTargetGroups",
       "elasticloadbalancing:DescribeTargetHealth",
     ]
@@ -281,6 +389,57 @@ resource "aws_iam_policy" "script_runner_ecs_task" {
 resource "aws_iam_role_policy_attachment" "script_runner_ecs_task" {
   role       = aws_iam_role.script_runner_ecs_task.name
   policy_arn = aws_iam_policy.script_runner_ecs_task.arn
+}
+
+# A managed policy is limited to 6,144 characters, so the build flow's permissions
+# (events table, Step Functions callback, Bedrock) are a second policy on the same role.
+data "aws_iam_policy_document" "script_runner_ecs_task_build_flow" {
+  statement {
+    sid       = "ReadWriteBuildEvents"
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem"]
+    resources = [aws_dynamodb_table.build_review.arn]
+  }
+
+  statement {
+    sid       = "ReportScriptResult"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess", "states:SendTaskFailure"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "InvokeBedrockInferenceProfile"
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel"]
+    resources = ["arn:${data.aws_partition.current.partition}:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/${local.bedrock_model_id}"]
+  }
+
+  # The profile routes to the foundation model in any of its geography's regions.
+  statement {
+    sid       = "InvokeBedrockFoundationModel"
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel"]
+    resources = ["arn:${data.aws_partition.current.partition}:bedrock:*::foundation-model/${local.bedrock_foundation_model_id}*"]
+
+    condition {
+      test     = "StringLike"
+      variable = "bedrock:InferenceProfileArn"
+      values   = ["arn:${data.aws_partition.current.partition}:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/${local.bedrock_model_id}"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "script_runner_ecs_task_build_flow" {
+  name        = "${local.application_name}-script-runner-task-build-flow"
+  description = "Permissions for script-runner tasks to write build events, report results to Step Functions and invoke Bedrock."
+  policy      = data.aws_iam_policy_document.script_runner_ecs_task_build_flow.json
+  tags        = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "script_runner_ecs_task_build_flow" {
+  role       = aws_iam_role.script_runner_ecs_task.name
+  policy_arn = aws_iam_policy.script_runner_ecs_task_build_flow.arn
 }
 
 # ---------- EC2 capacity: gives the task access to a Docker daemon ----------
@@ -380,35 +539,19 @@ resource "aws_ecs_task_definition" "script_runner" {
     host_path = "/var/run/docker.sock"
   }
 
-  container_definitions = jsonencode([
-    {
-      name      = "script-runner"
-      image     = "${local.script_runner_ecr_repository_url}:${local.script_runner_image_tag}"
-      essential = true
-      # The docker socket is root-owned; the image's default user cannot use it.
-      user = "root"
+  container_definitions = jsonencode([local.script_runner_ec2_container_definition])
+}
 
-      environment = local.script_runner_environment_variables
-
-      mountPoints = [
-        {
-          sourceVolume  = "docker-socket"
-          containerPath = "/var/run/docker.sock"
-          readOnly      = false
-        }
-      ]
-
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.script_runner.name
-          awslogs-region        = data.aws_region.current.region
-          awslogs-stream-prefix = "script-runner"
-          mode                  = "blocking"
-        }
-      }
-    }
-  ])
+resource "aws_ecs_task_definition" "script_runner_fargate" {
+  family                   = local.script_runner_fargate_task_definition_family
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = local.script_runner_task_cpu
+  memory                   = local.script_runner_task_memory
+  execution_role_arn       = aws_iam_role.script_runner_ecs_execution.arn
+  task_role_arn            = aws_iam_role.script_runner_ecs_task.arn
+  container_definitions    = jsonencode([local.script_runner_container_definition])
+  tags                     = local.tags
 }
 
 data "aws_iam_policy_document" "script_runner_ebs" {

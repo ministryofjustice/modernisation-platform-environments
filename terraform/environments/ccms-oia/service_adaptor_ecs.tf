@@ -4,7 +4,7 @@
 resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
   family             = "${local.adaptor_app_name}-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "bridge"
+  network_mode       = "awsvpc"
   requires_compatibilities = [
     "EC2",
   ]
@@ -41,7 +41,7 @@ resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
 
 resource "aws_ecs_service" "ecs_adaptor_service" {
   name            = local.adaptor_app_name
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = aws_ecs_cluster.conn_saa.id
   task_definition = aws_ecs_task_definition.ecs_adaptor_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].adaptor_app_count
 
@@ -58,7 +58,7 @@ resource "aws_ecs_service" "ecs_adaptor_service" {
   # stalling with "insufficient resources" because there is no room to place
   # the new task revision alongside the old one.
   capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
+    capacity_provider = aws_ecs_capacity_provider.capacity_provider_conn_saa.name
     weight            = 1
     base              = 1
   }
@@ -66,16 +66,21 @@ resource "aws_ecs_service" "ecs_adaptor_service" {
 
   health_check_grace_period_seconds = 300
 
-  lifecycle {
-    ignore_changes = [
-      task_definition
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     task_definition
+  #   ]
+  # }
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
   }
 
+  network_configuration {
+    security_groups = [aws_security_group.ecs_tasks_adaptor.id]
+    subnets         = data.aws_subnets.shared-private.ids
+  }
+  
   load_balancer {
     target_group_arn = aws_lb_target_group.adaptor_target_group.id
     container_name   = "${local.adaptor_app_name}-container"

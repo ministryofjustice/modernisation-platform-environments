@@ -238,6 +238,15 @@ module "vpc_endpoints" {
           { Name = format("%s-s3-vpc-endpoint", local.application_name) }
         )
       }
+      dynamodb = {
+        service         = "dynamodb"
+        service_type    = "Gateway"
+        route_table_ids = module.vpc.private_route_table_ids
+        tags = merge(
+          local.tags,
+          { Name = format("%s-dynamodb-vpc-endpoint", local.application_name) }
+        )
+      }
     }
   )
 }

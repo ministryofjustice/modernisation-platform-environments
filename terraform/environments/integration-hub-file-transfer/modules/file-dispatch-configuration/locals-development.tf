@@ -13,9 +13,9 @@ locals {
           recipient_id = "products-poc-slack-test"
           # Existing web-app membership is managed by root; this grants pickup reads only.
           authorised_groups = {
-            integration-hub = "8662e2b4-3021-7017-56ba-8794aa2047cd"
+            azure-aws-sso-integration-hub = "1622e2b4-9011-7000-b2fc-87228b7308cd"
           }
-          slack_channel_id = "C0ARA0C101L" # integration-hub-team
+          slack_channel_id = "C0CAB9Q6S2U" # integration-hub-alerts
           slack_team_id    = "T02DYEB3A"   # Justice Digital
         }
       }

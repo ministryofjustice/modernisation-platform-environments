@@ -103,6 +103,36 @@ data "aws_subnet" "public_subnets_c" {
   }
 }
 
+# Protected subnets (host the VPC interface endpoints: SSM, Logs, Secrets Manager etc.)
+data "aws_subnet" "protected_subnets_a" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}a"
+  }
+}
+
+data "aws_subnet" "protected_subnets_b" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}b"
+  }
+}
+
+data "aws_subnet" "protected_subnets_c" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}c"
+  }
+}
+
+# S3 gateway endpoint prefix list (managed by AWS)
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}
+
 # Route53 DNS data
 data "aws_route53_zone" "external" {
   provider = aws.core-vpc

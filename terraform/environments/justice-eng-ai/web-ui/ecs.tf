@@ -132,13 +132,21 @@ resource "aws_ecs_task_definition" "app" {
           name  = "MPAPB_LOG_FORMAT"
           value = "json"
         },
-        # Trust the ALB's X-Amzn-Oidc-Identity header only when the listener
-        # is actually running the authenticate-oidc action; otherwise the
-        # header can be spoofed by anything with network reach to the task.
-        # See ui/app/auth.py.
+        # ALB sign-in mode (builder_auth_mode = "alb", see oidc.tf). The UI
+        # verifies the ALB-signed X-Amzn-Oidc-Data JWT on every request --
+        # ES256 signature, expiry, and that its ``signer`` header equals
+        # MPAPB_ALB_SIGNER_ARN -- and refuses requests without a valid one.
+        # The unsigned X-Amzn-Oidc-Identity header is never trusted on its
+        # own. The UI refuses to START in ALB mode without a valid signer
+        # ARN, so both values flip together. See app/alb_auth.py in the
+        # prototype-builder repo.
         {
           name  = "MPAPB_TRUST_ALB_OIDC"
           value = local.oidc_wired ? "true" : "false"
+        },
+        {
+          name  = "MPAPB_ALB_SIGNER_ARN"
+          value = local.oidc_wired ? aws_lb.app.arn : ""
         },
         {
           name  = "MPAPB_FORGE_URL"

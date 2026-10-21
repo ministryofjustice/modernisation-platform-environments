@@ -64,7 +64,7 @@ jobs:
 
   fetch-secrets:
     name: Fetch ENV management secrets
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@ebec2f2fda2f93172de61774b5875b9cef7462bc # v6.2.12
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -95,7 +95,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b9151ad79209d53d7f738430aa6868c5b7589237 # v6.2.9
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -238,7 +238,7 @@ jobs:
 
       - name: Upload AMI Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ami-preview-${{ matrix.account_name }}
           path: |
@@ -296,7 +296,7 @@ jobs:
 
       - name: Upload EBS Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ebs-preview-${{ matrix.account_name }}
           path: |
@@ -306,7 +306,7 @@ jobs:
 
       - name: Upload Unified Preview Artifact
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: cleanup-report-preview-${{ matrix.account_name }}
           path: reports/cleanup_report.csv
@@ -339,7 +339,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b9151ad79209d53d7f738430aa6868c5b7589237 # v6.2.9
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -527,7 +527,7 @@ jobs:
 
       - name: Upload AMI Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ami-live-${{ matrix.account_name }}
           path: |
@@ -596,7 +596,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@b9151ad79209d53d7f738430aa6868c5b7589237 # v6.2.9
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -660,7 +660,7 @@ jobs:
 
       - name: Upload EBS Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ebs-live-${{ matrix.account_name }}
           path: reports/ebs_cleanup_report.csv

@@ -15,6 +15,11 @@
           "StringEquals": "rolling",
           "Next": "DiscoverRolling"
         },
+        {
+          "Variable": "$.mode",
+          "StringEquals": "rolling_recovery",
+          "Next": "DiscoverRollingRecovery"
+        },
 %{ if reconciliation_consumer == "AC" || reconciliation_consumer == "EMDI" }
         {
           "Variable": "$.mode",
@@ -42,7 +47,105 @@
         "FunctionName": "${planner_function_name}",
         "Payload": {
           "action": "discover_rolling",
-          "consumer": "${reconciliation_consumer}"
+          "consumer": "${reconciliation_consumer}",
+          "mode": "rolling",
+          "execution_id.$": "$$.Execution.Id",
+          "state_machine_arn.$": "$$.StateMachine.Id",
+          "aggregate_notifications": true
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "CheckRollingDiscovery"
+    },
+    "DiscoverRollingContinuation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "discover_rolling",
+          "consumer": "${reconciliation_consumer}",
+          "mode": "rolling",
+          "execution_id.$": "$$.Execution.Id",
+          "state_machine_arn.$": "$$.StateMachine.Id",
+          "iteration.$": "$.iteration",
+          "position_start_utc.$": "$.position_start_utc",
+          "activation_start_utc.$": "$.activation_start_utc"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "CheckRollingDiscovery"
+    },
+    "DiscoverRollingRecovery": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "discover_rolling",
+          "consumer": "${reconciliation_consumer}",
+          "mode": "rolling_recovery",
+          "execution_id.$": "$$.Execution.Id",
+          "state_machine_arn.$": "$$.StateMachine.Id",
+          "recovery_episode_id.$": "$.recovery_episode_id",
+          "lease_token.$": "$.lease_token"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "CheckRollingDiscovery"
+    },
+    "DiscoverRollingRecoveryContinuation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "discover_rolling",
+          "consumer": "${reconciliation_consumer}",
+          "mode": "rolling_recovery",
+          "execution_id.$": "$$.Execution.Id",
+          "state_machine_arn.$": "$$.StateMachine.Id",
+          "recovery_episode_id.$": "$.episode_id",
+          "iteration.$": "$.iteration"
         }
       },
       "OutputPath": "$.Payload",
@@ -76,15 +179,209 @@
         },
         {
           "Variable": "$.status",
+          "StringEquals": "approval_required",
+          "Next": "WaitForLegacyRollingApproval"
+        },
+        {
+          "Variable": "$.status",
           "StringEquals": "replay_ready",
-          "Next": "PreparePlannedDates"
+          "Next": "PrepareLegacyPlannedDates"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "review_required",
+          "Next": "PlanningComplete"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "recovery_in_progress",
+          "Next": "PlanningComplete"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "recovery_complete",
+          "Next": "RollingComplete"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "planning",
+          "Next": "PlanRolling"
         }
       ],
       "Default": "UnexpectedPlanningResult"
     },
+    "WaitForLegacyRollingApproval": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "park_rolling_approval",
+          "consumer": "${reconciliation_consumer}",
+          "execution_id.$": "$.execution_id",
+          "plan_id.$": "$.plan_id",
+          "task_token.$": "$$.Task.Token"
+        }
+      },
+      "ResultPath": "$.approval",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "RecordLegacyRollingApproval"
+    },
+    "RecordLegacyRollingApproval": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "record_rolling_approval",
+          "consumer": "${reconciliation_consumer}",
+          "execution_id.$": "$.execution_id",
+          "plan_id.$": "$.plan_id",
+          "decision.$": "$.approval.decision"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "CheckLegacyRollingApproval"
+    },
+    "CheckLegacyRollingApproval": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "replay_ready",
+          "Next": "PrepareLegacyPlannedDates"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "rejected",
+          "Next": "RollingRejected"
+        }
+      ],
+      "Default": "UnexpectedLegacyRollingApprovalResult"
+    },
+    "PrepareLegacyPlannedDates": {
+      "Type": "Pass",
+      "Parameters": {
+        "mode": "rolling",
+        "consumer": "${reconciliation_consumer}",
+        "execution_id.$": "$.execution_id",
+        "thread_id.$": "$.thread_id",
+        "episode_id": "",
+        "recovery_mode": false,
+        "iteration": 0,
+        "filter_dates.$": "$.candidates"
+      },
+      "Next": "ProcessDates"
+    },
+    "RollingRejected": {
+      "Type": "Succeed"
+    },
+    "UnexpectedLegacyRollingApprovalResult": {
+      "Type": "Fail",
+      "Error": "UnexpectedRollingApprovalResult",
+      "Cause": "The legacy rolling approval callback returned an unexpected result."
+    },
+    "PlanRolling": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "plan_rolling",
+          "consumer": "${reconciliation_consumer}",
+          "execution_id.$": "$.execution_id"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "CheckRollingPlanning"
+    },
+    "CheckRollingPlanning": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "planning",
+          "Next": "WaitBeforeRollingPlanning"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "replay_ready",
+          "Next": "PreparePlannedDates"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "iteration_clean",
+          "Next": "CheckEmptyRollingPlan"
+        }
+      ],
+      "Default": "UnexpectedPlanningResult"
+    },
+    "WaitBeforeRollingPlanning": {
+      "Type": "Wait",
+      "Seconds": 1,
+      "Next": "PlanRolling"
+    },
+    "CheckEmptyRollingPlan": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.recovery_mode",
+          "BooleanEquals": true,
+          "Next": "DiscoverRollingRecoveryContinuation"
+        }
+      ],
+      "Default": "DiscoverRollingContinuation"
+    },
     "PreparePlannedDates": {
       "Type": "Pass",
       "Parameters": {
+        "mode": "rolling",
+        "consumer": "${reconciliation_consumer}",
+        "execution_id.$": "$.execution_id",
+        "thread_id.$": "$.thread_id",
+        "episode_id.$": "$.episode_id",
+        "recovery_mode.$": "$.recovery_mode",
+        "iteration.$": "$.iteration",
+        "position_start_utc.$": "$.position_start_utc",
+        "activation_start_utc.$": "$.activation_start_utc",
         "filter_dates.$": "$.candidates"
       },
       "Next": "ProcessDates"
@@ -530,7 +827,17 @@
             },
             "Retry": [
               {
-                "ErrorEquals": ["States.ALL"],
+                "ErrorEquals": [
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 15,
+                "BackoffRate": 2,
+                "MaxAttempts": 6
+              },
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
                 "IntervalSeconds": 2,
                 "BackoffRate": 2,
                 "MaxAttempts": 2
@@ -538,7 +845,9 @@
             ],
             "Catch": [
               {
-                "ErrorEquals": ["States.ALL"],
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
                 "ResultPath": "$.error",
                 "Next": "MarkPlannedFailed"
               }
@@ -569,6 +878,15 @@
                 "MaxAttempts": 3
               }
             ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
+                "ResultPath": "$.error",
+                "Next": "MarkPlannedFailed"
+              }
+            ],
             "Next": "CheckRollingVerification"
           },
           "CheckRollingVerification": {
@@ -590,7 +908,6 @@
           "MarkPlannedSucceeded": {
             "Type": "Pass",
             "Parameters": {
-              "filter_date.$": "$.filter_date.date",
               "status": "SUCCEEDED",
               "result.$": "$.verification.Payload"
             },
@@ -599,21 +916,33 @@
           "MarkPlannedFailed": {
             "Type": "Pass",
             "Parameters": {
-              "filter_date.$": "$.filter_date.date",
               "status": "FAILED",
               "error.$": "$.error"
             },
             "End": true
           },
           "RollingVerificationFailed": {
-            "Type": "Fail",
-            "Error": "RollingReconciliationVerificationFailed",
-            "Cause": "Stale positions remain after rolling replay."
+            "Type": "Pass",
+            "Parameters": {
+              "status": "FAILED",
+              "error": {
+                "Error": "RollingReconciliationVerificationFailed",
+                "Cause": "Stale positions remain after rolling replay."
+              },
+              "result.$": "$.verification.Payload"
+            },
+            "End": true
           },
           "UnexpectedRollingVerificationResult": {
-            "Type": "Fail",
-            "Error": "UnexpectedRollingVerificationResult",
-            "Cause": "The planner returned an unexpected rolling verification status."
+            "Type": "Pass",
+            "Parameters": {
+              "status": "FAILED",
+              "error": {
+                "Error": "UnexpectedRollingVerificationResult",
+                "Cause": "The planner returned an unexpected rolling verification status."
+              }
+            },
+            "End": true
           },
 %{ endif }
           "MergeInto${table_name}": {
@@ -645,7 +974,9 @@
             },
             "Retry": [
               {
-                "ErrorEquals": ["States.ALL"],
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
                 "IntervalSeconds": 2,
                 "BackoffRate": 2,
                 "MaxAttempts": 2
@@ -653,7 +984,9 @@
             ],
             "Catch": [
               {
-                "ErrorEquals": ["States.ALL"],
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
                 "ResultPath": "$.error",
                 "Next": "MarkFailed"
               }
@@ -680,7 +1013,116 @@
           }
         }
       },
+%{ if planner_function_name != "" && reconciliation_consumer != "" }
+      "Next": "CheckProcessDatesCompletion"
+%{ else }
       "End": true
+%{ endif }
+    }%{ if planner_function_name != "" && reconciliation_consumer != "" },
+    "CheckProcessDatesCompletion": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.mode",
+          "StringEquals": "rolling",
+          "Next": "CompleteRolling"
+        }
+      ],
+      "Default": "MergeComplete"
+    },
+    "CompleteRolling": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "complete_rolling",
+          "consumer": "${reconciliation_consumer}",
+          "execution_id.$": "$.execution_id",
+          "thread_id.$": "$.thread_id",
+          "episode_id.$": "$.episode_id",
+          "results.$": "$.date_results"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "CheckRollingCompletion"
+    },
+    "CheckRollingCompletion": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "continue_rolling",
+          "Next": "DiscoverRollingContinuation"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "continue_recovery",
+          "Next": "DiscoverRollingRecoveryContinuation"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "continue_execution",
+          "Next": "StartRecoveryContinuation"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "completed",
+          "Next": "RollingComplete"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "failed",
+          "Next": "RollingFailed"
+        }
+      ],
+      "Default": "UnexpectedRollingCompletionResult"
+    },
+    "StartRecoveryContinuation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::states:startExecution",
+      "Parameters": {
+        "StateMachineArn.$": "$$.StateMachine.Id",
+        "Name.$": "States.UUID()",
+        "Input": {
+          "mode": "rolling_recovery",
+          "recovery_episode_id.$": "$.episode_id",
+          "lease_token.$": "$.lease_token",
+          "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id"
+        }
+      },
+      "ResultPath": "$.continuation",
+      "Next": "RollingComplete"
+    },
+    "RollingComplete": {
+      "Type": "Succeed"
+    },
+    "RollingFailed": {
+      "Type": "Fail",
+      "Error": "RollingReconciliationFailed",
+      "Cause": "One or more rolling replay work items failed."
+    },
+    "UnexpectedRollingCompletionResult": {
+      "Type": "Fail",
+      "Error": "UnexpectedRollingCompletionResult",
+      "Cause": "The planner returned an unexpected rolling completion status."
+    },
+    "MergeComplete": {
+      "Type": "Succeed"
     }
+%{ endif }
   }
 }
