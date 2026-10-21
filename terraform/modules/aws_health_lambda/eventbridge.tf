@@ -26,7 +26,7 @@ resource "aws_lambda_permission" "aws_health" {
 }
 
 resource "aws_lambda_permission" "allow_external_aws_accounts_eventbridge" {
-  for_each      = nonsensitive(toset(keys(local.aws_accounts)))
+  for_each = nonsensitive(toset(keys(local.aws_accounts)))
 
   statement_id  = "AllowHealthEvents${each.key}"
   action        = "lambda:InvokeFunction"
