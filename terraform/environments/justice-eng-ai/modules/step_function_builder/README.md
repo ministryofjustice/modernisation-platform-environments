@@ -186,3 +186,10 @@ location (e.g. S3) instead of relying on Step Functions to carry it.
 This module intentionally keeps `input_path` as a single, generic JSONPath
 rather than a named-parameter list: the actual input shape is specific to
 each calling environment, not something the module should assume.
+
+Build-specific queries and approval-token lookups follow DynamoDB pagination,
+including empty filtered pages. They read one projected event per page and stop
+at the newest matching event, or fail with `BuildEventNotFound` after exhausting
+the application's history. Caller result paths and transitions are preserved.
+Duplicate callback deliveries use the AWS SDK `Sfn.*Exception` error names and
+complete quietly when the token is already consumed.

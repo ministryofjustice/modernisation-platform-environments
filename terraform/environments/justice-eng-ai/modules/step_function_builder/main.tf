@@ -140,34 +140,131 @@ locals {
       {
         Type     = "Task"
         Resource = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:dynamodb:query"
-        Parameters = merge({
+        Parameters = {
           TableName                = step.table_name
           KeyConditionExpression   = "#hash = :hash AND #range > :floor"
           ExpressionAttributeNames = { "#hash" = try(step.hash_key_name, "AppID"), "#range" = try(step.range_key_name, "SysKey") }
-          ExpressionAttributeValues = merge(
-            {
-              ":hash"  = { "S.$" = step.hash_key }
-              ":floor" = { N = "0" }
-            },
-            try(step.build_id, null) == null ? {} : {
-              ":build_id" = { "N.$" = step.build_id }
-            }
-          )
+          ExpressionAttributeValues = {
+            ":hash"  = { "S.$" = step.hash_key }
+            ":floor" = { N = "0" }
+          }
           ScanIndexForward = false
           ConsistentRead   = true
-          },
-          try(step.build_id, null) == null ? { Limit = 1 } : {},
-          try(step.build_id, null) == null ? {} : {
-            FilterExpression = "BuildID = :build_id"
-          },
-        )
+          Limit            = 1
+        }
         ResultSelector = { for name, type in step.result_attributes : "${name}.$" => "$.Items[0].${name}.${type}" }
       },
       local.transitions[step.name],
       try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
       length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry }
-    )
+    ) if try(step.build_id, null) == null
   }
+
+  # FilterExpression is evaluated after each page. A page can be empty even
+  # when the requested build exists. Keep the cursor until a match or exhaustion.
+  # Limit and projection bound each response independently of build history size.
+  paginated_query_specs = merge(
+    { for step in local.query_steps : step.name => {
+      parameters = {
+        TableName                = step.table_name
+        KeyConditionExpression   = "#hash = :hash AND #range > :floor"
+        ExpressionAttributeNames = { "#hash" = try(step.hash_key_name, "AppID"), "#range" = try(step.range_key_name, "SysKey") }
+        FilterExpression         = "BuildID = :build_id"
+        ExpressionAttributeValues = {
+          ":hash"     = { "S.$" = step.hash_key }
+          ":floor"    = { N = "0" }
+          ":build_id" = { "N.$" = step.build_id }
+        }
+        ProjectionExpression = join(", ", keys(step.result_attributes))
+        ScanIndexForward     = false
+        ConsistentRead       = true
+        Limit                = 1
+      }
+      cursor_key  = try(step.hash_key_name, "AppID")
+      selectors   = { for name, type in step.result_attributes : "${name}.$" => "$.__build_query.Items[0].${name}.${type}" }
+      result_path = try(step.result_path, null)
+      transition  = local.transitions[step.name]
+      retry       = try(step.retry, [])
+    } if try(step.build_id, null) != null },
+    { for step in local.build_query_steps : step.name => {
+      parameters = {
+        TableName              = step.table_name
+        KeyConditionExpression = "AppID = :app_id AND SysKey > :floor"
+        FilterExpression       = "BuildID = :build_id"
+        ExpressionAttributeValues = {
+          ":app_id"   = { "S.$" = "$.package_identity.AppID" }
+          ":floor"    = { N = "0" }
+          ":build_id" = { "N.$" = "States.Format('{}', $.package_identity.BuildID)" }
+        }
+        ProjectionExpression = join(", ", keys(step.result_attributes))
+        ScanIndexForward     = false
+        ConsistentRead       = true
+        Limit                = 1
+      }
+      cursor_key  = "AppID"
+      selectors   = { for name, type in step.result_attributes : "${name}.$" => "$.__build_query.Items[0].${name}.${type}" }
+      result_path = try(step.result_path, null)
+      transition  = local.transitions[step.name]
+      retry       = try(step.retry, [])
+    } },
+    { for step in local.approval_steps : "find_waiting_event" => {
+      parameters = {
+        TableName              = step.table_name
+        KeyConditionExpression = "AppID = :app AND SysKey > :floor"
+        FilterExpression       = "BuildID = :build AND JobStatus = :status"
+        ExpressionAttributeValues = {
+          ":app"    = { "S.$" = "$.AppID" }
+          ":build"  = { "N.$" = "$.BuildID" }
+          ":floor"  = { N = "0" }
+          ":status" = { S = try(step.job_status, "awaiting_approval") }
+        }
+        ProjectionExpression = "TaskToken"
+        ScanIndexForward     = false
+        ConsistentRead       = true
+        Limit                = 1
+      }
+      cursor_key  = "AppID"
+      selectors   = { "token.$" = "$.__build_query.Items[0].TaskToken.S" }
+      result_path = "$.waiting_event"
+      transition  = { Next = "route_decision" }
+      retry       = []
+    } }
+  )
+
+  paginated_query_state_groups = { for name, query in local.paginated_query_specs : name => {
+    (name) = merge({
+      Type       = "Task"
+      Resource   = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:dynamodb:query"
+      Parameters = query.parameters
+      ResultPath = "$.__build_query"
+      Next       = "${name}_check_page"
+    }, length(query.retry) == 0 ? {} : { Retry = query.retry })
+    "${name}_next_page" = merge({
+      Type       = "Task"
+      Resource   = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:dynamodb:query"
+      Parameters = merge(query.parameters, { "ExclusiveStartKey.$" = "$.__build_query.LastEvaluatedKey" })
+      ResultPath = "$.__build_query"
+      Next       = "${name}_check_page"
+    }, length(query.retry) == 0 ? {} : { Retry = query.retry })
+    "${name}_check_page" = {
+      Type = "Choice"
+      Choices = [
+        { Variable = "$.__build_query.Items[0]", IsPresent = true, Next = "${name}_select" },
+        { Variable = "$.__build_query.LastEvaluatedKey.${query.cursor_key}", IsPresent = true, Next = "${name}_next_page" },
+      ]
+      Default = "${name}_not_found"
+    }
+    "${name}_select" = merge({
+      Type       = "Pass"
+      Parameters = query.selectors
+    }, query.result_path == null ? {} : { ResultPath = query.result_path }, query.transition)
+    "${name}_not_found" = {
+      Type  = "Fail"
+      Error = "BuildEventNotFound"
+      Cause = "No matching build event exists after querying all pages."
+    }
+  } }
+  paginated_query_states = merge({}, [for name, states in local.paginated_query_state_groups : states if name != "find_waiting_event"]...)
 
   # Resolves a Forge package stem to its review event. Versioned stems use
   # ``<AppID>~<BuildID>`` and query that exact numeric build; legacy stems use
@@ -205,28 +302,6 @@ locals {
       ResultPath = "$.package_identity"
       Next       = "${step.name}_latest"
     }
-    (step.name) = merge(
-      {
-        Type     = "Task"
-        Resource = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:dynamodb:query"
-        Parameters = {
-          TableName              = step.table_name
-          KeyConditionExpression = "AppID = :app_id"
-          FilterExpression       = "BuildID = :build_id"
-          ExpressionAttributeValues = {
-            ":app_id"   = { "S.$" = "$.package_identity.AppID" }
-            ":build_id" = { "N.$" = "States.Format('{}', $.package_identity.BuildID)" }
-          }
-          ScanIndexForward     = false
-          ConsistentRead       = true
-          ProjectionExpression = join(", ", keys(step.result_attributes))
-        }
-        ResultSelector = { for name, type in step.result_attributes : "${name}.$" => "$.Items[0].${name}.${type}" }
-      },
-      local.transitions[step.name],
-      try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
-      length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry }
-    )
     "${step.name}_latest" = merge(
       {
         Type     = "Task"
@@ -319,7 +394,7 @@ locals {
   definition = {
     Comment = "Runs an ordered process using ECS script runner tasks and nested Step Functions."
     StartAt = local.step_entrypoints[var.steps[0].name]
-    States  = merge(local.task_states, local.step_function_states, local.dynamodb_states, local.query_states, local.build_query_states, local.approval_states, local.choice_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states, local.child_cleanup_states)
+    States  = merge(local.task_states, local.step_function_states, local.dynamodb_states, local.query_states, local.paginated_query_states, local.build_query_states, local.approval_states, local.choice_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states, local.child_cleanup_states)
   }
 
 }
@@ -372,7 +447,7 @@ resource "aws_sfn_state_machine" "resume" {
   definition = jsonencode({
     Comment = "Resumes the ${var.name} execution waiting for this approval."
     StartAt = "extract_decision"
-    States = {
+    States = merge(try(local.paginated_query_state_groups["find_waiting_event"], {}), {
       extract_decision = {
         Type = "Pass"
         Parameters = {
@@ -381,26 +456,6 @@ resource "aws_sfn_state_machine" "resume" {
           "JobStatus.$" = "$[0].dynamodb.NewImage.JobStatus.S"
         }
         Next = "find_waiting_event"
-      }
-      find_waiting_event = {
-        Type     = "Task"
-        Resource = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:dynamodb:query"
-        Parameters = {
-          TableName              = local.approval_steps[0].table_name
-          KeyConditionExpression = "AppID = :app AND SysKey > :floor"
-          FilterExpression       = "BuildID = :build AND JobStatus = :status"
-          ScanIndexForward       = false
-          ConsistentRead         = true
-          ExpressionAttributeValues = {
-            ":app"    = { "S.$" = "$.AppID" }
-            ":build"  = { "N.$" = "$.BuildID" }
-            ":floor"  = { N = "0" }
-            ":status" = { S = try(local.approval_steps[0].job_status, "awaiting_approval") }
-          }
-        }
-        ResultSelector = { "token.$" = "$.Items[0].TaskToken.S" }
-        ResultPath     = "$.waiting_event"
-        Next           = "route_decision"
       }
       route_decision = {
         Type = "Choice"
@@ -427,7 +482,7 @@ resource "aws_sfn_state_machine" "resume" {
         }
         Retry = [{ ErrorEquals = ["States.TaskFailed"], IntervalSeconds = 2, BackoffRate = 2, MaxAttempts = 3 }]
         Catch = [
-          { ErrorEquals = ["Sfn.InvalidToken", "Sfn.TaskDoesNotExist", "Sfn.TaskTimedOut"], Next = "already_resumed" },
+          { ErrorEquals = ["Sfn.InvalidTokenException", "Sfn.TaskDoesNotExistException", "Sfn.TaskTimedOutException"], Next = "already_resumed" },
           { ErrorEquals = ["States.ALL"], Next = "callback_failed" },
         ]
         End = true
@@ -442,7 +497,7 @@ resource "aws_sfn_state_machine" "resume" {
         }
         Retry = [{ ErrorEquals = ["States.TaskFailed"], IntervalSeconds = 2, BackoffRate = 2, MaxAttempts = 3 }]
         Catch = [
-          { ErrorEquals = ["Sfn.InvalidToken", "Sfn.TaskDoesNotExist", "Sfn.TaskTimedOut"], Next = "already_resumed" },
+          { ErrorEquals = ["Sfn.InvalidTokenException", "Sfn.TaskDoesNotExistException", "Sfn.TaskTimedOutException"], Next = "already_resumed" },
           { ErrorEquals = ["States.ALL"], Next = "callback_failed" },
         ]
         End = true
@@ -461,6 +516,6 @@ resource "aws_sfn_state_machine" "resume" {
         Error = "ReviewCallbackFailed"
         Cause = "The paused execution could not be resumed."
       }
-    }
+    })
   })
 }
