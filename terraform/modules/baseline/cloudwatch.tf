@@ -121,3 +121,21 @@ resource "aws_cloudwatch_metric_alarm" "this" {
     Name = each.key
   })
 }
+
+resource "aws_cloudwatch_event_rule" "baseline_aws_health_event_rule" {
+  count          = local.baseline_enable_aws_health_lambda ? 1 : 0
+  name           = var.baseline_aws_health_lambda_configuration.rule_name
+  event_bus_name = "default"
+  event_pattern = jsonencode({
+    source = ["aws.health"]
+  })
+}
+
+resource "aws_cloudwatch_event_target" "aws_health_event_target" {
+  count          = local.baseline_enable_aws_health_lambda ? 1 : 0
+  rule           = aws_cloudwatch_event_rule.baseline_aws_health_event_rule[count.index].name
+  event_bus_name = "default"
+  target_id      = "AWSHealthLambda"
+  role_arn       = aws_iam_role.baseline_eventbridge_invoke_lambda[count.index].arn
+  arn            = var.baseline_aws_health_lambda_configuration.aws_health_lambda_arn
+}

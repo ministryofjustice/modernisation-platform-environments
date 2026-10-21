@@ -51,3 +51,35 @@ resource "aws_iam_policy" "this" {
     create_before_destroy = true
   }
 }
+
+data "aws_iam_policy_document" "baseline_eventbridge_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "baseline_invoke_aws_health_lambda" {
+  count = local.baseline_enable_aws_health_lambda ? 1 : 0
+
+  statement {
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [
+      var.baseline_aws_health_lambda_configuration.aws_health_lambda_arn
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "baseline_invoke_aws_health_lambda" {
+  count  = local.baseline_enable_aws_health_lambda ? 1 : 0
+  name   = "InvokeAWSHealthLambda"
+  role   = aws_iam_role.baseline_eventbridge_invoke_lambda[count.index].id
+  policy = data.aws_iam_policy_document.baseline_invoke_aws_health_lambda[count.index].json
+}
+

@@ -72,3 +72,9 @@ resource "aws_iam_service_linked_role" "this" {
     Name = each.key
   })
 }
+
+resource "aws_iam_role" "baseline_eventbridge_invoke_lambda" {
+  count              = local.baseline_enable_aws_health_lambda ? 1 : 0
+  name               = "EventBridgeInvokeAWSHealthLambda"
+  assume_role_policy = data.aws_iam_policy_document.baseline_eventbridge_assume_role.json
+}
