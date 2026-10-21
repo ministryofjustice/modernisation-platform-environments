@@ -14,7 +14,13 @@ locals {
   # this is phase 2, alongside the OpenSearch provider / FGAC mapping (#8592).
   enable_opensearch_ingestion = local.opensearch_objects_enabled
 
-  opensearch_ingestion_bucket        = "${terraform.workspace}-fluentbit"
+  # TEMPORARY, for the demo only: hardcoded to one ephemeral dev cluster's bucket
+  # instead of the per-workspace name above, because that bucket doesn't exist at
+  # the root level. This cluster can be torn down at any time — if the demo
+  # pipeline starts failing on a missing bucket, that's why. Revert to the
+  # ${terraform.workspace}-fluentbit form (or the Option B cross-account design,
+  # see ADR-017) once a durable answer exists. Tracked on #8419.
+  opensearch_ingestion_bucket        = "cp-2010-1157-fluentbit"
   opensearch_ingestion_index         = "cp-${local.opensearch_env_label}-logs"
   opensearch_ingestion_pipeline_name = "cp-${local.opensearch_env_label}-s3-logs"
 }
