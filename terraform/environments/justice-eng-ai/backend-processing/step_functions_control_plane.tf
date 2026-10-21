@@ -17,7 +17,9 @@ locals {
         { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
         { name = "AWS_REGION", value = data.aws_region.current.region },
       ]
-      result_path = "$.control_plane_task"
+      result_path     = "$.control_plane_task"
+      timeout_seconds = 900
+      outputs         = true
     },
     {
       name              = "latest_event"
