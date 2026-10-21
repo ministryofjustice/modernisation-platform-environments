@@ -6,7 +6,7 @@ resource "aws_iam_role" "eventbridge_step_functions" {
     Statement = [{
       Effect = "Allow"
       Principal = {
-        Service = "events.amazonaws.com"
+        Service = "scheduler.amazonaws.com"
       }
       Action = "sts:AssumeRole"
     }]
