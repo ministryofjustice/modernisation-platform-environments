@@ -37,8 +37,7 @@ locals {
       enable_ssm_command_monitoring              = true
       s3_iam_policies                            = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
       ssm_maintenance_window_run_commands        = ["install-windows-definition-updates", "patch-manager-run-patch-baseline-group1", "patch-manager-run-patch-baseline-group2"]
-      ssm_patch_baselines                        = ["WindowsPatchGroup2Baseline"]
-      #ssm_patch_baselines                        = ["WindowsPatchGroup1Baseline", "WindowsPatchGroup2Baseline"]
+      ssm_patch_baselines                        = ["WindowsPatchGroup1Baseline", "WindowsPatchGroup2Baseline"]
     }
   }
 

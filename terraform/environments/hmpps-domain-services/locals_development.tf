@@ -141,13 +141,13 @@ locals {
       }
     }
 
-    #ssm_patch_baselines = {
+    ssm_patch_baselines = {
       # example emergency patching configuration
-    #  WindowsPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["WindowsPatchGroup1Baseline"], {
-    #    approved_patches = ["KB5128928"]
-    #    #rule1_approve_after_days = null
-    #    #rule1_approve_until_date = null
-    #  })
-    #}
+      WindowsPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["WindowsPatchGroup1Baseline"], {
+        approved_patches = ["KB5128928"]
+        #rule1_approve_after_days = null
+        #rule1_approve_until_date = null
+      })
+    }
   }
 }
