@@ -137,41 +137,6 @@ data "aws_iam_policy_document" "script_runner_ecs_task" {
   source_policy_documents = [data.aws_iam_policy_document.script_runner_common.json]
 
   statement {
-    sid       = "ReadWriteBuildEvents"
-    effect    = "Allow"
-    actions   = ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem"]
-    resources = [aws_dynamodb_table.build_review.arn]
-  }
-
-  statement {
-    sid       = "ReportScriptResult"
-    effect    = "Allow"
-    actions   = ["states:SendTaskSuccess", "states:SendTaskFailure"]
-    resources = ["*"]
-  }
-
-  statement {
-    sid       = "InvokeBedrockInferenceProfile"
-    effect    = "Allow"
-    actions   = ["bedrock:InvokeModel"]
-    resources = ["arn:${data.aws_partition.current.partition}:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/${local.bedrock_model_id}"]
-  }
-
-  # The profile routes to the foundation model in any of its geography's regions.
-  statement {
-    sid       = "InvokeBedrockFoundationModel"
-    effect    = "Allow"
-    actions   = ["bedrock:InvokeModel"]
-    resources = ["arn:${data.aws_partition.current.partition}:bedrock:*::foundation-model/${local.bedrock_foundation_model_id}*"]
-
-    condition {
-      test     = "StringLike"
-      variable = "bedrock:InferenceProfileArn"
-      values   = ["arn:${data.aws_partition.current.partition}:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/${local.bedrock_model_id}"]
-    }
-  }
-
-  statement {
     sid       = "ListBucketsOwnedByCurrentAccount"
     effect    = "Allow"
     actions   = ["s3:ListAllMyBuckets"]
@@ -424,6 +389,57 @@ resource "aws_iam_policy" "script_runner_ecs_task" {
 resource "aws_iam_role_policy_attachment" "script_runner_ecs_task" {
   role       = aws_iam_role.script_runner_ecs_task.name
   policy_arn = aws_iam_policy.script_runner_ecs_task.arn
+}
+
+# A managed policy is limited to 6,144 characters, so the build flow's permissions
+# (events table, Step Functions callback, Bedrock) are a second policy on the same role.
+data "aws_iam_policy_document" "script_runner_ecs_task_build_flow" {
+  statement {
+    sid       = "ReadWriteBuildEvents"
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem"]
+    resources = [aws_dynamodb_table.build_review.arn]
+  }
+
+  statement {
+    sid       = "ReportScriptResult"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess", "states:SendTaskFailure"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "InvokeBedrockInferenceProfile"
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel"]
+    resources = ["arn:${data.aws_partition.current.partition}:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/${local.bedrock_model_id}"]
+  }
+
+  # The profile routes to the foundation model in any of its geography's regions.
+  statement {
+    sid       = "InvokeBedrockFoundationModel"
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel"]
+    resources = ["arn:${data.aws_partition.current.partition}:bedrock:*::foundation-model/${local.bedrock_foundation_model_id}*"]
+
+    condition {
+      test     = "StringLike"
+      variable = "bedrock:InferenceProfileArn"
+      values   = ["arn:${data.aws_partition.current.partition}:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/${local.bedrock_model_id}"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "script_runner_ecs_task_build_flow" {
+  name        = "${local.application_name}-script-runner-task-build-flow"
+  description = "Permissions for script-runner tasks to write build events, report results to Step Functions and invoke Bedrock."
+  policy      = data.aws_iam_policy_document.script_runner_ecs_task_build_flow.json
+  tags        = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "script_runner_ecs_task_build_flow" {
+  role       = aws_iam_role.script_runner_ecs_task.name
+  policy_arn = aws_iam_policy.script_runner_ecs_task_build_flow.arn
 }
 
 # ---------- EC2 capacity: gives the task access to a Docker daemon ----------
