@@ -6,6 +6,10 @@ locals {
     maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
+  aws_health_lambda_configuration_production = {
+    enabled = false
+  }
+
   baseline_presets_production = {
     options = {
       db_backup_object_lock_days          = 14
@@ -40,10 +44,6 @@ locals {
           description = "wildcard cert for nomis production domains"
         }
       }
-    }
-
-    baseline_aws_health_lambda_configuration = {
-      enabled = false
     }
 
     cloudwatch_dashboards = {
