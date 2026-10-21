@@ -51,7 +51,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_console_internal_
 #  MP Workspaces (V1) - DEV & TEST only, SSO HTTPS access
 resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_console_internal_443_mp_v1_workspaces" {
   count             = local.ssogen_enabled && (local.environment == "development" || local.environment == "test") ? 1 : 0
-  security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
+  security_group_id = aws_security_group.sg_ssogen_console_internal_alb[count.index].id
   description       = "HTTPS from MP Workspaces (V1)"
   ip_protocol       = "TCP"
   from_port         = 443
