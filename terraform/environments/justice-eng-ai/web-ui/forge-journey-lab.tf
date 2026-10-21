@@ -216,6 +216,49 @@ resource "aws_iam_role_policy_attachment" "forge_ecs_task_package_s3" {
   policy_arn = aws_iam_policy.forge_ecs_task_package_s3[0].arn
 }
 
+# Grant Forge's task role write access to the build-details table, which
+# packaging records each build in before the S3 upload. The table is owned by
+# the backend-processing root (dynamodb.tf there); its name is read from that
+# root's outputs, like the staging bucket. Forge only writes to DynamoDB when
+# it packages to S3, so this is gated on the same flag.
+#   UpdateItem: atomically increments the per-app counter item (SysKey 0).
+#   PutItem:    writes the build record (conditional, never overwrites).
+# The table uses the AWS-managed DynamoDB key, so no KMS grant is needed.
+# try() guards against backend-processing not having been applied with its
+# build_details_table_name output yet -- remove once it has been.
+locals {
+  forge_build_details_table_name = try(data.terraform_remote_state.backend_processing.outputs.build_details_table_name, "")
+  forge_build_details_enabled    = local.forge_package_s3_enabled && local.forge_build_details_table_name != ""
+}
+
+data "aws_iam_policy_document" "forge_ecs_task_build_details" {
+  count = local.forge_build_details_enabled ? 1 : 0
+
+  statement {
+    sid    = "RecordForgeBuilds"
+    effect = "Allow"
+    actions = [
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${local.forge_build_details_table_name}"]
+  }
+}
+
+resource "aws_iam_policy" "forge_ecs_task_build_details" {
+  count       = local.forge_build_details_enabled ? 1 : 0
+  name        = "${local.forge_name}-ecs-task-build-details"
+  description = "Allow Forge Journey Lab to record packaged builds in the build-details DynamoDB table."
+  policy      = data.aws_iam_policy_document.forge_ecs_task_build_details[0].json
+  tags        = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "forge_ecs_task_build_details" {
+  count      = local.forge_build_details_enabled ? 1 : 0
+  role       = aws_iam_role.forge_ecs_task[0].name
+  policy_arn = aws_iam_policy.forge_ecs_task_build_details[0].arn
+}
+
 resource "aws_security_group" "forge_ecs_service" {
   count = local.forge_internal ? 1 : 0
 
