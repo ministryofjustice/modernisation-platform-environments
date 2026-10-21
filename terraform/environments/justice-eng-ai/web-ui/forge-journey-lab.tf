@@ -243,12 +243,36 @@ data "aws_iam_policy_document" "forge_ecs_task_build_details" {
     ]
     resources = ["arn:${data.aws_partition.current.partition}:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${local.forge_build_details_table_name}"]
   }
+
+  # Requester status uses a projected Query, never Scan or workflow tokens.
+  statement {
+    sid       = "ReadForgeRequesterStatus"
+    effect    = "Allow"
+    actions   = ["dynamodb:Query"]
+    resources = ["arn:${data.aws_partition.current.partition}:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${local.forge_build_details_table_name}"]
+
+    condition {
+      test     = "ForAllValues:StringEquals"
+      variable = "dynamodb:Attributes"
+      values   = ["AppID", "SysKey", "BuildID", "UserName", "JobStage", "JobStatus", "Date", "ReviewReason"]
+    }
+    condition {
+      test     = "Null"
+      variable = "dynamodb:Attributes"
+      values   = ["false"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "dynamodb:Select"
+      values   = ["SPECIFIC_ATTRIBUTES"]
+    }
+  }
 }
 
 resource "aws_iam_policy" "forge_ecs_task_build_details" {
   count       = local.forge_build_details_enabled ? 1 : 0
   name        = "${local.forge_name}-ecs-task-build-details"
-  description = "Allow Forge Journey Lab to record packaged builds in the build-details DynamoDB table."
+  description = "Allow Forge Journey Lab to record packaged builds and read projected requester status."
   policy      = data.aws_iam_policy_document.forge_ecs_task_build_details[0].json
   tags        = local.tags
 }
