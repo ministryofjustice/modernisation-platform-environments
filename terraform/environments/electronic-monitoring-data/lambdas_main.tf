@@ -1652,7 +1652,7 @@ module "register_athena" {
   role_arn                       = aws_iam_role.register_athena[0].arn
   memory_size                    = 1024
   timeout                        = 60
-  reserved_concurrent_executions = 1
+  reserved_concurrent_executions = 2
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.env_name
   security_group_ids             = [aws_security_group.lambda_generic.id]
