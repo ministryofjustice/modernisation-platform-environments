@@ -21,6 +21,9 @@ locals {
   script_runner_app_id_path           = "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1)), '.'), 0)"
   script_runner_forge_runtime_version = local.application_data.accounts[local.environment].forge_runtime_version
 
+  # Cross-region inference profile (e.g. eu.anthropic.claude-...); the underlying foundation model has no geography prefix.
+  bedrock_model_id            = local.application_data.accounts[local.environment].bedrock_model_id
+  bedrock_foundation_model_id = join(".", slice(split(".", local.bedrock_model_id), 1, length(split(".", local.bedrock_model_id))))
   # Task capacity; adjust after the script requirements are known.
   script_runner_task_cpu    = 1024
   script_runner_task_memory = 2048
@@ -132,13 +135,6 @@ resource "aws_iam_role" "script_runner_ecs_task" {
 
 data "aws_iam_policy_document" "script_runner_ecs_task" {
   source_policy_documents = [data.aws_iam_policy_document.script_runner_common.json]
-
-  statement {
-    sid       = "ReadWriteBuildEvents"
-    effect    = "Allow"
-    actions   = ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem"]
-    resources = [aws_dynamodb_table.build_review.arn]
-  }
 
   statement {
     sid       = "ListBucketsOwnedByCurrentAccount"
@@ -393,6 +389,57 @@ resource "aws_iam_policy" "script_runner_ecs_task" {
 resource "aws_iam_role_policy_attachment" "script_runner_ecs_task" {
   role       = aws_iam_role.script_runner_ecs_task.name
   policy_arn = aws_iam_policy.script_runner_ecs_task.arn
+}
+
+# A managed policy is limited to 6,144 characters, so the build flow's permissions
+# (events table, Step Functions callback, Bedrock) are a second policy on the same role.
+data "aws_iam_policy_document" "script_runner_ecs_task_build_flow" {
+  statement {
+    sid       = "ReadWriteBuildEvents"
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem"]
+    resources = [aws_dynamodb_table.build_review.arn]
+  }
+
+  statement {
+    sid       = "ReportScriptResult"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess", "states:SendTaskFailure"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "InvokeBedrockInferenceProfile"
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel"]
+    resources = ["arn:${data.aws_partition.current.partition}:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/${local.bedrock_model_id}"]
+  }
+
+  # The profile routes to the foundation model in any of its geography's regions.
+  statement {
+    sid       = "InvokeBedrockFoundationModel"
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel"]
+    resources = ["arn:${data.aws_partition.current.partition}:bedrock:*::foundation-model/${local.bedrock_foundation_model_id}*"]
+
+    condition {
+      test     = "StringLike"
+      variable = "bedrock:InferenceProfileArn"
+      values   = ["arn:${data.aws_partition.current.partition}:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/${local.bedrock_model_id}"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "script_runner_ecs_task_build_flow" {
+  name        = "${local.application_name}-script-runner-task-build-flow"
+  description = "Permissions for script-runner tasks to write build events, report results to Step Functions and invoke Bedrock."
+  policy      = data.aws_iam_policy_document.script_runner_ecs_task_build_flow.json
+  tags        = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "script_runner_ecs_task_build_flow" {
+  role       = aws_iam_role.script_runner_ecs_task.name
+  policy_arn = aws_iam_policy.script_runner_ecs_task_build_flow.arn
 }
 
 # ---------- EC2 capacity: gives the task access to a Docker daemon ----------

@@ -14,7 +14,9 @@ resource "aws_security_group" "oem_app_security_group" {
 resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc" {
   security_group_id = aws_security_group.oem_app_security_group.id
   description       = "Allow all outbound traffic within the VPC"
-  ip_protocol       = "-1"
+  ip_protocol       = "tcp"
+  from_port         = 1521
+  to_port           = 1521
   cidr_ipv4         = data.aws_vpc.shared.cidr_block
 
   tags = {

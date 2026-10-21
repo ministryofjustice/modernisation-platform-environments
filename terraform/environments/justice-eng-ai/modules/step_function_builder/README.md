@@ -4,7 +4,7 @@ The module creates a Standard Step Functions state machine from an ordered list 
 
 Each step is either:
 
-- `script_runner`: requires `name`, `type = "script_runner"`, `script_path`, and `shell_type`. Optional `variables` is a list of `{ name, value }` or `{ name, path }` objects. `path` reads from the current Step Functions input.
+- `script_runner`: requires `name`, `type = "script_runner"`, `script_path`, and `shell_type`. Optional `variables` is a list of `{ name, value }` or `{ name, path }` objects. `path` reads from the current Step Functions input. Optional `outputs = true` makes the script able to return values: the module runs the task with `ecs:runTask.waitForTaskToken` and sets `SCRIPT_OUTPUT_FILE` (`/tmp/script-output.json`) and `TASK_TOKEN`. The script writes a JSON object to `SCRIPT_OUTPUT_FILE`, and the container's exit hook returns it (or `{}` if no file was written) at the step's `result_path`. A non-zero exit fails the step, with no exit-code retry loop. The task role needs `states:SendTaskSuccess` and `states:SendTaskFailure`.
 - `step_function`: requires `name`, `type = "step_function"`, and `state_machine_name`. Optional `input_path` selects the input passed to the child workflow. The module builds the ARN using the current account and region.
 
 - `dynamodb_get_item`: requires `name`, `type = "dynamodb_get_item"`, `table_name` and `key` (attribute name => JSONPath or intrinsic function giving its string value). Optional `result_attributes` returns those string attributes at the top level of the result; without it the raw `{ Item = {...} }` result is returned, with no `Item` when nothing exists. Reads natively through Step Functions, with no Lambda.
