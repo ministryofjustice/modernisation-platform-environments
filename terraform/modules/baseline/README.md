@@ -42,6 +42,6 @@ are merged together and passed into baseline.  For example,
 - `locals_test.tf` defines additional s3 bucket just needed for test account.
 
 AWS Health event forwarding is configured through
-`baseline_aws_health_lambda_configuration`. Set `enabled = true` and provide
-`baseline_aws_health_lambda_arn` and `rule_name` to enable forwarding.
+`aws_health_lambda_configuration`. Set `enabled = true` and provide
+`aws_health_lambda_arn` and `rule_name` to enable forwarding.
 It is disabled by default.

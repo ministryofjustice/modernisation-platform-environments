@@ -9,7 +9,7 @@ locals {
     length(var.options.ssm_maintenance_window_run_commands) != 0 ? ["SSMPatchManagerTaskPolicy"] : [],
     var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessRole"] : [],
     var.options.enable_vmimport ? ["vmimport"] : [],
-    var.options.baseline_aws_health_lambda_configuration.enabled ? ["EventBridgeInvokeAWSHealthLambda"] : [],
+    var.options.aws_health_lambda_configuration.enabled ? ["EventBridgeInvokeAWSHealthLambda"] : [],
   ]))
 
   iam_roles = {

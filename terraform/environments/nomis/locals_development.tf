@@ -7,7 +7,7 @@ locals {
 
   aws_health_lambda_configuration_development = {
     enabled                        = true
-    baseline_aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
+    aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
     rule_name                      = "ForwardAllHealthEvents"
   }
 

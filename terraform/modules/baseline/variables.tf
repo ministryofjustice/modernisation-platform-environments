@@ -66,12 +66,12 @@ variable "backups" {
   default = {}
 }
 
-variable "baseline_aws_health_lambda_configuration" {
+variable "aws_health_lambda_configuration" {
   description = "Configuration for AWS Health event forwarding to the AWS Health lambda"
 
   type = object({
     enabled                        = bool
-    baseline_aws_health_lambda_arn = optional(string)
+    aws_health_lambda_arn = optional(string)
     rule_name                      = optional(string)
   })
 
@@ -81,14 +81,14 @@ variable "baseline_aws_health_lambda_configuration" {
 
   validation {
     condition = (
-      !var.baseline_aws_health_lambda_configuration.enabled ||
+      !var.aws_health_lambda_configuration.enabled ||
       (
-        try(trimspace(var.baseline_aws_health_lambda_configuration.baseline_aws_health_lambda_arn), "") != "" &&
-        try(trimspace(var.baseline_aws_health_lambda_configuration.rule_name), "") != ""
+        try(trimspace(var.aws_health_lambda_configuration.aws_health_lambda_arn), "") != "" &&
+        try(trimspace(var.aws_health_lambda_configuration.rule_name), "") != ""
       )
     )
 
-    error_message = "When baseline_aws_health_lambda_configuration.enabled is true, baseline_aws_health_lambda_arn and rule_name must both be provided and non-empty."
+    error_message = "When aws_health_lambda_configuration.enabled is true, aws_health_lambda_arn and rule_name must both be provided and non-empty."
   }
 }
 
