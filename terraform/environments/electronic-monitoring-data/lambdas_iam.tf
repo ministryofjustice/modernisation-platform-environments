@@ -3735,6 +3735,22 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
       "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation-approval-tokens/${local.environment_shorthand}/*",
     ]
   }
+
+  statement {
+    sid    = "ReconciliationRecoveryControl"
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:DeleteItem",
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+    ]
+
+    resources = [
+      aws_dynamodb_table.downstream_reconciliation_control.arn,
+    ]
+  }
 }
 
 resource "aws_iam_policy" "merge_redrive_planner" {
@@ -3785,6 +3801,32 @@ data "aws_iam_policy_document" "merge_redrive_approval_policy_document" {
     effect    = "Allow"
     actions   = ["states:SendTaskSuccess"]
     resources = ["*"]
+  }
+
+  statement {
+    sid    = "ReconciliationRecoveryControl"
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:UpdateItem",
+    ]
+
+    resources = [
+      aws_dynamodb_table.downstream_reconciliation_control.arn,
+    ]
+  }
+
+  statement {
+    sid     = "StartApprovedRollingRecovery"
+    effect  = "Allow"
+    actions = ["states:StartExecution"]
+
+    resources = [
+      module.merge_into_mdss_staged_position.arn,
+      module.merge_into_mdss_ac_position.arn,
+      module.merge_into_emdi_position.arn,
+    ]
   }
 }
 

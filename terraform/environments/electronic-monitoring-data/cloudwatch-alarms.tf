@@ -512,3 +512,59 @@ resource "aws_cloudwatch_metric_alarm" "specials_guard_lambda_errors" {
     aws_sns_topic.emds_alerts.arn,
   ]
 }
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation workflow failures
+# Surface planner, replay, verification and dependency failures in Slack.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_state_machines = tomap({
+    staged = {
+      consumer = "STAGED"
+      arn      = module.merge_into_mdss_staged_position.arn
+    }
+    ac = {
+      consumer = "AC"
+      arn      = module.merge_into_mdss_ac_position.arn
+    }
+    emdi = {
+      consumer = "EMDI"
+      arn      = module.merge_into_emdi_position.arn
+    }
+  })
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_execution_failed" {
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_state_machines
+    : tomap({})
+  )
+
+  alarm_name = "downstream_reconciliation_${each.key}_execution_failed"
+
+  alarm_description = (
+    "Triggered when ${each.value.consumer} downstream reconciliation fails"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "ExecutionsFailed"
+  namespace   = "AWS/States"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    StateMachineArn = each.value.arn
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}

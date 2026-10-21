@@ -1,4 +1,6 @@
 locals {
+  step_function_retry_attempts = try(local.application_data.accounts[local.environment].step_function_retry_attempts, 3)
+
   step_functions_child_state_machine_arns = [
     "arn:${data.aws_partition.current.partition}:states:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${local.application_name}-*"
   ]
@@ -160,6 +162,20 @@ data "aws_iam_policy_document" "step_functions_common" {
       variable = "iam:PassedToService"
       values   = ["ec2.amazonaws.com"]
     }
+  }
+
+  statement {
+    sid       = "ReadWriteBuildEvents"
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem"]
+    resources = [aws_dynamodb_table.build_review.arn]
+  }
+
+  statement {
+    sid       = "ResumePausedExecutions"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess", "states:SendTaskFailure"]
+    resources = ["*"]
   }
 
   statement {

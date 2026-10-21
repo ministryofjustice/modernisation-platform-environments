@@ -16,6 +16,13 @@ resource "aws_s3_bucket" "log_archive" {
   force_destroy = local.cluster_environment == "development_cluster" ? "true" : "false"
 }
 
+# Emit object events to EventBridge so consumers fan out via their own rules
+# (e.g. the OpenSearch ingestion pipeline, #8419). One per bucket, owned here.
+resource "aws_s3_bucket_notification" "log_archive" {
+  bucket      = aws_s3_bucket.log_archive.id
+  eventbridge = true
+}
+
 resource "aws_s3_bucket_public_access_block" "log_archive" {
   bucket = aws_s3_bucket.log_archive.id
 

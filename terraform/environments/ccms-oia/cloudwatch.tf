@@ -73,7 +73,7 @@ resource "aws_cloudwatch_metric_alarm" "container_connector_count" {
   statistic           = "Average"
   threshold           = local.application_data.accounts[local.environment].connector_app_count
   dimensions = {
-    ClusterName = aws_ecs_cluster.main.name
+    ClusterName = aws_ecs_cluster.conn_saa.name
     ServiceName = aws_ecs_service.ecs_connector_service.name
   }
   alarm_description         = "The number of OIA ECS tasks is less than ${local.application_data.accounts[local.environment].opa_app_count}. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
@@ -96,7 +96,7 @@ resource "aws_cloudwatch_metric_alarm" "container_opahub_count" {
   statistic           = "Average"
   threshold           = local.application_data.accounts[local.environment].opa_app_count
   dimensions = {
-    ClusterName = aws_ecs_cluster.main.name
+    ClusterName = aws_ecs_cluster.opa.name
     ServiceName = aws_ecs_service.opahub.name
   }
   alarm_description         = "The number of OIA ECS tasks is less than ${local.application_data.accounts[local.environment].opa_app_count}. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
@@ -118,7 +118,7 @@ resource "aws_cloudwatch_metric_alarm" "container_adaptor_count" {
   statistic           = "Average"
   threshold           = local.application_data.accounts[local.environment].adaptor_app_count
   dimensions = {
-    ClusterName = aws_ecs_cluster.main.name
+    ClusterName = aws_ecs_cluster.conn_saa.name
     ServiceName = aws_ecs_service.ecs_adaptor_service.name
   }
   alarm_description         = "The number of OIA ECS tasks is less than ${local.application_data.accounts[local.environment].opa_app_count}. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
@@ -131,8 +131,8 @@ resource "aws_cloudwatch_metric_alarm" "container_adaptor_count" {
 }
 
 # Underlying EC2 Instance Status Check Failure
-resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
-  alarm_name          = "${local.application_name}-${local.environment}-status-check-failure"
+resource "aws_cloudwatch_metric_alarm" "Opa_Status_Check_Failure" {
+  alarm_name          = "${local.application_name}-${local.environment}-opa-status-check-failure"
   alarm_description   = "A oia cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = "StatusCheckFailed"
@@ -143,7 +143,28 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster_scaling_group.name
+    AutoScalingGroupName = aws_autoscaling_group.opa_cluster_scaling_group.name
+  }
+  alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions    = [aws_sns_topic.cloudwatch_alerts.arn]
+
+  tags = local.tags
+}
+
+# Underlying EC2 Instance Status Check Failure
+resource "aws_cloudwatch_metric_alarm" "Conn_Saa_Status_Check_Failure" {
+  alarm_name          = "${local.application_name}-${local.environment}-conn-saa-status-check-failure"
+  alarm_description   = "A oia cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  metric_name         = "StatusCheckFailed"
+  statistic           = "Maximum"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  evaluation_periods  = "5"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.conn_saa_cluster_scaling_group.name
   }
   alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions    = [aws_sns_topic.cloudwatch_alerts.arn]
@@ -274,7 +295,7 @@ resource "aws_cloudwatch_metric_alarm" "opa_alb_healthyhosts" {
   alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
   dimensions = {
-    TargetGroup  = aws_lb_target_group.opahub_target_group.arn_suffix
+    TargetGroup  = aws_lb_target_group.opahub_ssl_target_group.arn_suffix
     LoadBalancer = aws_lb.opahub.arn_suffix
   }
 }

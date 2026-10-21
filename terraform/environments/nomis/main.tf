@@ -231,9 +231,26 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "ssm_documents", {}),
   )
 
+  ssm_maintenance_window_run_commands = merge(
+    module.baseline_presets.ssm_maintenance_window_run_commands,
+    lookup(local.baseline_all_environments, "ssm_maintenance_window_run_commands", {}),
+    lookup(local.baseline_environment_specific, "ssm_maintenance_window_run_commands", {}),
+  )
+
   ssm_parameters = merge(
     module.baseline_presets.ssm_parameters,
     lookup(local.baseline_all_environments, "ssm_parameters", {}),
     lookup(local.baseline_environment_specific, "ssm_parameters", {}),
   )
+
+  ssm_patch_baselines = merge(
+    module.baseline_presets.ssm_patch_baselines,
+    lookup(local.baseline_all_environments, "ssm_patch_baselines", {}),
+    lookup(local.baseline_environment_specific, "ssm_patch_baselines", {}),
+  )
+}
+
+module "aws_health_lambda_cloudwatch_events" {
+  source                          = "../../modules/aws_health_lambda_cloudwatch_events"
+  aws_health_lambda_configuration = local.aws_health_lambda_configuration_environment_specific
 }
