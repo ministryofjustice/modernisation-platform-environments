@@ -55,11 +55,6 @@ resource "aws_iam_role" "this" {
   })
 }
 
-moved {
-  from = aws_iam_role.baseline_eventbridge_invoke_lambda[0]
-  to   = aws_iam_role.this["EventBridgeInvokeAWSHealthLambda"]
-}
-
 resource "aws_iam_role_policy_attachment" "this" {
   for_each = local.iam_role_policy_attachments
 
