@@ -267,3 +267,280 @@ run "fractional_retry_limit" {
   }
   expect_failures = [var.step_function_retry_attempts]
 }
+
+run "review_gate_steps" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name        = "first"
+        type        = "script_runner"
+        script_path = "scripts/test.sh"
+        shell_type  = "bash"
+        result_path = "$.first"
+      },
+      {
+        name              = "read_decision"
+        type              = "dynamodb_get_item"
+        table_name        = "review-queue"
+        key               = { AppID = "$.app_id" }
+        result_attributes = ["AppID", "status"]
+        result_path       = "$"
+      },
+      {
+        name     = "gate"
+        type     = "choice"
+        variable = "$.status"
+        equals   = "approved"
+      },
+      {
+        name               = "child"
+        type               = "step_function"
+        state_machine_name = "child-machine"
+      },
+    ]
+  }
+
+  assert {
+    condition = (
+      local.definition.States.first_finish.Next == "read_decision" &&
+      endswith(local.definition.States.read_decision.Resource, ":states:::dynamodb:getItem") &&
+      local.definition.States.read_decision.Parameters.Key.AppID["S.$"] == "$.app_id" &&
+      local.definition.States.read_decision.ResultSelector["status.$"] == "$.Item.status.S" &&
+      local.definition.States.read_decision.ResultPath == "$" &&
+      local.definition.States.read_decision.Next == "gate"
+    )
+    error_message = "dynamodb_get_item must read the item natively and flatten the requested attributes."
+  }
+
+  assert {
+    condition = (
+      local.definition.States.gate.Choices[0].StringEquals == "approved" &&
+      local.definition.States.gate.Choices[0].Next == "child" &&
+      local.definition.States.gate.Default == "gate_stop" &&
+      local.definition.States.gate_stop.Type == "Succeed"
+    )
+    error_message = "choice must continue when matched and otherwise succeed without running later steps."
+  }
+}
+
+run "choice_cannot_be_last" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name     = "gate"
+        type     = "choice"
+        variable = "$.status"
+        equals   = "approved"
+      },
+    ]
+  }
+  expect_failures = [var.steps]
+}
+
+run "review_gate_when_absent" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name        = "read_record"
+        type        = "dynamodb_get_item"
+        table_name  = "review-queue"
+        key         = { AppID = "$.app_id" }
+        result_path = "$.review"
+      },
+      {
+        name        = "gate"
+        type        = "choice"
+        variable    = "$.review.Item"
+        when_absent = true
+      },
+      {
+        name               = "child"
+        type               = "step_function"
+        state_machine_name = "child-machine"
+      },
+    ]
+  }
+
+  assert {
+    condition = (
+      !contains(keys(local.definition.States.read_record), "ResultSelector") &&
+      local.definition.States.read_record.ResultPath == "$.review" &&
+      local.definition.States.gate.Choices[0].Not.Variable == "$.review.Item" &&
+      local.definition.States.gate.Choices[0].Not.IsPresent == true &&
+      local.definition.States.gate.Choices[0].Next == "child" &&
+      local.definition.States.gate.Default == "gate_stop"
+    )
+    error_message = "when_absent must continue only when the variable is missing, and the raw item must be returned without a ResultSelector."
+  }
+}
+
+run "latest_event_and_approval_wait" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name              = "latest"
+        type              = "dynamodb_query_latest"
+        table_name        = "build-details"
+        hash_key          = "$.AppID"
+        result_attributes = { BuildID = "N", JobStatus = "S" }
+        result_path       = "$.latest"
+      },
+      {
+        name     = "gate"
+        type     = "choice"
+        variable = "$.latest.JobStatus"
+        equals   = "awaiting_approval"
+      },
+      {
+        name       = "wait_for_approval"
+        type       = "wait_for_approval"
+        table_name = "build-details"
+        app_id     = "$.AppID"
+        build_id   = "$.BuildID"
+        user_name  = "$.UserName"
+        job_stage  = "control_plane"
+      },
+    ]
+  }
+
+  assert {
+    condition = (
+      endswith(local.definition.States.latest.Resource, ":states:::aws-sdk:dynamodb:query") &&
+      local.definition.States.latest.Parameters.ScanIndexForward == false &&
+      local.definition.States.latest.Parameters.Limit == 1 &&
+      local.definition.States.latest.Parameters.ExpressionAttributeValues[":hash"]["S.$"] == "$.AppID" &&
+      local.definition.States.latest.ResultSelector["BuildID.$"] == "$.Items[0].BuildID.N" &&
+      local.definition.States.latest.ResultSelector["JobStatus.$"] == "$.Items[0].JobStatus.S" &&
+      local.definition.States.latest.ResultPath == "$.latest" &&
+      local.definition.States.latest.Next == "gate"
+    )
+    error_message = "dynamodb_query_latest must read the newest event and flatten the requested attributes."
+  }
+
+  assert {
+    condition = (
+      local.definition.States.gate.Choices[0].Next == "wait_for_approval_next_key" &&
+      local.definition.States.wait_for_approval_next_key.Parameters.UpdateExpression == "ADD LastSysKey :one" &&
+      local.definition.States.wait_for_approval_next_key.ResultPath == "$.wait_for_approval_event" &&
+      local.definition.States.wait_for_approval_next_key.Next == "wait_for_approval"
+    )
+    error_message = "wait_for_approval must first increment the counter."
+  }
+
+  assert {
+    condition = (
+      endswith(local.definition.States.wait_for_approval.Resource, ":states:::aws-sdk:dynamodb:putItem.waitForTaskToken") &&
+      local.definition.States.wait_for_approval.Parameters.Item.TaskToken["S.$"] == "$$.Task.Token" &&
+      local.definition.States.wait_for_approval.Parameters.Item.SysKey["N.$"] == "$.wait_for_approval_event.value" &&
+      local.definition.States.wait_for_approval.Parameters.Item.JobStatus.S == "awaiting_approval" &&
+      local.definition.States.wait_for_approval.Parameters.Item.UserName["S.$"] == "$.UserName" &&
+      local.definition.States.wait_for_approval.ResultPath == "$.wait_for_approval_result" &&
+      local.definition.States.wait_for_approval.TimeoutSeconds == 31536000 &&
+      local.definition.States.wait_for_approval.End == true
+    )
+    error_message = "wait_for_approval must store the task token in an event and wait for the callback."
+  }
+}
+
+run "wait_for_approval_requires_fields" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name       = "wait_for_approval"
+        type       = "wait_for_approval"
+        table_name = "build-details"
+      },
+    ]
+  }
+  expect_failures = [var.steps]
+}
+
+run "resume_state_machine_created_with_approval_step" {
+  command = plan
+  variables {
+    name = "control"
+    steps = [
+      {
+        name       = "wait_for_approval"
+        type       = "wait_for_approval"
+        table_name = "build-details"
+        app_id     = "$.AppID"
+        build_id   = "$.BuildID"
+        job_stage  = "control_plane"
+      },
+    ]
+  }
+
+  assert {
+    condition = (
+      length(aws_sfn_state_machine.resume) == 1 &&
+      aws_sfn_state_machine.resume[0].name == "control-resume" &&
+      strcontains(aws_sfn_state_machine.resume[0].definition, "sendTaskSuccess") &&
+      strcontains(aws_sfn_state_machine.resume[0].definition, "build-details")
+    )
+    error_message = "A wait_for_approval step must create the companion resume state machine for its table."
+  }
+}
+
+run "no_resume_state_machine_without_approval_step" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name       = "read"
+        type       = "dynamodb_get_item"
+        table_name = "t"
+        key        = { AppID = "States.Format('x')" }
+      },
+    ]
+  }
+
+  assert {
+    condition     = length(aws_sfn_state_machine.resume) == 0
+    error_message = "Without a wait_for_approval step no resume state machine is created."
+  }
+}
+
+run "only_one_approval_step" {
+  command = plan
+  variables {
+    steps = [
+      { name = "a", type = "wait_for_approval", table_name = "t", app_id = "$.AppID", build_id = "$.BuildID", job_stage = "x" },
+      { name = "b", type = "wait_for_approval", table_name = "t", app_id = "$.AppID", build_id = "$.BuildID", job_stage = "y" },
+    ]
+  }
+  expect_failures = [var.steps]
+}
+
+run "script_outputs" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name        = "first"
+        type        = "script_runner"
+        script_path = "scripts/test.py"
+        shell_type  = "python3"
+        outputs     = true
+        result_path = "$.first"
+      },
+    ]
+  }
+
+  assert {
+    condition = (
+      endswith(local.definition.States.first.Resource, "ecs:runTask.waitForTaskToken") &&
+      local.definition.States.first.Next == "first_finish" &&
+      local.definition.States.first.Parameters.Overrides.ContainerOverrides[0].Environment[2].Name == "SCRIPT_OUTPUT_FILE" &&
+      local.definition.States.first.Parameters.Overrides.ContainerOverrides[0].Environment[3]["Value.$"] == "$$.Task.Token" &&
+      !contains(keys(local.definition.States), "first_check_exit_code") &&
+      local.definition.States.first_finish.ResultPath == "$.first"
+    )
+    error_message = "A script step with outputs waits for a task token, skips the exit-code check and returns the script's JSON at result_path."
+  }
+}

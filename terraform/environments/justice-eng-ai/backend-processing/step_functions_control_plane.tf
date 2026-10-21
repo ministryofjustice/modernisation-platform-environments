@@ -10,11 +10,41 @@ locals {
       variables = [
         { name = "s3_folder", path = "$.s3_folder" },
         { name = "s3_file", path = "$.s3_file" },
+        { name = "S3_BUCKET", value = aws_s3_bucket.staging_bucket.id },
         { name = "AppID", path = local.script_runner_app_id_path },
-        { name = "forge_runtime_version", value = local.script_runner_forge_runtime_version },
+        { name = "BuildID", path = "$.latest.BuildID" },
+        { name = "BEDROCK_MODEL_ID", value = local.bedrock_model_id },
+        { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
+        { name = "AWS_REGION", value = data.aws_region.current.region },
       ]
-      result_path = "$.control_plane_task"
-    }
+      result_path     = "$.control_plane_task"
+      timeout_seconds = 900
+      outputs         = true
+    },
+    {
+      name              = "latest_event"
+      type              = "dynamodb_query_latest"
+      table_name        = aws_dynamodb_table.build_review.name
+      hash_key          = local.script_runner_app_id_path
+      result_attributes = { JobStatus = "S" }
+      result_path       = "$.review"
+    },
+    {
+      # auto_approved ends the workflow here and the root carries on; awaiting_approval pauses below.
+      name     = "approval_gate"
+      type     = "choice"
+      variable = "$.review.JobStatus"
+      equals   = "awaiting_approval"
+    },
+    {
+      name       = "wait_for_approval"
+      type       = "wait_for_approval"
+      table_name = aws_dynamodb_table.build_review.name
+      app_id     = local.script_runner_app_id_path
+      build_id   = "$.latest.BuildID"
+      user_name  = "$.latest.UserName"
+      job_stage  = "control_plane"
+    },
   ]
 }
 

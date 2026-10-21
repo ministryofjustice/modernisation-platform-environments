@@ -4,8 +4,13 @@ The module creates a Standard Step Functions state machine from an ordered list 
 
 Each step is either:
 
-- `script_runner`: requires `name`, `type = "script_runner"`, `script_path`, and `shell_type`. Optional `variables` is a list of `{ name, value }` or `{ name, path }` objects. `path` reads from the current Step Functions input.
+- `script_runner`: requires `name`, `type = "script_runner"`, `script_path`, and `shell_type`. Optional `variables` is a list of `{ name, value }` or `{ name, path }` objects. `path` reads from the current Step Functions input. Optional `outputs = true` makes the script able to return values: the module runs the task with `ecs:runTask.waitForTaskToken` and sets `SCRIPT_OUTPUT_FILE` (`/tmp/script-output.json`) and `TASK_TOKEN`. The script writes a JSON object to `SCRIPT_OUTPUT_FILE`, and the container's exit hook returns it (or `{}` if no file was written) at the step's `result_path`. A non-zero exit fails the step, with no exit-code retry loop. The task role needs `states:SendTaskSuccess` and `states:SendTaskFailure`.
 - `step_function`: requires `name`, `type = "step_function"`, and `state_machine_name`. Optional `input_path` selects the input passed to the child workflow. The module builds the ARN using the current account and region.
+
+- `dynamodb_get_item`: requires `name`, `type = "dynamodb_get_item"`, `table_name` and `key` (attribute name => JSONPath or intrinsic function giving its string value). Optional `result_attributes` returns those string attributes at the top level of the result; without it the raw `{ Item = {...} }` result is returned, with no `Item` when nothing exists. Reads natively through Step Functions, with no Lambda.
+- `choice`: requires `name`, `type = "choice"`, `variable`, and either `equals` or `when_absent = true`. Execution continues to the next step when the string at `variable` equals `equals` (or, with `when_absent`, when `variable` is absent); otherwise it ends successfully at `<name>_stop` (optional `stop_comment`). It cannot be the last step.
+- `dynamodb_query_latest`: requires `name`, `type = "dynamodb_query_latest"`, `table_name`, `hash_key` (JSONPath or intrinsic giving the string hash key value) and `result_attributes` (attribute name => `"S"` or `"N"`). It reads the newest item whose range key is above 0 (a counter item at range key 0 is skipped) and returns those attributes, as strings, at the top level of the result. Optional `hash_key_name` (default `AppID`) and `range_key_name` (default `SysKey`). Uses the AWS SDK integration, with no Lambda.
+- `wait_for_approval`: requires `name`, `type = "wait_for_approval"`, `table_name`, `app_id` and `build_id` (JSONPaths) and `job_stage`. Optional `job_status` (default `awaiting_approval`), `user_name` (JSONPath), `timeout_seconds` (default 31536000, one year) and `result_path` (default `$.<name>_result`). It increments the table's counter item (hash key + range key 0, attribute `LastSysKey`) to get the next `SysKey`, appends an event holding the task token (`TaskToken`), and pauses until `SendTaskSuccess` or `SendTaskFailure` is called with that token. Resume the execution by looking the token up by `AppID` and `BuildID`. The module also creates a companion state machine `<name>-resume` (output `resume_arn`) that does this: start it with the DynamoDB stream record of the approving event (an array of one record) and it finds the `awaiting_approval` event for that `AppID` and `BuildID` and calls `SendTaskSuccess`. A second delivery of the same approval ends quietly. At most one `wait_for_approval` step is allowed per state machine.
 
 The first list item starts the process; subsequent items run in list order. Both step types support optional `retry`, `timeout_seconds`, and `result_path` attributes. Set `result_path` when a step should preserve the current input while storing its result.
 
@@ -34,14 +39,17 @@ In justice-eng-ai, set `accounts.<environment>.step_function_retry_attempts` in
 `application_variables.json`. The backend-processing workflows pass this setting
 to the module, falling back to 3 when the key is absent.
 
-The justice-eng-ai control-plane and infrastructure workflows derive `AppID`
-from the uploaded `s3_file` basename (`<AppID>.json`, with no dots in the ID),
-using the same expression as the image-build tag. They do not require `AppID`
-or `forge_runtime_version` in execution input. Both pass the pinned
-runtime tag from `accounts.<environment>.forge_runtime_version` in
-`application_variables.json` as the `forge_runtime_version` environment variable.
-The version lookup and filename expression are shared locals in the backend
-script-runner configuration.
+The justice-eng-ai control-plane workflow runs `scripts/control/root.py`. The
+script writes a record to the build review DynamoDB table (`dynamodb.tf`), keyed
+by `AppID` (the `s3_file` basename), only when the automated assessment flags the
+request for review. The workflow then looks the record up. The root workflow
+continues to the post-approval workflow (image build, then infrastructure) only
+when no record exists, i.e. the request was approved automatically. A request
+with a record waits in the table with status `not approved`; when a reviewer sets
+it to `approved`, an EventBridge Pipe on the table's stream
+(`eventbridge_pipes.tf`) starts the post-approval workflow with the record's
+`AppID`, `s3_folder` and `s3_file`. `AppID` and `forge_runtime_version` for the
+later steps are derived in Terraform, not returned by the script.
 
 ## Parent fallback cleanup for EC2 children
 

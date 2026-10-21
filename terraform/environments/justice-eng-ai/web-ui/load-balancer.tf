@@ -96,6 +96,13 @@ resource "aws_lb_listener" "https" {
     order            = local.oidc_wired ? 2 : 1
     target_group_arn = aws_lb_target_group.app.arn
   }
+
+  lifecycle {
+    precondition {
+      condition     = contains(["in-app", "alb"], local.builder_auth_mode)
+      error_message = "builder_auth_mode in application_variables.json must be \"in-app\" or \"alb\" (got \"${local.builder_auth_mode}\"). A typo would otherwise silently switch sign-in mode."
+    }
+  }
 }
 
 # ``/healthz`` bypasses OIDC so external monitors (and curl-based debugging)

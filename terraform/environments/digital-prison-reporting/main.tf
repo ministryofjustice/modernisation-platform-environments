@@ -210,6 +210,64 @@ module "glue_switch_prisons_hive_data_location_job" {
   ]
 }
 
+# Glue Job, Switch Reporting Hive Data Location
+module "glue_switch_reporting_hive_data_location_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-switch-reporting-data-source-${local.env}"
+  short_name                    = "${local.project}-switch-reporting-data-source"
+  command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
+  description                   = "Switch a domain's Hive tables in its reporting database to another data location.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.reporting.database: (Required) the domain's reporting database e.g. prisons or probation\n--dpr.reporting.data.switch.target.s3.path: (Required) s3 path to point the tables to e.g. s3://dpr-curated-zone-<env>"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-switch-reporting-data-source-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-switch-reporting-data-source-${local.env}/"
+
+  script_location = local.glue_placeholder_script_location
+  project_id      = local.project
+  aws_kms_key     = local.s3_kms_arn
+
+  custom_metric_namespace     = local.custom_metric_namespace
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
+
+  tags = merge(
+    local.all_tags,
+    {
+      dpr-name          = "${local.project}-switch-reporting-data-source-${local.env}"
+      dpr-resource-type = "Glue Job"
+      dpr-jira          = "DHS-953"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                = local.glue_jobs_jar_location
+    "--extra-files"               = local.shared_log4j_properties_path
+    "--class"                     = "uk.gov.justice.digital.job.SwitchHiveTableJob"
+    "--dpr.aws.region"            = local.account_region
+    "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id,
+    "--dpr.contract.registryName" = module.s3_schema_registry_bucket.bucket_id
+    "--dpr.schema.cache.max.size" = local.hive_table_creation_job_schema_cache_max_size
+    "--dpr.log.level"             = local.glue_job_common_log_level
+  }
+
+  depends_on = [
+    module.s3_raw_archive_bucket.bucket_id,
+    module.s3_structured_bucket.bucket_id,
+    module.s3_curated_bucket.bucket_id,
+    module.s3_glue_job_bucket.bucket_id,
+    module.glue_prisons_database.db_name,
+    module.glue_probation_database.db_name,
+    module.glue_registry_avro.registry_name
+  ]
+}
+
 # Glue Job, S3 Data Deletion Job
 module "glue_s3_data_deletion_job" {
   source                        = "./modules/glue_job"

@@ -120,7 +120,7 @@ class WorkerTests(unittest.TestCase):
         bucket = "integration-hub-file-transfer-pickup-development-346568122691"
         payload = message(DATA, CONFIG["portal_url"], {"bucket": bucket, "key": key})
         description = payload["content"]["description"]
-        self.assertEqual(description, f"Pickup path (URL-encoded): {key}\n<{CONFIG['portal_url']}|Open file-transfer pickup>")
+        self.assertEqual(description, f"File (URL-encoded): file.txt\nPickup path (URL-encoded): {key}\n<{CONFIG['portal_url']}|Open file-transfer pickup>")
         self.assertNotIn(bucket, description)
         self.assertNotIn("s3://", description)
 

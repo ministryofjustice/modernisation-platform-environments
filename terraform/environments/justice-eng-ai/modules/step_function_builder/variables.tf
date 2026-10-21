@@ -12,11 +12,28 @@ variable "steps" {
   description = <<-EOT
     Ordered process steps. Each item has a name and type. A script_runner step
     also has script_path, shell_type, and optional variables as {name, value}
-    or {name, path}. A step_function item has state_machine_name and optional
+    or {name, path}. A script_runner step may set outputs = true so the script
+    can return a JSON object (written to SCRIPT_OUTPUT_FILE) at its result_path. A step_function item has state_machine_name and optional
     input_path. Optional retry, timeout_seconds, and result_path fields apply
     to either type.
     A step_function step may set ec2_cleanup = { managed_by = "..." } to
     terminate its disposable hosts when the child fails after task retries.
+
+    A dynamodb_get_item step has table_name, key (attribute name => JSONPath or
+    intrinsic for its string value), optional result_attributes (string
+    attributes returned at the top level of the result) and optional
+    result_path. A dynamodb_query_latest step has table_name, hash_key (JSONPath
+    or intrinsic for the string hash key value), result_attributes (attribute
+    name => "S" or "N", returned as strings at the top level of the result),
+    optional hash_key_name (default AppID), range_key_name (default SysKey) and
+    result_path; it reads the newest item with a range key above 0. A
+    wait_for_approval step has table_name, app_id and build_id (JSONPaths),
+    job_stage, and optional job_status (default awaiting_approval), user_name
+    (JSONPath), timeout_seconds (default 31536000) and result_path; it appends
+    an event holding the task token and pauses until the token is sent back. A choice step has variable plus equals, or when_absent = true;
+    execution continues to the next step when the string matches (or the
+    variable is absent) and otherwise ends successfully (optional
+    stop_comment). A choice step cannot be last.
 
     Scope input_path to the specific prior result a step_function step needs
     (e.g. "$.previous_step_name") rather than "$", to avoid forwarding the
@@ -41,9 +58,9 @@ variable "steps" {
 
   validation {
     condition = alltrue([
-      for step in var.steps : contains(["script_runner", "step_function"], try(step.type, ""))
+      for step in var.steps : contains(["script_runner", "step_function", "dynamodb_get_item", "dynamodb_query_latest", "wait_for_approval", "choice"], try(step.type, ""))
     ])
-    error_message = "Each step type must be script_runner or step_function."
+    error_message = "Each step type must be script_runner, step_function, dynamodb_get_item, dynamodb_query_latest, wait_for_approval or choice."
   }
 
   validation {
@@ -51,9 +68,52 @@ variable "steps" {
       for step in var.steps : try(step.type, "") == "script_runner" ? (
         try(step.script_path, "") != "" &&
         try(step.shell_type, "") != ""
-      ) : try(step.state_machine_name, "") != "" && !startswith(try(step.state_machine_name, ""), "arn:")
+        ) : try(step.type, "") == "step_function" ? (
+        try(step.state_machine_name, "") != "" && !startswith(try(step.state_machine_name, ""), "arn:")
+      ) : true
     ])
     error_message = "Script runner steps require script_path and shell_type; step_function steps require a state_machine_name, not an ARN."
+  }
+
+  validation {
+    condition = alltrue([
+      for step in var.steps : try(step.type, "") == "dynamodb_get_item" ? (
+        try(step.table_name, "") != "" && try(length(step.key) > 0, false)
+      ) : true
+    ])
+    error_message = "dynamodb_get_item steps require table_name and a non-empty key."
+  }
+
+  validation {
+    condition = alltrue([
+      for step in var.steps : try(step.type, "") == "dynamodb_query_latest" ? (
+        try(step.table_name, "") != "" && try(step.hash_key, "") != "" && try(length(step.result_attributes) > 0, false)
+      ) : true
+    ])
+    error_message = "dynamodb_query_latest steps require table_name, hash_key and a non-empty result_attributes map."
+  }
+
+  validation {
+    condition = alltrue([
+      for step in var.steps : try(step.type, "") == "wait_for_approval" ? (
+        try(step.table_name, "") != "" && try(step.app_id, "") != "" && try(step.build_id, "") != "" && try(step.job_stage, "") != ""
+      ) : true
+    ])
+    error_message = "wait_for_approval steps require table_name, app_id, build_id and job_stage."
+  }
+
+  validation {
+    condition     = length([for step in var.steps : step if try(step.type, "") == "wait_for_approval"]) <= 1
+    error_message = "A state machine can have at most one wait_for_approval step."
+  }
+
+  validation {
+    condition = alltrue([
+      for index, step in var.steps : try(step.type, "") == "choice" ? (
+        try(step.variable, "") != "" && (try(step.equals, null) != null || try(step.when_absent, false)) && index < length(var.steps) - 1
+      ) : true
+    ])
+    error_message = "choice steps require variable and either equals or when_absent, and cannot be the last step."
   }
 }
 

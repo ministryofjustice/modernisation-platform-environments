@@ -52,15 +52,22 @@ def _is_secret_not_found(error):
     return response.get("Error", {}).get("Code") == "ResourceNotFoundException"
 
 
+def _is_invalid_secret_name(error):
+    response = getattr(error, "response", {})
+    return (
+        response.get("Error", {}).get("Code") == "ValidationException"
+        and response.get("Error", {}).get("Message", "").startswith("Invalid name.")
+    )
+
+
 def find_dispatch_configuration(secret_client, secret_name_prefix, object_key):
     secret_name_prefix = _required_string(secret_name_prefix, "secretNamePrefix")
     for candidate in secret_name_candidates(object_key):
+        secret_name = f"{secret_name_prefix}{candidate}"
         try:
-            response = secret_client.get_secret_value(
-                SecretId=f"{secret_name_prefix}{candidate}"
-            )
+            response = secret_client.get_secret_value(SecretId=secret_name)
         except Exception as error:
-            if _is_secret_not_found(error):
+            if _is_secret_not_found(error) or _is_invalid_secret_name(error):
                 continue
             raise
 
