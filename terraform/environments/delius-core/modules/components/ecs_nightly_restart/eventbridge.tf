@@ -33,7 +33,7 @@ resource "aws_iam_role_policy" "eventbridge_start_execution" {
 }
 
 resource "aws_scheduler_schedule" "nightly_restart" {
-  name        = "${local.lambda_name}-nightly-restart"
+  name = "${local.lambda_name}-nightly-restart"
 
   schedule_expression          = local.schedule_expression
   schedule_expression_timezone = "Europe/London"

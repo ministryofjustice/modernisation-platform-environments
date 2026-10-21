@@ -60,7 +60,7 @@ module "octo_access_entra_id_secret" {
 
   tags = merge(
     local.tags,
-    { "credential-expiration" = "2026-10-22" }
+    { "credential-expiration" = "2027-04-19" }
   )
 }
 

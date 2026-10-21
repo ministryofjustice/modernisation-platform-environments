@@ -431,6 +431,13 @@ data "aws_iam_policy_document" "script_runner_ecs_task_build_flow" {
   }
 }
 
+# The role is created here, so the account-role lookup in s3.tf cannot see it; grant the staging bucket key directly.
+resource "aws_iam_role_policy" "script_runner_ecs_task_staging_bucket_kms" {
+  name   = "${local.application_name}-script-runner-staging-bucket-kms"
+  role   = aws_iam_role.script_runner_ecs_task.name
+  policy = data.aws_iam_policy_document.ecs_staging_bucket_kms.json
+}
+
 resource "aws_iam_policy" "script_runner_ecs_task_build_flow" {
   name        = "${local.application_name}-script-runner-task-build-flow"
   description = "Permissions for script-runner tasks to write build events, report results to Step Functions and invoke Bedrock."
