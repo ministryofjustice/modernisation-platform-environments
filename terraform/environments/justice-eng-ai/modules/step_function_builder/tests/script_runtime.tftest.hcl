@@ -98,9 +98,49 @@ run "approval_callback_routing" {
       jsondecode(aws_sfn_state_machine.resume[0].definition).States.route_decision.Choices[1].StringEquals == "rejected" &&
       endswith(jsondecode(aws_sfn_state_machine.resume[0].definition).States.send_task_success.Resource, ":sfn:sendTaskSuccess") &&
       endswith(jsondecode(aws_sfn_state_machine.resume[0].definition).States.send_task_failure.Resource, ":sfn:sendTaskFailure") &&
-      jsondecode(aws_sfn_state_machine.resume[0].definition).States.send_task_failure.Parameters.Error == "ReviewRejected"
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.send_task_failure.Parameters.Error == "ReviewRejected" &&
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.send_task_success.Retry[0].ErrorEquals[0] == "States.TaskFailed" &&
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.send_task_success.Catch[0].Next == "already_resumed" &&
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.send_task_success.Catch[1].Next == "callback_failed" &&
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.callback_failed.Type == "Fail"
     )
     error_message = "Review callbacks must send task success for approval and task failure for rejection."
+  }
+}
+
+run "query_exact_build" {
+  command = plan
+
+  variables {
+    script_runner = null
+    steps = [{
+      name              = "build_event"
+      type              = "dynamodb_query_build"
+      table_name        = "test-build-details"
+      package_stem      = "$.package_stem"
+      result_attributes = { BuildID = "N", UserName = "S" }
+      result_path       = "$.latest"
+    }]
+  }
+
+  assert {
+    condition = (
+      local.definition.StartAt == "build_event_extract" &&
+      local.definition.States.build_event_extract.Parameters["stem.$"] == "$.package_stem" &&
+      local.definition.States.build_event_detect.Choices[0].StringMatches == "*~*" &&
+      local.definition.States.build_event_detect.Default == "build_event_prepare_latest" &&
+      local.definition.States.build_event_prepare_exact.Parameters["AppID.$"] == "States.ArrayGetItem(States.StringSplit($.package_identity.stem, '~'), 0)" &&
+      local.definition.States.build_event_prepare_exact.Parameters["BuildID.$"] == "States.StringToJson(States.ArrayGetItem(States.StringSplit($.package_identity.stem, '~'), 1))" &&
+      local.definition.States.build_event_prepare_latest.Parameters["AppID.$"] == "$.package_identity.stem" &&
+      local.definition.States.build_event.Parameters.FilterExpression == "BuildID = :build_id" &&
+      local.definition.States.build_event.Parameters.ScanIndexForward == false &&
+      local.definition.States.build_event.Parameters.ExpressionAttributeValues[":app_id"]["S.$"] == "$.package_identity.AppID" &&
+      local.definition.States.build_event.Parameters.ExpressionAttributeValues[":build_id"]["N.$"] == "States.Format('{}', $.package_identity.BuildID)" &&
+      local.definition.States.build_event_latest.Parameters.ExpressionAttributeValues[":app_id"]["S.$"] == "$.package_identity.AppID" &&
+      local.definition.States.build_event_latest.Parameters.Limit == 1 &&
+      local.definition.States.build_event.ResultSelector["UserName.$"] == "$.Items[0].UserName.S"
+    )
+    error_message = "Build queries must route legacy keys to latest and versioned keys to the exact numeric BuildID."
   }
 }
 
@@ -473,6 +513,30 @@ run "latest_event_and_approval_wait" {
       local.definition.States.wait_for_approval.End == true
     )
     error_message = "wait_for_approval must store the task token in an event and wait for the callback."
+  }
+}
+
+run "latest_event_for_exact_build" {
+  command = plan
+  variables {
+    script_runner = null
+    steps = [{
+      name              = "latest"
+      type              = "dynamodb_query_latest"
+      table_name        = "build-details"
+      hash_key          = "$.AppID"
+      build_id          = "$.BuildID"
+      result_attributes = { JobStatus = "S" }
+    }]
+  }
+
+  assert {
+    condition = (
+      local.definition.States.latest.Parameters.FilterExpression == "BuildID = :build_id" &&
+      local.definition.States.latest.Parameters.ExpressionAttributeValues[":build_id"]["N.$"] == "$.BuildID" &&
+      !contains(keys(local.definition.States.latest.Parameters), "Limit")
+    )
+    error_message = "A build-specific latest-event query must filter by BuildID before selecting the newest matching event."
   }
 }
 

@@ -26,6 +26,7 @@ locals {
       type              = "dynamodb_query_latest"
       table_name        = aws_dynamodb_table.build_review.name
       hash_key          = local.script_runner_app_id_path
+      build_id          = "$.latest.BuildID"
       result_attributes = { JobStatus = "S" }
       result_path       = "$.review"
     },

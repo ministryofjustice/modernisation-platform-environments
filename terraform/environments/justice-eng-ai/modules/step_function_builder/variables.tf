@@ -25,8 +25,12 @@ variable "steps" {
     result_path. A dynamodb_query_latest step has table_name, hash_key (JSONPath
     or intrinsic for the string hash key value), result_attributes (attribute
     name => "S" or "N", returned as strings at the top level of the result),
-    optional hash_key_name (default AppID), range_key_name (default SysKey) and
-    result_path; it reads the newest item with a range key above 0. A
+    optional hash_key_name (default AppID), range_key_name (default SysKey),
+    build_id (a numeric JSONPath filter) and result_path; it reads the newest
+    matching item with a range key above 0. A
+    dynamodb_query_build step has table_name, package_stem and
+    result_attributes. Versioned package stems select the matching numeric
+    BuildID; legacy stems select the newest event for the AppID. A
     wait_for_approval step has table_name, app_id and build_id (JSONPaths),
     job_stage, and optional job_status (default awaiting_approval), user_name
     (JSONPath), timeout_seconds (default 31536000) and result_path; it appends
@@ -60,9 +64,9 @@ variable "steps" {
 
   validation {
     condition = alltrue([
-      for step in var.steps : contains(["script_runner", "step_function", "dynamodb_get_item", "dynamodb_query_latest", "wait_for_approval", "choice"], try(step.type, ""))
+      for step in var.steps : contains(["script_runner", "step_function", "dynamodb_get_item", "dynamodb_query_latest", "dynamodb_query_build", "wait_for_approval", "choice"], try(step.type, ""))
     ])
-    error_message = "Each step type must be script_runner, step_function, dynamodb_get_item, dynamodb_query_latest, wait_for_approval or choice."
+    error_message = "Each step type must be script_runner, step_function, dynamodb_get_item, dynamodb_query_latest, dynamodb_query_build, wait_for_approval or choice."
   }
 
   validation {
@@ -93,6 +97,15 @@ variable "steps" {
       ) : true
     ])
     error_message = "dynamodb_query_latest steps require table_name, hash_key and a non-empty result_attributes map."
+  }
+
+  validation {
+    condition = alltrue([
+      for step in var.steps : try(step.type, "") == "dynamodb_query_build" ? (
+        try(step.table_name, "") != "" && try(step.package_stem, "") != "" && try(length(step.result_attributes) > 0, false)
+      ) : true
+    ])
+    error_message = "dynamodb_query_build steps require table_name, package_stem and a non-empty result_attributes map."
   }
 
   validation {

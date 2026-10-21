@@ -135,6 +135,7 @@ data "aws_iam_policy_document" "ecs_task_build_review" {
     effect = "Allow"
     actions = [
       "dynamodb:PutItem",
+      "dynamodb:TransactWriteItems",
       "dynamodb:UpdateItem",
     ]
     resources = ["arn:${data.aws_partition.current.partition}:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${local.build_review_table_name}"]

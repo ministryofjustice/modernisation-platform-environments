@@ -9,11 +9,12 @@ locals {
   step_function_steps = [for step in var.steps : step if step.type == "step_function"]
   dynamodb_steps      = [for step in var.steps : step if step.type == "dynamodb_get_item"]
   query_steps         = [for step in var.steps : step if step.type == "dynamodb_query_latest"]
+  build_query_steps   = [for step in var.steps : step if step.type == "dynamodb_query_build"]
   approval_steps      = [for step in var.steps : step if step.type == "wait_for_approval"]
   choice_steps        = [for step in var.steps : step if step.type == "choice"]
   child_cleanup_steps = [for step in local.step_function_steps : step if try(step.ec2_cleanup, null) != null]
   step_entrypoints = {
-    for step in var.steps : step.name => step.type == "script_runner" ? "${step.name}_prepare_host" : step.type == "wait_for_approval" ? "${step.name}_next_key" : try(step.ec2_cleanup, null) != null ? "${step.name}_prepare_child" : step.name
+    for step in var.steps : step.name => step.type == "script_runner" ? "${step.name}_prepare_host" : step.type == "wait_for_approval" ? "${step.name}_next_key" : step.type == "dynamodb_query_build" ? "${step.name}_extract" : try(step.ec2_cleanup, null) != null ? "${step.name}_prepare_child" : step.name
   }
 
   transitions = {
@@ -139,18 +140,27 @@ locals {
       {
         Type     = "Task"
         Resource = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:dynamodb:query"
-        Parameters = {
+        Parameters = merge({
           TableName                = step.table_name
           KeyConditionExpression   = "#hash = :hash AND #range > :floor"
           ExpressionAttributeNames = { "#hash" = try(step.hash_key_name, "AppID"), "#range" = try(step.range_key_name, "SysKey") }
-          ExpressionAttributeValues = {
-            ":hash"  = { "S.$" = step.hash_key }
-            ":floor" = { N = "0" }
-          }
+          ExpressionAttributeValues = merge(
+            {
+              ":hash"  = { "S.$" = step.hash_key }
+              ":floor" = { N = "0" }
+            },
+            try(step.build_id, null) == null ? {} : {
+              ":build_id" = { "N.$" = step.build_id }
+            }
+          )
           ScanIndexForward = false
-          Limit            = 1
           ConsistentRead   = true
-        }
+          },
+          try(step.build_id, null) == null ? { Limit = 1 } : {},
+          try(step.build_id, null) == null ? {} : {
+            FilterExpression = "BuildID = :build_id"
+          },
+        )
         ResultSelector = { for name, type in step.result_attributes : "${name}.$" => "$.Items[0].${name}.${type}" }
       },
       local.transitions[step.name],
@@ -158,6 +168,88 @@ locals {
       length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry }
     )
   }
+
+  # Resolves a Forge package stem to its review event. Versioned stems use
+  # ``<AppID>~<BuildID>`` and query that exact numeric build; legacy stems use
+  # the newest event for the AppID so application-first rollouts remain safe.
+  build_query_states = merge({}, [for step in local.build_query_steps : {
+    "${step.name}_extract" = {
+      Type       = "Pass"
+      Parameters = { "stem.$" = step.package_stem }
+      ResultPath = "$.package_identity"
+      Next       = "${step.name}_detect"
+    }
+    "${step.name}_detect" = {
+      Type = "Choice"
+      Choices = [{
+        Variable      = "$.package_identity.stem"
+        StringMatches = "*~*"
+        Next          = "${step.name}_prepare_exact"
+      }]
+      Default = "${step.name}_prepare_latest"
+    }
+    "${step.name}_prepare_exact" = {
+      Type = "Pass"
+      Parameters = {
+        "AppID.$"   = "States.ArrayGetItem(States.StringSplit($.package_identity.stem, '~'), 0)"
+        "BuildID.$" = "States.StringToJson(States.ArrayGetItem(States.StringSplit($.package_identity.stem, '~'), 1))"
+      }
+      ResultPath = "$.package_identity"
+      Next       = step.name
+    }
+    "${step.name}_prepare_latest" = {
+      Type = "Pass"
+      Parameters = {
+        "AppID.$" = "$.package_identity.stem"
+      }
+      ResultPath = "$.package_identity"
+      Next       = "${step.name}_latest"
+    }
+    (step.name) = merge(
+      {
+        Type     = "Task"
+        Resource = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:dynamodb:query"
+        Parameters = {
+          TableName              = step.table_name
+          KeyConditionExpression = "AppID = :app_id"
+          FilterExpression       = "BuildID = :build_id"
+          ExpressionAttributeValues = {
+            ":app_id"   = { "S.$" = "$.package_identity.AppID" }
+            ":build_id" = { "N.$" = "States.Format('{}', $.package_identity.BuildID)" }
+          }
+          ScanIndexForward     = false
+          ConsistentRead       = true
+          ProjectionExpression = join(", ", keys(step.result_attributes))
+        }
+        ResultSelector = { for name, type in step.result_attributes : "${name}.$" => "$.Items[0].${name}.${type}" }
+      },
+      local.transitions[step.name],
+      try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
+      length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry }
+    )
+    "${step.name}_latest" = merge(
+      {
+        Type     = "Task"
+        Resource = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:dynamodb:query"
+        Parameters = {
+          TableName              = step.table_name
+          KeyConditionExpression = "AppID = :app_id AND SysKey > :floor"
+          ExpressionAttributeValues = {
+            ":app_id" = { "S.$" = "$.package_identity.AppID" }
+            ":floor"  = { N = "0" }
+          }
+          ScanIndexForward     = false
+          Limit                = 1
+          ConsistentRead       = true
+          ProjectionExpression = join(", ", keys(step.result_attributes))
+        }
+        ResultSelector = { for name, type in step.result_attributes : "${name}.$" => "$.Items[0].${name}.${type}" }
+      },
+      local.transitions[step.name],
+      try(step.result_path, null) == null ? {} : { ResultPath = step.result_path },
+      length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry }
+    )
+  }]...)
 
   # Pauses the execution until an external caller sends the task token back
   # (SendTaskSuccess/SendTaskFailure). Appends an event to the build events table that
@@ -227,7 +319,7 @@ locals {
   definition = {
     Comment = "Runs an ordered process using ECS script runner tasks and nested Step Functions."
     StartAt = local.step_entrypoints[var.steps[0].name]
-    States  = merge(local.task_states, local.step_function_states, local.dynamodb_states, local.query_states, local.approval_states, local.choice_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states, local.child_cleanup_states)
+    States  = merge(local.task_states, local.step_function_states, local.dynamodb_states, local.query_states, local.build_query_states, local.approval_states, local.choice_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states, local.child_cleanup_states)
   }
 
 }
@@ -333,9 +425,12 @@ resource "aws_sfn_state_machine" "resume" {
           "TaskToken.$" = "$.waiting_event.token"
           Output        = "{}"
         }
-        # The token was already used, e.g. the same decision was delivered twice.
-        Catch = [{ ErrorEquals = ["States.ALL"], Next = "already_resumed" }]
-        End   = true
+        Retry = [{ ErrorEquals = ["States.TaskFailed"], IntervalSeconds = 2, BackoffRate = 2, MaxAttempts = 3 }]
+        Catch = [
+          { ErrorEquals = ["Sfn.InvalidToken", "Sfn.TaskDoesNotExist", "Sfn.TaskTimedOut"], Next = "already_resumed" },
+          { ErrorEquals = ["States.ALL"], Next = "callback_failed" },
+        ]
+        End = true
       }
       send_task_failure = {
         Type     = "Task"
@@ -345,8 +440,12 @@ resource "aws_sfn_state_machine" "resume" {
           Error         = "ReviewRejected"
           Cause         = "Application review was rejected"
         }
-        Catch = [{ ErrorEquals = ["States.ALL"], Next = "already_resumed" }]
-        End   = true
+        Retry = [{ ErrorEquals = ["States.TaskFailed"], IntervalSeconds = 2, BackoffRate = 2, MaxAttempts = 3 }]
+        Catch = [
+          { ErrorEquals = ["Sfn.InvalidToken", "Sfn.TaskDoesNotExist", "Sfn.TaskTimedOut"], Next = "already_resumed" },
+          { ErrorEquals = ["States.ALL"], Next = "callback_failed" },
+        ]
+        End = true
       }
       unexpected_status = {
         Type  = "Fail"
@@ -356,6 +455,11 @@ resource "aws_sfn_state_machine" "resume" {
       already_resumed = {
         Type    = "Succeed"
         Comment = "Nothing is waiting for this review decision."
+      }
+      callback_failed = {
+        Type  = "Fail"
+        Error = "ReviewCallbackFailed"
+        Cause = "The paused execution could not be resumed."
       }
     }
   })
