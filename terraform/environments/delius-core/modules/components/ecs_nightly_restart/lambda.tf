@@ -1,6 +1,6 @@
 locals {
   lambda_name         = "${var.service_name}-nightly-restart"
-  schedule_expression = "cron(15 10 * * ? *)" # 09:15 every day
+  schedule_expression = "cron(20 11 * * ? *)" # 02:15 every day
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {

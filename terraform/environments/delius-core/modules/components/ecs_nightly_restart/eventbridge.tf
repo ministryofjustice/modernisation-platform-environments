@@ -32,13 +32,22 @@ resource "aws_iam_role_policy" "eventbridge_start_execution" {
   })
 }
 
-resource "aws_cloudwatch_event_rule" "nightly_restart_rule" {
-  name                = "${local.lambda_name}-nightly-restart-rule"
-  schedule_expression = local.schedule_expression
-}
+resource "aws_scheduler_schedule" "nightly_restart" {
+  name        = "${local.lambda_name}-nightly-restart"
 
-resource "aws_cloudwatch_event_target" "nightly_restart_target" {
-  rule     = aws_cloudwatch_event_rule.nightly_restart_rule.name
-  arn      = aws_sfn_state_machine.ecs_restart.arn
-  role_arn = aws_iam_role.eventbridge_step_functions.arn
+  schedule_expression          = local.schedule_expression
+  schedule_expression_timezone = "Europe/London"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  target {
+    arn      = aws_sfn_state_machine.ecs_restart.arn
+    role_arn = aws_iam_role.eventbridge_step_functions.arn
+  }
+
+  depends_on = [
+    aws_iam_role_policy.eventbridge_start_execution
+  ]
 }
