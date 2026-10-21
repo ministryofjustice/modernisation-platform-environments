@@ -141,20 +141,11 @@ locals {
       }
     }
 
+    # example emergency patching configuration
     ssm_patch_baselines = {
-      # example emergency patching configuration
-      WindowsPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["WindowsPatchGroup1Baseline"], {
-        approved_patches = ["KB5128928"]
-        additional_approval_rules = [{
-          approve_after_days = 0
-          compliance_level   = "CRITICAL"
-          patch_filters = {
-            CLASSIFICATION = ["DefinitionUpdates"]
-            MSRC_SEVERITY  = ["*"]
-            PRODUCT        = ["*"]
-          }
-        }]
-      })
+      # WindowsPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["WindowsPatchGroup1Baseline"], {
+      #   approved_patches = ["KB5128928"]
+      # })
     }
   }
 }
