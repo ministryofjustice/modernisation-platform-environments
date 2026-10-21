@@ -28,6 +28,7 @@ locals {
         { name = "FORGE_RUNTIME_BASE_ECR_REPOSITORY_URI", value = local.forge_runtime_base_ecr_repository_uri },
       ]
       result_path     = "$.image_build_task"
+      outputs         = true
       timeout_seconds = 3600
     }
   ]

@@ -12,7 +12,8 @@ variable "steps" {
   description = <<-EOT
     Ordered process steps. Each item has a name and type. A script_runner step
     also has script_path, shell_type, and optional variables as {name, value}
-    or {name, path}. A step_function item has state_machine_name and optional
+    or {name, path}. A script_runner step may set outputs = true so the script
+    can return a JSON object (written to SCRIPT_OUTPUT_FILE) at its result_path. A step_function item has state_machine_name and optional
     input_path. Optional retry, timeout_seconds, and result_path fields apply
     to either type.
     A step_function step may set ec2_cleanup = { managed_by = "..." } to

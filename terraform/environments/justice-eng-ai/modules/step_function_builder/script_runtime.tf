@@ -40,7 +40,7 @@ locals {
       ResultPath = "$.script_runner_host.failure"
       Next       = local.ec2_mode ? "${step.name}_terminate_instance" : "${step.name}_failed"
     }
-  }]...)
+  } if !try(step.outputs, false)]...)
 
   fargate_lifecycle_states = merge({}, [for step in local.task_steps : {
     "${step.name}_prepare_host" = {

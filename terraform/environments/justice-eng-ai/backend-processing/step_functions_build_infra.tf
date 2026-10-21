@@ -11,10 +11,12 @@ locals {
         { name = "AppID", path = local.script_runner_app_id_path },
         { name = "BuildID", path = "$.latest.BuildID" },
         { name = "forge_runtime_version", value = local.script_runner_forge_runtime_version },
+        { name = "index_html_path", path = "$.image_build_task.index_html_path" },
         { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
         { name = "AWS_REGION", value = local.aws_region },
       ]
       result_path = "$.build_infra_task"
+      outputs     = true
     }
   ]
 }

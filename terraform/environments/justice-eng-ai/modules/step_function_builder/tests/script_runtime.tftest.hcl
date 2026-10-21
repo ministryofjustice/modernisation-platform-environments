@@ -516,3 +516,31 @@ run "only_one_approval_step" {
   }
   expect_failures = [var.steps]
 }
+
+run "script_outputs" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name        = "first"
+        type        = "script_runner"
+        script_path = "scripts/test.py"
+        shell_type  = "python3"
+        outputs     = true
+        result_path = "$.first"
+      },
+    ]
+  }
+
+  assert {
+    condition = (
+      endswith(local.definition.States.first.Resource, "ecs:runTask.waitForTaskToken") &&
+      local.definition.States.first.Next == "first_finish" &&
+      local.definition.States.first.Parameters.Overrides.ContainerOverrides[0].Environment[2].Name == "SCRIPT_OUTPUT_FILE" &&
+      local.definition.States.first.Parameters.Overrides.ContainerOverrides[0].Environment[3]["Value.$"] == "$$.Task.Token" &&
+      !contains(keys(local.definition.States), "first_check_exit_code") &&
+      local.definition.States.first_finish.ResultPath == "$.first"
+    )
+    error_message = "A script step with outputs waits for a task token, skips the exit-code check and returns the script's JSON at result_path."
+  }
+}
