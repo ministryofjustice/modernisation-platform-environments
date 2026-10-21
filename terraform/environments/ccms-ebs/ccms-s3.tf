@@ -3,8 +3,8 @@
 # S3 Bucket - Logging
 # ---------------------------------------------
 module "s3-bucket-logging" {
-  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
+  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
@@ -131,8 +131,8 @@ resource "aws_s3_bucket_notification" "logging_bucket_notification" {
 # S3 Bucket - R-sync
 # ---------------------------------------------
 module "s3-bucket-dbbackup" {
-  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
+  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = true
@@ -189,7 +189,7 @@ module "s3-bucket-dbbackup" {
   log_bucket                = local.logging_bucket_name
   log_prefix                = "s3access/"
   log_partition_date_source = "EventTime"
-  manage_log_bucket_policy  = false
+  # manage_log_bucket_policy  = false
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
