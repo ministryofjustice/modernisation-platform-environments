@@ -3,8 +3,8 @@
 # ---------------------------------------------
 
 module "s3-bucket-sftp-bc" {
-  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
   bucket_name        = local.sftp_bc_bucket_name
   versioning_enabled = true
   bucket_policy = [jsonencode({
@@ -71,15 +71,14 @@ module "s3-bucket-sftp-bc" {
   log_buckets = {
     log_bucket_name = local.logging_bucket_name
     log_bucket_arn  = "arn:aws:s3:::${local.logging_bucket_name}"
-    log_bucket_policy = jsonencode({
-      Version   = "2012-10-17"
-      Statement = []
-    })
-
   }
-  log_prefix     = "s3access/${local.sftp_bc_bucket_name}"
-  custom_kms_key = aws_kms_key.s3_sftp_kms_key.arn
-  sse_algorithm  = "aws:kms"
+  log_prefix                = "s3access/"
+  log_partition_date_source = "EventTime"
+  manage_log_bucket_policy  = false
+
+  custom_kms_key              = aws_kms_key.s3_sftp_kms_key.arn
+  enforce_kms_request_headers = false
+  sse_algorithm               = "aws:kms"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -118,12 +117,6 @@ module "s3-bucket-sftp-bc" {
     { Name = lower(format("s3-%s-%s-bc-inbound-mp", local.application_name, local.environment)) }
   )
 }
-
-# resource "aws_s3_bucket_logging" "s3_bucket_sftp_bc" {
-#   bucket        = module.s3-bucket-sftp-bc.bucket.id
-#   target_bucket = local.logging_bucket_name
-#   target_prefix = "s3access/${local.sftp_bc_bucket_name}/"
-# }
 
 resource "aws_s3_bucket_notification" "sftp_bucket_notification" {
   bucket      = module.s3-bucket-sftp-bc.bucket.id
