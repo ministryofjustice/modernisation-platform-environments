@@ -14,11 +14,11 @@ resource "aws_security_group" "load_balancer_internal" {
 
 # EGRESS
 resource "aws_vpc_security_group_egress_rule" "lb_int_egress_3872_app" {
-  security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Allow all outbound traffic"
-  ip_protocol       = "tcp"
-  from_port         = 3872
-  to_port           = 3872
+  security_group_id            = aws_security_group.load_balancer_internal.id
+  description                  = "Allow all outbound traffic"
+  ip_protocol                  = "tcp"
+  from_port                    = 3872
+  to_port                      = 3872
   referenced_security_group_id = aws_security_group.oem_app_security_group.id
 
   tags = {
@@ -27,11 +27,11 @@ resource "aws_vpc_security_group_egress_rule" "lb_int_egress_3872_app" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "lb_int_egress_8000_app" {
-  security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Allow all outbound traffic"
-  ip_protocol       = "tcp"
-  from_port         = 8000
-  to_port           = 8000
+  security_group_id            = aws_security_group.load_balancer_internal.id
+  description                  = "Allow all outbound traffic"
+  ip_protocol                  = "tcp"
+  from_port                    = 8000
+  to_port                      = 8000
   referenced_security_group_id = aws_security_group.oem_app_security_group.id
 
   tags = {
@@ -40,11 +40,11 @@ resource "aws_vpc_security_group_egress_rule" "lb_int_egress_8000_app" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "lb_int_egress_7803_app" {
-  security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Allow all outbound traffic"
-  ip_protocol       = "tcp"
-  from_port         = 7803
-  to_port           = 7803
+  security_group_id            = aws_security_group.load_balancer_internal.id
+  description                  = "Allow all outbound traffic"
+  ip_protocol                  = "tcp"
+  from_port                    = 7803
+  to_port                      = 7803
   referenced_security_group_id = aws_security_group.oem_app_security_group.id
 
   tags = {
@@ -53,11 +53,11 @@ resource "aws_vpc_security_group_egress_rule" "lb_int_egress_7803_app" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "lb_int_egress_4903_app" {
-  security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Allow all outbound traffic"
-  ip_protocol       = "tcp"
-  from_port         = 4903
-  to_port           = 4903
+  security_group_id            = aws_security_group.load_balancer_internal.id
+  description                  = "Allow all outbound traffic"
+  ip_protocol                  = "tcp"
+  from_port                    = 4903
+  to_port                      = 4903
   referenced_security_group_id = aws_security_group.oem_app_security_group.id
 
   tags = {
@@ -66,11 +66,11 @@ resource "aws_vpc_security_group_egress_rule" "lb_int_egress_4903_app" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "lb_int_egress_7102_app" {
-  security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Allow all outbound traffic"
-  ip_protocol       = "tcp"
-  from_port         = 7102
-  to_port           = 7102
+  security_group_id            = aws_security_group.load_balancer_internal.id
+  description                  = "Allow all outbound traffic"
+  ip_protocol                  = "tcp"
+  from_port                    = 7102
+  to_port                      = 7102
   referenced_security_group_id = aws_security_group.oem_app_security_group.id
 
   tags = {

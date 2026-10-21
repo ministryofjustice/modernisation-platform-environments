@@ -19,7 +19,7 @@ A one-way managed file transfer service, provided by the Integration Hub, to all
 
 - ftps.file-transfer.service.justice.gov.uk
 - sftp.file-transfer.service.justice.gov.uk
-- https://web.file-transfer.service.justice.gov.uk
+- <https://web.file-transfer.service.justice.gov.uk>
 
 ### **Incident response hours:**
 
