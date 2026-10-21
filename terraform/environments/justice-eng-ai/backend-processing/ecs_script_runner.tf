@@ -144,6 +144,13 @@ data "aws_iam_policy_document" "script_runner_ecs_task" {
   }
 
   statement {
+    sid       = "ReportScriptResult"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess", "states:SendTaskFailure"]
+    resources = ["*"]
+  }
+
+  statement {
     sid       = "InvokeBedrockInferenceProfile"
     effect    = "Allow"
     actions   = ["bedrock:InvokeModel"]

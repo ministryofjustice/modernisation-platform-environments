@@ -28,7 +28,7 @@ locals {
     for step in local.task_steps : step.name => merge(
       {
         Type     = "Task"
-        Resource = "arn:${data.aws_partition.current.partition}:states:::ecs:runTask.sync"
+        Resource = "arn:${data.aws_partition.current.partition}:states:::ecs:runTask.${try(step.outputs, false) ? "waitForTaskToken" : "sync"}"
         Parameters = merge({
           LaunchType     = var.script_runner.launch_type
           Cluster        = var.script_runner.cluster_arn
@@ -47,6 +47,11 @@ locals {
                     try(variable.path, null) == null ? { Value = variable.value } : { "Value.$" = variable.path }
                   )
                 ],
+                # The container's exit hook sends the JSON in SCRIPT_OUTPUT_FILE back with this token.
+                try(step.outputs, false) ? [
+                  { Name = "SCRIPT_OUTPUT_FILE", Value = "/tmp/script-output.json" },
+                  { Name = "TASK_TOKEN", "Value.$" = "$$.Task.Token" },
+                ] : [],
               )
             }]
           }
@@ -69,7 +74,8 @@ locals {
         })
       },
       {
-        Next       = "${step.name}_check_exit_code"
+        # With outputs the task reports success or failure itself, so there is no exit code to check.
+        Next       = try(step.outputs, false) ? (local.ec2_mode ? "${step.name}_terminate_instance" : "${step.name}_finish") : "${step.name}_check_exit_code"
         ResultPath = "$.script_runner_host.task_result"
         Catch      = [{ ErrorEquals = ["States.ALL"], ResultPath = "$.script_runner_host.failure", Next = local.ec2_mode ? "${step.name}_terminate_instance" : "${step.name}_failed" }]
       },
