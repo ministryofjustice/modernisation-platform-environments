@@ -86,6 +86,18 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x_mp_v1_workspaces"
   cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
 }
 
+# The following rule is added for POC Azure Virtual Desktop (AVD) workspace to MP CCMS EBS DB Oracle Net Listener.
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_wp_azure_virtual_desktop" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle Net Listener from Azure Virtual Desktop (AVD) workspace for POC - DEV only"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1522
+  cidr_blocks       = [local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr]
+}
+
 ### Oracle
 
 resource "aws_security_group_rule" "ingress_traffic_ebsdb_5101" {
