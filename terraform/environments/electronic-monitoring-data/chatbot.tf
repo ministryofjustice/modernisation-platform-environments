@@ -2,7 +2,6 @@ module "chatbot_alerts" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=4214f6ab7ecc2224365b110c43269063443b325c"
 
   # Map Slack channel per environment
-  # comment to deploy the build - to be removed
   slack_channel_id = {
     test    = "C09C3P43UNP"
     preprod = "C09EVH89M35"

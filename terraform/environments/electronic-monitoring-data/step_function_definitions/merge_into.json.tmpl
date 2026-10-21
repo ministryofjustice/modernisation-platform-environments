@@ -687,8 +687,7 @@
       "MaxConcurrency": 1,
       "ResultPath": "$.date_results",
       "ItemSelector": {
-        "filter_date.$": "$$.Map.Item.Value",
-        "input.$": "$"
+        "filter_date.$": "$$.Map.Item.Value"
       },
       "Iterator": {
         "StartAt": "%{ if planner_function_name != "" && reconciliation_consumer != "" }SelectDateInput%{ else }MergeInto${table_name}%{ endif }",
@@ -714,6 +713,14 @@
               "Payload.$": "$.filter_date.replay_input"
             },
             "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 15,
+                "BackoffRate": 2,
+                "MaxAttempts": 6
+              },
               {
                 "ErrorEquals": [
                   "States.ALL"
