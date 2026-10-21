@@ -99,6 +99,33 @@ data "aws_iam_policy_document" "test_harness_permissions" {
   }
 
   statement {
+    sid       = "ListTestCleanObjectVersions"
+    effect    = "Allow"
+    actions   = ["s3:ListBucketVersions"]
+    resources = [data.aws_s3_bucket.clean[0].arn]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["${local.incoming_prefix}*"]
+    }
+  }
+
+  statement {
+    sid       = "DescribeTestDispatchConfiguration"
+    effect    = "Allow"
+    actions   = ["secretsmanager:DescribeSecret"]
+    resources = [data.aws_secretsmanager_secret.test_dispatch[0].arn]
+  }
+
+  statement {
+    sid       = "InvokeTestPushToS3Writer"
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = [local.test_writer_function_arn]
+  }
+
+  statement {
     sid       = "DecryptDeliveredFixture"
     effect    = "Allow"
     actions   = ["kms:Decrypt"]
