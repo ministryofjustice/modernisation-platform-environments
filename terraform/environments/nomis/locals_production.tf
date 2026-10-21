@@ -6,7 +6,7 @@ locals {
     maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
-  aws_health_lambda_configuration_production = {
+  baseline_aws_health_lambda_configuration_production = {
     enabled = false
   }
 
