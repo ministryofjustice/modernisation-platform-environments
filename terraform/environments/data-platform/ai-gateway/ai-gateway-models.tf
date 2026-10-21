@@ -42,6 +42,7 @@ resource "litellm_model" "amazon_bedrock_batch" {
   additional_litellm_params_json = jsonencode({
     s3_bucket_name        = local.ai_gateway_batch_storage.input_bucket_name
     s3_output_bucket_name = local.ai_gateway_batch_storage.output_bucket_name
+    s3_encryption_key_id  = local.ai_gateway_batch_storage.output_kms_key_arn
     s3_bucket_owner       = local.ai_gateway_batch_storage.bucket_owner
     s3_region_name        = local.ai_gateway_batch_storage.region
     aws_batch_role_arn    = aws_iam_role.bedrock_batch_execution.arn

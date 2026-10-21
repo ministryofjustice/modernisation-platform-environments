@@ -106,6 +106,10 @@ data "aws_iam_policy_document" "ai_gateway" {
         actions   = ["s3:GetObject"]
         resources = [local.ai_gateway_batch_object_arns.output]
       }
+      BatchInferenceKMSAccess = {
+        actions   = ["kms:GenerateDataKey", "kms:Decrypt", "kms:DescribeKey"]
+        resources = [local.ai_gateway_batch_storage.output_kms_key_arn]
+      }
     }
 
     content {

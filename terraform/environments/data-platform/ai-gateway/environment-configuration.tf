@@ -9,6 +9,7 @@ locals {
       ai_gateway_batch_storage = {
         input_bucket_name  = "alpha-airflow-aigw-example-input"
         output_bucket_name = "alpha-airflow-aigw-example-output"
+        output_kms_key_arn = "arn:aws:kms:eu-west-1:593291632749:key/48120119-33ea-4c0b-bf47-bbc236388eaa"
         bucket_owner       = "593291632749"
         region             = "eu-west-1"
       }

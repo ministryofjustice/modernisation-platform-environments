@@ -40,6 +40,10 @@ data "aws_iam_policy_document" "bedrock_batch_execution_permissions" {
         actions   = ["s3:PutObject"]
         resources = [local.ai_gateway_batch_object_arns.output]
       }
+      BatchInferenceOutputKMSAccess = {
+        actions   = ["kms:GenerateDataKey", "kms:Decrypt", "kms:DescribeKey"]
+        resources = [local.ai_gateway_batch_storage.output_kms_key_arn]
+      }
     }
 
     content {
