@@ -5,7 +5,29 @@ name        = "COH-No-RI-SP-PARQUET-Export"
     
     data_query {
       query_statement = <<EOF
-        SELECT *
+        SELECT
+            "action_type",
+            "currency_code",
+            "current_resource_details",
+            "current_resource_summary",
+            "current_resource_type",
+            "estimated_monthly_cost_after_discount",
+            "estimated_monthly_cost_before_discount",
+            "estimated_monthly_savings_after_discount",
+            "estimated_monthly_savings_before_discount",
+            "estimated_savings_percentage_after_discount",
+            "estimated_savings_percentage_before_discount",
+            "implementation_effort",
+            "last_refresh_timestamp",
+            "recommendation_id",
+            "recommendation_lookback_period_in_days",
+            "recommendation_source",
+            "recommended_resource_details",
+            "recommended_resource_summary",
+            "recommended_resource_type",
+            "region",
+            "restart_needed",
+            "rollback_possible"
         FROM COST_OPTIMIZATION_RECOMMENDATIONS
         WHERE current_resource_type NOT IN (
             'ComputeSavingsPlans',
