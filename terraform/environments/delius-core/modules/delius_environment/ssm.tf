@@ -25,7 +25,7 @@ locals {
   bucket_prefix_final = "${local.app_alias_ssm_bucket}-${var.env_name}-ssm-sessions"
 
   nightly_muted_alarm_names = concat(module.weblogic.nightly_muted_alarm_names, module.weblogic_eis.nightly_muted_alarm_names,
-    var.env_name == "test" ? concat(module.weblogic_data.nightly_muted_alarm_names) : []
+    var.env_name == "test" ? concat(module.weblogic_testdata_api.nightly_muted_alarm_names) : []
   )
 }
 

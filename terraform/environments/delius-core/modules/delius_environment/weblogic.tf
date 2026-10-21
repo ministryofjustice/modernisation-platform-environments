@@ -38,8 +38,8 @@ module "weblogic" {
 
   db_ingress_security_groups = []
 
-  microservice_lb = aws_lb.delius_core_frontend
-  microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn 
+  microservice_lb                    = aws_lb.delius_core_frontend
+  microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
@@ -294,11 +294,11 @@ locals {
 module "ecs_nightly_restart_weblogic" {
   source = "../components/ecs_nightly_restart"
 
-  env_name                               = var.env_name
-  cluster_name                           = module.ecs.ecs_cluster_arn
-  service_name                           = "${var.env_name}-weblogic"
-  service_arn                            = local.weblogic_service_arn
-  task_count                             = data.aws_ssm_parameter.weblogic_task_count.value
+  env_name                  = var.env_name
+  cluster_name              = module.ecs.ecs_cluster_arn
+  service_name              = "${var.env_name}-weblogic"
+  service_arn               = local.weblogic_service_arn
+  task_count                = data.aws_ssm_parameter.weblogic_task_count.value
   nightly_muted_alarm_names = module.weblogic.nightly_muted_alarm_names
 }
 
