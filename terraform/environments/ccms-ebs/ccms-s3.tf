@@ -3,8 +3,8 @@
 # S3 Bucket - Logging
 # ---------------------------------------------
 module "s3-bucket-logging" {
-  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
@@ -75,8 +75,6 @@ module "s3-bucket-logging" {
     ]
   })]
 
-  log_bucket    = local.logging_bucket_name
-  log_prefix    = "s3access/${local.logging_bucket_name}"
   sse_algorithm = "AES256"
 
   # Refer to the below section "Replication" before enabling replication
@@ -102,30 +100,9 @@ module "s3-bucket-logging" {
         autoclean = "true"
       }
 
-      transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
-          storage_class = "GLACIER"
-        }
-      ]
-
       expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
       }
-
-      noncurrent_version_transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
-          storage_class = "GLACIER"
-        }
-      ]
-
       noncurrent_version_expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
       }
@@ -154,8 +131,8 @@ resource "aws_s3_bucket_notification" "logging_bucket_notification" {
 # S3 Bucket - R-sync
 # ---------------------------------------------
 module "s3-bucket-dbbackup" {
-  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = true
@@ -209,8 +186,10 @@ module "s3-bucket-dbbackup" {
     ]
   })]
 
-  log_bucket = local.logging_bucket_name
-  log_prefix = "s3access/${local.rsync_bucket_name}"
+  log_bucket                = local.logging_bucket_name
+  log_prefix                = "s3access/"
+  log_partition_date_source = "EventTime"
+  manage_log_bucket_policy  = false
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -278,7 +257,12 @@ resource "aws_s3_bucket_logging" "ccms_ebs_shared_logging" {
   bucket = aws_s3_bucket.ccms_ebs_shared.id
 
   target_bucket = local.logging_bucket_name
-  target_prefix = "s3-access-logs/${local.application_name}-${local.environment}-shared/"
+  target_prefix = "s3-access-logs/"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
 }
 
 resource "aws_s3_object" "folder" {
@@ -349,7 +333,12 @@ resource "aws_s3_bucket_logging" "lambda_payment_load_logging" {
   bucket = aws_s3_bucket.lambda_payment_load.id
 
   target_bucket = local.logging_bucket_name
-  target_prefix = "s3-access-logs/${local.application_name}-${local.environment}-payment-load/"
+  target_prefix = "s3-access-logs/"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "lambda_payment_load" {
