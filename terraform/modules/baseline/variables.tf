@@ -70,9 +70,9 @@ variable "aws_health_lambda_configuration" {
   description = "Configuration for AWS Health event forwarding to the AWS Health lambda"
 
   type = object({
-    enabled                        = bool
+    enabled               = bool
     aws_health_lambda_arn = optional(string)
-    rule_name                      = optional(string)
+    rule_name             = optional(string)
   })
 
   default = {

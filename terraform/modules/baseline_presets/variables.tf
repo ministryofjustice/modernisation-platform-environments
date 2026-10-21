@@ -13,10 +13,10 @@ variable "ip_addresses" {
 variable "options" {
   description = "Map of options controlling what resources to return"
   type = object({
-    backup_plan_daily_delete_after                = optional(number, 7)             # override retention for daily + weekly backup plan
-    backup_plan_weekly_delete_after               = optional(number, 28)            # override retention for daily + weekly backup plan
-    aws_health_lambda_configuration      = optional(object({
-      enabled                        = optional(bool, false)
+    backup_plan_daily_delete_after  = optional(number, 7)  # override retention for daily + weekly backup plan
+    backup_plan_weekly_delete_after = optional(number, 28) # override retention for daily + weekly backup plan
+    aws_health_lambda_configuration = optional(object({
+      enabled               = optional(bool, false)
       aws_health_lambda_arn = optional(string)
     }), {})
     cloudwatch_dashboard_default_widget_groups    = optional(list(string))          # create Cloudwatch-Default dashboard; list of map keys to filter local.cloudwatch_dashboard_widget_groups
