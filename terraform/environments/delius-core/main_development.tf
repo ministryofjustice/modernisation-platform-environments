@@ -88,3 +88,9 @@ module "environment_poc" {
 
   db_backup_config = local.db_backup_config_poc
 }
+
+module "aws_health_lambda_cloudwatch_events" {
+  source                          = "../../modules/aws_health_lambda_cloudwatch_events"
+  aws_health_lambda_configuration = local.aws_health_lambda_configuration_development
+}
+

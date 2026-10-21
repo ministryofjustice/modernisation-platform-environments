@@ -159,4 +159,10 @@ locals {
     expire_current_after_days    = 80
     expire_noncurrent_after_days = 10
   }
+
+  aws_health_lambda_configuration_test = {
+    enabled               = true
+    aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
+    rule_name             = "ForwardAllHealthEvents"
+  }
 }
