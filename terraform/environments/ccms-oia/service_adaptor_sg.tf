@@ -59,8 +59,8 @@ resource "aws_vpc_security_group_egress_rule" "adaptor_alb_egress_ecs_opa_tasks"
 }
 
 moved {
-  from = aws_vpc_security_group_egress_rule.adaptor_alb_egress_oia_ec2.id
-  to   = aws_vpc_security_group_egress_rule.adaptor_alb_egress_ecs_opa_tasks.id
+  from = aws_vpc_security_group_egress_rule.adaptor_alb_egress_oia_ec2
+  to   = aws_vpc_security_group_egress_rule.adaptor_alb_egress_ecs_opa_tasks
 }
 # Adapter Security Group
 
