@@ -48,7 +48,39 @@ permissions:
 
 jobs:
 
+  plan-terraform:
+    if: inputs.action == 'plan'
+    strategy:
+      fail-fast: false
+      matrix:
+        component:
+          - root
+          - network
+          - cluster
+          - cluster-base
+          - cluster-core
+          - cluster-components
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: ${{ inputs.application }}
+      environment: ${{ inputs.environment }}
+      action: plan
+      post_plan_to_pr: true
+      plan_apply_tfargs: ${{ matrix.component == 'cluster' && format('-var=created_by={0}/{1}/actions/runs/{2}/', github.server_url, github.repository, github.run_id) || '' }}
+      component: ${{ matrix.component }}
+      account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
+      terraform_version: ${{ inputs.terraform_version }}
+      mint_grafana_token: ${{ matrix.component == 'root' }}
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+
   root-terraform:
+    if: inputs.action != 'plan'
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
