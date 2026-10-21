@@ -1282,7 +1282,8 @@ module "trigger_api_integration" {
   subnet_ids              = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    API_BASE_URL = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
+    API_BASE_URL     = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
+    ENVIRONMENT_NAME = local.environment_shorthand
   }
 }
 
