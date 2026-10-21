@@ -28,6 +28,10 @@ parameters:
     type: String
     default: "90"
     description: Alert if a certificate expires within this many days
+  environmentName:
+    type: String
+    default: ""
+    description: Environment shown in the alert, e.g. ccms-ebs-production
 mainSteps:
   - name: CheckCertificateExpiry
     action: aws:runShellScript
@@ -59,22 +63,35 @@ mainSteps:
 
           # Published in the same shape as an ACM expiry event so the Slack integration lambda renders it as a certificate alert
           alert() {
-            local label="$1"
-            local days_left="$2"
+            local name="$1"
+            local subject="$2"
+            local days_left="$3"
+            local end_epoch="$4"
             local message
-            message=$(CERT_LABEL="$label ($(hostname):{{ keystorePath }})" DAYS_LEFT="$days_left" "$PYTHON" -c '
+            message=$(CERT_NAME="$name" CERT_SUBJECT="$subject" DAYS_LEFT="$days_left" END_EPOCH="$end_epoch" ENV_NAME="{{ environmentName }}" \
+              SERVER="$(hostname -s)" LOCATION="{{ keystorePath }}" "$PYTHON" -c '
           import json, os, datetime
           print(json.dumps({
               "source": "aws.acm",
               "time": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
-              "detail": {"DaysToExpiry": int(os.environ["DAYS_LEFT"]), "CommonName": os.environ["CERT_LABEL"]},
+              "detail": {
+                  "DaysToExpiry": int(os.environ["DAYS_LEFT"]),
+                  "ExpiryDate": datetime.datetime.utcfromtimestamp(int(os.environ["END_EPOCH"])).strftime("%a, %d %b %Y"),
+                  "CommonName": os.environ["CERT_NAME"],
+                  "SubjectName": os.environ["CERT_SUBJECT"],
+                  "Environment": os.environ["ENV_NAME"],
+                  "Server": os.environ["SERVER"],
+                  "Location": os.environ["LOCATION"],
+              },
           }))')
-            aws sns publish --region "$REGION" --topic-arn "{{ snsTopicArn }}" --subject "Certificate expiring soon: $label" --message "$message"
+            aws sns publish --region "$REGION" --topic-arn "{{ snsTopicArn }}" --subject "Certificate expiring soon: $name ({{ environmentName }})" --message "$message"
           }
 
           check_expiry() {
-            local label="$1"
-            local end_date="$2"
+            local name="$1"
+            local subject="$2"
+            local end_date="$3"
+            local label="$name: $subject"
             local end_epoch
             end_epoch=$(date -d "$end_date" +%s 2>/dev/null) || { echo "Could not parse expiry date for $label: $end_date"; return; }
             # Certificates that have already expired (e.g. old Baltimore roots) are logged but never alerted on
@@ -85,7 +102,7 @@ mainSteps:
             local days_left=$(( (end_epoch - NOW_EPOCH) / 86400 ))
             echo "$label expires in $days_left days ($end_date)"
             if [ "$days_left" -le "$THRESHOLD_DAYS" ]; then
-              alert "$label" "$days_left"
+              alert "$name" "$subject" "$days_left" "$end_epoch"
             fi
           }
 
@@ -113,7 +130,7 @@ mainSteps:
                     *)
                       if [ -z "${SEEN["$OWNER|$END_DATE"]+x}" ]; then
                         SEEN["$OWNER|$END_DATE"]=1
-                        check_expiry "$ALIAS: $OWNER" "$END_DATE"
+                        check_expiry "$ALIAS" "$OWNER" "$END_DATE"
                       fi
                       ;;
                   esac
@@ -137,7 +154,9 @@ mainSteps:
               CERT_FILE="$WORKDIR/cert.pem"
               if "$ORAPKI" wallet export -wallet "{{ keystorePath }}" -pwd "$PASSWORD" -dn "$dn" -cert "$CERT_FILE" >/dev/null 2>&1; then
                 END_DATE=$(openssl x509 -enddate -noout -in "$CERT_FILE" | cut -d= -f2)
-                check_expiry "$dn" "$END_DATE"
+                # Wallet entries have no alias, so use the certificate's CN as its name
+                cn=$(sed -n 's/^.*CN=\([^,]*\).*$/\1/p' <<< "$dn")
+                check_expiry "${cn:-$dn}" "$dn" "$END_DATE"
               else
                 echo "Could not export certificate for $dn to check expiry"
               fi
