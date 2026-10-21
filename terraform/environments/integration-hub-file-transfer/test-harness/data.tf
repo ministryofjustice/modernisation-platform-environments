@@ -15,9 +15,3 @@ data "aws_s3_bucket" "clean" {
 
   bucket = local.clean_bucket_name
 }
-
-data "aws_secretsmanager_secret" "test_dispatch" {
-  count = local.create_test_harness ? 1 : 0
-
-  name = "${local.application_name}/file-dispatch/${local.incoming_prefix}"
-}

@@ -115,7 +115,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     sid       = "DescribeTestDispatchConfiguration"
     effect    = "Allow"
     actions   = ["secretsmanager:DescribeSecret"]
-    resources = [data.aws_secretsmanager_secret.test_dispatch[0].arn]
+    resources = [local.test_dispatch_secret_arn]
   }
 
   statement {
