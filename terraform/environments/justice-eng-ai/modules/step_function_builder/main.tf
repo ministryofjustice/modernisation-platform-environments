@@ -267,9 +267,8 @@ resource "aws_sfn_state_machine" "this" {
 }
 
 # Companion state machine for a wait_for_approval step. Start it with the DynamoDB stream
-# record of the approving event (an array holding one record); it finds the task token
-# stored by the matching awaiting_approval event and sends it back, so the paused
-# execution of the main state machine continues.
+# record of an approval or rejection event (an array holding one record); it finds the task
+# token stored by the matching awaiting_approval event and completes the paused task.
 resource "aws_sfn_state_machine" "resume" {
   count = length(local.approval_steps) > 0 ? 1 : 0
 
@@ -280,8 +279,17 @@ resource "aws_sfn_state_machine" "resume" {
 
   definition = jsonencode({
     Comment = "Resumes the ${var.name} execution waiting for this approval."
-    StartAt = "find_waiting_event"
+    StartAt = "extract_decision"
     States = {
+      extract_decision = {
+        Type = "Pass"
+        Parameters = {
+          "AppID.$"     = "$[0].dynamodb.NewImage.AppID.S"
+          "BuildID.$"   = "$[0].dynamodb.NewImage.BuildID.N"
+          "JobStatus.$" = "$[0].dynamodb.NewImage.JobStatus.S"
+        }
+        Next = "find_waiting_event"
+      }
       find_waiting_event = {
         Type     = "Task"
         Resource = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:dynamodb:query"
@@ -292,29 +300,62 @@ resource "aws_sfn_state_machine" "resume" {
           ScanIndexForward       = false
           ConsistentRead         = true
           ExpressionAttributeValues = {
-            ":app"    = { "S.$" = "$[0].dynamodb.NewImage.AppID.S" }
-            ":build"  = { "N.$" = "$[0].dynamodb.NewImage.BuildID.N" }
+            ":app"    = { "S.$" = "$.AppID" }
+            ":build"  = { "N.$" = "$.BuildID" }
             ":floor"  = { N = "0" }
             ":status" = { S = try(local.approval_steps[0].job_status, "awaiting_approval") }
           }
         }
         ResultSelector = { "token.$" = "$.Items[0].TaskToken.S" }
-        Next           = "send_task_success"
+        ResultPath     = "$.waiting_event"
+        Next           = "route_decision"
+      }
+      route_decision = {
+        Type = "Choice"
+        Choices = [
+          {
+            Variable     = "$.JobStatus"
+            StringEquals = "approved"
+            Next         = "send_task_success"
+          },
+          {
+            Variable     = "$.JobStatus"
+            StringEquals = "rejected"
+            Next         = "send_task_failure"
+          },
+        ]
+        Default = "unexpected_status"
       }
       send_task_success = {
         Type     = "Task"
         Resource = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:sfn:sendTaskSuccess"
         Parameters = {
-          "TaskToken.$" = "$.token"
+          "TaskToken.$" = "$.waiting_event.token"
           Output        = "{}"
         }
-        # The token was already used, e.g. the same approval was delivered twice.
+        # The token was already used, e.g. the same decision was delivered twice.
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "already_resumed" }]
         End   = true
       }
+      send_task_failure = {
+        Type     = "Task"
+        Resource = "arn:${data.aws_partition.current.partition}:states:::aws-sdk:sfn:sendTaskFailure"
+        Parameters = {
+          "TaskToken.$" = "$.waiting_event.token"
+          Error         = "ReviewRejected"
+          Cause         = "Application review was rejected"
+        }
+        Catch = [{ ErrorEquals = ["States.ALL"], Next = "already_resumed" }]
+        End   = true
+      }
+      unexpected_status = {
+        Type  = "Fail"
+        Error = "UnexpectedReviewStatus"
+        Cause = "Review callback status must be approved or rejected"
+      }
       already_resumed = {
         Type    = "Succeed"
-        Comment = "Nothing is waiting for this approval."
+        Comment = "Nothing is waiting for this review decision."
       }
     }
   })

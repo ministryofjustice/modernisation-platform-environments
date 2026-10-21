@@ -30,7 +30,9 @@ variable "steps" {
     wait_for_approval step has table_name, app_id and build_id (JSONPaths),
     job_stage, and optional job_status (default awaiting_approval), user_name
     (JSONPath), timeout_seconds (default 31536000) and result_path; it appends
-    an event holding the task token and pauses until the token is sent back. A choice step has variable plus equals, or when_absent = true;
+    an event holding the task token and pauses until the companion state
+    machine receives an approved or rejected stream event and sends task
+    success or failure. A choice step has variable plus equals, or when_absent = true;
     execution continues to the next step when the string matches (or the
     variable is absent) and otherwise ends successfully (optional
     stop_comment). A choice step cannot be last.

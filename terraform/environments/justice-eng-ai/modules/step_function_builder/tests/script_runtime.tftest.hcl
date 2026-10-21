@@ -74,6 +74,36 @@ run "disabled_retries" {
   }
 }
 
+run "approval_callback_routing" {
+  command = plan
+
+  variables {
+    script_runner = null
+    steps = [{
+      name       = "wait_for_review"
+      type       = "wait_for_approval"
+      table_name = "test-build-details"
+      app_id     = "$.AppID"
+      build_id   = "$.BuildID"
+      job_stage  = "control_plane"
+    }]
+  }
+
+  assert {
+    condition = (
+      jsondecode(aws_sfn_state_machine.resume[0].definition).StartAt == "extract_decision" &&
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.extract_decision.Parameters["JobStatus.$"] == "$[0].dynamodb.NewImage.JobStatus.S" &&
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.find_waiting_event.ResultPath == "$.waiting_event" &&
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.route_decision.Choices[0].StringEquals == "approved" &&
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.route_decision.Choices[1].StringEquals == "rejected" &&
+      endswith(jsondecode(aws_sfn_state_machine.resume[0].definition).States.send_task_success.Resource, ":sfn:sendTaskSuccess") &&
+      endswith(jsondecode(aws_sfn_state_machine.resume[0].definition).States.send_task_failure.Resource, ":sfn:sendTaskFailure") &&
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.send_task_failure.Parameters.Error == "ReviewRejected"
+    )
+    error_message = "Review callbacks must send task success for approval and task failure for rejection."
+  }
+}
+
 run "ec2_custom_retries" {
   command = plan
   variables {
