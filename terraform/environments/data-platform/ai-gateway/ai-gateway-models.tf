@@ -9,15 +9,19 @@ resource "litellm_model" "amazon_bedrock" {
   aws_region_name = each.value.region
   aws_role_name   = can(each.value.aws_role_name) ? "arn:aws:iam::${local.environment_management.account_ids[each.value.aws_account_name]}:role/${each.value.aws_role_name}" : module.iam_role.arn
 
-  additional_litellm_params = {
-    ai_model_provider            = try(each.value.model_provider, "Amazon Bedrock")
-    ai_model_family              = each.value.model_family
-    ai_model_name                = each.value.model_name
-    ai_model_location            = each.value.model_location
-    ai_aws_account_name          = try(each.value.aws_account_name, null)
-    ai_model_generally_available = each.value.generally_available
-    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_location\",\"ai_model_generally_available\",\"ai_aws_account_name\"]"
-  }
+  additional_litellm_params = merge(
+    {
+      ai_model_provider            = try(each.value.model_provider, "Amazon Bedrock")
+      ai_model_family              = each.value.model_family
+      ai_model_name                = each.value.model_name
+      ai_model_location            = each.value.model_location
+      ai_model_generally_available = each.value.generally_available
+      additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_location\",\"ai_model_generally_available\",\"ai_aws_account_name\"]"
+    },
+    try(each.value.aws_account_name, null) == null ? {} : {
+      ai_aws_account_name = each.value.aws_account_name
+    }
+  )
 
   depends_on = [
     helm_release.ai_gateway_configuration,
