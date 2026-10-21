@@ -58,12 +58,7 @@ resource "aws_vpc_security_group_egress_rule" "adaptor_alb_egress_ecs_opa_tasks"
   referenced_security_group_id = aws_security_group.ecs_tasks_adaptor.id
 }
 
-moved {
-  from = aws_vpc_security_group_egress_rule.adaptor_alb_egress_oia_ec2
-  to   = aws_vpc_security_group_egress_rule.adaptor_alb_egress_ecs_opa_tasks
-}
 # Adapter Security Group
-
 
 resource "aws_security_group" "ecs_tasks_adaptor" {
   name_prefix = "${local.adaptor_app_name}-ecs-tasks-security-group"
