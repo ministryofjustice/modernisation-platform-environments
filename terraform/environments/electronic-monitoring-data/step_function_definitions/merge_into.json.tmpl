@@ -828,6 +828,14 @@
             "Retry": [
               {
                 "ErrorEquals": [
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 15,
+                "BackoffRate": 2,
+                "MaxAttempts": 6
+              },
+              {
+                "ErrorEquals": [
                   "States.ALL"
                 ],
                 "IntervalSeconds": 2,
