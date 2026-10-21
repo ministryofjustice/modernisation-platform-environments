@@ -119,7 +119,9 @@ If the Lambda invocation fails, the event is sent to the `guardduty_lambda-dlq` 
 
 The function code is in [modules/guardduty-lambda/src/lambda.py](modules/guardduty-lambda/src/lambda.py).
 
-> `NO_THREATS_FOUND` is currently included in `quarantine_statuses` for testing.
+All five scan outcomes are sent to Slack. Only `THREATS_FOUND`, `FAILED`,
+`ACCESS_DENIED`, and `UNSUPPORTED` invoke the quarantine Lambda and trigger
+quarantine. Clean scans (`NO_THREATS_FOUND`) do not invoke the Lambda.
 
 ### 6. CloudTrail provides the audit trail
 

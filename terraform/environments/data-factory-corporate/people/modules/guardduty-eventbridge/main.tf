@@ -35,7 +35,7 @@ resource "aws_cloudwatch_event_rule" "guardduty_quarantine" {
       }
 
       scanResultDetails = {
-        scanResultStatus = var.scan_result_statuses
+        scanResultStatus = var.quarantine_scan_result_statuses
       }
     }
   })
@@ -145,7 +145,7 @@ resource "aws_cloudwatch_event_rule" "scan_alerts" {
         bucketName = var.bucket_names
       }
       scanResultDetails = {
-        scanResultStatus = var.scan_result_statuses
+        scanResultStatus = var.alert_scan_result_statuses
       }
     }
   })

@@ -299,7 +299,8 @@ module "data_factory_guardduty_eventbridge" {
 
   bucket_names = [module.sherlock_landing_bucket_mp.bucket.bucket]
 
-  scan_result_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
+  alert_scan_result_statuses      = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
+  quarantine_scan_result_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
 
   target_lambda_name = module.data_factory_guardduty_lambda.name
 
@@ -359,7 +360,7 @@ module "data_factory_guardduty_lambda" {
     Infrastructure = "sherlock-guardduty-malware-scan"
   }
 
-  quarantine_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
+  quarantine_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
 
   eventbridge_rule_arn = module.data_factory_guardduty_eventbridge.rule_arn
 

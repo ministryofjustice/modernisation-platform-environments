@@ -2,16 +2,17 @@
 
 Routes GuardDuty Malware Protection for S3 events for the configured buckets to
 a quarantine Lambda and an SNS alerts topic. Object scan results matching
-`scan_result_statuses` trigger both targets; protection plan warnings and errors
-trigger SNS alerts independently. The Lambda decides which matched objects to
-quarantine using its own configured statuses.
+`alert_scan_result_statuses` trigger SNS alerts, while results matching
+`quarantine_scan_result_statuses` invoke the Lambda. Protection plan warnings and
+errors trigger SNS alerts independently. The Lambda decides which matched objects
+to quarantine using its own configured statuses.
 
 To receive alerts in Slack, authorise the Slack workspace in Amazon Q Developer
 in chat applications and connect a channel to the `scan_alerts_topic_arn` output
 after deployment. The people root optionally configures the Slack channel;
 this module only provides the SNS topic. Include
-`NO_THREATS_FOUND` in `scan_result_statuses` only if clean scan notifications
-are required.
+`NO_THREATS_FOUND` in `alert_scan_result_statuses` for clean scan notifications
+without invoking the quarantine Lambda.
 
 ## Event flow
 
@@ -26,7 +27,8 @@ module "data_factory_guardduty_eventbridge" {
 
     name                 = "eventbridge-malware-rule"
     bucket_names         = [module.sherlock_landing_bucket_mp.bucket.bucket]
-    scan_result_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
+    alert_scan_result_statuses      = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
+    quarantine_scan_result_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
     target_lambda_name   = module.data_factory_guardduty_lambda.name
     target_lambda_arn    = module.data_factory_guardduty_lambda.arn
 
@@ -77,7 +79,8 @@ No modules.
 | ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_bucket_names"></a> [bucket\_names](#input\_bucket\_names) | Names of the S3 buckets to apply rule to. | `list(string)` | `[]` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the EventBridge rule. | `string` | `"eventbridge-guardduty-quarantine"` | no |
-| <a name="input_scan_result_statuses"></a> [scan\_result\_statuses](#input\_scan\_result\_statuses) | List of scan result statuses to match in the EventBridge rule. | `list(string)` | <pre>[<br/>  "THREATS_FOUND",<br/>  "FAILED",<br/>  "ACCESS_DENIED"<br/>]</pre> | no |
+| <a name="input_alert_scan_result_statuses"></a> [alert\_scan\_result\_statuses](#input\_alert\_scan\_result\_statuses) | List of scan result statuses to publish to the alerts topic. | `list(string)` | <pre>[<br/>  "THREATS_FOUND",<br/>  "FAILED",<br/>  "ACCESS_DENIED",<br/>  "UNSUPPORTED",<br/>  "NO_THREATS_FOUND"<br/>]</pre> | no |
+| <a name="input_quarantine_scan_result_statuses"></a> [quarantine\_scan\_result\_statuses](#input\_quarantine\_scan\_result\_statuses) | List of scan result statuses that invoke the quarantine Lambda. | `list(string)` | <pre>[<br/>  "THREATS_FOUND",<br/>  "FAILED",<br/>  "ACCESS_DENIED"<br/>]</pre> | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to created resources. | `map(string)` | `{}` | no |
 | <a name="input_target_lambda_arn"></a> [target\_lambda\_arn](#input\_target\_lambda\_arn) | ARN of the target Lambda function. | `string` | n/a | yes |
 | <a name="input_target_lambda_name"></a> [target\_lambda\_name](#input\_target\_lambda\_name) | Name of the target Lambda function. | `string` | `"quarantine-lambda"` | no |

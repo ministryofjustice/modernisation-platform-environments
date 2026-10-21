@@ -20,10 +20,16 @@ variable "target_lambda_arn" {
   type        = string
 }
 
-variable "scan_result_statuses" {
-  description = "List of scan result statuses to match in the EventBridge rule."
+variable "quarantine_scan_result_statuses" {
+  description = "List of scan result statuses that invoke the quarantine Lambda."
   type        = list(string)
-  default     = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED"]
+  default     = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
+}
+
+variable "alert_scan_result_statuses" {
+  description = "List of scan result statuses to publish to the alerts topic."
+  type        = list(string)
+  default     = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
 }
 
 variable "target_lambda_name" {
