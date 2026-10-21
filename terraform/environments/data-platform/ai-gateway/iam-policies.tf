@@ -44,51 +44,48 @@ data "aws_iam_policy_document" "ai_gateway" {
     ]
   }
 
-  # Lets the pod submit batch inference jobs against the same models it can already invoke directly
-  statement {
-    sid     = "BedrockCreateBatchInferenceJob"
-    effect  = "Allow"
-    actions = ["bedrock:CreateModelInvocationJob"]
-    resources = concat(
-      formatlist("arn:aws:bedrock:%s:${data.aws_caller_identity.current.account_id}:inference-profile/*", ["eu-west-1", "eu-west-2"]),
-      ["arn:aws:bedrock:eu-*::foundation-model/*"],
-      [local.ai_gateway_bedrock_batch_job_arn]
-    )
+  dynamic "statement" {
+    for_each = { for sid, permissions in {
+      BedrockCreateBatchInferenceJob = {
+        actions = ["bedrock:CreateModelInvocationJob"]
+        resources = concat(
+          formatlist("arn:aws:bedrock:%s:${data.aws_caller_identity.current.account_id}:inference-profile/*", ["eu-west-1", "eu-west-2"]),
+          ["arn:aws:bedrock:eu-*::foundation-model/*"],
+          [local.ai_gateway_bedrock_batch_job_arn]
+        )
+      }
+      BedrockManageBatchInferenceJobs = {
+        actions   = ["bedrock:GetModelInvocationJob", "bedrock:StopModelInvocationJob"]
+        resources = [local.ai_gateway_bedrock_batch_job_arn]
+      }
+      BedrockListBatchInferenceJobs = {
+        actions   = ["bedrock:ListModelInvocationJobs", "bedrock:TagResource", "bedrock:UntagResource", "bedrock:ListTagsForResource"]
+        resources = ["*"]
+      }
+    } : sid => permissions if terraform.workspace == "data-platform-development" }
+
+    content {
+      sid       = statement.key
+      effect    = "Allow"
+      actions   = statement.value.actions
+      resources = statement.value.resources
+    }
   }
 
-  statement {
-    sid    = "BedrockManageBatchInferenceJobs"
-    effect = "Allow"
-    actions = [
-      "bedrock:GetModelInvocationJob",
-      "bedrock:StopModelInvocationJob"
-    ]
-    resources = [local.ai_gateway_bedrock_batch_job_arn]
-  }
+  dynamic "statement" {
+    for_each = terraform.workspace == "data-platform-development" ? [1] : []
 
-  # ListModelInvocationJobs/TagResource/etc. don't support resource-level scoping
-  statement {
-    sid    = "BedrockListBatchInferenceJobs"
-    effect = "Allow"
-    actions = [
-      "bedrock:ListModelInvocationJobs",
-      "bedrock:TagResource",
-      "bedrock:UntagResource",
-      "bedrock:ListTagsForResource"
-    ]
-    resources = ["*"]
-  }
+    content {
+      sid       = "PassBedrockBatchExecutionRole"
+      effect    = "Allow"
+      actions   = ["iam:PassRole"]
+      resources = [aws_iam_role.bedrock_batch_execution[0].arn]
 
-  statement {
-    sid       = "PassBedrockBatchExecutionRole"
-    effect    = "Allow"
-    actions   = ["iam:PassRole"]
-    resources = [aws_iam_role.bedrock_batch_execution.arn]
-
-    condition {
-      test     = "StringEquals"
-      variable = "iam:PassedToService"
-      values   = ["bedrock.amazonaws.com"]
+      condition {
+        test     = "StringEquals"
+        variable = "iam:PassedToService"
+        values   = ["bedrock.amazonaws.com"]
+      }
     }
   }
 

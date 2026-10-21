@@ -1,6 +1,8 @@
 # Service role that Bedrock (not the AI Gateway pod) assumes while a batch inference job runs,
 # to read from the input bucket and write results to the output bucket.
 data "aws_iam_policy_document" "bedrock_batch_execution_trust" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
   statement {
     sid     = "AllowBedrockAssumeRole"
     effect  = "Allow"
@@ -26,6 +28,8 @@ data "aws_iam_policy_document" "bedrock_batch_execution_trust" {
 }
 
 data "aws_iam_policy_document" "bedrock_batch_execution_permissions" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
   dynamic "statement" {
     for_each = local.ai_gateway_batch_storage == null ? {} : {
       BatchInferenceListBuckets = {
@@ -72,19 +76,40 @@ data "aws_iam_policy_document" "bedrock_batch_execution_permissions" {
 }
 
 module "bedrock_batch_execution_iam_policy" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=1d73bcb359419e1b41872ac5ccaf8808b8f1150e" # v6.6.0
 
   name_prefix = "${local.component_name}-bedrock-batch-execution"
 
-  policy = data.aws_iam_policy_document.bedrock_batch_execution_permissions.json
+  policy = data.aws_iam_policy_document.bedrock_batch_execution_permissions[0].json
 }
 
 resource "aws_iam_role" "bedrock_batch_execution" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
   name               = "${local.component_name}-bedrock-batch-execution"
-  assume_role_policy = data.aws_iam_policy_document.bedrock_batch_execution_trust.json
+  assume_role_policy = data.aws_iam_policy_document.bedrock_batch_execution_trust[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "bedrock_batch_execution" {
-  role       = aws_iam_role.bedrock_batch_execution.name
-  policy_arn = module.bedrock_batch_execution_iam_policy.arn
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  role       = aws_iam_role.bedrock_batch_execution[0].name
+  policy_arn = module.bedrock_batch_execution_iam_policy[0].arn
+}
+
+moved {
+  from = module.bedrock_batch_execution_iam_policy
+  to   = module.bedrock_batch_execution_iam_policy[0]
+}
+
+moved {
+  from = aws_iam_role.bedrock_batch_execution
+  to   = aws_iam_role.bedrock_batch_execution[0]
+}
+
+moved {
+  from = aws_iam_role_policy_attachment.bedrock_batch_execution
+  to   = aws_iam_role_policy_attachment.bedrock_batch_execution[0]
 }
