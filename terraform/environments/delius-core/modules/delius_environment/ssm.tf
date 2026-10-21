@@ -23,6 +23,10 @@ locals {
   app_alias_ssm_bucket = var.env_name == "training" ? "delius" : var.account_info.application_name
 
   bucket_prefix_final = "${local.app_alias_ssm_bucket}-${var.env_name}-ssm-sessions"
+
+  nightly_muted_alarm_names = concat(module.weblogic.nightly_muted_alarm_names, module.weblogic_eis.nightly_muted_alarm_names,
+    var.env_name == "test" ? concat(module.weblogic_data.nightly_muted_alarm_names) : []
+  )
 }
 
 resource "aws_ssm_parameter" "ldap_bind_password" {
@@ -404,4 +408,11 @@ module "s3_bucket_ssm_sessions" {
   }
 
   tags = var.tags
+}
+
+resource "aws_ssm_parameter" "nightly_muted_alarm_names" {
+  name        = format("/%s-%s/nightly_muted_alarm_names", var.account_info.application_name, var.env_name)
+  description = "CloudWatch alarms to mute during ECS deployments"
+  type        = "String"
+  value       = jsonencode(local.nightly_muted_alarm_names)
 }

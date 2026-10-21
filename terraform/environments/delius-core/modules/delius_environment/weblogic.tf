@@ -293,9 +293,16 @@ locals {
 module "ecs_nightly_restart_weblogic" {
   source = "../components/ecs_nightly_restart"
 
-  env_name     = var.env_name
-  cluster_name = module.ecs.ecs_cluster_arn
-  service_name = "${var.env_name}-weblogic"
-  service_arn  = local.weblogic_service_arn
-  task_count   = data.aws_ssm_parameter.weblogic_task_count.value
+  env_name                  = var.env_name
+  cluster_name              = module.ecs.ecs_cluster_arn
+  service_name              = "${var.env_name}-weblogic"
+  service_arn               = local.weblogic_service_arn
+  task_count                = data.aws_ssm_parameter.weblogic_task_count.value
+}
+
+resource "aws_ssm_parameter" "weblogic_muted_alarm_names" {
+  name        = "/${var.env_name}/weblogic/muted_alarm_names"
+  type        = "String"
+  value       = join(",", module.weblogic.nightly_muted_alarm_names)
+  description = "The list of alarms to be muted during deploymnets"
 }
