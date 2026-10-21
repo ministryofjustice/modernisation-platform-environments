@@ -104,11 +104,10 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    # Publish the companion workflow, then pin its commit before merging this caller.
-    uses: ministryofjustice/integration-hub/.github/workflows/file-transfer-tests.yml@smoke-test
+    uses: ministryofjustice/integration-hub/.github/workflows/file-transfer-tests.yml@d8f56f8a70348a5ece2cbb767f65cb5f929686c7
     with:
       infrastructure-sha: ${{ github.sha }}
-      harness-ref: a5e613fd135f67d88f2fc7e1683986b33cfd8ecf
+      harness-ref: d8f56f8a70348a5ece2cbb767f65cb5f929686c7
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
