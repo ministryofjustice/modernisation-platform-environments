@@ -145,7 +145,7 @@ resource "aws_ecs_capacity_provider" "weblogic_testdata_api" {
       target_capacity = 100
     }
 
-    managed_termination_protection = "ENABLED"
+    managed_termination_protection = var.enable_autoscaling_schedule ? "DISABLED" : "ENABLED"
   }
 }
 

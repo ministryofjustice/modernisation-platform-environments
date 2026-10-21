@@ -2,7 +2,6 @@ module "weblogic_eis" {
   source = "../helpers/delius_microservice"
 
   providers = {
-    aws                       = aws
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
@@ -71,7 +70,7 @@ module "weblogic_eis" {
     }
   ]
 
-  log_error_pattern       = ""
+  log_error_pattern       = "FATAL"
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_frontend.arn_suffix
   enable_platform_backups = var.enable_platform_backups
@@ -165,7 +164,7 @@ resource "aws_ecs_capacity_provider" "weblogic_eis" {
       target_capacity = 100
     }
 
-    managed_termination_protection = "ENABLED"
+    managed_termination_protection = var.enable_autoscaling_schedule ? "DISABLED" : "ENABLED"
   }
 }
 
