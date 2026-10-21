@@ -1,6 +1,6 @@
 locals {
   lambda_name         = "${var.service_name}-nightly-restart"
-  schedule_expression = "cron(15 02 * * ? *)" # 02:15 every day
+  schedule_expression = "cron(15 10 * * ? *)" # 09:15 every day
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -33,13 +33,6 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
     actions   = ["ecs:DescribeServices"]
     resources = [var.service_arn]
   }
-}
-
-resource "aws_lambda_permission" "allow_cloudwatch" {
-  action        = "lambda:InvokeFunction"
-  principal     = "events.amazonaws.com"
-  function_name = aws_lambda_function.nightly_restart_lambda.function_name
-  source_arn    = aws_cloudwatch_event_rule.rule.arn
 }
 
 resource "aws_iam_role" "lambda_role" {
