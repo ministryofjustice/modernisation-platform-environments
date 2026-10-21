@@ -137,5 +137,5 @@ resource "aws_cloudwatch_event_target" "aws_health_event_target" {
   event_bus_name = "default"
   target_id      = "AWSHealthLambda"
   role_arn       = aws_iam_role.baseline_eventbridge_invoke_lambda[count.index].arn
-  arn            = var.baseline_aws_health_lambda_configuration.aws_health_lambda_arn
+  arn            = var.baseline_aws_health_lambda_configuration.baseline_aws_health_lambda_arn
 }

@@ -62,9 +62,9 @@ module "baseline" {
     }
   }
 
-  baseline_aws_health_lambda_cloudwatch_events = merge(
-    lookup(local.baseline_all_environments, "baseline_aws_health_lambda_cloudwatch_events", {}),
-    lookup(local.baseline_environment_specific, "baseline_aws_health_lambda_cloudwatch_events", {}),
+  baseline_aws_health_lambda_configuration = merge(
+    lookup(local.baseline_all_environments, "baseline_aws_health_lambda_configuration", {}),
+    lookup(local.baseline_environment_specific, "baseline_aws_health_lambda_configuration", {}),
   )
 
   bastion_linux = merge(

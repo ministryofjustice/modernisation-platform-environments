@@ -81,11 +81,11 @@ variable "baseline_aws_health_lambda_configuration" {
 
   validation {
     condition = (
-    !var.baseline_aws_health_lambda_configuration.enabled ||
-    (
-    try(trimspace(var.baseline_aws_health_lambda_configuration.baseline_aws_health_lambda_arn), "") != "" &&
-    try(trimspace(var.baseline_aws_health_lambda_configuration.rule_name), "") != ""
-    )
+      !var.baseline_aws_health_lambda_configuration.enabled ||
+      (
+        try(trimspace(var.baseline_aws_health_lambda_configuration.baseline_aws_health_lambda_arn), "") != "" &&
+        try(trimspace(var.baseline_aws_health_lambda_configuration.rule_name), "") != ""
+      )
     )
 
     error_message = "When baseline_aws_health_lambda_configuration.enabled is true, baseline_aws_health_lambda_arn and rule_name must both be provided and non-empty."

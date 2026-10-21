@@ -71,7 +71,7 @@ data "aws_iam_policy_document" "baseline_invoke_aws_health_lambda" {
     effect  = "Allow"
     actions = ["lambda:InvokeFunction"]
     resources = [
-      var.baseline_aws_health_lambda_configuration.aws_health_lambda_arn
+      var.baseline_aws_health_lambda_configuration.baseline_aws_health_lambda_arn
     ]
   }
 }
@@ -82,4 +82,3 @@ resource "aws_iam_role_policy" "baseline_invoke_aws_health_lambda" {
   role   = aws_iam_role.baseline_eventbridge_invoke_lambda[count.index].id
   policy = data.aws_iam_policy_document.baseline_invoke_aws_health_lambda[count.index].json
 }
-
