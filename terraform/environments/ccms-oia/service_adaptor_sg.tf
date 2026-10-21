@@ -49,9 +49,9 @@ resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_c" {
 # }
 
 # Restricted outbound traffic to Adaptor ECS tasks
-resource "aws_vpc_security_group_egress_rule" "adaptor_alb_egress_oia_ec2" {
+resource "aws_vpc_security_group_egress_rule" "adaptor_alb_egress_ecs_opa_tasks" {
   security_group_id            = aws_security_group.adaptor_load_balancer.id
-  description                  = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
+  description                  = "Allow outbound traffic to ECS tasks"
   ip_protocol                  = "tcp"
   from_port                    = local.application_data.accounts[local.environment].adaptor_server_port
   to_port                      = local.application_data.accounts[local.environment].adaptor_server_port
@@ -59,7 +59,6 @@ resource "aws_vpc_security_group_egress_rule" "adaptor_alb_egress_oia_ec2" {
 }
 
 # Adapter Security Group
-
 
 resource "aws_security_group" "ecs_tasks_adaptor" {
   name_prefix = "${local.adaptor_app_name}-ecs-tasks-security-group"
