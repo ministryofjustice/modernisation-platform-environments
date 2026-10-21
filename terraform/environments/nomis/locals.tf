@@ -2,14 +2,6 @@
 # define environment specific configuration in locals_development.tf, locals_test.tf etc.
 
 locals {
-  baseline_aws_health_lambda_configuration_specific = {
-    development   = local.baseline_aws_health_lambda_configuration_development
-    test          = local.baseline_aws_health_lambda_configuration_test
-    preproduction = local.baseline_aws_health_lambda_configuration_preproduction
-    production    = local.baseline_aws_health_lambda_configuration_production
-  }
-  baseline_aws_health_lambda_configuration_environment_specific = local.baseline_aws_health_lambda_configuration_specific[local.environment]
-
   baseline_presets_environments_specific = {
     development   = local.baseline_presets_development
     test          = local.baseline_presets_test

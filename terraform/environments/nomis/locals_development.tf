@@ -5,12 +5,6 @@ locals {
     maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
-  baseline_aws_health_lambda_configuration_development = {
-    enabled               = true
-    baseline_aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
-    rule_name             = "ForwardAllHealthEvents"
-  }
-
   baseline_presets_development = {
     options = {
       sns_topics = {
@@ -55,6 +49,12 @@ locals {
           }]
         }
       }
+    }
+
+    baseline_aws_health_lambda_cloudwatch_events = {
+      enabled                        = true
+      baseline_aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
+      rule_name                      = "ForwardAllHealthEvents"
     }
 
     cloudwatch_dashboards = {
