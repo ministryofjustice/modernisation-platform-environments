@@ -69,7 +69,7 @@ module "github_workflow_scheduler" {
 
 resource "aws_secretsmanager_secret" "aws_health_lambda_accounts" {
   count = local.enable_aws_health_lambda ? 1 : 0
-  name = "aws_health_lambda_accounts"
+  name  = "aws_health_lambda_accounts"
 }
 
 module "aws_health_lambda" {

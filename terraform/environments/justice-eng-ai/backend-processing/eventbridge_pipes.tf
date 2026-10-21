@@ -1,6 +1,18 @@
-# Starts the post-approval workflow when an event is inserted with JobStage
-# "control_plane" and JobStatus "approved". EventBridge Pipes reads the DynamoDB stream
-# directly, so no Lambda is needed.
+# Starts a target state machine when an event with a matching JobStage and JobStatus is
+# inserted into the build events table. EventBridge Pipes reads the DynamoDB stream
+# directly, so no Lambda is needed. Add an entry to local.pipes for each new trigger;
+# the target receives the stream record (an array holding one record) as its input.
+locals {
+  pipes = [
+    {
+      name       = "build-approved"
+      event_name = "INSERT"
+      job_stage  = "control_plane"
+      job_status = "approved"
+      target_arn = module.step_functions_control_plane.resume_arn
+    },
+  ]
+}
 
 resource "aws_sqs_queue" "build_approval_pipe_dlq" {
   name                    = "${local.application_name}-build-approval-pipe-dlq"
@@ -46,10 +58,10 @@ data "aws_iam_policy_document" "build_approval_pipe" {
   }
 
   statement {
-    sid       = "StartPostApprovalWorkflow"
+    sid       = "StartTargetWorkflows"
     effect    = "Allow"
     actions   = ["states:StartExecution"]
-    resources = [module.step_functions_post_approval.arn]
+    resources = distinct(local.pipes[*].target_arn)
   }
 
   statement {
@@ -66,21 +78,23 @@ resource "aws_iam_role_policy" "build_approval_pipe" {
   policy = data.aws_iam_policy_document.build_approval_pipe.json
 }
 
-resource "aws_pipes_pipe" "build_approval" {
-  name     = "${local.application_name}-build-approval"
+resource "aws_pipes_pipe" "build_events" {
+  for_each = { for pipe in local.pipes : pipe.name => pipe }
+
+  name     = "${local.application_name}-${each.key}"
   role_arn = aws_iam_role.build_approval_pipe.arn
   source   = aws_dynamodb_table.build_review.stream_arn
-  target   = module.step_functions_post_approval.arn
+  target   = each.value.target_arn
 
   source_parameters {
     filter_criteria {
       filter {
         pattern = jsonencode({
-          eventName = ["INSERT"]
+          eventName = [each.value.event_name]
           dynamodb = {
             NewImage = {
-              JobStage  = { S = ["control_plane"] }
-              JobStatus = { S = ["approved"] }
+              JobStage  = { S = [each.value.job_stage] }
+              JobStatus = { S = [each.value.job_status] }
             }
           }
         })
@@ -99,10 +113,6 @@ resource "aws_pipes_pipe" "build_approval" {
   }
 
   target_parameters {
-    # Same shape as the control plane output, so the post-approval workflow
-    # starts exactly as it would after an automatic approval.
-    input_template = jsonencode({ for name in local.build_review_attributes : name => "<$.dynamodb.NewImage.${name}.S>" })
-
     step_function_state_machine_parameters {
       invocation_type = "FIRE_AND_FORGET"
     }

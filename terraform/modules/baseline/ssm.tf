@@ -238,15 +238,17 @@ resource "aws_ssm_parameter" "placeholder" {
 resource "aws_ssm_patch_baseline" "this" {
   for_each = var.ssm_patch_baselines
 
+  approved_patches = each.value.approved_patches
   description      = each.value.description
   name             = each.key
   operating_system = each.value.operating_system
   rejected_patches = each.value.rejected_patches
 
   approval_rule {
-    approve_after_days = each.value.rule1_approve_after_days
-    approve_until_date = each.value.rule1_approve_until_date
-    compliance_level   = each.value.rule1_compliance_level
+    approve_after_days  = each.value.rule1_approve_after_days
+    approve_until_date  = each.value.rule1_approve_until_date
+    compliance_level    = each.value.rule1_compliance_level
+    enable_non_security = each.value.rule1_enable_non_security
 
     dynamic "patch_filter" {
       for_each = each.value.rule1_patch_filters
@@ -254,6 +256,26 @@ resource "aws_ssm_patch_baseline" "this" {
       content {
         key    = patch_filter.key
         values = patch_filter.value
+      }
+    }
+  }
+
+  dynamic "approval_rule" {
+    for_each = each.value.additional_approval_rules
+
+    content {
+      approve_after_days  = approval_rule.value.approve_after_days
+      approve_until_date  = approval_rule.value.approve_until_date
+      compliance_level    = approval_rule.value.compliance_level
+      enable_non_security = approval_rule.value.enable_non_security
+
+      dynamic "patch_filter" {
+        for_each = approval_rule.value.patch_filters
+
+        content {
+          key    = patch_filter.key
+          values = patch_filter.value
+        }
       }
     }
   }

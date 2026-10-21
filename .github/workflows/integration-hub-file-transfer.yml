@@ -121,6 +121,8 @@ jobs:
               routing_key: env.PAGERDUTY_ROUTING_KEY,
               event_action: "trigger",
               dedup_key: ($repository + ":" + $workflow + ":" + $run),
+              client: "GitHub Actions",
+              client_url: $url,
               payload: {
                 summary: ($workflow + " Terraform run failed on main"),
                 source: $repository,
