@@ -139,3 +139,8 @@ resource "aws_cloudwatch_event_target" "aws_health_event_target" {
   role_arn       = aws_iam_role.this["EventBridgeInvokeAWSHealthLambda"].arn
   arn            = var.aws_health_lambda_configuration.aws_health_lambda_arn
 }
+
+moved {
+  from = aws_cloudwatch_event_rule.baseline_aws_health_event_rule[0]
+  to   = aws_cloudwatch_event_rule.aws_health_event_rule[0]
+}
