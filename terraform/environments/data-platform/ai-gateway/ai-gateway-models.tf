@@ -14,8 +14,9 @@ resource "litellm_model" "amazon_bedrock" {
     ai_model_family              = each.value.model_family
     ai_model_name                = each.value.model_name
     ai_model_location            = each.value.model_location
+    ai_aws_account_name          = try(each.value.aws_account_name, null)
     ai_model_generally_available = each.value.generally_available
-    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_location\",\"ai_model_generally_available\"]"
+    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_location\",\"ai_model_generally_available\",\"ai_aws_account_name\"]"
   }
 
   depends_on = [
