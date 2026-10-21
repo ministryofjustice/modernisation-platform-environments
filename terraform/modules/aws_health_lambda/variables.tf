@@ -3,6 +3,11 @@ variable "aws_account_id" {
   type        = string
 }
 
+variable "aws_accounts_secret_name" {
+  description = "The name of the AWS Secrets Manager secret that contains the AWS account IDs"
+  type        = string
+}
+
 variable "aws_region" {
   description = "The AWS region where the Lambda and KMS resources are deployed"
   type        = string

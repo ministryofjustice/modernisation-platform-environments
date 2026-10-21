@@ -249,3 +249,8 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "ssm_patch_baselines", {}),
   )
 }
+
+module "aws_health_lambda_cloudwatch_events" {
+  source                          = "../../modules/aws_health_lambda_cloudwatch_events"
+  aws_health_lambda_configuration = local.aws_health_lambda_configuration_environment_specific
+}

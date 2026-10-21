@@ -20,3 +20,7 @@ resource "terraform_data" "lambda_build" {
     EOT
   }
 }
+
+data "aws_secretsmanager_secret_version" "aws_accounts" {
+  secret_id = var.aws_accounts_secret_name
+}
