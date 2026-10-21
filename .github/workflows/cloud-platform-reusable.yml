@@ -70,7 +70,7 @@ jobs:
       component: ${{ matrix.component }}
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
-      runner: "octo-production"
+      runner: "ubuntu-latest"
       terraform_version: ${{ inputs.terraform_version }}
       mint_grafana_token: ${{ matrix.component == 'root' }}
     secrets:
