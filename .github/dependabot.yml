@@ -330,38 +330,6 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
-      - "terraform/environments/cloud-platform-live"
-      - "terraform/environments/cloud-platform-live/cluster"
-      - "terraform/environments/cloud-platform-live/cluster-components"
-      - "terraform/environments/cloud-platform-live/cluster-core"
-      - "terraform/environments/cloud-platform-live/network"
-    schedule:
-      interval: "daily"
-    groups:
-      cloud-platform-live:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
-      - "terraform/environments/cloud-platform-non-live"
-      - "terraform/environments/cloud-platform-non-live/cluster"
-      - "terraform/environments/cloud-platform-non-live/cluster-components"
-      - "terraform/environments/cloud-platform-non-live/cluster-core"
-      - "terraform/environments/cloud-platform-non-live/network"
-    schedule:
-      interval: "daily"
-    groups:
-      cloud-platform-non-live:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
       - "terraform/environments/coat"
     schedule:
       interval: "daily"
@@ -928,8 +896,6 @@ updates:
       - "terraform/environments/integration-hub-api"
       - "terraform/environments/integration-hub-api/benefit-checker-api"
       - "terraform/environments/integration-hub-api/file-transfer-api"
-      - "terraform/environments/integration-hub-api/modules/file-transfer-api"
-      - "terraform/environments/integration-hub-api/modules/integration-hub-file-transfer-api"
     schedule:
       interval: "daily"
     groups:
@@ -958,6 +924,7 @@ updates:
       - "terraform/environments/integration-hub-file-transfer/pull-from-presigned-url"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup"
+      - "terraform/environments/integration-hub-file-transfer/push-to-sftp"
       - "terraform/environments/integration-hub-file-transfer/test-harness"
     schedule:
       interval: "daily"

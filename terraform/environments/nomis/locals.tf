@@ -42,6 +42,8 @@ locals {
       route53_resolver_rules                      = { outbound-data-and-private-subnets = ["azure-fixngo-domain"] }
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
       software_bucket_name                        = "ec2-image-builder-nomis"
+      ssm_maintenance_window_run_commands         = ["install-windows-definition-updates", "patch-manager-run-patch-baseline-group1"]
+      ssm_patch_baselines                         = ["WindowsPatchGroup1Baseline"]
     }
   }
 
@@ -51,18 +53,5 @@ locals {
     }
 
     security_groups = local.security_groups
-
-    patch_manager = {
-      patch_schedules = {
-        Windows = "cron(10 06 ? * WED *)" # 06:10 for nomis windows clients we work around the overnight shutdown  
-      }
-      patch_tag_key               = "os-type"
-      maintenance_window_duration = 4
-      maintenance_window_cutoff   = 2
-      patch_classifications = {
-        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
-      }
-    }
   }
 }

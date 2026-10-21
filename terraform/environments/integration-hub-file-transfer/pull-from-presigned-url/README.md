@@ -4,7 +4,7 @@ After retaining a clean file, the notifier publishes a custom notification to a
 recipient-specific encrypted SNS topic. The Modernisation Platform Chatbot module
 connects that topic to Slack. No incoming webhook or new Slack app is needed.
 
-Development targets `#integration-hub-team` (`C0ARA0C101L`) in the Justice Digital
+Development targets `#integration-hub-alerts` (`C0CAB9Q6S2U`) in the Justice Digital
 workspace (`T02DYEB3A`). The AWS account must first be connected to that workspace
 in Amazon Q Developer in chat applications (formerly AWS Chatbot). This is a
 one-time account setup; the Terraform module cannot perform the Slack OAuth step.
@@ -54,3 +54,20 @@ Run the notifier tests from the repository root:
 PYTHONPATH=terraform/environments/integration-hub-file-transfer/pull-from-presigned-url/lambda/notifier \
   python3 -m unittest discover -s terraform/environments/integration-hub-file-transfer/pull-from-presigned-url/lambda/notifier/tests -v
 ```
+
+
+### Customer filenames
+
+New pickup copies use the exact clean object's `original-file-name` S3 metadata,
+which the upload API supplies and the file mover preserves. For example:
+`products-poc-slack-test/<transfer-directory>/monthly-report.csv`.
+Slack shows the filename separately as well as the pickup path. Both are URL-encoded
+to prevent filenames from introducing Slack mentions or links. The download response
+also specifies the filename using UTF-8 Content-Disposition.
+
+The transfer directory continues to isolate uploads with identical filenames.
+Path components, control characters and bidirectional formatting characters are removed
+from labels; empty/dot-only labels use `download`, and names are limited to S3's key
+byte budget. If original-name metadata is absent, the clean object's basename is used.
+Existing files are not renamed. Notification retries reuse their saved pickup receipt,
+so neither their path nor their collection deadline changes after this deployment.

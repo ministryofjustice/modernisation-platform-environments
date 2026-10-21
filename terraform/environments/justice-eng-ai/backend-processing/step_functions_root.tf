@@ -3,25 +3,34 @@ locals {
 
   root_process_steps = [
     {
+      # BuildID and UserName come from the latest event the UI wrote for this AppID.
+      name              = "latest_event"
+      type              = "dynamodb_query_latest"
+      table_name        = aws_dynamodb_table.build_review.name
+      hash_key          = local.script_runner_app_id_path
+      result_attributes = { BuildID = "N", UserName = "S" }
+      result_path       = "$.latest"
+    },
+    {
+      name               = "control_plane"
+      type               = "step_function"
+      state_machine_name = local.control_plane_state_machine_name
+      input_path         = "$"
+      result_path        = "$.control_plane"
+    },
+    {
       name               = "build_test_deploy_app_image"
       type               = "step_function"
       state_machine_name = local.build_image_state_machine_name
-      input_path         = "$"
+      input_path         = "$.control_plane.Output"
       result_path        = "$.build_test_deploy_app_image"
     },
     {
       name               = "build_app_infra"
       type               = "step_function"
-      state_machine_name = "${local.application_name}-build-app-infra"
-      input_path         = "$.build_test_deploy_app_image"
+      state_machine_name = local.build_infra_state_machine_name
+      input_path         = "$.build_test_deploy_app_image.Output"
       result_path        = "$.build_app_infra"
-    },
-    {
-      name               = "deploy_to_infra"
-      type               = "step_function"
-      state_machine_name = "${local.application_name}-deploy-to-infra"
-      input_path         = "$.build_app_infra"
-      result_path        = "$.deploy_to_infra"
     },
   ]
 }
@@ -37,5 +46,7 @@ module "step_functions_root" {
   depends_on = [
     aws_iam_role_policy.step_functions_common,
     module.step_functions_build_image,
+    module.step_functions_build_infra,
+    module.step_functions_control_plane,
   ]
 }

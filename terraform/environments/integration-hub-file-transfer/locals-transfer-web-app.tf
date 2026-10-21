@@ -22,6 +22,6 @@ locals {
 
   # GetGroupId does not reliably resolve groups by display name, so IDs are explicit here.
   transfer_iam_identity_center_groups = {
-    integration-hub = "8662e2b4-3021-7017-56ba-8794aa2047cd"
+    azure-aws-sso-integration-hub = "1622e2b4-9011-7000-b2fc-87228b7308cd"
   }
 }

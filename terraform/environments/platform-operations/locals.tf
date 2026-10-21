@@ -43,4 +43,10 @@ locals {
   github_actions_lambda_environment_specific = local.github_actions_lambda_environments_specific[local.environment]
 
   github_actions_project_name = "github-actions"
+
+  enable_aws_health_lambda_environments_specific = {
+    development = local.enable_aws_health_lambda_development
+    production  = local.enable_aws_health_lambda_production
+  }
+  enable_aws_health_lambda = local.enable_aws_health_lambda_environments_specific[local.environment]
 }
