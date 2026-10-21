@@ -140,5 +140,12 @@ locals {
         ]
       }
     }
+
+    # example emergency patching configuration
+    ssm_patch_baselines = {
+      # WindowsPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["WindowsPatchGroup1Baseline"], {
+      #   approved_patches = ["KB5128928"]
+      # })
+    }
   }
 }
