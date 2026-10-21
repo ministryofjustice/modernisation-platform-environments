@@ -96,13 +96,14 @@ resource "aws_ssm_association" "certificate_wallet_expiry_check" {
   association_name = "certificate-wallet-expiry-check-${each.key}"
 
   parameters = {
-    certType      = each.value.cert_type
-    keystorePath  = each.value.keystore_path
-    envFile       = each.value.env_file
-    secretId      = aws_secretsmanager_secret.ebs_secrets.name
-    secretKey     = each.value.secret_key
-    snsTopicArn   = aws_sns_topic.cw_alerts.arn
-    thresholdDays = "90"
+    certType        = each.value.cert_type
+    keystorePath    = each.value.keystore_path
+    envFile         = each.value.env_file
+    secretId        = aws_secretsmanager_secret.ebs_secrets.name
+    secretKey       = each.value.secret_key
+    snsTopicArn     = aws_sns_topic.cw_alerts.arn
+    thresholdDays   = "90"
+    environmentName = "${local.application_name}-${local.environment}"
   }
 
   targets {
