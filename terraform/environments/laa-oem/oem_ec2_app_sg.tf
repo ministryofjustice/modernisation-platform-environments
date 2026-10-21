@@ -15,7 +15,6 @@ resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc" {
   ip_protocol       = "tcp"
   from_port         = 1521
   to_port           = 1521
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
   referenced_security_group_id = aws_security_group.oem_db_security_group.id
 
   tags = {
