@@ -15,7 +15,9 @@ resource "aws_secretsmanager_secret_version" "opahub_secrets" {
     "db_password"     = "",
     "wl_user"         = "",
     "wl_password"     = "",
-    "secret_key"      = ""
+    "secret_key"      = "",
+    "KEYSTORE_PASSWORD"   = "",
+    "TRUSTSTORE_PASSWORD" = ""
   })
 
   lifecycle {

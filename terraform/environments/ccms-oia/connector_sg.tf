@@ -48,13 +48,23 @@ resource "aws_vpc_security_group_ingress_rule" "connector_alb_ingress_workspace"
 }
 
 # Restricted outbound traffic to OIA EC2 instances
-resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_oia_ec2" {
-  security_group_id            = aws_security_group.connector_load_balancer.id
-  description                  = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
-  ip_protocol                  = "tcp"
-  from_port                    = 32768
-  to_port                      = 61000
-  referenced_security_group_id = aws_security_group.cluster_ec2.id
+# resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_oia_ec2" {
+#   security_group_id            = aws_security_group.connector_load_balancer.id
+#   description                  = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
+#   ip_protocol                  = "tcp"
+#   from_port                    = 32768
+#   to_port                      = 61000
+#   referenced_security_group_id = aws_security_group.cluster_ec2.id
+# }
+
+# Restricted outbound traffic to OIA ECS Tasks
+resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_ecs_tasks" {
+  security_group_id = aws_security_group.connector_load_balancer.id
+  ip_protocol       = "tcp"
+  description       = "Allow outbound traffic to ECS tasks"
+  from_port         = local.application_data.accounts[local.environment].connector_server_port
+  to_port           = local.application_data.accounts[local.environment].connector_server_port
+  referenced_security_group_id = aws_security_group.ecs_tasks_connector.id
 }
 
 # Container Security Group
@@ -126,15 +136,15 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_443" {
   cidr_ipv4         = each.value
 }
 
-# resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_cp_443" {
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_cp_443" {
 
-#   security_group_id = aws_security_group.ecs_tasks_connector.id
-#   description       = "Connector ECS tasks egress to CP BC"
-#   ip_protocol       = "tcp"
-#   from_port         = 443
-#   to_port           = 443
-#   cidr_ipv4         = local.application_data.accounts[local.environment].cloud_platform_cidr
-# }
+  security_group_id = aws_security_group.ecs_tasks_connector.id
+  description       = "Connector ECS tasks egress to CP BC"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = "0.0.0.0/0"
+}
 
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_1521" {
@@ -165,11 +175,11 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_1522" 
   cidr_ipv4         = each.value
 }
 
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_2049_efs" {
-  security_group_id            = aws_security_group.ecs_tasks_connector.id
-  description                  = "Allow egress to EFS security group on port 2049"
-  ip_protocol                  = "tcp"
-  from_port                    = 2049
-  to_port                      = 2049
-  referenced_security_group_id = aws_security_group.oia-efs-security-group.id
-}
+# resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_2049_efs" {
+#   security_group_id            = aws_security_group.ecs_tasks_connector.id
+#   description                  = "Allow egress to EFS security group on port 2049"
+#   ip_protocol                  = "tcp"
+#   from_port                    = 2049
+#   to_port                      = 2049
+#   referenced_security_group_id = aws_security_group.oia-efs-security-group.id
+# }

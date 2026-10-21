@@ -1223,6 +1223,8 @@ variable "ssm_parameters" {
 variable "ssm_patch_baselines" {
   description = "A map of SSM patch baselines to create where name is the map key"
   type = map(object({
+    # add explicit rule1 approval rules to make it easier to override values from baseline presets
+    approved_patches          = optional(list(string))
     description               = optional(string)
     operating_system          = string
     rejected_patches          = optional(list(string))
@@ -1231,6 +1233,13 @@ variable "ssm_patch_baselines" {
     rule1_compliance_level    = optional(string)
     rule1_enable_non_security = optional(bool)
     rule1_patch_filters       = optional(map(list(string)), {})
+    additional_approval_rules = optional(list(object({
+      approve_after_days  = optional(number)
+      approve_until_date  = optional(string)
+      compliance_level    = optional(string)
+      enable_non_security = optional(bool)
+      patch_filters       = optional(map(list(string)), {})
+    })), [])
 
     is_default  = optional(bool, false) # optionally set as default for given OS
     patch_group = optional(string)      # optionally assign to a patch group
