@@ -14,6 +14,7 @@ locals {
     var.options.enable_vmimport ? ["vmimportPolicy"] : [],
     var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessPolicy"] : [],
     length(var.options.ssm_maintenance_window_run_commands) != 0 ? ["SSMPatchManagerTaskPolicy"] : [],
+    var.options.baseline_aws_health_lambda_configuration.enabled ? ["InvokeAWSHealthLambda"] : [],
     "EC2Default",
     "EC2Db",
   ]))
@@ -43,6 +44,17 @@ locals {
         local.iam_policy_statements_in_ec2_default,
         var.options.enable_s3_db_backup_bucket ? local.iam_policy_statements_ec2.S3DbBackupRead : [],
       ])
+    }
+
+    InvokeAWSHealthLambda = {
+      description = "Allows EventBridge to invoke the AWS Health Lambda function"
+      statements = [
+        {
+          effect    = "Allow"
+          actions   = ["lambda:InvokeFunction"]
+          resources = [var.options.baseline_aws_health_lambda_configuration.baseline_aws_health_lambda_arn]
+        }
+      ]
     }
 
     # EC2Web = {

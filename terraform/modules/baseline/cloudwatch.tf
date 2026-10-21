@@ -136,6 +136,6 @@ resource "aws_cloudwatch_event_target" "aws_health_event_target" {
   rule           = aws_cloudwatch_event_rule.baseline_aws_health_event_rule[count.index].name
   event_bus_name = "default"
   target_id      = "AWSHealthLambda"
-  role_arn       = aws_iam_role.baseline_eventbridge_invoke_lambda[count.index].arn
+  role_arn       = aws_iam_role.this["EventBridgeInvokeAWSHealthLambda"].arn
   arn            = var.baseline_aws_health_lambda_configuration.baseline_aws_health_lambda_arn
 }

@@ -18,6 +18,11 @@ locals {
   }
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
 
+  baseline_aws_health_lambda_configuration = merge(
+    lookup(local.baseline_all_environments, "baseline_aws_health_lambda_configuration", {}),
+    lookup(local.baseline_environment_specific, "baseline_aws_health_lambda_configuration", {}),
+  )
+
   baseline_presets_all_environments = {
     options = {
       cloudwatch_metric_alarms_default_actions    = ["pagerduty"]

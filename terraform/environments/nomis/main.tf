@@ -30,7 +30,10 @@ module "baseline_presets" {
 
   options = merge(
     local.baseline_presets_all_environments.options,
-    local.baseline_presets_environment_specific.options
+    local.baseline_presets_environment_specific.options,
+    {
+      baseline_aws_health_lambda_configuration = local.baseline_aws_health_lambda_configuration
+    }
   )
 }
 
@@ -62,10 +65,7 @@ module "baseline" {
     }
   }
 
-  baseline_aws_health_lambda_configuration = merge(
-    lookup(local.baseline_all_environments, "baseline_aws_health_lambda_configuration", {}),
-    lookup(local.baseline_environment_specific, "baseline_aws_health_lambda_configuration", {}),
-  )
+  baseline_aws_health_lambda_configuration = local.baseline_aws_health_lambda_configuration
 
   bastion_linux = merge(
     lookup(local.baseline_all_environments, "bastion_linux", {}),

@@ -55,6 +55,11 @@ resource "aws_iam_role" "this" {
   })
 }
 
+moved {
+  from = aws_iam_role.baseline_eventbridge_invoke_lambda[0]
+  to   = aws_iam_role.this["EventBridgeInvokeAWSHealthLambda"]
+}
+
 resource "aws_iam_role_policy_attachment" "this" {
   for_each = local.iam_role_policy_attachments
 
@@ -71,10 +76,4 @@ resource "aws_iam_service_linked_role" "this" {
   tags = merge(local.tags, each.value.tags, {
     Name = each.key
   })
-}
-
-resource "aws_iam_role" "baseline_eventbridge_invoke_lambda" {
-  count              = local.baseline_enable_aws_health_lambda ? 1 : 0
-  name               = "EventBridgeInvokeAWSHealthLambda"
-  assume_role_policy = data.aws_iam_policy_document.baseline_eventbridge_assume_role.json
 }
