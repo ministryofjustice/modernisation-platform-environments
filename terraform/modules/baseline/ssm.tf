@@ -244,14 +244,24 @@ resource "aws_ssm_patch_baseline" "this" {
   operating_system = each.value.operating_system
   rejected_patches = each.value.rejected_patches
 
+  approval_rule {
+    approve_after_days  = each.value.rule1_approve_after_days
+    approve_until_date  = each.value.rule1_approve_until_date
+    compliance_level    = each.value.rule1_compliance_level
+    enable_non_security = each.value.rule1_enable_non_security
+
+    dynamic "patch_filter" {
+      for_each = each.value.rule1_patch_filters
+
+      content {
+        key    = patch_filter.key
+        values = patch_filter.value
+      }
+    }
+  }
+
   dynamic "approval_rule" {
-    for_each = concat(each.value.rule1_approve_after_days == null && each.value.rule1_approve_until_date == null ? [] : [{
-      approve_after_days  = each.value.rule1_approve_after_days
-      approve_until_date  = each.value.rule1_approve_until_date
-      compliance_level    = each.value.rule1_compliance_level
-      enable_non_security = each.value.rule1_enable_non_security
-      patch_filters       = each.value.rule1_patch_filters
-    }], each.value.additional_approval_rules)
+    for_each = each.value.additional_approval_rules
 
     content {
       approve_after_days  = approval_rule.value.approve_after_days
