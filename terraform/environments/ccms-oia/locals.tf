@@ -7,7 +7,7 @@ locals {
   opa_app_name        = "ccms-opa"
   connector_app_name  = "ccms-connector"
   adaptor_app_name    = "ccms-service-adaptor"
-  
+
   first_cluster_name  = "opa-cluster"
   second_cluster_name = "conn-saa-cluster"
 
