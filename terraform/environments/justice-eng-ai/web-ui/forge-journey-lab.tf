@@ -78,12 +78,12 @@ data "aws_iam_policy_document" "forge_ecs_task_execution_secrets" {
     sid     = "ReadForgeSecrets"
     effect  = "Allow"
     actions = ["secretsmanager:GetSecretValue"]
-    resources = [
+    resources = concat([
       aws_secretsmanager_secret.forge_session_secret[0].arn,
       aws_secretsmanager_secret.entra_oidc_tenant_id[0].arn,
       aws_secretsmanager_secret.entra_oidc_client_id[0].arn,
       aws_secretsmanager_secret.entra_oidc_client_secret[0].arn,
-    ]
+    ], local.forge_governance ? [aws_secretsmanager_secret.forge_governance[0].arn] : [])
   }
 }
 
@@ -366,7 +366,7 @@ resource "aws_ecs_task_definition" "forge" {
         protocol      = "tcp"
       }]
 
-      environment = [
+      environment = concat([
         { name = "AWS_REGION", value = data.aws_region.current.region },
         { name = "CHROMIUM_SANDBOX_ENABLED", value = "false" },
         { name = "DATA_DIR", value = "/data" },
@@ -387,14 +387,14 @@ resource "aws_ecs_task_definition" "forge" {
         { name = "SESSION_COOKIE_SECURE", value = "true" },
         { name = "TMPDIR", value = "/data" },
         { name = "TRUST_PROXY_HOPS", value = "1" },
-      ]
+      ], local.forge_governance_environment)
 
-      secrets = [
+      secrets = concat([
         { name = "SESSION_SECRET", valueFrom = aws_secretsmanager_secret.forge_session_secret[0].arn },
         { name = "ENTRA_TENANT_ID", valueFrom = aws_secretsmanager_secret.entra_oidc_tenant_id[0].arn },
         { name = "ENTRA_CLIENT_ID", valueFrom = aws_secretsmanager_secret.entra_oidc_client_id[0].arn },
         { name = "ENTRA_CLIENT_SECRET", valueFrom = aws_secretsmanager_secret.entra_oidc_client_secret[0].arn },
-      ]
+      ], local.forge_governance_secrets)
 
       mountPoints = [{
         sourceVolume  = "data"
