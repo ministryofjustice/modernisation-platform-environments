@@ -6,7 +6,7 @@ locals {
   aws_region                      = data.aws_region.current.region
   aws_dns_suffix                  = data.aws_partition.current.dns_suffix
 
-  ecr_repository_uri                    = "${local.core_shared_services_account_id}.dkr.ecr.${local.aws_region}.${local.aws_dns_suffix}/${local.application_data.accounts[local.environment].ecr_repository_name}"
+  ecr_repository_uri                    = aws_ecr_repository.user_applications.repository_url
   forge_runtime_base_ecr_repository_uri = "${local.core_shared_services_account_id}.dkr.ecr.${local.aws_region}.${local.aws_dns_suffix}/${local.application_data.accounts[local.environment].forge_runtime_base_ecr_repository_name}"
 
   build_image_steps = [
@@ -20,12 +20,15 @@ locals {
         { name = "S3_FOLDER", path = "$.s3_folder" },
         { name = "S3_FILE", path = "States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1))" },
         { name = "ECR_REPOSITORY_URI", value = local.ecr_repository_uri },
-        { name = "IMAGE_TAG", path = local.script_runner_app_id_path },
+        { name = "AppID", path = local.script_runner_app_id_path },
+        { name = "BuildID", path = "$.latest.BuildID" },
+        { name = "IMAGE_TAG", path = "States.Format('{}-{}', ${local.script_runner_app_id_path}, $.latest.BuildID)" },
         { name = "AWS_REGION", value = local.aws_region },
         { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
         { name = "FORGE_RUNTIME_BASE_ECR_REPOSITORY_URI", value = local.forge_runtime_base_ecr_repository_uri },
       ]
       result_path     = "$.image_build_task"
+      outputs         = true
       timeout_seconds = 3600
     }
   ]

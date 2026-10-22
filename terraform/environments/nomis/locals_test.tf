@@ -5,6 +5,12 @@ locals {
     maintenance_message = "T1 and T2 are rarely used so are started on demand. T3 is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
   }
 
+  aws_health_lambda_configuration_test = {
+    enabled               = true
+    aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
+    rule_name             = "ForwardAllHealthEvents"
+  }
+
   baseline_presets_test = {
     options = {
       sns_topics = {
@@ -268,7 +274,7 @@ locals {
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
           data  = { total_size = 1000 }
-          flash = { total_size = 50 }
+          flash = { total_size = 100 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true

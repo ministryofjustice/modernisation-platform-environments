@@ -50,8 +50,7 @@
           "consumer": "${reconciliation_consumer}",
           "mode": "rolling",
           "execution_id.$": "$$.Execution.Id",
-          "state_machine_arn.$": "$$.StateMachine.Id",
-          "aggregate_notifications": true
+          "state_machine_arn.$": "$$.StateMachine.Id"
         }
       },
       "OutputPath": "$.Payload",
@@ -174,21 +173,6 @@
         },
         {
           "Variable": "$.status",
-          "StringEquals": "manual_review_required",
-          "Next": "PlanningComplete"
-        },
-        {
-          "Variable": "$.status",
-          "StringEquals": "approval_required",
-          "Next": "WaitForLegacyRollingApproval"
-        },
-        {
-          "Variable": "$.status",
-          "StringEquals": "replay_ready",
-          "Next": "PrepareLegacyPlannedDates"
-        },
-        {
-          "Variable": "$.status",
           "StringEquals": "review_required",
           "Next": "PlanningComplete"
         },
@@ -209,102 +193,6 @@
         }
       ],
       "Default": "UnexpectedPlanningResult"
-    },
-    "WaitForLegacyRollingApproval": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-      "Parameters": {
-        "FunctionName": "${planner_function_name}",
-        "Payload": {
-          "action": "park_rolling_approval",
-          "consumer": "${reconciliation_consumer}",
-          "execution_id.$": "$.execution_id",
-          "plan_id.$": "$.plan_id",
-          "task_token.$": "$$.Task.Token"
-        }
-      },
-      "ResultPath": "$.approval",
-      "Retry": [
-        {
-          "ErrorEquals": [
-            "Lambda.ServiceException",
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
-            "Lambda.TooManyRequestsException"
-          ],
-          "IntervalSeconds": 2,
-          "BackoffRate": 2,
-          "MaxAttempts": 3
-        }
-      ],
-      "Next": "RecordLegacyRollingApproval"
-    },
-    "RecordLegacyRollingApproval": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
-      "Parameters": {
-        "FunctionName": "${planner_function_name}",
-        "Payload": {
-          "action": "record_rolling_approval",
-          "consumer": "${reconciliation_consumer}",
-          "execution_id.$": "$.execution_id",
-          "plan_id.$": "$.plan_id",
-          "decision.$": "$.approval.decision"
-        }
-      },
-      "OutputPath": "$.Payload",
-      "Retry": [
-        {
-          "ErrorEquals": [
-            "Lambda.ServiceException",
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
-            "Lambda.TooManyRequestsException"
-          ],
-          "IntervalSeconds": 2,
-          "BackoffRate": 2,
-          "MaxAttempts": 3
-        }
-      ],
-      "Next": "CheckLegacyRollingApproval"
-    },
-    "CheckLegacyRollingApproval": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Variable": "$.status",
-          "StringEquals": "replay_ready",
-          "Next": "PrepareLegacyPlannedDates"
-        },
-        {
-          "Variable": "$.status",
-          "StringEquals": "rejected",
-          "Next": "RollingRejected"
-        }
-      ],
-      "Default": "UnexpectedLegacyRollingApprovalResult"
-    },
-    "PrepareLegacyPlannedDates": {
-      "Type": "Pass",
-      "Parameters": {
-        "mode": "rolling",
-        "consumer": "${reconciliation_consumer}",
-        "execution_id.$": "$.execution_id",
-        "thread_id.$": "$.thread_id",
-        "episode_id": "",
-        "recovery_mode": false,
-        "iteration": 0,
-        "filter_dates.$": "$.candidates"
-      },
-      "Next": "ProcessDates"
-    },
-    "RollingRejected": {
-      "Type": "Succeed"
-    },
-    "UnexpectedLegacyRollingApprovalResult": {
-      "Type": "Fail",
-      "Error": "UnexpectedRollingApprovalResult",
-      "Cause": "The legacy rolling approval callback returned an unexpected result."
     },
     "PlanRolling": {
       "Type": "Task",
@@ -799,8 +687,7 @@
       "MaxConcurrency": 1,
       "ResultPath": "$.date_results",
       "ItemSelector": {
-        "filter_date.$": "$$.Map.Item.Value",
-        "input.$": "$"
+        "filter_date.$": "$$.Map.Item.Value"
       },
       "Iterator": {
         "StartAt": "%{ if planner_function_name != "" && reconciliation_consumer != "" }SelectDateInput%{ else }MergeInto${table_name}%{ endif }",
@@ -826,6 +713,14 @@
               "Payload.$": "$.filter_date.replay_input"
             },
             "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 15,
+                "BackoffRate": 2,
+                "MaxAttempts": 6
+              },
               {
                 "ErrorEquals": [
                   "States.ALL"

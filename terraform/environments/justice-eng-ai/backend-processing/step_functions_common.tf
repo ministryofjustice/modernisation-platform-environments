@@ -165,10 +165,17 @@ data "aws_iam_policy_document" "step_functions_common" {
   }
 
   statement {
-    sid       = "ReadBuildReviewQueue"
+    sid       = "ReadWriteBuildEvents"
     effect    = "Allow"
-    actions   = ["dynamodb:GetItem"]
+    actions   = ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem"]
     resources = [aws_dynamodb_table.build_review.arn]
+  }
+
+  statement {
+    sid       = "ResumePausedExecutions"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess", "states:SendTaskFailure"]
+    resources = ["*"]
   }
 
   statement {
@@ -255,7 +262,7 @@ data "aws_iam_policy_document" "script_runner_common" {
   }
 
   statement {
-    sid    = "PushPrototypeImagesToSharedRepository"
+    sid    = "PushPrototypeImagesToAccountRepository"
     effect = "Allow"
     actions = [
       "ecr:BatchCheckLayerAvailability",
@@ -264,7 +271,7 @@ data "aws_iam_policy_document" "script_runner_common" {
       "ecr:CompleteLayerUpload",
       "ecr:PutImage",
     ]
-    resources = ["arn:${data.aws_partition.current.partition}:ecr:${data.aws_region.current.region}:${local.environment_management.account_ids["core-shared-services-production"]}:repository/${local.application_data.accounts[local.environment].ecr_repository_name}"]
+    resources = [aws_ecr_repository.user_applications.arn]
   }
 }
 
