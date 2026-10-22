@@ -590,6 +590,16 @@
         },
         {
           "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        },
+        {
+          "ErrorEquals": [
             "States.ALL"
           ],
           "IntervalSeconds": 2,
