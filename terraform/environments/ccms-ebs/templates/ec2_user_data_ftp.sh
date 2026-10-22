@@ -235,4 +235,3 @@ else
   chown -h $USERNAME:$USERNAME /home/$USERNAME/$inbound_bucket
   chown -h $USERNAME:$USERNAME /home/$USERNAME/$outbound_bucket
 fi
-
