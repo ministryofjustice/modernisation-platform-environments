@@ -198,14 +198,6 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
     },
     {
       "Effect": "Allow",
-      "Action": ["s3:GetObject","s3:ListBucket","s3:GetObjectAttributes"],
-      "Resource": [
-         aws_s3_bucket.ccms_ebs_shared.arn,
-         "${aws_s3_bucket.ccms_ebs_shared.arn}/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
       "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:*"]
     },
