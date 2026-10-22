@@ -235,5 +235,5 @@ data "aws_iam_policy_document" "s3" {
 resource "aws_iam_role_policy_attachment" "ssogen_ec2_policy_s3" {
   count      = local.ssogen_enabled ? 1 : 0
   role       = aws_iam_role.ssogen_ec2[count.index].name
-  policy_arn = data.aws_iam_role_policy_attachment.ssogen_ec2_policy[count.index].arn
+  policy_arn = data.aws_iam_policy_document.s3.arn
 }
