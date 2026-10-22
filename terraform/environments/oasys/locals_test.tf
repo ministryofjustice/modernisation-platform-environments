@@ -245,7 +245,7 @@ locals {
           description         = "t2 oasys database"
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "t2"
-          oracle-sids         = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2OASYS2 T2ONRAUD T2ONRBDS T2ONRSYS T2BOAUD T2BOSYS"
+          oracle-sids         = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS" # Also has T2OASYS2 T2BOAUD T2BOSYS
         })
       })
 
