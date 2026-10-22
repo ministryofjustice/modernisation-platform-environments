@@ -21,13 +21,13 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
     resources = [var.service_arn]
   }
   statement {
-    effect    = "Allow"
-    actions   = [
+    effect = "Allow"
+    actions = [
       "cloudwatch:DescribeAlarms",
       "cloudwatch:DisableAlarmActions",
       "cloudwatch:EnableAlarmActions",
       "cloudwatch:ListTagsForResource"
-      ]
+    ]
     resources = ["*"]
   }
   statement {
