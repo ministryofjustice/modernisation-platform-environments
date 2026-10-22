@@ -205,10 +205,10 @@ module "ecs_nightly_restart_weblogic_data" {
   count  = var.env_name == "test" ? 1 : 0
   source = "../components/ecs_nightly_restart"
 
-  env_name                  = var.env_name
-  cluster_name              = module.ecs.ecs_cluster_arn
-  service_name              = "${var.env_name}-weblogic-data"
-  service_arn               = local.weblogic_data_service_arn
-  task_count                = data.aws_ssm_parameter.weblogic_data_task_count[0].value
-  nightly_muted_alarm_names = module.weblogic_testdata_api[0].nightly_muted_alarm_names
+  env_name     = var.env_name
+  app_name     = "weblogic-data"
+  cluster_name = module.ecs.ecs_cluster_arn
+  service_name = "${var.env_name}-weblogic-data"
+  service_arn  = local.weblogic_data_service_arn
+  task_count   = data.aws_ssm_parameter.weblogic_data_task_count[0].value
 }
