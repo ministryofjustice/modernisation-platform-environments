@@ -230,13 +230,13 @@ resource "aws_iam_policy" "ssogen_ec2_s3_policy" {
       "Action": [
         "s3:ListBucket"
       ],
-      "Resource": ["aws_s3_bucket.ccms_ebs_shared.arn"]
+      "Resource": ["${aws_s3_bucket.ccms_ebs_shared.arn}"]
     },
     {
       "Effect": "Allow",
       "Action": [
         "s3:GetObject",
-        "s3:GetObjectAttributes
+        "s3:GetObjectAttributes"
       ],
       "Resource": ["${aws_s3_bucket.ccms_ebs_shared.arn}/*"]
     },    
