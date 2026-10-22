@@ -26,15 +26,16 @@ locals {
       type              = "dynamodb_query_latest"
       table_name        = aws_dynamodb_table.build_review.name
       hash_key          = local.script_runner_app_id_path
+      build_id          = "$.latest.BuildID"
       result_attributes = { JobStatus = "S" }
       result_path       = "$.review"
     },
     {
-      # auto_approved ends the workflow here and the root carries on; awaiting_approval pauses below.
+      # auto_approved ends the workflow here; review_required creates the token-bearing wait event below.
       name     = "approval_gate"
       type     = "choice"
       variable = "$.review.JobStatus"
-      equals   = "awaiting_approval"
+      equals   = "review_required"
     },
     {
       name       = "wait_for_approval"
