@@ -104,10 +104,10 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: ministryofjustice/integration-hub/.github/workflows/file-transfer-tests.yml@d8f56f8a70348a5ece2cbb767f65cb5f929686c7
+    uses: ministryofjustice/integration-hub/.github/workflows/file-transfer-tests.yml@91500ccee6a7042526b80736d6837057d0704533
     with:
       infrastructure-sha: ${{ github.sha }}
-      harness-ref: d8f56f8a70348a5ece2cbb767f65cb5f929686c7
+      harness-ref: 91500ccee6a7042526b80736d6837057d0704533
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
