@@ -201,3 +201,12 @@ resource "aws_lakeformation_permissions" "cemo_integration_curated_fms_tables" {
     name          = "x_serg2_ems_csm_case"
   }
 }
+
+resource "aws_lakeformation_permissions" "cemo_integration_curated_fms_table_wap" {
+  principal   = module.emd_api_integration_role.iam_role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+  table {
+    database_name = "serco_fms_curated${local.dbt_suffix}"
+    name          = "x_serg2_ems_csm_case_wap"
+  }
+}

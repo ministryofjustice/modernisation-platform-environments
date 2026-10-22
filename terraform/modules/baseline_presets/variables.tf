@@ -13,8 +13,12 @@ variable "ip_addresses" {
 variable "options" {
   description = "Map of options controlling what resources to return"
   type = object({
-    backup_plan_daily_delete_after                = optional(number, 7)             # override retention for daily + weekly backup plan
-    backup_plan_weekly_delete_after               = optional(number, 28)            # override retention for daily + weekly backup plan
+    backup_plan_daily_delete_after  = optional(number, 7)  # override retention for daily + weekly backup plan
+    backup_plan_weekly_delete_after = optional(number, 28) # override retention for daily + weekly backup plan
+    aws_health_lambda_configuration = optional(object({
+      enabled               = optional(bool, false)
+      aws_health_lambda_arn = optional(string)
+    }), {})
     cloudwatch_dashboard_default_widget_groups    = optional(list(string))          # create Cloudwatch-Default dashboard; list of map keys to filter local.cloudwatch_dashboard_widget_groups
     cloudwatch_log_groups_retention_in_days       = optional(number)                # number of days to retain cloudwatch log groups, retention is environment specific, so will be determined in locals.
     cloudwatch_metric_alarms_default_actions      = optional(list(string))          # default alarm_action to apply to cloudwatch metrics returned by this module
@@ -63,4 +67,13 @@ variable "options" {
       pagerduty_integrations = {}
     })
   })
+
+  validation {
+    condition = (
+      !var.options.aws_health_lambda_configuration.enabled ||
+      try(trimspace(var.options.aws_health_lambda_configuration.aws_health_lambda_arn), "") != ""
+    )
+
+    error_message = "When AWS Health event forwarding is enabled, aws_health_lambda_arn must be provided and non-empty."
+  }
 }
