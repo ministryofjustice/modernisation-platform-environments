@@ -88,12 +88,7 @@ resource "aws_s3_bucket_logging" "buckets_access_logging" {
   bucket = each.value.id
 
   target_bucket = local.logging_bucket_name
-  target_prefix = "s3-access-logs/"
-  target_object_key_format {
-    partitioned_prefix {
-      partition_date_source = "EventTime"
-    }
-  }
+  target_prefix = "s3-access-logs/${each.key}/"
 }
 resource "aws_s3_bucket_public_access_block" "bucket_public_access" {
   for_each                = aws_s3_bucket.buckets
