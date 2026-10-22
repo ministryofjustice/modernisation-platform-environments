@@ -1,11 +1,8 @@
 provider "awscc" {
-  alias  = "bcm_endpoint"
-  region = "us-east-1"
+  region = "eu-west-2"
 }
 
 resource "awscc_bcmdataexports_export" "coh_no_ri_sp_export" {
-  provider = awscc.bcm_endpoint
-
   export = {
     name        = "COH-No-RI-SP-PARQUET-Export"
     description = "Export Cost Optimization Hub recommendations excluding RI and Savings Plans in PARQUET format"
