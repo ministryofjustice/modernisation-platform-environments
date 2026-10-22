@@ -1,11 +1,9 @@
 provider "awscc" {
   region = "eu-west-2"
-  dynamic "assume_role" {
-    for_each = can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? [1] : []
-    content {
-      role_arn = can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
-    }
-  }
+
+  assume_role = can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? {
+    role_arn = can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  } : null
 }
 
 resource "awscc_bcmdataexports_export" "coh_no_ri_sp_export" {
