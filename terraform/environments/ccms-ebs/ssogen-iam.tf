@@ -239,7 +239,7 @@ resource "aws_iam_policy" "ssogen_ec2_s3_policy" {
         "s3:GetObjectAttributes"
       ],
       "Resource": ["${aws_s3_bucket.ccms_ebs_shared.arn}/*"]
-    },    
+    }    
   ]
 }
 EOF
