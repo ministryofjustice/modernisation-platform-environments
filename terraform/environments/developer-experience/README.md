@@ -77,12 +77,13 @@ Modernisation Platform
 
 ## GitHub repository backup storage
 
-The `github-management/` Terraform root provisions the storage for the opt-in
+The `github-backup/` Terraform component provisions the storage for the opt-in
 [GitHub backup proof of concept](https://github.com/ministryofjustice/developer-experience/issues/453).
 Resources are created only in the `developer-experience-production` workspace,
-in its DevEx AWS account, in `eu-west-2`. Apply this component's existing state,
-not the parent directory's Terraform root. Account IDs are resolved through the
-existing environment-management configuration; no account ID is hard-coded.
+in its DevEx AWS account, in `eu-west-2`. Run Terraform from `github-backup/`
+against this component's own state, not the parent directory's Terraform root.
+Account IDs are resolved through the existing environment-management
+configuration; no account ID is hard-coded.
 
 | Contract | Value |
 | --- | --- |
@@ -91,18 +92,23 @@ existing environment-management configuration; no account ID is hard-coded.
 | Parameter value | `s3://mojdevx-production-github-backup` |
 | Bucket | `mojdevx-production-github-backup` |
 | KMS alias | `alias/github-backup` |
-| Consumer IAM role | Existing `github-management` role |
+| Consumer IAM role | Existing `github-management` role, managed by `github-management/` |
 | Region | `eu-west-2` |
 
-The `github-backup-destination` Terraform output exposes the parameter name,
+Deploy `github-backup/` before `github-management/`: the management component
+looks up the bucket and KMS alias when it applies the consumer role's upload
+permissions. The SSM parameter path is retained so consumers do not need to
+change their configuration.
+
+The `github_backup_destination` Terraform output exposes the parameter name,
 URI, key ARN, role ARN, account ID and region after deployment. It is null
 outside production.
 
 To inspect this contract from the deployed component's state, run
-`terraform output -json github-backup-destination` from `github-management/`
+`terraform output -json github_backup_destination` from `github-backup/`
 with the existing backend initialised and the production workspace selected.
 
-The storage reuses the component's existing upstream module pins:
+The storage uses these pinned upstream modules:
 `terraform-aws-modules/terraform-aws-s3-bucket` v5.15.4
 (`dd0c434de5e74d8864e249ee020d917b076b6e32`) and
 `terraform-aws-modules/terraform-aws-kms` v4.2.1
@@ -117,7 +123,8 @@ There is no automatic expiry of archives or object versions: a retention policy
 must be agreed separately. The KMS key has a 30-day deletion window and must be
 retained for as long as its encrypted backups need to be restored.
 
-The existing role trusted by `ministryofjustice/developer-experience-github-management`
+The existing role managed by `github-management/` and trusted by
+`ministryofjustice/developer-experience-github-management`
 can retrieve this exact parameter with `ssm:GetParameter`, upload archives with
 `s3:PutObject`, clean up failed multipart uploads with `s3:AbortMultipartUpload`,
 and use `kms:GenerateDataKey` and `kms:Decrypt` on the dedicated key (decryption is

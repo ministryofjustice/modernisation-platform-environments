@@ -15,7 +15,7 @@ module "iam_role" {
     GitHubBackupDestinationRead = {
       effect    = "Allow"
       actions   = ["ssm:GetParameter"]
-      resources = [aws_ssm_parameter.github-backup-destination[0].arn]
+      resources = ["arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/github-management/github-backup/s3-uri"]
     }
     GitHubBackupUpload = {
       effect = "Allow"
@@ -23,7 +23,7 @@ module "iam_role" {
         "s3:PutObject",
         "s3:AbortMultipartUpload"
       ]
-      resources = ["${module.github-backup[0].s3_bucket_arn}/*"]
+      resources = ["${data.aws_s3_bucket.github_backup[0].arn}/*"]
     }
     GitHubBackupEncryption = {
       effect = "Allow"
@@ -31,7 +31,7 @@ module "iam_role" {
         "kms:GenerateDataKey",
         "kms:Decrypt"
       ]
-      resources = [module.github-backup-key[0].key_arn]
+      resources = [data.aws_kms_alias.github_backup[0].target_key_arn]
     }
     KMSAccess = {
       effect = "Allow"

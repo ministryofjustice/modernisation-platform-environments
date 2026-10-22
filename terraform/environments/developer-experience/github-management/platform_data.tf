@@ -3,6 +3,18 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+data "aws_s3_bucket" "github_backup" {
+  count = local.is-production ? 1 : 0
+
+  bucket = "${local.global_config.s3_bucket_prefix}-${local.environment}-github-backup"
+}
+
+data "aws_kms_alias" "github_backup" {
+  count = local.is-production ? 1 : 0
+
+  name = "alias/github-backup"
+}
+
 # VPC and subnet data
 data "aws_vpc" "shared" {
   tags = {
