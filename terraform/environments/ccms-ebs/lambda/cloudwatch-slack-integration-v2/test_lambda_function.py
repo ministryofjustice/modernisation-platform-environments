@@ -574,6 +574,39 @@ def test_build_cert():
     assert "17.0" not in blob
 
 
+def test_build_cert_keystore_check():
+    event = acm_event()
+    event["detail"].update(
+        {
+            "CommonName": "ccms_codesign",
+            "ExpiryDate": "Sat, 07 Aug 2027",
+            "SubjectName": "CN=Legal Aid Agency, OU=Code Signing, O=Ministry of Justice, C=GB",
+            "Environment": "ccms-ebs-test",
+            "Server": "ccms-ebs-app1",
+            "Location": "/u03/ebs/apps_st/appl/admin/adkeystore.dat",
+        }
+    )
+    payload = lf.build_cert(event)
+    header = payload["blocks"][0]["text"]["text"]
+    body = payload["blocks"][1]["text"]["text"]
+    assert header == ":rotating_light: *ENV: ccms-ebs-test. Certificate ccms_codesign is expiring on Sat, 07 Aug 2027.*"
+    assert body.splitlines() == [
+        "*Details*",
+        " • *Common Name:* ccms_codesign",
+        " • *Subject Name:* CN=Legal Aid Agency, OU=Code Signing, O=Ministry of Justice, C=GB",
+        " • *Days to Expiry:* 17",
+        " • *Server:* ccms-ebs-app1",
+        " • *Location:* /u03/ebs/apps_st/appl/admin/adkeystore.dat",
+    ]
+
+
+def test_build_cert_acm_event_has_no_keystore_fields():
+    blob = json.dumps(lf.build_cert(acm_event()))
+    assert "ENV:" not in blob
+    for field in ("Subject Name", "Server", "Location"):
+        assert field not in blob
+
+
 def test_build_fallback():
     payload = lf.build_fallback("My Title", {"foo": "bar"})
     blob = json.dumps(payload)
