@@ -217,23 +217,36 @@ resource "aws_iam_role_policy_attachment" "ssogen_ec2_policy" {
   policy_arn = aws_iam_policy.ssogen_ec2_instance_policy[count.index].arn
 }
 
-data "aws_iam_policy_document" "s3" {
-  statement {
-    actions = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.ccms_ebs_shared.arn]
-  }
+resource "aws_iam_policy" "ssogen_ec2_s3_policy" {
+  count = local.ssogen_enabled ? 1 : 0
+  name  = "${local.application_name_ssogen}-s3"
 
-  statement {
-    actions = [
-      "s3:GetObject",
-      "s3:GetObjectAttributes"
-    ]
-    resources = ["${aws_s3_bucket.ccms_ebs_shared.arn}/*"]
-  }
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3: ListBucket"
+      ],
+      "Resource": [aws_s3_bucket.ccms_ebs_shared.arn]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3: GetObject",
+        "s3: GetObjectAttributes
+      ],
+      "Resource": ["${aws_s3_bucket.ccms_ebs_shared.arn}"/*]
+    },    
+  ]
+}
+EOF
 }
 
-resource "aws_iam_role_policy_attachment" "ssogen_ec2_policy_s3" {
+resource "aws_iam_role_policy_attachment" "ssogen_ec2_s3_policy_attachment" {
   count      = local.ssogen_enabled ? 1 : 0
   role       = aws_iam_role.ssogen_ec2[count.index].name
-  policy_arn = data.aws_iam_policy_document.s3.json
+  policy_arn = aws_iam_policy.ssogen_ec2_s3_policy[count.index].arn
 }
