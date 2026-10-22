@@ -385,6 +385,15 @@
           "MaxAttempts": 3
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
+        }
+      ],
       "Next": "CheckHistoricalPlanning"
     },
     "CheckHistoricalPlanning": {
@@ -440,6 +449,15 @@
           "MaxAttempts": 3
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
+        }
+      ],
       "Next": "RecordHistoricalApproval"
     },
     "RecordHistoricalApproval": {
@@ -467,6 +485,15 @@
           "IntervalSeconds": 2,
           "BackoffRate": 2,
           "MaxAttempts": 3
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
         }
       ],
       "Next": "CheckHistoricalApproval"
@@ -512,6 +539,15 @@
           "MaxAttempts": 3
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
+        }
+      ],
       "Next": "CheckHistoricalChunk"
     },
     "CheckHistoricalChunk": {
@@ -546,14 +582,28 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.ServiceException",
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
             "Lambda.TooManyRequestsException"
           ],
-          "IntervalSeconds": 5,
+          "IntervalSeconds": 15,
           "BackoffRate": 2,
-          "MaxAttempts": 3
+          "MaxAttempts": 6
+        },
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
         }
       ],
       "Next": "VerifyHistoricalChunk"
@@ -582,6 +632,15 @@
           "IntervalSeconds": 2,
           "BackoffRate": 2,
           "MaxAttempts": 3
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
         }
       ],
       "Next": "CheckHistoricalVerification"
@@ -632,6 +691,15 @@
           "MaxAttempts": 3
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
+        }
+      ],
       "Next": "NextHistoricalChunk"
     },
     "CompleteHistorical": {
@@ -646,6 +714,15 @@
         }
       },
       "OutputPath": "$.Payload",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
+        }
+      ],
       "Next": "HistoricalComplete"
     },
     "HistoricalComplete": {
@@ -655,29 +732,97 @@
       "Type": "Succeed"
     },
     "HistoricalVerificationFailed": {
-      "Type": "Fail",
-      "Error": "HistoricalReconciliationVerificationFailed",
-      "Cause": "Eligible positions remain after historical replay."
+      "Type": "Pass",
+      "Parameters": {
+        "consumer.$": "$.consumer",
+        "execution_id.$": "$.execution_id",
+        "failure": {
+          "Error": "HistoricalReconciliationVerificationFailed",
+          "Cause": "Eligible positions remain after historical replay."
+        }
+      },
+      "Next": "NotifyHistoricalFailure"
     },
     "UnexpectedHistoricalPlanningResult": {
-      "Type": "Fail",
-      "Error": "UnexpectedHistoricalPlanningResult",
-      "Cause": "The planner returned an unexpected historical planning status."
+      "Type": "Pass",
+      "Parameters": {
+        "consumer.$": "$.consumer",
+        "execution_id.$": "$.execution_id",
+        "failure": {
+          "Error": "UnexpectedHistoricalPlanningResult",
+          "Cause": "The planner returned an unexpected historical planning status."
+        }
+      },
+      "Next": "NotifyHistoricalFailure"
     },
     "UnexpectedHistoricalApprovalResult": {
-      "Type": "Fail",
-      "Error": "UnexpectedHistoricalApprovalResult",
-      "Cause": "The historical approval callback returned an unexpected result."
+      "Type": "Pass",
+      "Parameters": {
+        "consumer.$": "$.consumer",
+        "execution_id.$": "$.execution_id",
+        "failure": {
+          "Error": "UnexpectedHistoricalApprovalResult",
+          "Cause": "The historical approval callback returned an unexpected result."
+        }
+      },
+      "Next": "NotifyHistoricalFailure"
     },
     "UnexpectedHistoricalReplayResult": {
-      "Type": "Fail",
-      "Error": "UnexpectedHistoricalReplayResult",
-      "Cause": "The planner returned an unexpected historical replay status."
+      "Type": "Pass",
+      "Parameters": {
+        "consumer.$": "$.consumer",
+        "execution_id.$": "$.execution_id",
+        "failure": {
+          "Error": "UnexpectedHistoricalReplayResult",
+          "Cause": "The planner returned an unexpected historical replay status."
+        }
+      },
+      "Next": "NotifyHistoricalFailure"
     },
     "UnexpectedHistoricalVerificationResult": {
+      "Type": "Pass",
+      "Parameters": {
+        "consumer.$": "$.consumer",
+        "execution_id.$": "$.execution_id",
+        "failure": {
+          "Error": "UnexpectedHistoricalVerificationResult",
+          "Cause": "The planner returned an unexpected historical verification status."
+        }
+      },
+      "Next": "NotifyHistoricalFailure"
+    },
+    "NotifyHistoricalFailure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "fail_historical",
+          "consumer": "${reconciliation_consumer}",
+          "execution_id.$": "$.execution_id",
+          "failure.$": "$.failure"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "HistoricalFailed"
+    },
+    "HistoricalFailed": {
       "Type": "Fail",
-      "Error": "UnexpectedHistoricalVerificationResult",
-      "Cause": "The planner returned an unexpected historical verification status."
+      "Error": "HistoricalReconciliationFailed",
+      "Cause": "Historical reconciliation failed. See the Amazon Q notification for details."
     },
 %{ endif }
 %{ endif }
