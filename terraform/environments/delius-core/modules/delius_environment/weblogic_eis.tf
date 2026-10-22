@@ -200,10 +200,10 @@ locals {
 module "ecs_nightly_restart_weblogic_eis" {
   source = "../components/ecs_nightly_restart"
 
-  env_name                  = var.env_name
-  cluster_name              = module.ecs.ecs_cluster_arn
-  service_name              = "${var.env_name}-weblogic-eis"
-  service_arn               = local.weblogic_eis_service_arn
-  task_count                = data.aws_ssm_parameter.weblogic_eis_task_count.value
-  nightly_muted_alarm_names = module.weblogic_eis.nightly_muted_alarm_names
+  env_name     = var.env_name
+  app_name     = "weblogic-eis"
+  cluster_name = module.ecs.ecs_cluster_arn
+  service_name = "${var.env_name}-weblogic-eis"
+  service_arn  = local.weblogic_eis_service_arn
+  task_count   = data.aws_ssm_parameter.weblogic_eis_task_count.value
 }
