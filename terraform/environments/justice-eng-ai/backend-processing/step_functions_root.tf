@@ -3,19 +3,17 @@ locals {
 
   root_process_steps = [
     {
-      # BuildID and UserName come from the latest event the UI wrote for this AppID.
-      name              = "latest_event"
-      type              = "dynamodb_query_latest"
-      table_name        = aws_dynamodb_table.build_review.name
-      hash_key          = local.script_runner_app_id_path
-      result_attributes = { BuildID = "N", UserName = "S" }
-      result_path       = "$.latest"
+      name               = "resolve_submission"
+      type               = "step_function"
+      state_machine_name = local.resolve_submission_state_machine_name
+      input_path         = "$"
+      result_path        = "$.resolved"
     },
     {
       name               = "control_plane"
       type               = "step_function"
       state_machine_name = local.control_plane_state_machine_name
-      input_path         = "$"
+      input_path         = "$.resolved.Output"
       result_path        = "$.control_plane"
     },
     {
@@ -48,5 +46,6 @@ module "step_functions_root" {
     module.step_functions_build_image,
     module.step_functions_build_infra,
     module.step_functions_control_plane,
+    module.step_functions_resolve_submission,
   ]
 }

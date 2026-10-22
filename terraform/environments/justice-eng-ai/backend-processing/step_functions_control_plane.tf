@@ -7,33 +7,20 @@ locals {
       type        = "script_runner"
       script_path = "scripts/control/root.py"
       shell_type  = "python3"
-      variables = [
-        { name = "s3_folder", path = "$.s3_folder" },
-        { name = "s3_file", path = "$.s3_file" },
-        { name = "S3_BUCKET", value = aws_s3_bucket.staging_bucket.id },
-        { name = "AppID", path = local.script_runner_app_id_path },
-        { name = "BuildID", path = "$.latest.BuildID" },
+      variables = concat(local.submission_environment, [
         { name = "BEDROCK_MODEL_ID", value = local.bedrock_model_id },
         { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
         { name = "AWS_REGION", value = data.aws_region.current.region },
-      ]
+      ])
       result_path     = "$.control_plane_task"
       timeout_seconds = 900
       outputs         = true
     },
     {
-      name              = "latest_event"
-      type              = "dynamodb_query_latest"
-      table_name        = aws_dynamodb_table.build_review.name
-      hash_key          = local.script_runner_app_id_path
-      result_attributes = { JobStatus = "S" }
-      result_path       = "$.review"
-    },
-    {
       # auto_approved ends the workflow here and the root carries on; awaiting_approval pauses below.
       name     = "approval_gate"
       type     = "choice"
-      variable = "$.review.JobStatus"
+      variable = "$.control_plane_task.JobStatus"
       equals   = "awaiting_approval"
     },
     {
@@ -41,9 +28,13 @@ locals {
       type       = "wait_for_approval"
       table_name = aws_dynamodb_table.build_review.name
       app_id     = local.script_runner_app_id_path
-      build_id   = "$.latest.BuildID"
-      user_name  = "$.latest.UserName"
+      build_id   = "$.submission.buildNumber"
+      user_name  = "$.submission.userName"
       job_stage  = "control_plane"
+      identity_fields = {
+        SubmissionID = { type = "N", path = "$.submission.sysKey" }
+        SourceSha256 = { type = "S", path = "$.submission.sha256" }
+      }
     },
   ]
 }

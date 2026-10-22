@@ -196,7 +196,8 @@ locals {
               Date      = { "S.$" = "$$.State.EnteredTime" }
               TaskToken = { "S.$" = "$$.Task.Token" }
             },
-            try(step.user_name, null) == null ? {} : { UserName = { "S.$" = step.user_name } }
+            try(step.user_name, null) == null ? {} : { UserName = { "S.$" = step.user_name } },
+            { for name, field in try(step.identity_fields, {}) : name => { "${field.type}.$" = field.path } }
           )
         }
         ResultPath     = coalesce(try(step.result_path, null), "$.${step.name}_result")
@@ -288,15 +289,18 @@ resource "aws_sfn_state_machine" "resume" {
         Parameters = {
           TableName              = local.approval_steps[0].table_name
           KeyConditionExpression = "AppID = :app AND SysKey > :floor"
-          FilterExpression       = "BuildID = :build AND JobStatus = :status"
-          ScanIndexForward       = false
-          ConsistentRead         = true
-          ExpressionAttributeValues = {
+          FilterExpression = join(" AND ", concat(
+            ["BuildID = :build", "JobStatus = :status"],
+            [for name, field in try(local.approval_steps[0].identity_fields, {}) : "${name} = :identity_${name}"]
+          ))
+          ScanIndexForward = false
+          ConsistentRead   = true
+          ExpressionAttributeValues = merge({
             ":app"    = { "S.$" = "$[0].dynamodb.NewImage.AppID.S" }
             ":build"  = { "N.$" = "$[0].dynamodb.NewImage.BuildID.N" }
             ":floor"  = { N = "0" }
             ":status" = { S = try(local.approval_steps[0].job_status, "awaiting_approval") }
-          }
+          }, { for name, field in try(local.approval_steps[0].identity_fields, {}) : ":identity_${name}" => { "${field.type}.$" = "$[0].dynamodb.NewImage.${name}.${field.type}" } })
         }
         ResultSelector = { "token.$" = "$.Items[0].TaskToken.S" }
         Next           = "send_task_success"

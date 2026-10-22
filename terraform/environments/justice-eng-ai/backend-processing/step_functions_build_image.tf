@@ -15,18 +15,13 @@ locals {
       type        = "script_runner"
       script_path = "scripts/prototype-image-build/build-prototype-image.py"
       shell_type  = "python3"
-      variables = [
-        { name = "S3_BUCKET", value = aws_s3_bucket.staging_bucket.id },
-        { name = "S3_FOLDER", path = "$.s3_folder" },
-        { name = "S3_FILE", path = "States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1))" },
+      variables = concat(local.submission_environment, [
         { name = "ECR_REPOSITORY_URI", value = local.ecr_repository_uri },
-        { name = "AppID", path = local.script_runner_app_id_path },
-        { name = "BuildID", path = "$.latest.BuildID" },
-        { name = "IMAGE_TAG", path = "States.Format('{}-{}', ${local.script_runner_app_id_path}, $.latest.BuildID)" },
+        { name = "IMAGE_TAG", path = "States.Format('{}-{}', ${local.script_runner_app_id_path}, $.submission.buildNumber)" },
         { name = "AWS_REGION", value = local.aws_region },
         { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
         { name = "FORGE_RUNTIME_BASE_ECR_REPOSITORY_URI", value = local.forge_runtime_base_ecr_repository_uri },
-      ]
+      ])
       result_path     = "$.image_build_task"
       outputs         = true
       timeout_seconds = 3600

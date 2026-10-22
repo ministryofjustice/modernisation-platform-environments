@@ -188,3 +188,5 @@ location (e.g. S3) instead of relying on Step Functions to carry it.
 This module intentionally keeps `input_path` as a single, generic JSONPath
 rather than a named-parameter list: the actual input shape is specific to
 each calling environment, not something the module should assume.
+
+Approval steps may set `identity_fields = { SubmissionID = { type = "N", path = "$.submission.sysKey" }, SourceSha256 = { type = "S", path = "$.submission.sha256" } }`. These fields are stored on the waiting event and matched against the approval event during resume. Approval writers must supply both fields. Missing identity does not fall back to matching only AppID/BuildID. Existing module callers without identity_fields retain their current behaviour.

@@ -103,6 +103,18 @@ variable "steps" {
   }
 
   validation {
+    condition = alltrue([
+      for step in var.steps : alltrue([
+        for name, field in try(step.identity_fields, {}) : try(
+          contains(["S", "N"], field.type) && field.path != "" &&
+          !contains(["AppID", "SysKey", "BuildID", "TaskToken", "JobStatus", "JobStage", "Date", "UserName"], name), false
+        )
+      ])
+    ])
+    error_message = "Approval identity fields require S/N types, a path and non-reserved attribute names."
+  }
+
+  validation {
     condition     = length([for step in var.steps : step if try(step.type, "") == "wait_for_approval"]) <= 1
     error_message = "A state machine can have at most one wait_for_approval step."
   }

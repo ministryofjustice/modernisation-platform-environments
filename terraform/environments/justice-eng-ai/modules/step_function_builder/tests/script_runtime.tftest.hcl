@@ -544,3 +544,31 @@ run "script_outputs" {
     error_message = "A script step with outputs waits for a task token, skips the exit-code check and returns the script's JSON at result_path."
   }
 }
+
+run "approval_is_bound_to_submission_and_package" {
+  command = plan
+  variables {
+    steps = [{
+      name       = "wait_for_approval"
+      type       = "wait_for_approval"
+      table_name = "test-events"
+      app_id     = "$.submission.appId"
+      build_id   = "$.submission.buildNumber"
+      job_stage  = "control_plane"
+      identity_fields = {
+        SubmissionID = { type = "N", path = "$.submission.sysKey" }
+        SourceSha256 = { type = "S", path = "$.submission.sha256" }
+      }
+    }]
+  }
+  assert {
+    condition = (
+      local.definition.States.wait_for_approval.Parameters.Item.SubmissionID["N.$"] == "$.submission.sysKey" &&
+      local.definition.States.wait_for_approval.Parameters.Item.SourceSha256["S.$"] == "$.submission.sha256" &&
+      strcontains(jsondecode(aws_sfn_state_machine.resume[0].definition).States.find_waiting_event.Parameters.FilterExpression, "SubmissionID = :identity_SubmissionID") &&
+      strcontains(jsondecode(aws_sfn_state_machine.resume[0].definition).States.find_waiting_event.Parameters.FilterExpression, "SourceSha256 = :identity_SourceSha256") &&
+      jsondecode(aws_sfn_state_machine.resume[0].definition).States.find_waiting_event.Parameters.ExpressionAttributeValues[":identity_SubmissionID"]["N.$"] == "$[0].dynamodb.NewImage.SubmissionID.N"
+    )
+    error_message = "Approval callbacks must match both the submission and the package hash."
+  }
+}

@@ -232,6 +232,7 @@ resource "aws_cloudwatch_event_target" "staging_bucket_root_upload" {
 
   input_transformer {
     input_paths = {
+      # Keep the full key: consumers must not infer AppID from its basename.
       s3_file = "$.detail.object.key"
     }
     input_template = <<-JSON
