@@ -3,7 +3,8 @@
 # ---------------------------------------------
 
 module "s3-bucket-sftp-bc" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
   bucket_name        = local.sftp_bc_bucket_name
   versioning_enabled = true
   bucket_policy = [jsonencode({
@@ -67,10 +68,17 @@ module "s3-bucket-sftp-bc" {
     ]
   })]
 
-  log_bucket     = local.logging_bucket_name
-  log_prefix     = "s3access/${local.sftp_bc_bucket_name}"
-  custom_kms_key = aws_kms_key.s3_sftp_kms_key.arn
-  sse_algorithm  = "aws:kms"
+  log_buckets = {
+    log_bucket_name = local.logging_bucket_name
+  }
+  manage_log_bucket_policy = false
+
+  log_prefix                = "s3-access-logs/"
+  log_partition_date_source = "EventTime"
+
+  enforce_kms_request_headers = false
+  custom_kms_key              = aws_kms_key.s3_sftp_kms_key.arn
+  sse_algorithm               = "aws:kms"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
