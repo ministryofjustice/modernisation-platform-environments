@@ -3,8 +3,8 @@
 # S3 Bucket - Logging
 # ---------------------------------------------
 module "s3-bucket-logging" {
-  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
@@ -75,8 +75,6 @@ module "s3-bucket-logging" {
     ]
   })]
 
-  log_bucket    = local.logging_bucket_name
-  log_prefix    = "s3access/${local.logging_bucket_name}"
   sse_algorithm = "AES256"
 
   # Refer to the below section "Replication" before enabling replication
@@ -102,29 +100,9 @@ module "s3-bucket-logging" {
         autoclean = "true"
       }
 
-      transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
-          storage_class = "GLACIER"
-        }
-      ]
-
       expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
       }
-
-      noncurrent_version_transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
-          storage_class = "GLACIER"
-        }
-      ]
 
       noncurrent_version_expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
@@ -154,8 +132,8 @@ resource "aws_s3_bucket_notification" "logging_bucket_notification" {
 # S3 Bucket - R-sync
 # ---------------------------------------------
 module "s3-bucket-dbbackup" {
-  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = true
@@ -209,8 +187,14 @@ module "s3-bucket-dbbackup" {
     ]
   })]
 
-  log_bucket = local.logging_bucket_name
-  log_prefix = "s3access/${local.rsync_bucket_name}"
+  log_buckets = {
+    log_bucket_name = local.logging_bucket_name
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  }
+  manage_log_bucket_policy = false
+
+  log_prefix                = "s3-access-logs/"
+  log_partition_date_source = "EventTime"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -323,6 +307,18 @@ data "aws_iam_policy_document" "shared_bucket_secure_transport" {
 resource "aws_s3_bucket_policy" "shared_bucket_secure_transport" {
   bucket = aws_s3_bucket.ccms_ebs_shared.id
   policy = data.aws_iam_policy_document.shared_bucket_secure_transport.json
+}
+
+resource "aws_s3_bucket_logging" "shared_bucket_secure_transport" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.id
+
+  target_bucket = module.s3-bucket-logging.bucket.id
+  target_prefix = "s3-access-logs/"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
 }
 
 # S3 Bucket for Payment Load
