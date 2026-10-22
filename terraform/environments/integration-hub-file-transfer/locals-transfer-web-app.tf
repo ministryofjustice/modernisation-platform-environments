@@ -1,14 +1,3 @@
-data "aws_ssoadmin_instances" "this" {
-  provider = aws.sso-readonly
-}
-
-data "aws_identitystore_group" "this" {
-  for_each          = local.transfer_iam_identity_center_groups
-  provider          = aws.sso-readonly
-  identity_store_id = one(data.aws_ssoadmin_instances.this.identity_store_ids)
-  group_id          = each.value
-}
-
 locals {
   transfer_web_app_log_groups = {
     cloudfront = "${local.application_name}-${local.environment}-web-access"
