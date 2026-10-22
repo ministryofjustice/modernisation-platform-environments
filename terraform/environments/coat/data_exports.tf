@@ -55,6 +55,7 @@ name        = "COH-No-RI-SP-PARQUET-Export"
         s3_bucket       = "cloud-platform-4e74939a04d400578bfbe3f3f707b07e"
         s3_region       = "eu-west-2"
         s3_prefix       = "coh-reports-auto/"
+        s3_bucket_owner = "754256621582"
 
         s3_output_configurations {
           overwrite   = "OVERWRITE_REPORT"
