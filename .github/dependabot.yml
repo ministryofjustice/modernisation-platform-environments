@@ -896,8 +896,6 @@ updates:
       - "terraform/environments/integration-hub-api"
       - "terraform/environments/integration-hub-api/benefit-checker-api"
       - "terraform/environments/integration-hub-api/file-transfer-api"
-      - "terraform/environments/integration-hub-api/modules/file-transfer-api"
-      - "terraform/environments/integration-hub-api/modules/integration-hub-file-transfer-api"
     schedule:
       interval: "daily"
     groups:
@@ -926,6 +924,7 @@ updates:
       - "terraform/environments/integration-hub-file-transfer/pull-from-presigned-url"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup"
+      - "terraform/environments/integration-hub-file-transfer/push-to-sftp"
       - "terraform/environments/integration-hub-file-transfer/test-harness"
     schedule:
       interval: "daily"

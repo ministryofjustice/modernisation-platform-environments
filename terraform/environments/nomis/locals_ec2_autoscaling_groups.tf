@@ -103,6 +103,8 @@ locals {
         description                     = "Windows Server 2022 client testing for NOMIS"
         instance-access-policy          = "full"
         os-type                         = "Windows"
+        "Patch Group"                   = "patchgroup1"
+        run-patch-baseline              = "weekly"
         server-type                     = "NomisClient"
         update-ssm-agent                = "patchgroup1"
         update-configuration-management = "patchgroup1"

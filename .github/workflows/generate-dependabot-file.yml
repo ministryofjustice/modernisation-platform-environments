@@ -21,7 +21,7 @@ permissions: {}
 
 jobs:
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@ebec2f2fda2f93172de61774b5875b9cef7462bc # v6.2.12
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
     permissions:
       id-token: write
     secrets:
@@ -38,7 +38,7 @@ jobs:
         with:
           persist-credentials: true
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@51a39f5eba93a24bacfdb24b8fda4a244c266018 # v6.2.11
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
         with:
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -50,7 +50,7 @@ jobs:
         run: bash ./scripts/git-setup.sh
 
       - name: Commit and Create PR with Signed Commit
-        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@ebec2f2fda2f93172de61774b5875b9cef7462bc # v6.2.12
+        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_title: "Automated Update: Dependabot File"

@@ -3,24 +3,33 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-# Route53 DNS data
-data "aws_route53_zone" "network-services" {
-  provider = aws.core-network-services
+data "aws_vpc" "prototype" {
+  count = local.prototype_edge_enabled ? 1 : 0
 
-  name         = "modernisation-platform.service.justice.gov.uk."
-  private_zone = false
+  tags = {
+    Name = "${local.application_name}-${local.environment}"
+  }
 }
 
-# State for core-network-services resource information
-data "terraform_remote_state" "core_network_services" {
-  backend = "s3"
-  config = {
-    acl     = "bucket-owner-full-control"
-    bucket  = "modernisation-platform-terraform-state"
-    key     = "environments/accounts/core-network-services/core-network-services-production/terraform.tfstate"
-    region  = "eu-west-2"
-    encrypt = "true"
+data "aws_subnets" "public_prototypes" {
+  count = local.prototype_edge_enabled ? 1 : 0
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.prototype[0].id]
   }
+
+  tags = {
+    Name = "${local.application_name}-${local.environment}-public-prototypes-*"
+  }
+}
+
+# Each environment's web-ui root owns its ai-builder hosted zone in the same account.
+data "aws_route53_zone" "ai_builder" {
+  count = local.prototype_edge_enabled ? 1 : 0
+
+  name         = "${local.prototype_domain_name}."
+  private_zone = false
 }
 
 data "aws_organizations_organization" "root_account" {}

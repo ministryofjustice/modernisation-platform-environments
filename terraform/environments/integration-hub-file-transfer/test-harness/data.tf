@@ -9,3 +9,9 @@ data "aws_kms_key" "incoming" {
 
   key_id = local.incoming_kms_key_alias
 }
+
+data "aws_s3_bucket" "clean" {
+  count = local.create_test_harness ? 1 : 0
+
+  bucket = local.clean_bucket_name
+}

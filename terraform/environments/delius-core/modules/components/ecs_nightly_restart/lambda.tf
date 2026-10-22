@@ -20,23 +20,19 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
     actions   = ["ecs:UpdateService"]
     resources = [var.service_arn]
   }
-}
-
-resource "aws_cloudwatch_event_rule" "rule" {
-  name                = "${local.lambda_name}-rule"
-  schedule_expression = local.schedule_expression
-}
-
-resource "aws_cloudwatch_event_target" "target" {
-  rule = aws_cloudwatch_event_rule.rule.name
-  arn  = aws_lambda_function.nightly_restart_lambda.arn
-}
-
-resource "aws_lambda_permission" "allow_cloudwatch" {
-  action        = "lambda:InvokeFunction"
-  principal     = "events.amazonaws.com"
-  function_name = aws_lambda_function.nightly_restart_lambda.function_name
-  source_arn    = aws_cloudwatch_event_rule.rule.arn
+  statement {
+    effect  = "Allow"
+    actions = ["cloudwatch:DisableAlarmActions", "cloudwatch:EnableAlarmActions"]
+    resources = [
+      for alarm_name in var.nightly_muted_alarm_names :
+      "arn:aws:cloudwatch:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:alarm:${alarm_name}"
+    ]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ecs:DescribeServices"]
+    resources = [var.service_arn]
+  }
 }
 
 resource "aws_iam_role" "lambda_role" {
@@ -85,6 +81,7 @@ resource "aws_lambda_function" "nightly_restart_lambda" {
       CLUSTER       = var.cluster_name
       SERVICE       = var.service_name
       DESIRED_COUNT = var.task_count
+      ALARM_NAMES   = join(",", var.nightly_muted_alarm_names)
     }
   }
 }

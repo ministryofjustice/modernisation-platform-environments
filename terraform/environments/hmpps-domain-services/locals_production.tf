@@ -85,9 +85,6 @@ locals {
         }
         instance = merge(local.ec2_instances.jumpserver.instance, {
           instance_type = "r6i.large"
-          tags = {
-            patch-manager = "group1"
-          }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name              = "azure.hmpp.root"
@@ -99,15 +96,11 @@ locals {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
         })
-        instance = merge(local.ec2_instances.rdgw.instance, {
-          tags = {
-            patch-manager = "group1"
-          }
-        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description              = "Remote Desktop Gateway for azure.hmpp.root domain"
           domain-name              = "azure.hmpp.root"
           gha-jumpserver-startstop = "production"
+          "Patch Group"            = "patchgroup1"
           update-ssm-agent         = "patchgroup1"
         })
       })
@@ -116,15 +109,11 @@ locals {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2b"
         })
-        instance = merge(local.ec2_instances.rdgw.instance, {
-          tags = {
-            patch-manager = "group2"
-          }
-        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description              = "Remote Desktop Gateway for azure.hmpp.root domain"
           domain-name              = "azure.hmpp.root"
           gha-jumpserver-startstop = "production"
+          "Patch Group"            = "patchgroup2"
           update-ssm-agent         = "patchgroup2"
         })
       })
@@ -132,12 +121,6 @@ locals {
       pd-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           availability_zone = "eu-west-2a"
-        })
-        instance = merge(local.ec2_instances.rds.instance, {
-          instance_type = "t3.large"
-          tags = {
-            patch-manager = "group2"
-          }
         })
         tags = merge(local.ec2_instances.rds.tags, {
           description              = "Remote Desktop Services for azure.hmpp.root domain"
