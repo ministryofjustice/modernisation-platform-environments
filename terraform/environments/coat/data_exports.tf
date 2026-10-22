@@ -6,6 +6,11 @@ provider "awscc" {
   } : null
 }
 
+resource "awscc_iam_service_linked_role" "bcm_data_exports" {
+  aws_service_name = "bcm-data-exports.amazonaws.com"
+  description      = "Service-linked role for AWS BCM Data Exports"
+}
+
 resource "awscc_bcmdataexports_export" "coh_no_ri_sp_export" {
   export = {
     name        = "COH-No-RI-SP-PARQUET-Export"
@@ -78,4 +83,6 @@ resource "awscc_bcmdataexports_export" "coh_no_ri_sp_export" {
       frequency = "SYNCHRONOUS"
     }
   }
+
+  depends_on = [awscc_iam_service_linked_role.bcm_data_exports]
 }
