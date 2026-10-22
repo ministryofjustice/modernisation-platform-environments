@@ -1,10 +1,10 @@
 # Hosted zone delegated from the modernisation-platform account via NS
-# records raised in a companion PR there (ai-builder-dev./ai-builder. under
-# modernisation-platform.service.justice.gov.uk). After applying here, copy
+# records raised in a companion PR there for the environment's hosted_zone_name
+# configured in application_variables.json. After applying here, copy
 # aws_route53_zone.app's name servers (see the route53_zone_name_servers
 # output below) into that PR's REPLACE_WITH_*_NAME_SERVER_* placeholders.
 locals {
-  hosted_zone_name = local.is-production ? "ai-builder.modernisation-platform.service.justice.gov.uk" : "ai-builder-dev.modernisation-platform.service.justice.gov.uk"
+  hosted_zone_name = local.application_data.accounts[local.environment].hosted_zone_name
 }
 
 resource "aws_route53_zone" "app" {
