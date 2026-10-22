@@ -9,6 +9,13 @@ resource "aws_security_group" "oem_app_security_group" {
 }
 
 # EGRESS
+# The 1521 rule was previously named oem_app_sg_egress_vpc; this keeps the existing rule in state
+# rather than Terraform trying to create a duplicate of it.
+moved {
+  from = aws_vpc_security_group_egress_rule.oem_app_sg_egress_vpc
+  to   = aws_vpc_security_group_egress_rule.oem_app_sg_egress_vpc_db_1521
+}
+
 resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_1521" {
   security_group_id = aws_security_group.oem_app_security_group.id
   description       = "Allow traffic from app servers to the database on port 1521"
