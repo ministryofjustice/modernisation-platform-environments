@@ -198,7 +198,7 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
     },
     {
       "Effect": "Allow",
-      "Action": ["s3:GetObject","s3:ListBucket","s3:GetObjectAttributes"],
+      "Action": ["s3:GetObject","s3:ListBucket"],
       "Resource": [
          aws_s3_bucket.ccms_ebs_shared.arn,
          "${aws_s3_bucket.ccms_ebs_shared.arn}/*"
