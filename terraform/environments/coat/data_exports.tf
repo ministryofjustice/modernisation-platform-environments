@@ -1,10 +1,17 @@
-resource "aws_bcmdataexports_export" "coh_no_ri_sp_export" {
-  export {
-name        = "COH-No-RI-SP-PARQUET-Export"
+provider "awscc" {
+  alias  = "bcm_endpoint"
+  region = "us-east-1"
+}
+
+resource "awscc_bcmdataexports_export" "coh_no_ri_sp_export" {
+  provider = awscc.bcm_endpoint
+
+  export = {
+    name        = "COH-No-RI-SP-PARQUET-Export"
     description = "Export Cost Optimization Hub recommendations excluding RI and Savings Plans in PARQUET format"
-    
-    data_query {
-      query_statement = <<EOF
+
+    data_query = {
+      query_statement = <<-EOF
         SELECT 
             action_type,
             currency_code,
@@ -50,13 +57,14 @@ name        = "COH-No-RI-SP-PARQUET-Export"
       }
     }
 
-    destination_configurations {
-      s3_destination {
-        s3_bucket       = "cloud-platform-4e74939a04d400578bfbe3f3f707b07e"
-        s3_region       = "eu-west-2"
-        s3_prefix       = "coh-reports-auto/"
+    destination_configurations = {
+      s3_destination = {
+        s3_bucket = "cloud-platform-4e74939a04d400578bfbe3f3f707b07e"
+        s3_region = "eu-west-2"
+        s3_prefix = "coh-reports-auto/"
+        s3_bucket_owner = "754256621582"
 
-        s3_output_configurations {
+        s3_output_configurations = {
           overwrite   = "OVERWRITE_REPORT"
           format      = "PARQUET"
           compression = "PARQUET"
@@ -65,7 +73,7 @@ name        = "COH-No-RI-SP-PARQUET-Export"
       }
     }
 
-    refresh_cadence {
+    refresh_cadence = {
       frequency = "SYNCHRONOUS"
     }
   }
