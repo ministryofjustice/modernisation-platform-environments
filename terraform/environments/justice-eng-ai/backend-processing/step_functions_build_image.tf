@@ -6,7 +6,7 @@ locals {
   aws_region                      = data.aws_region.current.region
   aws_dns_suffix                  = data.aws_partition.current.dns_suffix
 
-  ecr_repository_uri                    = "${local.core_shared_services_account_id}.dkr.ecr.${local.aws_region}.${local.aws_dns_suffix}/${local.application_data.accounts[local.environment].ecr_repository_name}"
+  ecr_repository_uri                    = aws_ecr_repository.user_applications.repository_url
   forge_runtime_base_ecr_repository_uri = "${local.core_shared_services_account_id}.dkr.ecr.${local.aws_region}.${local.aws_dns_suffix}/${local.application_data.accounts[local.environment].forge_runtime_base_ecr_repository_name}"
 
   build_image_steps = [
