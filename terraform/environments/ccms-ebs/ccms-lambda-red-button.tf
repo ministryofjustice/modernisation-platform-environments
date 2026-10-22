@@ -100,7 +100,6 @@ resource "aws_s3_bucket" "red_button_data" {
 resource "aws_s3_bucket_logging" "red_button_access_logging" {
 
   bucket = aws_s3_bucket.red_button_data.id
-
   target_bucket = local.logging_bucket_name
   target_prefix = "s3-access-logs/"
   target_object_key_format {
