@@ -74,3 +74,79 @@ Modernisation Platform
 ### **How to resolve specific issues:**
 
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
+
+## GitHub repository backup storage
+
+The `github-management/` Terraform root provisions the storage for the opt-in
+[GitHub backup proof of concept](https://github.com/ministryofjustice/developer-experience/issues/453).
+Resources are created only in the `developer-experience-production` workspace,
+in its DevEx AWS account, in `eu-west-2`. Apply this component's existing state,
+not the parent directory's Terraform root. Account IDs are resolved through the
+existing environment-management configuration; no account ID is hard-coded.
+
+| Contract | Value |
+| --- | --- |
+| SSM Parameter Store name | `/github-management/github-backup/s3-uri` |
+| Parameter type | `String` (the URI is not a secret) |
+| Parameter value | `s3://mojdevx-production-github-backup` |
+| Bucket | `mojdevx-production-github-backup` |
+| KMS alias | `alias/github-backup` |
+| Consumer IAM role | Existing `github-management` role |
+| Region | `eu-west-2` |
+
+The `github-backup-destination` Terraform output exposes the parameter name,
+URI, key ARN, role ARN, account ID and region after deployment. It is null
+outside production.
+
+To inspect this contract from the deployed component's state, run
+`terraform output -json github-backup-destination` from `github-management/`
+with the existing backend initialised and the production workspace selected.
+
+The storage reuses the component's existing upstream module pins:
+`terraform-aws-modules/terraform-aws-s3-bucket` v5.15.4
+(`dd0c434de5e74d8864e249ee020d917b076b6e32`) and
+`terraform-aws-modules/terraform-aws-kms` v4.2.1
+(`af1d45558a6073c017a732d2273efcc733b34d0f`).
+
+The private bucket blocks all public access, disables ACLs with
+`BucketOwnerEnforced` ownership, requires secure transport and TLS 1.2 or later,
+and enables versioning and default KMS encryption with a dedicated rotating key.
+`force_destroy = false` prevents Terraform from emptying a populated bucket
+during deletion. This is not Object Lock or an immutable retention guarantee.
+There is no automatic expiry of archives or object versions: a retention policy
+must be agreed separately. The KMS key has a 30-day deletion window and must be
+retained for as long as its encrypted backups need to be restored.
+
+The existing role trusted by `ministryofjustice/developer-experience-github-management`
+can retrieve this exact parameter with `ssm:GetParameter`, upload archives with
+`s3:PutObject`, clean up failed multipart uploads with `s3:AbortMultipartUpload`,
+and use `kms:GenerateDataKey` and `kms:Decrypt` on the dedicated key (decryption is
+required for multipart uploads). No backup object read, list or delete access is
+added, and neither the role's trust policy nor the `octo-access` role is changed.
+A restore consumer will need separately scoped object-read and KMS permissions.
+
+The role's existing GitHub OIDC subject pattern is
+`ministryofjustice@2203574/developer-experience-github-management@1333267581:*`.
+This is repository-identity scoped, but its subject suffix is not restricted to
+a particular branch or GitHub environment. The consumer must use a token
+matching that existing subject configuration; this change does not add trust for
+the repository being backed up. The backup bucket's policy adds only denies for
+insecure transport and TLS below 1.2, not a public or cross-account allow.
+Same-account upload access comes from the existing role's scoped IAM permissions.
+
+After deploying, assume the existing role in the DevEx production account and
+retrieve the destination before passing it to the backup script:
+
+```sh
+aws ssm get-parameter \
+  --region eu-west-2 \
+  --name /github-management/github-backup/s3-uri \
+  --query Parameter.Value \
+  --output text
+```
+
+The consumer appends `owner/repository/timestamp-unique-archive` keys to this
+base URI. Upload without an ACL; S3 applies the bucket's default KMS encryption.
+This infrastructure does not deploy a backup job or schedule. Deployment,
+GitHub Actions authentication and scheduled consumer wiring remain separate;
+no backup interval has been agreed.

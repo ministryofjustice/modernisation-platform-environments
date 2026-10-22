@@ -12,6 +12,27 @@ module "iam_role" {
 
   create_inline_policy = true
   inline_policy_permissions = {
+    GitHubBackupDestinationRead = {
+      effect    = "Allow"
+      actions   = ["ssm:GetParameter"]
+      resources = [aws_ssm_parameter.github-backup-destination[0].arn]
+    }
+    GitHubBackupUpload = {
+      effect = "Allow"
+      actions = [
+        "s3:PutObject",
+        "s3:AbortMultipartUpload"
+      ]
+      resources = ["${module.github-backup[0].s3_bucket_arn}/*"]
+    }
+    GitHubBackupEncryption = {
+      effect = "Allow"
+      actions = [
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+      resources = [module.github-backup-key[0].key_arn]
+    }
     KMSAccess = {
       effect = "Allow"
       actions = [
