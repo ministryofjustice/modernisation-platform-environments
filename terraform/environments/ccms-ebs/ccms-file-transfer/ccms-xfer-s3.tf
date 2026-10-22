@@ -70,7 +70,7 @@ module "s3-bucket-sftp-bc" {
 
   log_buckets = {
     log_bucket_name = local.logging_bucket_name
-    log_bucket_arn = "arn:aws:s3:::${local.logging_bucket_name}"
+    log_bucket_arn  = "arn:aws:s3:::${local.logging_bucket_name}"
   }
   manage_log_bucket_policy = false
 
