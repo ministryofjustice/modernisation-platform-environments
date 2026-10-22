@@ -59,6 +59,7 @@ locals {
       enable_vmimport                             = true
       s3_bucket_name                              = "${local.application_name}-${local.environment}"
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+      ssm_patch_baselines                         = ["RedhatPatchGroup1Baseline"]
     }
   }
 
