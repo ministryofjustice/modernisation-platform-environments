@@ -273,7 +273,6 @@ locals {
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "t2"
           oracle-sids         = "T2BOSYS T2BOAUD" # these DBs are on t2-oasys host
-          oracle-sids         = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2OASYS2 T2ONRAUD T2ONRBDS T2ONRSYS T2BOAUD T2BOSYS"
         })
       })
     }
