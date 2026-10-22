@@ -3,6 +3,11 @@ variable "env_name" {
   type        = string
 }
 
+variable "app_name" {
+  description = "The name of the ECS service"
+  type        = string
+}
+
 variable "service_name" {
   description = "The name of the ECS service"
   type        = string
@@ -21,9 +26,4 @@ variable "cluster_name" {
 variable "task_count" {
   description = "The desired task count for the ECS service"
   type        = number
-}
-
-variable "nightly_muted_alarm_names" {
-  description = "List of muted alarm names for the ECS service"
-  type        = list(string)
 }
