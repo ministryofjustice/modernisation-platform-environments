@@ -1,6 +1,6 @@
 locals {
   lambda_name         = "${var.service_name}-nightly-restart"
-  schedule_expression = "cron(40 10 * * ? *)" # 02:15 every day
+  schedule_expression = "cron(15 02 * * ? *)" # 02:15 every day
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
   }
   statement {
     effect    = "Allow"
-    actions   = ["cloudwatch:DisableAlarmActions", "cloudwatch:EnableAlarmActions"]
+    actions   = ["cloudwatch:DescribeAlarms", "cloudwatch:DisableAlarmActions", "cloudwatch:EnableAlarmActions"]
     resources = ["*"]
   }
   statement {
