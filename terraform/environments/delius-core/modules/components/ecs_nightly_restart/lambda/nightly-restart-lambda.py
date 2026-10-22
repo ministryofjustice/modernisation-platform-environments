@@ -38,9 +38,12 @@ def get_alarm_names():
 
 def disable_alarms():
     names = get_alarm_names()
+    print(f"Found {len(names)} alarms to mute: {names}", flush=True)
 
     if names:
+        print("Disabling alarm actions...", flush=True)
         cloudwatch.disable_alarm_actions(AlarmNames=names)
+        print("Alarm actions disabled successfully.", flush=True)
 
     return {
         "disabled": True,
@@ -51,9 +54,14 @@ def disable_alarms():
 
 def enable_alarms():
     names = get_alarm_names()
+    print(f"Found {len(names)} alarms to unmute: {names}", flush=True)
 
     if names:
+        print("Enabling alarm actions...", flush=True)
         cloudwatch.enable_alarm_actions(AlarmNames=names)
+        print("Alarm actions enabled successfully.", flush=True)
+    else:
+        print("No matching alarms found.", flush=True)
 
     return {
         "enabled": True,

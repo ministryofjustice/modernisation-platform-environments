@@ -22,7 +22,12 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
   }
   statement {
     effect    = "Allow"
-    actions   = ["cloudwatch:DescribeAlarms", "cloudwatch:DisableAlarmActions", "cloudwatch:EnableAlarmActions"]
+    actions   = [
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:DisableAlarmActions",
+      "cloudwatch:EnableAlarmActions",
+      "cloudwatch:ListTagsForResource"
+      ]
     resources = ["*"]
   }
   statement {
@@ -72,6 +77,7 @@ resource "aws_lambda_function" "nightly_restart_lambda" {
   handler          = "lambda.handler"
   filename         = data.archive_file.nightly_restart_lambda_zip.output_path
   source_code_hash = filebase64sha256(data.archive_file.nightly_restart_lambda_zip.output_path)
+  timeout          = 30
   tags             = { Name = local.lambda_name }
   environment {
     variables = {
