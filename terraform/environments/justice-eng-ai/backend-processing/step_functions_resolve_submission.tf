@@ -8,6 +8,7 @@ locals {
     variables = [
       { name = "S3_BUCKET", value = aws_s3_bucket.staging_bucket.id },
       { name = "S3_KEY", path = "$.s3_file" },
+      { name = "SOURCE_EVENT", path = "States.JsonToString($)" },
       { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
       { name = "AWS_REGION", value = data.aws_region.current.region },
     ]

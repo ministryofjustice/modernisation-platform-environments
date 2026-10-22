@@ -137,6 +137,7 @@ data "aws_iam_policy_document" "staging_bucket" {
         "s3:GetBucketLocation",
         "s3:ListBucket",
         "s3:GetObject",
+        "s3:GetObjectVersion",
         "s3:PutObject",
       ]
       resources = [
@@ -233,10 +234,11 @@ resource "aws_cloudwatch_event_target" "staging_bucket_root_upload" {
   input_transformer {
     input_paths = {
       # Keep the full key: consumers must not infer AppID from its basename.
-      s3_file = "$.detail.object.key"
+      s3_file   = "$.detail.object.key"
+      s3_object = "$.detail.object"
     }
     input_template = <<-JSON
-      {"s3_folder": ${jsonencode(local.s3_folder)}, "s3_file": <s3_file>}
+      {"s3_folder": ${jsonencode(local.s3_folder)}, "s3_file": <s3_file>, "s3_object": <s3_object>}
     JSON
   }
 

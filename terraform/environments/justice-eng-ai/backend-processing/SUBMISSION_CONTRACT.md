@@ -2,7 +2,7 @@
 
 Deploy the companion application-builder consumers/resolver before applying this workflow change. Enable #44's immutable producer only after both old and new fixtures have been tested in development.
 
-The S3 trigger already passes the complete key. The new resolver child workflow runs on the existing Fargate script runner before any DynamoDB lookup. It reads the configured staging bucket and event key, validates package identifiers against the exact submitted `(AppID, SysKey)` event, and emits `submission` into its output. No application ID is inferred from the filename.
+The S3 trigger passes the complete key and original object metadata, including the version ID. The resolver pins the event version when available; downstream reads retain it. The existing staging-bucket resource policy gains GetObjectVersion for the same task-role principals and bucket scope. The new resolver child workflow runs on the existing Fargate script runner before any DynamoDB lookup. It reads the configured staging bucket and event key, validates package identifiers against the exact submitted `(AppID, SysKey)` event, and emits `submission` into its output. No application ID is inferred from the filename.
 
 All processing stages receive AppID, numeric BuildID, Forge UUID, SUBMISSION_ID, complete S3 key, hash, version and assurance via the shared `submission_environment` local. IDs are strings when passed as ECS environment values. The approval status comes from the scoped control-plane script output, not the latest unrelated application event.
 
