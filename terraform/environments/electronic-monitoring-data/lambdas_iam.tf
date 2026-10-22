@@ -4219,6 +4219,14 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
     resources = ["${module.s3-raw-formatted-data-bucket.bucket.arn}/*"]
   }
   statement {
+    sid    = "GetDbCatalog"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+    ]
+    resources = ["arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog"]
+  }
+  statement {
     sid    = "GetDbs"
     effect = "Allow"
     actions = [
