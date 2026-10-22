@@ -25,7 +25,7 @@ locals {
     dev     = "C0A51K7L2QG"
     test    = "C09C3P43UNP"
     preprod = "C09EVH89M35"
-    prod    = "C0CA72GG65B"
+    prod    = "C069RF589V4"
   }
 }
 

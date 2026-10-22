@@ -5,7 +5,7 @@ module "chatbot_alerts" {
   slack_channel_id = {
     test    = "C09C3P43UNP"
     preprod = "C09EVH89M35"
-    prod    = "C0CA72GG65B"
+    prod    = "C069RF589V4"
     dev     = "C0A51K7L2QG"
   }[local.environment_shorthand]
 
@@ -26,7 +26,7 @@ module "chatbot_alerts" {
 module "chatbot_operational_incidents" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=4214f6ab7ecc2224365b110c43269063443b325c"
 
-  slack_channel_id = "C0CA72GG65B"
+  slack_channel_id = "C069RF589V4"
   slack_team_id    = "T02DYEB3A"
 
   sns_topic_arns = local.is-production ? [
