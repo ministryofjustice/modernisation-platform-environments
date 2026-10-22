@@ -95,5 +95,5 @@ resource "aws_route53_record" "ssogen_admin_primary" {
   name     = "ccms-${local.application_name_ssogen}-admin.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
   ttl      = 300
-  records  = [data.aws_instance.ssogen_primary_details[count.index].private_ip]
+  records  = [data.aws_instance.ssogen_secondary_details[count.index].private_ip]
 }
