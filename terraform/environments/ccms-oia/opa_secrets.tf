@@ -10,12 +10,12 @@ resource "aws_secretsmanager_secret" "opahub_secrets" {
 resource "aws_secretsmanager_secret_version" "opahub_secrets" {
   secret_id = aws_secretsmanager_secret.opahub_secrets.id
   secret_string = jsonencode({
-    "opahub_password" = "",
-    "db_user"         = "",
-    "db_password"     = "",
-    "wl_user"         = "",
-    "wl_password"     = "",
-    "secret_key"      = "",
+    "opahub_password"     = "",
+    "db_user"             = "",
+    "db_password"         = "",
+    "wl_user"             = "",
+    "wl_password"         = "",
+    "secret_key"          = "",
     "KEYSTORE_PASSWORD"   = "",
     "TRUSTSTORE_PASSWORD" = ""
   })
