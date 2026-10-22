@@ -248,21 +248,6 @@ locals {
           oracle-sids         = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2OASYS2 T2ONRAUD T2ONRBDS T2ONRSYS T2BOAUD T2BOSYS"
         })
       })
-
-      t2-onr-db-a = merge(local.ec2_instances.db11g, { # needs the terraform aws provider/user-data fix + resize
-        cloudwatch_metric_alarms = {}                  # instance is ear marked for deletion
-        config = merge(local.ec2_instances.db11g.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.db11g.instance, {
-          disable_api_termination = false
-          instance_type           = "r6i.xlarge"
-          #instance_type           = "r6i.large"
-        })
-      })
     }
 
     iam_policies = {
