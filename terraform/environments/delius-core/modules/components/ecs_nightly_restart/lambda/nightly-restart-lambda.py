@@ -1,3 +1,4 @@
+
 import os
 import boto3
 
@@ -6,27 +7,67 @@ cloudwatch = boto3.client("cloudwatch")
 
 
 def get_alarm_names():
-    return [
-        name.strip()
-        for name in os.environ.get("ALARM_NAMES", "").split(",")
-        if name.strip()
-    ]
+    tag_key = "app"
+    tag_value = os.environ["APP_NAME"]
+
+    paginator = cloudwatch.get_paginator("describe_alarms")
+    alarm_names = []
+
+    for page in paginator.paginate():
+        alarms = (
+            page.get("MetricAlarms", [])
+            + page.get("CompositeAlarms", [])
+        )
+
+        for alarm in alarms:
+            alarm_arn = alarm["AlarmArn"]
+            response = cloudwatch.list_tags_for_resource(
+                ResourceARN=alarm_arn
+            )
+
+            tags = {
+                tag["Key"]: tag["Value"]
+                for tag in response.get("Tags", [])
+            }
+
+            if tags.get(tag_key) == tag_value:
+                alarm_names.append(alarm["AlarmName"])
+
+    return alarm_names
 
 
 def disable_alarms():
     names = get_alarm_names()
-    if names:
-        cloudwatch.disable_alarm_actions(AlarmNames=names)
+    print(f"Found {len(names)} alarms to mute: {names}", flush=True)
 
-    return {"disabled": True}
+    if names:
+        print("Disabling alarm actions...", flush=True)
+        cloudwatch.disable_alarm_actions(AlarmNames=names)
+        print("Alarm actions disabled successfully.", flush=True)
+
+    return {
+        "disabled": True,
+        "count": len(names),
+        "alarms": names,
+    }
 
 
 def enable_alarms():
     names = get_alarm_names()
-    if names:
-        cloudwatch.enable_alarm_actions(AlarmNames=names)
+    print(f"Found {len(names)} alarms to unmute: {names}", flush=True)
 
-    return {"enabled": True}
+    if names:
+        print("Enabling alarm actions...", flush=True)
+        cloudwatch.enable_alarm_actions(AlarmNames=names)
+        print("Alarm actions enabled successfully.", flush=True)
+    else:
+        print("No matching alarms found.", flush=True)
+
+    return {
+        "enabled": True,
+        "count": len(names),
+        "alarms": names,
+    }
 
 
 def start_deployment():
@@ -60,7 +101,7 @@ def check_stability(event):
     stable = (
         len(service.get("deployments", [])) == 1
         and service.get("runningCount", 0)
-            == service.get("desiredCount", 0)
+        == service.get("desiredCount", 0)
         and service.get("pendingCount", 0) == 0
     )
 
