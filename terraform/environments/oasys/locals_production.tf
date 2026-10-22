@@ -999,6 +999,12 @@ locals {
         "*-cpu-iowait-high", # disable iowait alarm as planned out-of-hours work may trigger it
       ]
     }
-  }
 
+    ssm_patch_baselines = {
+      RedHatPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["RedHatPatchGroup1Baseline"], {
+        rule1_approve_after_days = null
+        rule1_approve_until_date = "2026-09-17"
+      })
+    }
+  }
 }
