@@ -1,3 +1,9 @@
+data "aws_sns_topic" "pagerduty" {
+  for_each = toset(["high-priority", "low-priority"])
+
+  name = "pagerduty-${each.key}"
+}
+
 module "cloudwatch_metric_alarms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   for_each = local.cloudwatch_metric_alarms

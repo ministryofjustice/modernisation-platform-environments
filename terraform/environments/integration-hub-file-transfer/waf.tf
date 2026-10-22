@@ -31,7 +31,7 @@ module "waf_web_app" {
       statement = {
         byte_match_statement = {
           positional_constraint = "EXACTLY"
-          search_string         = lower(aws_acm_certificate.web_app.domain_name)
+          search_string         = lower(local.acm_domains.web_app)
           field_to_match = {
             single_header = {
               name = "host"
