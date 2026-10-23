@@ -55,4 +55,19 @@ locals {
 
   # Native Identity Center SSO for Dashboards. See ADR-017.
   opensearch_idc_enabled = local.enable_opensearch
+
+  #-----------------------------------------------------------------------------
+  # Container Platform identity OIDC role ARNs (privilege-escalation hardening,
+  # ministryofjustice/cloud-platform#8612).
+  #
+  # The two github-actions-container-platform-identity-{plan,apply} OIDC roles
+  # exist ONLY in the cloud-platform-live workspace (count-gated in oidc.tf),
+  # but ContainerPlatformEKSAccess[ReadOnly] is created in every workspace/
+  # account. The EKS-access trust policies therefore cannot reference the OIDC
+  # role objects (unknown where count=0) and must name them as constructed ARN
+  # strings. Only the live account id is needed, and it is available in every
+  # workspace via environment_management, so these resolve everywhere.
+  #-----------------------------------------------------------------------------
+  cp_identity_apply_role_arn = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-live"]}:role/github-actions-container-platform-identity-apply"
+  cp_identity_plan_role_arn  = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-live"]}:role/github-actions-container-platform-identity-plan"
 }
