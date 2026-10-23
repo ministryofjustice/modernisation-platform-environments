@@ -4248,6 +4248,14 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
     ]
     resources = [for db in local.api_integration_databases : "${replace(db.arn, ":database/", ":table/")}/*"]
   }
+  statement {
+    sid = "Tables"
+    effect = "Allow"
+    actions = [
+      "glue:CreateTable",
+    ]
+    resources = [for db in local.api_integration_databases : "${db.arn}/*"]
+  }
 }
 
 
