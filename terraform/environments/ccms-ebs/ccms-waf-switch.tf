@@ -111,25 +111,25 @@ resource "aws_lambda_function" "ssogen_waf_maintenance" {
     }
   }
 }
-
+#disabling waf allow till further noticie 23/10
 # EventBridge schedule to trigger Lambda
-resource "aws_scheduler_schedule" "waf_allow_schedule" {
-  name       = "waf-allow-schedule"
-  group_name = "default"
+# resource "aws_scheduler_schedule" "waf_allow_schedule" {
+#   name       = "waf-allow-schedule"
+#   group_name = "default"
 
-  schedule_expression_timezone = "Europe/London"
-  flexible_time_window {
-    mode = "OFF"
-  }
+#   schedule_expression_timezone = "Europe/London"
+#   flexible_time_window {
+#     mode = "OFF"
+#   }
 
-  schedule_expression = "cron(00 07 ? * MON-SUN *)"
+#   schedule_expression = "cron(00 07 ? * MON-SUN *)"
 
-  target {
-    arn      = aws_lambda_function.waf_maintenance.arn
-    input    = jsonencode({ mode = "ALLOW" })
-    role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
-  }
-}
+#   target {
+#     arn      = aws_lambda_function.waf_maintenance.arn
+#     input    = jsonencode({ mode = "ALLOW" })
+#     role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
+#   }
+# }
 
 resource "aws_scheduler_schedule" "waf_block_schedule" {
   name       = "waf-block-schedule"
