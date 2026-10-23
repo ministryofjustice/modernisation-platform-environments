@@ -131,7 +131,6 @@ locals {
   # e.g. src/github-workflow-monitoring/github-workflow-monitor.sh -i 3600 -n 168 -r all | grep -v all | cut -d, -f2,3 | sed 's/^/["/g' | sed 's/,/", "/g' | sed 's/$/", "dso-pipelines-pagerduty"],/g'
   gha_pipeline_alarms = [
     # [repo name, pipeline name, sns topic, optionally overwrite alarm settings]
-    ["dso-certificates", "cert-renewal-prod", "dso-pipelines-pagerduty", {}],
     ["dso-certificates", "stale", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-ad", "application-management", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-ad", "application-cleanup", "dso-pipelines-pagerduty", {}],
@@ -139,7 +138,6 @@ locals {
     ["dso-infra-azure-ad", "send-reminders", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-fixngo", "terragrunt-DigitalStudioDevTestEnvironments", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-fixngo", "terragrunt-NOMSDigitalStudioProduction1", "dso-pipelines-pagerduty", {}],
-    ["dso-infra-azure-fixngo", "terragrunt-NOMSDevTestEnvironments", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-fixngo", "terragrunt-NOMSProduction1", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-fixngo", "stale", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "ssm_command_monitoring", "dso-pipelines-pagerduty", { threshold = "10" }], # pipeline sometimes fails due to API errors hence only alarm if it continually fails
@@ -161,9 +159,6 @@ locals {
     ["dso-modernisation-platform-automation", "onr_environment_start", "oasys-national-reporting-preproduction-pagerduty", {}],
     ["dso-modernisation-platform-automation", "onr_environment_stop", "oasys-national-reporting-preproduction-pagerduty", {}],
     ["dso-modernisation-platform-automation", "security_hub_alerting", "dso-pipelines-pagerduty", {}],
-    ["dso-repositories", "stale", "dso-pipelines-pagerduty", {}],
-    ["dso-useful-stuff", "stale", "dso-pipelines-pagerduty", {}],
-    ["dso-useful-stuff", "dangling-dns", "dso-pipelines-pagerduty", {}],
   ]
 
   cloudwatch_metric_alarms_github_action_failed = {

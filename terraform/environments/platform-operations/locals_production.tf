@@ -14,9 +14,51 @@ locals {
     }
   }
 
+  enable_aws_health_lambda_production = true
+
   github_actions_lambda_production = {
     enable_outbound_federation = true
     github_workflows = {
+      azure-ad-application-cleanup = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-infra-azure-ad"
+        schedule = "cron(00 8 ? * TUE )"
+        timezone = "Europe/London"
+        workflow = "application-cleanup.yml"
+      }
+      azure-ad-application-management = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-infra-azure-ad"
+        schedule = "cron(00 2 ? * * )"
+        timezone = "Europe/London"
+        workflow = "application-management.yml"
+      }
+      azure-ad-automated-user-management = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-infra-azure-ad"
+        schedule = "cron(00 7 ? * TUE )"
+        timezone = "Europe/London"
+        workflow = "automated-user-management.yml"
+      }
+      azure-ad-send-reminders = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-infra-azure-ad"
+        schedule = "cron(00 9 ? * MON )"
+        timezone = "Europe/London"
+        workflow = "send-reminders.yml"
+      }
       azure-fixngo-dso-devtest-drift-check = {
         identity = "platops"
         inputs = {
@@ -130,16 +172,6 @@ locals {
         schedule = "cron(03 1 ? * MON-FRI *)"
         timezone = "Europe/London"
         workflow = "stale.yml"
-      }
-      dso-certificates-cert-renewal-prod = {
-        identity = "platops"
-        inputs   = {}
-
-        ref      = "main"
-        repo     = "dso-certificates"
-        schedule = "cron(00 5 ? * TUE-THU *)"
-        timezone = "Europe/London"
-        workflow = "cert-renewal-prod.yml"
       }
       dso-certificates-stale = {
         identity = "platops"

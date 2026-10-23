@@ -20,23 +20,21 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
     actions   = ["ecs:UpdateService"]
     resources = [var.service_arn]
   }
-}
-
-resource "aws_cloudwatch_event_rule" "rule" {
-  name                = "${local.lambda_name}-rule"
-  schedule_expression = local.schedule_expression
-}
-
-resource "aws_cloudwatch_event_target" "target" {
-  rule = aws_cloudwatch_event_rule.rule.name
-  arn  = aws_lambda_function.nightly_restart_lambda.arn
-}
-
-resource "aws_lambda_permission" "allow_cloudwatch" {
-  action        = "lambda:InvokeFunction"
-  principal     = "events.amazonaws.com"
-  function_name = aws_lambda_function.nightly_restart_lambda.function_name
-  source_arn    = aws_cloudwatch_event_rule.rule.arn
+  statement {
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:DisableAlarmActions",
+      "cloudwatch:EnableAlarmActions",
+      "cloudwatch:ListTagsForResource"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ecs:DescribeServices"]
+    resources = [var.service_arn]
+  }
 }
 
 resource "aws_iam_role" "lambda_role" {
@@ -79,12 +77,14 @@ resource "aws_lambda_function" "nightly_restart_lambda" {
   handler          = "lambda.handler"
   filename         = data.archive_file.nightly_restart_lambda_zip.output_path
   source_code_hash = filebase64sha256(data.archive_file.nightly_restart_lambda_zip.output_path)
+  timeout          = 30
   tags             = { Name = local.lambda_name }
   environment {
     variables = {
       CLUSTER       = var.cluster_name
       SERVICE       = var.service_name
       DESIRED_COUNT = var.task_count
+      APP_NAME      = var.app_name
     }
   }
 }

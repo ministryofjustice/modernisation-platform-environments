@@ -27,6 +27,21 @@ data "aws_ssoadmin_instances" "opensearch" {
   provider = aws.sso-readonly
 }
 
+locals {
+  # The UI dashboardAdmin check matches on group ID. The IDs are hardcoded
+  # because the ModernisationPlatformSSOReadOnly role returns
+  # ResourceNotFoundException when calling GetGroupId despite having
+  # identitystore:Get*. This mirrors the same workaround (and the same two
+  # groups) used for AMG RBAC in amg.tf and for ArgoCD RBAC in cluster/locals.tf.
+  # TODO: switch back to a data.aws_identitystore_group lookup once the read role
+  # permissions are fixed.
+  opensearch_ui_admin_group_ids_list = [
+    "664252b4-7021-701e-49b9-6c46ccc7899e", # cloud-platform-engineers
+    "7682a204-00f1-7031-257e-713bb28289c6", # container-platform-aws
+  ]
+  opensearch_ui_admin_group_ids = join(",", local.opensearch_ui_admin_group_ids_list)
+}
+
 # Audit log group. Under /aws/vendedlogs/ so one prefix-wide resource policy
 # (below) covers it — CloudWatch allows only 10 resource policies per Region.
 resource "aws_cloudwatch_log_group" "opensearch_audit" {
@@ -253,13 +268,29 @@ resource "aws_opensearch_application" "logs" {
     iam_role_for_identity_center_application_arn = aws_iam_role.opensearch_ui_app[0].arn
   }
 
-  # UI admin by Identity Center group — same admin groups as Grafana.
-  app_config {
-    key   = "opensearchDashboards.dashboardAdmin.groups"
-    value = "cloud-platform-engineers,container-platform-aws"
+  # UI admin by Identity Center group — same admin groups as Grafana. The IDs
+  # are set in the locals above. Dynamic so the block is only sent when IdC is
+  # enabled — app_config value must be 1+ chars, so an empty block would fail.
+  dynamic "app_config" {
+    for_each = local.opensearch_idc_enabled ? [1] : []
+    content {
+      key   = "opensearchDashboards.dashboardAdmin.groups"
+      value = local.opensearch_ui_admin_group_ids
+    }
   }
 
   tags = merge(local.tags, { component = "observability" })
+}
+
+# Assign the admin groups to the IdC application. The app requires assignment, so
+# without this Identity Center passes no group claims and every sign-in fails with
+# "not authorized to access dashboards" — even with the groups set in app_config.
+resource "aws_ssoadmin_application_assignment" "opensearch_ui_admin" {
+  for_each = local.opensearch_idc_enabled ? toset(local.opensearch_ui_admin_group_ids_list) : []
+
+  application_arn = aws_opensearch_application.logs[0].iam_identity_center_options[0].iam_identity_center_application_arn
+  principal_id    = each.value
+  principal_type  = "GROUP"
 }
 
 output "opensearch_ui_app_endpoint" {

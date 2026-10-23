@@ -352,34 +352,55 @@ resource "aws_s3_bucket_versioning" "lambda_payment_load" {
   }
 }
 
-# Lifecycle configuration: expire current objects and noncurrent versions after 30 days
+# Lifecycle configuration - see ADR "Payment Load S3 Bucket Retention" (SRE-25): no retention after a successful
+# load into CCMS. The payment load Lambda moves a file to completed/ only when every payment loaded, so that prefix
+# is the success signal. Pending files (bucket root) are not expired, so a file is never deleted just because it was
+# uploaded. Failed files are kept for a short period to investigate the error - the business fixes and resends them.
 resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle" {
   bucket = aws_s3_bucket.lambda_payment_load.id
-  # One lifecycle rule per prefix
+
   rule {
-    id     = "expire-${aws_s3_bucket.lambda_payment_load.id}-${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current}d"
+    id     = "expire-completed-after-successful-load"
+    status = "Enabled"
+
+    filter {
+      prefix = "completed/"
+    }
+
+    expiration {
+      days = local.application_data.accounts[local.environment].payment_load_s3_days_expiration_completed
+    }
+  }
+
+  rule {
+    id     = "expire-failed-after-investigation"
+    status = "Enabled"
+
+    filter {
+      prefix = "failed/"
+    }
+
+    expiration {
+      days = local.application_data.accounts[local.environment].payment_load_s3_days_expiration_failed
+    }
+  }
+
+  # The bucket is versioned and the Lambda moves files by copy and delete, so remove the previous versions
+  # and leftover delete markers too - otherwise the data would still be held as noncurrent versions
+  rule {
+    id     = "expire-noncurrent-versions"
     status = "Enabled"
 
     filter {
       prefix = ""
     }
 
-    expiration {
-      days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
-    }
-
-    noncurrent_version_transition {
-      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
-      storage_class   = "STANDARD_IA"
-    }
-
-    noncurrent_version_transition {
-      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
-      storage_class   = "GLACIER"
-    }
-
     noncurrent_version_expiration {
-      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+      noncurrent_days = local.application_data.accounts[local.environment].payment_load_s3_days_expiration_noncurrent
+    }
+
+    expiration {
+      expired_object_delete_marker = true
     }
 
     abort_incomplete_multipart_upload {

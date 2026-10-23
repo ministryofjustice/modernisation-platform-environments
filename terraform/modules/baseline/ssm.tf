@@ -113,6 +113,72 @@ resource "aws_ssm_document" "this" {
   })
 }
 
+resource "aws_ssm_maintenance_window" "run_command" {
+  for_each = var.ssm_maintenance_window_run_commands
+
+  cutoff            = each.value.cutoff
+  description       = each.value.description
+  duration          = each.value.duration
+  name              = each.key
+  schedule          = each.value.schedule
+  schedule_timezone = each.value.schedule_timezone
+
+  tags = merge(local.tags, each.value.tags, {
+    Name = each.key
+  })
+}
+
+resource "aws_ssm_maintenance_window_target" "run_command" {
+  for_each = var.ssm_maintenance_window_run_commands
+
+  description   = each.value.description
+  name          = each.key
+  resource_type = "INSTANCE"
+  window_id     = aws_ssm_maintenance_window.run_command[each.key].id
+
+  dynamic "targets" {
+    for_each = each.value.targets_by_tag
+    content {
+      key    = "tag:${targets.key}"
+      values = targets.value
+    }
+  }
+}
+
+resource "aws_ssm_maintenance_window_task" "run_command" {
+  for_each = var.ssm_maintenance_window_run_commands
+
+  cutoff_behavior  = each.value.cutoff_behavior
+  description      = each.value.description
+  max_errors       = each.value.max_errors
+  max_concurrency  = each.value.max_concurrency
+  name             = each.key
+  priority         = each.value.priority
+  task_type        = "RUN_COMMAND"
+  task_arn         = each.value.command_arn
+  service_role_arn = try(aws_iam_role.this[each.value.service_role_arn].arn, each.value.service_role_arn)
+  window_id        = aws_ssm_maintenance_window.run_command[each.key].id
+
+  targets {
+    key    = "WindowTargetIds"
+    values = [aws_ssm_maintenance_window_target.run_command[each.key].id]
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+      document_version = "$LATEST"
+
+      dynamic "parameter" {
+        for_each = each.value.run_command_parameters
+        content {
+          name   = parameter.key
+          values = parameter.value
+        }
+      }
+    }
+  }
+}
+
 resource "random_password" "this" {
   for_each = local.ssm_random_passwords
 
@@ -167,4 +233,77 @@ resource "aws_ssm_parameter" "placeholder" {
   lifecycle {
     ignore_changes = [value]
   }
+}
+
+resource "aws_ssm_patch_baseline" "this" {
+  for_each = var.ssm_patch_baselines
+
+  approved_patches = each.value.approved_patches
+  description      = each.value.description
+  name             = each.key
+  operating_system = each.value.operating_system
+  rejected_patches = each.value.rejected_patches
+
+  approval_rule {
+    approve_after_days  = each.value.rule1_approve_after_days
+    approve_until_date  = each.value.rule1_approve_until_date
+    compliance_level    = each.value.rule1_compliance_level
+    enable_non_security = each.value.rule1_enable_non_security
+
+    dynamic "patch_filter" {
+      for_each = each.value.rule1_patch_filters
+
+      content {
+        key    = patch_filter.key
+        values = patch_filter.value
+      }
+    }
+  }
+
+  dynamic "approval_rule" {
+    for_each = each.value.additional_approval_rules
+
+    content {
+      approve_after_days  = approval_rule.value.approve_after_days
+      approve_until_date  = approval_rule.value.approve_until_date
+      compliance_level    = approval_rule.value.compliance_level
+      enable_non_security = approval_rule.value.enable_non_security
+
+      dynamic "patch_filter" {
+        for_each = approval_rule.value.patch_filters
+
+        content {
+          key    = patch_filter.key
+          values = patch_filter.value
+        }
+      }
+    }
+  }
+
+  tags = merge(local.tags, each.value.tags, {
+    Name = each.key
+  })
+}
+
+locals {
+  ssm_default_patch_baselines = {
+    for key, value in var.ssm_patch_baselines : key => value if value.is_default == true
+  }
+  ssm_patch_groups = {
+    for key, value in var.ssm_patch_baselines : key => value if value.patch_group != null
+  }
+}
+
+resource "aws_ssm_default_patch_baseline" "this" {
+  for_each = local.ssm_default_patch_baselines
+
+  baseline_id      = aws_ssm_patch_baseline.this[each.key].id
+  operating_system = each.value.operating_system
+}
+
+resource "aws_ssm_patch_group" "this" {
+  for_each = local.ssm_patch_groups
+
+  baseline_id = aws_ssm_patch_baseline.this[each.key].id
+  patch_group = each.value.patch_group
 }
