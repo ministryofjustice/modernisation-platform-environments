@@ -192,7 +192,7 @@ output "opensearch_dashboards_endpoint" {
 # with the domain as its data source and Identity Center sign-in. See ADR-017.
 #------------------------------------------------------------------------------
 
-# Role the UI application assumes to reach the domain and resolve IdC groups.
+# Role the UI application assumes to reach the domain and resolve IdC groups
 resource "aws_iam_role" "opensearch_ui_app" {
   count = local.opensearch_idc_enabled ? 1 : 0
 
