@@ -18,3 +18,11 @@ provider "kubectl" {
   token                  = try(data.aws_eks_cluster_auth.cluster.token, null)
   load_config_file       = false
 }
+
+provider "opensearch" {
+  url               = "https://${data.aws_opensearch_domain.fluent_bit.endpoint}"
+  aws_region        = "eu-west-2"
+  sign_aws_requests = true
+  healthcheck       = false
+  sniff             = false
+}
