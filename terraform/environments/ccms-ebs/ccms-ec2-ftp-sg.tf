@@ -93,25 +93,28 @@ resource "aws_security_group" "ec2_sg_ftp" {
 #   local.application_data.accounts[local.environment].lz_aws_subnet_env]
 # }
 
-resource "aws_security_group_rule" "ingress_private_traffic_lambda" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "ingress"
-  description       = "allow all tcp traffic from lambda"
-  protocol          = "TCP"
-  from_port         = 0
-  to_port           = 65535
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
 
-resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "ingress"
-  description       = "allow all tcp traffic from ebsdb"
-  protocol          = "TCP"
-  from_port         = 0
-  to_port           = 65535
-  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
-}
+# resource "aws_security_group_rule" "ingress_private_traffic_lambda" {
+#   security_group_id = aws_security_group.ec2_sg_ftp.id
+#   type              = "ingress"
+#   description       = "allow all tcp traffic from lambda"
+#   protocol          = "TCP"
+#   from_port         = 0
+#   to_port           = 65535
+#   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+# }
+
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
+#   security_group_id = aws_security_group.ec2_sg_ftp.id
+#   type              = "ingress"
+#   description       = "allow all tcp traffic from ebsdb"
+#   protocol          = "TCP"
+#   from_port         = 0
+#   to_port           = 65535
+#   cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+# }
 
 
 # EGRESS Rules

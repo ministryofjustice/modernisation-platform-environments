@@ -13,162 +13,188 @@ resource "aws_security_group" "ec2_sg_ebsdb" {
 
 ### HTTP
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_80" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "HTTP"
-  protocol          = "TCP"
-  from_port         = 80
-  to_port           = 80
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_80" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "HTTP"
+#   protocol          = "TCP"
+#   from_port         = 80
+#   to_port           = 80
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
 ### HTTPS
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_443" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "HTTPS"
-  protocol          = "TCP"
-  from_port         = 443
-  to_port           = 443
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_443" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "HTTPS"
+#   protocol          = "TCP"
+#   from_port         = 443
+#   to_port           = 443
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
 ### SSH
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_22" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "SSH"
-  protocol          = "TCP"
-  from_port         = 22
-  to_port           = 22
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-  local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_22" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "SSH"
+#   protocol          = "TCP"
+#   from_port         = 22
+#   to_port           = 22
+#   cidr_blocks = [data.aws_vpc.shared.cidr_block,
+#   local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod]
+# }
 
 ### Oracle LDAP
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_1389" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "Oracle LDAP"
-  protocol          = "TCP"
-  from_port         = 1389
-  to_port           = 1389
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_1389" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "Oracle LDAP"
+#   protocol          = "TCP"
+#   from_port         = 1389
+#   to_port           = 1389
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
 ### Oracle Listerner Port
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "Oracle Net Listener"
-  protocol          = "TCP"
-  from_port         = 1521
-  to_port           = 1522
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].cloud_platform_subnet]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "Oracle Net Listener"
+#   protocol          = "TCP"
+#   from_port         = 1521
+#   to_port           = 1522
+#   cidr_blocks = [data.aws_vpc.shared.cidr_block,
+#     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
+#   local.application_data.accounts[local.environment].cloud_platform_subnet]
+# }
 
 # MP Workspaces (V1) - DEV only, EBS DB Oracle Net Listener access
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x_mp_v1_workspaces" {
-  count             = local.environment == "development" ? 1 : 0
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "Oracle Net Listener from MP Workspaces (V1) - DEV only"
-  protocol          = "TCP"
-  from_port         = 1521
-  to_port           = 1522
-  cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x_mp_v1_workspaces" {
+#   count             = local.environment == "development" ? 1 : 0
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "Oracle Net Listener from MP Workspaces (V1) - DEV only"
+#   protocol          = "TCP"
+#   from_port         = 1521
+#   to_port           = 1522
+#   cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
+# }
 
 ### Oracle
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_5101" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "Oracle"
-  protocol          = "TCP"
-  from_port         = 5101
-  to_port           = 5101
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_5101" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "Oracle"
+#   protocol          = "TCP"
+#   from_port         = 5101
+#   to_port           = 5101
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
 ### Oracle
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_5401" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "Oracle"
-  protocol          = "TCP"
-  from_port         = 5401
-  to_port           = 5401
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_5401" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "Oracle"
+#   protocol          = "TCP"
+#   from_port         = 5401
+#   to_port           = 5401
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
 ### Oracle
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_5575" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "Oracle"
-  protocol          = "TCP"
-  from_port         = 5575
-  to_port           = 5575
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_5575" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "Oracle"
+#   protocol          = "TCP"
+#   from_port         = 5575
+#   to_port           = 5575
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
 ### Oracle LDAP SSL
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_1636" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "Oracle LDAP SSL"
-  protocol          = "TCP"
-  from_port         = 1636
-  to_port           = 1636
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_1636" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "Oracle LDAP SSL"
+#   protocol          = "TCP"
+#   from_port         = 1636
+#   to_port           = 1636
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
 ### Oracle
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_10401" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "Oracle"
-  protocol          = "TCP"
-  from_port         = 10401
-  to_port           = 10401
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_10401" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "Oracle"
+#   protocol          = "TCP"
+#   from_port         = 10401
+#   to_port           = 10401
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
 ### Oracle HTTP
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_800x" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "Oracle HTTP"
-  protocol          = "TCP"
-  from_port         = 8000
-  to_port           = 8005
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_800x" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "Oracle HTTP"
+#   protocol          = "TCP"
+#   from_port         = 8000
+#   to_port           = 8005
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
 ### Oracle HTTPS
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_4443" {
-  security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  type              = "ingress"
-  description       = "Oracle HTTPS"
-  protocol          = "TCP"
-  from_port         = 4443
-  to_port           = 4444
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+
+# resource "aws_security_group_rule" "ingress_traffic_ebsdb_4443" {
+#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
+#   type              = "ingress"
+#   description       = "Oracle HTTPS"
+#   protocol          = "TCP"
+#   from_port         = 4443
+#   to_port           = 4444
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
 
 # EGRESS Rules
