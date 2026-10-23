@@ -49,11 +49,11 @@ resource "aws_vpc_security_group_ingress_rule" "connector_alb_ingress_workspace"
 
 # Allow all outbound (to be restricted later)
 resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_ecs_tasks" {
-  security_group_id = aws_security_group.connector_load_balancer.id
-  ip_protocol       = "tcp"
-  description       = "Allow all outbound traffic (to be locked down later)"
-  from_port         = local.application_data.accounts[local.environment].connector_server_port
-  to_port           = local.application_data.accounts[local.environment].connector_server_port
+  security_group_id            = aws_security_group.connector_load_balancer.id
+  ip_protocol                  = "tcp"
+  description                  = "Allow all outbound traffic (to be locked down later)"
+  from_port                    = local.application_data.accounts[local.environment].connector_server_port
+  to_port                      = local.application_data.accounts[local.environment].connector_server_port
   referenced_security_group_id = aws_security_group.ecs_tasks_connector.id
 }
 
@@ -97,7 +97,7 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_connector_ingress_ec2"
 # }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_vpce" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.vpce_subnets_a.cidr_block,
     data.aws_subnet.vpce_subnets_b.cidr_block,
     data.aws_subnet.vpce_subnets_c.cidr_block,
@@ -120,7 +120,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_s3" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_443" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.private_subnets_a.cidr_block,
     data.aws_subnet.private_subnets_b.cidr_block,
     data.aws_subnet.private_subnets_c.cidr_block
@@ -134,7 +134,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_443" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_1521" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.data_subnets_a.cidr_block,
     data.aws_subnet.data_subnets_b.cidr_block,
     data.aws_subnet.data_subnets_c.cidr_block,
@@ -148,7 +148,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_1521" 
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_1522" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.data_subnets_a.cidr_block,
     data.aws_subnet.data_subnets_b.cidr_block,
     data.aws_subnet.data_subnets_c.cidr_block,

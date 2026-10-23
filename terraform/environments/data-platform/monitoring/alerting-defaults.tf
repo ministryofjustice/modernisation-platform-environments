@@ -15,9 +15,9 @@ locals {
     litellm_model_no_healthy_deployments_crit = 0 # any positive delta = model has zero healthy deployments (all cooled down)
 
     # ── Proxy Errors & Traffic ──────────────────────────────────────────────
-    litellm_proxy_failed_requests_warn          = 1    # % of all proxy requests failing
-    litellm_proxy_failed_requests_crit          = 5    # % of all proxy requests failing
-    litellm_proxy_failed_requests_by_model_crit = 10   # % — higher than global threshold; per-model traffic is noisier
+    litellm_proxy_failed_requests_warn          = 5    # % of all proxy requests failing
+    litellm_proxy_failed_requests_crit          = 10   # % of all proxy requests failing
+    litellm_proxy_failed_requests_by_model_crit = 20   # % — higher than global threshold; per-model traffic is noisier
     litellm_proxy_traffic_baseline_warn         = -50  # fire when traffic is 50% below 1h-ago rate
     litellm_proxy_traffic_baseline_crit         = -80  # fire when traffic is 80% below 1h-ago rate
     litellm_proxy_zero_traffic_crit             = 0.01 # req/s floor treated as effectively zero — pairs with ok_when_nodata=false

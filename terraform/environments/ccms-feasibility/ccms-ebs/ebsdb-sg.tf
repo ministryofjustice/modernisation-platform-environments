@@ -8,7 +8,7 @@ resource "aws_security_group" "ebsdb" {
   })
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_apps_oracle" {
+resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_apps" {
   security_group_id            = aws_security_group.ebsdb.id
   description                  = "Oracle Net listener from EBS apps tier"
   ip_protocol                  = "tcp"
@@ -17,13 +17,22 @@ resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_apps_oracle" {
   referenced_security_group_id = aws_security_group.ebsapps.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_cloud_platform_oracle" {
+resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_cloud_platform" {
   security_group_id = aws_security_group.ebsdb.id
   description       = "Oracle Net listener from Cloud Platform"
   ip_protocol       = "tcp"
   from_port         = 1521
   to_port           = 1522
   cidr_ipv4         = local.application_data.accounts[local.environment].cloud_platform_subnet
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_pui" {
+  security_group_id            = aws_security_group.ebsdb.id
+  description                  = "Oracle Net listener from the ccms-pui ECS tasks"
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1522
+  referenced_security_group_id = data.aws_security_group.pui_ecs_tasks.id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_apps_fndfs" {
@@ -87,4 +96,25 @@ resource "aws_vpc_security_group_egress_rule" "ebsdb_http" {
   from_port         = 80
   to_port           = 80
   cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "ebsdb_to_clamav" {
+  security_group_id            = aws_security_group.ebsdb.id
+  description                  = "ClamAV outbound"
+  ip_protocol                  = "tcp"
+  from_port                    = 3310
+  to_port                      = 3310
+  referenced_security_group_id = data.aws_security_group.clamav.id
+}
+
+# PUI ECS task SG, managed in the ccms-feasibility/ccms-pui stack
+data "aws_security_group" "pui_ecs_tasks" {
+  vpc_id = data.aws_vpc.shared.id
+  name   = "ccms-pui-${local.env_label}-ecs-tasks-sg"
+}
+
+# Shared ClamAV SG, managed in the ccms-feasibility root stack
+data "aws_security_group" "clamav" {
+  vpc_id = data.aws_vpc.shared.id
+  name   = "${local.application_name}-clamav-sg"
 }

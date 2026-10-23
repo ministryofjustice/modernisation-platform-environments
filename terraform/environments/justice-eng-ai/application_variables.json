@@ -1,0 +1,36 @@
+{
+  "accounts": {
+    "development": {
+      "vpc_cidr": "10.0.0.0/16",
+      "s3_folder": "forge-builds",
+      "step_function_retry_attempts": 3,
+      "forge_runtime_version": "forge-runtime-v0.4.2",
+      "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
+      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
+    },
+    "test": {
+      "vpc_cidr": "10.0.0.0/16",
+      "s3_folder": "forge-builds",
+      "step_function_retry_attempts": 3,
+      "forge_runtime_version": "forge-runtime-v0.4.2",
+      "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
+      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
+    },
+    "preproduction": {
+      "vpc_cidr": "10.0.0.0/16",
+      "s3_folder": "forge-builds",
+      "step_function_retry_attempts": 3,
+      "forge_runtime_version": "forge-runtime-v0.4.2",
+      "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
+      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
+    },
+    "production": {
+      "vpc_cidr": "10.0.0.0/16",
+      "s3_folder": "forge-builds",
+      "step_function_retry_attempts": 3,
+      "forge_runtime_version": "forge-runtime-v0.4.2",
+      "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
+      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
+    }
+  }
+}

@@ -7,108 +7,199 @@ import psycopg2
 
 secretsmanager = boto3.client("secretsmanager")
 
+SUPPORTED_ACTIONS = {
+    "reset",
+    "seed",
+    "mutate",
+    "read",
+}
+
+TABLE_NAME = "public.dms_integration_test"
+
+INITIAL_ROWS = [
+    {
+        "id": 1,
+        "description": "First DMS integration test row",
+        "createdAt": "2026-09-10T09:00:00+00:00",
+    },
+    {
+        "id": 2,
+        "description": "Second DMS integration test row",
+        "createdAt": "2026-09-10T09:01:00+00:00",
+    },
+    {
+        "id": 3,
+        "description": "Third DMS integration test row",
+        "createdAt": "2026-09-10T09:02:00+00:00",
+    },
+]
+
 
 def lambda_handler(event, context):
-    action = event.get("action", "seed")
+    action = (event or {}).get("action", "seed")
 
-    if action not in {"seed", "mutate"}:
+    if action not in SUPPORTED_ACTIONS:
         return {
             "statusCode": 400,
-            "message": f"Unsupported action: {action}",
+            "action": action,
+            "message": (
+                f"Unsupported action: {action}. Supported actions are: "
+                + ", ".join(sorted(SUPPORTED_ACTIONS))
+                + "."
+            ),
         }
 
-    secret_arn = os.environ["RDS_SECRET_ARN"]
-    db_host = os.environ["DB_HOST"]
-    db_port = int(os.environ["DB_PORT"])
-    db_name = os.environ["DB_NAME"]
+    configuration = load_configuration()
+    secret = get_secret(configuration["rds_secret_arn"])
 
+    connection = connect(configuration, secret)
+
+    try:
+        handlers = {
+            "reset": reset_database,
+            "seed": seed_database,
+            "mutate": mutate_database,
+            "read": read_database,
+        }
+
+        return handlers[action](connection)
+    finally:
+        connection.close()
+
+
+def load_configuration():
+    return {
+        "rds_secret_arn": os.environ["RDS_SECRET_ARN"],
+        "host": os.environ["DB_HOST"],
+        "port": int(os.environ["DB_PORT"]),
+        "database_name": os.environ["DB_NAME"],
+    }
+
+
+def get_secret(secret_arn):
     response = secretsmanager.get_secret_value(
-        SecretId=secret_arn
+        SecretId=secret_arn,
     )
 
     secret = json.loads(response["SecretString"])
 
-    connection = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        dbname=db_name,
+    missing_fields = {"username", "password"}.difference(secret)
+
+    if missing_fields:
+        raise ValueError(
+            "Secrets Manager secret is missing required credential fields: "
+            + ", ".join(sorted(missing_fields))
+        )
+
+    return secret
+
+
+def connect(configuration, secret):
+    return psycopg2.connect(
+        host=configuration["host"],
+        port=configuration["port"],
+        dbname=configuration["database_name"],
         user=secret["username"],
         password=secret["password"],
         sslmode="require",
         connect_timeout=10,
     )
 
-    try:
-        if action == "seed":
-            return seed_database(connection)
 
-        return mutate_database(connection)
+def reset_database(connection):
+    with connection:
+        with connection.cursor() as cursor:
+            ensure_test_table(cursor)
 
-    finally:
-        connection.close()
+            cursor.execute(
+                f"""
+                DELETE FROM {TABLE_NAME}
+                """
+            )
+
+            deleted_row_count = cursor.rowcount
+            rows = fetch_rows(cursor)
+
+    return build_response(
+        action="reset",
+        message=(
+            "PostgreSQL DMS integration-test table reset successfully."
+        ),
+        rows=rows,
+        changes={
+            "deletedDuringReset": deleted_row_count,
+        },
+    )
 
 
 def seed_database(connection):
     with connection:
         with connection.cursor() as cursor:
+            ensure_test_table(cursor)
+
             cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS public.dms_integration_test (
-                    id BIGINT PRIMARY KEY,
-                    description TEXT NOT NULL,
-                    created_at TIMESTAMPTZ NOT NULL
-                )
+                f"""
+                DELETE FROM {TABLE_NAME}
                 """
             )
 
-            cursor.execute(
-                """
-                INSERT INTO public.dms_integration_test (
+            cursor.executemany(
+                f"""
+                INSERT INTO {TABLE_NAME} (
                     id,
                     description,
                     created_at
                 )
-                VALUES
-                    (1, 'First DMS integration test row', TIMESTAMPTZ '2026-09-10 09:00:00+00'),
-                    (2, 'Second DMS integration test row', TIMESTAMPTZ '2026-09-10 09:01:00+00'),
-                    (3, 'Third DMS integration test row', TIMESTAMPTZ '2026-09-10 09:02:00+00')
-                ON CONFLICT (id)
-                DO UPDATE SET
-                    description = EXCLUDED.description,
-                    created_at = EXCLUDED.created_at
-                """
+                VALUES (
+                    %s,
+                    %s,
+                    %s::timestamptz
+                )
+                """,
+                [
+                    (
+                        row["id"],
+                        row["description"],
+                        row["createdAt"],
+                    )
+                    for row in INITIAL_ROWS
+                ],
             )
 
-            cursor.execute(
-                """
-                DELETE FROM public.dms_integration_test
-                WHERE id > 3
-                """
+            rows = fetch_rows(cursor)
+            assert_rows_match(
+                rows,
+                INITIAL_ROWS,
+                "PostgreSQL seed",
             )
 
-            cursor.execute(
-                """
-                SELECT COUNT(*)
-                FROM public.dms_integration_test
-                """
-            )
-
-            row_count = cursor.fetchone()[0]
-
-    return {
-        "statusCode": 200,
-        "action": "seed",
-        "message": "DMS integration test database seeded successfully.",
-        "rowCount": row_count,
-    }
+    return build_response(
+        action="seed",
+        message=(
+            "PostgreSQL DMS integration-test data seeded successfully."
+        ),
+        rows=rows,
+        changes={
+            "inserted": [row["id"] for row in INITIAL_ROWS],
+        },
+    )
 
 
 def mutate_database(connection):
     with connection:
         with connection.cursor() as cursor:
+            ensure_test_table(cursor)
+
+            current_rows = fetch_rows(cursor)
+            assert_rows_match(
+                current_rows,
+                INITIAL_ROWS,
+                "PostgreSQL mutation starting state",
+            )
+
             cursor.execute(
-                """
-                INSERT INTO public.dms_integration_test (
+                f"""
+                INSERT INTO {TABLE_NAME} (
                     id,
                     description,
                     created_at
@@ -118,47 +209,141 @@ def mutate_database(connection):
                     'Fourth DMS integration test row - CDC insert',
                     TIMESTAMPTZ '2026-09-10 10:00:00+00'
                 )
-                ON CONFLICT (id)
-                DO UPDATE SET
-                    description = EXCLUDED.description,
-                    created_at = EXCLUDED.created_at
                 """
+            )
+            require_affected_row_count(
+                cursor.rowcount,
+                expected=1,
+                operation="insert ID 4",
             )
 
             cursor.execute(
-                """
-                UPDATE public.dms_integration_test
-                SET description = 'Second DMS integration test row - CDC updated'
+                f"""
+                UPDATE {TABLE_NAME}
+                SET description =
+                    'Second DMS integration test row - CDC updated'
                 WHERE id = 2
                 """
             )
+            require_affected_row_count(
+                cursor.rowcount,
+                expected=1,
+                operation="update ID 2",
+            )
 
             cursor.execute(
-                """
-                DELETE FROM public.dms_integration_test
+                f"""
+                DELETE FROM {TABLE_NAME}
                 WHERE id = 3
                 """
             )
-
-            cursor.execute(
-                """
-                SELECT id, description
-                FROM public.dms_integration_test
-                ORDER BY id
-                """
+            require_affected_row_count(
+                cursor.rowcount,
+                expected=1,
+                operation="delete ID 3",
             )
 
-            rows = [
-                {
-                    "id": row[0],
-                    "description": row[1],
-                }
-                for row in cursor.fetchall()
-            ]
+            rows = fetch_rows(cursor)
 
-    return {
+    return build_response(
+        action="mutate",
+        message=(
+            "PostgreSQL DMS CDC test mutations applied successfully."
+        ),
+        rows=rows,
+        changes={
+            "inserted": [4],
+            "updated": [2],
+            "deleted": [3],
+        },
+    )
+
+
+def read_database(connection):
+    with connection:
+        with connection.cursor() as cursor:
+            ensure_test_table(cursor)
+            rows = fetch_rows(cursor)
+
+    return build_response(
+        action="read",
+        message=(
+            "PostgreSQL DMS integration-test table read successfully."
+        ),
+        rows=rows,
+    )
+
+
+def ensure_test_table(cursor):
+    cursor.execute(
+        f"""
+        CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
+            id BIGINT PRIMARY KEY,
+            description TEXT NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL
+        )
+        """
+    )
+
+
+def fetch_rows(cursor):
+    cursor.execute(
+        f"""
+        SELECT
+            id,
+            description,
+            created_at
+        FROM {TABLE_NAME}
+        ORDER BY id
+        """
+    )
+
+    return [
+        {
+            "id": row[0],
+            "description": row[1],
+            "createdAt": row[2].isoformat(),
+        }
+        for row in cursor.fetchall()
+    ]
+
+
+def assert_rows_match(actual_rows, expected_rows, operation):
+    if actual_rows != expected_rows:
+        raise RuntimeError(
+            f"{operation} produced or received an unexpected table state. "
+            f"Expected: {expected_rows}. Actual: {actual_rows}."
+        )
+
+
+def require_affected_row_count(
+    actual,
+    expected,
+    operation,
+):
+    if actual != expected:
+        raise RuntimeError(
+            f"PostgreSQL mutation operation '{operation}' affected "
+            f"{actual} rows; expected {expected}."
+        )
+
+
+def build_response(
+    action,
+    message,
+    rows,
+    changes=None,
+):
+    response = {
         "statusCode": 200,
-        "action": "mutate",
-        "message": "DMS CDC test mutations applied successfully.",
+        "engine": "postgresql",
+        "action": action,
+        "message": message,
+        "rowCount": len(rows),
         "rows": rows,
     }
+
+    if changes is not None:
+        response["changes"] = changes
+
+    return response

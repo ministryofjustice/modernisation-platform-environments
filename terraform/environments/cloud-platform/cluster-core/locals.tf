@@ -1,6 +1,14 @@
 locals {
   bu_accounts = jsondecode(file("${path.module}/../accounts.json"))
 
+  # Shared BU -> parent IdC group mapping, sourced from the single
+  # business-units.json consumed by this component, the root grafana component
+  # and cluster/ (cloud-platform#8558). Each bu_configs[*].viewer_group is read
+  # from here. octo->office-of-the-cto and cd->central-digital are inferred from
+  # child-team naming; hmpps/laa are exact (see ADR-002 "Groups in use"). JSON
+  # cannot carry this note, so it lives here.
+  business_units = jsondecode(file("${path.module}/../business-units.json")).business_units
+
   mp_environments = concat(
     [
       "cloud-platform-preproduction",
@@ -59,32 +67,53 @@ locals {
   # BU configuration — defines the spoke clusters and path within the monorepo
   # Each BU gets a nonlive and live AppProject + ApplicationSet pair
   # All BUs share the same source repo; isolation is via path prefix + AppProject destinations
+  #
+  # viewer_group is the BU's parent IAM Identity Center group (a child of the
+  # GitHub `business-units` team). It receives read-only ArgoCD UI access to
+  # this BU's Applications via the AppProject `roles` grant below — layer 2 of
+  # the BU-user access model (ADR-002, cloud-platform#8548). The paired layer-1
+  # VIEWER login mapping lives in the cluster component. Group NAMES are the
+  # source of truth; IDs are resolved from ListGroups (see data.tf).
+  #
+  # viewer_group is sourced from the shared business-units.json
+  # (local.business_units) so the BU -> parent group mapping has a single source
+  # of truth. The clusters map stays inline here — cluster names are specific to
+  # this component.
   bu_configs = {
     octo = {
       clusters = {
         nonlive = "container-platform-octo-nonlive"
         live    = "container-platform-octo-live"
       }
+      viewer_group = local.business_units["octo"].parent_group
     }
     laa = {
       clusters = {
         nonlive = "container-platform-laa-nonlive"
         live    = "container-platform-laa-live"
       }
+      viewer_group = local.business_units["laa"].parent_group
     }
     hmpps = {
       clusters = {
         nonlive = "container-platform-hmpps-nonlive"
         live    = "container-platform-hmpps-live"
       }
+      viewer_group = local.business_units["hmpps"].parent_group
     }
     cd = {
       clusters = {
         nonlive = "container-platform-cd-nonlive"
         live    = "container-platform-cd-live"
       }
+      viewer_group = local.business_units["cd"].parent_group
     }
   }
+
+  # Resolve BU parent group NAME -> IDC group ID (hub-only; see data.tf).
+  argocd_idc_group_id_by_name = local.is_argocd_hub ? {
+    for g in data.aws_identitystore_groups.all[0].groups : g.display_name => g.group_id
+  } : {}
 
   # Flatten BU configs into per-environment AppProject entries
   bu_appprojects = merge([
@@ -100,6 +129,10 @@ locals {
         # Cluster ARN constructed from account ID + cluster name
         cluster_arn = "arn:aws:eks:eu-west-2:${local.environment_management.account_ids[cluster_workspace]}:cluster/${cluster_workspace}"
         auto_sync   = env == "nonlive" ? true : false
+        # Read-only ArgoCD UI access (layer 2). Resolved BU parent group ID, or
+        # null if the group name does not resolve — the AppProject then simply
+        # gets no viewer role rather than failing the plan.
+        viewer_group_id = lookup(local.argocd_idc_group_id_by_name, bu_config.viewer_group, null)
       }
     }
   ]...)
@@ -134,7 +167,7 @@ locals {
   # "<prefix>-spoke" derived from the hub's "<prefix>-hub" workspace name.
   ephemeral_spoke_workspace = replace(terraform.workspace, "-hub", "-spoke")
   ephemeral_spoke_registration = local.is_ephemeral_hub ? {
-    "${local.ephemeral_spoke_workspace}" = {
+    (local.ephemeral_spoke_workspace) = {
       bu_name           = "ephemeral"
       environment       = "nonlive"
       source_repo       = local.environments_repo
@@ -142,6 +175,8 @@ locals {
       path_prefix       = "namespaces/ephemeral"
       cluster_arn       = "arn:aws:eks:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${local.ephemeral_spoke_workspace}"
       auto_sync         = true
+      # Ephemeral dev spokes have no BU parent group, so no read-only viewer role.
+      viewer_group_id = null
     }
   } : {}
 

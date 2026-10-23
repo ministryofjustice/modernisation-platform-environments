@@ -13,7 +13,7 @@ locals {
     migration_environment_short_name       = "test"
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/test/ec2-user.pub")
-    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
+    homepage_path                          = "/NDelius-war/delius/JSP/homepage.xhtml"
     has_mis_environment                    = false
   }
 
@@ -80,20 +80,24 @@ locals {
   }
 
   delius_microservices_configs_test = {
+    # Weblogic/EIS ECS config managed here: https://github.com/ministryofjustice/delius-releases
     weblogic = {
       ec2_instance_type = "r7i.xlarge"
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
       asg_min_size      = 2
       asg_max_size      = 2
     }
 
     weblogic_eis = {
       ec2_instance_type = "r7i.large"
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
       asg_min_size      = 1
       asg_max_size      = 1
     }
 
     weblogic_testdata_api = {
       ec2_instance_type = "r7i.large"
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
       asg_min_size      = 1
       asg_max_size      = 1
     }
@@ -101,8 +105,8 @@ locals {
     pwm = {
       image_tag        = "8250538047-1"
       container_port   = 8080
-      container_cpu    = 1024
-      container_memory = 2048
+      container_cpu    = 2048
+      container_memory = 4096
     }
 
     ldap = {
@@ -154,5 +158,11 @@ locals {
     object_lock_days             = 0
     expire_current_after_days    = 80
     expire_noncurrent_after_days = 10
+  }
+
+  aws_health_lambda_configuration_test = {
+    enabled               = local.is-test
+    aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
+    rule_name             = "ForwardAllHealthEvents"
   }
 }

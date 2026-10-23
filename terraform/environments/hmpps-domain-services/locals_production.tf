@@ -37,6 +37,7 @@ locals {
         }
       }
 
+      # TM-2057: Oct 2026: delete this cert once internally signed cert has been configured
       remote_desktop_wildcard_and_planetfm_cert_v3 = {
         certificate_transparency_logging_preference = false # this should have been set to true
         cloudwatch_metric_alarms                    = module.baseline_presets.cloudwatch_metric_alarms.acm
@@ -52,22 +53,6 @@ locals {
           description = "wildcard cert for hmpps remote desktop services"
         }
       }
-
-      # TM-2057: Oct 2026, use below to replace above 2 certs
-      # remote_desktop_wildcard_and_planetfm_cert_v4 = {
-      #   cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-      #   domain_name                         = "*.hmpps-domain.service.justice.gov.uk"
-      #   export                              = true
-      #   external_validation_records_created = true
-      #   subject_alternate_names = [
-      #     "*.planetfm.service.justice.gov.uk",
-      #     "cafmtx.az.justice.gov.uk",
-      #     "hmpps-az-gw1.justice.gov.uk",
-      #   ]
-      #   tags = {
-      #     description = "wildcard cert for hmpps remote desktop services"
-      #   }
-      # }
     }
 
     cloudwatch_dashboards = {
@@ -100,9 +85,6 @@ locals {
         }
         instance = merge(local.ec2_instances.jumpserver.instance, {
           instance_type = "r6i.large"
-          tags = {
-            patch-manager = "group1"
-          }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name              = "azure.hmpp.root"
@@ -114,15 +96,11 @@ locals {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
         })
-        instance = merge(local.ec2_instances.rdgw.instance, {
-          tags = {
-            patch-manager = "group1"
-          }
-        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description              = "Remote Desktop Gateway for azure.hmpp.root domain"
           domain-name              = "azure.hmpp.root"
           gha-jumpserver-startstop = "production"
+          "Patch Group"            = "patchgroup1"
           update-ssm-agent         = "patchgroup1"
         })
       })
@@ -131,15 +109,11 @@ locals {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2b"
         })
-        instance = merge(local.ec2_instances.rdgw.instance, {
-          tags = {
-            patch-manager = "group2"
-          }
-        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description              = "Remote Desktop Gateway for azure.hmpp.root domain"
           domain-name              = "azure.hmpp.root"
           gha-jumpserver-startstop = "production"
+          "Patch Group"            = "patchgroup2"
           update-ssm-agent         = "patchgroup2"
         })
       })
@@ -147,12 +121,6 @@ locals {
       pd-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           availability_zone = "eu-west-2a"
-        })
-        instance = merge(local.ec2_instances.rds.instance, {
-          instance_type = "t3.large"
-          tags = {
-            patch-manager = "group2"
-          }
         })
         tags = merge(local.ec2_instances.rds.tags, {
           description              = "Remote Desktop Services for azure.hmpp.root domain"
@@ -235,6 +203,25 @@ locals {
                   }
                 }]
               }
+              eol = {
+                priority = 300
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = file("templates/eol.html")
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "eol.hmpps-domain.service.justice.gov.uk",
+                      "hmpps-az-gw1.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               maintenance = {
                 priority = 999
                 actions = [{
@@ -310,6 +297,7 @@ locals {
         ]
 
         lb_alias_records = [
+          { name = "eol", type = "A", lbs_map_key = "public" },
           { name = "maintenance", type = "A", lbs_map_key = "public" },
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },

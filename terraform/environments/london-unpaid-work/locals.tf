@@ -2,6 +2,7 @@
 locals {
   baseline_presets_all_environments = {
     options = {
+      enable_business_unit_kms_cmks               = true
       enable_ec2_cloud_watch_agent                = true
       enable_ec2_oracle_enterprise_managed_server = true
       enable_ec2_security_groups                  = true
@@ -35,4 +36,6 @@ locals {
     production    = local.baseline_production
   }
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
+
+  account_config = local.application_data.accounts[local.environment]
 }

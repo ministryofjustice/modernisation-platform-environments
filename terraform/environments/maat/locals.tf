@@ -2,7 +2,7 @@
 
 locals {
   env_account_id     = local.environment_management.account_ids[terraform.workspace]
-  env_account_region = data.aws_region.current.id
+  env_account_region = data.aws_region.current.region
 
   # For CloudFront validation for MAAT
 

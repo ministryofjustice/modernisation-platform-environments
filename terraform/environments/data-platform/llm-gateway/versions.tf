@@ -16,18 +16,6 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
-    kubernetes = {
-      version = "~> 2.0"
-      source  = "hashicorp/kubernetes"
-    }
-    helm = {
-      version = "~> 3.0"
-      source  = "hashicorp/helm"
-    }
-    litellm = {
-      source  = "ncecere/litellm"
-      version = "~> 0.0"
-    }
     random = {
       version = "~> 3.0"
       source  = "hashicorp/random"

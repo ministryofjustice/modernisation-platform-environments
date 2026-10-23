@@ -1,16 +1,32 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "rds_enabled": true,
+      "db_identifier": "london-unpaid-work-database",
+      "db_engine": "sqlserver-se",
+      "db_engine_version": "15.00.4480.2.v1",
+      "db_instance_class": "db.m5.large",
+      "db_user": "admin",
+      "db_port": 1433,
+      "db_allocated_storage": 20,
+      "db_max_allocated_storage": 100,
+      "db_storage_type": "gp3",
+      "db_multi_az": false,
+      "db_backup_retention_period": 15,
+      "db_auto_minor_version_upgrade": true,
+      "db_allow_major_version_upgrade": false,
+      "db_deletion_protection": false,
+      "db_skip_final_snapshot": true,
+      "db_apply_immediately": true
     },
     "test": {
-      "example_var": "test-data"
+      "rds_enabled": false
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "rds_enabled": false
     },
     "production": {
-      "example_var": "production-data"
+      "rds_enabled": false
     }
   }
 }

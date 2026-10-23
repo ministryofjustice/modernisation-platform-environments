@@ -9,9 +9,9 @@ Lambda/EC2 automation that provisions users.
 ## Key facts
 
 | | |
-|---|---|
+| --- | --- |
 | **VPC CIDR** | `10.26.130.0/23` (dev) · `10.27.130.0/23` (prod) |
-| **WorkSpaces access** | IP group restricted to 4 Global Protect gateway IPs; only Windows, macOS and Web clients allowed |
+| **WorkSpaces access** | IP group allows 4 Global Protect gateway IPs and Prisma VPN (`128.77.75.64/26`); only Windows, macOS and Web clients allowed |
 | **MFA compute** | ECS Fargate, 1024 CPU / 2048 MB — `linotp` :5000 + `freeradius` :1812/1813 UDP |
 | **RDS** | MySQL 8.0, db.t3.micro, private-only, SG allows port 3306 from the ECS task SG only |
 | **Egress** | private subnets → Network Firewall (FQDN allow-list) → NAT Gateway → IGW |

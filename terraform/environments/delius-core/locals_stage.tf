@@ -12,7 +12,7 @@ locals {
     migration_environment_short_name       = "stage"
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/stage/ec2-user.pub")
-    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
+    homepage_path                          = "/NDelius-war/delius/JSP/homepage.xhtml"
     has_mis_environment                    = true
   }
 
@@ -84,14 +84,17 @@ locals {
   }
 
   delius_microservices_configs_stage = {
+    # Weblogic/EIS ECS config managed here: https://github.com/ministryofjustice/delius-releases
     weblogic = {
       ec2_instance_type = "r7i.xlarge"
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
       asg_min_size      = 1
       asg_max_size      = 1
     }
 
     weblogic_eis = {
       ec2_instance_type = "r7i.large"
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
       asg_min_size      = 0
       asg_max_size      = 0
     }

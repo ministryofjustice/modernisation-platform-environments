@@ -56,26 +56,29 @@ locals {
       queue_name = local.live_feed_dlq_names.push_data_export_to_p1
     }
   }
+
   merge_lambdas = {
     staged_position = {
       lambda_name = module.merge_mdss_staged_position[0].lambda_function_name
       threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
     }
+
     staged_event = {
       lambda_name = module.merge_mdss_staged_event[0].lambda_function_name
       threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
     }
+
     ac_position = {
       lambda_name = module.merge_ac_position[0].lambda_function_name
       threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
     }
+
     emdi_position = {
       lambda_name = module.merge_emdi_position[0].lambda_function_name
       threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
     }
   }
 }
-
 
 resource "aws_cloudwatch_metric_alarm" "sqs_dlq_has_messages" {
   for_each = local.sqs_dlq_alarm_queues
@@ -137,6 +140,29 @@ resource "aws_cloudwatch_metric_alarm" "sqs_dlq_has_messages" {
     label       = "Messages visible or in flight"
     return_data = true
   }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "fms_audit_write_failed" {
+  alarm_name        = "fms_audit_write_failed"
+  alarm_description = "Triggered when load_fms cannot write FMS validation audit data"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  # Use EventBridge -> cloudwatch_alarm_threader -> SNS custom notifications.
+  # Disable direct alarm actions to avoid duplicate Slack messages.
+  actions_enabled = false
+
+  metric_name = "FmsAuditWriteFailedCount"
+  namespace   = "EMDS/FMS"
+  period      = 300
+  statistic   = "Sum"
 
   alarm_actions = [
     aws_sns_topic.emds_alerts.arn
@@ -365,6 +391,180 @@ resource "aws_cloudwatch_metric_alarm" "live_feed_incident_events_dlq" {
   ]
 
   ok_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Downstream specials remediation guard
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "specials_guard_detected" {
+  for_each = local.specials_remediation_active_consumers
+
+  alarm_name = "downstream_specials_detected_${each.key}"
+
+  alarm_description = "Triggered when downstream specials are detected for ${each.value.consumer}"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "SpecialsDetected"
+  namespace   = "EM/SpecialsGuard"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    Consumer    = each.value.consumer
+    Environment = local.environment_shorthand
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "specials_guard_cleanup_failed" {
+  for_each = local.specials_remediation_active_consumers
+
+  alarm_name = "downstream_specials_cleanup_failed_${each.key}"
+
+  alarm_description = "Triggered when downstream specials cleanup fails for ${each.value.consumer}"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "CleanupFailed"
+  namespace   = "EM/SpecialsGuard"
+  period      = 300
+  statistic   = "Maximum"
+
+  dimensions = {
+    Consumer    = each.value.consumer
+    Environment = local.environment_shorthand
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "specials_guard_heartbeat_missing" {
+  for_each = local.specials_remediation_active_consumers
+
+  alarm_name = "downstream_specials_guard_heartbeat_missing_${each.key}"
+
+  alarm_description = "Triggered when the specials guard heartbeat is missing for ${each.value.consumer}"
+
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 1
+  treat_missing_data  = "breaching"
+
+  actions_enabled = false
+
+  metric_name = "GuardHeartbeat"
+  namespace   = "EM/SpecialsGuard"
+  period      = 900
+  statistic   = "Sum"
+
+  dimensions = {
+    Consumer    = each.value.consumer
+    Environment = local.environment_shorthand
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "specials_guard_lambda_errors" {
+  count = local.specials_remediation_enabled ? 1 : 0
+
+  alarm_name        = "downstream_specials_guard_lambda_errors"
+  alarm_description = "Triggered when the specials remediation Lambda records errors"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "Errors"
+  namespace   = "AWS/Lambda"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    FunctionName = module.live_feed_specials_remediator.lambda_function_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation workflow failures
+# Surface planner, replay, verification and dependency failures in Slack.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_state_machines = tomap({
+    staged = {
+      consumer = "STAGED"
+      arn      = module.merge_into_mdss_staged_position.arn
+    }
+    ac = {
+      consumer = "AC"
+      arn      = module.merge_into_mdss_ac_position.arn
+    }
+    emdi = {
+      consumer = "EMDI"
+      arn      = module.merge_into_emdi_position.arn
+    }
+  })
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_execution_failed" {
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_state_machines
+    : tomap({})
+  )
+
+  alarm_name = "downstream_reconciliation_${each.key}_execution_failed"
+
+  alarm_description = (
+    "Triggered when ${each.value.consumer} downstream reconciliation fails"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "ExecutionsFailed"
+  namespace   = "AWS/States"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    StateMachineArn = each.value.arn
+  }
+
+  alarm_actions = [
     aws_sns_topic.emds_alerts.arn,
   ]
 }

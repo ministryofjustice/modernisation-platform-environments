@@ -21,6 +21,7 @@ CONTENT_HEADERS = {
     "WebsiteRedirectLocation": "WebsiteRedirectLocation",
 }
 CHECKSUM_FIELDS = ["ChecksumCRC32", "ChecksumCRC32C", "ChecksumSHA1", "ChecksumSHA256"]
+SCAN_STATUS_TAG_KEY = "GuardDutyMalwareScanStatus"
 RESERVED_METADATA = {
     "mft-correlation-id",
     "mft-receipt-token",
@@ -77,10 +78,16 @@ class S3CopyEngine:
                 raise ValueError("Processing object correlation metadata does not match the event")
             if "mft-route-copy-token" in metadata:
                 raise ValueError("Processing object contains reserved ROUTE metadata")
+        tags = tag_response.get("TagSet", [])
+        if operation == "ROUTE":
+            tags = [
+                *(tag for tag in tags if tag["Key"] != SCAN_STATUS_TAG_KEY),
+                {"Key": SCAN_STATUS_TAG_KEY, "Value": operation_event.scan_result_status},
+            ]
         return SourceSnapshot(
             size_bytes=response["ContentLength"],
             metadata=metadata,
-            tags=tag_response.get("TagSet", []),
+            tags=tags,
             headers={
                 destination_name: response[source_name]
                 for source_name, destination_name in CONTENT_HEADERS.items()

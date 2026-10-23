@@ -18,7 +18,6 @@ module "justice_public_dns_zone" {
   tags                = local.tags
 }
 
-
 locals {
   # Allow SES only where the zone's own SES identity is verified (dev/preprod), otherwise park it
   ses_sends_as_domain = try(local.application_data.accounts[local.environment].ses_domain_identities[local.application_data.accounts[local.environment].domain_name].create_records, false)

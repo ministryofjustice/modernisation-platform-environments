@@ -54,7 +54,7 @@ The TF Docs below provides reference to all inputs.
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ------ | --------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5.0 |
 | <a name="provider_aws.core-network-services"></a> [aws.core-network-services](#provider\_aws.core-network-services) | ~> 5.0 |
 | <a name="provider_aws.core-vpc"></a> [aws.core-vpc](#provider\_aws.core-vpc) | ~> 5.0 |
@@ -62,7 +62,7 @@ The TF Docs below provides reference to all inputs.
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ------ | -------- | --------- |
 | <a name="module_bastion_linux"></a> [bastion\_linux](#module\_bastion\_linux) | github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux | c918b2189d9f81d224e07e98fa1bc9ff38e4ba12 |
 | <a name="module_ecs"></a> [ecs](#module\_ecs) | github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster | v4.3.0 |
 | <a name="module_gdpr_api_service"></a> [gdpr\_api\_service](#module\_gdpr\_api\_service) | ../helpers/delius_microservice | n/a |
@@ -88,7 +88,7 @@ The TF Docs below provides reference to all inputs.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ------ | ------ |
 | [aws_acm_certificate.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) | resource |
 | [aws_acm_certificate_validation.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) | resource |
 | [aws_iam_access_key.pwm_ses_smtp_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) | resource |
@@ -166,7 +166,7 @@ The TF Docs below provides reference to all inputs.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ------ | ------------- | ------ | --------- | :--------: |
 | <a name="input_account_config"></a> [account\_config](#input\_account\_config) | n/a | `any` | n/a | yes |
 | <a name="input_account_info"></a> [account\_info](#input\_account\_info) | Account level info | `any` | n/a | yes |
 | <a name="input_app_name"></a> [app\_name](#input\_app\_name) | n/a | `string` | n/a | yes |

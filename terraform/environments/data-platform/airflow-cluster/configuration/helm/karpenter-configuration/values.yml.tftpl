@@ -1,0 +1,21 @@
+---
+clusterName: ${cluster_name}
+clusterVersion: "${cluster_version}"
+
+ebsKmsKeyId: ${ebs_kms_key_id}
+
+nodeRole: ${node_role}
+nodeVersion: "${node_version}"
+
+subnetSelectorTerms:
+%{ for subnet_id in subnet_ids ~}
+  - id: ${subnet_id}
+%{ endfor ~}
+
+securityGroupSelectorTerms:
+%{ for security_group_id in security_group_ids ~}
+  - id: ${security_group_id}
+%{ endfor ~}
+
+ec2NodeClassTags:
+  ${replace(yamlencode(ec2_node_class_tags), "\n", "\n  ")}

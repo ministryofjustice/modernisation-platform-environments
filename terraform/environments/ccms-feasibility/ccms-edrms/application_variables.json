@@ -12,7 +12,7 @@
       "edrms_server_port": 8080,
       "container_cpu": 1024,
       "container_memory": 2048,
-      "app_count": 1,
+      "app_count": 0,
       "spring_profiles_active": "WithoutNorthgate",
       "northgate_proxy": "10.120.0.147/32",
       "target_northgate_hub_dime_url": "http://10.120.0.147/DocumentHub/dime",

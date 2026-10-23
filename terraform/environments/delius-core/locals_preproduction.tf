@@ -12,7 +12,7 @@ locals {
     migration_environment_short_name       = "pre-prod"
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/preprod/ec2-user.pub")
-    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
+    homepage_path                          = "/NDelius-war/delius/JSP/homepage.xhtml"
     has_mis_environment                    = false
   }
 
@@ -61,13 +61,13 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 3000
+        iops       = 8000
         throughput = 700
         type       = "gp3"
         total_size = 10000
       }
       flash = {
-        iops       = 3000
+        iops       = 8000
         throughput = 700
         type       = "gp3"
         total_size = 6000
@@ -84,15 +84,17 @@ locals {
   }
 
   delius_microservices_configs_preprod = {
-
+    # Weblogic/EIS ECS config managed here: https://github.com/ministryofjustice/delius-releases
     weblogic = {
       ec2_instance_type = "r7i.xlarge"
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
       asg_min_size      = 7
       asg_max_size      = 7
     }
 
     weblogic_eis = {
       ec2_instance_type = "r7i.xlarge"
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
       asg_min_size      = 1
       asg_max_size      = 1
     }

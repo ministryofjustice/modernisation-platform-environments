@@ -38,7 +38,7 @@ locals {
         }
       }
       grafana_version                 = "12.4"
-      grafana_api_key_rotator_version = "1.2.2"
+      grafana_api_key_rotator_version = "1.2.3"
     }
     production = {
       tenant_configuration = {
@@ -416,6 +416,40 @@ locals {
             }
           }
         },
+        "hmpps-datahub-restricted" = {
+          "identity_centre_team" = "hmpps-datahub-restricted",
+          # cloudwatch_enabled is false because the data sources are owned by the digital-prison-reporting tenant; this tenant is only granted query access to them
+          "aws_accounts" = {
+            "digital-prison-reporting-development" = {
+              cloudwatch_enabled              = false
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "digital-prison-reporting-preproduction" = {
+              cloudwatch_enabled              = false
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "digital-prison-reporting-production" = {
+              cloudwatch_enabled              = false
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "digital-prison-reporting-test" = {
+              cloudwatch_enabled              = false
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            }
+          }
+        },
         "modernisation-platform" = {
           identity_centre_team = "modernisation-platform"
           slack_channels       = ["mod-plat-observ-test"]
@@ -503,6 +537,25 @@ locals {
                   workgroup = "coat_cur_report"
                 }
               }
+            }
+          }
+        },
+        "eucs" = {
+          "identity_centre_team" = "eucs-modern-workplace-admins",
+          "aws_accounts" = {
+            "eucs-appstream-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "eucs-appstream-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
             }
           }
         }

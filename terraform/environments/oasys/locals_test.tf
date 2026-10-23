@@ -59,7 +59,7 @@ locals {
     ec2_autoscaling_groups = {
       t1-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
-          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
+          scale_up = { recurrence = "0 5 * * Mon-Fri" }
           # scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -84,7 +84,7 @@ locals {
       t2-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 5 * * Mon-Fri" }
-          # scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+          scale_down = { recurrence = "30 22 * * Mon-Fri", desired_capacity = 0 }
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
@@ -245,33 +245,7 @@ locals {
           description         = "t2 oasys database"
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "t2"
-          oracle-sids         = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
-        })
-      })
-
-      t2-onr-db-a = merge(local.ec2_instances.db11g, { # needs the terraform aws provider/user-data fix + resize
-        config = merge(local.ec2_instances.db11g.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
-          ])
-        })
-        ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100 } # /u01
-          "/dev/sdc" = { label = "app", size = 500 } # /u02
-          "/dev/sde" = { label = "data", size = 2000, iops = 3000, throughput = 125 }
-          "/dev/sdj" = { label = "flash", size = 600, iops = 3000, throughput = 125 }
-          "/dev/sds" = { label = "swap", size = 2 }
-        }
-        instance = merge(local.ec2_instances.db11g.instance, {
-          disable_api_termination = true
-          instance_type           = "r6i.xlarge"
-          #instance_type           = "r6i.large"
-        })
-        tags = merge(local.ec2_instances.db11g.tags, {
-          instance-scheduling = "skip-scheduling"
-          oasys-environment   = "t2"
-          oracle-sids         = "T2BOSYS T2BOAUD"
+          oracle-sids         = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2OASYS2 T2ONRAUD T2ONRBDS T2ONRSYS T2BOAUD T2BOSYS"
         })
       })
     }
@@ -369,7 +343,7 @@ locals {
               "kms:Decrypt",
             ]
             resources = [
-              aws_kms_key.arns_integration[0].arn,
+              length(aws_kms_key.arns_integration) == 1 ? aws_kms_key.arns_integration[0].arn : null
             ]
             condition = {
               test     = "StringEquals"

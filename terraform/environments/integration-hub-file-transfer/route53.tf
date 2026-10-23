@@ -25,7 +25,7 @@ module "r53_file_transfer" {
       name    = "web"
       type    = "CNAME"
       ttl     = 300
-      records = [trimprefix(aws_transfer_web_app.this.access_endpoint, "https://")]
+      records = [module.cloudfront_web_app.cloudfront_distribution_domain_name]
     }
   }
 }

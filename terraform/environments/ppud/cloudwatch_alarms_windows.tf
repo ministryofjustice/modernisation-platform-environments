@@ -277,27 +277,6 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   }
 }
 
-# IIS Status Check Alarm
-
-resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "IIS-Failure-${each.key}"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = 3
-  datapoints_to_alarm = 2
-  metric_name         = "IncomingLogEvents"
-  namespace           = "AWS/Logs"
-  period              = 60
-  statistic           = "Average"
-  threshold           = 1
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId = each.key
-  }
-}
-
 ############################################################################
 # CloudWatch Service, Port25 Check and EmailSender Check Alarms [Production]
 ############################################################################

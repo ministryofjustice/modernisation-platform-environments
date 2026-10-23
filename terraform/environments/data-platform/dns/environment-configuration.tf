@@ -5,21 +5,6 @@ locals {
       route53_zones = {
         "development.data-platform.service.justice.gov.uk" = {
           records = {
-            llm-gateway-ns = {
-              /* 
-                Delegate llm-gateway.development.data-platform.service.justice.gov.uk to Cloud Platform 
-                https://github.com/ministryofjustice/cloud-platform-environments/blob/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-llm-gateway-development/resources/route53.tf
-              */
-              type = "NS"
-              name = "llm-gateway"
-              ttl  = 86400
-              records = [
-                "ns-1340.awsdns-39.org.",
-                "ns-1602.awsdns-08.co.uk.",
-                "ns-440.awsdns-55.com.",
-                "ns-885.awsdns-46.net."
-              ]
-            }
             monitoring-ns = {
               /* 
                 Delegate monitoring.development.data-platform.service.justice.gov.uk to Cloud Platform 
@@ -133,12 +118,6 @@ locals {
               name    = "_github-pages-challenge-ministryofjustice.manual"
               ttl     = 300
               records = ["a0a17e7f4aa71bec7357a6ed2efd5e"]
-            },
-            manual-github-pages-cname = {
-              type    = "CNAME"
-              name    = "manual"
-              ttl     = 300
-              records = ["ministryofjustice.github.io."]
             },
             docs-hub-github-pages-cname = {
               type    = "CNAME"

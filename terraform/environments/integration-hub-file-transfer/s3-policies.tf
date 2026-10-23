@@ -1,5 +1,4 @@
 
-
 data "aws_iam_policy_document" "s3_audit" {
   statement {
     sid     = "AWSCloudTrailAclCheck"

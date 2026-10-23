@@ -1,4 +1,17 @@
+data "aws_ssoadmin_instances" "this" {
+  provider = aws.sso-readonly
+}
+
+data "aws_identitystore_group" "this" {
+  for_each          = local.transfer_iam_identity_center_groups
+  provider          = aws.sso-readonly
+  identity_store_id = one(data.aws_ssoadmin_instances.this.identity_store_ids)
+  group_id          = each.value
+}
+
 resource "aws_transfer_web_app" "this" {
+  access_endpoint = "https://${local.acm_domains.web_app}"
+
   identity_provider_details {
     identity_center_config {
       instance_arn = one(data.aws_ssoadmin_instances.this.arns)

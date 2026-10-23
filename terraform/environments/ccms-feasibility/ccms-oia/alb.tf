@@ -1,6 +1,11 @@
+# Shared load balancer access log bucket, managed in ccms-feasibility root
+data "aws_s3_bucket" "lb_access_logs" {
+  bucket = "${local.application_name}-lb-access-logs"
+}
+
 module "alb_opahub" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b08a04f9346b56b005fdff6fcd595dc04a60fb8a
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=b08a04f9346b56b005fdff6fcd595dc04a60fb8a"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=10d2292"
 
   name               = "${local.opahub_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -15,12 +20,22 @@ module "alb_opahub" {
 
   enable_deletion_protection = local.application_data.accounts[local.environment].alb_deletion_protection
 
+  access_logs = {
+    bucket = data.aws_s3_bucket.lb_access_logs.id
+    prefix = local.opahub_name
+  }
+
+  alarms = {
+    topic_arn         = data.aws_sns_topic.alerts.arn
+    min_healthy_hosts = local.application_data.accounts[local.environment].opa_app_count # same as the ECS service's desired_count
+  }
+
   tags = local.tags
 }
 
 module "alb_connector" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b08a04f9346b56b005fdff6fcd595dc04a60fb8a
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=b08a04f9346b56b005fdff6fcd595dc04a60fb8a"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=10d2292"
 
   name               = "${local.connector_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -35,12 +50,22 @@ module "alb_connector" {
 
   enable_deletion_protection = local.application_data.accounts[local.environment].alb_deletion_protection
 
+  access_logs = {
+    bucket = data.aws_s3_bucket.lb_access_logs.id
+    prefix = local.connector_name
+  }
+
+  alarms = {
+    topic_arn         = data.aws_sns_topic.alerts.arn
+    min_healthy_hosts = local.application_data.accounts[local.environment].connector_desired_count # same as the ECS service's desired_count
+  }
+
   tags = local.tags
 }
 
 module "alb_adaptor" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b08a04f9346b56b005fdff6fcd595dc04a60fb8a
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=b08a04f9346b56b005fdff6fcd595dc04a60fb8a"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=10d2292"
 
   name               = "${local.adaptor_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -54,6 +79,16 @@ module "alb_adaptor" {
   }
 
   enable_deletion_protection = local.application_data.accounts[local.environment].alb_deletion_protection
+
+  access_logs = {
+    bucket = data.aws_s3_bucket.lb_access_logs.id
+    prefix = local.adaptor_name
+  }
+
+  alarms = {
+    topic_arn         = data.aws_sns_topic.alerts.arn
+    min_healthy_hosts = local.application_data.accounts[local.environment].adaptor_desired_count # same as the ECS service's desired_count
+  }
 
   tags = local.tags
 }

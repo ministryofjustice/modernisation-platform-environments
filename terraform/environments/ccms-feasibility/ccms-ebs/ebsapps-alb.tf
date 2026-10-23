@@ -1,6 +1,11 @@
+# Shared load balancer access log bucket, managed in ccms-feasibility root
+data "aws_s3_bucket" "lb_access_logs" {
+  bucket = "${local.application_name}-lb-access-logs"
+}
+
 module "alb" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/08ee30f
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=08ee30f"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=10d2292"
 
   name               = "${local.component_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -19,6 +24,16 @@ module "alb" {
   }
 
   enable_deletion_protection = false
+
+  access_logs = {
+    bucket = data.aws_s3_bucket.lb_access_logs.id
+    prefix = local.component_name
+  }
+
+  alarms = {
+    topic_arn         = data.aws_sns_topic.alerts.arn
+    min_healthy_hosts = local.ebsapps_count # one target per EBS apps instance
+  }
 
   tags = local.tags
 }

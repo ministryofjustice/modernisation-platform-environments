@@ -13,7 +13,7 @@ locals {
     migration_environment_short_name       = "mis-dev"
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/dev/ec2-user.pub")
-    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
+    homepage_path                          = "/NDelius-war/delius/JSP/homepage.xhtml"
     has_mis_environment                    = true
   }
 
@@ -35,6 +35,7 @@ locals {
   db_config_dev = {
     instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    pinned_ami_id  = "ami-0dd96e2b8b5825449"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -81,12 +82,14 @@ locals {
     # Weblogic/EIS ECS config managed here: https://github.com/ministryofjustice/delius-releases
     weblogic = {
       ec2_instance_type = "r7i.large"
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
       asg_min_size      = 1
       asg_max_size      = 1
     }
 
     weblogic_eis = {
       ec2_instance_type = "r7i.large"
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
       asg_min_size      = 1
       asg_max_size      = 1
     }
@@ -155,5 +158,11 @@ locals {
     object_lock_days             = 3
     expire_current_after_days    = 80
     expire_noncurrent_after_days = 10
+  }
+
+  aws_health_lambda_configuration_development = {
+    enabled               = local.is-development
+    aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
+    rule_name             = "ForwardAllHealthEvents"
   }
 }

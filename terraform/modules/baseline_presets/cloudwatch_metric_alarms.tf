@@ -357,6 +357,52 @@ locals {
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
+    ec2_instance_cwagent_collectd_rclone_sync = {
+      rclone-sync-error = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_rclone_sync_value"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if any metric collected via /opt/textfile_monitoring/rclone_sync is in error, See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/6319178819"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      rclone-sync-metric-not-updated = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_rclone_sync_seconds"
+        period              = "300"
+        statistic           = "Minimum"
+        threshold           = "7200"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if no metrics in /opt/textfile_monitoring/rclone_sync have been updated in the last 2 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/6319572194"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+
+    lambda = {
+      lambda-error-count = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
+        metric_name         = "Errors"
+        namespace           = "AWS/Lambda"
+        period              = tostring(var.options.cloudwatch_metric_alarms_lambda_error_period)
+        statistic           = "Sum"
+        threshold           = "1"
+        alarm_description   = "Triggers if there has been at least one failed Lambda invocation during the configured evaluation period"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+        dimensions          = var.options.cloudwatch_metric_alarms_lambda_function_name != null ? { FunctionName = var.options.cloudwatch_metric_alarms_lambda_function_name } : {}
+      }
+    }
 
     lb = {
       unhealthy-load-balancer-host = {
@@ -373,6 +419,7 @@ locals {
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
+
     network_lb = {
       unhealthy-network-load-balancer-host = {
         comparison_operator = "GreaterThanOrEqualToThreshold"

@@ -1,3 +1,14 @@
+module "litellm_registry_secret" {
+  count = try(local.environment_configuration.litellm_image_pull_secret, "") != "" ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name = "${local.component_name}/litellm-registry"
+
+  secret_string         = jsonencode({ auths = {} })
+  ignore_secret_changes = true
+}
+
 module "litellm_license_secret" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 

@@ -34,6 +34,21 @@ module "dms_validation_step_function" {
   type = "STANDARD"
 }
 
+# ------------------------------------------
+# DLT Iceberg Maintenance Step Function
+# ------------------------------------------
+
+module "dlt_iceberg_maintenance" {
+  source       = "./modules/step_function"
+  name         = "dlt-iceberg-maintenance"
+  type         = "STANDARD"
+  iam_policies = tomap({ "invoke_maintenance_lambdas" = aws_iam_policy.dlt_iceberg_maintenance_invoke })
+  variable_dictionary = tomap({
+    "trigger_arn" = module.trigger_dlt_iceberg_maintenance.lambda_function_arn,
+    "poll_arn"    = module.poll_dlt_iceberg_maintenance.lambda_function_arn,
+  })
+}
+
 
 # ------------------------------------------
 # Data Cut Back Step Function
@@ -68,6 +83,7 @@ module "ears_sars_step_function" {
     {
       "ears_sars_request"   = module.ears_sars_request[0].lambda_function_name,
       "write_to_sharepoint" = module.write_to_sharepoint[0].lambda_function_name,
+      "send_email"          = module.send_ear_sar_response[0].lambda_function_name,
     }
   )
   type = "STANDARD"
@@ -130,8 +146,10 @@ module "iceberg_table_maintenance_step_function" {
 # ------------------------------------------
 
 module "merge_into_mdss_staged_position" {
-  source       = "./modules/merge_into_reconciler"
-  function_to_iterate = module.merge_mdss_staged_position[0]
+  source                  = "./modules/merge_into_reconciler"
+  function_to_iterate     = module.merge_mdss_staged_position[0]
+  planner_function_arn    = module.merge_redrive_planner.lambda_function_arn
+  reconciliation_consumer = "STAGED"
 }
 
 # ------------------------------------------
@@ -139,7 +157,7 @@ module "merge_into_mdss_staged_position" {
 # ------------------------------------------
 
 module "merge_into_mdss_staged_event" {
-  source       = "./modules/merge_into_reconciler"
+  source              = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_mdss_staged_event[0]
 }
 
@@ -148,8 +166,10 @@ module "merge_into_mdss_staged_event" {
 # ------------------------------------------
 
 module "merge_into_emdi_position" {
-  source       = "./modules/merge_into_reconciler"
-  function_to_iterate = module.merge_emdi_position[0]
+  source                  = "./modules/merge_into_reconciler"
+  function_to_iterate     = module.merge_emdi_position[0]
+  planner_function_arn    = module.merge_redrive_planner.lambda_function_arn
+  reconciliation_consumer = "EMDI"
 }
 
 # ------------------------------------------
@@ -157,8 +177,10 @@ module "merge_into_emdi_position" {
 # ------------------------------------------
 
 module "merge_into_mdss_ac_position" {
-  source       = "./modules/merge_into_reconciler"
-  function_to_iterate = module.merge_ac_position[0]
+  source                  = "./modules/merge_into_reconciler"
+  function_to_iterate     = module.merge_ac_position[0]
+  planner_function_arn    = module.merge_redrive_planner.lambda_function_arn
+  reconciliation_consumer = "AC"
 }
 
 # ------------------------------------------------------------------------------
@@ -401,9 +423,9 @@ module "trigger_cadt_step_function" {
   iam_policies = tomap({ "trigger_cadt_step_function_policy" = aws_iam_policy.trigger_cadt_step_function_policy })
   variable_dictionary = tomap(
     {
-      "trigger_cadt"  = module.trigger_cadt.lambda_function_name,
-      "environment"   = local.environment,
-      "poll_cadt"     = module.poll_cadt.lambda_function_name,
+      "trigger_cadt" = module.trigger_cadt.lambda_function_name,
+      "environment"  = local.environment,
+      "poll_cadt"    = module.poll_cadt.lambda_function_name,
     }
   )
   type = "STANDARD"

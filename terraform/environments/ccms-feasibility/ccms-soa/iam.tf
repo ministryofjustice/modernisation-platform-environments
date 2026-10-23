@@ -118,9 +118,12 @@ resource "aws_iam_policy" "ecs_secrets" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect   = "Allow"
-      Action   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
-      Resource = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${local.component_name}*"]
+      Effect = "Allow"
+      Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
+      Resource = [
+        "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${local.component_name}*",
+        data.aws_secretsmanager_secret.slack_webhooks.arn, # root alerting secret, for SLACK_CHANNEL_WEBHOOK
+      ]
     }]
   })
 }

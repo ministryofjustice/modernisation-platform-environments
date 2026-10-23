@@ -6,6 +6,10 @@ locals {
     maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
+  aws_health_lambda_configuration_production = {
+    enabled = false
+  }
+
   baseline_presets_production = {
     options = {
       db_backup_object_lock_days          = 14
@@ -48,7 +52,6 @@ locals {
         start          = "-PT6H"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
-          local.cloudwatch_dashboard_widget_groups.connectivity,
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.xtag,
           local.cloudwatch_dashboard_widget_groups.asg,
@@ -445,7 +448,6 @@ locals {
         cloudwatch_metric_alarms = merge(
           local.cloudwatch_metric_alarms.db,
           local.cloudwatch_metric_alarms.db_connected,
-          local.cloudwatch_metric_alarms.db_connectivity_test,
         )
         config = merge(local.ec2_instances.db.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"

@@ -1,7 +1,7 @@
 module "lambda_file_received_adapter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   architectures                     = ["arm64"]
   attach_dead_letter_policy         = true
@@ -68,7 +68,7 @@ module "lambda_file_received_adapter" {
 module "lambda_file_scan_result_recorded_adapter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   architectures                     = ["arm64"]
   attach_dead_letter_policy         = true
@@ -126,9 +126,7 @@ module "lambda_file_scan_result_recorded_adapter" {
       effect = "Allow"
       actions = [
         "s3:GetObject",
-        "s3:GetObjectTagging",
         "s3:GetObjectVersion",
-        "s3:GetObjectVersionTagging",
       ]
       resources = ["${module.s3_bucket["processing"].s3_bucket_arn}/*"]
     }
@@ -149,7 +147,7 @@ module "lambda_file_scan_result_recorded_adapter" {
 module "lambda_stage" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   architectures                     = ["arm64"]
   attach_dead_letter_policy         = true
@@ -274,7 +272,7 @@ module "lambda_stage" {
 module "lambda_route" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   architectures                     = ["arm64"]
   attach_dead_letter_policy         = true
@@ -398,7 +396,7 @@ module "lambda_route" {
 module "lambda_file_action_execution_requested_adapter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   architectures                     = ["arm64"]
   attach_dead_letter_policy         = true
@@ -421,12 +419,14 @@ module "lambda_file_action_execution_requested_adapter" {
   trigger_on_package_timestamp      = false
 
   environment_variables = {
-    DISPATCH_SECRET_NAME_PREFIX = local.file_dispatch_secret_name_prefix
-    EVENT_BUS_ARN               = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
-    IDEMPOTENCY_EXPIRY_SECONDS  = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
-    IDEMPOTENCY_TABLE           = module.dynamodb_adapter_idempotency.dynamodb_table_id
-    POWERTOOLS_LOG_LEVEL        = "INFO"
-    POWERTOOLS_SERVICE_NAME     = "file-action-execution-requested-adapter"
+    DISPATCH_SECRET_NAME_PREFIX  = local.file_dispatch_secret_name_prefix
+    EVENT_BUS_ARN                = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
+    IDEMPOTENCY_EXPIRY_SECONDS   = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE            = module.dynamodb_adapter_idempotency.dynamodb_table_id
+    POWERTOOLS_LOG_LEVEL         = "INFO"
+    POWERTOOLS_METRICS_NAMESPACE = "IntegrationHubFileTransfer"
+    POWERTOOLS_SERVICE_NAME      = "file-action-execution-requested-adapter"
+    WORKFLOW_IDEMPOTENCY_TABLE   = module.dynamodb_file_transfer_idempotency.dynamodb_table_id
   }
 
   attach_policy_statements = true
@@ -445,6 +445,11 @@ module "lambda_file_action_execution_requested_adapter" {
         "dynamodb:UpdateItem",
       ]
       resources = [module.dynamodb_adapter_idempotency.dynamodb_table_arn]
+    }
+    read_staging_record = {
+      effect    = "Allow"
+      actions   = ["dynamodb:GetItem"]
+      resources = [module.dynamodb_file_transfer_idempotency.dynamodb_table_arn]
     }
     read_dispatch_configuration = {
       effect  = "Allow"

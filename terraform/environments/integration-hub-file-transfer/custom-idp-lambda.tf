@@ -1,7 +1,7 @@
 module "lambda_custom_idp_layer" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   architectures   = ["arm64"]
   create_function = false
@@ -20,7 +20,7 @@ module "lambda_custom_idp_layer" {
 module "lambda_custom_idp" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  version = "8.9.0"
 
   function_name                  = "${local.application_name}-custom-idp"
   architectures                  = ["arm64"]

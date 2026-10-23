@@ -326,7 +326,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_host_memory_critical" {
   tags = merge(var.tags, { app = var.name })
 }
 
-resource "aws_cloudwatch_metric_alarm" "ecs_desired-task-count-warning" {
+resource "aws_cloudwatch_metric_alarm" "ecs_desired_task_count_warning" {
   alarm_name          = "${var.name}-${var.env_name}-desired-task-count-warning"
   alarm_description   = "ECS service tasks below desired amount"
   actions_enabled     = true
@@ -351,20 +351,20 @@ resource "aws_cloudwatch_metric_alarm" "ecs_desired-task-count-warning" {
 }
 
 ######################################
-###           ALB Alarms           ###
+###      Target Group Alarms       ###
 ######################################
 resource "aws_cloudwatch_metric_alarm" "alb_response_time_critical" {
   count               = var.microservice_lb != null ? 1 : 0
   alarm_name          = "${var.name}-${var.env_name}-response-time-critical"
-  alarm_description   = "Average response time for the `${var.name}` service exceeded 5 seconds."
+  alarm_description   = "P9 response time for the `${var.name}` service exceeded 10 seconds."
   namespace           = "AWS/ApplicationELB"
-  statistic           = "Average"
+  extended_statistic  = "p99"
   metric_name         = "TargetResponseTime"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  threshold           = 5
+  threshold           = 10
   treat_missing_data  = "notBreaching"
-  evaluation_periods  = 1
-  period              = 300
+  evaluation_periods  = 5
+  period              = 60
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   dimensions = {
@@ -383,7 +383,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_warning" {
   statistic           = "Sum"
   metric_name         = "HTTPCode_Target_5XX_Count"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  threshold           = 1
+  threshold           = 5
   treat_missing_data  = "notBreaching"
   evaluation_periods  = 2
   period              = 60

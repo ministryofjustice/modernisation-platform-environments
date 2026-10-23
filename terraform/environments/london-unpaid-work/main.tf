@@ -69,15 +69,33 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "security_groups", {}),
   )
 
-  ec2_instances = merge(
-    lookup(local.baseline_all_environments, "ec2_instances", {}),
-    lookup(local.baseline_environment_specific, "ec2_instances", {}),
-  )
-
   iam_policies = merge(
     module.baseline_presets.iam_policies,
     lookup(local.baseline_all_environments, "iam_policies", {}),
     lookup(local.baseline_environment_specific, "iam_policies", {}),
   )
+
+  kms_grants = merge(
+    module.baseline_presets.kms_grants,
+    lookup(local.baseline_all_environments, "kms_grants", {}),
+    lookup(local.baseline_environment_specific, "kms_grants", {}),
+  )
+
+  ec2_autoscaling_groups = merge(
+    lookup(local.baseline_all_environments, "ec2_autoscaling_groups", {}),
+    lookup(local.baseline_environment_specific, "ec2_autoscaling_groups", {}),
+  )
+
+  ec2_instances = merge(
+    lookup(local.baseline_all_environments, "ec2_instances", {}),
+    lookup(local.baseline_environment_specific, "ec2_instances", {}),
+  )
 }
 
+module "github_workflow_scheduler" {
+  source                     = "../../modules/github_lambda"
+  aws_account_id             = data.aws_caller_identity.current.id
+  project_name               = "london-unpaid-work-github-trigger"
+  enable_outbound_federation = false # Already set in this account
+  github_workflows           = local.github_workflows
+}

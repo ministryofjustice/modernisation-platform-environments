@@ -16,6 +16,7 @@ module "weblogic_testdata_api" {
   name              = "weblogic-data"
   create_service    = "false"
   env_name          = var.env_name
+  desired_count     = data.aws_ssm_parameter.weblogic_data_task_count[0].value
   account_config    = var.account_config
   account_info      = var.account_info
   capacity_provider = aws_ecs_capacity_provider.weblogic_testdata_api[0].name
@@ -82,7 +83,7 @@ resource "aws_launch_template" "weblogic_testdata_api" {
   count = var.env_name == "test" ? 1 : 0
 
   name_prefix   = "weblogic-testdata-api-${var.env_name}-ecs-"
-  image_id      = data.aws_ami.ecs_ami.id
+  image_id      = var.delius_microservice_configs.weblogic_testdata_api.ami_id
   instance_type = var.delius_microservice_configs.weblogic_testdata_api.ec2_instance_type
 
   user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", { ecs_cluster_name = module.ecs.ecs_cluster_name }))
@@ -111,7 +112,7 @@ resource "aws_autoscaling_group" "weblogic_testdata_api" {
   name                  = "weblogic-testdata-api-${var.env_name}-ecs-asg"
   max_size              = 1
   min_size              = 1
-  protect_from_scale_in = true
+  protect_from_scale_in = var.enable_autoscaling_schedule ? false : true
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
 
@@ -144,8 +145,30 @@ resource "aws_ecs_capacity_provider" "weblogic_testdata_api" {
       target_capacity = 100
     }
 
-    managed_termination_protection = "ENABLED"
+    managed_termination_protection = var.enable_autoscaling_schedule ? "DISABLED" : "ENABLED"
   }
+}
+
+resource "aws_autoscaling_schedule" "weblogic_data_scale_down" {
+  count = var.env_name == "test" && var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-data-${var.env_name}-scaledown"
+  min_size               = 0
+  max_size               = 0
+  desired_capacity       = 0
+  recurrence             = "0 19 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic_testdata_api[0].name
+}
+
+resource "aws_autoscaling_schedule" "weblogic_data_scale_up" {
+  count = var.env_name == "test" && var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-data-${var.env_name}-scaleup"
+  min_size               = var.delius_microservice_configs.weblogic_testdata_api.asg_min_size
+  max_size               = var.delius_microservice_configs.weblogic_testdata_api.asg_max_size
+  desired_capacity       = var.delius_microservice_configs.weblogic_testdata_api.asg_min_size
+  recurrence             = "0 5 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic_testdata_api[0].name
 }
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_testdata_api" {
@@ -172,4 +195,20 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_testdata_a
     type             = "forward"
     target_group_arn = module.weblogic_testdata_api[0].target_group_arn
   }
+}
+
+locals {
+  weblogic_data_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic-data"
+}
+
+module "ecs_nightly_restart_weblogic_data" {
+  count  = var.env_name == "test" ? 1 : 0
+  source = "../components/ecs_nightly_restart"
+
+  env_name     = var.env_name
+  app_name     = "weblogic-data"
+  cluster_name = module.ecs.ecs_cluster_arn
+  service_name = "${var.env_name}-weblogic-data"
+  service_arn  = local.weblogic_data_service_arn
+  task_count   = data.aws_ssm_parameter.weblogic_data_task_count[0].value
 }

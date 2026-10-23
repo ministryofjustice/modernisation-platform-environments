@@ -34,7 +34,8 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
         "alarmName" : concat(
           [
             aws_cloudwatch_metric_alarm.glue_database_count_high.alarm_name,
-            aws_cloudwatch_metric_alarm.mdss_reconciler_errors_alarm[0].alarm_name
+            aws_cloudwatch_metric_alarm.mdss_reconciler_errors_alarm[0].alarm_name,
+            aws_cloudwatch_metric_alarm.fms_audit_write_failed.alarm_name
           ],
           [
             for _, alarm in aws_cloudwatch_metric_alarm.sqs_dlq_has_messages :
@@ -58,6 +59,22 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
           ],
           [
             for _, alarm in aws_cloudwatch_metric_alarm.merge_lambdas_long_queue :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.specials_guard_detected :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.specials_guard_cleanup_failed :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.specials_guard_heartbeat_missing :
+            alarm.alarm_name
+          ],
+          [
+            for alarm in aws_cloudwatch_metric_alarm.specials_guard_lambda_errors :
             alarm.alarm_name
           ],
         )

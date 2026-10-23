@@ -4,38 +4,38 @@ resource "aws_security_group" "transfer" {
   vpc_id      = module.vpc_isolated.vpc_id
 
   dynamic "ingress" {
-    for_each = local.transfer_user_cidr_blocks
+    for_each = local.transfer_cidr_blocks
 
     content {
-      description = "SFTP from ${ingress.key}"
+      description = "SFTP"
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = ingress.value
+      cidr_blocks = [ingress.value]
     }
   }
 
   dynamic "ingress" {
-    for_each = local.transfer_user_cidr_blocks
+    for_each = local.transfer_cidr_blocks
 
     content {
-      description = "FTPS control from ${ingress.key}"
+      description = "FTPS control"
       from_port   = 21
       to_port     = 21
       protocol    = "tcp"
-      cidr_blocks = ingress.value
+      cidr_blocks = [ingress.value]
     }
   }
 
   dynamic "ingress" {
-    for_each = local.transfer_user_cidr_blocks
+    for_each = local.transfer_cidr_blocks
 
     content {
-      description = "FTPS data from ${ingress.key}"
+      description = "FTPS data"
       from_port   = 8192
       to_port     = 8200
       protocol    = "tcp"
-      cidr_blocks = ingress.value
+      cidr_blocks = [ingress.value]
     }
   }
 

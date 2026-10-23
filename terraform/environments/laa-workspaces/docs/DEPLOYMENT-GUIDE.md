@@ -525,7 +525,7 @@ Open browser: `https://workspace-mfa.laa-development.modernisation-platform.serv
 3. Fill in the form:
 
 | Field | Value |
-|-------|-------|
+| ------- | ------- |
 | **Resolver name** | `LAA-AD-Users` |
 | **Server-URI** | `ldap://10.200.1.245, ldap://10.200.2.11` ⭐ Use AD DNS IPs from Step 2.7 |
 | **BaseDN** | `OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local` |
@@ -1283,7 +1283,7 @@ Use this checklist to track your deployment progress:
 ### Network Ports
 
 | Source | Destination | Port | Protocol | Purpose |
-|--------|-------------|------|----------|---------|
+| -------- | ------------- | ------ | ---------- | --------- |
 | Internet | ALB | 80 | TCP | HTTP (redirects to HTTPS) |
 | Internet | ALB | 443 | TCP | HTTPS (user portal) |
 | ALB | RADIUS EC2 | 443 | TCP | Backend HTTPS |
@@ -1296,7 +1296,7 @@ Use this checklist to track your deployment progress:
 ## Cost Estimation (Development Environment)
 
 | Resource | Specification | Monthly Cost |
-|----------|--------------|--------------|
+| ---------- | -------------- | -------------- |
 | EC2 (RADIUS) | 1x t3.medium | ~$30 |
 | EBS | 30GB gp3 | ~$2.40 |
 | ALB | Standard | ~$20 |

@@ -20,7 +20,7 @@ locals {
 }
 
 module "instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=10a406200823b3d1a7f183ed0a44255fd6ee2ffc" # v4.1.0
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=f6c3bf0a96f9391cb8d6a89227b55f05f6bf60a7" # v4.3.0
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts

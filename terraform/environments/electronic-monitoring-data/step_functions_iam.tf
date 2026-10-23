@@ -69,9 +69,13 @@ resource "aws_iam_policy" "data_cutback_step_function_policy" {
 data "aws_iam_policy_document" "ears_sars_policy_document" {
   count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   statement {
-    effect    = "Allow"
-    actions   = ["lambda:InvokeFunction"]
-    resources = [module.ears_sars_request[0].lambda_function_arn, module.write_to_sharepoint[0].lambda_function_arn, ]
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [
+      module.ears_sars_request[0].lambda_function_arn,
+      module.write_to_sharepoint[0].lambda_function_arn,
+      module.send_ear_sar_response[0].lambda_function_arn,
+    ]
   }
 }
 
@@ -301,3 +305,81 @@ resource "aws_iam_policy" "trigger_cadt_step_function_policy" {
   name   = "trigger_cadt_step_function_role"
   policy = data.aws_iam_policy_document.trigger_cadt_step_function_policy_document.json
 }
+
+# ------------------------------------------------------------------------------
+# DLT Iceberg maintenance trigger policy
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "dlt_iceberg_maintenance_invoke" {
+  statement {
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [
+      module.trigger_dlt_iceberg_maintenance.lambda_function_arn,
+      module.poll_dlt_iceberg_maintenance.lambda_function_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "dlt_iceberg_maintenance_invoke" {
+  name   = "dlt-iceberg-maintenance-invoke"
+  policy = data.aws_iam_policy_document.dlt_iceberg_maintenance_invoke.json
+}
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation scheduler
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "downstream_reconciliation_scheduler" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_scheduler_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Principal = {
+          Service = "scheduler.amazonaws.com"
+        }
+
+        Action = "sts:AssumeRole"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_scheduler_start_policy"
+  role = aws_iam_role.downstream_reconciliation_scheduler[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "states:StartExecution",
+        ]
+
+        Resource = [
+          module.merge_into_mdss_staged_position.arn,
+          module.merge_into_mdss_ac_position.arn,
+          module.merge_into_emdi_position.arn,
+        ]
+      },
+    ]
+  })
+}
+

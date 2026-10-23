@@ -31,9 +31,12 @@ resource "helm_release" "litellm_admin" {
       "${path.module}/src/helm/values/litellm-admin/values.yml.tftpl",
       {
         # Kubernetes
-        namespace          = local.component_name
-        imageRepository    = "ghcr.io/berriai/litellm-non_root"
-        imageTag           = local.environment_configuration.litellm_version
+        namespace = local.component_name
+        # imageRepository    = "ghcr.io/berriai/litellm-non_root"
+        # imageTag           = local.environment_configuration.litellm_version
+        imageRepository    = try(local.environment_configuration.litellm_image_repository, "ghcr.io/berriai/litellm-non_root")
+        imageTag           = try(local.environment_configuration.litellm_image_tag, local.environment_configuration.litellm_version)
+        imagePullSecret    = try(local.environment_configuration.litellm_image_pull_secret, "")
         serviceAccountName = kubernetes_service_account_v1.ai_gateway.metadata[0].name
         ingressHostname    = "admin.${local.environment_configuration.ai_gateway_hostname}"
         proxyHostname      = local.environment_configuration.ai_gateway_hostname
@@ -83,6 +86,7 @@ resource "helm_release" "litellm_admin" {
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_config_map_v1.google_application_credentials,
     kubernetes_manifest.external_secret_litellm_license,
+    kubernetes_manifest.external_secret_litellm_registry,
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
@@ -102,9 +106,12 @@ resource "helm_release" "litellm" {
       "${path.module}/src/helm/values/litellm/values.yml.tftpl",
       {
         # Kubernetes
-        namespace          = local.component_name
-        imageRepository    = "ghcr.io/berriai/litellm-non_root"
-        imageTag           = local.environment_configuration.litellm_version
+        namespace = local.component_name
+        # imageRepository    = "ghcr.io/berriai/litellm-non_root"
+        # imageTag           = local.environment_configuration.litellm_version
+        imageRepository    = try(local.environment_configuration.litellm_image_repository, "ghcr.io/berriai/litellm-non_root")
+        imageTag           = try(local.environment_configuration.litellm_image_tag, local.environment_configuration.litellm_version)
+        imagePullSecret    = try(local.environment_configuration.litellm_image_pull_secret, "")
         serviceAccountName = kubernetes_service_account_v1.ai_gateway.metadata[0].name
         ingressHostname    = local.environment_configuration.ai_gateway_hostname
 
@@ -161,6 +168,7 @@ resource "helm_release" "litellm" {
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_config_map_v1.google_application_credentials,
     kubernetes_manifest.external_secret_litellm_license,
+    kubernetes_manifest.external_secret_litellm_registry,
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
