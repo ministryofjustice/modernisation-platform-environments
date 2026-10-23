@@ -6,6 +6,10 @@ provider "awscc" {
   } : null
 }
 
+# resource "aws_costoptimizationhub_enrollment_status" "enroll_costoptimizationhub_include_member_accounts" {
+#   include_member_accounts = true
+# }
+
 resource "awscc_iam_service_linked_role" "bcm_data_exports" {
   aws_service_name = "bcm-data-exports.amazonaws.com"
   description      = "Service-linked role for AWS BCM Data Exports"
@@ -67,7 +71,7 @@ resource "awscc_bcmdataexports_export" "coh_no_ri_sp_export" {
       s3_destination = {
         s3_bucket = "cloud-platform-4e74939a04d400578bfbe3f3f707b07e"
         s3_region = "eu-west-2"
-        s3_prefix = "coh-reports-auto/"
+        s3_prefix = "coh-reports-auto"
         s3_bucket_owner = "754256621582"
 
         s3_output_configurations = {
