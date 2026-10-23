@@ -11,6 +11,13 @@ locals {
       job_status = "approved"
       target_arn = module.step_functions_control_plane.resume_arn
     },
+    {
+      name       = "build-rejected"
+      event_name = "INSERT"
+      job_stage  = "control_plane"
+      job_status = "rejected"
+      target_arn = module.step_functions_control_plane.resume_arn
+    },
   ]
 }
 

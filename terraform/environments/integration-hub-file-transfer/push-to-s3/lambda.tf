@@ -1,3 +1,11 @@
+data "aws_kms_key" "secrets" {
+  key_id = local.secrets_kms_key_alias
+}
+
+data "aws_kms_key" "logs" {
+  key_id = local.logs_kms_key_alias
+}
+
 module "lambda_file_mover" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"

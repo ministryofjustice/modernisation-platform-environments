@@ -139,6 +139,14 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "logs:DeleteLogGroup",
       "logs:CreateLogStream",
       "logs:CreateLogDelivery",
+      # DeleteLogDelivery/UpdateLogDelivery are required for AMP's CloudWatch
+      # Logs (vended-log) delivery: deleting a workspace that has a rules/alerting
+      # logging configuration tears down the log delivery as the caller, so
+      # without these DeleteWorkspace fails with a misleading 403 AccessDenied.
+      # See ministryofjustice/cloud-platform#8611 and the AMP CloudWatch Logs
+      # required-permissions policy.
+      "logs:DeleteLogDelivery",
+      "logs:UpdateLogDelivery",
       "logs:CreateDelivery",
       "logs:DeleteDelivery*",
       "logs:GetDelivery*",
