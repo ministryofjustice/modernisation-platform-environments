@@ -1,6 +1,6 @@
 # ECS Cluster
 resource "aws_ecs_cluster" "opa" {
-  name = "${local.first_cluster_name}"
+  name = local.first_cluster_name
 
   setting {
     name  = "containerInsights"
@@ -9,7 +9,7 @@ resource "aws_ecs_cluster" "opa" {
 }
 
 resource "aws_ecs_cluster" "conn_saa" {
-  name = "${local.second_cluster_name}"
+  name = local.second_cluster_name
 
   setting {
     name  = "containerInsights"

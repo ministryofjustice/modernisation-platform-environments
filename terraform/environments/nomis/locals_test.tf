@@ -274,7 +274,7 @@ locals {
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
           data  = { total_size = 1000 }
-          flash = { total_size = 50 }
+          flash = { total_size = 100 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true

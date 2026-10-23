@@ -17,6 +17,8 @@ locals {
   # its staging_bucket_name output yet -- remove once it has been.
   forge_package_s3_bucket = var.forge_package_s3_bucket != "" ? var.forge_package_s3_bucket : try(data.terraform_remote_state.backend_processing.outputs.staging_bucket_name, "")
 
+  build_review_table_name = try(data.terraform_remote_state.backend_processing.outputs.build_details_table_name, "${local.application_name}-build-details")
+
   # Private subnets for ECS/EFS, sourced from the shared-VPC lookups
   # defined in platform_data.tf (data.aws_vpc.shared et al).
   private_subnet_ids = [

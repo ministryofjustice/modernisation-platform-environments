@@ -48,7 +48,3 @@ output "nlb_target_group_arn_map" {
 output "nlb_service_r53_record" {
   value = try(aws_route53_record.services_nlb_r53_record[0].fqdn, null)
 }
-
-output "nightly_muted_alarm_names" {
-  value = concat([aws_cloudwatch_metric_alarm.ecs_desired_task_count_warning.alarm_name], length(aws_cloudwatch_metric_alarm.ecs_healthy_hosts_fatal) > 0 ? [aws_cloudwatch_metric_alarm.ecs_healthy_hosts_fatal[0].alarm_name] : [])
-}

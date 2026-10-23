@@ -59,11 +59,11 @@ resource "aws_vpc_security_group_ingress_rule" "connector_alb_ingress_workspace"
 
 # Restricted outbound traffic to OIA ECS Tasks
 resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_ecs_tasks" {
-  security_group_id = aws_security_group.connector_load_balancer.id
-  ip_protocol       = "tcp"
-  description       = "Allow outbound traffic to ECS tasks"
-  from_port         = local.application_data.accounts[local.environment].connector_server_port
-  to_port           = local.application_data.accounts[local.environment].connector_server_port
+  security_group_id            = aws_security_group.connector_load_balancer.id
+  ip_protocol                  = "tcp"
+  description                  = "Allow outbound traffic to ECS tasks"
+  from_port                    = local.application_data.accounts[local.environment].connector_server_port
+  to_port                      = local.application_data.accounts[local.environment].connector_server_port
   referenced_security_group_id = aws_security_group.ecs_tasks_connector.id
 }
 
