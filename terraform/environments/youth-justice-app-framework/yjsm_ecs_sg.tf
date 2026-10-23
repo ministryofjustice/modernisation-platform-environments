@@ -11,4 +11,10 @@ resource "aws_security_group" "yjsm_ecs_sg" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(local.tags, { Name = "yjsm-ecs-sg-${local.environment}" })
+
+  # The ECS task definitions are create_before_destroy, so a replacement of this
+  # group has to be too or the plan cycles.
+  lifecycle {
+    create_before_destroy = true
+  }
 }
