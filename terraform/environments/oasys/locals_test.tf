@@ -245,34 +245,7 @@ locals {
           description         = "t2 oasys database"
           instance-scheduling = "skip-scheduling"
           oasys-environment   = "t2"
-          oracle-sids         = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2ONRAUD T2ONRBDS T2ONRSYS"
-        })
-      })
-
-      t2-onr-db-a = merge(local.ec2_instances.db11g, { # needs the terraform aws provider/user-data fix + resize
-        cloudwatch_metric_alarms = {}                  # instance is ear marked for deletion
-        config = merge(local.ec2_instances.db11g.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
-            "Ec2T2DatabasePolicy",
-          ])
-        })
-        ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100 } # /u01
-          "/dev/sdc" = { label = "app", size = 500 } # /u02
-          "/dev/sde" = { label = "data", size = 2000, iops = 3000, throughput = 125 }
-          "/dev/sdj" = { label = "flash", size = 600, iops = 3000, throughput = 125 }
-          "/dev/sds" = { label = "swap", size = 2 }
-        }
-        instance = merge(local.ec2_instances.db11g.instance, {
-          disable_api_termination = true
-          instance_type           = "r6i.xlarge"
-          #instance_type           = "r6i.large"
-        })
-        tags = merge(local.ec2_instances.db11g.tags, {
-          instance-scheduling = "skip-scheduling"
-          oasys-environment   = "t2"
-          oracle-sids         = "T2BOSYS T2BOAUD" # these DBs are on t2-oasys host
+          oracle-sids         = "T2BIPINF T2MISTRN T2OASREP T2OASYS T2OASYS2 T2ONRAUD T2ONRBDS T2ONRSYS T2BOAUD T2BOSYS"
         })
       })
     }
