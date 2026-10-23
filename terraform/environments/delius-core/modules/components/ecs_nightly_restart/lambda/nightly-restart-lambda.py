@@ -7,8 +7,9 @@ cloudwatch = boto3.client("cloudwatch")
 
 
 def get_alarm_names():
-    tag_key = "app"
-    tag_value = os.environ["APP_NAME"]
+    print("Fetching CloudWatch alarms...", flush=True)
+    tag_key = "service"
+    tag_value = os.environ["SERVICE"]
 
     paginator = cloudwatch.get_paginator("describe_alarms")
     alarm_names = []
