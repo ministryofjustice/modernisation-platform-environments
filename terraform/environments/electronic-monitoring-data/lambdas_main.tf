@@ -1661,7 +1661,8 @@ module "register_athena" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    ENVIRONMENT_NAME = local.env_name
+    ENVIRONMENT_NAME     = local.env_name
+    RAW_FORMATTED_BUCKET = "s3://${module.s3-raw-formatted-data-bucket.bucket.id}"
   }
 
   depends_on = [
