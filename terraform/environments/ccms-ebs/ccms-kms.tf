@@ -113,7 +113,7 @@ data "aws_iam_policy_document" "s3_dbbackup_kms_policy" {
 
 resource "aws_kms_alias" "s3_dbbackup_kms_alias" {
   name          = "alias/s3-dbbackup-alias"
-  target_key_id = aws_kms_key.s3_sftp_kms_key.key_id
+  target_key_id = aws_kms_key.s3_dbbackup_kms_key.key_id
 }
 
 resource "aws_kms_key" "s3_dbbackup_kms_key" {
