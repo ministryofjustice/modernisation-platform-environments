@@ -109,6 +109,17 @@ module "s3-bucket-logging" {
       }
 
       abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+    },
+    {
+      id      = "s3-access-log-expire-after-90"
+      enabled = "Enabled"
+      prefix  = "s3-access-logs/"
+      expiration = {
+        days = 90
+      }
+      noncurrent_version_expiration = {
+        days = 90
+      }
     }
   ]
 
@@ -232,17 +243,6 @@ module "s3-bucket-dbbackup" {
       }
 
       abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].rman_s3_lifecycle_days_abort_incomplete_multipart_upload_days
-    },
-    {
-      id      = "s3-access-log-expire-after-90"
-      enabled = "Enabled"
-      prefix  = "s3-access-logs/"
-      expiration = {
-        days = 90
-      }
-      noncurrent_version_expiration = {
-        days = 90
-      }
     }
   ]
 
