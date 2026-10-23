@@ -79,7 +79,7 @@ resource "aws_sfn_state_machine" "ecs_restart" {
         Catch = [{
           ErrorEquals = ["States.ALL"]
           ResultPath  = "$.error"
-          Next        = "EnableAlarmsAfterFailure"
+          Next        = "StartDeployment"
         }]
 
         Next = "StartDeployment"

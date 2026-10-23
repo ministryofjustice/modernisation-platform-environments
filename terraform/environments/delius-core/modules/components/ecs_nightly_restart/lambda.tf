@@ -84,7 +84,6 @@ resource "aws_lambda_function" "nightly_restart_lambda" {
       CLUSTER       = var.cluster_name
       SERVICE       = var.service_name
       DESIRED_COUNT = var.task_count
-      APP_NAME      = var.app_name
     }
   }
 }
