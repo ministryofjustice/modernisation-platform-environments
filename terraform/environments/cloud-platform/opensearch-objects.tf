@@ -49,8 +49,8 @@ locals {
   opensearch_objects_enabled = local.enable_opensearch && lookup(local.environment_configuration, "opensearch_objects_enabled", false)
 
   # Separate gate for roles and mappings, so turning them on doesn't also try to
-  # build the ingestion pipeline. Off by default. Before switching on: map the
-  # apply role to security_manager by hand (one-off bootstrap, see #8592).
+  # build the ingestion pipeline. Off by default. Before switching on, give
+  # github-actions-plan read access inside OpenSearch (one-off, see #8592).
   opensearch_roles_enabled = local.enable_opensearch && lookup(local.environment_configuration, "opensearch_roles_enabled", false)
 
   opensearch_roles_bus = local.opensearch_roles_enabled ? local.opensearch_bus : {}
