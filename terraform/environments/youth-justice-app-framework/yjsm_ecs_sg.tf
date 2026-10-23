@@ -6,9 +6,9 @@
 # let every other internal ECS service through. Egress is already open on the
 # shared ECS service security group.
 resource "aws_security_group" "yjsm_ecs_sg" {
-  name        = "yjsm-ecs-sg"
+  name        = "yjsm-ecs-sg-${local.environment}"
   description = "Identity for yjsm services that call out to Juniper over Transit Gateway"
   vpc_id      = data.aws_vpc.shared.id
 
-  tags = merge(local.tags, { Name = "yjsm-ecs-sg" })
+  tags = merge(local.tags, { Name = "yjsm-ecs-sg-${local.environment}" })
 }
