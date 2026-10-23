@@ -27,6 +27,18 @@ data "aws_iam_policy_document" "merge_into_this" {
   }
 
   dynamic "statement" {
+    for_each = var.reconciliation_state_prefix_arn != "" ? [1] : []
+
+    content {
+      effect  = "Allow"
+      actions = ["s3:GetObject"]
+      resources = [
+        "${var.reconciliation_state_prefix_arn}/*",
+      ]
+    }
+  }
+
+  dynamic "statement" {
     for_each = var.reconciliation_consumer != "" ? [1] : []
 
     content {
