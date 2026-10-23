@@ -39,7 +39,10 @@ data "aws_iam_policy_document" "test_harness_trust" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/integration-hub:environment:smoke-test"]
+      values = [
+        "repo:ministryofjustice/integration-hub:environment:smoke-test",
+        "repo:ministryofjustice/modernisation-platform-environments:environment:smoke-test"
+      ]
     }
   }
 }
