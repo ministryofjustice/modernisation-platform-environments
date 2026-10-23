@@ -12,27 +12,6 @@ module "iam_role" {
 
   create_inline_policy = true
   inline_policy_permissions = {
-    GitHubBackupDestinationRead = {
-      effect    = "Allow"
-      actions   = ["ssm:GetParameter"]
-      resources = ["arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/github-management/github-backup/s3-uri"]
-    }
-    GitHubBackupUpload = {
-      effect = "Allow"
-      actions = [
-        "s3:PutObject",
-        "s3:AbortMultipartUpload"
-      ]
-      resources = ["${data.aws_s3_bucket.github_backup[0].arn}/*"]
-    }
-    GitHubBackupEncryption = {
-      effect = "Allow"
-      actions = [
-        "kms:GenerateDataKey",
-        "kms:Decrypt"
-      ]
-      resources = [data.aws_kms_alias.github_backup[0].target_key_arn]
-    }
     KMSAccess = {
       effect = "Allow"
       actions = [

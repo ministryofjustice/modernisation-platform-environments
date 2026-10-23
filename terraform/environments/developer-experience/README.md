@@ -77,7 +77,8 @@ Modernisation Platform
 
 ## GitHub repository backup storage
 
-The `github-backup/` Terraform component provisions the storage for the opt-in
+The `github-backup/` Terraform component provisions the storage and dedicated
+uploader IAM role for the opt-in
 [GitHub backup proof of concept](https://github.com/ministryofjustice/developer-experience/issues/453).
 Resources are created only in the `developer-experience-production` workspace,
 in its DevEx AWS account, in `eu-west-2`. Run Terraform from `github-backup/`
@@ -87,18 +88,23 @@ configuration; no account ID is hard-coded.
 
 | Contract | Value |
 | --- | --- |
-| SSM Parameter Store name | `/github-management/github-backup/s3-uri` |
+| SSM Parameter Store name | `/github-backup/s3-uri` |
 | Parameter type | `String` (the URI is not a secret) |
 | Parameter value | `s3://mojdevx-production-github-backup` |
 | Bucket | `mojdevx-production-github-backup` |
 | KMS alias | `alias/github-backup` |
-| Consumer IAM role | Existing `github-management` role, managed by `github-management/` |
+| Consumer IAM role | Dedicated `github-backup` role, managed by `github-backup/` |
 | Region | `eu-west-2` |
 
-Deploy `github-backup/` before `github-management/`: the management component
-looks up the bucket and KMS alias when it applies the consumer role's upload
-permissions. The SSM parameter path is retained so consumers do not need to
-change their configuration.
+The component manages its own storage and uploader permissions. It does not
+depend on the `github-management/` component, and does not change that
+component's roles or policies.
+
+The destination parameter is now `/github-backup/s3-uri`, rather than the
+earlier `/github-management/github-backup/s3-uri`. If the earlier version was
+already deployed, Terraform will replace that parameter; update any consumers
+to use the new path and assume the dedicated `github-backup` role. The bucket
+and KMS key names are unchanged.
 
 The `github_backup_destination` Terraform output exposes the parameter name,
 URI, key ARN, role ARN, account ID and region after deployment. It is null
@@ -113,6 +119,8 @@ The storage uses these pinned upstream modules:
 (`dd0c434de5e74d8864e249ee020d917b076b6e32`) and
 `terraform-aws-modules/terraform-aws-kms` v4.2.1
 (`af1d45558a6073c017a732d2273efcc733b34d0f`).
+The uploader role uses `terraform-aws-modules/terraform-aws-iam` v6.8.1
+(`ba3fd6ded6911e0454092147fe3704171cc05e00`).
 
 The private bucket blocks all public access, disables ACLs with
 `BucketOwnerEnforced` ownership, requires secure transport and TLS 1.2 or later,
@@ -123,31 +131,32 @@ There is no automatic expiry of archives or object versions: a retention policy
 must be agreed separately. The KMS key has a 30-day deletion window and must be
 retained for as long as its encrypted backups need to be restored.
 
-The existing role managed by `github-management/` and trusted by
+The dedicated `github-backup` role trusted by
 `ministryofjustice/developer-experience-github-management`
 can retrieve this exact parameter with `ssm:GetParameter`, upload archives with
 `s3:PutObject`, clean up failed multipart uploads with `s3:AbortMultipartUpload`,
 and use `kms:GenerateDataKey` and `kms:Decrypt` on the dedicated key (decryption is
 required for multipart uploads). No backup object read, list or delete access is
-added, and neither the role's trust policy nor the `octo-access` role is changed.
+added. The existing `github-management` and `octo-access` roles are unchanged.
 A restore consumer will need separately scoped object-read and KMS permissions.
 
-The role's existing GitHub OIDC subject pattern is
+The backup role's GitHub OIDC subject pattern is
 `ministryofjustice@2203574/developer-experience-github-management@1333267581:*`.
 This is repository-identity scoped, but its subject suffix is not restricted to
 a particular branch or GitHub environment. The consumer must use a token
 matching that existing subject configuration; this change does not add trust for
 the repository being backed up. The backup bucket's policy adds only denies for
 insecure transport and TLS below 1.2, not a public or cross-account allow.
-Same-account upload access comes from the existing role's scoped IAM permissions.
+Same-account upload access comes from the backup role's scoped IAM permissions.
 
-After deploying, assume the existing role in the DevEx production account and
+After deploying, configure the consumer workflow to assume the `github-backup`
+role in the DevEx production account (its ARN is in the Terraform output), and
 retrieve the destination before passing it to the backup script:
 
 ```sh
 aws ssm get-parameter \
   --region eu-west-2 \
-  --name /github-management/github-backup/s3-uri \
+  --name /github-backup/s3-uri \
   --query Parameter.Value \
   --output text
 ```
