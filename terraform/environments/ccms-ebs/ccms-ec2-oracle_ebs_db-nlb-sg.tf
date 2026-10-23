@@ -28,16 +28,16 @@ resource "aws_security_group" "sg_ebsdb_nlb" {
 # EGRESS Rules
 
 ### All
-
-resource "aws_security_group_rule" "egress_traffic_ebsdbnlb" {
-  security_group_id = aws_security_group.sg_ebsdb_nlb.id
-  type              = "egress"
-  description       = "All"
-  protocol          = "TCP"
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsdbnlb" {
+#   security_group_id = aws_security_group.sg_ebsdb_nlb.id
+#   type              = "egress"
+#   description       = "All"
+#   protocol          = "TCP"
+#   from_port         = 0
+#   to_port           = 0
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 
 

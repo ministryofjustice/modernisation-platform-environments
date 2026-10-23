@@ -263,236 +263,237 @@ resource "aws_security_group" "ec2_sg_ebsapps" {
 
 ### HTTP
 
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
 
-resource "aws_security_group_rule" "egress_traffic_ebsapps_80" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "Oracle HTTPs"
-  protocol          = "TCP"
-  from_port         = 80
-  to_port           = 80
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_80" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "Oracle HTTPs"
+#   protocol          = "TCP"
+#   from_port         = 80
+#   to_port           = 80
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### HTTPS
 
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_443" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "HTTPS"
-  protocol          = "TCP"
-  from_port         = 443
-  to_port           = 443
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_443" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "HTTPS"
+#   protocol          = "TCP"
+#   from_port         = 443
+#   to_port           = 443
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### FTP
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_2x" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "FTP"
-  protocol          = "TCP"
-  from_port         = 20
-  to_port           = 21
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_2x" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "FTP"
+#   protocol          = "TCP"
+#   from_port         = 20
+#   to_port           = 21
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### SSH
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_22" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "SSH"
-  protocol          = "TCP"
-  from_port         = 22
-  to_port           = 22
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_22" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "SSH"
+#   protocol          = "TCP"
+#   from_port         = 22
+#   to_port           = 22
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### ORACLE LDAP
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_1389" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "ORACLE LDAP"
-  protocol          = "TCP"
-  from_port         = 1389
-  to_port           = 1389
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_1389" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "ORACLE LDAP"
+#   protocol          = "TCP"
+#   from_port         = 1389
+#   to_port           = 1389
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### ORACLE Net Listener
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_152x" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "ORACLE Net Listener"
-  protocol          = "TCP"
-  from_port         = 1521
-  to_port           = 1522
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
-### Oracle
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_5101" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "Oracle"
-  protocol          = "TCP"
-  from_port         = 5101
-  to_port           = 5101
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_152x" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "ORACLE Net Listener"
+#   protocol          = "TCP"
+#   from_port         = 1521
+#   to_port           = 1522
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### Oracle
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_5401" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "Oracle"
-  protocol          = "TCP"
-  from_port         = 5401
-  to_port           = 5401
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_5101" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "Oracle"
+#   protocol          = "TCP"
+#   from_port         = 5101
+#   to_port           = 5101
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### Oracle
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_5401" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "Oracle"
+#   protocol          = "TCP"
+#   from_port         = 5401
+#   to_port           = 5401
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
-resource "aws_security_group_rule" "egress_traffic_ebsapps_5575" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "Oracle"
-  protocol          = "TCP"
-  from_port         = 5575
-  to_port           = 5575
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+### Oracle
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_5575" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "Oracle"
+#   protocol          = "TCP"
+#   from_port         = 5575
+#   to_port           = 5575
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### Oracle LDAP SSL
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_1636" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "Oracle LDAP SSL"
-  protocol          = "TCP"
-  from_port         = 1636
-  to_port           = 1636
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_1636" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "Oracle LDAP SSL"
+#   protocol          = "TCP"
+#   from_port         = 1636
+#   to_port           = 1636
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### Oracle
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_10401" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "Oracle"
-  protocol          = "TCP"
-  from_port         = 10401
-  to_port           = 10401
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_10401" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "Oracle"
+#   protocol          = "TCP"
+#   from_port         = 10401
+#   to_port           = 10401
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### Lloyds FTP
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_50000" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "Oracle"
-  protocol          = "TCP"
-  from_port         = 50000
-  to_port           = 51000
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_50000" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "Oracle"
+#   protocol          = "TCP"
+#   from_port         = 50000
+#   to_port           = 51000
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### Oracle HTTP
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_800x" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "Oracle HTTP"
-  protocol          = "TCP"
-  from_port         = 8000
-  to_port           = 8005
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_800x" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "Oracle HTTP"
+#   protocol          = "TCP"
+#   from_port         = 8000
+#   to_port           = 8005
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### Oracle HTTPS
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_4443" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "Oracle HTTPS"
-  protocol          = "TCP"
-  from_port         = 4443
-  to_port           = 4444
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_4443" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "Oracle HTTPS"
+#   protocol          = "TCP"
+#   from_port         = 4443
+#   to_port           = 4444
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### OEM Agent Port (EBS Apps -> OMS)
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_agent_3872" {
-  count             = local.environment == "development" ? 1 : 0
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "EBS Apps to OEM OMS agent port"
-  protocol          = "TCP"
-  from_port         = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
-  to_port           = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
-  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_agent_3872" {
+#   count             = local.environment == "development" ? 1 : 0
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "EBS Apps to OEM OMS agent port"
+#   protocol          = "TCP"
+#   from_port         = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
+#   to_port           = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
+#   cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
+# }
 
 ### OEM OMS Upload Port (EBS Apps -> OMS)
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_oms_4903" {
-  count             = local.environment == "development" ? 1 : 0
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "EBS Apps to OEM OMS upload port"
-  protocol          = "TCP"
-  from_port         = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
-  to_port           = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
-  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_oms_4903" {
+#   count             = local.environment == "development" ? 1 : 0
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "EBS Apps to OEM OMS upload port"
+#   protocol          = "TCP"
+#   from_port         = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
+#   to_port           = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
+#   cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
+# }
 
 ### OEM Agent HTTPS Port (EBS Apps -> OMS)
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_https_7803" {
-  count             = local.environment == "development" ? 1 : 0
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "EBS Apps to OEM OMS agent HTTPS port"
-  protocol          = "TCP"
-  from_port         = 7803
-  to_port           = 7803
-  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_https_7803" {
+#   count             = local.environment == "development" ? 1 : 0
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "EBS Apps to OEM OMS agent HTTPS port"
+#   protocol          = "TCP"
+#   from_port         = 7803
+#   to_port           = 7803
+#   cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
+# }
 
 ### OEM DB Oracle Listener (EBS Apps -> OEM DB)
-
-resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_db_1521" {
-  count             = local.environment == "development" ? 1 : 0
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "EBS Apps to OEM DB Oracle listener"
-  protocol          = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oem_db_platform_cidr]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_db_1521" {
+#   count             = local.environment == "development" ? 1 : 0
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "EBS Apps to OEM DB Oracle listener"
+#   protocol          = "TCP"
+#   from_port         = 1521
+#   to_port           = 1521
+#   cidr_blocks       = [local.application_data.accounts[local.environment].oem.oem_db_platform_cidr]
+# }
 
 # EGRESS Rules ---- Found in the OLD ALB SG, unsure if needed or not, but adding here as related to the apps instances
 
 ### All
-
-resource "aws_security_group_rule" "egress_traffic_ebslb_80" {
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "egress"
-  description       = "All"
-  protocol          = "TCP"
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebslb_80" {
+#   security_group_id = aws_security_group.ec2_sg_ebsapps.id
+#   type              = "egress"
+#   description       = "All"
+#   protocol          = "TCP"
+#   from_port         = 0
+#   to_port           = 0
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }

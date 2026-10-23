@@ -47,13 +47,14 @@ resource "aws_security_group" "smtp4dev_mock_server_sg" {
 #   cidr_ipv4   = data.aws_subnet.data_subnets_a.cidr_block
 # }
 
-resource "aws_vpc_security_group_egress_rule" "smtp4dev_http_egress_rule" {
-  count             = local.is-production ? 0 : 1
-  security_group_id = aws_security_group.smtp4dev_mock_server_sg[count.index].id
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_vpc_security_group_egress_rule" "smtp4dev_http_egress_rule" {
+#   count             = local.is-production ? 0 : 1
+#   security_group_id = aws_security_group.smtp4dev_mock_server_sg[count.index].id
 
-  description = "HTTPS outbound (Port 443)"
-  ip_protocol = "tcp"
-  from_port   = 443
-  to_port     = 443
-  cidr_ipv4   = "0.0.0.0/0"
-}
+#   description = "HTTPS outbound (Port 443)"
+#   ip_protocol = "tcp"
+#   from_port   = 443
+#   to_port     = 443
+#   cidr_ipv4   = "0.0.0.0/0"
+# }

@@ -6,21 +6,23 @@ resource "aws_security_group" "efs-security-group" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "efs-security-group-ingress" {
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_vpc_security_group_ingress_rule" "efs-security-group-ingress" {
 
-  count             = local.ssogen_enabled ? length(local.private_subnets_cidr_blocks) : 0
-  description       = "Allow inbound access from ec2 instances"
-  security_group_id = aws_security_group.efs-security-group[0].id
-  ip_protocol       = "tcp"
-  from_port         = 2049
-  to_port           = 2049
-  cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
-}
+#   count             = local.ssogen_enabled ? length(local.private_subnets_cidr_blocks) : 0
+#   description       = "Allow inbound access from ec2 instances"
+#   security_group_id = aws_security_group.efs-security-group[0].id
+#   ip_protocol       = "tcp"
+#   from_port         = 2049
+#   to_port           = 2049
+#   cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
+# }
 
-resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
-  count             = local.ssogen_enabled ? 1 : 0
-  description       = "Allow connections to EFS"
-  security_group_id = aws_security_group.efs-security-group[count.index].id
-  ip_protocol       = "-1"
-  cidr_ipv4         = "0.0.0.0/0"
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
+#   count             = local.ssogen_enabled ? 1 : 0
+#   description       = "Allow connections to EFS"
+#   security_group_id = aws_security_group.efs-security-group[count.index].id
+#   ip_protocol       = "-1"
+#   cidr_ipv4         = "0.0.0.0/0"
+# }

@@ -78,16 +78,16 @@ resource "aws_security_group" "sg_ebsapps_internal_alb" {
 # EGRESS Rules
 
 ### All
-
-resource "aws_security_group_rule" "egress_traffic_ebsalb_internal_all" {
-  security_group_id = aws_security_group.sg_ebsapps_internal_alb.id
-  type              = "egress"
-  description       = "All"
-  protocol          = "TCP"
-  from_port         = 8000
-  to_port           = 8005
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_ebsalb_internal_all" {
+#   security_group_id = aws_security_group.sg_ebsapps_internal_alb.id
+#   type              = "egress"
+#   description       = "All"
+#   protocol          = "TCP"
+#   from_port         = 8000
+#   to_port           = 8005
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 
 

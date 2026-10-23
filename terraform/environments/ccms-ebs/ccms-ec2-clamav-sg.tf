@@ -45,37 +45,37 @@ resource "aws_security_group" "ec2_sg_clamav" {
 
 
 ### ClamAV
-
-resource "aws_security_group_rule" "egress_traffic_clamav_3310" {
-  security_group_id = aws_security_group.ec2_sg_clamav.id
-  type              = "egress"
-  description       = "ClamAV"
-  protocol          = "TCP"
-  from_port         = 3310
-  to_port           = 3310
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_clamav_3310" {
+#   security_group_id = aws_security_group.ec2_sg_clamav.id
+#   type              = "egress"
+#   description       = "ClamAV"
+#   protocol          = "TCP"
+#   from_port         = 3310
+#   to_port           = 3310
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### SSH
-
-resource "aws_security_group_rule" "egress_traffic_clamav_22" {
-  security_group_id = aws_security_group.ec2_sg_clamav.id
-  type              = "egress"
-  description       = "SSH"
-  protocol          = "TCP"
-  from_port         = 22
-  to_port           = 22
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_clamav_22" {
+#   security_group_id = aws_security_group.ec2_sg_clamav.id
+#   type              = "egress"
+#   description       = "SSH"
+#   protocol          = "TCP"
+#   from_port         = 22
+#   to_port           = 22
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### HTTPS
-
-resource "aws_security_group_rule" "egress_traffic_clamav_443" {
-  security_group_id = aws_security_group.ec2_sg_clamav.id
-  type              = "egress"
-  description       = "HTTPS"
-  protocol          = "TCP"
-  from_port         = 443
-  to_port           = 443
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
+# resource "aws_security_group_rule" "egress_traffic_clamav_443" {
+#   security_group_id = aws_security_group.ec2_sg_clamav.id
+#   type              = "egress"
+#   description       = "HTTPS"
+#   protocol          = "TCP"
+#   from_port         = 443
+#   to_port           = 443
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
