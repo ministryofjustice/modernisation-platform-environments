@@ -352,6 +352,18 @@ resource "aws_s3_bucket_versioning" "lambda_payment_load" {
   }
 }
 
+resource "aws_s3_bucket_logging" "lambda_payment_load" {
+  bucket = aws_s3_bucket.lambda_payment_load.id
+
+  target_bucket = module.s3-bucket-logging.bucket.id
+  target_prefix = "s3-access-logs/"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
 # Lifecycle configuration - see ADR "Payment Load S3 Bucket Retention" (SRE-25): no retention after a successful
 # load into CCMS. The payment load Lambda moves a file to completed/ only when every payment loaded, so that prefix
 # is the success signal. Pending files (bucket root) are not expired, so a file is never deleted just because it was
