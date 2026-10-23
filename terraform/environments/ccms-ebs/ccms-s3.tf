@@ -198,6 +198,7 @@ module "s3-bucket-dbbackup" {
 
   sse_algorithm  = "aws:kms"
   custom_kms_key = aws_kms_key.s3_dbbackup_kms_key.arn
+  enforce_kms_request_headers = false
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
