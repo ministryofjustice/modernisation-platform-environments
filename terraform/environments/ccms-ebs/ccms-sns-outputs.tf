@@ -1,6 +1,6 @@
 output "aws_secretsmanager_secret_support_email_account_arn" {
   description = "aws_secretsmanager_secret support_email_account arn"
-  value       = aws_secretsmanager_secret.support_email_account.arn
+  value       = aws_secretsmanager_secret.support_email_account.secret_arn
 }
 
 #

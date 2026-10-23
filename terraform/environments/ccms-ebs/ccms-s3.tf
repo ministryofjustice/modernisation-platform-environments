@@ -196,8 +196,8 @@ module "s3-bucket-dbbackup" {
   log_prefix                = "s3-access-logs/"
   log_partition_date_source = "EventTime"
 
-  sse_algorithm  = "aws:kms"
-  custom_kms_key = aws_kms_key.s3_dbbackup_kms_key.arn
+  sse_algorithm               = "aws:kms"
+  custom_kms_key              = aws_kms_key.s3_dbbackup_kms_key.arn
   enforce_kms_request_headers = false
 
   # Refer to the below section "Replication" before enabling replication
