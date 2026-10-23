@@ -37,6 +37,37 @@ data "aws_iam_policy_document" "merge_into_this" {
       ]
     }
   }
+
+  dynamic "statement" {
+    for_each = var.reconciliation_consumer != "" ? [1] : []
+
+    content {
+      effect = "Allow"
+      actions = [
+        "states:DescribeExecution",
+        "states:StopExecution",
+      ]
+      resources = [
+        "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:execution:merge_into_${local.name}:*",
+      ]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = var.reconciliation_consumer != "" ? [1] : []
+
+    content {
+      effect = "Allow"
+      actions = [
+        "events:DescribeRule",
+        "events:PutRule",
+        "events:PutTargets",
+      ]
+      resources = [
+        "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule",
+      ]
+    }
+  }
 }
 
 resource "aws_iam_policy" "merge_into_this" {

@@ -31,6 +31,16 @@
           "StringEquals": "full",
           "Next": "StartHistoricalFull"
         },
+        {
+          "Variable": "$.mode",
+          "StringEquals": "historical_planning",
+          "Next": "ResumeHistoricalPlanning"
+        },
+        {
+          "Variable": "$.mode",
+          "StringEquals": "historical_recovery",
+          "Next": "ResumeHistoricalRecovery"
+        },
 %{ endif }
         {
           "Variable": "$.mode",
@@ -350,7 +360,7 @@
         {
           "Variable": "$.status",
           "StringEquals": "planning",
-          "Next": "PlanHistorical"
+          "Next": "InitialiseHistoricalPlanning"
         },
         {
           "Variable": "$.status",
@@ -359,6 +369,26 @@
         }
       ],
       "Default": "UnexpectedHistoricalPlanningResult"
+    },
+    "InitialiseHistoricalPlanning": {
+      "Type": "Pass",
+      "Parameters": {
+        "consumer": "${reconciliation_consumer}",
+        "execution_id.$": "$.execution_id",
+        "planning_iterations": 0,
+        "planning_execution_index": 0
+      },
+      "Next": "PlanHistorical"
+    },
+    "ResumeHistoricalPlanning": {
+      "Type": "Pass",
+      "Parameters": {
+        "consumer": "${reconciliation_consumer}",
+        "execution_id.$": "$.execution_id",
+        "planning_iterations": 0,
+        "planning_execution_index.$": "$.planning_execution_index"
+      },
+      "Next": "PlanHistorical"
     },
     "PlanHistorical": {
       "Type": "Task",
@@ -371,7 +401,7 @@
           "execution_id.$": "$.execution_id"
         }
       },
-      "OutputPath": "$.Payload",
+      "ResultPath": "$.planning_result",
       "Retry": [
         {
           "ErrorEquals": [
@@ -400,42 +430,123 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.status",
+          "Variable": "$.planning_result.Payload.status",
           "StringEquals": "planning",
-          "Next": "WaitBeforeHistoricalPlanning"
+          "Next": "IncrementHistoricalPlanning"
         },
         {
-          "Variable": "$.status",
+          "Variable": "$.planning_result.Payload.status",
           "StringEquals": "replay_ready",
-          "Next": "NextHistoricalChunk"
+          "Next": "PrepareHistoricalAutomaticRecovery"
         },
         {
-          "Variable": "$.status",
+          "Variable": "$.planning_result.Payload.status",
           "StringEquals": "approval_required",
-          "Next": "WaitForHistoricalApproval"
+          "Next": "PrepareHistoricalApproval"
+        },
+        {
+          "Variable": "$.planning_result.Payload.status",
+          "StringEquals": "completed",
+          "Next": "HistoricalComplete"
         }
       ],
       "Default": "UnexpectedHistoricalPlanningResult"
+    },
+    "IncrementHistoricalPlanning": {
+      "Type": "Pass",
+      "Parameters": {
+        "consumer": "${reconciliation_consumer}",
+        "execution_id.$": "$.planning_result.Payload.execution_id",
+        "planning_iterations.$": "States.MathAdd($.planning_iterations, 1)",
+        "planning_execution_index.$": "$.planning_execution_index"
+      },
+      "Next": "CheckHistoricalPlanningLimit"
+    },
+    "CheckHistoricalPlanningLimit": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.planning_iterations",
+          "NumericGreaterThanEquals": 100,
+          "Next": "PrepareHistoricalPlanningContinuation"
+        }
+      ],
+      "Default": "WaitBeforeHistoricalPlanning"
+    },
+    "PrepareHistoricalPlanningContinuation": {
+      "Type": "Pass",
+      "Parameters": {
+        "execution_id.$": "$.execution_id",
+        "planning_execution_index.$": "States.MathAdd($.planning_execution_index, 1)"
+      },
+      "Next": "StartHistoricalPlanningContinuation"
+    },
+    "StartHistoricalPlanningContinuation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::states:startExecution",
+      "Parameters": {
+        "StateMachineArn.$": "$$.StateMachine.Id",
+        "Name.$": "States.Format('historical-plan-{}-{}', $.execution_id, $.planning_execution_index)",
+        "Input": {
+          "mode": "historical_planning",
+          "execution_id.$": "$.execution_id",
+          "planning_execution_index.$": "$.planning_execution_index",
+          "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id"
+        }
+      },
+      "ResultPath": "$.continuation",
+      "Next": "HistoricalPlanningContinued"
+    },
+    "HistoricalPlanningContinued": {
+      "Type": "Succeed"
     },
     "WaitBeforeHistoricalPlanning": {
       "Type": "Wait",
       "Seconds": 1,
       "Next": "PlanHistorical"
     },
-    "WaitForHistoricalApproval": {
+    "PrepareHistoricalAutomaticRecovery": {
+      "Type": "Pass",
+      "Parameters": {
+        "execution_id.$": "$.planning_result.Payload.execution_id",
+        "phase": "automatic",
+        "recovery_execution_index": 0
+      },
+      "Next": "StartHistoricalAutomaticRecovery"
+    },
+    "StartHistoricalAutomaticRecovery": {
       "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Resource": "arn:aws:states:::states:startExecution",
+      "Parameters": {
+        "StateMachineArn.$": "$$.StateMachine.Id",
+        "Name.$": "States.Format('historical-auto-{}-{}', $.execution_id, $.recovery_execution_index)",
+        "Input": {
+          "mode": "historical_recovery",
+          "execution_id.$": "$.execution_id",
+          "phase": "automatic",
+          "recovery_execution_index.$": "$.recovery_execution_index",
+          "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id"
+        }
+      },
+      "ResultPath": "$.recovery",
+      "Next": "HistoricalRecoveryStarted"
+    },
+    "HistoricalRecoveryStarted": {
+      "Type": "Succeed"
+    },
+    "PrepareHistoricalApproval": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "FunctionName": "${planner_function_name}",
         "Payload": {
-          "action": "park_historical_approval",
+          "action": "prepare_historical_approval",
           "consumer": "${reconciliation_consumer}",
-          "execution_id.$": "$.execution_id",
-          "plan_id.$": "$.plan_id",
-          "task_token.$": "$$.Task.Token"
+          "execution_id.$": "$.planning_result.Payload.execution_id",
+          "plan_id.$": "$.planning_result.Payload.plan_id"
         }
       },
-      "ResultPath": "$.approval",
+      "OutputPath": "$.Payload",
       "Retry": [
         {
           "ErrorEquals": [
@@ -458,6 +569,103 @@
           "Next": "NotifyHistoricalFailure"
         }
       ],
+      "Next": "HistoricalApprovalAndAutomaticRecovery"
+    },
+    "HistoricalApprovalAndAutomaticRecovery": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "WaitForHistoricalApproval",
+          "States": {
+            "WaitForHistoricalApproval": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "${planner_function_name}",
+                "Payload": {
+                  "action": "park_historical_approval",
+                  "consumer": "${reconciliation_consumer}",
+                  "execution_id.$": "$.execution_id",
+                  "plan_id.$": "$.plan_id",
+                  "task_token.$": "$$.Task.Token"
+                }
+              },
+              "ResultPath": "$.approval",
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException",
+                    "Lambda.TooManyRequestsException"
+                  ],
+                  "IntervalSeconds": 2,
+                  "BackoffRate": 2,
+                  "MaxAttempts": 3
+                }
+              ],
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "HasHistoricalAutomaticScopes",
+          "States": {
+            "HasHistoricalAutomaticScopes": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.automatic_scope_count",
+                  "NumericGreaterThan": 0,
+                  "Next": "RunHistoricalAutomaticRecovery"
+                }
+              ],
+              "Default": "NoHistoricalAutomaticRecovery"
+            },
+            "RunHistoricalAutomaticRecovery": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::states:startExecution.sync:2",
+              "Parameters": {
+                "StateMachineArn.$": "$$.StateMachine.Id",
+                "Name.$": "States.Format('historical-auto-{}-0', $.execution_id)",
+                "Input": {
+                  "mode": "historical_recovery",
+                  "execution_id.$": "$.execution_id",
+                  "phase": "automatic",
+                  "recovery_execution_index": 0,
+                  "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id"
+                }
+              },
+              "ResultPath": "$.automatic_recovery",
+              "End": true
+            },
+            "NoHistoricalAutomaticRecovery": {
+              "Type": "Pass",
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.approval_and_recovery",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
+        }
+      ],
+      "Next": "PrepareHistoricalApprovalDecision"
+    },
+    "PrepareHistoricalApprovalDecision": {
+      "Type": "Pass",
+      "Parameters": {
+        "consumer": "${reconciliation_consumer}",
+        "execution_id.$": "$.execution_id",
+        "plan_id.$": "$.plan_id",
+        "decision.$": "$.approval_and_recovery[0].approval.decision"
+      },
       "Next": "RecordHistoricalApproval"
     },
     "RecordHistoricalApproval": {
@@ -470,7 +678,7 @@
           "consumer": "${reconciliation_consumer}",
           "execution_id.$": "$.execution_id",
           "plan_id.$": "$.plan_id",
-          "decision.$": "$.approval.decision"
+          "decision.$": "$.decision"
         }
       },
       "OutputPath": "$.Payload",
@@ -504,7 +712,7 @@
         {
           "Variable": "$.status",
           "StringEquals": "replay_ready",
-          "Next": "NextHistoricalChunk"
+          "Next": "PrepareHistoricalReviewRecovery"
         },
         {
           "Variable": "$.status",
@@ -514,6 +722,46 @@
       ],
       "Default": "UnexpectedHistoricalApprovalResult"
     },
+    "PrepareHistoricalReviewRecovery": {
+      "Type": "Pass",
+      "Parameters": {
+        "execution_id.$": "$.execution_id",
+        "phase": "review",
+        "recovery_execution_index": 0
+      },
+      "Next": "StartHistoricalReviewRecovery"
+    },
+    "StartHistoricalReviewRecovery": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::states:startExecution",
+      "Parameters": {
+        "StateMachineArn.$": "$$.StateMachine.Id",
+        "Name.$": "States.Format('historical-review-{}-{}', $.execution_id, $.recovery_execution_index)",
+        "Input": {
+          "mode": "historical_recovery",
+          "execution_id.$": "$.execution_id",
+          "phase": "review",
+          "recovery_execution_index.$": "$.recovery_execution_index",
+          "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id"
+        }
+      },
+      "ResultPath": "$.recovery",
+      "Next": "HistoricalReviewRecoveryStarted"
+    },
+    "HistoricalReviewRecoveryStarted": {
+      "Type": "Succeed"
+    },
+    "ResumeHistoricalRecovery": {
+      "Type": "Pass",
+      "Parameters": {
+        "consumer": "${reconciliation_consumer}",
+        "execution_id.$": "$.execution_id",
+        "recovery_phase.$": "$.phase",
+        "recovery_execution_index.$": "$.recovery_execution_index",
+        "recovery_chunks_in_execution": 0
+      },
+      "Next": "NextHistoricalChunk"
+    },
     "NextHistoricalChunk": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
@@ -522,10 +770,11 @@
         "Payload": {
           "action": "next_historical_chunk",
           "consumer": "${reconciliation_consumer}",
-          "execution_id.$": "$.execution_id"
+          "execution_id.$": "$.execution_id",
+          "phase.$": "$.recovery_phase"
         }
       },
-      "OutputPath": "$.Payload",
+      "ResultPath": "$.chunk_result",
       "Retry": [
         {
           "ErrorEquals": [
@@ -554,19 +803,24 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.status",
+          "Variable": "$.chunk_result.Payload.status",
           "StringEquals": "chunk_ready",
           "Next": "ReplayHistoricalPosition"
         },
         {
-          "Variable": "$.status",
-          "StringEquals": "complete",
-          "Next": "CompleteHistorical"
+          "Variable": "$.chunk_result.Payload.status",
+          "StringEquals": "scope_split",
+          "Next": "NextHistoricalChunk"
         },
         {
-          "Variable": "$.status",
-          "StringEquals": "approval_required",
-          "Next": "WaitForHistoricalApproval"
+          "Variable": "$.chunk_result.Payload.status",
+          "StringEquals": "scope_clean",
+          "Next": "NextHistoricalChunk"
+        },
+        {
+          "Variable": "$.chunk_result.Payload.status",
+          "StringEquals": "phase_complete",
+          "Next": "CheckHistoricalPhaseCompletion"
         }
       ],
       "Default": "UnexpectedHistoricalReplayResult"
@@ -576,7 +830,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "FunctionName": "${merge_function_name}",
-        "Payload.$": "$.replay_input"
+        "Payload.$": "$.chunk_result.Payload.replay_input"
       },
       "ResultPath": null,
       "Retry": [
@@ -627,10 +881,10 @@
           "action": "verify_historical_chunk",
           "consumer": "${reconciliation_consumer}",
           "execution_id.$": "$.execution_id",
-          "chunk_index.$": "$.chunk_index"
+          "phase.$": "$.recovery_phase"
         }
       },
-      "OutputPath": "$.Payload",
+      "ResultPath": "$.verification_result",
       "Retry": [
         {
           "ErrorEquals": [
@@ -659,12 +913,12 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.status",
+          "Variable": "$.verification_result.Payload.status",
           "StringEquals": "verified",
           "Next": "CheckpointHistoricalChunk"
         },
         {
-          "Variable": "$.status",
+          "Variable": "$.verification_result.Payload.status",
           "StringEquals": "verification_failed",
           "Next": "HistoricalVerificationFailed"
         }
@@ -680,14 +934,14 @@
           "action": "checkpoint_historical",
           "consumer": "${reconciliation_consumer}",
           "execution_id.$": "$.execution_id",
-          "chunk_index.$": "$.chunk_index",
-          "verification_status.$": "$.status",
-          "positions_recovered.$": "$.positions_recovered",
-          "data_scanned_in_bytes.$": "$.data_scanned_in_bytes",
-          "period.$": "$.period"
+          "phase.$": "$.recovery_phase",
+          "verification_status.$": "$.verification_result.Payload.status",
+          "positions_recovered.$": "$.verification_result.Payload.positions_recovered",
+          "data_scanned_in_bytes.$": "$.verification_result.Payload.data_scanned_in_bytes",
+          "period.$": "$.verification_result.Payload.period"
         }
       },
-      "OutputPath": "$.Payload",
+      "ResultPath": "$.checkpoint_result",
       "Retry": [
         {
           "ErrorEquals": [
@@ -710,7 +964,88 @@
           "Next": "NotifyHistoricalFailure"
         }
       ],
-      "Next": "NextHistoricalChunk"
+      "Next": "IncrementHistoricalRecovery"
+    },
+    "IncrementHistoricalRecovery": {
+      "Type": "Pass",
+      "Parameters": {
+        "consumer": "${reconciliation_consumer}",
+        "execution_id.$": "$.execution_id",
+        "recovery_phase.$": "$.recovery_phase",
+        "recovery_execution_index.$": "$.recovery_execution_index",
+        "recovery_chunks_in_execution.$": "States.MathAdd($.recovery_chunks_in_execution, 1)"
+      },
+      "Next": "CheckHistoricalRecoveryLimit"
+    },
+    "CheckHistoricalRecoveryLimit": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.recovery_chunks_in_execution",
+          "NumericGreaterThanEquals": 20,
+          "Next": "PrepareHistoricalRecoveryContinuation"
+        }
+      ],
+      "Default": "NextHistoricalChunk"
+    },
+    "PrepareHistoricalRecoveryContinuation": {
+      "Type": "Pass",
+      "Parameters": {
+        "execution_id.$": "$.execution_id",
+        "recovery_phase.$": "$.recovery_phase",
+        "recovery_execution_index.$": "States.MathAdd($.recovery_execution_index, 1)"
+      },
+      "Next": "StartHistoricalRecoveryContinuation"
+    },
+    "StartHistoricalRecoveryContinuation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::states:startExecution.sync:2",
+      "Parameters": {
+        "StateMachineArn.$": "$$.StateMachine.Id",
+        "Name.$": "States.Format('historical-recovery-{}-{}', $.execution_id, $.recovery_execution_index)",
+        "Input": {
+          "mode": "historical_recovery",
+          "execution_id.$": "$.execution_id",
+          "phase.$": "$.recovery_phase",
+          "recovery_execution_index.$": "$.recovery_execution_index",
+          "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id"
+        }
+      },
+      "ResultPath": "$.continuation",
+      "Next": "HistoricalRecoveryContinued"
+    },
+    "HistoricalRecoveryContinued": {
+      "Type": "Succeed"
+    },
+    "CheckHistoricalPhaseCompletion": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.recovery_phase",
+          "StringEquals": "automatic",
+          "Next": "CheckAutomaticHistoricalCompletion"
+        },
+        {
+          "Variable": "$.recovery_phase",
+          "StringEquals": "review",
+          "Next": "CompleteHistorical"
+        }
+      ],
+      "Default": "UnexpectedHistoricalReplayResult"
+    },
+    "CheckAutomaticHistoricalCompletion": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.chunk_result.Payload.review_scope_count",
+          "NumericGreaterThan": 0,
+          "Next": "HistoricalPhaseComplete"
+        }
+      ],
+      "Default": "CompleteHistorical"
+    },
+    "HistoricalPhaseComplete": {
+      "Type": "Succeed"
     },
     "CompleteHistorical": {
       "Type": "Task",
@@ -744,7 +1079,7 @@
     "HistoricalVerificationFailed": {
       "Type": "Pass",
       "Parameters": {
-        "consumer.$": "$.consumer",
+        "consumer": "${reconciliation_consumer}",
         "execution_id.$": "$.execution_id",
         "failure": {
           "Error": "HistoricalReconciliationVerificationFailed",
@@ -756,7 +1091,7 @@
     "UnexpectedHistoricalPlanningResult": {
       "Type": "Pass",
       "Parameters": {
-        "consumer.$": "$.consumer",
+        "consumer": "${reconciliation_consumer}",
         "execution_id.$": "$.execution_id",
         "failure": {
           "Error": "UnexpectedHistoricalPlanningResult",
@@ -768,7 +1103,7 @@
     "UnexpectedHistoricalApprovalResult": {
       "Type": "Pass",
       "Parameters": {
-        "consumer.$": "$.consumer",
+        "consumer": "${reconciliation_consumer}",
         "execution_id.$": "$.execution_id",
         "failure": {
           "Error": "UnexpectedHistoricalApprovalResult",
@@ -780,7 +1115,7 @@
     "UnexpectedHistoricalReplayResult": {
       "Type": "Pass",
       "Parameters": {
-        "consumer.$": "$.consumer",
+        "consumer": "${reconciliation_consumer}",
         "execution_id.$": "$.execution_id",
         "failure": {
           "Error": "UnexpectedHistoricalReplayResult",
@@ -792,7 +1127,7 @@
     "UnexpectedHistoricalVerificationResult": {
       "Type": "Pass",
       "Parameters": {
-        "consumer.$": "$.consumer",
+        "consumer": "${reconciliation_consumer}",
         "execution_id.$": "$.execution_id",
         "failure": {
           "Error": "UnexpectedHistoricalVerificationResult",
