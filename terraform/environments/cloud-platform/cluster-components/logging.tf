@@ -75,7 +75,7 @@ resource "opensearch_role" "fluent_bit" {
   cluster_permissions = ["indices:data/write/bulk"]
 
   index_permissions {
-    index_patterns  = ["fluentbit-${terraform.workspace}-*"]
+    index_patterns  = ["${terraform.workspace}-*"]
     allowed_actions = ["write", "create_index"]
   }
 }
