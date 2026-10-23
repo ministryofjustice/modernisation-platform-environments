@@ -244,14 +244,14 @@ resource "aws_security_group" "opahub_db" {
 }
 
 # Ingress from AWS Workspaces
-resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_workspaces" {
-  security_group_id = aws_security_group.opahub_db.id
-  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
-  ip_protocol       = "tcp"
-  from_port         = 3306
-  to_port           = 3306
-  description       = "Allow MySQL access from Workspaces"
-}
+# resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_workspaces" {
+#   security_group_id = aws_security_group.opahub_db.id
+#   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+#   ip_protocol       = "tcp"
+#   from_port         = 3306
+#   to_port           = 3306
+#   description       = "Allow MySQL access from Workspaces"
+# }
 
 # Ingress from ECS Cluster
 resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ec2" {

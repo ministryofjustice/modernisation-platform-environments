@@ -236,13 +236,13 @@ resource "aws_vpc_security_group_ingress_rule" "tds_db_ingress" {
   cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
 }
 
-resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress" {
-  security_group_id = aws_security_group.tds_db.id
-  description       = "Workspace to Database Ingress"
-  ip_protocol       = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
-}
+# resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress" {
+#   security_group_id = aws_security_group.tds_db.id
+#   description       = "Workspace to Database Ingress"
+#   ip_protocol       = "TCP"
+#   from_port         = 1521
+#   to_port           = 1521
+#   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+# }
 
 
