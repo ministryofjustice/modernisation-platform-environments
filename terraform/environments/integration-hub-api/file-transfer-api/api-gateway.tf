@@ -16,15 +16,17 @@ module "api_gateway" {
   } : null
 
   authorizers = {
-    mft_request = {
-      authorizer_type                   = "REQUEST"
-      name                              = "${local.resource_name_prefix}-authorizer"
-      authorizer_uri                    = module.lambda_api_authorizer.lambda_function_invoke_arn
-      authorizer_payload_format_version = "2.0"
-      enable_simple_responses           = true
-      identity_sources                  = ["$request.header.Authorization"]
+    entra = {
+      authorizer_type  = "JWT"
+      name             = "${local.resource_name_prefix}-entra"
+      identity_sources = ["$request.header.Authorization"]
+      jwt_configuration = {
+        issuer   = "https://login.microsoftonline.com/${local.entra_tenant_id}/v2.0"
+        audience = [local.entra_api_audience]
+      }
     }
   }
+  depends_on = [terraform_data.entra_configuration]
 
   create_domain_name             = false
   create_routes_and_integrations = false
@@ -53,32 +55,32 @@ resource "aws_apigatewayv2_route" "transfer_tickets" {
   api_id             = module.api_gateway.api_id
   route_key          = "POST /transfer-tickets"
   target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
-  authorization_type = "CUSTOM"
-  authorizer_id      = module.api_gateway.authorizers["mft_request"].id
+  authorization_type = "JWT"
+  authorizer_id      = module.api_gateway.authorizers["entra"].id
 }
 
 resource "aws_apigatewayv2_route" "transfer_ticket_parts" {
   api_id             = module.api_gateway.api_id
   route_key          = "POST /transfer-tickets/{transferTicket}/parts"
   target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
-  authorization_type = "CUSTOM"
-  authorizer_id      = module.api_gateway.authorizers["mft_request"].id
+  authorization_type = "JWT"
+  authorizer_id      = module.api_gateway.authorizers["entra"].id
 }
 
 resource "aws_apigatewayv2_route" "transfer_ticket_complete" {
   api_id             = module.api_gateway.api_id
   route_key          = "POST /transfer-tickets/{transferTicket}/complete"
   target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
-  authorization_type = "CUSTOM"
-  authorizer_id      = module.api_gateway.authorizers["mft_request"].id
+  authorization_type = "JWT"
+  authorizer_id      = module.api_gateway.authorizers["entra"].id
 }
 
 resource "aws_apigatewayv2_route" "transfer_ticket_abort" {
   api_id             = module.api_gateway.api_id
   route_key          = "DELETE /transfer-tickets/{transferTicket}"
   target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
-  authorization_type = "CUSTOM"
-  authorizer_id      = module.api_gateway.authorizers["mft_request"].id
+  authorization_type = "JWT"
+  authorizer_id      = module.api_gateway.authorizers["entra"].id
 }
 
 resource "aws_apigatewayv2_route" "api_docs" {
@@ -137,14 +139,6 @@ resource "aws_lambda_permission" "allow_api_gateway_upload_ticket" {
   function_name = module.lambda_upload_ticket.lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${module.api_gateway.api_execution_arn}/*/*"
-}
-
-resource "aws_lambda_permission" "allow_api_gateway_authorizer" {
-  statement_id  = "AllowExecutionFromApiGatewayAuthorizer"
-  action        = "lambda:InvokeFunction"
-  function_name = module.lambda_api_authorizer.lambda_function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${module.api_gateway.api_execution_arn}/authorizers/${module.api_gateway.authorizers["mft_request"].id}"
 }
 
 resource "aws_lambda_permission" "allow_api_gateway_api_docs" {
