@@ -77,7 +77,9 @@ module "s3-bucket-sftp-bc" {
   log_prefix                = "s3-access-logs/"
   log_partition_date_source = "EventTime"
 
-  enforce_kms_request_headers = false
+  # unencrypted uploads are required in the bc bucket current state (as of 23/10/26)
+  # set enforce_kms_request_headers = false to ensure this remains
+  enforce_kms_request_headers = false 
   custom_kms_key              = aws_kms_key.s3_sftp_kms_key.arn
   sse_algorithm               = "aws:kms"
 
