@@ -44,10 +44,9 @@ locals {
         "login.microsoftonline.com",
         "graph.microsoft.com", # Admin UI SSO profile and groups
       ],
-      # LiteLLM model cost map and Prisma engine downloads
+      # LiteLLM model cost map
       [
         "raw.githubusercontent.com",
-        "binaries.prisma.sh",
       ]
     )),
     local.ai_gateway_microsoft_foundry_fqdns
