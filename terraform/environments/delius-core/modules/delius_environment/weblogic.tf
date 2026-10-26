@@ -291,7 +291,13 @@ locals {
   weblogic_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic"
 }
 
+moved {
+  from = module.ecs_nightly_restart_weblogic
+  to   = module.ecs_nightly_restart_weblogic[0]
+}
+
 module "ecs_nightly_restart_weblogic" {
+  count  = var.enable_autoscaling_schedule ? 0 : 1
   source = "../components/ecs_nightly_restart"
 
   env_name     = var.env_name

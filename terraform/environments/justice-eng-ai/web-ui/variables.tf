@@ -94,8 +94,8 @@ variable "entra_reviewer_group_id" {
     reviewer dashboard when in-app OIDC is enabled. Presence in the
     id_token ``groups`` claim -> ``roles.is_reviewer_via_group`` returns
     true. See ``entra_admin_group_id`` for why this isn't a secret. Leave
-    empty to fall back on ``MPAPB_REVIEWER_USER_IDS`` /
-    ``MPAPB_REVIEWER_GITHUB_TEAM`` for reviewer authorisation.
+    empty to fall back on ``MPAPB_REVIEWER_USER_IDS`` for break-glass
+    reviewer authorisation.
   EOT
   default     = ""
   validation {
@@ -112,14 +112,14 @@ variable "builder_hostname" {
 
 variable "container_image_tag" {
   type        = string
-  description = "Container image tag to run from ECR. CI/CD pushes new task-definition revisions directly and this attribute is ignore_changes'd thereafter (see aws_ecs_service.app), so this default only matters for the service's initial creation."
-  default     = "ui-build-ce979fe"
+  description = "Container image tag to run from ECR. CI/CD now publishes the newest UI image under the moving tag ui-build-latest, so this defaults to that to stop Terraform registering task-definition revisions that point at an old pinned build. The service ignores task_definition changes (see aws_ecs_service.app), so a new deployment is still needed to pick up a fresh image."
+  default     = "ui-build-latest"
 }
 
 variable "forge_container_image_tag" {
   type        = string
-  description = "Image tag to run for the Forge Journey Lab container, pulled from the same shared-services ECR repository as the UI image (a forge-build-<sha> tag, not the UI's ui-build-<sha> tag). Same ignore_changes caveat as container_image_tag applies once CI/CD takes over."
-  default     = "forge-build-ce979fe"
+  description = "Image tag to run for the Forge Journey Lab container, pulled from the same shared-services ECR repository as the UI image (the moving forge-build-latest tag, not the UI's ui-build-latest tag). Same ignore_changes caveat as container_image_tag applies once CI/CD takes over."
+  default     = "forge-build-latest"
 }
 
 variable "app_container_port" {
@@ -182,32 +182,13 @@ variable "github_intake_workflow_file" {
   default     = "intake.yml"
 }
 
-variable "reviewer_github_team" {
-  type        = string
-  description = <<EOT
-GitHub org/team slug (e.g. "ministryofjustice/modernisation-platform")
-whose members are allowed to see the ``/review`` reviewer dashboard.
-
-The task will use the GitHub App to fetch team members via
-``GET /orgs/{org}/teams/{team_slug}/members``. This requires the App to
-have ``Organization -> Members: Read-only`` permission granted AND for
-an org owner to have accepted the permission bump (see the GitHub App
-settings page). Without that permission the API returns 404, we log a
-warning, and the reviewer dashboard silently denies all users.
-
-Leave empty to disable team-based review access entirely (only the
-env-var allow-list below can then grant access).
-EOT
-  default     = "ministryofjustice/modernisation-platform"
-}
-
 variable "reviewer_user_ids" {
   type        = string
   description = <<EOT
 Comma-separated 12-hex ``user_id`` values (the value
-``ui/app/auth.resolve_user`` returns) that get reviewer access without
-needing to verify a GitHub username. Break-glass mechanism -- prefer
-adding people to ``reviewer_github_team`` above.
+``ui/app/auth.resolve_user`` returns) that get reviewer access without an
+Entra reviewer or administrator group claim. This is a break-glass mechanism;
+prefer granting access through the relevant Entra group.
 
 Users can find their own id via ``/whoami`` while signed in.
 EOT

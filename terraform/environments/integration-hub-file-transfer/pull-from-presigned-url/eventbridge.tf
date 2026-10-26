@@ -1,3 +1,7 @@
+data "aws_cloudwatch_event_bus" "file_transfer" {
+  name = local.application_name
+}
+
 module "eventbridge_notifications" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/eventbridge/aws"
