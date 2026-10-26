@@ -1,14 +1,16 @@
 
 import os
+import time
 import boto3
+from botocore.config import Config
 
 ecs = boto3.client("ecs")
-cloudwatch = boto3.client("cloudwatch")
-
+cloudwatch = boto3.client("cloudwatch",config=Config(retries={"mode": "adaptive","max_attempts": 10}))
 
 def get_alarm_names():
-    tag_key = "app"
-    tag_value = os.environ["APP_NAME"]
+    print("Fetching CloudWatch alarms...", flush=True)
+    tag_key = "service"
+    tag_value = os.environ["SERVICE"]
 
     paginator = cloudwatch.get_paginator("describe_alarms")
     alarm_names = []
@@ -24,6 +26,7 @@ def get_alarm_names():
             response = cloudwatch.list_tags_for_resource(
                 ResourceARN=alarm_arn
             )
+            time.sleep(0.05) # Combat rate limiting
 
             tags = {
                 tag["Key"]: tag["Value"]
