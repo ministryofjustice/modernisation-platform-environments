@@ -53,8 +53,7 @@ resource "aws_iam_role_policy_attachment" "glue_service" {
 resource "aws_glue_catalog_table" "alb_access_logs" {
   name          = "${local.name}-alb-access-logs"
   database_name = aws_athena_database.alb_logs.name
-
-  table_type = "EXTERNAL_TABLE"
+  table_type    = "EXTERNAL_TABLE"
 
   partition_keys {
     name = "day"
@@ -75,14 +74,18 @@ resource "aws_glue_catalog_table" "alb_access_logs" {
     location      = "s3://${module.s3_bucket.bucket.id}/${local.name}-access/AWSLogs/${var.account_id}/elasticloadbalancing/${var.account_region}/"
     input_format  = "org.apache.hadoop.mapred.TextInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
+
     ser_de_info {
-      name = "alb_access_logs"
-      parameters = {
-        "serialization.format" = "1",
-        "input.regex"          = "([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*)[:-]([0-9]*) ([-.0-9]*) ([-.0-9]*) ([-.0-9]*) (|[-0-9]*) (-|[-0-9]*) ([-0-9]*) ([-0-9]*) \"([^ ]*) (.*) (- |[^ ]*)\" \"([^\"]*)\" ([A-Z0-9-_]+) ([A-Za-z0-9.-]*) ([^ ]*) \"([^\"]*)\" \"([^\"]*)\" \"([^\"]*)\" ([-.0-9]*) ([^ ]*) \"([^\"]*)\" \"([^\"]*)\" \"([^ ]*)\" \"([^\\s]+?)\" \"([^\\s]+)\" \"([^ ]*)\" \"([^ ]*)\" ?([^ ]*)? ?( .*)?"
-      }
+      name                  = "alb_access_logs"
       serialization_library = "org.apache.hadoop.hive.serde2.RegexSerDe"
+
+      parameters = {
+        "serialization.format" = "1"
+
+        "input.regex" = "([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*)[:-]([0-9]*) ([-.0-9]*) ([-.0-9]*) ([-.0-9]*) (|[-0-9]*) (-|[-0-9]*) ([-0-9]*) ([-0-9]*) \\\"([^ ]*) (.*) (- |[^ ]*)\\\" \\\"([^\\\"]*)\\\" ([A-Z0-9-_]+) ([A-Za-z0-9.-]*) ([^ ]*) \\\"([^\\\"]*)\\\" \\\"([^\\\"]*)\\\" \\\"([^\\\"]*)\\\" ([-.0-9]*) ([^ ]*) \\\"([^\\\"]*)\\\" \\\"([^\\\"]*)\\\" \\\"([^ ]*)\\\" \\\"([^\\\\s]+?)\\\" \\\"([^\\\\s]+)\\\" \\\"([^ ]*)\\\" \\\"([^ ]*)\\\" ?([^ ]*)? ?( .*)?"
+      }
     }
+
     columns {
       name = "type"
       type = "string"
