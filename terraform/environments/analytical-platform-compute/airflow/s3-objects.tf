@@ -14,6 +14,22 @@ module "airflow_requirements_object" {
   tags = local.tags
 }
 
+module "airflow_constraints_object" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
+  version = "5.13.0"
+
+  bucket        = module.mwaa_bucket.s3_bucket_id
+  key           = "dags/constraints-3.11.txt"
+  file_source   = "src/airflow/constraints.txt"
+  source_hash   = filemd5("src/airflow/constraints.txt")
+  force_destroy = true
+
+  tags = local.tags
+}
+
 module "airflow_kube_config_object" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
