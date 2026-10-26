@@ -73,24 +73,24 @@ resource "aws_lambda_function" "waf_maintenance" {
 }
 
 # EventBridge schedule to trigger Lambda
-#stopping allow till further notice 23/10/2026
-# resource "aws_scheduler_schedule" "waf_allow_schedule" {
-#   name       = "waf-allow-schedule"
-#   group_name = "default"
 
-#   schedule_expression_timezone = "Europe/London"
-#   flexible_time_window {
-#     mode = "OFF"
-#   }
+resource "aws_scheduler_schedule" "waf_allow_schedule" {
+  name       = "waf-allow-schedule"
+  group_name = "default"
 
-#   schedule_expression = "cron(00 07 ? * MON-SUN *)"
+  schedule_expression_timezone = "Europe/London"
+  flexible_time_window {
+    mode = "OFF"
+  }
 
-#   target {
-#     arn      = aws_lambda_function.waf_maintenance.arn
-#     input    = jsonencode({ mode = "ALLOW" })
-#     role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
-#   }
-# }
+  schedule_expression = "cron(00 07 ? * MON-SUN *)"
+
+  target {
+    arn      = aws_lambda_function.waf_maintenance.arn
+    input    = jsonencode({ mode = "ALLOW" })
+    role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
+  }
+}
 
 resource "aws_scheduler_schedule" "waf_block_schedule" {
   name       = "waf-block-schedule"
