@@ -24,6 +24,7 @@ def get_alarm_names():
             response = cloudwatch.list_tags_for_resource(
                 ResourceARN=alarm_arn
             )
+            time.sleep(0.05) # Combat rate limiting
 
             tags = {
                 tag["Key"]: tag["Value"]
