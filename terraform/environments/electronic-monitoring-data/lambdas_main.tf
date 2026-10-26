@@ -1266,7 +1266,7 @@ module "live_feed_incident_manager" {
 # Trigger cpr integration
 #-----------------------------------------------------------------------------------
 
-module "trigger_cpr_integration" {
+module "trigger_api_integration" {
   count                   = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
@@ -1282,7 +1282,8 @@ module "trigger_cpr_integration" {
   subnet_ids              = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    API_BASE_URL = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
+    API_BASE_URL     = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
+    ENVIRONMENT_NAME = local.environment_shorthand
   }
 }
 
@@ -1424,7 +1425,7 @@ module "merge_redrive_planner" {
   handler                        = "merge_redrive_planner.handler"
   memory_size                    = 1024
   timeout                        = 900
-  reserved_concurrent_executions = 2
+  reserved_concurrent_executions = 6
   cloudwatch_retention_days      = 7
 
   core_shared_services_id = local.environment_management.account_ids[
@@ -1443,22 +1444,28 @@ module "merge_redrive_planner" {
   environment_variables = {
     POWERTOOLS_LOG_LEVEL = "INFO"
 
-    ENVIRONMENT_NAME            = local.environment_shorthand
-    ATHENA_RESULTS_BUCKET       = module.s3-athena-bucket.bucket.id
-    ATHENA_WORKGROUP            = aws_athena_workgroup.downstream_reconciliation.name
-    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
-    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
-    SNS_TOPIC_ARN               = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT_NAME             = local.environment_shorthand
+    ATHENA_RESULTS_BUCKET        = module.s3-athena-bucket.bucket.id
+    ATHENA_WORKGROUP             = aws_athena_workgroup.downstream_reconciliation.name
+    RECONCILIATION_STATE_BUCKET  = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX  = "downstream-reconciliation"
+    RECONCILIATION_CONTROL_TABLE = aws_dynamodb_table.downstream_reconciliation_control.name
+    SNS_TOPIC_ARN                = aws_sns_topic.emds_alerts.arn
 
-    POSITION_LOOKBACK_HOURS            = "24"
-    ACTIVATION_LOOKBACK_HOURS          = "24"
-    RECONCILIATION_STALE_MINUTES       = "30"
-    MAX_AUTOMATIC_REPLAY_ROWS_PER_DATE = "50000"
-    MAX_AUTOMATIC_REPLAY_ROWS          = "250000"
-    MAX_AUTOMATIC_REPLAY_DATES         = "20"
-    MAX_REPLAY_ROWS_PER_CHUNK          = "50000"
-    MAX_AUTOMATIC_REPLAY_CHUNKS        = "20"
-    ATHENA_MAX_POLL_SECONDS            = "840"
+    POSITION_LOOKBACK_HOURS              = "24"
+    ACTIVATION_LOOKBACK_HOURS            = "24"
+    RECONCILIATION_STALE_MINUTES         = "30"
+    MAX_AUTOMATIC_REPLAY_ROWS_PER_DATE   = "50000"
+    MAX_AUTOMATIC_REPLAY_ROWS            = "250000"
+    MAX_AUTOMATIC_REPLAY_DATES           = "20"
+    MAX_REPLAY_ROWS_PER_CHUNK            = "250000"
+    MAX_AUTOMATIC_REPLAY_CHUNKS          = "20"
+    ROLLING_REVIEW_THRESHOLD_ROWS        = "2000000"
+    HISTORICAL_REVIEW_THRESHOLD_ROWS     = "2000000"
+    ROLLING_RECOVERY_EXIT_ROWS           = "250000"
+    MAX_ROLLING_ITERATIONS_PER_EXECUTION = "20"
+    RECOVERY_LEASE_SECONDS               = "1800"
+    ATHENA_MAX_POLL_SECONDS              = "840"
   }
 }
 
@@ -1486,9 +1493,11 @@ module "merge_redrive_approval" {
   )
 
   environment_variables = {
-    ENVIRONMENT_NAME            = local.environment_shorthand
-    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
-    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+    ENVIRONMENT_NAME             = local.environment_shorthand
+    RECONCILIATION_STATE_BUCKET  = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX  = "downstream-reconciliation"
+    RECONCILIATION_CONTROL_TABLE = aws_dynamodb_table.downstream_reconciliation_control.name
+    RECOVERY_LEASE_SECONDS       = "1800"
   }
 }
 
@@ -1571,4 +1580,93 @@ module "send_ear_sar_response" {
     EAR_SAR_REPLY_EMAILS        = jsondecode(data.aws_secretsmanager_secret_version.gov_notify_details[0].secret_string)["emails"]
     GOV_NOTIFY_REPLY_KEY        = jsondecode(data.aws_secretsmanager_secret_version.gov_notify_details[0].secret_string)["reply_key"]
   }
+}
+
+#-----------------------------------------------------------------------------------
+# Trigger DLT Iceberg Maintenance
+#-----------------------------------------------------------------------------------
+
+module "trigger_dlt_iceberg_maintenance" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "trigger_dlt_iceberg_maintenance"
+  image_name                     = "trigger_dlt_iceberg_maintenance"
+  role_name                      = aws_iam_role.trigger_dlt_iceberg_maintenance.name
+  role_arn                       = aws_iam_role.trigger_dlt_iceberg_maintenance.arn
+  memory_size                    = 2048
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    CATALOG_ID              = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME        = local.env_name
+    ATHENA_WORKGROUP        = aws_athena_workgroup.dlt_iceberg_maintenance.name
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+
+  depends_on = [
+    aws_iam_role_policy.trigger_dlt_iceberg_maintenance,
+    aws_lakeformation_permissions.dlt_iceberg_maintenance_database_access,
+    aws_lakeformation_permissions.dlt_iceberg_maintenance_table_access,
+    aws_lakeformation_permissions.dlt_iceberg_maintenance_data_location,
+  ]
+}
+
+module "poll_dlt_iceberg_maintenance" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "poll_dlt_iceberg_maintenance"
+  image_name                     = "poll_dlt_iceberg_maintenance"
+  role_name                      = aws_iam_role.poll_dlt_iceberg_maintenance.name
+  role_arn                       = aws_iam_role.poll_dlt_iceberg_maintenance.arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    CATALOG_ID              = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME        = local.env_name
+    ATHENA_WORKGROUP        = aws_athena_workgroup.dlt_iceberg_maintenance.name
+    MAX_WAIT_SECONDS        = "2700"
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+
+  depends_on = [aws_iam_role_policy.poll_dlt_iceberg_maintenance]
+}
+
+module "register_athena" {
+  count                          = local.is-production ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "register_athena"
+  image_name                     = "register_athena"
+  role_name                      = aws_iam_role.register_athena[0].name
+  role_arn                       = aws_iam_role.register_athena[0].arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    ENVIRONMENT_NAME = local.env_name
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.register_athena,
+    aws_lakeformation_permissions.api_int_db_level_perms,
+    aws_lakeformation_permissions.api_int_table_level_perms,
+  ]
 }

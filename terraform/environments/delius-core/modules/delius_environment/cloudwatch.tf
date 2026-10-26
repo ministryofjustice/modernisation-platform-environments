@@ -48,7 +48,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_4xx_warning" {
   statistic           = "Sum"
   metric_name         = "HTTPCode_ELB_4XX_Count"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 50
+  threshold           = 200
   treat_missing_data  = "notBreaching"
   evaluation_periods  = 2
   period              = 60
@@ -69,7 +69,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_5xx_warning" {
   statistic           = "Sum"
   metric_name         = "HTTPCode_ELB_5XX_Count"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 1
+  threshold           = 10
   treat_missing_data  = "notBreaching"
   evaluation_periods  = 2
   period              = 60

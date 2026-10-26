@@ -146,6 +146,29 @@ resource "aws_cloudwatch_metric_alarm" "sqs_dlq_has_messages" {
   ]
 }
 
+resource "aws_cloudwatch_metric_alarm" "fms_audit_write_failed" {
+  alarm_name        = "fms_audit_write_failed"
+  alarm_description = "Triggered when load_fms cannot write FMS validation audit data"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  # Use EventBridge -> cloudwatch_alarm_threader -> SNS custom notifications.
+  # Disable direct alarm actions to avoid duplicate Slack messages.
+  actions_enabled = false
+
+  metric_name = "FmsAuditWriteFailedCount"
+  namespace   = "EMDS/FMS"
+  period      = 300
+  statistic   = "Sum"
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
 resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   count               = 1
   alarm_name          = "mdss_reconciler_errors"
@@ -483,6 +506,62 @@ resource "aws_cloudwatch_metric_alarm" "specials_guard_lambda_errors" {
 
   dimensions = {
     FunctionName = module.live_feed_specials_remediator.lambda_function_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation workflow failures
+# Surface planner, replay, verification and dependency failures in Slack.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_state_machines = tomap({
+    staged = {
+      consumer = "STAGED"
+      arn      = module.merge_into_mdss_staged_position.arn
+    }
+    ac = {
+      consumer = "AC"
+      arn      = module.merge_into_mdss_ac_position.arn
+    }
+    emdi = {
+      consumer = "EMDI"
+      arn      = module.merge_into_emdi_position.arn
+    }
+  })
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_execution_failed" {
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_state_machines
+    : tomap({})
+  )
+
+  alarm_name = "downstream_reconciliation_${each.key}_execution_failed"
+
+  alarm_description = (
+    "Triggered when ${each.value.consumer} downstream reconciliation fails"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "ExecutionsFailed"
+  namespace   = "AWS/States"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    StateMachineArn = each.value.arn
   }
 
   alarm_actions = [

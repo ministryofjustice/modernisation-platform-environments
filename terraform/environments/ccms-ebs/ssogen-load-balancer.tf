@@ -25,7 +25,7 @@ resource "aws_lb" "ssogen_alb_console" {
   name               = lower(format("lb-console-%s-internal", local.application_name_ssogen))
   internal           = true
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.sg_ssogen_internal_alb[count.index].id]
+  security_groups    = [aws_security_group.sg_ssogen_console_internal_alb[count.index].id]
   subnets            = data.aws_subnets.shared-private.ids
 
   drop_invalid_header_fields = true

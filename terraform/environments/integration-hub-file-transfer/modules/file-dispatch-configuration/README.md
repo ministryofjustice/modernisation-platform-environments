@@ -6,9 +6,9 @@ These components have separate Terraform state. Keeping the configuration in a l
 
 Sensitive notification values and credentials must not be committed here. Terraform creates each dispatch secret with an initial value and ignores subsequent secret-value changes so that operators can populate sensitive values directly in AWS Secrets Manager.
 
-## Why there are two outputs
+## Outputs
 
-`prefixes` preserves the configuration as it is written: identities contain source prefixes, and each prefix contains its dispatch settings. This shape is easier to read and edit, and the parent component uses it when creating secrets.
+`prefixes` exports the runtime `action` and `notifications` settings only: identities contain source prefixes, and each prefix contains its dispatch settings. This shape is easier to read and edit, and the parent component uses it when creating secrets.
 
 `entries` presents the same non-sensitive action settings in a form suited to Terraform resources. Each entry is keyed by a short identifier derived from its identity and source prefix. Delivery patterns can filter this map by action and use it directly with `for_each`.
 
@@ -47,3 +47,20 @@ action = {
 ```
 
 The default region for both patterns is `eu-west-2`.
+
+## Slack pickup configuration
+
+Add a `pickup` block beside `action` and `notifications` in the relevant source
+prefix entry. Set `recipient_id` to the same value as `notifications.slack`, and
+provide `authorised_groups` (group name to Identity Center group ID),
+`slack_channel_id` and `slack_team_id`.
+
+`pickup_recipients` exports those settings with the source prefix, keyed by the
+recipient ID. The pickup component uses them to configure Slack delivery and
+read-only grants to `<recipient_id>/*`. The `pickup` block is not written to the
+dispatch secret. Existing web-app assignments remain in the root configuration;
+the group IDs here must refer to groups already assigned to that application.
+
+Keep recipient IDs and group names stable: they form resource keys and pickup
+folder paths. Adding pickup access does not grant upload/delete permission or
+change the existing incoming-folder grants.

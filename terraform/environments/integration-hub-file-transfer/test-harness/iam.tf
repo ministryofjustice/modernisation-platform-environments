@@ -1,3 +1,21 @@
+data "aws_s3_bucket" "incoming" {
+  count = local.create_test_harness ? 1 : 0
+
+  bucket = local.incoming_bucket_name
+}
+
+data "aws_kms_key" "incoming" {
+  count = local.create_test_harness ? 1 : 0
+
+  key_id = local.incoming_kms_key_alias
+}
+
+data "aws_s3_bucket" "clean" {
+  count = local.create_test_harness ? 1 : 0
+
+  bucket = local.clean_bucket_name
+}
+
 data "aws_iam_policy_document" "test_harness_trust" {
   count = local.create_test_harness ? 1 : 0
 
@@ -21,7 +39,10 @@ data "aws_iam_policy_document" "test_harness_trust" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/integration-hub:environment:smoke-test"]
+      values = [
+        "repo:ministryofjustice/integration-hub:environment:smoke-test",
+        "repo:ministryofjustice/modernisation-platform-environments:environment:smoke-test"
+      ]
     }
   }
 }
@@ -96,6 +117,33 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     effect    = "Allow"
     actions   = ["s3:GetObject"]
     resources = ["${module.s3_test_harness.s3_bucket_arn}/${local.destination_prefix}*"]
+  }
+
+  statement {
+    sid       = "ListTestCleanObjectVersions"
+    effect    = "Allow"
+    actions   = ["s3:ListBucketVersions"]
+    resources = [data.aws_s3_bucket.clean[0].arn]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["${local.incoming_prefix}*"]
+    }
+  }
+
+  statement {
+    sid       = "DescribeTestDispatchConfiguration"
+    effect    = "Allow"
+    actions   = ["secretsmanager:DescribeSecret"]
+    resources = [local.test_dispatch_secret_arn]
+  }
+
+  statement {
+    sid       = "InvokeTestPushToS3Writer"
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = [local.test_writer_function_arn]
   }
 
   statement {

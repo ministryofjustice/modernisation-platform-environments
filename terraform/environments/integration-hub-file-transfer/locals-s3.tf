@@ -1,4 +1,6 @@
 locals {
+  cloudtrail_retention_days = local.is-production ? 400 : 30
+
   s3_bucket_keys = [
     "incoming",
     "processing",
@@ -49,6 +51,10 @@ locals {
       ]
     }
 
+    preproduction = {
+      default = []
+    }
+
     production = {
       default = [
         {
@@ -75,6 +81,11 @@ locals {
 
     test = {
       default = local.s3_bucket_lifecycle_defaults.test.default
+      buckets = {}
+    }
+
+    preproduction = {
+      default = local.s3_bucket_lifecycle_defaults.preproduction.default
       buckets = {}
     }
 

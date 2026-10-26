@@ -100,20 +100,19 @@ resource "aws_ecs_task_definition" "app" {
           name  = "GITHUB_INTAKE_WORKFLOW_FILE"
           value = var.github_intake_workflow_file
         },
-        # Reviewer dashboard ("/review"): only members of this team can
-        # verify their GH username and see the queue. Requires the
-        # GitHub App to have Organization -> Members: Read-only granted
-        # (see var.reviewer_github_team docstring). Empty disables the
-        # team-based path entirely.
-        {
-          name  = "MPAPB_REVIEWER_GITHUB_TEAM"
-          value = var.reviewer_github_team
-        },
         # Break-glass allow-list of ``user_id`` values (from /whoami)
-        # that bypass the team check. Prefer the team-based path.
+        # for reviewer access when Entra group claims are unavailable.
         {
           name  = "MPAPB_REVIEWER_USER_IDS"
           value = var.reviewer_user_ids
+        },
+        {
+          name  = "MPAPB_REVIEW_BACKEND"
+          value = "dynamodb"
+        },
+        {
+          name  = "MPAPB_REVIEW_TABLE_NAME"
+          value = local.build_review_table_name
         },
         # Operator override for the ``email_id`` input on the Deployment
         # workflow dispatch. Empty (default) sends the empty string --
@@ -132,13 +131,21 @@ resource "aws_ecs_task_definition" "app" {
           name  = "MPAPB_LOG_FORMAT"
           value = "json"
         },
-        # Trust the ALB's X-Amzn-Oidc-Identity header only when the listener
-        # is actually running the authenticate-oidc action; otherwise the
-        # header can be spoofed by anything with network reach to the task.
-        # See ui/app/auth.py.
+        # ALB sign-in mode (builder_auth_mode = "alb", see oidc.tf). The UI
+        # verifies the ALB-signed X-Amzn-Oidc-Data JWT on every request --
+        # ES256 signature, expiry, and that its ``signer`` header equals
+        # MPAPB_ALB_SIGNER_ARN -- and refuses requests without a valid one.
+        # The unsigned X-Amzn-Oidc-Identity header is never trusted on its
+        # own. The UI refuses to START in ALB mode without a valid signer
+        # ARN, so both values flip together. See app/alb_auth.py in the
+        # prototype-builder repo.
         {
           name  = "MPAPB_TRUST_ALB_OIDC"
           value = local.oidc_wired ? "true" : "false"
+        },
+        {
+          name  = "MPAPB_ALB_SIGNER_ARN"
+          value = local.oidc_wired ? aws_lb.app.arn : ""
         },
         {
           name  = "MPAPB_FORGE_URL"

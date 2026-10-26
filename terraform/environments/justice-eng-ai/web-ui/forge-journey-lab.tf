@@ -216,6 +216,73 @@ resource "aws_iam_role_policy_attachment" "forge_ecs_task_package_s3" {
   policy_arn = aws_iam_policy.forge_ecs_task_package_s3[0].arn
 }
 
+# Grant Forge's task role write access to the build-details table, which
+# packaging records each build in before the S3 upload. The table is owned by
+# the backend-processing root (dynamodb.tf there); its name is read from that
+# root's outputs, like the staging bucket. Forge only writes to DynamoDB when
+# it packages to S3, so this is gated on the same flag.
+#   UpdateItem: atomically increments the per-app counter item (SysKey 0).
+#   PutItem:    writes the build record (conditional, never overwrites).
+# The table uses the AWS-managed DynamoDB key, so no KMS grant is needed.
+# try() guards against backend-processing not having been applied with its
+# build_details_table_name output yet -- remove once it has been.
+locals {
+  forge_build_details_table_name = try(data.terraform_remote_state.backend_processing.outputs.build_details_table_name, "")
+  forge_build_details_enabled    = local.forge_package_s3_enabled && local.forge_build_details_table_name != ""
+}
+
+data "aws_iam_policy_document" "forge_ecs_task_build_details" {
+  count = local.forge_build_details_enabled ? 1 : 0
+
+  statement {
+    sid    = "RecordForgeBuilds"
+    effect = "Allow"
+    actions = [
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${local.forge_build_details_table_name}"]
+  }
+
+  # Requester status uses a projected Query, never Scan or workflow tokens.
+  statement {
+    sid       = "ReadForgeRequesterStatus"
+    effect    = "Allow"
+    actions   = ["dynamodb:Query"]
+    resources = ["arn:${data.aws_partition.current.partition}:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${local.forge_build_details_table_name}"]
+
+    condition {
+      test     = "ForAllValues:StringEquals"
+      variable = "dynamodb:Attributes"
+      values   = ["AppID", "SysKey", "BuildID", "UserName", "JobStage", "JobStatus", "Date", "ReviewReason"]
+    }
+    condition {
+      test     = "Null"
+      variable = "dynamodb:Attributes"
+      values   = ["false"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "dynamodb:Select"
+      values   = ["SPECIFIC_ATTRIBUTES"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "forge_ecs_task_build_details" {
+  count       = local.forge_build_details_enabled ? 1 : 0
+  name        = "${local.forge_name}-ecs-task-build-details"
+  description = "Allow Forge Journey Lab to record packaged builds and read projected requester status."
+  policy      = data.aws_iam_policy_document.forge_ecs_task_build_details[0].json
+  tags        = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "forge_ecs_task_build_details" {
+  count      = local.forge_build_details_enabled ? 1 : 0
+  role       = aws_iam_role.forge_ecs_task[0].name
+  policy_arn = aws_iam_policy.forge_ecs_task_build_details[0].arn
+}
+
 resource "aws_security_group" "forge_ecs_service" {
   count = local.forge_internal ? 1 : 0
 
@@ -376,9 +443,10 @@ resource "aws_ecs_task_definition" "forge" {
         { name = "ENTRA_POST_LOGOUT_REDIRECT_URI", value = "https://${local.forge_hostname}/" },
         { name = "ENTRA_REDIRECT_URI", value = "https://${local.forge_hostname}/auth/callback" },
         { name = "FORGE_PACKAGE_S3_BUCKET", value = local.forge_package_s3_bucket },
-        { name = "FORGE_PACKAGE_S3_KMS_KEY_ARN", value = local.forge_package_s3_kms_key_arn },
+        { name = "FORGE_PACKAGE_KEY_VERSION", value = "2" },
         { name = "FORGE_PACKAGE_S3_PREFIX", value = var.forge_package_s3_prefix },
         { name = "FORGE_PACKAGE_S3_REGION", value = data.aws_region.current.region },
+        { name = "REVIEW_TABLE_NAME", value = local.build_review_table_name },
         { name = "LLM_MODEL", value = var.bedrock_model_id },
         { name = "LLM_PROVIDER", value = "bedrock" },
         { name = "NODE_ENV", value = "production" },

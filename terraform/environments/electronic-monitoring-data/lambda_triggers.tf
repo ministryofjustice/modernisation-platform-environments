@@ -213,6 +213,20 @@ module "fms_fan_out_event_queue" {
   maximum_concurrency  = 100
   max_receive_count    = local.load_sqs_max_receive_count
 }
+# ----------------------------------------------
+# Register Athena event queue
+# Do not create the Register Athena trigger in production.
+# ----------------------------------------------
+module "register_athena_event_queue" {
+  count = local.is-production ? 0 : 1
+
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.register_athena[0].lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 2
+  max_receive_count    = local.load_sqs_max_receive_count
+}
 
 resource "aws_s3_bucket_notification" "load_mdss_event" {
   bucket = module.s3-raw-formatted-data-bucket.bucket.id
@@ -236,7 +250,26 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     filter_prefix = "serco/fms/validation_rejected"
   }
 
-  depends_on = [module.load_mdss_event_queue, module.load_fms_event_queue]
+  dynamic "queue" {
+    for_each = local.is-production ? {} : {
+      person_record = "person_record/"
+      cemo          = "cemo/"
+    }
+
+    iterator = trigger
+
+    content {
+      queue_arn     = module.register_athena_event_queue[0].sqs_queue.arn
+      events        = ["s3:ObjectCreated:*"]
+      filter_prefix = trigger.value
+    }
+  }
+
+  depends_on = [
+    module.load_mdss_event_queue,
+    module.load_fms_event_queue,
+    module.register_athena_event_queue,
+  ]
 }
 
 # ----------------------------------------------
@@ -629,21 +662,25 @@ resource "aws_lambda_permission" "allow_eventbridge_specials_remediation" {
 
 # ------------------------------------------------------------------------------
 # Rolling downstream position reconciliation
+# Run each consumer every four hours through its existing merge orchestration.
 # ------------------------------------------------------------------------------
 
 locals {
   downstream_reconciliation_rolling_schedules = tomap({
     staged = {
       consumer            = "STAGED"
-      schedule_expression = "cron(0,30 * * * ? *)"
+      schedule_expression = "cron(0 0/4 * * ? *)"
+      state_machine_arn   = module.merge_into_mdss_staged_position.arn
     }
     ac = {
       consumer            = "AC"
-      schedule_expression = "cron(10,40 * * * ? *)"
+      schedule_expression = "cron(10 0/4 * * ? *)"
+      state_machine_arn   = module.merge_into_mdss_ac_position.arn
     }
     emdi = {
       consumer            = "EMDI"
-      schedule_expression = "cron(20,50 * * * ? *)"
+      schedule_expression = "cron(20 0/4 * * ? *)"
+      state_machine_arn   = module.merge_into_emdi_position.arn
     }
   })
 }
@@ -657,7 +694,7 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
 
   name = "downstream_reconciliation_${each.key}_rolling"
 
-  description = "Runs ${each.value.consumer} downstream position reconciliation every 30 minutes"
+  description = "Runs ${each.value.consumer} downstream position reconciliation every 4 hours"
 
   flexible_time_window {
     mode = "OFF"
@@ -666,14 +703,19 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
   schedule_expression = each.value.schedule_expression
 
   target {
-    arn      = aws_sfn_state_machine.downstream_reconciliation.arn
+    arn      = each.value.state_machine_arn
     role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
 
     input = jsonencode({
-      consumer = each.value.consumer
-      mode     = "rolling"
+      mode = "rolling"
     })
   }
+
+  depends_on = [
+    aws_lakeformation_permissions.merge_redrive_planner_database_access,
+    aws_lakeformation_permissions.merge_redrive_planner_table_access,
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+  ]
 }
 
 # ------------------------------------------------------------------------------
@@ -732,4 +774,32 @@ resource "aws_scheduler_schedule" "rota_channel_notifier" {
     arn      = module.rota_channel_notifier.lambda_function_arn
     role_arn = aws_iam_role.rota_channel_notifier_scheduler[0].arn
   }
+}
+
+
+#-----------------------------------------------------------------------------------
+# Trigger DLT Iceberg Maintenance
+# Runs sequential OPTIMIZE and VACUUM on dlt Iceberg load tables.
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "dlt_iceberg_maintenance" {
+  name        = "dlt-iceberg-maintenance"
+  description = "Run sequential OPTIMIZE and VACUUM on dlt Iceberg load tables."
+  # Keep scheduled starts further apart than the state machine's 3000-second timeout.
+  schedule_expression = "rate(1 hour)"
+}
+
+resource "aws_cloudwatch_event_target" "dlt_iceberg_maintenance" {
+  rule      = aws_cloudwatch_event_rule.dlt_iceberg_maintenance.name
+  target_id = "dlt-iceberg-maintenance"
+  arn       = module.dlt_iceberg_maintenance.arn
+  role_arn  = aws_iam_role.dlt_iceberg_maintenance_events.arn
+  input     = jsonencode({})
+
+  retry_policy {
+    maximum_event_age_in_seconds = 300
+    maximum_retry_attempts       = 2
+  }
+
+  depends_on = [aws_iam_role_policy.dlt_iceberg_maintenance_start]
 }
