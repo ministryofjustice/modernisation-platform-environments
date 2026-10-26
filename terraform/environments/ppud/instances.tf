@@ -944,14 +944,14 @@ resource "aws_instance" "s618358rgvw030" {
   }
 }
 
-# Data Analytics Server
+# Data Analytics / Anti-Malware Scanning Server
 
 resource "aws_instance" "s618358rgvw031" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-038a9d01a2c2c0cea"
-  instance_type          = "c6i.xlarge"
+  instance_type          = "c8i.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]
