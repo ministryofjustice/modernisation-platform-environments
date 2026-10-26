@@ -80,7 +80,7 @@ variable "entra_admin_group_id" {
     tfvar rather than in Secrets Manager. Leave empty to disable
     admin-role wiring.
   EOT
-  default     = ""
+  default     = "d0c842bc-1581-47b6-af5c-409db76fbbf2"
   validation {
     condition     = var.entra_admin_group_id == "" || can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", var.entra_admin_group_id))
     error_message = "entra_admin_group_id must be empty or a GUID."
@@ -97,7 +97,7 @@ variable "entra_reviewer_group_id" {
     empty to fall back on ``MPAPB_REVIEWER_USER_IDS`` for break-glass
     reviewer authorisation.
   EOT
-  default     = ""
+  default     = "d0c842bc-1581-47b6-af5c-409db76fbbf2"
   validation {
     condition     = var.entra_reviewer_group_id == "" || can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", var.entra_reviewer_group_id))
     error_message = "entra_reviewer_group_id must be empty or a GUID."

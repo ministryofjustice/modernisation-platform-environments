@@ -102,7 +102,11 @@ def build_github_issue(event):
             f"## Event scope\n{detail['eventScopeCode']}",
         ]
     )
-    return {"title": title, "body": "\n\n".join(sections), "labels": ["support"]}
+    return {
+        "title": title,
+        "body": "\n\n".join(sections),
+        "labels": ["support", "aws_health_event"],
+    }
 
 
 def create_github_issue(github_org, github_token, repo, issue):
@@ -141,6 +145,25 @@ def lambda_handler(event, context):
 
     if not isinstance(event, dict):
         raise ValueError("Event must be an object")
+
+    affected_entities = event["detail"].get("affectedEntities")
+    if affected_entities and all(
+        entity.get("status") == "RESOLVED" for entity in affected_entities
+    ):
+        message = (
+            "All affected entities are RESOLVED; this is a resolved event, "
+            "therefore not generating a ticket."
+        )
+        logger.info(
+            "%s Event ARN: %s; account: %s",
+            message,
+            event["detail"].get("eventArn"),
+            event.get("account"),
+        )
+        return {
+            "statusCode": 200,
+            "body": json.dumps({"message": message}),
+        }
 
     audience = event.get("audience") or os.getenv("WEB_IDENTITY_AUDIENCE")
     duration_seconds_raw = event.get("duration_seconds") or os.getenv(

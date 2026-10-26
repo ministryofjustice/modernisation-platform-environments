@@ -1425,7 +1425,7 @@ module "merge_redrive_planner" {
   handler                        = "merge_redrive_planner.handler"
   memory_size                    = 1024
   timeout                        = 900
-  reserved_concurrent_executions = 2
+  reserved_concurrent_executions = 6
   cloudwatch_retention_days      = 7
 
   core_shared_services_id = local.environment_management.account_ids[
@@ -1458,9 +1458,10 @@ module "merge_redrive_planner" {
     MAX_AUTOMATIC_REPLAY_ROWS_PER_DATE   = "50000"
     MAX_AUTOMATIC_REPLAY_ROWS            = "250000"
     MAX_AUTOMATIC_REPLAY_DATES           = "20"
-    MAX_REPLAY_ROWS_PER_CHUNK            = "50000"
+    MAX_REPLAY_ROWS_PER_CHUNK            = "250000"
     MAX_AUTOMATIC_REPLAY_CHUNKS          = "20"
     ROLLING_REVIEW_THRESHOLD_ROWS        = "2000000"
+    HISTORICAL_REVIEW_THRESHOLD_ROWS     = "2000000"
     ROLLING_RECOVERY_EXIT_ROWS           = "250000"
     MAX_ROLLING_ITERATIONS_PER_EXECUTION = "20"
     RECOVERY_LEASE_SECONDS               = "1800"

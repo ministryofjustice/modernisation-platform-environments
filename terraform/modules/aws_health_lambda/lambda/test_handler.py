@@ -32,9 +32,10 @@ class HandlerTests(unittest.TestCase):
         self.addCleanup(environment.stop)
         self.event = {
             "detail-type": "AWS Health Event",
-            "account": "123456789",
+            "account": "test-account",
             "resources": ["cluster|service"],
             "detail": {
+                "eventTypeCode": "AWS_ECS_TASK_PATCHING_RETIREMENT",
                 "startTime": "Thu, 22 Oct 2026 18:00:00 GMT",
                 "endTime": "Thu, 29 Oct 2026 18:00:00 GMT",
                 "affectedEntities": [
@@ -52,7 +53,11 @@ class HandlerTests(unittest.TestCase):
 
     def test_issue_contains_health_fields(self):
         issue = handler.build_github_issue(self.event)
-        self.assertEqual(issue["title"], "AWS Health Event: 123456789")
+        self.assertEqual(
+            issue["title"],
+            "AWS Health Event: AWS_ECS_TASK_PATCHING_RETIREMENT - test-account",
+        )
+        self.assertEqual(issue["labels"], ["support", "aws_health_event"])
         for value in (
             self.event["detail"]["startTime"],
             self.event["detail"]["endTime"],
@@ -116,7 +121,7 @@ class HandlerTests(unittest.TestCase):
         )
         original = copy.deepcopy(self.event)
         issue = handler.build_github_issue(self.event)
-        self.assertEqual(set(issue), {"title", "body"})
+        self.assertEqual(set(issue), {"title", "body", "labels"})
         self.assertIn(
             "## Resources\n- cluster|service\n- another-cluster|another-service",
             issue["body"],
@@ -319,6 +324,72 @@ class HandlerTests(unittest.TestCase):
                 )
         self.assertNotIn(sensitive_value, str(raised.exception))
         self.assertNotIn(sensitive_value, "\n".join(logs.output))
+
+    @patch.object(handler, "create_github_issue")
+    @patch.object(handler, "get_github_token")
+    @patch.object(handler, "get_web_identity_token")
+    def test_resolved_entities_skip_ticket_and_authentication(
+        self, web_token, github_token, create
+    ):
+        for count in (1, 2):
+            with self.subTest(entity_count=count):
+                event = copy.deepcopy(self.event)
+                event["detail"]["eventArn"] = "arn:aws:health:example"
+                event["detail"]["affectedEntities"] = [
+                    {"entityValue": f"resource-{index}", "status": "RESOLVED"}
+                    for index in range(count)
+                ]
+                original = copy.deepcopy(event)
+                with self.assertLogs(handler.logger, level="INFO") as logs:
+                    result = handler.lambda_handler(event, None)
+                self.assertEqual(result["statusCode"], 200)
+                self.assertIn(
+                    "not generating a ticket", json.loads(result["body"])["message"]
+                )
+                self.assertIn("All affected entities are RESOLVED", "\n".join(logs.output))
+                self.assertIn("arn:aws:health:example", "\n".join(logs.output))
+                self.assertEqual(event, original)
+        web_token.assert_not_called()
+        github_token.assert_not_called()
+        create.assert_not_called()
+
+    @patch.object(handler, "create_github_issue")
+    @patch.object(handler, "get_github_token", return_value="github-token")
+    @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
+    def test_non_resolved_or_absent_entities_still_generate_labelled_tickets(
+        self, web_token, github_token, create
+    ):
+        cases = {
+            "mixed": [{"status": "RESOLVED"}, {"status": "IMPAIRED"}],
+            "impaired": [{"status": "IMPAIRED"}],
+            "unknown_status": [{"status": "RESOLVED"}, {}],
+            "empty": [],
+            "null": None,
+            "missing": None,
+        }
+        create.return_value = {"number": 42, "html_url": "https://example/42"}
+        for name, entities in cases.items():
+            with self.subTest(case=name):
+                web_token.reset_mock()
+                github_token.reset_mock()
+                create.reset_mock()
+                event = copy.deepcopy(self.event)
+                if name == "missing":
+                    del event["detail"]["affectedEntities"]
+                else:
+                    event["detail"]["affectedEntities"] = entities
+                original = copy.deepcopy(event)
+                result = handler.lambda_handler(event, None)
+                web_token.assert_called_once()
+                github_token.assert_called_once()
+                create.assert_called_once()
+                self.assertEqual(
+                    create.call_args.kwargs["issue"]["labels"],
+                    ["support", "aws_health_event"],
+                )
+                self.assertEqual(result["statusCode"], 200)
+                self.assertEqual(json.loads(result["body"])["issue_number"], 42)
+                self.assertEqual(event, original)
 
     @patch.object(handler, "create_github_issue")
     @patch.object(handler, "get_github_token")
