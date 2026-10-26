@@ -198,15 +198,6 @@ module "s3-bucket-dbbackup" {
     ]
   })]
 
-  log_buckets = {
-    log_bucket_name = local.logging_bucket_name
-    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-  }
-  manage_log_bucket_policy = false
-
-  log_prefix                = "s3-access-logs/"
-  log_partition_date_source = "EventTime"
-
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
