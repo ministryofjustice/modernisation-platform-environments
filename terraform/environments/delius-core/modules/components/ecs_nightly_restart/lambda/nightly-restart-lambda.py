@@ -1,6 +1,8 @@
 
 import os
+import time
 import boto3
+from botocore.config import Config
 
 ecs = boto3.client("ecs")
 cloudwatch = boto3.client("cloudwatch",config=Config(retries={"mode": "adaptive","max_attempts": 10}))
