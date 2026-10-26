@@ -23,6 +23,10 @@ locals {
   forge_desired_count      = 1
 }
 
+data "aws_ecr_image" "forge_build_latest" {
+  repository_name = local.forge_ecr_repository_url
+  image_tag       = "forge-build-latest"
+}
 resource "random_password" "forge_session_secret" {
   count = local.forge_internal ? 1 : 0
 
