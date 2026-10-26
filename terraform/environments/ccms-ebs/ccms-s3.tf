@@ -143,8 +143,8 @@ resource "aws_s3_bucket_notification" "logging_bucket_notification" {
 # S3 Bucket - R-sync
 # ---------------------------------------------
 module "s3-bucket-dbbackup" {
-  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/494aa4438cec612e45387109caa832aff4cac1ce
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=494aa4438cec612e45387109caa832aff4cac1ce" # v9.0.1
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = true
@@ -206,10 +206,6 @@ module "s3-bucket-dbbackup" {
 
   log_prefix                = "s3-access-logs/"
   log_partition_date_source = "EventTime"
-
-  sse_algorithm               = "aws:kms"
-  custom_kms_key              = aws_kms_key.s3_dbbackup_kms_key.arn
-  enforce_kms_request_headers = false
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
