@@ -33,11 +33,6 @@
         },
         {
           "Variable": "$.mode",
-          "StringEquals": "historical_planning",
-          "Next": "ResumeHistoricalPlanning"
-        },
-        {
-          "Variable": "$.mode",
           "StringEquals": "historical_recovery",
           "Next": "ResumeHistoricalRecovery"
         },
@@ -360,7 +355,7 @@
         {
           "Variable": "$.status",
           "StringEquals": "planning",
-          "Next": "InitialiseHistoricalPlanning"
+          "Next": "RunHistoricalDiscovery"
         },
         {
           "Variable": "$.status",
@@ -370,38 +365,90 @@
       ],
       "Default": "UnexpectedHistoricalPlanningResult"
     },
-    "InitialiseHistoricalPlanning": {
-      "Type": "Pass",
-      "Parameters": {
+    "RunHistoricalDiscovery": {
+      "Type": "Map",
+      "Label": "HistoricalDiscovery",
+      "ItemReader": {
+        "Resource": "arn:aws:states:::s3:getObject",
+        "ReaderConfig": {
+          "InputType": "JSON",
+          "ItemsPointer": "/pending_scopes"
+        },
+        "Parameters": {
+          "Bucket.$": "$.discovery_bucket",
+          "Key.$": "$.discovery_plan_key"
+        }
+      },
+      "ItemSelector": {
         "consumer": "${reconciliation_consumer}",
         "execution_id.$": "$.execution_id",
-        "planning_iterations": 0,
-        "planning_execution_index": 0
+        "scope_index.$": "$$.Map.Item.Index",
+        "scope.$": "$$.Map.Item.Value"
       },
-      "Next": "PlanHistorical"
-    },
-    "ResumeHistoricalPlanning": {
-      "Type": "Pass",
-      "Parameters": {
-        "consumer": "${reconciliation_consumer}",
-        "execution_id.$": "$.execution_id",
-        "planning_iterations": 0,
-        "planning_execution_index.$": "$.planning_execution_index"
+      "MaxConcurrency": 5,
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "DISTRIBUTED",
+          "ExecutionType": "STANDARD"
+        },
+        "StartAt": "InspectHistoricalDiscoveryScope",
+        "States": {
+          "InspectHistoricalDiscoveryScope": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${planner_function_name}",
+              "Payload": {
+                "action": "inspect_historical_discovery_scope",
+                "consumer.$": "$.consumer",
+                "execution_id.$": "$.execution_id",
+                "scope_index.$": "$.scope_index",
+                "scope.$": "$.scope"
+              }
+            },
+            "OutputPath": "$.Payload",
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 3
+              }
+            ],
+            "End": true
+          }
+        }
       },
-      "Next": "PlanHistorical"
+      "ResultPath": null,
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
+        }
+      ],
+      "Next": "AggregateHistoricalDiscovery"
     },
-    "PlanHistorical": {
+    "AggregateHistoricalDiscovery": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "FunctionName": "${planner_function_name}",
         "Payload": {
-          "action": "plan_historical",
+          "action": "aggregate_historical_discovery",
           "consumer": "${reconciliation_consumer}",
-          "execution_id.$": "$.execution_id"
+          "execution_id.$": "$.execution_id",
+          "scope_count.$": "$.discovery_scope_count"
         }
       },
-      "ResultPath": "$.planning_result",
+      "OutputPath": "$.Payload",
       "Retry": [
         {
           "ErrorEquals": [
@@ -424,91 +471,33 @@
           "Next": "NotifyHistoricalFailure"
         }
       ],
-      "Next": "CheckHistoricalPlanning"
+      "Next": "CheckHistoricalDiscovery"
     },
-    "CheckHistoricalPlanning": {
+    "CheckHistoricalDiscovery": {
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.planning_result.Payload.status",
-          "StringEquals": "planning",
-          "Next": "IncrementHistoricalPlanning"
-        },
-        {
-          "Variable": "$.planning_result.Payload.status",
+          "Variable": "$.status",
           "StringEquals": "replay_ready",
           "Next": "PrepareHistoricalAutomaticRecovery"
         },
         {
-          "Variable": "$.planning_result.Payload.status",
+          "Variable": "$.status",
           "StringEquals": "approval_required",
           "Next": "PrepareHistoricalApproval"
         },
         {
-          "Variable": "$.planning_result.Payload.status",
+          "Variable": "$.status",
           "StringEquals": "completed",
           "Next": "HistoricalComplete"
         }
       ],
       "Default": "UnexpectedHistoricalPlanningResult"
     },
-    "IncrementHistoricalPlanning": {
-      "Type": "Pass",
-      "Parameters": {
-        "consumer": "${reconciliation_consumer}",
-        "execution_id.$": "$.planning_result.Payload.execution_id",
-        "planning_iterations.$": "States.MathAdd($.planning_iterations, 1)",
-        "planning_execution_index.$": "$.planning_execution_index"
-      },
-      "Next": "CheckHistoricalPlanningLimit"
-    },
-    "CheckHistoricalPlanningLimit": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Variable": "$.planning_iterations",
-          "NumericGreaterThanEquals": 100,
-          "Next": "PrepareHistoricalPlanningContinuation"
-        }
-      ],
-      "Default": "WaitBeforeHistoricalPlanning"
-    },
-    "PrepareHistoricalPlanningContinuation": {
-      "Type": "Pass",
-      "Parameters": {
-        "execution_id.$": "$.execution_id",
-        "planning_execution_index.$": "States.MathAdd($.planning_execution_index, 1)"
-      },
-      "Next": "StartHistoricalPlanningContinuation"
-    },
-    "StartHistoricalPlanningContinuation": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::states:startExecution",
-      "Parameters": {
-        "StateMachineArn.$": "$$.StateMachine.Id",
-        "Name.$": "States.Format('historical-plan-{}-{}', $.execution_id, $.planning_execution_index)",
-        "Input": {
-          "mode": "historical_planning",
-          "execution_id.$": "$.execution_id",
-          "planning_execution_index.$": "$.planning_execution_index",
-          "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id"
-        }
-      },
-      "ResultPath": "$.continuation",
-      "Next": "HistoricalPlanningContinued"
-    },
-    "HistoricalPlanningContinued": {
-      "Type": "Succeed"
-    },
-    "WaitBeforeHistoricalPlanning": {
-      "Type": "Wait",
-      "Seconds": 1,
-      "Next": "PlanHistorical"
-    },
     "PrepareHistoricalAutomaticRecovery": {
       "Type": "Pass",
       "Parameters": {
-        "execution_id.$": "$.planning_result.Payload.execution_id",
+        "execution_id.$": "$.execution_id",
         "phase": "automatic",
         "recovery_execution_index": 0
       },
@@ -542,8 +531,8 @@
         "Payload": {
           "action": "prepare_historical_approval",
           "consumer": "${reconciliation_consumer}",
-          "execution_id.$": "$.planning_result.Payload.execution_id",
-          "plan_id.$": "$.planning_result.Payload.plan_id"
+          "execution_id.$": "$.execution_id",
+          "plan_id.$": "$.plan_id"
         }
       },
       "OutputPath": "$.Payload",
@@ -1002,7 +991,7 @@
       "Resource": "arn:aws:states:::states:startExecution.sync:2",
       "Parameters": {
         "StateMachineArn.$": "$$.StateMachine.Id",
-        "Name.$": "States.Format('historical-recovery-{}-{}', $.execution_id, $.recovery_execution_index)",
+        "Name.$": "States.Format('historical-{}-{}-{}', $.recovery_phase, $.execution_id, $.recovery_execution_index)",
         "Input": {
           "mode": "historical_recovery",
           "execution_id.$": "$.execution_id",
@@ -1012,6 +1001,15 @@
         }
       },
       "ResultPath": "$.continuation",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
+        }
+      ],
       "Next": "HistoricalRecoveryContinued"
     },
     "HistoricalRecoveryContinued": {

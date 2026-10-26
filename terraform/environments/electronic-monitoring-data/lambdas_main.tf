@@ -1425,7 +1425,7 @@ module "merge_redrive_planner" {
   handler                        = "merge_redrive_planner.handler"
   memory_size                    = 1024
   timeout                        = 900
-  reserved_concurrent_executions = 2
+  reserved_concurrent_executions = 6
   cloudwatch_retention_days      = 7
 
   core_shared_services_id = local.environment_management.account_ids[

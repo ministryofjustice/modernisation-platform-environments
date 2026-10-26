@@ -475,3 +475,49 @@ data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_
     resources = ["*"]
   }
 }
+
+# OIDC Roles for GitHub Actions - Secret fetch (pull requests and main share one policy)
+module "github_actions_container_platform_identity_oidc_secret_role_plan" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-container-platform-identity-secrets-plan"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_secret_policy[0].json]
+  subject_claim       = "pull_request"
+  tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Secrets Fetch Plan Role" }, local.tags)
+}
+
+module "github_actions_container_platform_identity_oidc_secret_role_main" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-container-platform-identity-secrets-apply"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_secret_policy[0].json]
+  subject_claim       = "ref:refs/heads/main"
+  tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Secrets Fetch Apply Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_secret_policy" {
+  count = terraform.workspace == "cloud-platform-live" ? 1 : 0
+
+  statement {
+    sid       = "ReadEnvironmentManagementSecret"
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [data.aws_ssm_parameter.environment_management_arn[0].value]
+  }
+
+  statement {
+    sid       = "ReadEnvironmentManagementArnParameter"
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter"]
+    resources = [data.aws_ssm_parameter.environment_management_arn[0].arn]
+  }
+
+  statement {
+    sid       = "DecryptEnvironmentManagementSecretKey"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = ["arn:aws:kms:eu-west-2:${local.modernisation_platform_account_id}:key/${data.aws_secretsmanager_secret.environment_management.kms_key_id}"]
+  }
+}
