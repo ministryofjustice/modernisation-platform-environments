@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         },
         {
           name  = "STATE_MODE"
-          value = "false"
+          value = "True"
         },
         {
           name  = "WORKFLOW_NAME"
@@ -76,10 +76,6 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         {
           name = "ARTEFACT_TARGET"
           value = local.environment_shorthand
-        },
-        {
-          name = "VARS"
-          value = jsonencode({"state": "./state"})
         }
       ]
     }
