@@ -4225,6 +4225,7 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
       "glue:GetDatabase",
       "glue:GetTable",
       "glue:CreateTable",
+      "glue:UpdateTable",
     ]
     resources = ["arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog"]
   }
