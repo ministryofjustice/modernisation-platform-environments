@@ -175,15 +175,15 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_4443" {
 
 ### HTTP
 
-# resource "aws_security_group_rule" "egress_traffic_ebsdb_80" {
-#   security_group_id = aws_security_group.ec2_sg_ebsdb.id
-#   type              = "egress"
-#   description       = "Oracle HTTPs"
-#   protocol          = "TCP"
-#   from_port         = 80
-#   to_port           = 80
-#   cidr_blocks       = ["0.0.0.0/0"]
-# }
+resource "aws_security_group_rule" "egress_traffic_ebsdb_80" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "Oracle HTTPs"
+  protocol          = "TCP"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = ["0.0.0.0/0"]
+}
 
 ### HTTPS
 
