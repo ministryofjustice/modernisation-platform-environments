@@ -3,8 +3,7 @@ import os
 import boto3
 
 ecs = boto3.client("ecs")
-cloudwatch = boto3.client("cloudwatch")
-
+cloudwatch = boto3.client("cloudwatch",config=Config(retries={"mode": "adaptive","max_attempts": 10}))
 
 def get_alarm_names():
     print("Fetching CloudWatch alarms...", flush=True)
