@@ -991,7 +991,7 @@
       "Resource": "arn:aws:states:::states:startExecution.sync:2",
       "Parameters": {
         "StateMachineArn.$": "$$.StateMachine.Id",
-        "Name.$": "States.Format('historical-recovery-{}-{}', $.execution_id, $.recovery_execution_index)",
+        "Name.$": "States.Format('historical-{}-{}-{}', $.recovery_phase, $.execution_id, $.recovery_execution_index)",
         "Input": {
           "mode": "historical_recovery",
           "execution_id.$": "$.execution_id",
@@ -1001,6 +1001,15 @@
         }
       },
       "ResultPath": "$.continuation",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.failure",
+          "Next": "NotifyHistoricalFailure"
+        }
+      ],
       "Next": "HistoricalRecoveryContinued"
     },
     "HistoricalRecoveryContinued": {
