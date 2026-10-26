@@ -93,28 +93,25 @@ resource "aws_security_group" "ec2_sg_ftp" {
 #   local.application_data.accounts[local.environment].lz_aws_subnet_env]
 # }
 
-# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+resource "aws_security_group_rule" "ingress_private_traffic_lambda" {
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "ingress"
+  description       = "allow all tcp traffic from lambda"
+  protocol          = "TCP"
+  from_port         = 0
+  to_port           = 65535
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+}
 
-# resource "aws_security_group_rule" "ingress_private_traffic_lambda" {
-#   security_group_id = aws_security_group.ec2_sg_ftp.id
-#   type              = "ingress"
-#   description       = "allow all tcp traffic from lambda"
-#   protocol          = "TCP"
-#   from_port         = 0
-#   to_port           = 65535
-#   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-# }
-
-# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
-# resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
-#   security_group_id = aws_security_group.ec2_sg_ftp.id
-#   type              = "ingress"
-#   description       = "allow all tcp traffic from ebsdb"
-#   protocol          = "TCP"
-#   from_port         = 0
-#   to_port           = 65535
-#   cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
-# }
+resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "ingress"
+  description       = "allow all tcp traffic from ebsdb"
+  protocol          = "TCP"
+  from_port         = 0
+  to_port           = 65535
+  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+}
 
 
 # EGRESS Rules
@@ -146,74 +143,69 @@ resource "aws_security_group" "ec2_sg_ftp" {
 #   cidr_blocks       = [each.value]
 # }
 
-# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
-# resource "aws_security_group_rule" "egress_traffic_ftp_22_xerox" {
-#   count             = local.environment != "test" ? 1 : 0
-#   security_group_id = aws_security_group.ec2_sg_ftp.id
-#   type              = "egress"
-#   description       = "SSH for testing third party host xerox"
-#   protocol          = "TCP"
-#   from_port         = 22
-#   to_port           = 22
-#   cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-xerox-outbound"].secret_string)["HOST_CIDR"]]
-# }
+resource "aws_security_group_rule" "egress_traffic_ftp_22_xerox" {
+  count             = local.environment != "test" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = "SSH for testing third party host xerox"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-xerox-outbound"].secret_string)["HOST_CIDR"]]
+}
 
-# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
-# resource "aws_security_group_rule" "egress_traffic_ftp_22_eckoh" {
-#   count             = local.environment != "test" ? 1 : 0
-#   security_group_id = aws_security_group.ec2_sg_ftp.id
-#   type              = "egress"
-#   description       = "SSH for testing third party host eckoh"
-#   protocol          = "TCP"
-#   from_port         = 22
-#   to_port           = 22
-#   cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-eckoh-inbound-ccms"].secret_string)["HOST_CIDR"]]
-# }
+resource "aws_security_group_rule" "egress_traffic_ftp_22_eckoh" {
+  count             = local.environment != "test" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = "SSH for testing third party host eckoh"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-eckoh-inbound-ccms"].secret_string)["HOST_CIDR"]]
+}
 
-# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
-# resource "aws_security_group_rule" "egress_traffic_ftp_22_allpay" {
-#   count             = local.environment != "test" ? 1 : 0
-#   security_group_id = aws_security_group.ec2_sg_ftp.id
-#   type              = "egress"
-#   description       = "SSH for testing third party host allpay"
-#   protocol          = "TCP"
-#   from_port         = 22
-#   to_port           = 22
-#   cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-allpay-inbound-ccms"].secret_string)["HOST_CIDR"]]
-# }
+resource "aws_security_group_rule" "egress_traffic_ftp_22_allpay" {
+  count             = local.environment != "test" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = "SSH for testing third party host allpay"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-allpay-inbound-ccms"].secret_string)["HOST_CIDR"]]
+}
 
-# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
-# resource "aws_security_group_rule" "egress_traffic_ftp_22_rossendales" {
-#   count             = local.environment != "test" ? 1 : 0
-#   security_group_id = aws_security_group.ec2_sg_ftp.id
-#   type              = "egress"
-#   description       = "SSH for testing third party host rossendales"
-#   protocol          = "TCP"
-#   from_port         = 22
-#   to_port           = 22
-#   cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-rossendales-ccms-inbound"].secret_string)["HOST_CIDR"]]
-# }
+resource "aws_security_group_rule" "egress_traffic_ftp_22_rossendales" {
+  count             = local.environment != "test" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = "SSH for testing third party host rossendales"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-rossendales-ccms-inbound"].secret_string)["HOST_CIDR"]]
+}
 
 ### SFTP
-# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
-# resource "aws_security_group_rule" "egress_traffic_ftp_8022" {
-#   count             = local.environment != "test" ? 1 : 0
-#   security_group_id = aws_security_group.ec2_sg_ftp.id
-#   type              = "egress"
-#   description       = "SFTP for 1stlocate thirdparty"
-#   protocol          = "TCP"
-#   from_port         = 8022
-#   to_port           = 8022
-#   cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-1stlocate-ccms-inbound"].secret_string)["HOST_CIDR"]]
-# }
+resource "aws_security_group_rule" "egress_traffic_ftp_8022" {
+  count             = local.environment != "test" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = "SFTP for 1stlocate thirdparty"
+  protocol          = "TCP"
+  from_port         = 8022
+  to_port           = 8022
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-1stlocate-ccms-inbound"].secret_string)["HOST_CIDR"]]
+}
 ### HTTPS
-# THe following rule is commented as part of emudhra cert exercise on 23Oct2026
-# resource "aws_security_group_rule" "egress_traffic_ftp_443" {
-#   security_group_id = aws_security_group.ec2_sg_ftp.id
-#   type              = "egress"
-#   description       = "HTTPS"
-#   protocol          = "TCP"
-#   from_port         = 443
-#   to_port           = 443
-#   cidr_blocks       = ["0.0.0.0/0"]
-# }
+
+resource "aws_security_group_rule" "egress_traffic_ftp_443" {
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = "HTTPS"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = ["0.0.0.0/0"]
+}
