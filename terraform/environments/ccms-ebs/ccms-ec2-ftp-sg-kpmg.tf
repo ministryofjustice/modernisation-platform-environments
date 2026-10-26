@@ -14,21 +14,19 @@ resource "aws_security_group" "ftp_sg_kpmg" {
   }
 }
 
-# THe following ingress is commented as part of emudhra cert exercise on 23Oct2026
+resource "aws_vpc_security_group_ingress_rule" "ftp_workspaces_22_ingress_kpmg" {
+  count             = local.is-preproduction ? 1 : 0
+  security_group_id = aws_security_group.ftp_sg_kpmg[0].id
+  description       = "[KPMG] AWS Workspaces to FTP:22"
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
 
-# resource "aws_vpc_security_group_ingress_rule" "ftp_workspaces_22_ingress_kpmg" {
-#   count             = local.is-preproduction ? 1 : 0
-#   security_group_id = aws_security_group.ftp_sg_kpmg[0].id
-#   description       = "[KPMG] AWS Workspaces to FTP:22"
-#   ip_protocol       = "tcp"
-#   from_port         = 22
-#   to_port           = 22
-#   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
-
-#   tags = merge(local.tags,
-#     { Name = "[KPMG] AWS Workspaces to FTP:22" }
-#   )
-# }
+  tags = merge(local.tags,
+    { Name = "[KPMG] AWS Workspaces to FTP:22" }
+  )
+}
 
 # Only created in preproduction, where KPMG are testing - keep the existing preproduction SG rather than recreating it
 moved {
