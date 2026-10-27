@@ -1,12 +1,20 @@
 {
   "accounts": {
     "development": {
-      "builder_auth_mode": "in-app",
+      "builder_auth_mode": "alb",
+      "hosted_zone_name": "ai-builder-dev.modernisation-platform.service.justice.gov.uk",
       "builder_hostname": "ai-builder-dev.modernisation-platform.service.justice.gov.uk",
       "forge_hostname": "forge.ai-builder-dev.modernisation-platform.service.justice.gov.uk"
     },
+    "test": {
+      "builder_auth_mode": "alb",
+      "hosted_zone_name": "ai-builder-test.modernisation-platform.service.justice.gov.uk",
+      "builder_hostname": "ai-builder-test.modernisation-platform.service.justice.gov.uk",
+      "forge_hostname": "forge.ai-builder-test.modernisation-platform.service.justice.gov.uk"
+    },
     "production": {
-      "builder_auth_mode": "in-app",
+      "builder_auth_mode": "alb",
+      "hosted_zone_name": "ai-builder.modernisation-platform.service.justice.gov.uk",
       "builder_hostname": "ai-builder.modernisation-platform.service.justice.gov.uk",
       "forge_hostname": "forge.ai-builder.modernisation-platform.service.justice.gov.uk"
     }

@@ -207,13 +207,15 @@ resource "aws_iam_role" "opensearch_ui_app" {
         Action    = "sts:AssumeRole"
       },
       {
-        # Scopes the SSO context to this account's portal OIDC provider.
+        # Lets the UI attach the signed-in user's Identity Center identity to domain
+        # requests. Must be the AWS-defined context provider — any other value makes
+        # every UI data request fail with a 400 (sign-in still works).
         Effect    = "Allow"
         Principal = { Service = "application.opensearchservice.amazonaws.com" }
         Action    = "sts:SetContext"
         Condition = {
           "ForAllValues:ArnEquals" = {
-            "sts:RequestContextProviders" = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/portal.sso.${data.aws_region.current.region}.amazonaws.com/apl/*"
+            "sts:RequestContextProviders" = "arn:aws:iam::aws:contextProvider/IdentityCenter"
           }
         }
       }

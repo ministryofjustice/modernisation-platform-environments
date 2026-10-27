@@ -1,3 +1,23 @@
+data "aws_kms_key" "logs" {
+  key_id = "alias/logs/${local.application_name}-${local.environment}"
+}
+
+data "aws_kms_key" "secrets" {
+  key_id = "alias/secrets/${local.application_name}-${local.environment}"
+}
+
+data "aws_secretsmanager_secret" "dispatch" {
+  for_each = local.recipients
+  name     = "${local.application_name}/file-dispatch/${each.value.prefix}"
+
+  lifecycle {
+    precondition {
+      condition     = contains(keys(module.dispatch_configuration.entries), each.value.prefix)
+      error_message = "Each pickup prefix must have an existing shared dispatch entry; deploy its secret from root first."
+    }
+  }
+}
+
 module "lambda_notifier" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source        = "terraform-aws-modules/lambda/aws"

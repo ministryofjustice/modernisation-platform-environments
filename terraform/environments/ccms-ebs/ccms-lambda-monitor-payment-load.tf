@@ -28,7 +28,7 @@ resource "aws_iam_role_policy" "lambda_payment_load_monitor_policy" {
       {
         Effect   = "Allow"
         Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.lambda_payment_load_monitor.function_name}:*"
+        Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.lambda_payment_load_monitor.function_name}:*"
 
       },
       {
@@ -103,5 +103,5 @@ resource "aws_lambda_permission" "allow_cloudwatch_logs_invoke" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_payment_load_monitor.function_name
   principal     = "logs.amazonaws.com"
-  source_arn    = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.application_name}-${local.environment}-payment-load:*"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.application_name}-${local.environment}-payment-load:*"
 }

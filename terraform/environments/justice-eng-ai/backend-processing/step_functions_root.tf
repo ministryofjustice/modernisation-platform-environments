@@ -3,11 +3,10 @@ locals {
 
   root_process_steps = [
     {
-      # BuildID and UserName come from the latest event the UI wrote for this AppID.
-      name              = "latest_event"
-      type              = "dynamodb_query_latest"
+      name              = "build_event"
+      type              = "dynamodb_query_build"
       table_name        = aws_dynamodb_table.build_review.name
-      hash_key          = local.script_runner_app_id_path
+      package_stem      = local.script_runner_package_stem_path
       result_attributes = { BuildID = "N", UserName = "S" }
       result_path       = "$.latest"
     },

@@ -9,8 +9,9 @@ Each step is either:
 
 - `dynamodb_get_item`: requires `name`, `type = "dynamodb_get_item"`, `table_name` and `key` (attribute name => JSONPath or intrinsic function giving its string value). Optional `result_attributes` returns those string attributes at the top level of the result; without it the raw `{ Item = {...} }` result is returned, with no `Item` when nothing exists. Reads natively through Step Functions, with no Lambda.
 - `choice`: requires `name`, `type = "choice"`, `variable`, and either `equals` or `when_absent = true`. Execution continues to the next step when the string at `variable` equals `equals` (or, with `when_absent`, when `variable` is absent); otherwise it ends successfully at `<name>_stop` (optional `stop_comment`). It cannot be the last step.
-- `dynamodb_query_latest`: requires `name`, `type = "dynamodb_query_latest"`, `table_name`, `hash_key` (JSONPath or intrinsic giving the string hash key value) and `result_attributes` (attribute name => `"S"` or `"N"`). It reads the newest item whose range key is above 0 (a counter item at range key 0 is skipped) and returns those attributes, as strings, at the top level of the result. Optional `hash_key_name` (default `AppID`) and `range_key_name` (default `SysKey`). Uses the AWS SDK integration, with no Lambda.
-- `wait_for_approval`: requires `name`, `type = "wait_for_approval"`, `table_name`, `app_id` and `build_id` (JSONPaths) and `job_stage`. Optional `job_status` (default `awaiting_approval`), `user_name` (JSONPath), `timeout_seconds` (default 31536000, one year) and `result_path` (default `$.<name>_result`). It increments the table's counter item (hash key + range key 0, attribute `LastSysKey`) to get the next `SysKey`, appends an event holding the task token (`TaskToken`), and pauses until `SendTaskSuccess` or `SendTaskFailure` is called with that token. Resume the execution by looking the token up by `AppID` and `BuildID`. The module also creates a companion state machine `<name>-resume` (output `resume_arn`) that does this: start it with the DynamoDB stream record of the approving event (an array of one record) and it finds the `awaiting_approval` event for that `AppID` and `BuildID` and calls `SendTaskSuccess`. A second delivery of the same approval ends quietly. At most one `wait_for_approval` step is allowed per state machine.
+- `dynamodb_query_latest`: requires `name`, `type = "dynamodb_query_latest"`, `table_name`, `hash_key` (JSONPath or intrinsic giving the string hash key value) and `result_attributes` (attribute name => `"S"` or `"N"`). It reads the newest item whose range key is above 0 (a counter item at range key 0 is skipped) and returns those attributes, as strings, at the top level of the result. Optional `hash_key_name` (default `AppID`), `range_key_name` (default `SysKey`) and `build_id` (a JSONPath selecting one numeric BuildID). Uses the AWS SDK integration, with no Lambda.
+- `dynamodb_query_build`: requires `name`, `type = "dynamodb_query_build"`, `table_name`, `package_stem` (JSONPath or intrinsic giving the S3 package stem) and `result_attributes` (attribute name => `"S"` or `"N"`). A versioned `<AppID>~<BuildID>` stem selects the matching numeric build; a legacy `<AppID>` stem selects the newest event for rollout compatibility.
+- `wait_for_approval`: requires `name`, `type = "wait_for_approval"`, `table_name`, `app_id` and `build_id` (JSONPaths) and `job_stage`. Optional `job_status` (default `awaiting_approval`), `user_name` (JSONPath), `timeout_seconds` (default 31536000, one year) and `result_path` (default `$.<name>_result`). It increments the table's counter item (hash key + range key 0, attribute `LastSysKey`), appends an event holding the task token (`TaskToken`), and pauses. The companion `<name>-resume` state machine (output `resume_arn`) accepts a one-record DynamoDB stream event, finds the matching `awaiting_approval` token by `AppID` and `BuildID`, then calls `SendTaskSuccess` for `approved` or `SendTaskFailure` for `rejected`. A repeated decision ends quietly after the token has already been consumed. At most one `wait_for_approval` step is allowed per state machine.
 
 The first list item starts the process; subsequent items run in list order. Both step types support optional `retry`, `timeout_seconds`, and `result_path` attributes. Set `result_path` when a step should preserve the current input while storing its result.
 
@@ -39,17 +40,14 @@ In justice-eng-ai, set `accounts.<environment>.step_function_retry_attempts` in
 `application_variables.json`. The backend-processing workflows pass this setting
 to the module, falling back to 3 when the key is absent.
 
-The justice-eng-ai control-plane workflow runs `scripts/control/root.py`. The
-script writes a record to the build review DynamoDB table (`dynamodb.tf`), keyed
-by `AppID` (the `s3_file` basename), only when the automated assessment flags the
-request for review. The workflow then looks the record up. The root workflow
-continues to the post-approval workflow (image build, then infrastructure) only
-when no record exists, i.e. the request was approved automatically. A request
-with a record waits in the table with status `not approved`; when a reviewer sets
-it to `approved`, an EventBridge Pipe on the table's stream
-(`eventbridge_pipes.tf`) starts the post-approval workflow with the record's
-`AppID`, `s3_folder` and `s3_file`. `AppID` and `forge_runtime_version` for the
-later steps are derived in Terraform, not returned by the script.
+The justice-eng-ai control-plane workflow runs `scripts/control/root.py`, which
+appends either `auto_approved` or the internal `review_required` status to the
+build-events table. The workflow reads that latest event and ends immediately
+for an automatic approval. Requests requiring review enter `wait_for_approval`,
+which appends the user-visible `awaiting_approval` event containing the callback
+token and pauses. The Builder UI appends an `approved` or `rejected` decision.
+Matching EventBridge Pipes start the companion resume state machine, which sends
+task success for an approval or task failure for a rejection.
 
 ## Parent fallback cleanup for EC2 children
 
@@ -188,3 +186,10 @@ location (e.g. S3) instead of relying on Step Functions to carry it.
 This module intentionally keeps `input_path` as a single, generic JSONPath
 rather than a named-parameter list: the actual input shape is specific to
 each calling environment, not something the module should assume.
+
+Build-specific queries and approval-token lookups follow DynamoDB pagination,
+including empty filtered pages. They read one projected event per page and stop
+at the newest matching event, or fail with `BuildEventNotFound` after exhausting
+the application's history. Caller result paths and transitions are preserved.
+Duplicate callback deliveries use the AWS SDK `Sfn.*Exception` error names and
+complete quietly when the token is already consumed.

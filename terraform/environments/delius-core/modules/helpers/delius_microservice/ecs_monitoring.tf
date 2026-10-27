@@ -25,7 +25,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_warning" {
     ClusterName = local.cluster_name
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_critical" {
@@ -47,7 +47,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_critical" {
     ClusterName = local.cluster_name
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_memory_warning" {
@@ -69,7 +69,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_warning" {
     ClusterName = local.cluster_name
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_memory_critical" {
@@ -91,7 +91,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_critical" {
     ClusterName = local.cluster_name
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 resource "aws_cloudwatch_log_metric_filter" "ecs_log_error_filter" {
@@ -122,7 +122,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_error_critical" {
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_healthy_hosts_fatal" {
@@ -143,7 +143,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_healthy_hosts_fatal" {
     TargetGroup  = aws_lb_target_group.frontend[0].arn_suffix
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 # Weblogic Capacity Provider Alarms
@@ -174,7 +174,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_root_volume_usage_warning" {
     EOT
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_host_volume_usage_critical" {
@@ -203,7 +203,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_host_volume_usage_critical" {
     EOT
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_host_cpu_warning" {
@@ -326,7 +326,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_host_memory_critical" {
   tags = merge(var.tags, { app = var.name })
 }
 
-resource "aws_cloudwatch_metric_alarm" "ecs_desired-task-count-warning" {
+resource "aws_cloudwatch_metric_alarm" "ecs_desired_task_count_warning" {
   alarm_name          = "${var.name}-${var.env_name}-desired-task-count-warning"
   alarm_description   = "ECS service tasks below desired amount"
   actions_enabled     = true
@@ -347,7 +347,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_desired-task-count-warning" {
     ClusterName = local.cluster_name
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 ######################################
@@ -356,15 +356,15 @@ resource "aws_cloudwatch_metric_alarm" "ecs_desired-task-count-warning" {
 resource "aws_cloudwatch_metric_alarm" "alb_response_time_critical" {
   count               = var.microservice_lb != null ? 1 : 0
   alarm_name          = "${var.name}-${var.env_name}-response-time-critical"
-  alarm_description   = "Average response time for the `${var.name}` service exceeded 5 seconds."
+  alarm_description   = "P9 response time for the `${var.name}` service exceeded 10 seconds."
   namespace           = "AWS/ApplicationELB"
-  statistic           = "Average"
+  extended_statistic  = "p99"
   metric_name         = "TargetResponseTime"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = 10
   treat_missing_data  = "notBreaching"
-  evaluation_periods  = 1
-  period              = 300
+  evaluation_periods  = 5
+  period              = 60
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   dimensions = {
@@ -372,7 +372,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_time_critical" {
     TargetGroup  = aws_lb_target_group.frontend[0].arn_suffix
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_warning" {
@@ -383,7 +383,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_warning" {
   statistic           = "Sum"
   metric_name         = "HTTPCode_Target_5XX_Count"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  threshold           = 1
+  threshold           = 5
   treat_missing_data  = "notBreaching"
   evaluation_periods  = 2
   period              = 60
@@ -394,7 +394,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_warning" {
     TargetGroup  = aws_lb_target_group.frontend[0].arn_suffix
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_critical" {
@@ -416,5 +416,5 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_critical" {
     TargetGroup  = aws_lb_target_group.frontend[0].arn_suffix
   }
 
-  tags = merge(var.tags, { "app" = var.name })
+  tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
 }

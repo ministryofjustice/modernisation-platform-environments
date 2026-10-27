@@ -54,6 +54,8 @@ locals {
         seconds_until_auto_pause = 3600
       }
       elasticache_node_type = "cache.t4g.medium"
+
+      ai_gateway_egress_policy_enabled = true
     }
     test = {
       litellm_version           = "1.101.0"
@@ -97,6 +99,8 @@ locals {
         seconds_until_auto_pause = 3600
       }
       elasticache_node_type = "cache.t4g.medium"
+
+      ai_gateway_egress_policy_enabled = false
     }
     preproduction = {
       litellm_version           = "1.101.0"
@@ -136,6 +140,8 @@ locals {
       aurora_instances                          = { writer = {}, reader = {} }
       aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type                     = "cache.t4g.medium"
+
+      ai_gateway_egress_policy_enabled = false
     }
     production = {
       litellm_version           = "1.101.0"
@@ -199,6 +205,8 @@ locals {
       aurora_instances                          = { writer = {}, reader = {} }
       aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type                     = "cache.t4g.medium"
+
+      ai_gateway_egress_policy_enabled = false
     }
   }
 }
