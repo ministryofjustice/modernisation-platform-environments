@@ -84,7 +84,7 @@ resource "aws_lb_listener" "https" {
         user_info_endpoint         = "https://graph.microsoft.com/oidc/userinfo"
         client_id                  = data.aws_secretsmanager_secret_version.entra_oidc_client_id[0].secret_string
         client_secret              = data.aws_secretsmanager_secret_version.entra_oidc_client_secret[0].secret_string
-        scope                      = "openid email profile"
+        scope                      = local.alb_group_authorization_enabled ? "openid email profile https://graph.microsoft.com/User.Read" : "openid email profile"
         session_timeout            = 43200 # 12 hours
         on_unauthenticated_request = "authenticate"
       }
@@ -98,6 +98,10 @@ resource "aws_lb_listener" "https" {
   }
 
   lifecycle {
+    precondition {
+      condition     = !local.alb_group_authorization_enabled || local.oidc_wired
+      error_message = "ALB group authorisation requires configured ALB OIDC authentication."
+    }
     precondition {
       condition     = contains(["in-app", "alb"], local.builder_auth_mode)
       error_message = "builder_auth_mode in application_variables.json must be \"in-app\" or \"alb\" (got \"${local.builder_auth_mode}\"). A typo would otherwise silently switch sign-in mode."

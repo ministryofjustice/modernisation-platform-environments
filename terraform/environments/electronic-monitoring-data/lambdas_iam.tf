@@ -4219,11 +4219,25 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
     resources = ["${module.s3-raw-formatted-data-bucket.bucket.arn}/*"]
   }
   statement {
+    sid    = "GetDbCatalog"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "glue:CreateTable",
+      "glue:UpdateTable",
+    ]
+    resources = ["arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog"]
+  }
+  statement {
     sid    = "GetDbs"
     effect = "Allow"
     actions = [
       "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
       "glue:CreateTable",
+      "glue:UpdateTable",
     ]
     resources = [for db in local.api_integration_databases : db.arn]
   }
@@ -4233,6 +4247,7 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
     actions = [
       "glue:GetTable",
       "glue:UpdateTable",
+      "glue:CreateTable",
     ]
     resources = [for db in local.api_integration_databases : "${replace(db.arn, ":database/", ":table/")}/*"]
   }
