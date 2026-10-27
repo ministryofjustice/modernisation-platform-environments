@@ -25,6 +25,15 @@ The old root and legacy state remain untouched. No production accounts are added
 6. Exercise single PUT, multipart initiation, additional part URLs, completion and
    cancellation; verify incoming objects proceed through the MFT processing pipeline.
 
+## API hostname
+
+The `transfer_ticket_api_endpoint` output uses
+`https://api.<environment>.file-transfer.service.justice.gov.uk` (for example,
+`https://api.development.file-transfer.service.justice.gov.uk`). Production uses
+`https://api.file-transfer.service.justice.gov.uk` when that environment is onboarded.
+The AWS-generated endpoint remains enabled and is available as
+`transfer_ticket_api_execute_api_endpoint` during migration.
+
 Application code stays in `integration-hub-file-transfer-api`. Upload permissions
 are restricted to the server-configured client prefixes; no caller supplies a prefix.
 When changing clients in `application_variables.json`,
@@ -32,9 +41,9 @@ apply MFT first via its workflow_dispatch (the MFT workflow watches its own dire
 then this component. Existing browser CORS allows only the Transfer Web App origin;
 API clients can use Bruno/CLI directly. Browser onboarding needs an explicit origin.
 
-The recovery preserves existing authentication and upload routes. JWT, stable custom
-domains, production onboarding and per-client assumed roles remain separate design
-work. Alarm resources exist but no SNS actions are wired to retired cross-account topics.
+The recovery preserves existing authentication and upload routes. JWT, production
+onboarding and per-client assumed roles remain separate design work. Alarm resources
+exist but no SNS actions are wired to retired cross-account topics.
 
 The API resources are defined directly in this component; there is no separate
 module. The former `module.integration_hub_file_transfer_api` state addresses were
