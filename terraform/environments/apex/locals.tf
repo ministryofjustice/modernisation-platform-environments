@@ -59,7 +59,8 @@ locals {
   }
 
   user_data = base64encode(templatefile("user_data.sh", {
-    app_name = local.application_name
+    app_name    = local.application_name
+    environment = local.environment
   }))
 
   task_definition = templatefile("task_definition.json", {
