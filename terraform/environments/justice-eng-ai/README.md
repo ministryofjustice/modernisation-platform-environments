@@ -76,12 +76,18 @@ false. The companion application change must be available before enabling
 it. The initial configuration enables **development only**; test and
 production remain disabled until development acceptance.
 
-Enabling it adds delegated Microsoft Graph `User.Read` to the ALB OIDC
+Enabling it adds `offline_access` and delegated Microsoft Graph `User.Read` to the ALB OIDC
 scopes and sets `MPAPB_ALB_GROUP_AUTHORIZATION_ENABLED=true` on the builder
 task definition. The application binds the forwarded access token to the
 ALB-signed subject through Microsoft UserInfo, then checks the configured
 admin/reviewer group IDs using Graph. The same group intentionally grants
 both roles. No tenant-wide Graph application permissions are required.
+
+Entra v2 requires an explicit `offline_access` request to issue refresh
+tokens. The ALB uses that refresh token to renew access tokens during its
+12-hour session; the session timeout does not extend an access token's
+lifetime. The application continues to reject invalid Graph tokens rather
+than bypassing membership checks.
 
 Rollout order:
 
@@ -99,13 +105,31 @@ Rollout order:
    Cloning an old service revision for image deployment can omit the flag.
    The application CI currently does not deploy to test automatically.
 5. Start a fresh ALB login with consent to the new scope. Existing ALB
-   sessions may continue using tokens without `User.Read`.
+   sessions may continue using tokens without `User.Read` or a refresh token.
+   After adding `offline_access`, refresh the development session once by
+   removing only that site's `AWSELBAuthSessionCookie*` cookies and reloading.
+   Clearing the browser's HTTP cache alone does not renew the ALB session.
 6. Verify `/auth/user` includes the configured group, `/whoami` returns
    reviewer status, and review read/write access works for team members.
    Verify non-members are denied, Graph errors fail closed, and membership
    removal is reflected after Graph propagation and the 60-second cache.
 7. Enable the account setting for test/production only after development
    acceptance and repeat the plan, apply and ECS rollout checks.
+
+For the development token-renewal fix, expect only the listener scope to
+gain `offline_access`; no application image or ECS revision change is
+required. Review the plan for unrelated drift before applying. Test and
+production remain disabled in this configuration and their scopes are
+unchanged. After a fresh development login, verify reviewer access again
+after the original access token expires, without removing cookies or
+signing out. Entra access tokens typically last around 60–90 minutes;
+an immediate successful login alone does not prove renewal. Record the
+login and subsequent successful request times without recording tokens.
+If the 401 returns, inspect the ALB authentication and application Graph
+failure logs rather than treating another cookie reset as a fix.
+To roll back just this scope change, revert it and apply the reviewed
+development listener plan; removing refresh support can reintroduce expiry
+failures.
 
 Graph availability is required for authenticated dynamic pages while
 enabled. Health checks, assets and logout bypass membership lookup.
