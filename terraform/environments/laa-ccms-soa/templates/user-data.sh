@@ -8,6 +8,10 @@ echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
 echo 'ECS_VOLUME_PLUGIN_CAPABILITIES=["efsAuth"]' >> /etc/ecs/ecs.config
 echo 'ECS_INSTANCE_ATTRIBUTES={"server": "${server}","latest": "true"}' >> /etc/ecs/ecs.config
 
+#--Update CA certificates
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
+
 #--Configure EFS
 yum install -y amazon-efs-utils
 mkdir $EFS_MOUNT_POINT
@@ -25,7 +29,8 @@ yum install -y awscli
 
 # Configure SSH and pull git repo
 yum install git -y
-su ec2-user bash -c 'aws secretsmanager get-secret-value --secret-id soa-secrets --query SecretString   --output text --region eu-west-2| jq -r ".\"deploy-github-ssh-key\""|base64 -d > /home/ec2-user/.ssh/id_rsa'
+su ec2-user bash -c "aws secretsmanager get-secret-value --secret-id ccms/soa/deploy-github-ssh-key --query SecretString --output text --region eu-west-2 | base64 -d > /home/ec2-user/.ssh/id_rsa"
+chown ec2-user $EC2_USER_HOME_FOLDER/.ssh/id_rsa
 chgrp ec2-user $EC2_USER_HOME_FOLDER/.ssh/id_rsa
 chmod 400 $EC2_USER_HOME_FOLDER/.ssh/id_rsa
 cat <<EOF > $EC2_USER_HOME_FOLDER/.ssh/config
@@ -43,17 +48,23 @@ su ec2-user bash -c "git clone ssh://git@ssh.github.com:443/ministryofjustice/la
 #--Populate custom monitoring files
 su ec2-user bash -c "cp $EFS_MOUNT_POINT/laa-ccms-app-soa/monitoring/* $EFS_MOUNT_POINT/"
 
+#--Install s3fs and pre-reqs
+yum install fuse -y
+yum install fuse-libs -y
+yum install s3fs-fuse -y
+
 #--Make S3 integration dirs and mount S3
 sudo sed -i '/^#.*user_allow_other/s/^#//' /etc/fuse.conf
-dnf install -y mount-s3
 mkdir -p $INBOUND_S3_MOUNT_POINT
 mkdir -p $OUTBOUND_S3_MOUNT_POINT
 chmod 777 $INBOUND_S3_MOUNT_POINT
 chmod 777 $OUTBOUND_S3_MOUNT_POINT
-chown -R 1000:1000 $INBOUND_S3_MOUNT_POINT
-chown -R 1000:1000 $OUTBOUND_S3_MOUNT_POINT
-mount-s3 ${inbound_bucket} $INBOUND_S3_MOUNT_POINT --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
-mount-s3 ${outbound_bucket} $OUTBOUND_S3_MOUNT_POINT --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
+s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o allow_other -o multireq_max=5 -o use_cache=/tmp -o uid=1000 -o gid=1000 ${inbound_bucket} $INBOUND_S3_MOUNT_POINT
+s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o allow_other -o multireq_max=5 -o use_cache=/tmp -o uid=1000 -o gid=1000 ${outbound_bucket} $OUTBOUND_S3_MOUNT_POINT
+
+#--Add S3 mounts to fstab (incase of reboot)
+echo s3fs#${inbound_bucket} $EC2_USER_HOME_FOLDER/inbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
+echo s3fs#${outbound_bucket} $EC2_USER_HOME_FOLDER/outbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
 
 #--Create essential subdirs in S3 Bucket
 mkdir -p \
