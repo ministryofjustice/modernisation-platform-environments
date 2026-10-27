@@ -3,6 +3,11 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+data "aws_kms_key" "github_management" {
+  count  = local.is_production ? 1 : 0
+  key_id = "alias/github-management"
+}
+
 # VPC and subnet data
 data "aws_vpc" "shared" {
   tags = {

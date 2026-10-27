@@ -35,5 +35,17 @@ module "github_backup_role" {
       ]
       resources = [module.github_backup_key[0].key_arn]
     }
+    github_app_secret_read = {
+      sid       = "GitHubAppSecretRead"
+      effect    = "Allow"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [data.aws_secretsmanager_secret.github_app[0].arn]
+    }
+    github_app_secret_decrypt = {
+      sid       = "GitHubAppSecretDecrypt"
+      effect    = "Allow"
+      actions   = ["kms:Decrypt"]
+      resources = [data.aws_kms_key.github_management[0].arn]
+    }
   }
 }
