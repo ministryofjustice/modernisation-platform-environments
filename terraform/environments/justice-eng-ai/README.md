@@ -73,8 +73,9 @@ Modernisation Platform
 
 The web-ui account setting `alb_group_authorization_enabled` defaults to
 false. The companion application change must be available before enabling
-it. The initial configuration enables **development only**; test and
-production remain disabled until development acceptance.
+it. The configuration enables **development and test**; production remains
+disabled pending test acceptance. Development team members have confirmed
+reviewer access, and a review action has succeeded.
 
 Enabling it adds delegated Microsoft Graph `User.Read` to the ALB OIDC
 scopes and sets `MPAPB_ALB_GROUP_AUTHORIZATION_ENABLED=true` on the builder
@@ -88,31 +89,40 @@ Rollout order:
 1. Add delegated Graph `User.Read` to the Entra app registration and arrange
    consent under tenant policy. This repository does not manage Entra.
 2. Build the companion application image with the feature disabled.
-3. Review a web-ui Terraform plan. For development, expect the HTTPS listener scope
-   and task-definition environment change. Other accounts only receive the
-   explicit false task-definition flag; their listener scopes are unchanged.
-4. Approve only development application deployment, leaving production
-   unapproved. Apply development infrastructure, then explicitly deploy the
-   compatible application image using the new **development** task definition.
+3. Review the test web-ui Terraform plan. Expect the HTTPS listener to add
+   `https://graph.microsoft.com/User.Read` and the task-definition flag to
+   change from false to true. Development and production authorisation
+   settings must remain unchanged.
+4. Record the test service's current task-definition revision for rollback.
+   Apply test infrastructure, then explicitly deploy the compatible application
+   image using the new **test** task definition. The verified application
+   image tag is `ui-build-5a37ac2`; retain the new task definition's settings
+   when pinning the image rather than using the mutable `ui-build-latest` tag.
+   Leave production application deployment unapproved.
    The ECS service ignores
    `task_definition`, so Terraform registration is not a service rollout.
    Cloning an old service revision for image deployment can omit the flag.
    The application CI currently does not deploy to test automatically.
 5. Start a fresh ALB login with consent to the new scope. Existing ALB
-   sessions may continue using tokens without `User.Read`.
+   sessions may continue using tokens without `User.Read`. If necessary,
+   remove only the test site's `AWSELBAuthSessionCookie*` cookies and reload;
+   closing and reopening the browser does not reliably clear them.
 6. Verify `/auth/user` includes the configured group, `/whoami` returns
    reviewer status, and review read/write access works for team members.
    Verify non-members are denied, Graph errors fail closed, and membership
    removal is reflected after Graph propagation and the 60-second cache.
-7. Enable the account setting for test/production only after development
-   acceptance and repeat the plan, apply and ECS rollout checks.
+7. Enable the production account setting in a separate change only after
+   test acceptance and repeat the plan, apply and ECS rollout checks.
 
 Graph availability is required for authenticated dynamic pages while
 enabled. Health checks, assets and logout bypass membership lookup.
 UserInfo/token identity mismatch gives 401; Graph service or permission
 errors give 503. No tokens should be copied to logs, tickets or chat.
-Rollback by removing/disabling the account setting and deploying the
-resulting task definition; this restores allow-list-only ALB access.
+For an immediate application rollback, switch the affected service back to
+its recorded previous task-definition revision. Remove/disable that account's
+setting and apply Terraform to restore its previous listener scope, then
+deploy a compatible task definition with the flag false. This restores
+allow-list-only ALB access.
 
 <!-- Describe any conditions which restrict access to the service, such as if it’s IP-restricted or only accessible from a private network.-->
 
