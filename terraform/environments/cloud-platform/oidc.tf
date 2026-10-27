@@ -378,7 +378,10 @@ data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_
     actions = [
       "sts:AssumeRole"
     ]
-    resources = ["arn:aws:iam::*:role/ContainerPlatformEKSAccess"]
+    # Plan path is scoped to the READ-ONLY EKS access role; the write role
+    # (ContainerPlatformEKSAccess) is reserved for the apply path
+    # (ministryofjustice/cloud-platform#8612).
+    resources = ["arn:aws:iam::*:role/ContainerPlatformEKSAccessReadOnly"]
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceOrgID"
@@ -416,8 +419,11 @@ module "github_actions_container_platform_identity_oidc_role_apply" {
   github_repositories = ["ministryofjustice/container-platform-environments"]
   role_name           = "github-actions-container-platform-identity-apply"
   policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_policy_apply.json]
-  subject_claim       = "ref:refs/heads/*"
-  tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
+  # Only main may mint this apply token. The identity-apply workflow applies
+  # exclusively on main, so this closes the any-branch escalation path
+  # (ministryofjustice/cloud-platform#8612) with no change to normal behaviour.
+  subject_claim = "ref:refs/heads/main"
+  tags          = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
 }
 
 data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_policy_apply" {
@@ -445,6 +451,9 @@ data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_
     actions = [
       "sts:AssumeRole"
     ]
+    # Apply path keeps the WRITE EKS access role (ContainerPlatformEKSAccess);
+    # the plan path is deliberately scoped to the read-only variant instead
+    # (ministryofjustice/cloud-platform#8612).
     resources = ["arn:aws:iam::*:role/ContainerPlatformEKSAccess"]
     condition {
       test     = "StringEquals"
