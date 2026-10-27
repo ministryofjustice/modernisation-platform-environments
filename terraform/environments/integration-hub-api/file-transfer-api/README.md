@@ -159,9 +159,9 @@ Use the API application UUID as the v2 token audience, not its `api://` URI. The
 consumer uses `api_application_id_uri` plus `/.default` when requesting a token.
 
 [IDAM PR #967](https://github.com/ministryofjustice/staff-identity-idam-entra-infra/pull/967)
-adds GitHub trust to the development consumer. The API repository's protected
-`file-transfer-api-entra-development` environment permits only `main`, requires
-an Integration Hub reviewer, and disables self-approval and administrator bypass.
+added GitHub trust to the development consumer. The API repository's protected
+`file-transfer-api-entra-development` environment permits only `main` and disables administrator bypass. Development
+smoke runs no longer require a separate environment reviewer approval.
 Its identity trust belongs in IDAM Terraform, not in this AWS component.
 
 After IDAM apply, configure the three non-secret GitHub environment identifiers,
