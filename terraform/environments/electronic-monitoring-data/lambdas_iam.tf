@@ -4237,6 +4237,7 @@ data "aws_iam_policy_document" "register_athena_policy_document" {
       "glue:GetTables",
       "glue:GetTable",
       "glue:CreateTable",
+      "glue:UpdateTable",
     ]
     resources = [for db in local.api_integration_databases : db.arn]
   }
