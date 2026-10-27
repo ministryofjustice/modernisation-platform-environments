@@ -10,7 +10,7 @@ cloudwatch = boto3.client("cloudwatch",config=Config(retries={"mode": "adaptive"
 def get_alarm_names():
     print("Fetching CloudWatch alarms...", flush=True)
 
-    service_name = os.environ["SERVICE_NAME"].lower()
+    alarm_prefix = os.environ["ALARM_PREFIX"].lower()
 
     paginator = cloudwatch.get_paginator("describe_alarms")
     alarm_names = []
@@ -24,7 +24,7 @@ def get_alarm_names():
         for alarm in alarms:
             alarm_name = alarm["AlarmName"].lower()
 
-            if alarm_name.startswith(f"{service_name}-"):
+            if alarm_name.startswith(f"{alarm_prefix}-"):
                 alarm_names.append(alarm["AlarmName"])
 
     print(f"Found {len(alarm_names)} matching alarms: {alarm_names}",flush=True,)
@@ -68,8 +68,8 @@ def enable_alarms():
 
 def start_deployment():
     ecs.update_service(
-        cluster=os.environ["CLUSTER"],
-        service=os.environ["SERVICE"],
+        cluster=os.environ["CLUSTER_NAME"],
+        service=os.environ["SERVICE_NAME"],
         desiredCount=int(os.environ["DESIRED_COUNT"]),
         forceNewDeployment=True,
     )
@@ -79,8 +79,8 @@ def start_deployment():
 
 def check_stability(event):
     response = ecs.describe_services(
-        cluster=os.environ["CLUSTER"],
-        services=[os.environ["SERVICE"]],
+        cluster=os.environ["CLUSTER_NAME"],
+        services=[os.environ["SERVICE_NAME"]],
     )
 
     if response.get("failures"):
