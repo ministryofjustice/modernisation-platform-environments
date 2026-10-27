@@ -89,7 +89,7 @@
       "admin_log_retention_days": "7",
       "admin_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-admin",
       "admin_server_port": "7001",
-      "admin_container_version": "0.0.15-CVE-2026-91403",
+      "admin_container_version": "1b31fa773825264567d3a90582b032c8554d1c0f",
       "managed_log_retention_days": "7",
       "admin_ami_image_id": "ami-02f77a03ec776dc35",
       "admin_ec2_instance_type": "m5.xlarge",
