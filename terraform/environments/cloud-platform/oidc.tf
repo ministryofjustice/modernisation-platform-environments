@@ -230,6 +230,7 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "s3:PutBucketTagging",
       "s3:PutBucketVersioning",
       "s3:PutBucketPublicAccessBlock",
+      "s3:PutBucketNotification",
       "s3:PutEncryptionConfiguration",
       "s3:PutLifecycleConfiguration",
       "s3:PutBucketOwnershipControls",
