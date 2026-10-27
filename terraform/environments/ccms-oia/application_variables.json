@@ -175,7 +175,7 @@
       "ami_image_id": "ami-02f77a03ec776dc35",
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
-      "opa_container_version": "715734191500090458264b9938b45feb991dc096",
+      "opa_container_version": "bfd63583ee1e934985fdb57d120e2d50125f6365",
       "opa_ec2_instance_type": "m5.xlarge",
       "conn_saa_ec2_instance_type": "m5.xlarge",
       "ec2_instance_type_gh_runner": "t2.small",
