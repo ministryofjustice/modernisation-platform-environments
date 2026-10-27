@@ -37,7 +37,6 @@ resource "aws_launch_template" "ec2-launch-template" {
       iops                  = 0
     }
   }
-  user_data_replace_on_change = true
   user_data = base64encode(data.template_file.launch-template.rendered)
 
   tag_specifications {
