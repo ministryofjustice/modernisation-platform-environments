@@ -144,6 +144,10 @@ resource "aws_ecs_task_definition" "app" {
           value = local.oidc_wired ? "true" : "false"
         },
         {
+          name  = "MPAPB_ALB_GROUP_AUTHORIZATION_ENABLED"
+          value = local.alb_group_authorization_enabled ? "true" : "false"
+        },
+        {
           name  = "MPAPB_ALB_SIGNER_ARN"
           value = local.oidc_wired ? aws_lb.app.arn : ""
         },
