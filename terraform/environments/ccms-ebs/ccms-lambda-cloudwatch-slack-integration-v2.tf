@@ -40,7 +40,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_slack_integration_v2_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.cloudwatch_slack_integration_v2.function_name}:*"
+        Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.cloudwatch_slack_integration_v2.function_name}:*"
       },
       {
         Effect = "Allow"
