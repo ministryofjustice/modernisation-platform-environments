@@ -327,6 +327,95 @@ resource "aws_iam_policy" "dlt_iceberg_maintenance_invoke" {
 }
 
 # ------------------------------------------------------------------------------
+# Downstream reconciliation audit Step Function
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "downstream_reconciliation_audit" {
+  statement {
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+
+    resources = [
+      module.merge_redrive_planner.lambda_function_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "downstream_reconciliation_audit" {
+  name   = "downstream_reconciliation_audit_step_function_policy"
+  policy = data.aws_iam_policy_document.downstream_reconciliation_audit.json
+}
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation scheduler
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "downstream_reconciliation_scheduler" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_scheduler_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Principal = {
+          Service = "scheduler.amazonaws.com"
+        }
+
+        Action = "sts:AssumeRole"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_scheduler_start_policy"
+  role = aws_iam_role.downstream_reconciliation_scheduler[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "states:StartExecution",
+        ]
+
+        Resource = [
+          module.merge_into_mdss_staged_position.arn,
+          module.merge_into_mdss_ac_position.arn,
+          module.merge_into_emdi_position.arn,
+        ]
+      },
+      {
+        Effect = "Allow"
+
+        Action = [
+          "lambda:InvokeFunction",
+        ]
+
+        Resource = [
+          module.merge_redrive_planner.lambda_function_arn,
+        ]
+      },
+    ]
+  })
+}
+
+
+# ------------------------------------------------------------------------------
 # Downstream position reconciliation scheduler
 # ------------------------------------------------------------------------------
 
@@ -382,4 +471,3 @@ resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
     ]
   })
 }
-

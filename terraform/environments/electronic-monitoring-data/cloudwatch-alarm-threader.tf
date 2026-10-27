@@ -77,6 +77,22 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
             for alarm in aws_cloudwatch_metric_alarm.specials_guard_lambda_errors :
             alarm.alarm_name
           ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.downstream_reconciliation_execution_failed :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.downstream_reconciliation_audit_gaps :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.downstream_reconciliation_audit_stale :
+            alarm.alarm_name
+          ],
+          [
+            for alarm in aws_cloudwatch_metric_alarm.downstream_reconciliation_audit_execution_failed :
+            alarm.alarm_name
+          ],
         )
       }
     }
