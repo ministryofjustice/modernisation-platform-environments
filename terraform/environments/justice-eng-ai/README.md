@@ -73,9 +73,10 @@ Modernisation Platform
 
 The web-ui account setting `alb_group_authorization_enabled` defaults to
 false. The companion application change must be available before enabling
-it. The configuration enables **development and test**; production remains
-disabled pending test acceptance. Development team members have confirmed
-reviewer access, and a review action has succeeded.
+it. The configuration enables **development, test and production**.
+Development team members have confirmed reviewer access, and a review action
+has succeeded. Test and production require their own deployment and acceptance
+checks; enabling the account settings does not prove live access.
 
 Enabling it adds delegated Microsoft Graph `User.Read` to the ALB OIDC
 scopes and sets `MPAPB_ALB_GROUP_AUTHORIZATION_ENABLED=true` on the builder
@@ -89,30 +90,31 @@ Rollout order:
 1. Add delegated Graph `User.Read` to the Entra app registration and arrange
    consent under tenant policy. This repository does not manage Entra.
 2. Build the companion application image with the feature disabled.
-3. Review the test web-ui Terraform plan. Expect the HTTPS listener to add
+3. Review the test and production web-ui Terraform plans. In each, expect the HTTPS listener to add
    `https://graph.microsoft.com/User.Read` and the task-definition flag to
-   change from false to true. Development and production authorisation
-   settings must remain unchanged.
-4. Record the test service's current task-definition revision for rollback.
-   Apply test infrastructure, then explicitly deploy the compatible application
-   image using the new **test** task definition. The verified application
+   change from false to true. Development authorisation settings must remain
+   unchanged.
+4. For each target environment, record the service's current task-definition
+   revision for rollback. Apply that environment's infrastructure through the
+   approved workflow, then explicitly deploy the compatible application
+   image using its new task definition. The verified application
    image tag is `ui-build-5a37ac2`; retain the new task definition's settings
    when pinning the image rather than using the mutable `ui-build-latest` tag.
-   Leave production application deployment unapproved.
    The ECS service ignores
    `task_definition`, so Terraform registration is not a service rollout.
    Cloning an old service revision for image deployment can omit the flag.
    The application CI currently does not deploy to test automatically.
 5. Start a fresh ALB login with consent to the new scope. Existing ALB
    sessions may continue using tokens without `User.Read`. If necessary,
-   remove only the test site's `AWSELBAuthSessionCookie*` cookies and reload;
+   remove only that environment's site-specific `AWSELBAuthSessionCookie*` cookies and reload;
    closing and reopening the browser does not reliably clear them.
 6. Verify `/auth/user` includes the configured group, `/whoami` returns
    reviewer status, and review read/write access works for team members.
    Verify non-members are denied, Graph errors fail closed, and membership
    removal is reflected after Graph propagation and the 60-second cache.
-7. Enable the production account setting in a separate change only after
-   test acceptance and repeat the plan, apply and ECS rollout checks.
+7. Prefer completing test acceptance before deploying production. Repeat the
+   plan, apply, ECS rollout and acceptance checks for production; do not assume
+   test results validate production.
 
 Graph availability is required for authenticated dynamic pages while
 enabled. Health checks, assets and logout bypass membership lookup.
