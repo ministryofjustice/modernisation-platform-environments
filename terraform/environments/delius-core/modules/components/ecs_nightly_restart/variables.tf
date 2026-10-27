@@ -8,11 +8,6 @@ variable "app_name" {
   type        = string
 }
 
-variable "service_name" {
-  description = "The name of the ECS service"
-  type        = string
-}
-
 variable "service_arn" {
   description = "The ARN of the ECS service"
   type        = string

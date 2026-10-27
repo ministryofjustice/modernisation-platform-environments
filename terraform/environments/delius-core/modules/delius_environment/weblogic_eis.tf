@@ -209,7 +209,6 @@ module "ecs_nightly_restart_weblogic_eis" {
   env_name     = var.env_name
   app_name     = "weblogic-eis"
   cluster_name = module.ecs.ecs_cluster_arn
-  service_name = "${var.env_name}-weblogic-eis"
   service_arn  = local.weblogic_eis_service_arn
   task_count   = data.aws_ssm_parameter.weblogic_eis_task_count.value
 }

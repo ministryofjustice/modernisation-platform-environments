@@ -1,5 +1,6 @@
 locals {
-  lambda_name         = "${var.service_name}-nightly-restart"
+  service_name        = "${var.app_name}-${var.env_name}"
+  lambda_name         = "${local.service_name}-nightly-restart"
   schedule_expression = "cron(15 02 * * ? *)" # 02:15 every day
 }
 
@@ -71,7 +72,7 @@ resource "aws_lambda_function" "nightly_restart_lambda" {
   #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
 
   function_name    = local.lambda_name
-  description      = "Lambda function to restart the ${var.service_name} ECS service nightly"
+  description      = "Lambda function to restart the ${local.service_name} ECS service nightly"
   role             = aws_iam_role.lambda_role.arn
   runtime          = "python3.14"
   handler          = "lambda.handler"
@@ -82,7 +83,7 @@ resource "aws_lambda_function" "nightly_restart_lambda" {
   environment {
     variables = {
       CLUSTER       = var.cluster_name
-      SERVICE       = var.service_name
+      SERVICE_NAME  = local.service_name
       DESIRED_COUNT = var.task_count
     }
   }
