@@ -4,6 +4,7 @@
       "app_name": "ccms-oia-sandbox",
       "aws_region": "eu-west-2",
       "ami_image_id": "ami-02f77a03ec776dc35",
+      "conn_saa_ami_image_id": "ami-0d6d764bbe794b8ca",
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "60f1bf90edaed1f59fd7232486154e4b9c009f8c",
