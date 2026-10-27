@@ -1,5 +1,6 @@
 locals {
-  service_name        = "${var.app_name}-${var.env_name}"
+  service_name        = "${var.env_name}-${var.app_name}"
+  alarm_prefix        = "${var.app_name}-${var.env_name}"
   lambda_name         = "${local.service_name}-nightly-restart"
   schedule_expression = "cron(15 02 * * ? *)" # 02:15 every day
 }
@@ -82,8 +83,9 @@ resource "aws_lambda_function" "nightly_restart_lambda" {
   tags             = { Name = local.lambda_name }
   environment {
     variables = {
-      CLUSTER       = var.cluster_name
+      CLUSTER_NAME  = var.cluster_name
       SERVICE_NAME  = local.service_name
+      ALARM_PREFIX  = local.alarm_prefix
       DESIRED_COUNT = var.task_count
     }
   }

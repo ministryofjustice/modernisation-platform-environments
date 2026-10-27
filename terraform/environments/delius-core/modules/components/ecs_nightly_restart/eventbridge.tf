@@ -20,8 +20,8 @@ resource "aws_iam_role_policy" "eventbridge_start_execution" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect = "Allow"
-      Action = ["states:StartExecution"]
+      Effect   = "Allow"
+      Action   = ["states:StartExecution"]
       Resource = aws_sfn_state_machine.ecs_restart.arn
     }]
   })
