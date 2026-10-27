@@ -7,7 +7,7 @@
       "conn_saa_ami_image_id": "ami-02f77a03ec776dc35",
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
-      "opa_container_version": "60f1bf90edaed1f59fd7232486154e4b9c009f8c",
+      "opa_container_version": "62b9dd3d665632388c4e9ea9b6fad8439903241d",
       "ec2_instance_type": "m5.large",
       "ec2_instance_type_gh_runner": "t2.small",
       "instance_role_gh_runner": "gh-runner",
