@@ -39,8 +39,7 @@ resource "aws_launch_template" "ec2-launch-template" {
   }
   
   user_data = base64encode(data.template_file.launch-template.rendered)
-  user_data_replace_on_change = true
-
+  
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
