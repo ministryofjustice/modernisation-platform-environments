@@ -1,6 +1,4 @@
 resource "aws_mwaa_environment" "main" {
-  depends_on = [module.airflow_constraints_object]
-
   name                            = local.environment
   airflow_version                 = local.environment_configuration.airflow_version
   environment_class               = local.environment_configuration.airflow_environment_class
@@ -15,7 +13,7 @@ resource "aws_mwaa_environment" "main" {
   requirements_s3_path           = "requirements.txt"
   requirements_s3_object_version = module.airflow_requirements_object.s3_object_version_id
   plugins_s3_path                = "plugins.zip"
-  plugins_s3_object_version      = module.airflow_plugins_object.s3_object_version_id
+  plugins_s3_object_version      = data.aws_s3_object.airflow_plugins.version_id
 
   max_workers = local.environment_configuration.airflow_max_workers
   min_workers = local.environment_configuration.airflow_min_workers
