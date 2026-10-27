@@ -9,8 +9,8 @@ cloudwatch = boto3.client("cloudwatch",config=Config(retries={"mode": "adaptive"
 
 def get_alarm_names():
     print("Fetching CloudWatch alarms...", flush=True)
-    tag_key = "service"
-    tag_value = os.environ["SERVICE"]
+
+    service_name = os.environ["SERVICE_NAME"].lower()
 
     paginator = cloudwatch.get_paginator("describe_alarms")
     alarm_names = []
@@ -22,19 +22,12 @@ def get_alarm_names():
         )
 
         for alarm in alarms:
-            alarm_arn = alarm["AlarmArn"]
-            response = cloudwatch.list_tags_for_resource(
-                ResourceARN=alarm_arn
-            )
-            time.sleep(0.05) # Combat rate limiting
+            alarm_name = alarm["AlarmName"].lower()
 
-            tags = {
-                tag["Key"]: tag["Value"]
-                for tag in response.get("Tags", [])
-            }
-
-            if tags.get(tag_key) == tag_value:
+            if alarm_name.startswith(f"{service_name}-"):
                 alarm_names.append(alarm["AlarmName"])
+
+    print(f"Found {len(alarm_names)} matching alarms: {alarm_names}",flush=True,)
 
     return alarm_names
 

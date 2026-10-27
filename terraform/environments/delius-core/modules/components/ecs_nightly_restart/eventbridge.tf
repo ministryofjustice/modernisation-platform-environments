@@ -19,14 +19,9 @@ resource "aws_iam_role_policy" "eventbridge_start_execution" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-
     Statement = [{
       Effect = "Allow"
-
-      Action = [
-        "states:StartExecution"
-      ]
-
+      Action = ["states:StartExecution"]
       Resource = aws_sfn_state_machine.ecs_restart.arn
     }]
   })
@@ -47,7 +42,5 @@ resource "aws_scheduler_schedule" "nightly_restart" {
     role_arn = aws_iam_role.eventbridge_step_functions.arn
   }
 
-  depends_on = [
-    aws_iam_role_policy.eventbridge_start_execution
-  ]
+  depends_on = [aws_iam_role_policy.eventbridge_start_execution]
 }
