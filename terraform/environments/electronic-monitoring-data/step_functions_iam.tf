@@ -415,59 +415,6 @@ resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
 }
 
 
-# ------------------------------------------------------------------------------
-# Downstream position reconciliation scheduler
-# ------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 
-resource "aws_iam_role" "downstream_reconciliation_scheduler" {
-  count = (
-    local.is-preproduction || local.is-production ? 1 : 0
-  )
 
-  name = "downstream_reconciliation_scheduler_role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-
-    Statement = [
-      {
-        Effect = "Allow"
-
-        Principal = {
-          Service = "scheduler.amazonaws.com"
-        }
-
-        Action = "sts:AssumeRole"
-      },
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
-  count = (
-    local.is-preproduction || local.is-production ? 1 : 0
-  )
-
-  name = "downstream_reconciliation_scheduler_start_policy"
-  role = aws_iam_role.downstream_reconciliation_scheduler[0].id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-
-    Statement = [
-      {
-        Effect = "Allow"
-
-        Action = [
-          "states:StartExecution",
-        ]
-
-        Resource = [
-          module.merge_into_mdss_staged_position.arn,
-          module.merge_into_mdss_ac_position.arn,
-          module.merge_into_emdi_position.arn,
-        ]
-      },
-    ]
-  })
-}

@@ -456,17 +456,3 @@ module "trigger_cadt_step_function" {
 # Downstream reconciliation audit
 # ------------------------------------------
 
-module "downstream_reconciliation_audit" {
-  source       = "./modules/step_function"
-  name         = "downstream-reconciliation-audit"
-  type         = "STANDARD"
-  iam_policies = tomap({
-    downstream_reconciliation_audit = (
-      aws_iam_policy.downstream_reconciliation_audit
-    )
-  })
-
-  variable_dictionary = tomap({
-    planner_function_name = module.merge_redrive_planner.lambda_function_name
-  })
-}
