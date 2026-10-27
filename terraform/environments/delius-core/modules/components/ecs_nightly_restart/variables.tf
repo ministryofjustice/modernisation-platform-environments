@@ -3,7 +3,7 @@ variable "env_name" {
   type        = string
 }
 
-variable "service_name" {
+variable "app_name" {
   description = "The name of the ECS service"
   type        = string
 }

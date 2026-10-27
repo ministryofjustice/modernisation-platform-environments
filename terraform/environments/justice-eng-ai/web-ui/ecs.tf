@@ -100,20 +100,19 @@ resource "aws_ecs_task_definition" "app" {
           name  = "GITHUB_INTAKE_WORKFLOW_FILE"
           value = var.github_intake_workflow_file
         },
-        # Reviewer dashboard ("/review"): only members of this team can
-        # verify their GH username and see the queue. Requires the
-        # GitHub App to have Organization -> Members: Read-only granted
-        # (see var.reviewer_github_team docstring). Empty disables the
-        # team-based path entirely.
-        {
-          name  = "MPAPB_REVIEWER_GITHUB_TEAM"
-          value = var.reviewer_github_team
-        },
         # Break-glass allow-list of ``user_id`` values (from /whoami)
-        # that bypass the team check. Prefer the team-based path.
+        # for reviewer access when Entra group claims are unavailable.
         {
           name  = "MPAPB_REVIEWER_USER_IDS"
           value = var.reviewer_user_ids
+        },
+        {
+          name  = "MPAPB_REVIEW_BACKEND"
+          value = "dynamodb"
+        },
+        {
+          name  = "MPAPB_REVIEW_TABLE_NAME"
+          value = local.build_review_table_name
         },
         # Operator override for the ``email_id`` input on the Deployment
         # workflow dispatch. Empty (default) sends the empty string --

@@ -102,6 +102,7 @@
         "dps-visits",
         "dps-body-scans",
         "dps-prisoner-property",
+        "dps-prisoner-prop",
         "dps-csra"
       ],
       "alarms": {
@@ -344,6 +345,7 @@
         "dps-visits",
         "dps-body-scans",
         "dps-prisoner-property",
+        "dps-prisoner-prop",
         "dps-csra"
       ],
       "alarms": {
@@ -569,6 +571,7 @@
         "dps-visits",
         "dps-body-scans",
         "dps-prisoner-property",
+        "dps-prisoner-prop",
         "dps-csra"
       ],
       "alarms": {
@@ -807,6 +810,7 @@
         "dps-visits",
         "dps-body-scans",
         "dps-prisoner-property",
+        "dps-prisoner-prop",
         "dps-csra"
       ],
       "alarms": {

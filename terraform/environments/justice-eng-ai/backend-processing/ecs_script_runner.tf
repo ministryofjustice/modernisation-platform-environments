@@ -18,7 +18,8 @@ locals {
   script_runner_role_name_prefix = substr("${local.application_name}-script-runner", 0, 47)
 
   script_runner_environment_variables = []
-  script_runner_app_id_path           = "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1)), '.'), 0)"
+  script_runner_package_stem_path     = "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($.s3_file, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.s3_file, '/')), -1)), '.'), 0)"
+  script_runner_app_id_path           = "$.package_identity.AppID"
   script_runner_forge_runtime_version = local.application_data.accounts[local.environment].forge_runtime_version
 
   # Cross-region inference profile (e.g. eu.anthropic.claude-...); the underlying foundation model has no geography prefix.
@@ -428,6 +429,13 @@ data "aws_iam_policy_document" "script_runner_ecs_task_build_flow" {
       values   = ["arn:${data.aws_partition.current.partition}:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/${local.bedrock_model_id}"]
     }
   }
+}
+
+# The role is created here, so the account-role lookup in s3.tf cannot see it; grant the staging bucket key directly.
+resource "aws_iam_role_policy" "script_runner_ecs_task_staging_bucket_kms" {
+  name   = "${local.application_name}-script-runner-staging-bucket-kms"
+  role   = aws_iam_role.script_runner_ecs_task.name
+  policy = data.aws_iam_policy_document.ecs_staging_bucket_kms.json
 }
 
 resource "aws_iam_policy" "script_runner_ecs_task_build_flow" {

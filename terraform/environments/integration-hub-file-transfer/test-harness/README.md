@@ -52,7 +52,9 @@ Resources are created only in the test environment. The smoke test uses:
 | Delivery prefix | `push-to-s3/` |
 
 GitHub OIDC trust is restricted to jobs using the `smoke-test` environment in
-`ministryofjustice/integration-hub`, with audience `sts.amazonaws.com`. The
+`ministryofjustice/integration-hub` or
+`ministryofjustice/modernisation-platform-environments`, with audience
+`sts.amazonaws.com`. The
 workflow job must declare `environment: smoke-test` and grant `id-token: write`.
 Jobs without this environment do not match the trust policy, including jobs on
 `main`.

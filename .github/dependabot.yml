@@ -652,6 +652,7 @@ updates:
       - "terraform/environments/developer-experience"
       - "terraform/environments/developer-experience/auth0-event-stream"
       - "terraform/environments/developer-experience/github-audit-log-stream"
+      - "terraform/environments/developer-experience/github-backup"
       - "terraform/environments/developer-experience/github-management"
     schedule:
       interval: "daily"
@@ -1525,6 +1526,8 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/modules/acm_certificate"
+      - "terraform/modules/aws_health_lambda"
+      - "terraform/modules/aws_health_lambda_cloudwatch_events"
       - "terraform/modules/baseline"
       - "terraform/modules/baseline_presets"
       - "terraform/modules/cloudwatch_dashboard"

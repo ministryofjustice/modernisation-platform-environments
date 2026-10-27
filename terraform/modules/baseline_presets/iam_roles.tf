@@ -9,9 +9,22 @@ locals {
     length(var.options.ssm_maintenance_window_run_commands) != 0 ? ["SSMPatchManagerTaskPolicy"] : [],
     var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessRole"] : [],
     var.options.enable_vmimport ? ["vmimport"] : [],
+    var.options.aws_health_lambda_configuration.enabled ? ["EventBridgeInvokeAWSHealthLambda"] : [],
   ]))
 
   iam_roles = {
+    EventBridgeInvokeAWSHealthLambda = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
+        principals = {
+          type        = "Service"
+          identifiers = ["events.amazonaws.com"]
+        }
+      }]
+      policy_attachments = ["InvokeAWSHealthLambda"]
+    }
+
     # prereq: ImageBuilderLaunchTemplatePolicy and BusinessUnitKmsCmkPolicy 
     # policies must be included in iam_policies
     EC2ImageBuilderDistributionCrossAccountRole = {

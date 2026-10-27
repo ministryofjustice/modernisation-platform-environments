@@ -1,6 +1,6 @@
 resource "aws_security_group" "lambda_generic" {
 
-name_prefix = "${local.bucket_prefix}-generic-lambda-sg"
+  name_prefix = "${local.bucket_prefix}-generic-lambda-sg"
   description = "Generic Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -165,7 +165,7 @@ resource "aws_security_group_rule" "cloud_platform_access" {
 }
 
 resource "aws_security_group" "lambda_gov_notify_access" {
-  
+
   name_prefix = "${local.bucket_prefix}-outbound-gov-notify-lambda-sg"
   description = "Gov Notify Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id
