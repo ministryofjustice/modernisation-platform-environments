@@ -32,6 +32,20 @@ module "data_lake_settings" {
   read_only_admins = local.environments[local.environment].lakeformation_read_only_admins
 }
 
+resource "aws_glue_data_catalog_encryption_settings" "example" {
+  data_catalog_encryption_settings {
+    connection_password_encryption {
+      aws_kms_key_id                       = aws_kms_key.data_lake_kms_key.arn
+      return_connection_password_encrypted = true
+    }
+
+    encryption_at_rest {
+      catalog_encryption_mode = "SSE-KMS"
+      sse_aws_kms_key_id      = aws_kms_key.data_lake_kms_key.arn
+    }
+  }
+}
+
 data "aws_iam_policy_document" "data_lake_kms_key" {
   #checkov:skip=CKV_AWS_356: Delegates access to the root account for KMS key management
   #checkov:skip=CKV_AWS_109: Delegates access to the root account for KMS key management
