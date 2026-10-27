@@ -10,16 +10,7 @@ locals {
     "eu-west-1" = "hmcts-claude-provider-bedrock-logs-${data.aws_caller_identity.current.account_id}"
     "eu-west-2" = "hmcts-claude-provider-bedrock-logs-${data.aws_caller_identity.current.account_id}-eu-west-2"
   }
-  bedrock_logging_regions = keys(local.bedrock_log_buckets)
-
-  # Request and response bodies are the only sensitive part of a record and almost all of its
-  # volume. The token counts and identity that attribution and the dashboard rely on are envelope
-  # fields, so disabling text delivery should leave them intact; eu-west-1 has it off first to
-  # confirm that before eu-west-2 follows.
-  bedrock_log_text_delivery = {
-    "eu-west-1" = false
-    "eu-west-2" = true
-  }
+  bedrock_logging_regions    = keys(local.bedrock_log_buckets)
   bedrock_log_retention_days = 90
 }
 
@@ -286,8 +277,12 @@ resource "aws_bedrock_model_invocation_logging_configuration" "this" {
   logging_config {
     embedding_data_delivery_enabled = false
     image_data_delivery_enabled     = false
-    text_data_delivery_enabled      = local.bedrock_log_text_delivery[each.key]
     video_data_delivery_enabled     = false
+
+    # Request and response bodies are the only sensitive part of a record and almost all of its
+    # volume. Token counts, identity and requestMetadata are envelope fields and keep being
+    # delivered without them.
+    text_data_delivery_enabled = false
 
     s3_config {
       bucket_name = aws_s3_bucket.bedrock_logs[each.key].id

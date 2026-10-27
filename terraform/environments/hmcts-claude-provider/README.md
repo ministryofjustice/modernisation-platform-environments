@@ -80,8 +80,15 @@ region has its own bucket, KMS key and log group:
 | eu-west-1 | `hmcts-claude-provider-bedrock-logs-<account-id>` | `/aws/bedrock/modelinvocations` |
 | eu-west-2 | `hmcts-claude-provider-bedrock-logs-<account-id>-eu-west-2` | `/aws/bedrock/modelinvocations` |
 
-Prompts and responses land under `invocation-logs/` and expire after 90 days. Any region not in that
-table is still uncaptured; add it to `bedrock_log_buckets` in `bedrock_logging.tf` to start logging it.
+Records land under `invocation-logs/` and expire after 90 days. Any region not in that table is
+still uncaptured; add it to `bedrock_log_buckets` in `bedrock_logging.tf` to start logging it.
+
+Request and response bodies are not logged: `text_data_delivery_enabled` is false, so a record
+carries only the envelope - timestamp, principal, model, region and the four token counts. That is
+everything the dashboard and per-person attribution need, and it keeps prompts and source code out
+of the buckets entirely. One side effect: with bodies off, a streaming invocation writes a second
+record under the same `requestId` with zero token counts, so a call count has to be
+`count_distinct(requestId)` rather than `count(*)`. Token sums are unaffected.
 
 ### Usage dashboard
 

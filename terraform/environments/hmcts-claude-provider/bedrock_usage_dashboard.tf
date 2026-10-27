@@ -54,7 +54,7 @@ locals {
           query = join("\n", [
             "SOURCE '${aws_cloudwatch_log_group.bedrock_logs[region].name}'",
             "| fields coalesce(requestMetadata.user, identity.arn) as user, requestMetadata.team as team",
-            "| stats count(*) as calls, sum(input.inputTokenCount) as input_tokens, sum(input.cacheReadInputTokenCount) as cache_read, sum(input.cacheWriteInputTokenCount) as cache_write, sum(output.outputTokenCount) as output_tokens by user, team",
+            "| stats count_distinct(requestId) as calls, sum(input.inputTokenCount) as input_tokens, sum(input.cacheReadInputTokenCount) as cache_read, sum(input.cacheWriteInputTokenCount) as cache_write, sum(output.outputTokenCount) as output_tokens by user, team",
             "| sort calls desc",
           ])
         }
@@ -73,7 +73,7 @@ locals {
           query = join("\n", [
             "SOURCE '${aws_cloudwatch_log_group.bedrock_logs[region].name}'",
             trimspace(local.bedrock_cost_fields),
-            "| stats (sum(c_in) + sum(c_cw) + sum(c_cr) + sum(c_out)) / 1000000 as est_usd, count(*) as calls by user",
+            "| stats (sum(c_in) + sum(c_cw) + sum(c_cr) + sum(c_out)) / 1000000 as est_usd, count_distinct(requestId) as calls by user",
             "| sort est_usd desc",
           ])
         }
@@ -92,7 +92,7 @@ locals {
           query = join("\n", [
             "SOURCE '${aws_cloudwatch_log_group.bedrock_logs[region].name}'",
             trimspace(local.bedrock_cost_fields),
-            "| stats (sum(c_in) + sum(c_cw) + sum(c_cr) + sum(c_out)) / 1000000 as est_usd, count(*) as calls by modelId",
+            "| stats (sum(c_in) + sum(c_cw) + sum(c_cr) + sum(c_out)) / 1000000 as est_usd, count_distinct(requestId) as calls by modelId",
             "| sort est_usd desc",
           ])
         }
