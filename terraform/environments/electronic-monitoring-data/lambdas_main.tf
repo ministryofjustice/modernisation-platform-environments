@@ -1470,13 +1470,13 @@ module "merge_redrive_planner" {
     CADT_ECS_TASK_FAMILY  = aws_ecs_task_definition.create_a_derived_table.family
 
     STAGED_RECONCILIATION_STATE_MACHINE_ARN = (
-      module.merge_into_mdss_staged_position.arn
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:merge_into_mdss_staged_position"
     )
     AC_RECONCILIATION_STATE_MACHINE_ARN = (
-      module.merge_into_mdss_ac_position.arn
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:merge_into_ac_position"
     )
     EMDI_RECONCILIATION_STATE_MACHINE_ARN = (
-      module.merge_into_emdi_position.arn
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:merge_into_emdi_position"
     )
 
     POSITION_LOOKBACK_HOURS              = "24"
