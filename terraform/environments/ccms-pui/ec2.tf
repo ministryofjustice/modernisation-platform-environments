@@ -1,12 +1,3 @@
-data "template_file" "launch-template" {
-  template = file("${path.module}/templates/user-data.sh")
-  vars = {
-    cluster_name       = "${local.application_name}-cluster"
-    deploy_environment = local.environment
-  }
-}
-
-
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = local.application_name
   image_id      = local.application_data.accounts[local.environment].ami_image_id
@@ -38,7 +29,12 @@ resource "aws_launch_template" "ec2-launch-template" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template.rendered)
+  user_data = base64encode(templatefile(
+    file("${path.module}/templates/user-data.sh"), {
+      cluster_name       = "${local.application_name}-cluster"
+      deploy_environment = local.environment
+    }
+  ))
 
   tag_specifications {
     resource_type = "instance"
