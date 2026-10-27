@@ -107,6 +107,9 @@ resource "aws_instance" "sftp_server" {
   vpc_security_group_ids = [aws_security_group.sftp_sg[0].id]
   iam_instance_profile   = aws_iam_instance_profile.ssm_profile[0].name
 
+  # Only applies on (re)creation as lifecycle ignores changes.
+  user_data = file("${path.module}/files/sftp-user-data.sh")
+
   metadata_options {
     http_tokens   = "required" # Force use of IMDSv2
     http_endpoint = "enabled"  # Enable IMDS access
