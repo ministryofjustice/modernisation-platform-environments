@@ -719,6 +719,81 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
 }
 
 # ------------------------------------------------------------------------------
+# Historical assurance audit
+# Trigger at midnight and let the planner defer around higher-priority workloads.
+# ------------------------------------------------------------------------------
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_audit" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_audit_midnight"
+
+  description = (
+    "Starts the downstream historical assurance audit at midnight"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(0 0 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.merge_redrive_planner.lambda_function_arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      action = "launch_historical_audit"
+    })
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+    module.downstream_reconciliation_audit,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation status publisher
+# Refresh low-cost operational metrics without running Athena queries.
+# ------------------------------------------------------------------------------
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_status" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_status"
+
+  description = (
+    "Publishes current downstream reconciliation status every five minutes"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = "rate(5 minutes)"
+
+  target {
+    arn      = module.merge_redrive_planner.lambda_function_arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      action = "publish_reconciliation_status"
+    })
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+  ]
+}
+
+
+# ------------------------------------------------------------------------------
 # Rota channel notifier schedule
 # ------------------------------------------------------------------------------
 
