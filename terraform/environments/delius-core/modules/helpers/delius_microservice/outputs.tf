@@ -48,3 +48,24 @@ output "nlb_target_group_arn_map" {
 output "nlb_service_r53_record" {
   value = try(aws_route53_record.services_nlb_r53_record[0].fqdn, null)
 }
+
+output "alarm_names" {
+  value = [
+    aws_cloudwatch_metric_alarm.ecs_cpu_critical,
+    aws_cloudwatch_metric_alarm.ecs_cpu_warning,
+    aws_cloudwatch_metric_alarm.ecs_desired_task_count_warning,
+    aws_cloudwatch_metric_alarm.ecs_memory_critical,
+    aws_cloudwatch_metric_alarm.ecs_memory_warning,
+    try(aws_cloudwatch_metric_alarm.alb_response_code_5xx_critical[0], []),
+    try(aws_cloudwatch_metric_alarm.alb_response_code_5xx_warning[0], []),
+    try(aws_cloudwatch_metric_alarm.alb_response_time_critical[0], []),
+    try(aws_cloudwatch_metric_alarm.ecs_error_critical[0], []),
+    try(aws_cloudwatch_metric_alarm.ecs_healthy_hosts_fatal[0], []),
+    try(aws_cloudwatch_metric_alarm.ecs_host_cpu_critical[0], []),
+    try(aws_cloudwatch_metric_alarm.ecs_host_cpu_warning[0], []),
+    try(aws_cloudwatch_metric_alarm.ecs_host_memory_critical[0], []),
+    try(aws_cloudwatch_metric_alarm.ecs_host_memory_warning[0], []),
+    try(aws_cloudwatch_metric_alarm.ecs_host_volume_usage_critical[0], []),
+    try(aws_cloudwatch_metric_alarm.ecs_root_volume_usage_warning[0], [])
+  ]
+}

@@ -103,3 +103,51 @@ resource "aws_cloudwatch_metric_alarm" "alb_rejected_connections_warning" {
 
   tags = merge(var.tags, { "Name" = local.alb_name })
 }
+
+resource "aws_cloudwatch_alarm_mute_rule" "weeknight_mute" {
+  count  = var.enable_autoscaling_schedule ? 1 : 0
+  name = "weeknight-alarm-mute"
+
+  mute_targets {
+    alarm_names = concat(
+      module.weblogic.alarm_names,
+      module.weblogic_eis.alarm_names,
+      try(module.weblogic_testdata_api.alarm_names, []),
+      module.pwm.alarm_names,
+      module.ldap_ecs.alarm_names,
+      try(module.oracle_db_shared.alarm_names, [])
+    )
+  }
+
+  rule {
+    schedule {
+      expression = "cron(0 21 ? * MON-FRI *)"
+      duration   = "PT9H"
+      timezone   = "Europe/London"
+    }
+  }
+}
+
+resource "aws_cloudwatch_alarm_mute_rule" "weekend_mute" {
+  count  = var.enable_autoscaling_schedule ? 1 : 0
+  name = "weeknight-alarm-mute"
+
+  mute_targets {
+    alarm_names = concat(
+      module.weblogic.alarm_names,
+      module.weblogic_eis.alarm_names,
+      try(module.weblogic_testdata_api.alarm_names, []),
+      module.pwm.alarm_names,
+      module.ldap_ecs.alarm_names,
+      try(module.oracle_db_shared.alarm_names, [])
+    )
+  }
+
+  rule {
+    schedule {
+      expression = "cron(0 0 ? * SAT *)"
+      duration   = "PT48H"
+      timezone   = "Europe/London"
+    }
+  }
+}
