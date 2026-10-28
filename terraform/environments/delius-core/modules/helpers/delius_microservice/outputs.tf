@@ -51,21 +51,21 @@ output "nlb_service_r53_record" {
 
 output "alarm_names" {
   value = [
-    aws_cloudwatch_metric_alarm.ecs_cpu_critical,
-    aws_cloudwatch_metric_alarm.ecs_cpu_warning,
-    aws_cloudwatch_metric_alarm.ecs_desired_task_count_warning,
-    aws_cloudwatch_metric_alarm.ecs_memory_critical,
-    aws_cloudwatch_metric_alarm.ecs_memory_warning,
-    try(aws_cloudwatch_metric_alarm.alb_response_code_5xx_critical[0], []),
-    try(aws_cloudwatch_metric_alarm.alb_response_code_5xx_warning[0], []),
-    try(aws_cloudwatch_metric_alarm.alb_response_time_critical[0], []),
-    try(aws_cloudwatch_metric_alarm.ecs_error_critical[0], []),
-    try(aws_cloudwatch_metric_alarm.ecs_healthy_hosts_fatal[0], []),
-    try(aws_cloudwatch_metric_alarm.ecs_host_cpu_critical[0], []),
-    try(aws_cloudwatch_metric_alarm.ecs_host_cpu_warning[0], []),
-    try(aws_cloudwatch_metric_alarm.ecs_host_memory_critical[0], []),
-    try(aws_cloudwatch_metric_alarm.ecs_host_memory_warning[0], []),
-    try(aws_cloudwatch_metric_alarm.ecs_host_volume_usage_critical[0], []),
-    try(aws_cloudwatch_metric_alarm.ecs_root_volume_usage_warning[0], [])
+    aws_cloudwatch_metric_alarm.ecs_cpu_critical.alarm_name,
+    aws_cloudwatch_metric_alarm.ecs_cpu_warning.alarm_name,
+    aws_cloudwatch_metric_alarm.ecs_desired_task_count_warning.alarm_name,
+    aws_cloudwatch_metric_alarm.ecs_memory_critical.alarm_name,
+    aws_cloudwatch_metric_alarm.ecs_memory_warning.alarm_name,
+    try(aws_cloudwatch_metric_alarm.alb_response_code_5xx_critical[0].alarm_name, null),
+    try(aws_cloudwatch_metric_alarm.alb_response_code_5xx_warning[0].alarm_name, null),
+    try(aws_cloudwatch_metric_alarm.alb_response_time_critical[0].alarm_name, null),
+    try(aws_cloudwatch_metric_alarm.ecs_error_critical[0].alarm_name, null),
+    try(aws_cloudwatch_metric_alarm.ecs_healthy_hosts_fatal[0].alarm_name, null),
+    try(aws_cloudwatch_metric_alarm.ecs_host_cpu_critical[0].alarm_name, null),
+    try(aws_cloudwatch_metric_alarm.ecs_host_cpu_warning[0].alarm_name, null),
+    try(aws_cloudwatch_metric_alarm.ecs_host_memory_critical[0].alarm_name, null),
+    try(aws_cloudwatch_metric_alarm.ecs_host_memory_warning[0].alarm_name, null),
+    try(aws_cloudwatch_metric_alarm.ecs_host_volume_usage_critical[0].alarm_name, null),
+    try(aws_cloudwatch_metric_alarm.ecs_root_volume_usage_warning[0].alarm_name, null)
   ]
 }
