@@ -92,13 +92,15 @@ lifetime. Invalid Graph tokens still fail closed.
 
 #### Coordinated UI releases
 
-The UI uses `ui-build-latest` as an intermediate release approach via
-`var.container_image_tag`. Automated commit-SHA promotion, following the
-script-runner pattern, is a separate follow-up; this change adds no release
-SSM parameters or application workflow changes. The tag is mutable: freeze
-competing image publications during this rollout and record the actual
-running image digest per environment afterward. The same tag does not
-guarantee the same image if its value changes between deployments.
+The UI uses the same SHA-tagged build across all three environments via
+the shared `var.container_image_tag` default: `ui-build-f0a35e6`, from commit
+`f0a35e6804e78defdb3cca6bb503e52f6522f267`. Its UI authentication tests and
+image build passed in [application workflow run 40671475362](https://github.com/ministryofjustice/modernisation-platform-ai-application-builder/actions/runs/40671475362).
+The existing build workflow already publishes SHA tags; no build changes
+are needed. Automated promotion following the script-runner pattern is a
+separate follow-up, with no release SSM parameters added here. Do not
+overwrite SHA tags; record actual running image digests after deployment.
+SHA naming alone does not enforce registry immutability.
 
 Terraform manages the UI service's task definition and waits for steady
 state. An approved web-ui apply now deploys the image and the complete
@@ -111,10 +113,11 @@ The application repository's image deployment workflow can still update
 the UI service outside Terraform. Do not approve competing UI releases
 during this rollout. Such updates appear as task-definition drift on the
 next Terraform plan, which will restore the Terraform task definition and
-configuration. Publishing a new image under `ui-build-latest` alone does not
-update existing tasks or create a Terraform diff. Later image releases
-still need an explicit service deployment. Do not assume an image-only
-deployment imports the newest Terraform settings.
+configuration. For later releases, update the shared `container_image_tag`
+default in a reviewed PR to promote the selected build across all three
+environments. Publishing a new `ui-build-latest` image does not change this
+Terraform release selection. Do not assume an image-only deployment imports
+the newest Terraform settings.
 
 Rollout order:
 
@@ -125,7 +128,8 @@ approve superseded pre-merge apply jobs from older workflow runs.
 
 1. Add delegated Graph `User.Read` to the Entra app registration and arrange
    consent under tenant policy. This repository does not manage Entra.
-2. Verify the build checks for the image currently published as `ui-build-latest`.
+2. Verify the linked build checks and confirm all three plans select
+   `ui-build-f0a35e6`, not `ui-build-latest`.
 3. Review each account's web-ui Terraform plan. Expect a new UI task
    definition and an actual service task-definition update. All accounts
    must use `MPAPB_TRUST_ALB_OIDC=true`, `MPAPB_ENTRA_ENABLED=false`,
@@ -168,8 +172,8 @@ For an emergency rollback, switch the affected service to a recorded
 compatible task-definition revision using its recorded image digest or
 commit tag, not the mutable `latest` tag. Reconcile the Terraform image
 setting and configuration in a PR before the next apply, otherwise Terraform
-restores its configured release. To disable group checks, disable the account setting and
-apply the reviewed listener and UI task-definition changes together; this
+restores its configured release. To disable group checks, disable the account
+setting and apply the reviewed listener and UI task-definition changes together; this
 restores allow-list-only ALB access. Do not restore an in-app task behind an
 authenticating ALB: production revision 15 has that mismatch and can restore
 the sign-in loop rather than working access.

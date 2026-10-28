@@ -112,8 +112,8 @@ variable "builder_hostname" {
 
 variable "container_image_tag" {
   type        = string
-  description = "UI image tag deployed with the Terraform task-definition settings. Uses ui-build-latest as an intermediate release approach. Publishing a new image under the same tag does not automatically redeploy running ECS tasks."
-  default     = "ui-build-latest"
+  description = "SHA-tagged UI build deployed with the Terraform task-definition settings across all environments. Update this shared release tag in a reviewed PR after verifying the application build."
+  default     = "ui-build-f0a35e6"
 }
 
 variable "forge_container_image_tag" {
