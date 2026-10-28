@@ -15,7 +15,7 @@ locals {
 
   lambda_environment = {
     ACTION_NAME                     = "push-to-sftp"
-    AUTHORISED_DESTINATION_MAP      = jsonencode(local.authorised_destinations_by_secret)
+    AUTHORISED_DESTINATION_MAP      = jsonencode(local.sftp_destinations_by_secret)
     CREDENTIAL_SECRET_MAP           = jsonencode(local.credential_arns_by_secret)
     DELIVERY_ROLE_MAP               = jsonencode(local.delivery_role_arns_by_secret)
     EVENT_BUS_NAME                  = data.aws_cloudwatch_event_bus.file_transfer.name

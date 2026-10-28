@@ -111,6 +111,27 @@ def stored_item(setup):
     return next(iter(setup.services.table.items.values()))
 
 
+@pytest.mark.parametrize("reporter", [False, True])
+def test_empty_configuration_rejects_requests_without_side_effects(setup, monkeypatch, reporter):
+    for name in ("AUTHORISED_DESTINATION_MAP", "SOURCE_PREFIX_MAP", "DELIVERY_ROLE_MAP", "CREDENTIAL_SECRET_MAP"):
+        monkeypatch.setenv(name, "{}")
+    metrics = Mock()
+    monkeypatch.setattr(worker, "metrics", metrics)
+    process = worker.process_reporter_event if reporter else worker.process_writer_event
+
+    assert process({"Records": [setup.record]}, None, setup.services) == {
+        "batchItemFailures": [{"itemIdentifier": "message-1"}]
+    }
+    metric_name = "ReporterRecordFailed" if reporter else "WriterRecordFailed"
+    assert any(call.kwargs.get("name") == metric_name for call in metrics.add_metric.call_args_list)
+    assert not setup.services.table.items
+    setup.services.secrets.get_secret_value.assert_not_called()
+    setup.services.sts.assume_role.assert_not_called()
+    setup.services.clients_for_role.assert_not_called()
+    setup.services.eventbridge.put_events.assert_not_called()
+    setup.transfer.assert_not_called()
+
+
 def test_upload_checkpoint_completion_and_duplicate(setup):
     assert worker.process_writer_record(setup.record, setup.config, setup.services, None) == "copied"
     assert stored_item(setup)["state"] == "SUCCEEDED"

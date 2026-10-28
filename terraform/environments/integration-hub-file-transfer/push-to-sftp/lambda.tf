@@ -30,7 +30,7 @@ module "lambda_file_mover" {
   hash_extra                        = "file-mover"
   timeout                           = 900
   tracing_mode                      = "Active"
-  vpc_subnet_ids                    = local.writer_subnet_ids
+  vpc_subnet_ids                    = contains(["preproduction", "production"], local.environment) ? local.private_subnet_ids : [local.private_subnet_ids[0]]
   vpc_security_group_ids            = [module.security_group_writer.id]
 
   environment_variables = merge(local.lambda_environment, {
@@ -40,7 +40,7 @@ module "lambda_file_mover" {
   event_source_mapping = {
     processing = {
       event_source_arn        = module.sqs_processing.queue_arn
-      enabled                 = local.delivery_enabled
+      enabled                 = true
       batch_size              = 1
       function_response_types = ["ReportBatchItemFailures"]
       scaling_config = {
@@ -80,7 +80,7 @@ module "lambda_file_mover" {
     read_dispatch_configuration = {
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = [for arn_prefix in values(local.dispatch_secret_arn_prefixes) : "${arn_prefix}??????"]
+      resources = [for secret_arn_prefix in values(local.push_to_sftp_secret_arn_prefixes) : "${secret_arn_prefix}??????"]
     }
     decrypt_dispatch_configuration = {
       effect    = "Allow"
@@ -102,7 +102,7 @@ module "lambda_file_mover" {
 resource "terraform_data" "delivery_configuration" {
   lifecycle {
     precondition {
-      condition     = length(local.writer_subnet_ids) > 0 && data.aws_region.current.region == "eu-west-2"
+      condition     = length(local.private_subnet_ids) > 0 && data.aws_region.current.region == "eu-west-2"
       error_message = "SFTP requires shared private subnets in eu-west-2."
     }
 

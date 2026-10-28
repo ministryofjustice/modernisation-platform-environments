@@ -1,7 +1,3 @@
-locals {
-  parent_event_bus_name = local.application_name
-}
-
 data "aws_cloudwatch_event_bus" "file_transfer" {
   name = local.parent_event_bus_name
 }
@@ -21,7 +17,7 @@ module "eventbridge_push_to_sftp" {
   rules = {
     "push-to-sftp" = {
       description = "Route authorised push-to-sftp file action requests"
-      enabled     = local.delivery_enabled
+      enabled     = true
       event_pattern = jsonencode({
         account       = [data.aws_caller_identity.current.account_id]
         source        = ["uk.gov.justice.service.managed-file-transfer"]

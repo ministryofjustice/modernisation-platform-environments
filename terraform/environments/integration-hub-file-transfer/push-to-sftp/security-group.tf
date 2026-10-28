@@ -1,3 +1,18 @@
+data "aws_subnets" "shared_protected" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected*"
+  }
+}
+
+data "aws_subnet" "shared_protected" {
+  for_each = toset(data.aws_subnets.shared_protected.ids)
+  id       = each.value
+}
+
 module "security_group_writer" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"
@@ -9,25 +24,7 @@ module "security_group_writer" {
   vpc_id          = data.aws_vpc.shared.id
 
   ingress_rules = {}
-  egress_rules = merge({
-    for key, rule in local.sftp_egress_rules : key => {
-      name        = "${local.pattern_name}-sftp"
-      description = "Approved recipient SFTP endpoint"
-      cidr_ipv4   = rule.cidr
-      ip_protocol = "tcp"
-      from_port   = rule.port
-      to_port     = rule.port
-    }
-    }, {
-    for subnet_id, subnet in data.aws_subnet.shared-protected : "https-${subnet_id}" => {
-      name        = "${local.pattern_name}-https"
-      description = "HTTPS to shared protected VPC endpoint subnets"
-      cidr_ipv4   = subnet.cidr_block
-      ip_protocol = "tcp"
-      from_port   = 443
-      to_port     = 443
-    }
-  })
+  egress_rules  = local.writer_egress_rules
 
   tags = merge(local.tags, { Name = local.pattern_name })
 }

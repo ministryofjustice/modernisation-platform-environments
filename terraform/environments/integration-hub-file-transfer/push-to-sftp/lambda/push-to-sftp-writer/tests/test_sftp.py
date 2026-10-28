@@ -213,15 +213,25 @@ def test_stream_deadline_prevents_upload(client, route):
     client.open.assert_not_called()
 
 
-def test_raw_paramiko_logs_do_not_propagate(caplog, monkeypatch):
+def test_raw_paramiko_logs_do_not_propagate(monkeypatch):
     import logging
     from contextlib import ExitStack
 
+    output = io.StringIO()
+    root_logger = logging.getLogger()
+    capture = logging.StreamHandler(output)
     monkeypatch.setattr(sftp, "trusted_host_keys", Mock(side_effect=InvalidMessage("missing host key")))
-    with ExitStack() as stack, pytest.raises(InvalidMessage):
-        sftp.connect_sftp({"host_public_keys": []}, Mock(), None, stack)
-    logging.getLogger("paramiko.transport").error("PRIVATE-AUTHENTICATION-MATERIAL")
-    assert "PRIVATE-AUTHENTICATION-MATERIAL" not in caplog.text
+    root_logger.addHandler(capture)
+    try:
+        root_logger.error("ROOT-LOGGING-CONTROL")
+        with ExitStack() as stack, pytest.raises(InvalidMessage):
+            sftp.connect_sftp({"host_public_keys": []}, Mock(), None, stack)
+        logging.getLogger("paramiko.transport").error("PRIVATE-AUTHENTICATION-MATERIAL")
+    finally:
+        root_logger.removeHandler(capture)
+        capture.close()
+    assert "ROOT-LOGGING-CONTROL" in output.getvalue()
+    assert "PRIVATE-AUTHENTICATION-MATERIAL" not in output.getvalue()
 
 
 @pytest.mark.parametrize("setup_fails", [False, True])

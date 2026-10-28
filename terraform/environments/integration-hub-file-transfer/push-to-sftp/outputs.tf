@@ -1,6 +1,28 @@
-output "delivery_enabled" {
-  description = "Whether SFTP requests and processing queue consumption are enabled."
-  value       = local.delivery_enabled
+output "delivery_roles" {
+  description = "Delivery role and authorised source and destination for each configured push-to-sftp dispatch entry."
+  value = {
+    for entry_id, role in module.iam_role_delivery : entry_id => {
+      identity             = local.push_to_sftp_entries[entry_id].identity
+      source_prefix        = local.push_to_sftp_entries[entry_id].source_prefix
+      destination_hostname = local.push_to_sftp_entries[entry_id].action.push_to_sftp.hostname
+      destination_prefix   = local.push_to_sftp_entries[entry_id].action.push_to_sftp.destination_prefix
+      role_arn             = role.arn
+    }
+  }
+}
+
+output "pipeline" {
+  description = "Shared push-to-sftp pipeline resource identifiers."
+  value = {
+    eventbridge_rule_arn = module.eventbridge_push_to_sftp.eventbridge_rule_arns["push-to-sftp"]
+    sns_topic_arn        = module.sns_push_to_sftp.topic_arn
+    sqs_queue_arn        = module.sqs_processing.queue_arn
+    sqs_dlq_arn          = module.sqs_dlq["processing"].queue_arn
+    eventbridge_dlq_arn  = module.sqs_dlq["eventbridge"].queue_arn
+    sns_dlq_arn          = module.sqs_dlq["sns"].queue_arn
+    processing_dlq_arn   = module.sqs_dlq["processing"].queue_arn
+    dlq_reporter_arn     = module.lambda_dlq_reporter.lambda_function_arn
+  }
 }
 
 output "credential_secrets" {
@@ -29,7 +51,7 @@ output "delivery_role_arns" {
 }
 
 output "processing_queue_url" {
-  description = "SFTP processing queue, disabled for Lambda consumption until explicitly enabled."
+  description = "SFTP processing queue URL."
   value       = module.sqs_processing.queue_url
 }
 

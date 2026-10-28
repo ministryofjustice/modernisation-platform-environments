@@ -68,7 +68,7 @@ action = {
 
 Replace the example CIDR with the recipient's approved IPv4 CIDRs and the host-key placeholder with the server public key verified through an independent channel. The port defaults to `22`. The destination prefix is relative to the SFTP account's starting directory and must be empty or end with `/`; a non-empty base directory must already exist.
 
-Keep the SSH client keypair in the delivery component's separate private/public Secrets Manager secrets, not in this action. SFTP delivery is disabled by default until recipient onboarding and interoperability checks are complete.
+Keep the SSH client keypair in the delivery component's separate private/public Secrets Manager secrets, not in this action. The shared SFTP pipeline is always enabled, including when there are no configured entries; requests without an authorised entry are rejected. Complete recipient onboarding and interoperability checks before sending files through a configured route. See the [SFTP component](../../push-to-sftp/README.md) for deployment and credential handling.
 
 ## Slack pickup configuration
 
