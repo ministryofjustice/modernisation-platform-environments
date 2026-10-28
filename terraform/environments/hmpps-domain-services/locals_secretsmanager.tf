@@ -54,8 +54,8 @@ locals {
             local.secretsmanager_secret_policies.domain_read,
           ]
         }
-        shared-certificates = {
-          description = "TLS certificates shared with other accounts"
+        shared-certificate-passwords = {
+          description = "Passwords for shared certs in s3://mod-platform-image-artefact-bucket20230203091453221500000001/hmpps/dso-certificates/ca-signed/"
           policy = [
             local.secretsmanager_secret_policies.domain_read,
           ]
