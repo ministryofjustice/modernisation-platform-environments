@@ -119,5 +119,5 @@ output "onboarding_replication_capacities" {
 
   value = local.dms_core_enabled ? {
     sandbox-shared = module.onboarding_replication_capacity[0].binding
-  } : {}
+  } : null
 }
