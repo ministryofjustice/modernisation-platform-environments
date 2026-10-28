@@ -1,0 +1,30 @@
+data "aws_sns_topic" "pagerduty" {
+  for_each = toset(["high-priority", "low-priority"])
+
+  name = "pagerduty-${each.key}"
+}
+
+module "cloudwatch_metric_alarms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
+  version = "5.7.3"
+
+  for_each = local.cloudwatch_metric_alarms
+
+  alarm_name          = "${local.pattern_name}-${each.key}"
+  alarm_description   = each.value.alarm_description
+  comparison_operator = "GreaterThanThreshold"
+  dimensions          = each.value.dimensions
+  datapoints_to_alarm = try(each.value.datapoints_to_alarm, null)
+  evaluation_periods  = each.value.evaluation_periods
+  metric_name         = each.value.metric_name
+  namespace           = each.value.namespace
+  period              = 300
+  statistic           = each.value.statistic
+  threshold           = each.value.threshold
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = local.cloudwatch_alarm_actions[each.key]
+  ok_actions          = each.key == "delivery-failed" ? [] : local.cloudwatch_alarm_actions[each.key]
+
+  tags = local.tags
+}
