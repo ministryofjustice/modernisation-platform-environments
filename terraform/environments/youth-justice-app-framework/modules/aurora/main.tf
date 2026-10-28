@@ -34,6 +34,7 @@ module "aurora" {
   iops              = var.iops
   storage_type      = var.storage_type
   storage_encrypted = true
+  kms_key_id        = var.cluster_kms_key_id
 
   # Instance options
   instance_class = var.db_cluster_instance_class

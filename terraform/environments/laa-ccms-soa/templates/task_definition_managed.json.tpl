@@ -2,7 +2,6 @@
   {
     "name": "${app_name}-managed",
     "image": "${app_image}:${container_version}",
-    "stopTimeout": 300,
     "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -13,8 +12,8 @@
     },
     "portMappings": [
       {
-        "containerPort": ${managed_ssl_port},
-        "hostPort": ${managed_ssl_port}
+        "containerPort": ${managed_server_port},
+        "hostPort": ${managed_server_port}
       },
       {
         "containerPort": 7574,
@@ -49,6 +48,26 @@
     ],
     "environment": [
       {
+        "name": "ADMIN_HOST",
+        "value": "${admin_host}"
+      },
+      {
+        "name": "ADMIN_PORT",
+        "value": "${admin_server_port}"
+      },
+      {
+        "name": "MANAGED_SERVER",
+        "value": "soa_server1"
+      },
+      {
+        "name": "adminhostname",
+        "value": "${admin_host}"
+      },
+      {
+        "name": "adminport",
+        "value": "${admin_server_port}"
+      },      
+      {
         "name": "DOMAIN_TYPE",
         "value": "soa"
       },
@@ -59,39 +78,19 @@
       {
         "name": "DOMAIN_ROOT",
         "value": "/u01/oracle/user_projects/domains"
-      },
-      {
-        "name": "CLUSTER_NAME",
-        "value": "ccms_soa_cluster"
-      },
-      {
-        "name": "ADMIN_HOST",
-        "value": "${admin_host}"
-      },
-      {
-        "name": "ADMIN_PORT",
-        "value": "${admin_server_port}"
-      },
-      {
-        "name": "adminhostname",
-        "value": "${admin_host}"
-      },
-      {
-        "name": "adminport",
-        "value": "${admin_server_port}"
-      },  
-      {
-        "name": "MANAGED_SERVER",
-        "value": "soa_server1"
-      },    
+      },      
       {
         "name": "MANAGED_HOST",
         "value": "${ms_hostname}"
       },
       {
         "name": "MS_PORT",
-        "value": "${managed_ssl_port}"
-      },     
+        "value": "${managed_server_port}"
+      },
+      {
+        "name": "CLUSTER_NAME",
+        "value": "ccms_soa_cluster"
+      },
       {
         "name": "USER_MEM_ARGS",
         "value": "${wl_mem_args}"
@@ -112,21 +111,8 @@
         },
         {
           "name": "EXTRA_JAVA_PROPERTIES",
-          "valueFrom": "${extra_java_properties}"
-        },
-        {
-          "name": "KEYSTORE_PASSWORD",
-          "valueFrom": "${keystorePassword}"
-        },
-        {
-          "name": "TRUSTSTORE_PASSWORD",
-          "valueFrom": "${truststorePassword}"
-        },
-        {
-           "name": "SLACK_CHANNEL_WEBHOOK",
-           "valueFrom": "${slack_channel_webhook}"
+          "valueFrom": "${trust_store_password}"
         }
     ]
   }
 ]
-
