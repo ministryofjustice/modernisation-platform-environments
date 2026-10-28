@@ -100,7 +100,7 @@ resource "aws_launch_template" "weblogic" {
 
   tag_specifications {
     resource_type = "instance"
-    tags = var.tags
+    tags          = var.tags
   }
 }
 

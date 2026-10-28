@@ -107,7 +107,7 @@ resource "aws_launch_template" "weblogic_testdata_api" {
 
   tag_specifications {
     resource_type = "instance"
-    tags = var.tags
+    tags          = var.tags
   }
 }
 

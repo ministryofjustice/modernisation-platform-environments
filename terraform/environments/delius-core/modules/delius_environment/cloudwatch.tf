@@ -105,8 +105,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_rejected_connections_warning" {
 }
 
 resource "aws_cloudwatch_alarm_mute_rule" "weeknight_mute" {
-  count  = var.enable_autoscaling_schedule ? 1 : 0
-  name = "weeknight-alarm-mute"
+  count = var.enable_autoscaling_schedule ? 1 : 0
+  name  = "weeknight-alarm-mute"
 
   mute_targets {
     alarm_names = compact(concat(
@@ -129,8 +129,8 @@ resource "aws_cloudwatch_alarm_mute_rule" "weeknight_mute" {
 }
 
 resource "aws_cloudwatch_alarm_mute_rule" "weekend_mute" {
-  count  = var.enable_autoscaling_schedule ? 1 : 0
-  name = "weekend-alarm-mute"
+  count = var.enable_autoscaling_schedule ? 1 : 0
+  name  = "weekend-alarm-mute"
 
   mute_targets {
     alarm_names = compact(concat(
