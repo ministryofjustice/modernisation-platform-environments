@@ -6,6 +6,8 @@ This component delivers exact clean S3 object versions to configured SFTP recipi
 
 The component selects `push-to-sftp` entries from the shared [file-dispatch configuration](../modules/file-dispatch-configuration/README.md#action-configuration). One EventBridge rule routes `FileActionExecutionRequested.v1` events through encrypted SNS and SQS to the writer Lambda. EventBridge, SNS and processing each have a separate encrypted DLQ; a reporter consumes these and publishes terminal outcomes to the existing event bus.
 
+The SNS topic is module-managed; its policy and subscription are explicit resources.
+
 The shared pipeline remains deployed and enabled with no entries. Per-entry roles and keypair secrets are then absent, and both Lambdas reject requests without an authorised configuration. There is no manual enablement switch. Deployed infrastructure alone does not establish recipient readiness or customer-supported availability.
 
 The writer processes one message at a time, with a 900-second timeout, maximum concurrency of five, 5,400-second queue visibility and five receives before dead-lettering. The reporter uses batches of ten, a 60-second timeout and maximum concurrency of two per DLQ; DLQ visibility is 360 seconds. Both return partial batch failures.

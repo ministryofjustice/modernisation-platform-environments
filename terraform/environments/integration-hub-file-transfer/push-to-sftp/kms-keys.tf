@@ -9,12 +9,17 @@ module "kms_transport" {
   enable_key_rotation     = true
   deletion_window_in_days = 30
   key_usage               = "ENCRYPT_DECRYPT"
-  key_administrators      = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+  is_enabled              = true
+
+  key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
 
   key_statements = [
     {
-      sid       = "AllowEventBridgePublishers"
-      actions   = ["kms:Decrypt", "kms:GenerateDataKey*"]
+      sid = "AllowEventBridgePublishers"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey*",
+      ]
       resources = ["*"]
       principals = [{
         type        = "Service"
@@ -27,8 +32,11 @@ module "kms_transport" {
       }]
     },
     {
-      sid       = "AllowSNSPublishers"
-      actions   = ["kms:Decrypt", "kms:GenerateDataKey*"]
+      sid = "AllowSNSPublishers"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey*",
+      ]
       resources = ["*"]
       principals = [{
         type        = "Service"
@@ -41,8 +49,11 @@ module "kms_transport" {
       }]
     },
     {
-      sid       = "AllowSQSService"
-      actions   = ["kms:Decrypt", "kms:GenerateDataKey*"]
+      sid = "AllowSQSService"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey*",
+      ]
       resources = ["*"]
       principals = [{
         type        = "Service"
