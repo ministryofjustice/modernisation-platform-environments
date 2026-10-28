@@ -50,8 +50,6 @@ module "pwm" {
   microservice_lb                    = aws_lb.delius_core_ancillary
   microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
 
-  alb_listener_rule_host_header = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
-
   platform_vars = var.platform_vars
 
   container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management:${var.delius_microservice_configs.pwm.image_tag}"
@@ -127,10 +125,28 @@ module "pwm" {
   enable_platform_backups = var.enable_platform_backups
 }
 
+resource "aws_lb_listener_rule" "ancillary_listener_rule" {
+  listener_arn = aws_lb_listener.ancillary_https.arn
+  priority     = 10
+
+  condition {
+    host_header {
+      values = [
+        var.env_name == "prod" ? "password-reset.probation.service.justice.gov.uk" : "password-reset.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "password-reset.${var.env_name}.${var.account_config.dns_suffix}"
+      ]
+    }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = module.pwm.target_group_arn
+  }
+}
+
 #############
 ### Certs ###
 #############
-
 resource "aws_acm_certificate" "pwm_legacy" {
   count = var.env_name != "prod" ? 1 : 0
 
@@ -170,7 +186,6 @@ resource "aws_lb_listener_certificate" "pwm_legacy_prod" {
 #############
 #### SSM ####
 #############
-
 resource "aws_ssm_parameter" "security_key" {
   #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = "/${var.env_name}/pwm/security_key"
@@ -188,7 +203,6 @@ resource "random_id" "security_key" {
 #############
 # SES
 #############
-
 resource "aws_ses_domain_identity" "pwm" {
   domain = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
 }
@@ -238,7 +252,6 @@ resource "aws_route53_record" "pwm_amazonses_dmarc_record" {
 #####################
 # SES SMTP User
 #####################
-
 resource "aws_iam_user" "pwm_ses_smtp_user" {
   #checkov:skip=CKV_AWS_273: "SES SMTP authentication requires IAM user credentials; no human access is granted"
   name = "${var.env_name}-pwm-smtp-user"
