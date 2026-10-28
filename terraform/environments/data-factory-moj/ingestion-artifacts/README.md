@@ -53,3 +53,16 @@ The publishing process will upload the tested package and its build details.
 The deployment process will then use that exact uploaded version.
 
 The Lambda itself does not need access to the ZIP it was deployed from.
+
+## Publishing permissions
+
+A dedicated GitHub Actions role allows the modules repository's
+integration/data-hub-modularisation branch to publish runtime packages.
+
+It can upload and read files under lambda/dms-runtime-controller/ in the
+artifact bucket and use the encryption key through S3.
+
+It cannot delete packages, change infrastructure or start ingestion.
+Other adapters will need their publishing permissions added explicitly.
+
+The publishing workflow will be connected separately.
