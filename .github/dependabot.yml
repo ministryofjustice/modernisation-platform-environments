@@ -475,6 +475,8 @@ updates:
       - "terraform/environments/data-factory-moj/dms-core/modules/dms-test-harness"
       - "terraform/environments/data-factory-moj/dms-core/modules/oracle-test-harness"
       - "terraform/environments/data-factory-moj/genesys-data-ingestion"
+      - "terraform/environments/data-factory-moj/ingestion-artifacts"
+      - "terraform/environments/data-factory-moj/ingestion-registry"
       - "terraform/environments/data-factory-moj/streaming-poc"
       - "terraform/environments/data-factory-moj/streaming-poc-devops"
       - "terraform/environments/data-factory-moj/streaming-poc-maf"
