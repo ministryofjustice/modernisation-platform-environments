@@ -3,7 +3,6 @@ module "pwm" {
 
   name                  = "pwd-manager"
   certificate_arn       = local.certificate_arn
-  # certificate_arn       = var.env_name == "prod" ? aws_acm_certificate.pwm_legacy_prod[0].arn : aws_acm_certificate.pwm_legacy[0].arn
   alb_security_group_id = aws_security_group.ancillary_alb_security_group.id
   env_name              = var.env_name
   container_port_config = [
