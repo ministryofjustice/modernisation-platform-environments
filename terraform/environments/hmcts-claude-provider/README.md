@@ -96,6 +96,36 @@ The `hmcts-claude-bedrock-usage` dashboard in eu-west-1 reports calls, tokens an
 user and by model. A Logs Insights query cannot span regions, so the dashboard carries one column of
 widgets per region and the columns have to be added together for an account total.
 
+### Copy to Azure for PlatOps
+
+HMCTS PlatOps have no AWS access, so `bedrock_logs_sync.tf` copies the records to an Azure Blob
+container they own, `bedrock-claude-v1-token-metrics` on `spsaitokenmetrics`. A DataSync task per
+region runs hourly in Enhanced mode, which transfers between S3 and Azure Blob with no agent to
+run. Records land under `<region>/` in the container, keeping the key layout they have in S3.
+
+The `data/` folders are excluded. They hold the request and response bodies written before text
+delivery was turned off - prompts and source code, not token metrics - and they stay in the bucket
+until the 90 day lifecycle reaches them.
+
+Deleted records are preserved at the destination, so our 90 day expiry does not prune their copy.
+
+The container's SAS token is held in Secrets Manager as `bedrock-logs-azure-sas`, one secret per
+logging region, and DataSync reads it at run time through `CustomSecretConfig`. Terraform creates
+the secret with a placeholder value and then ignores the value, so the token passes through neither
+a plan nor a state file. Set it, and rotate it, with the `developer` role:
+
+```bash
+umask 077; printf '%s' "$SAS_TOKEN" > /tmp/sas
+for region in eu-west-1 eu-west-2; do
+  aws secretsmanager put-secret-value --region "$region" \
+    --secret-id bedrock-logs-azure-sas --secret-string file:///tmp/sas
+done
+shred -u /tmp/sas
+```
+
+DataSync picks up a new value on the next run, with no Terraform change. The current token expires
+on 28 October 2027 and the task starts failing at that point, so rotate before then.
+
 ## Troubleshooting
 
 ### Bearer Token Authentication
