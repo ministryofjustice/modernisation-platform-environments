@@ -103,6 +103,11 @@ resource "aws_launch_template" "weblogic_eis" {
     http_tokens                 = "required"
     http_put_response_hop_limit = 2
   }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = var.tags
+  }
 }
 
 resource "aws_autoscaling_group" "weblogic_eis" {
