@@ -543,6 +543,13 @@ locals {
       "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db_bip
       "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db_bip
     }
+
+    ssm_patch_baselines = {
+      RedHatPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["RedHatPatchGroup1Baseline"], {
+        rule1_approve_after_days = null
+        rule1_approve_until_date = "2026-09-17"
+      })
+    }
   }
 }
 
