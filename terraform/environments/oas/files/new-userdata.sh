@@ -6,6 +6,10 @@ exec 2>&1
 # Create marker file to prove userdata started
 echo "Userdata started at $(date)" > /tmp/userdata_started
 
+# Distrust eMudhra/emSign and Comodo AAA roots (AL2023 fixed ca-certificates release)
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
+
 # Replace SSH keys with new Terraform-generated keys
 echo "Replacing SSH keys with new Terraform-generated keys..."
 

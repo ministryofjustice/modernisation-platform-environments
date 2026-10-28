@@ -29,6 +29,7 @@ module "api_gateway" {
   create_domain_name             = false
   create_routes_and_integrations = false
   create_stage                   = false
+  disable_execute_api_endpoint   = false
 
   tags = local.tags
 }
@@ -129,6 +130,24 @@ resource "aws_apigatewayv2_stage" "default" {
   }
 
   tags = local.tags
+}
+
+resource "aws_apigatewayv2_domain_name" "api" {
+  domain_name = local.acm_domains.api
+
+  domain_name_configuration {
+    certificate_arn = module.acm_api.acm_certificate_arn
+    endpoint_type   = "REGIONAL"
+    security_policy = "TLS_1_2"
+  }
+
+  tags = local.tags
+}
+
+resource "aws_apigatewayv2_api_mapping" "api" {
+  api_id      = module.api_gateway.api_id
+  domain_name = aws_apigatewayv2_domain_name.api.id
+  stage       = aws_apigatewayv2_stage.default.name
 }
 
 resource "aws_lambda_permission" "allow_api_gateway_upload_ticket" {
