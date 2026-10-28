@@ -78,36 +78,65 @@ Development team members have confirmed reviewer access, and a review action
 has succeeded. Test and production require their own deployment and acceptance
 checks; enabling the account settings does not prove live access.
 
-Enabling it adds delegated Microsoft Graph `User.Read` to the ALB OIDC
+Enabling it adds `offline_access` and delegated Microsoft Graph `User.Read` to the ALB OIDC
 scopes and sets `MPAPB_ALB_GROUP_AUTHORIZATION_ENABLED=true` on the builder
 task definition. The application binds the forwarded access token to the
 ALB-signed subject through Microsoft UserInfo, then checks the configured
 admin/reviewer group IDs using Graph. The same group intentionally grants
 both roles. No tenant-wide Graph application permissions are required.
 
+Entra v2 requires an explicit `offline_access` request to issue refresh
+tokens. The ALB uses that refresh token to renew access tokens during its
+12-hour session; the session timeout does not extend an access token's
+lifetime. Invalid Graph tokens still fail closed.
+
+#### Coordinated UI releases
+
+Each account pins its UI build using `container_image_tag` in
+`web-ui/application_variables.json`. The current release is
+`ui-build-f0a35e6`, whose application tests and image-build jobs succeeded
+in application workflow run `40671475362`. Accounts can promote builds
+independently by changing their own pin in a reviewed PR.
+
+Terraform manages the UI service's task definition and waits for steady
+state. An approved web-ui apply now deploys the pinned image and the complete
+authentication configuration together; it no longer only registers an
+unused revision. The ECS deployment circuit breaker retains automatic
+rollback on deployment failure. Desired count remains operator-managed.
+Forge retains its existing CI/CD deployment behaviour.
+
+The application repository's image deployment workflow can still update
+the UI service outside Terraform. Do not approve competing UI releases
+during this rollout. Such updates appear as task-definition drift on the
+next Terraform plan, which will restore the reviewed account pin and
+configuration. Before approving a later image release, update its account
+pin here as well; do not assume an image-only deployment imports the newest
+Terraform settings.
+
 Rollout order:
 
 1. Add delegated Graph `User.Read` to the Entra app registration and arrange
    consent under tenant policy. This repository does not manage Entra.
-2. Build the companion application image with the feature disabled.
-3. Review the test and production web-ui Terraform plans. In each, expect the HTTPS listener to add
-   `https://graph.microsoft.com/User.Read` and the task-definition flag to
-   change from false to true. Development authorisation settings must remain
-   unchanged.
-4. For each target environment, record the service's current task-definition
-   revision for rollback. Apply that environment's infrastructure through the
-   approved workflow, then explicitly deploy the compatible application
-   image using its new task definition. The verified application
-   image tag is `ui-build-5a37ac2`; retain the new task definition's settings
-   when pinning the image rather than using the mutable `ui-build-latest` tag.
-   The ECS service ignores
-   `task_definition`, so Terraform registration is not a service rollout.
-   Cloning an old service revision for image deployment can omit the flag.
-   The application CI currently does not deploy to test automatically.
+2. Verify the pinned image's build checks before promoting it.
+3. Review each account's web-ui Terraform plan. Expect a pinned UI task
+   definition and an actual service task-definition update. All accounts
+   must use `MPAPB_TRUST_ALB_OIDC=true`, `MPAPB_ENTRA_ENABLED=false`,
+   `MPAPB_ALB_GROUP_AUTHORIZATION_ENABLED=true`, the configured group IDs and
+   their own ALB signer ARN. Expect the listener scopes to include both
+   `https://graph.microsoft.com/User.Read` and `offline_access`. Compare
+   against live state; test has been reported working with the feature
+   enabled outside the merged configuration. Review unrelated drift separately.
+4. Record each service's current task-definition revision and listener scopes
+   for rollback. Production was running revision 15 during inspection on
+   28 October 2026; that is the previous state, not a known-working sign-in
+   configuration. Apply each environment's reviewed web-ui plan through its
+   approved workflow. The apply rolls the UI service onto the new task
+   definition and waits for stability; no manual revision cloning is needed.
 5. Start a fresh ALB login with consent to the new scope. Existing ALB
-   sessions may continue using tokens without `User.Read`. If necessary,
-   remove only that environment's site-specific `AWSELBAuthSessionCookie*` cookies and reload;
-   closing and reopening the browser does not reliably clear them.
+   sessions may lack `User.Read` or a refresh token. Refresh the session once
+   by removing only that site's `AWSELBAuthSessionCookie*` cookies and reloading.
+   Clearing the HTTP cache or closing the browser does not reliably renew
+   an ALB session.
 6. Verify `/auth/user` includes the configured group, `/whoami` returns
    reviewer status, and review read/write access works for team members.
    Verify non-members are denied, Graph errors fail closed, and membership
@@ -115,16 +144,26 @@ Rollout order:
 7. Prefer completing test acceptance before deploying production. Repeat the
    plan, apply, ECS rollout and acceptance checks for production; do not assume
    test results validate production.
+8. Verify access after the original access token expires without deleting
+   cookies or signing out. Entra tokens typically last around 60–90 minutes;
+   immediate successful login is not proof of renewal. Record login and
+   later successful request times, never tokens. If Graph 401 recurs,
+   investigate ALB authentication and application Graph logs rather than
+   treating repeated cookie deletion as the solution. Renewal remains
+   unverified until this live acceptance check passes.
 
 Graph availability is required for authenticated dynamic pages while
 enabled. Health checks, assets and logout bypass membership lookup.
 UserInfo/token identity mismatch gives 401; Graph service or permission
 errors give 503. No tokens should be copied to logs, tickets or chat.
-For an immediate application rollback, switch the affected service back to
-its recorded previous task-definition revision. Remove/disable that account's
-setting and apply Terraform to restore its previous listener scope, then
-deploy a compatible task definition with the flag false. This restores
-allow-list-only ALB access.
+For an emergency rollback, switch the affected service to a recorded
+compatible task-definition revision. Then update/revert the account pin and
+settings in a PR before the next apply, otherwise Terraform restores the
+reviewed release. To disable group checks, disable the account setting and
+apply the reviewed listener and UI task-definition changes together; this
+restores allow-list-only ALB access. Do not restore an in-app task behind an
+authenticating ALB: production revision 15 has that mismatch and can restore
+the sign-in loop rather than working access.
 
 <!-- Describe any conditions which restrict access to the service, such as if it’s IP-restricted or only accessible from a private network.-->
 
