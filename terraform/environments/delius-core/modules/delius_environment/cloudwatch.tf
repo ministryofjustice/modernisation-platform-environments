@@ -130,7 +130,7 @@ resource "aws_cloudwatch_alarm_mute_rule" "weeknight_mute" {
 
 resource "aws_cloudwatch_alarm_mute_rule" "weekend_mute" {
   count  = var.enable_autoscaling_schedule ? 1 : 0
-  name = "weeknight-alarm-mute"
+  name = "weekend-alarm-mute"
 
   mute_targets {
     alarm_names = concat(
