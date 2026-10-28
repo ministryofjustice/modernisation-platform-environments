@@ -97,6 +97,11 @@ resource "aws_launch_template" "weblogic" {
     http_tokens                 = "required"
     http_put_response_hop_limit = 2
   }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = var.tags
+  }
 }
 
 # ECS IAM
@@ -289,11 +294,6 @@ resource "aws_lb_listener_certificate" "legacy_prod" {
 
 locals {
   weblogic_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic"
-}
-
-moved {
-  from = module.ecs_nightly_restart_weblogic
-  to   = module.ecs_nightly_restart_weblogic[0]
 }
 
 module "ecs_nightly_restart_weblogic" {

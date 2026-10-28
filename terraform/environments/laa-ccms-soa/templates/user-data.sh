@@ -8,6 +8,10 @@ echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
 echo 'ECS_VOLUME_PLUGIN_CAPABILITIES=["efsAuth"]' >> /etc/ecs/ecs.config
 echo 'ECS_INSTANCE_ATTRIBUTES={"server": "${server}","latest": "true"}' >> /etc/ecs/ecs.config
 
+#--Update CA certificates
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
+
 #--Configure EFS
 yum install -y amazon-efs-utils
 mkdir $EFS_MOUNT_POINT
@@ -25,7 +29,8 @@ yum install -y awscli
 
 # Configure SSH and pull git repo
 yum install git -y
-su ec2-user bash -c 'aws secretsmanager get-secret-value --secret-id soa-secrets --query SecretString   --output text --region eu-west-2| jq -r ".\"deploy-github-ssh-key\""|base64 -d > /home/ec2-user/.ssh/id_rsa'
+su ec2-user bash -c "aws secretsmanager get-secret-value --secret-id ccms/soa/deploy-github-ssh-key --query SecretString --output text --region eu-west-2 | base64 -d > /home/ec2-user/.ssh/id_rsa"
+chown ec2-user $EC2_USER_HOME_FOLDER/.ssh/id_rsa
 chgrp ec2-user $EC2_USER_HOME_FOLDER/.ssh/id_rsa
 chmod 400 $EC2_USER_HOME_FOLDER/.ssh/id_rsa
 cat <<EOF > $EC2_USER_HOME_FOLDER/.ssh/config
