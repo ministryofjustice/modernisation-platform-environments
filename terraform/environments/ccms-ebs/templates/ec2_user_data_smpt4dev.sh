@@ -4,6 +4,9 @@ set -euo pipefail
 
 # Install Docker
 sudo su
+
+dnf update -y ca-certificates --releasever 2023.12.20261026
+
 sudo yum -y install docker
 sudo service docker start
  
