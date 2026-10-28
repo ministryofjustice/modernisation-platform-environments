@@ -132,7 +132,7 @@ resource "aws_lb_listener_rule" "ancillary_listener_rule" {
     host_header {
       values = [
         var.env_name == "prod" ? "password-reset.probation.service.justice.gov.uk" : "password-reset.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
-        "password-reset.${var.env_name}.${var.account_config.dns_suffix}"
+        "pwm.${var.env_name}.${var.account_config.dns_suffix}"
       ]
     }
   }
