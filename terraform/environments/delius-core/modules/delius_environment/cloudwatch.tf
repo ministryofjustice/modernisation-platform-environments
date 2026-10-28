@@ -109,14 +109,14 @@ resource "aws_cloudwatch_alarm_mute_rule" "weeknight_mute" {
   name = "weeknight-alarm-mute"
 
   mute_targets {
-    alarm_names = concat(
+    alarm_names = compact(concat(
       module.weblogic.alarm_names,
       module.weblogic_eis.alarm_names,
       try(module.weblogic_testdata_api.alarm_names, []),
       module.pwm.alarm_names,
       module.ldap_ecs.alarm_names,
       try(module.oracle_db_shared.alarm_names, [])
-    )
+    ))
   }
 
   rule {
@@ -133,14 +133,14 @@ resource "aws_cloudwatch_alarm_mute_rule" "weekend_mute" {
   name = "weekend-alarm-mute"
 
   mute_targets {
-    alarm_names = concat(
+    alarm_names = compact(concat(
       module.weblogic.alarm_names,
       module.weblogic_eis.alarm_names,
       try(module.weblogic_testdata_api.alarm_names, []),
       module.pwm.alarm_names,
       module.ldap_ecs.alarm_names,
       try(module.oracle_db_shared.alarm_names, [])
-    )
+    ))
   }
 
   rule {
