@@ -152,9 +152,11 @@ resource "aws_cloudformation_stack" "bedrock_logs_azure_location" {
 
 resource "aws_cloudwatch_log_group" "bedrock_logs_sync" {
   #checkov:skip=CKV_AWS_158: "Transfer logs carry object keys and counts, no record content"
-  for_each          = local.bedrock_log_buckets
-  region            = each.key
-  name              = "/aws/datasync/bedrock-logs-sync"
+  for_each = local.bedrock_log_buckets
+  region   = each.key
+
+  # An Enhanced mode task rejects any other name.
+  name              = "/aws/datasync"
   retention_in_days = 30
   tags              = local.tags
 }
