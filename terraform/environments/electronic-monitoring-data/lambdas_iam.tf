@@ -1449,6 +1449,19 @@ data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
     ]
     resources = [aws_kms_key.emds_alerts.arn]
   }
+
+  statement {
+    sid    = "ReadDownstreamReconciliationStatus"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*/status/*.json",
+    ]
+  }
 }
 
 resource "aws_iam_role" "mdss_daily_failure_digest" {
@@ -1854,6 +1867,19 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
     ]
     resources = [
       aws_sqs_queue.live_feed_incident_events.arn,
+    ]
+  }
+
+  statement {
+    sid    = "ReadDownstreamReconciliationStatus"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*/status/*.json",
     ]
   }
 }
@@ -3709,6 +3735,7 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
       aws_kms_key.emds_alerts.arn,
     ]
   }
+
   statement {
     sid    = "ReconciliationStateAccess"
     effect = "Allow"
@@ -3750,6 +3777,52 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
     resources = [
       aws_dynamodb_table.downstream_reconciliation_control.arn,
     ]
+  }
+
+  statement {
+    sid    = "ReadReconciliationExecutions"
+    effect = "Allow"
+
+    actions = [
+      "states:ListExecutions",
+    ]
+
+    resources = [
+      module.merge_into_mdss_staged_position.arn,
+      module.merge_into_mdss_ac_position.arn,
+      module.merge_into_emdi_position.arn,
+      module.downstream_reconciliation_audit.arn,
+    ]
+  }
+
+  statement {
+    sid    = "StartHistoricalAssuranceAudit"
+    effect = "Allow"
+
+    actions = [
+      "states:StartExecution",
+    ]
+
+    resources = [
+      module.downstream_reconciliation_audit.arn,
+    ]
+  }
+
+  statement {
+    sid    = "ReadCadtActivity"
+    effect = "Allow"
+
+    actions = [
+      "ecs:ListTasks",
+    ]
+
+    resources = ["*"]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "ecs:cluster"
+      values   = [aws_ecs_cluster.cadt.arn]
+    }
   }
 }
 
