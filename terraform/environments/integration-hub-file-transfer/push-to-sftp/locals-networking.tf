@@ -12,6 +12,17 @@ locals {
     }
   }
 
+  aws_service_egress_rules = {
+    for service, prefix_list in data.aws_ec2_managed_prefix_list.aws_services : "https-${service}" => {
+      name           = "${local.pattern_name}-${service}-https"
+      description    = "HTTPS to the regional ${service} managed prefix list"
+      prefix_list_id = prefix_list.id
+      ip_protocol    = "tcp"
+      from_port      = 443
+      to_port        = 443
+    }
+  }
+
   sftp_targets = distinct(flatten([
     for destination in values(local.sftp_destinations_by_secret) : [
       for cidr in destination.destination_cidr_blocks : {
@@ -34,6 +45,7 @@ locals {
 
   writer_egress_rules = merge(
     local.https_egress_rules,
+    local.aws_service_egress_rules,
     local.sftp_egress_rules,
   )
 }

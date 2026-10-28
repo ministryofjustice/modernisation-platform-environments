@@ -8,6 +8,8 @@ The component selects `push-to-sftp` entries from the shared [file-dispatch conf
 
 The SNS topic is module-managed; its policy and subscription are explicit resources.
 
+EventBridge grants follow the [SNS topic-policy guidance](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#sns-permissions) and [SNS KMS guidance](https://docs.aws.amazon.com/sns/latest/dg/sns-key-management.html#compatibility-with-aws-services): the publish grant is scoped to this topic and the encryption grant to its transport key, both for `events.amazonaws.com`. Source-account/ARN conditions are omitted from these grants; AWS does not support them for EventBridge-to-encrypted-topic KMS access.
+
 The shared pipeline remains deployed and enabled with no entries. Per-entry roles and keypair secrets are then absent, and both Lambdas reject requests without an authorised configuration. There is no manual enablement switch. Deployed infrastructure alone does not establish recipient readiness or customer-supported availability.
 
 The writer processes one message at a time, with a 900-second timeout, maximum concurrency of five, 5,400-second queue visibility and five receives before dead-lettering. The reporter uses batches of ten, a 60-second timeout and maximum concurrency of two per DLQ; DLQ visibility is 360 seconds. Both return partial batch failures.
@@ -22,7 +24,7 @@ The writer processes one message at a time, with a 900-second timeout, maximum c
 
 The writer retrieves the exact dispatch secret version referenced by the request and compares it with Terraform-authorised destination settings. It assumes the entry's delivery role to read only its clean source prefix and private-key secret. Credentials use `AWSCURRENT`; rotate through approved custodians, coordinating recipient authorisation before switching the current key.
 
-The writer uses shared private subnets: one deterministically selected subnet in development/test, all selected subnets in preproduction/production. Egress permits approved SFTP CIDRs/ports and HTTPS to shared protected-subnet CIDRs. SFTP rules use the same normalised destinations as the writer, with one rule per unique CIDR/port pair across all entries. Verify DNS, endpoint access and routes for S3, DynamoDB, STS, Secrets Manager and EventBridge, plus the recipient path. Protected-subnet HTTPS rules alone do not cover service gateway endpoints.
+The writer uses shared private subnets: one deterministically selected subnet in development/test, all selected subnets in preproduction/production. Egress permits approved SFTP CIDRs/ports, HTTPS to shared protected-subnet CIDRs, and HTTPS to the regional AWS-managed S3 and DynamoDB prefix lists. SFTP rules use the same normalised destinations as the writer, with one rule per unique CIDR/port pair across all entries. Prefix-list rules permit traffic but do not create routes or endpoints: verify S3/DynamoDB gateway endpoint routes and reachable private endpoints for STS, Secrets Manager and EventBridge, plus the recipient path.
 
 ## Delivery and recovery
 

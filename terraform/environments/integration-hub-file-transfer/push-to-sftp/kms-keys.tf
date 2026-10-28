@@ -14,6 +14,7 @@ module "kms_transport" {
   key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
 
   key_statements = [
+    # EventBridge-to-encrypted-SNS publishing does not support SourceAccount/SourceArn conditions.
     {
       sid = "AllowEventBridgePublishers"
       actions = [
@@ -24,11 +25,6 @@ module "kms_transport" {
       principals = [{
         type        = "Service"
         identifiers = ["events.amazonaws.com"]
-      }]
-      condition = [{
-        test     = "StringEquals"
-        variable = "aws:SourceAccount"
-        values   = [data.aws_caller_identity.current.account_id]
       }]
     },
     {

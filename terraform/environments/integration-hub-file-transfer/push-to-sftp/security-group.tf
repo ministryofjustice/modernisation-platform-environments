@@ -13,6 +13,12 @@ data "aws_subnet" "shared_protected" {
   id       = each.value
 }
 
+data "aws_ec2_managed_prefix_list" "aws_services" {
+  for_each = toset(["s3", "dynamodb"])
+
+  name = "com.amazonaws.${data.aws_region.current.region}.${each.key}"
+}
+
 module "security_group_writer" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"

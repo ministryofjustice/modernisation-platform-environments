@@ -22,18 +22,6 @@ data "aws_iam_policy_document" "sns_push_to_sftp" {
     }
 
     resources = [module.sns_push_to_sftp.topic_arn]
-
-    condition {
-      test     = "ArnEquals"
-      variable = "aws:SourceArn"
-      values   = [module.eventbridge_push_to_sftp.eventbridge_rule_arns["push-to-sftp"]]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
   }
 }
 
