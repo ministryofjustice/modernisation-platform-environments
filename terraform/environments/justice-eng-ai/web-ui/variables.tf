@@ -112,13 +112,13 @@ variable "builder_hostname" {
 
 variable "container_image_tag" {
   type        = string
-  description = "Fallback UI image tag for accounts without container_image_tag in application_variables.json. Configured accounts use their reviewed image pin, which Terraform deploys together with the task-definition settings."
+  description = "UI image tag deployed with the Terraform task-definition settings. Uses ui-build-latest as an intermediate release approach. Publishing a new image under the same tag does not automatically redeploy running ECS tasks."
   default     = "ui-build-latest"
 }
 
 variable "forge_container_image_tag" {
   type        = string
-  description = "Image tag to run for the Forge Journey Lab container, pulled from the same shared-services ECR repository as the UI image. Forge continues to ignore service task_definition changes and uses CI/CD for image deployment; this is separate from the Terraform-managed UI release pins."
+  description = "Image tag to run for the Forge Journey Lab container, pulled from the same shared-services ECR repository as the UI image. Forge continues to ignore service task_definition changes and uses CI/CD for image deployment, separately from the Terraform-managed UI configuration."
   default     = "forge-build-latest"
 }
 

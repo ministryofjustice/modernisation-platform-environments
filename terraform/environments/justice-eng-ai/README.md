@@ -92,14 +92,16 @@ lifetime. Invalid Graph tokens still fail closed.
 
 #### Coordinated UI releases
 
-Each account pins its UI build using `container_image_tag` in
-`web-ui/application_variables.json`. The current release is
-`ui-build-f0a35e6`, whose application tests and image-build jobs succeeded
-in application workflow run `40671475362`. Accounts can promote builds
-independently by changing their own pin in a reviewed PR.
+The UI uses `ui-build-latest` as an intermediate release approach via
+`var.container_image_tag`. Automated commit-SHA promotion, following the
+script-runner pattern, is a separate follow-up; this change adds no release
+SSM parameters or application workflow changes. The tag is mutable: freeze
+competing image publications during this rollout and record the actual
+running image digest per environment afterward. The same tag does not
+guarantee the same image if its value changes between deployments.
 
 Terraform manages the UI service's task definition and waits for steady
-state. An approved web-ui apply now deploys the pinned image and the complete
+state. An approved web-ui apply now deploys the image and the complete
 authentication configuration together; it no longer only registers an
 unused revision. The ECS deployment circuit breaker retains automatic
 rollback on deployment failure. Desired count remains operator-managed.
@@ -108,10 +110,11 @@ Forge retains its existing CI/CD deployment behaviour.
 The application repository's image deployment workflow can still update
 the UI service outside Terraform. Do not approve competing UI releases
 during this rollout. Such updates appear as task-definition drift on the
-next Terraform plan, which will restore the reviewed account pin and
-configuration. Before approving a later image release, update its account
-pin here as well; do not assume an image-only deployment imports the newest
-Terraform settings.
+next Terraform plan, which will restore the Terraform task definition and
+configuration. Publishing a new image under `ui-build-latest` alone does not
+update existing tasks or create a Terraform diff. Later image releases
+still need an explicit service deployment. Do not assume an image-only
+deployment imports the newest Terraform settings.
 
 Rollout order:
 
@@ -122,8 +125,8 @@ approve superseded pre-merge apply jobs from older workflow runs.
 
 1. Add delegated Graph `User.Read` to the Entra app registration and arrange
    consent under tenant policy. This repository does not manage Entra.
-2. Verify the pinned image's build checks before promoting it.
-3. Review each account's web-ui Terraform plan. Expect a pinned UI task
+2. Verify the build checks for the image currently published as `ui-build-latest`.
+3. Review each account's web-ui Terraform plan. Expect a new UI task
    definition and an actual service task-definition update. All accounts
    must use `MPAPB_TRUST_ALB_OIDC=true`, `MPAPB_ENTRA_ENABLED=false`,
    `MPAPB_ALB_GROUP_AUTHORIZATION_ENABLED=true`, the configured group IDs and
@@ -162,9 +165,10 @@ enabled. Health checks, assets and logout bypass membership lookup.
 UserInfo/token identity mismatch gives 401; Graph service or permission
 errors give 503. No tokens should be copied to logs, tickets or chat.
 For an emergency rollback, switch the affected service to a recorded
-compatible task-definition revision. Then update/revert the account pin and
-settings in a PR before the next apply, otherwise Terraform restores the
-reviewed release. To disable group checks, disable the account setting and
+compatible task-definition revision using its recorded image digest or
+commit tag, not the mutable `latest` tag. Reconcile the Terraform image
+setting and configuration in a PR before the next apply, otherwise Terraform
+restores its configured release. To disable group checks, disable the account setting and
 apply the reviewed listener and UI task-definition changes together; this
 restores allow-list-only ALB access. Do not restore an in-app task behind an
 authenticating ALB: production revision 15 has that mismatch and can restore

@@ -15,10 +15,6 @@ locals {
   # shared-services ECR repository policy must allow pull access from each
   # member account's ecs_task_execution role (managed outside this module).
   ui_ecr_repository_url = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/modernisation-platform-ai-builder-core"
-  ui_container_image_tag = try(
-    local.application_data.accounts[local.environment].container_image_tag,
-    var.container_image_tag,
-  )
 }
 
 resource "aws_ecs_cluster" "app" {
@@ -44,7 +40,7 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions = jsonencode([
     {
       name                   = "ui"
-      image                  = "${local.ui_ecr_repository_url}:${local.ui_container_image_tag}"
+      image                  = "${local.ui_ecr_repository_url}:${var.container_image_tag}"
       essential              = true
       readonlyRootFilesystem = true
 
@@ -319,7 +315,7 @@ resource "aws_ecs_service" "app" {
     aws_lb_listener.https
   ]
 
-  # Apply the reviewed image pin and authentication settings together.
+  # Apply the image and authentication settings together.
   # Desired count remains operator-managed.
   lifecycle {
     ignore_changes = [desired_count]
