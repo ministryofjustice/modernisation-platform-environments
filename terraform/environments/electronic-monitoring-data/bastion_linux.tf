@@ -1,3 +1,7 @@
+locals {
+  public_key_data = jsondecode(file("./bastion_linux.json"))
+}
+
 resource "aws_iam_role_policy" "zip_s3_policy" {
   count = local.is-production || local.is-development ? 1 : 0
 
