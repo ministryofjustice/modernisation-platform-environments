@@ -5,7 +5,7 @@ component layout. This is new infrastructure in `integration-hub-api-development
 with isolated state at `environments/members/integration-hub-api/file-transfer-api`.
 The old root and legacy state remain untouched. No production accounts are added.
 
-## Deployment order
+## Initial infrastructure setup
 
 1. Merge the Modernisation Platform component registration. Wait for generated
    component platform files, state access and workspace provisioning; reconcile
@@ -20,8 +20,9 @@ The old root and legacy state remain untouched. No production accounts are added
 4. Create companion repository environment
    `integration-hub-api-file-transfer-api-development`, restricted to main. Merge
    the companion workflow change and run `deploy-development` to install handlers.
-5. Populate credentials in the new account using the secret-name outputs. Placeholder
-   credentials are rejected. Update consumers/Bruno with `transfer_ticket_api_endpoint`.
+5. Configure the approved Entra registration IDs and consumer grants using the cutover
+   instructions below. Only the documentation routes retain separate Basic credentials.
+   Update consumers/Bruno with `transfer_ticket_api_endpoint`.
 6. Exercise single PUT, multipart initiation, additional part URLs, completion and
    cancellation; verify incoming objects proceed through the MFT processing pipeline.
 
@@ -41,9 +42,9 @@ apply MFT first via its workflow_dispatch (the MFT workflow watches its own dire
 then this component. Existing browser CORS allows only the Transfer Web App origin;
 API clients can use Bruno/CLI directly. Browser onboarding needs an explicit origin.
 
-The recovery preserves existing authentication and upload routes. JWT, production
-onboarding and per-client assumed roles remain separate design work. Alarm resources
-exist but no SNS actions are wired to retired cross-account topics.
+Upload routes use Entra JWT authentication after the coordinated cutover below.
+Production onboarding and per-client assumed roles remain separate design work.
+Alarm resources exist but no SNS actions are wired to retired cross-account topics.
 
 The API resources are defined directly in this component; there is no separate
 module. The former `module.integration_hub_file_transfer_api` state addresses were
@@ -57,79 +58,25 @@ created by another branch. Review the full plan before approving an apply.
 Environments without enabled API clients receive no API grants and do not require
 an API account. Enabling a client requires its API account to exist first.
 
-## What it does
+## Upload flow
 
-The API protects uploads with Basic authentication for user-driven HTTPS uploads,
-bearer-token authentication for system-to-system integrations, and role-based
-authorisation that maps callers to permitted `clientId` values. Credentials are held
-in Secrets Manager.
+1. The consumer obtains an application access token from the approved Entra tenant.
+2. API Gateway validates the JWT signature, issuer, audience and token lifetime.
+3. The upload handler checks the application token type, `FileTransfer.Upload` role
+   and explicit consumer application-to-client mapping before accessing uploads.
+4. The handler reads the client's upload configuration and issues a short-lived S3
+   PUT URL or starts a multipart upload with part URLs and follow-up operations.
+5. The client uploads directly to S3 using the exact returned headers. Multipart
+   clients request additional parts and complete or abort through authenticated routes.
+6. The file-transfer service scans and routes uploaded files. Configured pickup
+   notifications link to authenticated pickup; this API does not issue download URLs.
 
-1. A caller sends `POST /transfer-tickets` to API Gateway with a Basic auth header or
-   a bearer token.
-2. API Gateway invokes a Lambda request authorizer. Its result is cached for
-   300 seconds per `Authorization` header.
-3. The authorizer validates the caller against Secrets Manager and resolves the
-   caller's role mapping from DynamoDB.
-4. The upload-ticket Lambda reads client upload configuration from DynamoDB and
-   verifies that the caller may request a ticket for the requested `clientId`.
-5. For files at or below the single PUT limit, it returns a short-lived pre-signed
-   `PUT` URL for the Managed File Transfer incoming bucket.
-6. For larger files, it starts an S3 multipart upload, stores the upload session, and
-   returns the first batch of pre-signed part URLs plus the follow-up operations for
-   more parts, completion and abort.
-7. The client uploads directly to S3 and, for multipart uploads, completes the upload
-   through the API.
-8. When the file reaches the MFT `clean` bucket, the downstream notifier publishes an
-   SNS event with the `clientId`, `transferTicket`, file details and a pre-signed
-   download URL.
+## Legacy authentication resources
 
-## Authentication configuration
-
-[`application_variables.json`](application_variables.json) supports an
-`auth_configuration` block per environment:
-
-```json
-{
-  "auth_configuration": {
-    "roles": {
-      "products-poc-upload": {
-        "allowed_client_ids": ["products-poc"]
-      }
-    },
-    "users": {
-      "products-poc-user": {
-        "enabled": true,
-        "role_name": "products-poc-upload"
-      }
-    },
-    "system_principals": {
-      "products-poc-api": {
-        "enabled": true,
-        "role_name": "products-poc-upload"
-      }
-    }
-  }
-}
-```
-
-After apply, the created secret names are available as Terraform outputs
-(`user_auth_secret_names`, `system_auth_secret_names`). Terraform creates the secret
-containers only. Live secret values are managed operationally in Secrets Manager and
-ignored by Terraform after creation; the authorizer reads the current value at
-request time.
-
-A user secret holds:
-
-```json
-{ "username": "products-poc-user", "password": "<password>", "roleName": "products-poc-upload" }
-```
-
-A system principal secret holds the following. Callers send the bearer token as
-`<tokenId>.<bearerToken>`:
-
-```json
-{ "tokenId": "products-poc-api", "bearerToken": "<token>", "roleName": "products-poc-upload" }
-```
+The `auth_configuration` block, credential containers and authentication tables are
+retained temporarily to avoid destructive cleanup during cutover. Their Basic and
+static bearer credentials no longer authorise upload routes. Do not populate them
+as part of OAuth2 onboarding. Documentation credentials remain separate.
 
 ## Lambda code deployment
 
@@ -141,10 +88,84 @@ Terraform creates the Lambda functions with bootstrap placeholder code from
 
 If an apply changes a Lambda's `filename` (for example, when the bootstrap build path
 changes), it overwrites the live code with the placeholder. In that case, re-run
-`deploy-development`, then wait up to 5 minutes for the authorizer cache to expire
-before testing.
+`deploy-development` before testing. Upload routes use the JWT authorizer rather
+than the retired Lambda authorizer cache.
 
 ## Contract and tests
 
 The OpenAPI contract, Lambda unit tests, Bruno collection and example API calls are in
 the companion repository `integration-hub-file-transfer-api`.
+
+
+## Entra OAuth2 cutover (configuration required before apply)
+
+Upload routes now use the API Gateway JWT authorizer. Configure `accounts.<environment>.entra`
+in `application_variables.json` with approved, real IDs:
+
+```json
+{
+  "tenant_id": "<MoJ tenant UUID>",
+  "api_audience": "<file-transfer API application UUID>",
+  "application_clients": {
+    "<products-poc consumer application UUID>": ["products-poc"]
+  }
+}
+```
+
+The API application and consumer registration must be distinct. Request v2 access tokens,
+add the `idtyp` optional access-token claim, expose the application-only role
+`FileTransfer.Upload`, require assignment and grant/admin-consent that role to the consumer.
+Entra application roles are checked in the upload Lambda; they are not OAuth delegated
+scopes, so API Gateway `authorization_scopes` is deliberately not configured.
+
+Missing IDs/mappings block the Terraform plan. No tenant or consumer identity has been
+invented. Add production-specific registrations and grants before production deployment.
+
+Coordinate this change with the companion application's OAuth2 PR: deploy the new
+application first (it rejects legacy authorizer contexts), then apply this component.
+There is an intentional deny-all interval; schedule it. Do not restore the old application
+while JWT routes are active. A rollback must be coordinated and must not silently restore
+Basic access. Docs retain their separate Basic credentials.
+
+The retired authorizer is replaced with a deny-only bootstrap and loses credential/table
+read permissions and gateway invocation permission. Existing credential containers and
+auth tables are retained to avoid destructive credential/state cleanup in this cutover;
+none authorises an upload route. Delete these separately after acceptance.
+
+Validate with real Entra tokens before merge/deployment approval: valid application,
+wrong audience/issuer, expired/invalid signature, delegated user, missing application role,
+unmapped application, and cross-client access on all multipart operations. Unit tests in
+the application cover handler authorisation, not AWS cryptographic token validation.
+
+Production acceptance additionally needs payload/encryption/connectivity evidence,
+zero-critical-error smoke results and Buyer SecOps/Infra sign-off. This authentication
+change alone does not complete D07. Existing alarm actions are not wired; agree the
+operational alert destinations before production activation.
+
+
+## IDAM registrations and automated development testing
+
+Registration [IDAM PR #962](https://github.com/ministryofjustice/staff-identity-idam-entra-infra/pull/962)
+is merged. Merging does not itself supply the deployed registration IDs to this
+component. Obtain the `file_transfer_configuration` output from the IDAM deployment:
+
+| IDAM output | This component's `entra` setting | API test environment variable |
+| --- | --- | --- |
+| `tenant_id` | `tenant_id` | `ENTRA_TENANT_ID` |
+| `api_audience` | `api_audience` | `ENTRA_API_CLIENT_ID` |
+| `consumer_client_id` | Key in `application_clients`, mapped to `["products-poc"]` | `ENTRA_CONSUMER_CLIENT_ID` |
+
+Use the API application UUID as the v2 token audience, not its `api://` URI. The
+consumer uses `api_application_id_uri` plus `/.default` when requesting a token.
+
+[IDAM PR #967](https://github.com/ministryofjustice/staff-identity-idam-entra-infra/pull/967)
+added GitHub trust to the development consumer. The API repository's protected
+`file-transfer-api-entra-development` environment permits only `main` and disables administrator bypass. Development
+smoke runs no longer require a separate environment reviewer approval.
+Its identity trust belongs in IDAM Terraform, not in this AWS component.
+
+After IDAM apply, configure the three non-secret GitHub environment identifiers,
+complete the coordinated API cutover, then run **Test Entra development authentication**
+from `main`. It checks basic authentication failures and uploads a harmless file.
+It does not replace the broader token, multipart, scan and download acceptance tests.
+No changes to platform-managed workflows are needed for these tests.
