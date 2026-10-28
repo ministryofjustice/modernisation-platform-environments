@@ -35,8 +35,8 @@ resource "aws_instance" "ec2_gh_runner" {
     { backup = "true" }
   )
 
-lifecycle {
-  ignore_changes = [ user_data ]
-}
+  lifecycle {
+    ignore_changes = [user_data]
+  }
   depends_on = [aws_security_group.ec2_sg_gh_runner]
 }
