@@ -1,0 +1,360 @@
+{
+  "Comment": "Run bounded read-only downstream historical assurance checks.",
+  "StartAt": "PrepareAuditConsumers",
+  "States": {
+    "PrepareAuditConsumers": {
+      "Type": "Pass",
+      "Result": {
+        "consumers": [
+          "AC",
+          "EMDI"
+        ]
+      },
+      "ResultPath": "$.audit",
+      "Next": "AuditConsumers"
+    },
+    "AuditConsumers": {
+      "Type": "Map",
+      "ItemsPath": "$.audit.consumers",
+      "MaxConcurrency": 1,
+      "ItemSelector": {
+        "consumer.$": "$$.Map.Item.Value",
+        "execution_id.$": "$$.Execution.Id"
+      },
+      "Iterator": {
+        "StartAt": "StartHistoricalAudit",
+        "States": {
+          "StartHistoricalAudit": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${planner_function_name}",
+              "Payload": {
+                "action": "start_historical_audit",
+                "consumer.$": "$.consumer",
+                "execution_id.$": "$.execution_id"
+              }
+            },
+            "OutputPath": "$.Payload",
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 3
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
+                "ResultPath": "$.failure",
+                "Next": "RecordAuditFailure"
+              }
+            ],
+            "Next": "CheckAuditStart"
+          },
+          "CheckAuditStart": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.status",
+                "StringEquals": "planning",
+                "Next": "NextAuditScope"
+              },
+              {
+                "Variable": "$.status",
+                "StringEquals": "completed",
+                "Next": "AuditConsumerComplete"
+              }
+            ],
+            "Default": "UnexpectedAuditResult"
+          },
+          "NextAuditScope": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${planner_function_name}",
+              "Payload": {
+                "action": "next_historical_audit_scope",
+                "consumer.$": "$.consumer",
+                "execution_id.$": "$.execution_id"
+              }
+            },
+            "OutputPath": "$.Payload",
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 3
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
+                "ResultPath": "$.failure",
+                "Next": "RecordAuditFailure"
+              }
+            ],
+            "Next": "CheckAuditScope"
+          },
+          "CheckAuditScope": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.status",
+                "StringEquals": "scope_ready",
+                "Next": "CheckAuditBlockers"
+              },
+              {
+                "Variable": "$.status",
+                "StringEquals": "complete",
+                "Next": "CompleteHistoricalAudit"
+              }
+            ],
+            "Default": "UnexpectedAuditResult"
+          },
+          "CheckAuditBlockers": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${planner_function_name}",
+              "Payload": {
+                "action": "check_audit_blockers",
+                "consumer.$": "$.consumer",
+                "execution_id.$": "$.execution_id"
+              }
+            },
+            "ResultSelector": {
+              "status.$": "$.Payload.status",
+              "reason.$": "$.Payload.reason"
+            },
+            "ResultPath": "$.blocker",
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 3
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
+                "ResultPath": "$.failure",
+                "Next": "RecordAuditFailure"
+              }
+            ],
+            "Next": "CheckAuditBlockerResult"
+          },
+          "CheckAuditBlockerResult": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.blocker.status",
+                "StringEquals": "ready",
+                "Next": "InspectHistoricalAuditScope"
+              },
+              {
+                "Variable": "$.blocker.status",
+                "StringEquals": "blocked",
+                "Next": "WaitForAuditBlocker"
+              }
+            ],
+            "Default": "UnexpectedAuditResult"
+          },
+          "WaitForAuditBlocker": {
+            "Type": "Wait",
+            "Seconds": 300,
+            "Next": "CheckAuditBlockers"
+          },
+          "InspectHistoricalAuditScope": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${planner_function_name}",
+              "Payload": {
+                "action": "inspect_historical_discovery_scope",
+                "consumer.$": "$.consumer",
+                "execution_id.$": "$.execution_id",
+                "scope_index.$": "$.scope_index",
+                "scope.$": "$.scope"
+              }
+            },
+            "ResultPath": null,
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 3
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
+                "ResultPath": "$.failure",
+                "Next": "RecordAuditFailure"
+              }
+            ],
+            "Next": "CheckpointHistoricalAuditScope"
+          },
+          "CheckpointHistoricalAuditScope": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${planner_function_name}",
+              "Payload": {
+                "action": "checkpoint_historical_audit_scope",
+                "consumer.$": "$.consumer",
+                "execution_id.$": "$.execution_id",
+                "scope_index.$": "$.scope_index"
+              }
+            },
+            "ResultPath": null,
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 3
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
+                "ResultPath": "$.failure",
+                "Next": "RecordAuditFailure"
+              }
+            ],
+            "Next": "NextAuditScope"
+          },
+          "CompleteHistoricalAudit": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${planner_function_name}",
+              "Payload": {
+                "action": "complete_historical_audit",
+                "consumer.$": "$.consumer",
+                "execution_id.$": "$.execution_id"
+              }
+            },
+            "OutputPath": "$.Payload",
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 3
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
+                "ResultPath": "$.failure",
+                "Next": "RecordAuditFailure"
+              }
+            ],
+            "Next": "AuditConsumerComplete"
+          },
+          "RecordAuditFailure": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${planner_function_name}",
+              "Payload": {
+                "action": "fail_historical_audit",
+                "consumer.$": "$.consumer",
+                "execution_id.$": "$.execution_id",
+                "failure.$": "$.failure"
+              }
+            },
+            "OutputPath": "$.Payload",
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 3
+              }
+            ],
+            "Next": "AuditConsumerFailed"
+          },
+          "UnexpectedAuditResult": {
+            "Type": "Pass",
+            "Parameters": {
+              "consumer.$": "$.consumer",
+              "execution_id.$": "$.execution_id",
+              "failure": {
+                "Error": "UnexpectedHistoricalAuditResult",
+                "Cause": "The planner returned an unexpected audit status."
+              }
+            },
+            "Next": "RecordAuditFailure"
+          },
+          "AuditConsumerComplete": {
+            "Type": "Succeed"
+          },
+          "AuditConsumerFailed": {
+            "Type": "Fail",
+            "Error": "HistoricalAuditFailed",
+            "Cause": "Historical assurance audit failed."
+          }
+        }
+      },
+      "ResultPath": "$.consumer_results",
+      "Next": "AuditComplete"
+    },
+    "AuditComplete": {
+      "Type": "Succeed"
+    }
+  }
+}

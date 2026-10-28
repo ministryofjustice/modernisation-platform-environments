@@ -93,6 +93,7 @@ configuration; no account ID is hard-coded.
 | Parameter value | `s3://mojdevx-production-github-backup` |
 | Bucket | `mojdevx-production-github-backup` |
 | KMS alias | `alias/github-backup` |
+| GitHub App secret | `github-backup/github-app` |
 | Consumer IAM role | Dedicated `github-backup` role, managed by `github-backup/` |
 | Region | `eu-west-2` |
 
@@ -139,6 +140,30 @@ and use `kms:GenerateDataKey` and `kms:Decrypt` on the dedicated key (decryption
 required for multipart uploads). No backup object read, list or delete access is
 added. The existing `github-management` and `octo-access` roles are unchanged.
 A restore consumer will need separately scoped object-read and KMS permissions.
+
+### Dedicated GitHub backup App credentials
+
+The component creates `github-backup/github-app` in Secrets Manager using the
+same dedicated KMS key as the backups. The backup role has
+`secretsmanager:GetSecretValue` on this secret only; its existing `kms:Decrypt`
+permission covers decryption. No access to the GitHub management App secret is
+granted.
+
+Terraform initialises the secret with `CHANGEME` placeholders. After deployment,
+populate it directly in Secrets Manager with the dedicated backup App's
+`app_id`, `client_id`, `installation_id` and `private_key`.
+The installation ID must identify the App's installation in the
+`ministryofjustice` organisation. Preserve the private key's PEM formatting.
+Never commit real credentials or pass them through Terraform variables.
+`ignore_secret_changes = true` preserves credentials populated or rotated
+outside Terraform.
+
+Configure the backup workflow to read `github-backup/github-app` instead of
+`github-management/github-app`, use the `installation_id` field for its
+installation ID and mint short-lived installation tokens from the dedicated
+App. Creating and installing the App, populating credentials and
+updating the workflow are separate steps; do not enable the workflow until they
+are complete.
 
 The backup role's GitHub OIDC subject pattern is
 `ministryofjustice@2203574/developer-experience-github-management@1333267581:*`.

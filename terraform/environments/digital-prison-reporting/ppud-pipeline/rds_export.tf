@@ -110,6 +110,7 @@ module "ppud_rds_export" {
   lifecycle_rule_backup_uploads  = local.rds_backup_uploads_bucket_lifecycle_rule
   lifecycle_rule_parquet_exports = local.rds_parquet_export_bucket_lifecycle_rule
   parquet_exports_bucket_policy  = local.is-test ? ["{}"] : [data.aws_iam_policy_document.batch_replication_destination[0].json]
+  engine_version                 = local.application_data.accounts[local.environment].rds_module_sql_engine_version
 
   tags = merge(
     local.tags,

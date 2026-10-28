@@ -327,6 +327,26 @@ resource "aws_iam_policy" "dlt_iceberg_maintenance_invoke" {
 }
 
 # ------------------------------------------------------------------------------
+# Downstream reconciliation audit Step Function
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "downstream_reconciliation_audit" {
+  statement {
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+
+    resources = [
+      module.merge_redrive_planner.lambda_function_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "downstream_reconciliation_audit" {
+  name   = "downstream_reconciliation_audit_step_function_policy"
+  policy = data.aws_iam_policy_document.downstream_reconciliation_audit.json
+}
+
+# ------------------------------------------------------------------------------
 # Downstream position reconciliation scheduler
 # ------------------------------------------------------------------------------
 
@@ -379,7 +399,20 @@ resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
           module.merge_into_emdi_position.arn,
         ]
       },
+      {
+        Effect = "Allow"
+
+        Action = [
+          "lambda:InvokeFunction",
+        ]
+
+        Resource = [
+          module.merge_redrive_planner.lambda_function_arn,
+        ]
+      },
     ]
   })
 }
+
+
 
