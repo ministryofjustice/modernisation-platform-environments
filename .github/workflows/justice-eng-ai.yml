@@ -55,7 +55,7 @@ jobs:
     with:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
-      action: "${{ matrix.action }}"
+      action: "${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && matrix.action || 'plan' }}"
       component: "${{ matrix.component }}" # If your strategy workflow also outputs "matrix.component"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}

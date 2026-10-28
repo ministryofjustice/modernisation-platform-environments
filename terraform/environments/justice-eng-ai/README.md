@@ -115,6 +115,11 @@ Terraform settings.
 
 Rollout order:
 
+Pull requests run plans only for every environment. Deployments start from
+the main-branch workflow after merge (or an explicit main-branch deployment
+dispatch), retaining the existing environment approval protections. Do not
+approve superseded pre-merge apply jobs from older workflow runs.
+
 1. Add delegated Graph `User.Read` to the Entra app registration and arrange
    consent under tenant policy. This repository does not manage Entra.
 2. Verify the pinned image's build checks before promoting it.
