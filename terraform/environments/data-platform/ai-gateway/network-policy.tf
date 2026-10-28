@@ -28,6 +28,14 @@ locals {
         "${module.audit_logs.s3_bucket_id}.s3.${data.aws_region.current.region}.amazonaws.com",
         "truststore.pki.rds.amazonaws.com", # CA bundle for the rds_iam grant job
       ],
+      # Batch inference management and S3 endpoints
+      local.ai_gateway_batch_storage == null ? [] : [
+        "bedrock.${local.ai_gateway_bedrock_batch_region}.amazonaws.com",
+        "bedrock-runtime.${local.ai_gateway_bedrock_batch_region}.amazonaws.com",
+        "s3.${local.ai_gateway_batch_storage.region}.amazonaws.com",
+        "${local.ai_gateway_batch_storage.input_bucket_name}.s3.${local.ai_gateway_batch_storage.region}.amazonaws.com",
+        "${local.ai_gateway_batch_storage.output_bucket_name}.s3.${local.ai_gateway_batch_storage.region}.amazonaws.com",
+      ],
       [
         "sts.googleapis.com",
         "iamcredentials.googleapis.com",
