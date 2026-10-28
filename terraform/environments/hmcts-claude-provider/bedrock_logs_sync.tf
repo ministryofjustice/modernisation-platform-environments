@@ -217,10 +217,12 @@ resource "aws_datasync_task" "bedrock_logs" {
 
     # Neither end is a filesystem, so there is no ownership or permission to carry over.
     atime             = "NONE"
-    mtime             = "NONE"
     uid               = "NONE"
     gid               = "NONE"
     posix_permissions = "NONE"
+
+    # An Enhanced mode task rejects NONE, and repeat runs compare modification times.
+    mtime = "PRESERVE"
 
     # Our own lifecycle expires records after 90 days; PRESERVE stops that pruning their copy.
     preserve_deleted_files = "PRESERVE"
