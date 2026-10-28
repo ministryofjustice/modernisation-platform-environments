@@ -54,6 +54,12 @@ locals {
             local.secretsmanager_secret_policies.domain_read,
           ]
         }
+        shared-certificates = {
+          description = "TLS certificates shared with other accounts"
+          policy = [
+            local.secretsmanager_secret_policies.domain_read,
+          ]
+        }
       }
     }
     gfsl = {
