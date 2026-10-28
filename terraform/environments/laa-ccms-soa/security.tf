@@ -258,6 +258,16 @@ resource "aws_security_group_rule" "ecs_tasks_admin_server" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
+resource "aws_security_group_rule" "ecs_tasks_admin_workspace_ssh" {
+  security_group_id = aws_security_group.ecs_tasks_admin.id
+  type              = "ingress"
+  description       = "SSH - AWS Workspaces"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
+}
+
 resource "aws_security_group_rule" "ecs_tasks_admin_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
   type              = "egress"
@@ -283,6 +293,16 @@ resource "aws_security_group_rule" "ecs_tasks_managed_server" {
   from_port         = local.application_data.accounts[local.environment].managed_server_port
   to_port           = local.application_data.accounts[local.environment].managed_server_port
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_managed_workspace_ssh" {
+  security_group_id = aws_security_group.ecs_tasks_managed.id
+  type              = "ingress"
+  description       = "SSH - AWS Workspaces"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
 }
 
 resource "aws_security_group_rule" "ecs_tasks_managed_egress_all" {
