@@ -2,7 +2,7 @@ resource "aws_instance" "ec2_gh_runner" {
   instance_type               = local.application_data.accounts[local.environment].ec2_instance_type_gh_runner
   ami                         = local.application_data.accounts[local.environment].gh_runner_ami_id
   iam_instance_profile        = aws_iam_instance_profile.github_runner_instance_profile.name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg_gh_runner.id]
+  vpc_security_group_ids      = compact([aws_security_group.ec2_sg_gh_runner.id, one(aws_security_group.ec2_sg_gh_runner_kpmg[*].id)])
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   monitoring                  = true
   ebs_optimized               = true
@@ -35,8 +35,8 @@ resource "aws_instance" "ec2_gh_runner" {
     { backup = "true" }
   )
 
-lifecycle {
-  ignore_changes = [ user_data ]
-}
+  lifecycle {
+    ignore_changes = [user_data]
+  }
   depends_on = [aws_security_group.ec2_sg_gh_runner]
 }
