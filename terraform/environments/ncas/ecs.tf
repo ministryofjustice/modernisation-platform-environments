@@ -52,7 +52,7 @@ resource "aws_ecs_task_definition" "ncas_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = aws_db_instance.ncas_db.address
+          value = local.ncas_db.address
         },
         {
           name  = "RDS_PORT"
@@ -60,15 +60,15 @@ resource "aws_ecs_task_definition" "ncas_task_definition" {
         },
         {
           name  = "RDS_USERNAME"
-          value = aws_db_instance.ncas_db.username
+          value = local.ncas_db.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = aws_db_instance.ncas_db.password
+          value = local.ncas_db.password
         },
         {
           name  = "DB_NAME"
-          value = aws_db_instance.ncas_db.db_name
+          value = local.ncas_db.db_name
         },
         {
           name  = "supportEmail"
