@@ -43,6 +43,7 @@ resource "aws_route53_record" "alb_frontend_data" {
 }
 
 resource "aws_route53_record" "alb_ancillary" {
+  count    = contains(local.pwm_migrated_envs, var.env_name) ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = var.account_config.route53_external_zone.zone_id
