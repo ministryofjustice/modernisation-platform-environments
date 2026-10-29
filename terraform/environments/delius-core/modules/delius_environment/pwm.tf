@@ -1,5 +1,5 @@
 locals {
-  pwm_migrated_envs = ["dev", "test", "stage", "preprod"]
+  pwm_migrated_envs = ["dev", "test", "stage", "preprod", "prod"]
 }
 
 module "pwm" {
