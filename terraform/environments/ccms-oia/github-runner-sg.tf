@@ -1,10 +1,10 @@
 # Security Group for GitHub Runner Server
 resource "aws_security_group" "ec2_sg_gh_runner" {
-  name        = "ec2_sg_github_runner"
+  name        = "ec2_sg_clamav"
   description = "Security Group for GitHub Runner Server"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("github-runner-%s-sg", local.environment)) }
+    { Name = lower(format("clamav-%s-sg", local.environment)) }
   )
 }
 
