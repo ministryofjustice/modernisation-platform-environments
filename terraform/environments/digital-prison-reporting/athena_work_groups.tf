@@ -40,3 +40,23 @@ module "athena_workgroup_analytics_generic" {
     }
   )
 }
+
+# A workgroup for each reporting app deployment, so each has its own query history and results location.
+module "athena_workgroup_reporting_app" {
+  source   = "./modules/athena_workgroups"
+  for_each = toset(["prisons", "probation"])
+
+  name            = format("%s-reporting-%s-athena-workgroup", local.project, each.key)
+  output_location = format("s3://%s/athena-output/reporting-%s", module.s3_working_bucket.bucket_id, each.key)
+
+  tags = merge(
+    local.all_tags,
+    {
+      dpr-resource-group = "Athena"
+      dpr-resource-type  = "Athena-Workgroup"
+      dpr-jira           = "DHS-943"
+      project            = local.project
+      dpr-name           = format("%s-reporting-%s-athena-workgroup", local.project, each.key)
+    }
+  )
+}
