@@ -76,9 +76,15 @@ proxy_config:
       s3_bucket_name: ${auditLogsBucket}
       s3_region_name: ${auditLogsRegion}
       s3_path: litellm-audit
+    s3_callback_params:
+      s3_bucket_name: ${promptLogsBucket}
+      s3_region_name: ${promptLogsRegion}
+      s3_path: litellm-prompt
+      prompt_logging_models: ${promptLoggingModels} 
     cache: false
     require_auth_for_metrics_endpoint: false
-    callbacks: ["prometheus"]
+    store_prompts_in_spend_logs: false
+    callbacks: ["prometheus", "prompt_logging.prompt_logger"]
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
     service_callback: ["prometheus_system"]
@@ -148,6 +154,14 @@ volumes:
             path: google-identity-token
             audience: ${googleWorkloadIdentityAudience}
             expirationSeconds: 3600
+  - name: openai-workload-identity-token
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: openai-identity-token
+            audience: https://api.openai.com # must match the audience set on the OpenAI IdP
+            expirationSeconds: 3600
 
 volumeMounts:
   - name: ui
@@ -166,6 +180,9 @@ volumeMounts:
     readOnly: true
   - name: google-workload-identity-token
     mountPath: /var/run/secrets/sts.googleapis.com
+    readOnly: true
+  - name: openai-workload-identity-token
+    mountPath: /var/run/secrets/api.openai.com
     readOnly: true
 
 extraInitContainers:
@@ -234,5 +251,9 @@ envVars: {
     AZURE_CLIENT_ID: "${microsoft_foundry_client_id}",
     AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token",
     AZURE_AD_TOKEN: "oidc/azure/",
-    GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/iamcredentials.googleapis.com/credentials/credentials.json"
+    GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/iamcredentials.googleapis.com/credentials/credentials.json",
+    OPENAI_IDENTITY_PROVIDER_ID: "${openai_identity_provider_id}",
+    OPENAI_SERVICE_ACCOUNT_ID: "${openai_service_account_id}",
+    OPENAI_IDENTITY_TOKEN_FILE: "/var/run/secrets/api.openai.com/openai-identity-token",
+    PYTHONPATH: "/app/callbacks"
 }

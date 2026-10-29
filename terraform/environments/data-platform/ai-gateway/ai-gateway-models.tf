@@ -86,3 +86,31 @@ resource "litellm_model" "microsoft_foundry" {
     helm_release.litellm_admin
   ]
 }
+
+resource "litellm_model" "openai_daybreak" {
+  for_each = try(local.ai_gateway_models_filtered.openai_daybreak, {})
+
+  custom_llm_provider = "openai"
+  model_name          = "openai-${each.key}"
+  base_model          = each.value.model_id
+  tier                = "paid"
+  model_api_base      = "https://api.openai.com/v1"
+
+  additional_litellm_params = {
+    ai_model_provider            = "OpenAI"
+    ai_model_family              = each.value.model_family
+    ai_model_name                = each.value.model_name
+    ai_model_location            = each.value.model_location
+    ai_model_generally_available = each.value.generally_available
+    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_location\",\"ai_model_generally_available\"]"
+  }
+
+  lifecycle {
+    precondition {
+      condition     = can(local.environment_configuration.openai_workload_identity.ai_gateway.identity_provider_id) && can(local.environment_configuration.openai_workload_identity.ai_gateway.service_account_id)
+      error_message = "OpenAI models enabled in ${local.environment} but openai_workload_identity.ai_gateway IDs are missing."
+    }
+  }
+
+  depends_on = [helm_release.ai_gateway_configuration, helm_release.litellm, helm_release.litellm_admin]
+}

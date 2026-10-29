@@ -21,3 +21,14 @@ resource "kubernetes_config_map_v1" "google_application_credentials" {
     "credentials.json" = local.google_application_credentials
   }
 }
+
+resource "kubernetes_config_map_v1" "litellm_callbacks" {
+  metadata {
+    namespace = module.ai_gateway_namespace.name
+    name      = "litellm-callbacks"
+  }
+
+  data = {
+    "prompt_logging.py" = file("${path.module}/src/litellm/callbacks/prompt_logging.py")
+  }
+}
