@@ -121,8 +121,8 @@ resource "aws_cloudwatch_alarm_mute_rule" "weeknight_mute" {
 
   rule {
     schedule {
-      expression = "cron(0 21 * * MON-FRI)"
-      duration   = "PT9H"
+      expression = "cron(0 19 * * MON-FRI)"
+      duration   = "PT11H"
       timezone   = "Europe/London"
     }
   }
