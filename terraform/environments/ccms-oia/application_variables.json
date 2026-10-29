@@ -180,7 +180,7 @@
       "conn_saa_ec2_instance_type": "m5.xlarge",
       "ec2_instance_type_gh_runner": "t2.small",
       "instance_role_gh_runner": "gh-runner",
-      "opa_ec2_desired_capacity": "2",
+      "opa_ec2_desired_capacity": "3",
       "opa_ec2_max_size": "3",
       "opa_ec2_min_size": "2",
       "conn_saa_ec2_desired_capacity": "2",
