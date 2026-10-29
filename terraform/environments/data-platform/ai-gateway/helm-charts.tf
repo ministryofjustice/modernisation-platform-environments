@@ -58,6 +58,10 @@ resource "helm_release" "litellm_admin" {
         googleWorkloadIdentityAudience        = local.google_workload_identity_audience
         googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
 
+        # OpenAI
+        openai_identity_provider_id = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["identity_provider_id"]
+        openai_service_account_id   = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["service_account_id"]
+
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
         masterkeySecretKey  = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
@@ -70,6 +74,12 @@ resource "helm_release" "litellm_admin" {
         # Audit Logs
         auditLogsBucket = module.audit_logs.s3_bucket_id
         auditLogsRegion = data.aws_region.current.region
+
+        # Prompt Logs
+        promptLogsBucket          = module.prompt_logs.s3_bucket_id
+        promptLogsRegion          = data.aws_region.current.region
+        promptLoggingModels       = join(",", local.ai_gateway_prompt_logging_models)
+        litellmCallbacksConfigMap = kubernetes_config_map_v1.litellm_callbacks.metadata[0].name
 
         # Admin
         proxyAdminEmail = join(", ", local.proxy_admin_emails)
@@ -140,6 +150,10 @@ resource "helm_release" "litellm" {
         # Google
         googleWorkloadIdentityAudience        = local.google_workload_identity_audience
         googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
+
+        # OpenAI
+        openai_identity_provider_id = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["identity_provider_id"]
+        openai_service_account_id   = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["service_account_id"]
 
         # Autoscaling
         minReplicas                    = local.environment_configuration.ai_gateway_autoscaling.min_replicas

@@ -147,6 +147,17 @@ volumes:
             path: google-identity-token
             audience: ${googleWorkloadIdentityAudience}
             expirationSeconds: 3600
+  - name: openai-workload-identity-token
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: openai-identity-token
+            audience: https://api.openai.com
+            expirationSeconds: 3600
+  - name: litellm-callbacks
+    configMap:
+      name: ${litellmCallbacksConfigMap}
 
 volumeMounts:
   - name: app-cache
@@ -161,6 +172,12 @@ volumeMounts:
     readOnly: true
   - name: google-workload-identity-token
     mountPath: /var/run/secrets/sts.googleapis.com
+    readOnly: true
+  - name: openai-workload-identity-token
+    mountPath: /var/run/secrets/api.openai.com
+    readOnly: true
+  - name: litellm-callbacks
+    mountPath: /app/callbacks
     readOnly: true
 
 migrationJob:
@@ -191,5 +208,9 @@ envVars: {
     AZURE_CREDENTIAL: "DefaultAzureCredential",
     AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token", 
     AZURE_AD_TOKEN: "oidc/azure/",
-    GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/iamcredentials.googleapis.com/credentials/credentials.json"
+    GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/iamcredentials.googleapis.com/credentials/credentials.json",
+    OPENAI_IDENTITY_PROVIDER_ID: "${openai_identity_provider_id}",
+    OPENAI_SERVICE_ACCOUNT_ID: "${openai_service_account_id}",
+    OPENAI_IDENTITY_TOKEN_FILE: "/var/run/secrets/api.openai.com/openai-identity-token",
+    PYTHONPATH: "/app/callbacks"
 }
