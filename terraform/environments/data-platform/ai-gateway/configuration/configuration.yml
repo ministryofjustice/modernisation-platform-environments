@@ -132,6 +132,7 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      batch_available: true
     # Cohere
     cohere-embed-english-v3:
       model_id: "cohere.embed-english-v3"
@@ -243,9 +244,9 @@ models:
       model_name: "Qwen 3 32B"
       model_location: "United Kingdom"
       region: eu-west-2
-      generally_available: true
+      generally_available: false
       batch_available: true
-      environments_available: ["development"]
+      environments_available: ["development", "production"]
     # Justice Engineering AI Enablement
     jeaie-claude-haiku-4-5:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"

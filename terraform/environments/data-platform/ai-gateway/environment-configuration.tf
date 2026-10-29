@@ -7,9 +7,10 @@ locals {
       litellm_image_pull_secret = "litellm-enterprise-pull"
       ai_gateway_hostname       = "development.ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
-        input_bucket_name  = "alpha-airflow-aigw-example-input"
-        output_bucket_name = "alpha-airflow-aigw-example-output"
-        output_kms_key_arn = "arn:aws:kms:eu-west-1:593291632749:key/48120119-33ea-4c0b-bf47-bbc236388eaa"
+        input_bucket_name  = "alpha-bold-pilot-rr-families"
+        # Optional: output_bucket_name defaults to input_bucket_name when no output value is specified.
+        #output_bucket_name = ""
+        output_kms_key_arn = "arn:aws:kms:eu-west-1:593291632749:key/7da10bee-bf36-4e9a-904f-8e270f80e0d2"
         bucket_owner       = "593291632749"
         region             = "eu-west-1"
       }
@@ -103,9 +104,9 @@ locals {
       ai_gateway_egress_policy_enabled = true
     }
     preproduction = {
-      litellm_version           = "1.101.0"
+      litellm_version           = "1.104.0"
       litellm_image_repository  = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag         = "1.101.5-enterprise"
+      litellm_image_tag         = "1.104.1-enterprise"
       litellm_image_pull_secret = "litellm-enterprise-pull"
       ai_gateway_hostname       = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
@@ -144,9 +145,9 @@ locals {
       ai_gateway_egress_policy_enabled = false
     }
     production = {
-      litellm_version           = "1.101.0"
+      litellm_version           = "1.104.0"
       litellm_image_repository  = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag         = "1.101.5-enterprise"
+      litellm_image_tag         = "1.104.1-enterprise"
       litellm_image_pull_secret = "litellm-enterprise-pull"
       ai_gateway_hostname       = "ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
