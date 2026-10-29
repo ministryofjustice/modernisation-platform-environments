@@ -156,6 +156,39 @@ variable "web_acl_arn" {
   default     = null
 }
 
+################################################################################
+# CloudWatch Logs
+################################################################################
+
+variable "enable_cloudwatch_logs" {
+  description = "Deliver ALB logs to CloudWatch Logs as vended logs"
+  type        = bool
+  default     = false
+}
+
+variable "cloudwatch_log_types" {
+  description = "ALB log types to deliver to CloudWatch Logs"
+  type        = list(string)
+  default     = ["ALB_ACCESS_LOGS"]
+
+  validation {
+    condition     = alltrue([for t in var.cloudwatch_log_types : contains(["ALB_ACCESS_LOGS", "ALB_CONNECTION_LOGS", "ALB_HEALTH_CHECK_LOGS"], t)])
+    error_message = "cloudwatch_log_types must be one of ALB_ACCESS_LOGS, ALB_CONNECTION_LOGS, ALB_HEALTH_CHECK_LOGS."
+  }
+}
+
+variable "cloudwatch_log_retention_in_days" {
+  description = "Retention for the ALB CloudWatch log groups"
+  type        = number
+  default     = 400
+}
+
+variable "cloudwatch_log_kms_key_arn" {
+  description = "KMS key used to encrypt the ALB CloudWatch log groups"
+  type        = string
+  default     = null
+}
+
 #todo uncomment once we have logging bucket
 #variable "s3_access_logging_bucket" {
 #  description = "The bucket to store the access logs"

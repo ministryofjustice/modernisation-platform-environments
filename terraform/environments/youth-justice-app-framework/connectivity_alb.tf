@@ -14,9 +14,11 @@ module "connectivity_alb" {
   alb_route53_record_name    = "connectivity-lb"
   alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.id
 
-  listeners              = local.connectivity_listeners
-  existing_target_groups = module.internal_alb.target_group_arns
-  enable_access_logs     = true
+  listeners                  = local.connectivity_listeners
+  existing_target_groups     = module.internal_alb.target_group_arns
+  enable_access_logs         = true
+  enable_cloudwatch_logs     = true
+  cloudwatch_log_kms_key_arn = module.kms.key_arn
 
   #pass in provider for creating records on central route53
   providers = {

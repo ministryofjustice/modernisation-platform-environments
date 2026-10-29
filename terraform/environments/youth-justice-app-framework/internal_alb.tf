@@ -14,9 +14,11 @@ module "internal_alb" {
   alb_route53_record_name    = "private-lb"
   alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.id
 
-  listeners          = local.internal_listeners
-  target_groups      = local.target_groups
-  enable_access_logs = true
+  listeners                  = local.internal_listeners
+  target_groups              = local.target_groups
+  enable_access_logs         = true
+  enable_cloudwatch_logs     = true
+  cloudwatch_log_kms_key_arn = module.kms.key_arn
 
   #pass in provider for creating records on central route53
   providers = {

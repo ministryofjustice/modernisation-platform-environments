@@ -30,8 +30,10 @@ module "yjsm_hub_svc_alb" {
     }
   ]
 
-  enable_access_logs = true
-  alb_subnets_ids    = local.public_subnet_list[*].id
-  web_acl_arn        = module.waf.waf_arn
-  associate_web_acl  = true
+  enable_access_logs         = true
+  enable_cloudwatch_logs     = true
+  cloudwatch_log_kms_key_arn = module.kms.key_arn
+  alb_subnets_ids            = local.public_subnet_list[*].id
+  web_acl_arn                = module.waf.waf_arn
+  associate_web_acl          = true
 }
