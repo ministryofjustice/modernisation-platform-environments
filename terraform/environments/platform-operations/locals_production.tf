@@ -223,6 +223,16 @@ locals {
         timezone = "Europe/London"
         workflow = "laa-concierge-to-slack.yml"
       }
+      mp-automation-certificate-renewal = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 6 ? * TUE-THU *)"
+        timezone = "Europe/London"
+        workflow = "certificate_renewal.yml"
+      }
     }
   }
 }

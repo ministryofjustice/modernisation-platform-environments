@@ -49,7 +49,9 @@ module "aurora" {
     aws.core-network-services = aws.core-network-services
   }
   kms_key_arn = module.kms.key_arn
-  kms_key_id  = module.kms.key_id
+  # Only set for environments being rebuilt from snapshot; changing this on an existing cluster forces replacement
+  cluster_kms_key_id = try(local.application_data.accounts[local.environment].rds_restore_with_cmk, false) ? module.kms.key_arn : null
+  kms_key_id         = module.kms.key_id
 
   proxy_secret_arn = aws_secretsmanager_secret.proxy_account.arn
 
