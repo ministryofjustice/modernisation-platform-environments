@@ -7,10 +7,9 @@ locals {
       litellm_image_pull_secret = "litellm-enterprise-pull"
       ai_gateway_hostname       = "development.ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
-        input_bucket_name  = "alpha-bold-pilot-rr-families"
-        # Optional: output_bucket_name defaults to input_bucket_name when no output value is specified.
-        #output_bucket_name = ""
-        output_kms_key_arn = "arn:aws:kms:eu-west-1:593291632749:key/7da10bee-bf36-4e9a-904f-8e270f80e0d2"
+        input_bucket_name  = "alpha-airflow-aigw-example-input"
+        output_bucket_name = "alpha-airflow-aigw-example-output"
+        output_kms_key_arn = "arn:aws:kms:eu-west-1:593291632749:key/48120119-33ea-4c0b-bf47-bbc236388eaa"
         bucket_owner       = "593291632749"
         region             = "eu-west-1"
       }
@@ -150,6 +149,14 @@ locals {
       litellm_image_tag         = "1.104.1-enterprise"
       litellm_image_pull_secret = "litellm-enterprise-pull"
       ai_gateway_hostname       = "ai-gateway.justice.gov.uk"
+      ai_gateway_batch_storage = {
+        input_bucket_name  = "alpha-bold-pilot-rr-families"
+        # Optional: output_bucket_name defaults to input_bucket_name when no output value is specified.
+        #output_bucket_name = ""
+        output_kms_key_arn = "arn:aws:kms:eu-west-1:593291632749:key/7da10bee-bf36-4e9a-904f-8e270f80e0d2"
+        bucket_owner       = "593291632749"
+        region             = "eu-west-1"
+      }
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
