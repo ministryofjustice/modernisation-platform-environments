@@ -272,5 +272,17 @@ locals {
         timezone = "Europe/London"
         workflow = "github_workflow_monitoring.yml"
       }
+    mp-automation-ssm-command-monitoring = {
+      identity = "platops"
+      inputs = {
+        scheduled_run = "ssm_command_monitoring"
+      }
+
+      ref      = "main"
+      repo     = "dso-modernisation-platform-automation"
+      schedule = "cron(0 * * * ? *)"
+      timezone = "Europe/London"
+      workflow = "ssm_command_monitoring.yml"
+    }
   }
 }
