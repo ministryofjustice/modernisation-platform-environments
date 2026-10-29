@@ -4,6 +4,7 @@ set -e
 exec > /tmp/userdata.log 2>&1
 
 dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
 
 # amazon-linux-extras install -y epel
 # yum install -y wget unzip vsftpd jq s3fs-fuse amazon-cloudwatch-agent telnet
