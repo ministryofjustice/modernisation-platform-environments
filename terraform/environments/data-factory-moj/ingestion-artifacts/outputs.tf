@@ -17,3 +17,8 @@ output "artifact_access_log_bucket_name" {
   description = "Artifact access-log bucket name, or null outside development."
   value       = try(aws_s3_bucket.artifacts["access_logs"].id, null)
 }
+
+output "artifact_publisher_role_arn" {
+  description = "GitHub artifact publishing role ARN, or null outside development."
+  value       = one(aws_iam_role.artifact_publisher[*].arn)
+}
