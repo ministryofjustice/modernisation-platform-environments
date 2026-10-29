@@ -235,10 +235,6 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   }
 }
 
-locals {
-  weblogic_cutover_envs = ["dev", "test", "stage", "preprod", "prod"]
-}
-
 # Cert for Legacy URL: https://dsdmoj.atlassian.net/browse/TM-2173
 # 1. Create ACM cert (apply this config)
 # 2. Manually validate cert by adding validation records to legacy zone
@@ -246,7 +242,7 @@ locals {
 # 4. Uncomment aws_lb_listener_certificate and apply this config
 # 5. Create CNAME record in legacy that points ndelius.probation.service.justice.gov.uk -> ndelius.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk
 resource "aws_acm_certificate" "legacy" {
-  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
+  count = var.env_name != "prod" ? 1 : 0
 
   domain_name       = "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
   validation_method = "DNS"
@@ -263,14 +259,14 @@ resource "aws_acm_certificate" "legacy" {
 }
 
 resource "aws_lb_listener_certificate" "legacy" {
-  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
+  count = var.env_name != "prod" ? 1 : 0
 
   listener_arn    = aws_lb_listener.listener_https.arn
   certificate_arn = aws_acm_certificate.legacy[0].arn
 }
 
 resource "aws_acm_certificate" "legacy_prod" {
-  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
+  count = var.env_name == "prod" ? 1 : 0
 
   domain_name       = "ndelius.probation.service.justice.gov.uk"
   validation_method = "DNS"
@@ -286,7 +282,7 @@ resource "aws_acm_certificate" "legacy_prod" {
 }
 
 resource "aws_lb_listener_certificate" "legacy_prod" {
-  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
+  count = var.env_name == "prod" ? 1 : 0
 
   listener_arn    = aws_lb_listener.listener_https.arn
   certificate_arn = aws_acm_certificate.legacy_prod[0].arn
