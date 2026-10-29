@@ -43,14 +43,14 @@ resource "aws_instance" "smtp4dev_mock_server" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.smtp4dev_ec2_ssm_profile[count.index].name
 
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   user_data = base64encode(templatefile("./templates/ec2_user_data_smpt4dev.sh", {
     environment = "${local.environment}"
   }))
 
   lifecycle {
     ignore_changes = [
-      user_data,
+  #    user_data,
       user_data_replace_on_change
     ]
   }

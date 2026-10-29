@@ -14,8 +14,7 @@ resource "aws_instance" "ec2_ftp" {
     ignore_changes = [
       ebs_block_device,
       root_block_device,
-      ebs_optimized, 
-      user_data
+      ebs_optimized
     ]
   }
   user_data_replace_on_change = false
