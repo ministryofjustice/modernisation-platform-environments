@@ -260,5 +260,17 @@ locals {
         timezone = "Europe/London"
         workflow = "certificate_renewal.yml"
       }
+      mp-automation-github-workflow-monitoring = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "monitoring"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0/30 * * * ? *)"
+        timezone = "Europe/London"
+        workflow = "github_workflow_monitoring.yml"
+      }
   }
 }
