@@ -118,6 +118,7 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      batch_available: true
     claude-sonnet-5:
       model_id: eu.anthropic.claude-sonnet-5
       model_family: "Anthropic Claude"
@@ -132,7 +133,6 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
-      batch_available: true
     # Cohere
     cohere-embed-english-v3:
       model_id: "cohere.embed-english-v3"
