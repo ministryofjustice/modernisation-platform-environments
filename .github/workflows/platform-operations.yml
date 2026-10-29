@@ -31,7 +31,8 @@ name: platform-operations
         default: "root"
         type: string
 
-permissions: {}
+permissions:
+  issues: write
 
 jobs:
   strategy:

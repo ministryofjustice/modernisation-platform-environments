@@ -27,6 +27,7 @@ on:
           - destroy
 
 permissions:
+  issues: write
   id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
@@ -43,10 +44,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
@@ -58,10 +55,6 @@ jobs:
 
   destroy-development:
     if: inputs.action == 'destroy'
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"

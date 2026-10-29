@@ -31,7 +31,8 @@ name: justice-eng-ai
         default: "root"
         type: string
 
-permissions: {}
+permissions:
+  issues: write
 
 jobs:
   strategy:

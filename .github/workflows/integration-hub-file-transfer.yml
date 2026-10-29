@@ -32,6 +32,7 @@ name: integration-hub-file-transfer
         type: string
 
 permissions:
+  issues: write
   contents: read  # This is required for actions/checkout
 
 # Hold the shared environment through both deployment and verification.

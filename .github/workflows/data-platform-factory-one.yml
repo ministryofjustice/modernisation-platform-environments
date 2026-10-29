@@ -31,7 +31,8 @@ name: data-platform-factory-one
         default: "root"
         type: string
 
-permissions: {}
+permissions:
+  issues: write
 
 jobs:
   strategy:

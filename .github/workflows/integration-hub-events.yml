@@ -31,7 +31,8 @@ name: integration-hub-events
         default: "root"
         type: string
 
-permissions: {}
+permissions:
+  issues: write
 
 jobs:
   strategy:

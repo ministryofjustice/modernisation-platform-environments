@@ -43,6 +43,7 @@ on:
         description: "Optional: pre-fetched github_ci_user_environments_repo_pat secret, passed down to skip re-fetching in each component's plan/apply workflow."
 
 permissions:
+  issues: write
   id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
@@ -60,10 +61,6 @@ jobs:
           - cluster-base
           - cluster-core
           - cluster-components
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
@@ -85,10 +82,6 @@ jobs:
 
   root-terraform:
     if: inputs.action != 'plan'
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
@@ -112,10 +105,6 @@ jobs:
 
   network-terraform:
     needs: root-terraform
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
@@ -135,10 +124,6 @@ jobs:
 
   cluster-terraform:
     needs: network-terraform
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
@@ -159,10 +144,6 @@ jobs:
 
   cluster-base-terraform:
     needs: cluster-terraform
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
@@ -182,10 +163,6 @@ jobs:
 
   cluster-core-terraform:
     needs: cluster-base-terraform
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
@@ -205,10 +182,6 @@ jobs:
 
   cluster-components-terraform:
     needs: cluster-core-terraform
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
