@@ -32,7 +32,7 @@ locals {
           description = "wildcard cert for hmpps domain load balancer"
         }
       }
-      remote_desktop_and_planetfm_wildcard_cert_v2 = {
+      remote_desktop_and_planetfm_wildcard_cert_v4 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "*.preproduction.hmpps-domain.service.justice.gov.uk"
         external_validation_records_created = true
