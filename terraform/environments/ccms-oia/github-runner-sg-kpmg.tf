@@ -21,7 +21,7 @@ resource "aws_vpc_security_group_ingress_rule" "gh_runner_workspaces_22_ingress_
   ip_protocol       = "tcp"
   from_port         = 22
   to_port           = 22
-  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
 
   tags = merge(local.tags,
     { Name = "[KPMG] AWS Workspaces to GitHubRunner:22" }
