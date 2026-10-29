@@ -1,3 +1,24 @@
+data "aws_subnets" "shared_protected" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected*"
+  }
+}
+
+data "aws_subnet" "shared_protected" {
+  for_each = toset(data.aws_subnets.shared_protected.ids)
+  id       = each.value
+}
+
+data "aws_ec2_managed_prefix_list" "aws_services" {
+  for_each = toset(["s3", "dynamodb"])
+
+  name = "com.amazonaws.${data.aws_region.current.region}.${each.key}"
+}
+
 locals {
   private_subnet_ids = sort(data.aws_subnets.shared-private.ids)
 
@@ -43,7 +64,7 @@ locals {
     }
   }
 
-  writer_egress_rules = merge(
+  egress_rules = merge(
     local.https_egress_rules,
     local.aws_service_egress_rules,
     local.sftp_egress_rules,

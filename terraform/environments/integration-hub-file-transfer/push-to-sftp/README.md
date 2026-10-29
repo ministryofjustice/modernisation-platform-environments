@@ -26,6 +26,18 @@ The writer retrieves the exact dispatch secret version referenced by the request
 
 The writer uses shared private subnets: one deterministically selected subnet in development/test, all selected subnets in preproduction/production. Egress permits approved SFTP CIDRs/ports, HTTPS to shared protected-subnet CIDRs, and HTTPS to the regional AWS-managed S3 and DynamoDB prefix lists. SFTP rules use the same normalised destinations as the writer, with one rule per unique CIDR/port pair across all entries. Prefix-list rules permit traffic but do not create routes or endpoints: verify S3/DynamoDB gateway endpoint routes and reachable private endpoints for STS, Secrets Manager and EventBridge, plus the recipient path.
 
+For this private endpoint path, verify the following shared-VPC prerequisites; this component does not provision them:
+
+| Service | Endpoint service name | Connectivity requirement |
+| --- | --- | --- |
+| S3 | `com.amazonaws.eu-west-2.s3` | Gateway endpoint associated with the writer's private-subnet route tables |
+| DynamoDB | `com.amazonaws.eu-west-2.dynamodb` | Gateway endpoint associated with the writer's private-subnet route tables |
+| Secrets Manager | `com.amazonaws.eu-west-2.secretsmanager` | Interface endpoint in the allowed protected subnets |
+| STS | `com.amazonaws.eu-west-2.sts` | Interface endpoint in the allowed protected subnets; client uses the regional STS endpoint |
+| EventBridge | `com.amazonaws.eu-west-2.events` | Interface endpoint in the allowed protected subnets |
+
+Interface endpoints need private DNS enabled and endpoint security groups allowing inbound TCP/443 from the writer. Verify endpoint policies and network ACLs also permit the required requests and return traffic. Gateway endpoints do not have subnet network interfaces: service addresses remain regional public IPs, which is why the managed prefix-list egress rules are needed alongside the gateway routes.
+
 ## Delivery and recovery
 
 The destination path is the configured relative prefix plus the source key relative to its authorised source prefix. The writer streams the exact S3 version into a temporary remote file, verifies byte counts and renames it over the destination. The clean source is retained under the parent's lifecycle policy; remote retention belongs to the recipient.

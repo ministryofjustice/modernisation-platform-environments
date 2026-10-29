@@ -1,24 +1,3 @@
-data "aws_subnets" "shared_protected" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-protected*"
-  }
-}
-
-data "aws_subnet" "shared_protected" {
-  for_each = toset(data.aws_subnets.shared_protected.ids)
-  id       = each.value
-}
-
-data "aws_ec2_managed_prefix_list" "aws_services" {
-  for_each = toset(["s3", "dynamodb"])
-
-  name = "com.amazonaws.${data.aws_region.current.region}.${each.key}"
-}
-
 module "security_group_writer" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"
@@ -30,7 +9,7 @@ module "security_group_writer" {
   vpc_id          = data.aws_vpc.shared.id
 
   ingress_rules = {}
-  egress_rules  = local.writer_egress_rules
+  egress_rules  = local.egress_rules
 
   tags = merge(local.tags, { Name = local.pattern_name })
 }
