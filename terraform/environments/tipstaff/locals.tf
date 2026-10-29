@@ -15,4 +15,8 @@ locals {
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
+  # Database the application uses: tipstaff_db until the encrypted tipstaff_db_v2 has been restored for this environment
+  restore_snapshot_identifier = local.application_data.accounts[local.environment].restore_snapshot_identifier
+  tipstaff_db                 = local.restore_snapshot_identifier == "" ? aws_db_instance.tipstaff_db : aws_db_instance.tipstaff_db_v2[0]
+
 }
