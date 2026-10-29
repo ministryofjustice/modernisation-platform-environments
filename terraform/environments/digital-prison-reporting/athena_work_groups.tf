@@ -48,6 +48,7 @@ module "athena_workgroup_reporting_app" {
 
   name            = format("%s-reporting-%s-athena-workgroup", local.project, each.key)
   output_location = format("s3://%s/athena-output/reporting-%s", module.s3_working_bucket.bucket_id, each.key)
+  description     = format("The workgroup for the %s MI reporting app", each.key)
 
   tags = merge(
     local.all_tags,
