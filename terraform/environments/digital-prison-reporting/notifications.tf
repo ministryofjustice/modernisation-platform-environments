@@ -42,7 +42,7 @@ module "pagerduty_notifications" {
   #checkov:skip=CKV_TF_1: "Ensure Terraform module sources use a commit hash"
   count = local.enable_pagerduty_alerts ? 1 : 0
 
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = ["${local.project}-notification-topic-${local.environment}"]
   pagerduty_integration_key = data.aws_secretsmanager_secret_version.pagerduty_integration[0].secret_string
 
@@ -182,7 +182,7 @@ module "pagerduty_core_alerts" {
   depends_on = [
     module.pagerduty_sns
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [module.pagerduty_sns.sns_topic]
   pagerduty_integration_key = local.pagerduty_integration_keys["dpr_nonprod_alarms"]
 }
