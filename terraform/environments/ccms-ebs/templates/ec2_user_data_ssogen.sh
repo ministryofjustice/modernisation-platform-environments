@@ -1,5 +1,74 @@
 #!/bin/bash
-set -exuo pipefail
+
+set -euo pipefail
+#Logic for moving emudhra certs to blocked list
+B=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+S=/etc/pki/ca-trust/source
+
+if command -v openssl >/dev/null 2>&1; then
+  echo "openssl is available."
+else
+  echo "openssl is not available, exiting."
+  exit 1
+fi
+
+if [[ ! -f $B ]]; then
+  echo "Not found: $B, exiting."
+  exit 1
+fi
+
+if [[ -d "$S/blacklist" ]]; then
+  L=$S/blacklist
+  V="a"
+elif [[ -d "$S/blocklist" ]]; then
+  L=$S/blocklist
+  V="o"
+else
+  echo "ERROR: no blacklist/blocklist directory under $S" >&2
+  exit 1
+fi
+echo "Using $L"
+
+D=$(mktemp -d)
+cd "$D"
+csplit -s -z -f cert- "$B" '/-----BEGIN TRUSTED CERTIFICATE-----/' '{*}'
+
+for f in cert-*; do
+  echo -n "Processing: $f ... "
+  if ! subject=$(openssl x509 -noout -subject -in "$f"  2>/dev/null); then
+    echo "Skipping invalid certificate: $f" >&2
+    continue
+  echo $subject
+  fi
+
+  if echo "$subject" | grep -qiE 'cn=(aaa|emsign|emudhra)'; then
+    echo "dirty."
+    F=$(openssl x509 -in "$f" -noout -fingerprint -sha256 |cut -d= -f2 | tr -d :)
+    N=$(grep -oP 'CN=\K[^,]+' <<< $subject |tr \\040 \\137)
+    openssl x509 -in "$f" -out "$L/$N-$F.pem"
+    echo "Extracted and added to the block list: $(openssl x509 -in "$f" -noout -subject)"
+  else
+    echo "clean."
+  fi
+done
+
+echo
+ls -l $L |grep '\.pem'
+echo
+
+for f in $L/*.pem; do
+  echo -n "$(basename $f): "
+  openssl x509 -in "$f" -noout -subject 2>/dev/null
+done
+
+echo -e "\nRunning extraction.\n"
+update-ca-trust extract
+echo "Run these commands now:"
+echo "trust list --filter=bl${V}cklist"
+echo "curl -v https://dv-g3b-emudhra.we-have-a-problem.com/"
+echo
+
+cd / && rm -rf "$D"
 
 # === Set hostname ===
 hostnamectl set-hostname "${hostname}"
