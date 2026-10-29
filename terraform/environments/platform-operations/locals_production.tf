@@ -223,15 +223,77 @@ locals {
         timezone = "Europe/London"
         workflow = "laa-concierge-to-slack.yml"
       }
-      mp-automation-certificate-renewal = {
+      mp-automation-certificate-renewal-thursday = {
         identity = "platops"
-        inputs   = {}
+        inputs = {
+          scheduled_run = "thursday"
+        }
 
         ref      = "main"
         repo     = "dso-modernisation-platform-automation"
-        schedule = "cron(30 6 ? * TUE-THU *)"
+        schedule = "cron(30 6 ? * THU *)"
         timezone = "Europe/London"
         workflow = "certificate_renewal.yml"
+      }
+      mp-automation-certificate-renewal-tuesday = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "tuesday"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 6 ? * TUE *)"
+        timezone = "Europe/London"
+        workflow = "certificate_renewal.yml"
+      }
+      mp-automation-certificate-renewal-wednesday = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "wednesday"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 6 ? * WED *)"
+        timezone = "Europe/London"
+        workflow = "certificate_renewal.yml"
+      }
+      mp-automation-github-workflow-monitoring = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "monitoring"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0/30 * * * ? *)"
+        timezone = "Europe/London"
+        workflow = "github_workflow_monitoring.yml"
+      }
+      mp-automation-security-hub-alerting = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "security_hub_alerting"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 7 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "security_hub_alerting.yml"
+      }
+      mp-automation-ssm-command-monitoring = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ssm_command_monitoring"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 * * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ssm_command_monitoring.yml"
       }
     }
   }
