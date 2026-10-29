@@ -35,7 +35,7 @@ locals {
       remote_desktop_and_planetfm_wildcard_cert_v4 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "*.preproduction.hmpps-domain.service.justice.gov.uk"
-        external_validation_records_created = true
+        external_validation_records_created = false
         subject_alternate_names = [
           "*.hmpps-domain-services.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
           "*.pp.planetfm.service.justice.gov.uk",
