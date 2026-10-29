@@ -32,7 +32,7 @@
       "storage_type": "gp2",
       "engine": "postgres",
       "engine_version": "14.24",
-      "restore_snapshot_identifier": "",
+      "restore_snapshot_identifier": "dacp-db-pre-prod-rst8765-encrypted",
       "instance_class": "db.t3.micro",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
