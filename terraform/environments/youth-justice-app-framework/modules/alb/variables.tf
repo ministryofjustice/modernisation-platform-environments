@@ -59,6 +59,18 @@ variable "alb_ingress_with_cidr_blocks_rules" {
   default     = []
 }
 
+variable "alb_ingress_prefix_list_ids" {
+  description = "List of prefix list IDs used by every rule in alb_ingress_with_prefix_list_ids_rules"
+  type        = list(string)
+  default     = []
+}
+
+variable "alb_ingress_with_prefix_list_ids_rules" {
+  description = "List of ingress rules for the ALB security group where only prefix_list_ids is used (see alb_ingress_prefix_list_ids)"
+  type        = list(map(string))
+  default     = []
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
@@ -140,6 +152,45 @@ variable "associate_web_acl" {
 
 variable "web_acl_arn" {
   description = "Web Application Firewall (WAF) ARN of the resource to associate with the load balancer"
+  type        = string
+  default     = null
+}
+
+variable "enable_zonal_shift" {
+  description = "Enable the ARC zonal shift integration on the load balancer"
+  type        = bool
+  default     = false
+}
+
+################################################################################
+# CloudWatch Logs
+################################################################################
+
+variable "enable_cloudwatch_logs" {
+  description = "Deliver ALB logs to CloudWatch Logs as vended logs"
+  type        = bool
+  default     = false
+}
+
+variable "cloudwatch_log_types" {
+  description = "ALB log types to deliver to CloudWatch Logs"
+  type        = list(string)
+  default     = ["ALB_ACCESS_LOGS"]
+
+  validation {
+    condition     = alltrue([for t in var.cloudwatch_log_types : contains(["ALB_ACCESS_LOGS", "ALB_CONNECTION_LOGS", "ALB_HEALTH_CHECK_LOGS"], t)])
+    error_message = "cloudwatch_log_types must be one of ALB_ACCESS_LOGS, ALB_CONNECTION_LOGS, ALB_HEALTH_CHECK_LOGS."
+  }
+}
+
+variable "cloudwatch_log_retention_in_days" {
+  description = "Retention for the ALB CloudWatch log groups"
+  type        = number
+  default     = 400
+}
+
+variable "cloudwatch_log_kms_key_arn" {
+  description = "KMS key used to encrypt the ALB CloudWatch log groups"
   type        = string
   default     = null
 }
