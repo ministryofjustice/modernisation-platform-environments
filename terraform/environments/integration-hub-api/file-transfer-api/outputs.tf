@@ -1,16 +1,21 @@
 output "transfer_ticket_api_endpoint" {
-  description = "HTTP API endpoint for issuing managed file transfer upload tickets"
+  description = "Custom HTTPS endpoint for issuing managed file transfer upload tickets"
+  value       = "https://${local.acm_domains.api}"
+}
+
+output "transfer_ticket_api_execute_api_endpoint" {
+  description = "AWS-generated API Gateway endpoint, retained as a migration fallback"
   value       = module.api_gateway.api_endpoint
 }
 
 output "transfer_ticket_api_docs_url" {
   description = "Protected Swagger UI for the managed file transfer API"
-  value       = "${module.api_gateway.api_endpoint}/docs"
+  value       = "https://${local.acm_domains.api}/docs"
 }
 
 output "transfer_ticket_openapi_url" {
   description = "Protected OpenAPI contract URL for the managed file transfer API"
-  value       = "${module.api_gateway.api_endpoint}/openapi.yaml"
+  value       = "https://${local.acm_domains.api}/openapi.yaml"
 }
 
 output "transfer_ticket_api_docs_basic_auth_secret_name" {

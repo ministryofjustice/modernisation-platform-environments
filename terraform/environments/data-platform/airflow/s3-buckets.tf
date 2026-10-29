@@ -13,6 +13,11 @@ module "mwaa_bucket" {
     enabled = true
   }
 
+  # >>> TEMPORARY (Airflow 3 durability test): START
+  attach_policy = length(local.mwaa_bucket_workflow_access) > 0
+  policy        = data.aws_iam_policy_document.mwaa_bucket.json
+  # <<< TEMPORARY (Airflow 3 durability test): END
+
   server_side_encryption_configuration = {
     rule = {
       bucket_key_enabled = true
@@ -25,3 +30,4 @@ module "mwaa_bucket" {
 
   tags = local.tags
 }
+

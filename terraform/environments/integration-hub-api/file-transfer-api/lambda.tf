@@ -13,6 +13,9 @@ module "lambda_upload_ticket" {
   ignore_source_code_hash      = true
 
   environment_variables = {
+    ENTRA_TENANT_ID                   = local.entra_tenant_id
+    ENTRA_API_AUDIENCE                = local.entra_api_audience
+    ENTRA_APPLICATION_CLIENTS         = jsonencode(local.entra_application_clients)
     MAX_PRESIGNED_URL_EXPIRY_SECONDS  = tostring(local.api_configuration.max_presigned_url_expiry_seconds)
     MULTIPART_DEFAULT_PART_SIZE_BYTES = tostring(local.multipart_configuration.multipart_default_part_size_bytes)
     MULTIPART_INITIAL_PRESIGN_PARTS   = tostring(local.multipart_configuration.multipart_initial_presign_parts)
@@ -78,42 +81,10 @@ module "lambda_api_authorizer" {
   runtime                      = "python3.12"
   source_path                  = "${local.bootstrap_code_root}/request-authorizer"
   trigger_on_package_timestamp = false
-  ignore_source_code_hash      = true
 
-  environment_variables = {
-    AUTH_PRINCIPALS_TABLE = module.dynamodb_auth_principals.dynamodb_table_id
-    AUTH_ROLES_TABLE      = module.dynamodb_auth_roles.dynamodb_table_id
-  }
-
-  attach_policy_statements = true
-  policy_statements = merge(
-    {
-      auth_principals_table_read = {
-        effect    = "Allow"
-        actions   = ["dynamodb:GetItem"]
-        resources = [module.dynamodb_auth_principals.dynamodb_table_arn]
-      }
-      auth_roles_table_read = {
-        effect    = "Allow"
-        actions   = ["dynamodb:GetItem"]
-        resources = [module.dynamodb_auth_roles.dynamodb_table_arn]
-      }
-    },
-    length(local.auth_users) > 0 ? {
-      auth_user_secret_read = {
-        effect    = "Allow"
-        actions   = ["secretsmanager:GetSecretValue"]
-        resources = [for secret in values(module.api_user_credentials_secret) : secret.secret_arn]
-      }
-    } : {},
-    length(local.auth_system_principals) > 0 ? {
-      auth_system_secret_read = {
-        effect    = "Allow"
-        actions   = ["secretsmanager:GetSecretValue"]
-        resources = [for secret in values(module.api_system_bearer_token_secret) : secret.secret_arn]
-      }
-    } : {}
-  )
+  # Retained as a deny-only function during cutover; no gateway route invokes it.
+  # Restore the bootstrap handler to replace any previously deployed legacy code.
+  ignore_source_code_hash = false
 
   cloudwatch_logs_retention_in_days = 30
   tags                              = local.tags

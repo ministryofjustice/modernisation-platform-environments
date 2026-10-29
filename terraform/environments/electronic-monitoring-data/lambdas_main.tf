@@ -241,56 +241,6 @@ module "calculate_checksum" {
 
 }
 
-#-----------------------------------------------------------------------------------
-# DMS Validation Lambdas
-#-----------------------------------------------------------------------------------
-module "dms_retrieve_metadata" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-
-  source                  = "./modules/lambdas"
-  is_image                = true
-  function_name           = "dms_retrieve_metadata"
-  role_name               = aws_iam_role.dms_validation_lambda_role[0].name
-  role_arn                = aws_iam_role.dms_validation_lambda_role[0].arn
-  handler                 = "dms_retrieve_metadata.handler"
-  memory_size             = 10240
-  timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-
-  environment_variables = {
-    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
-  }
-
-  security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-}
-
-
-module "dms_validation" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-
-  source                  = "./modules/lambdas"
-  is_image                = true
-  function_name           = "dms_validation"
-  role_name               = aws_iam_role.dms_validation_lambda_role[0].name
-  role_arn                = aws_iam_role.dms_validation_lambda_role[0].arn
-  handler                 = "dms_validation.handler"
-  memory_size             = 10240
-  timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-
-  environment_variables = {
-    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
-    SECRET_NAME   = aws_secretsmanager_secret.db_password[0].name
-    USER          = aws_db_instance.database_2022[0].username
-    SERVER_NAME   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
-  }
-
-  security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-}
 
 #-----------------------------------------------------------------------------------
 # Process FMS metadata
@@ -517,7 +467,7 @@ module "data_cutback" {
 }
 
 #-----------------------------------------------------------------------------------
-# MDSS daily failure digest Lambda
+# Daily Live Feed Handover
 #-----------------------------------------------------------------------------------
 
 module "live_feed_daily_handover" {
@@ -566,6 +516,13 @@ module "live_feed_daily_handover" {
     LOAD_FMS_FUNCTION_NAME             = module.load_fms_lambda.lambda_function_name
     PROCESS_FMS_METADATA_FUNCTION_NAME = module.fms_expected_file_processor.lambda_function_name
     FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.fms_raw_file_formatter.lambda_function_name
+
+    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+
+    DOWNSTREAM_RECONCILIATION_DASHBOARD_NAME = (
+      "downstream-reconciliation-ops-${local.environment_shorthand}"
+    )
 
     LAMBDAS_PRODUCTION_RUN_URL = "https://github.com/ministryofjustice/electronic-monitoring-data-lambda-functions/actions/workflows/push-to-ecr.yaml"
     CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
@@ -682,6 +639,9 @@ module "cloudwatch_alarm_threader" {
     INCLUDE_REASON        = "true"
     ENABLE_CUSTOM_ACTIONS = "false"
     INCIDENT_QUEUE_URL    = aws_sqs_queue.live_feed_incident_events.id
+
+    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
 
     GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
       aws_sfn_state_machine.staging_db_janitor.arn
@@ -1425,7 +1385,7 @@ module "merge_redrive_planner" {
   handler                        = "merge_redrive_planner.handler"
   memory_size                    = 1024
   timeout                        = 900
-  reserved_concurrent_executions = 2
+  reserved_concurrent_executions = 6
   cloudwatch_retention_days      = 7
 
   core_shared_services_id = local.environment_management.account_ids[
@@ -1452,19 +1412,44 @@ module "merge_redrive_planner" {
     RECONCILIATION_CONTROL_TABLE = aws_dynamodb_table.downstream_reconciliation_control.name
     SNS_TOPIC_ARN                = aws_sns_topic.emds_alerts.arn
 
+    AUDIT_STATE_MACHINE_ARN = (
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:downstream-reconciliation-audit"
+    )
+
+    CADT_ECS_CLUSTER_NAME = aws_ecs_cluster.cadt.name
+    CADT_ECS_TASK_FAMILY  = aws_ecs_task_definition.create_a_derived_table.family
+
+    STAGED_RECONCILIATION_STATE_MACHINE_ARN = (
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:merge_into_mdss_staged_position"
+    )
+    AC_RECONCILIATION_STATE_MACHINE_ARN = (
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:merge_into_ac_position"
+    )
+    EMDI_RECONCILIATION_STATE_MACHINE_ARN = (
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:merge_into_emdi_position"
+    )
+
     POSITION_LOOKBACK_HOURS              = "24"
     ACTIVATION_LOOKBACK_HOURS            = "24"
     RECONCILIATION_STALE_MINUTES         = "30"
     MAX_AUTOMATIC_REPLAY_ROWS_PER_DATE   = "50000"
     MAX_AUTOMATIC_REPLAY_ROWS            = "250000"
     MAX_AUTOMATIC_REPLAY_DATES           = "20"
-    MAX_REPLAY_ROWS_PER_CHUNK            = "50000"
+    MAX_REPLAY_ROWS_PER_CHUNK            = "250000"
     MAX_AUTOMATIC_REPLAY_CHUNKS          = "20"
     ROLLING_REVIEW_THRESHOLD_ROWS        = "2000000"
+    HISTORICAL_REVIEW_THRESHOLD_ROWS     = "2000000"
     ROLLING_RECOVERY_EXIT_ROWS           = "250000"
     MAX_ROLLING_ITERATIONS_PER_EXECUTION = "20"
     RECOVERY_LEASE_SECONDS               = "1800"
     ATHENA_MAX_POLL_SECONDS              = "840"
+
+    AUDIT_DEEP_DAYS_PER_RUN     = "7"
+    AUDIT_ROLLING_GUARD_MINUTES = "20"
+    ROLLING_INTERVAL_HOURS      = "4"
+    STAGED_ROLLING_MINUTE       = "0"
+    AC_ROLLING_MINUTE           = "10"
+    EMDI_ROLLING_MINUTE         = "20"
   }
 }
 
@@ -1660,7 +1645,8 @@ module "register_athena" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    ENVIRONMENT_NAME = local.env_name
+    ENVIRONMENT_NAME     = local.env_name
+    RAW_FORMATTED_BUCKET = "s3://${module.s3-raw-formatted-data-bucket.bucket.id}"
   }
 
   depends_on = [

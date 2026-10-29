@@ -104,6 +104,11 @@ resource "aws_launch_template" "weblogic_testdata_api" {
     http_tokens                 = "required"
     http_put_response_hop_limit = 2
   }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = var.tags
+  }
 }
 
 resource "aws_autoscaling_group" "weblogic_testdata_api" {
@@ -208,7 +213,6 @@ module "ecs_nightly_restart_weblogic_data" {
   env_name     = var.env_name
   app_name     = "weblogic-data"
   cluster_name = module.ecs.ecs_cluster_arn
-  service_name = "${var.env_name}-weblogic-data"
   service_arn  = local.weblogic_data_service_arn
   task_count   = data.aws_ssm_parameter.weblogic_data_task_count[0].value
 }
