@@ -1,22 +1,5 @@
 [
   {
-      "name": "alpine-shell",
-      "image": "alpine:3.24.3",
-      "cpu": 10,
-      "memoryReservation": 32,
-      "portMappings": [],
-      "essential": false,
-      "command": [
-        "sh",
-        "-c",
-        "sleep infinity"
-      ],
-      "environment": [],
-      "mountPoints": [],
-      "volumesFrom": [],
-      "systemControls": []
-    },
-  {
     "name": "${app_name}",
     "image": "${app_image}:${container_version}",
     "logConfiguration": {
