@@ -15,6 +15,8 @@ module "yjsm_apps_nlb" {
   nlb_name        = "yjaf-yjsm-apps-nlb"
   nlb_subnets_ids = local.private_subnet_list[*].id
 
+  enable_zonal_shift = true
+
   # AWS assigns the node IPs. Once known, pin them here (private_ipv4_addresses,
   # subnet id => IP) so a replacement keeps the address Juniper points at.
 

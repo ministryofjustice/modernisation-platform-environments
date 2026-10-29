@@ -19,6 +19,7 @@ module "internal_alb" {
   enable_access_logs         = true
   enable_cloudwatch_logs     = true
   cloudwatch_log_kms_key_arn = module.kms.key_arn
+  enable_zonal_shift         = true
 
   #pass in provider for creating records on central route53
   providers = {

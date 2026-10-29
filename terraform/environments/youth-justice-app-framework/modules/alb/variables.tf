@@ -156,6 +156,12 @@ variable "web_acl_arn" {
   default     = null
 }
 
+variable "enable_zonal_shift" {
+  description = "Enable the ARC zonal shift integration on the load balancer"
+  type        = bool
+  default     = false
+}
+
 ################################################################################
 # CloudWatch Logs
 ################################################################################

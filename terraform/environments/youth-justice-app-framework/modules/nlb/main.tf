@@ -7,7 +7,7 @@
 module "nlb" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/alb/aws"
-  version = "9.9.0"
+  version = "9.17.0"
 
   name               = var.nlb_name
   load_balancer_type = "network"
@@ -24,6 +24,7 @@ module "nlb" {
 
   enable_deletion_protection       = false
   enable_cross_zone_load_balancing = true
+  enable_zonal_shift               = var.enable_zonal_shift
 
   security_group_ingress_rules = {
     for name, app in var.apps : "${name}-from-juniper" => {

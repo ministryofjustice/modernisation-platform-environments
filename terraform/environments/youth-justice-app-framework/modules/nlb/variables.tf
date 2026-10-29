@@ -53,6 +53,12 @@ variable "ingress_prefix_list_id" {
   type        = string
 }
 
+variable "enable_zonal_shift" {
+  description = "Enable the ARC zonal shift integration on the load balancer"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)

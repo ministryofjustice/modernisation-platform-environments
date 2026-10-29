@@ -43,6 +43,7 @@ module "yjsm_apps_alb" {
   enable_access_logs         = true
   enable_cloudwatch_logs     = true
   cloudwatch_log_kms_key_arn = module.kms.key_arn
+  enable_zonal_shift         = true
 }
 
 # Management server -> yjsm-ui, as it could reach the UI on the EC2 host's port
