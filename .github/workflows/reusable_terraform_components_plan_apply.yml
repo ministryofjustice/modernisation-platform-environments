@@ -79,9 +79,9 @@ env:
   SKIP_PLAN_EVALUATOR: "[]"
   SKIP_PLAN_EVALUATOR_FILE: ".github/config/skip-plan-evaluator-workspaces.json"
 permissions:
+  pull-requests: write
   id-token: write
   contents: read
-  issues: write
 concurrency:
   group: ${{ inputs.account_name && format('{0}-{1}', inputs.account_name, inputs.component) || format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) }}
 jobs:

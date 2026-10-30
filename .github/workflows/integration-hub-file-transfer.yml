@@ -32,7 +32,6 @@ name: integration-hub-file-transfer
         type: string
 
 permissions:
-  issues: write
   contents: read  # This is required for actions/checkout
 
 # Hold the shared environment through both deployment and verification.
@@ -79,7 +78,7 @@ jobs:
     needs: strategy
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     permissions:
-      issues: write
+      pull-requests: write
       id-token: write
       contents: read
     strategy:
@@ -104,6 +103,7 @@ jobs:
       (github.event_name != 'pull_request' ||
        github.event.pull_request.head.repo.full_name == github.repository)
     permissions:
+      pull-requests: write
       contents: read
       id-token: write
     uses: ministryofjustice/integration-hub/.github/workflows/file-transfer-tests.yml@91500ccee6a7042526b80736d6837057d0704533
@@ -124,6 +124,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
+      pull-requests: write
       id-token: write
     steps:
       - name: Configure AWS credentials for PagerDuty key retrieval
@@ -201,7 +202,7 @@ jobs:
   destroy-development:
     if: inputs.action == 'destroy'
     permissions:
-      issues: write
+      pull-requests: write
       id-token: write
       contents: read
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml

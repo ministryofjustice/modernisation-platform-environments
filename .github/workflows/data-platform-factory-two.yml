@@ -31,8 +31,7 @@ name: data-platform-factory-two
         default: "root"
         type: string
 
-permissions:
-  issues: write
+permissions: {}
 
 jobs:
   strategy:
@@ -47,7 +46,7 @@ jobs:
     needs: strategy
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     permissions:
-      issues: write
+      pull-requests: write
       id-token: write
       contents: read
     strategy:
@@ -66,7 +65,7 @@ jobs:
   destroy-development:
     if: inputs.action == 'destroy'
     permissions:
-      issues: write
+      pull-requests: write
       id-token: write
       contents: read
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml

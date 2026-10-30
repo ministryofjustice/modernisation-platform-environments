@@ -1373,6 +1373,7 @@ module "live_feed_specials_remediator" {
 
 # ------------------------------------------------------------------------------
 # Downstream position reconciliation
+# Planner uses AWS managed service APIs and does not require private VPC access.
 # ------------------------------------------------------------------------------
 
 module "merge_redrive_planner" {
@@ -1397,9 +1398,6 @@ module "merge_redrive_planner" {
       local.is-test ? "test" : "dev"
     )
   )
-
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
     POWERTOOLS_LOG_LEVEL = "INFO"

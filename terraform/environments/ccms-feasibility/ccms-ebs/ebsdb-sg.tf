@@ -35,6 +35,15 @@ resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_pui" {
   referenced_security_group_id = data.aws_security_group.pui_ecs_tasks.id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_soa_managed" {
+  security_group_id            = aws_security_group.ebsdb.id
+  description                  = "Oracle Net listener from the ccms-soa managed ECS tasks"
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1522
+  referenced_security_group_id = data.aws_security_group.soa_ecs_tasks_managed.id
+}
+
 resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_apps_fndfs" {
   security_group_id            = aws_security_group.ebsdb.id
   description                  = "Application Listener (FNDFS) from EBS apps tier"
@@ -111,6 +120,12 @@ resource "aws_vpc_security_group_egress_rule" "ebsdb_to_clamav" {
 data "aws_security_group" "pui_ecs_tasks" {
   vpc_id = data.aws_vpc.shared.id
   name   = "ccms-pui-${local.env_label}-ecs-tasks-sg"
+}
+
+# SOA managed ECS task SG, managed in the ccms-feasibility/ccms-soa stack
+data "aws_security_group" "soa_ecs_tasks_managed" {
+  vpc_id = data.aws_vpc.shared.id
+  name   = "ccms-soa-${local.env_label}-ecs-tasks-managed-sg"
 }
 
 # Shared ClamAV SG, managed in the ccms-feasibility root stack
