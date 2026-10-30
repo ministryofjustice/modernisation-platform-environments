@@ -13,17 +13,103 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
         x      = 0
         y      = 0
         width  = 24
-        height = 3
+        height = 5
 
         properties = {
           markdown = <<-EOT
             # Downstream reconciliation
-
+            **🟢 CLEAN / IN SYNC** means the latest completed reconciliation
+            found no eligible stale positions and the assurance is still current.
+            `IN SYNC` is a reconciliation assurance state. It does **not** mean
+            every position created in the last few minutes has already reached
+            the destination. Live-feed freshness is monitored separately.
+            **🔵 RUNNING** reconciliation is actively checking or recovering data.
+            **🟠 GAPS** means eligible missing data is known or requires review.
+            **🔴 FAILED / STALE** means clean assurance cannot be claimed.
+            **⚪ UNKNOWN** means no current reconciliation assurance is available.
             Rolling reconciliation runs every four hours:
             **STAGED :00** | **AC :10** | **EMDI :20**
-
-            `Known rolling gaps` shows the latest reconciliation assurance.
-            It is not a latest-position freshness measurement.
+          EOT
+        }
+      },
+      # ------------------------------------------------------------------------
+      # Reconciliation assurance health
+      # ------------------------------------------------------------------------
+      {
+        type   = "alarm"
+        x      = 0
+        y      = 5
+        width  = 12
+        height = 5
+        properties = {
+          title  = "Reconciliation assurance - green = clean / in sync"
+          sortBy = "default"
+          alarms = [
+            for _, alarm in
+            aws_cloudwatch_metric_alarm.downstream_reconciliation_assurance_not_clean :
+            alarm.arn
+          ]
+        }
+      },
+      # ------------------------------------------------------------------------
+      # Current reconciliation status
+      # ------------------------------------------------------------------------
+      {
+        type   = "log"
+        x      = 12
+        y      = 5
+        width  = 12
+        height = 5
+        properties = {
+          title  = "Current reconciliation status"
+          region = data.aws_region.current.name
+          view   = "table"
+          query = <<-EOT
+            SOURCE '${module.merge_redrive_planner.cloudwatch_log_group.name}'
+            \| filter message.event =
+                "DOWNSTREAM_RECONCILIATION_CONSUMER_STATUS"
+            \| stats
+                latest(message.display_status) as status,
+                latest(message.assurance_status) as assurance,
+                latest(message.active_modes) as activity,
+                latest(message.known_missing_positions) as missing,
+                latest(message.rolling_age_minutes) as age_minutes
+              by message.consumer
+            \| sort message.consumer asc
+          EOT
+        }
+      },
+      # ------------------------------------------------------------------------
+      # Current reconciliation activity
+      # ------------------------------------------------------------------------
+      {
+        type   = "log"
+        x      = 0
+        y      = 10
+        width  = 24
+        height = 6
+        properties = {
+          title  = "Current reconciliation activity and recovery progress"
+          region = data.aws_region.current.name
+          view   = "table"
+          query = <<-EOT
+            SOURCE '${module.merge_redrive_planner.cloudwatch_log_group.name}'
+            \| filter message.event =
+                "DOWNSTREAM_RECONCILIATION_CONSUMER_STATUS"
+            \| stats
+                latest(message.active_modes) as mode,
+                latest(message.active_status) as status,
+                latest(message.missing_positions_discovered) as discovered,
+                latest(message.positions_recovered) as recovered,
+                latest(message.positions_remaining) as remaining,
+                latest(message.progress_percent) as progress_percent,
+                latest(message.replay_chunks_completed) as chunks_complete,
+                latest(message.replay_chunks_planned) as chunks_planned,
+                latest(message.started_at_utc) as started,
+                latest(message.execution_id) as execution
+              by message.consumer
+            \| filter mode != "IDLE"
+            \| sort message.consumer asc
           EOT
         }
       },
@@ -34,7 +120,7 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "metric"
         x      = 0
-        y      = 3
+        y      = 16
         width  = 8
         height = 5
 
@@ -95,10 +181,9 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "metric"
         x      = 8
-        y      = 3
+        y      = 16
         width  = 8
         height = 5
-
         properties = {
           title  = "Known rolling gaps"
           region = data.aws_region.current.name
@@ -156,10 +241,9 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "metric"
         x      = 16
-        y      = 3
+        y      = 16
         width  = 8
         height = 5
-
         properties = {
           title  = "Rolling assurance age - minutes"
           region = data.aws_region.current.name
@@ -217,10 +301,9 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "metric"
         x      = 0
-        y      = 8
+        y      = 21
         width  = 12
         height = 5
-
         properties = {
           title  = "Historical audit - missing positions"
           region = data.aws_region.current.name
@@ -261,7 +344,7 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "metric"
         x      = 12
-        y      = 8
+        y      = 21
         width  = 12
         height = 5
 
@@ -309,7 +392,7 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "metric"
         x      = 0
-        y      = 13
+        y      = 26
         width  = 12
         height = 6
 
@@ -354,7 +437,7 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "metric"
         x      = 12
-        y      = 13
+        y      = 26
         width  = 12
         height = 6
 
@@ -430,7 +513,7 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "metric"
         x      = 0
-        y      = 19
+        y      = 32
         width  = 24
         height = 7
 
@@ -549,10 +632,9 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "metric"
         x      = 0
-        y      = 26
+        y      = 39
         width  = 12
         height = 6
-
         properties = {
           title  = "Reconciliation workflow failures"
           region = data.aws_region.current.name
@@ -607,7 +689,7 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "metric"
         x      = 12
-        y      = 26
+        y      = 39
         width  = 12
         height = 6
 
@@ -647,7 +729,7 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "log"
         x      = 0
-        y      = 32
+        y      = 45
         width  = 24
         height = 7
 
@@ -658,18 +740,33 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
 
           query = <<-EOT
             SOURCE '${module.merge_redrive_planner.cloudwatch_log_group.name}'
-            | filter message.event = "DOWNSTREAM_RECONCILIATION_AUDIT_STATUS"
-            | fields
-                @timestamp,
-                message.consumer,
-                message.status,
-                message.missing_positions,
-                message.earliest_missing_date,
-                message.latest_missing_date,
-                message.recommended_action,
-                message.deep_cursor_date
-            | sort @timestamp desc
-            | limit 20
+            \| filter message.event =
+                "DOWNSTREAM_RECONCILIATION_CONSUMER_STATUS"
+            \| filter
+                message.consumer = "AC"
+                or message.consumer = "EMDI"
+            \| stats
+                latest(message.historical_audit_status) as status,
+                latest(
+                  message.historical_audit_missing_positions
+                ) as missing,
+                latest(
+                  message.historical_audit_earliest_missing_date
+                ) as earliest_missing,
+                latest(
+                  message.historical_audit_latest_missing_date
+                ) as latest_missing,
+                latest(
+                  message.historical_audit_recommended_action
+                ) as recommendation,
+                latest(
+                  message.historical_audit_deep_cursor_date
+                ) as deep_cursor,
+                latest(
+                  message.historical_audit_age_hours
+                ) as age_hours
+              by message.consumer
+            \| sort message.consumer asc
           EOT
         }
       },
@@ -680,24 +777,24 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
       {
         type   = "log"
         x      = 0
-        y      = 39
+        y      = 52
         width  = 24
         height = 6
 
         properties = {
-          title  = "Historical audit waits"
+          title  = "Historical audit waits - selected dashboard time range"
           region = data.aws_region.current.name
           view   = "table"
-
+          
           query = <<-EOT
             SOURCE '${module.merge_redrive_planner.cloudwatch_log_group.name}'
-            | filter message.event = "DOWNSTREAM_RECONCILIATION_AUDIT_BLOCKED"
-            | fields
+            \| filter message.event = "DOWNSTREAM_RECONCILIATION_AUDIT_BLOCKED"
+            \| fields
                 @timestamp,
                 message.consumer,
                 message.reason
-            | sort @timestamp desc
-            | limit 50
+            \| sort @timestamp desc
+            \| limit 50
           EOT
         }
       }
