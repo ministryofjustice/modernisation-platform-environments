@@ -4,8 +4,8 @@
 # Deploys ArgoCD control plane resources (Level 1) on the hub cluster:
 # - Per-BU AppProjects with sourceRepos and destination restrictions
 # - Platform AppProject for infrastructure add-ons and namespace baselines
-# - Per-BU ApplicationSets using git-directory-generator (workloads)
-# - Per-BU baseline ApplicationSets using git-file-generator (product.yaml)
+# - Per-BU ApplicationSets using git-generator over service values YAML files
+# - Per-BU baseline ApplicationSets using git-generator over product.yaml files
 #
 # Only created when the cluster has the argocd-role=hub tag (set by the
 # cluster component when enable_argocd=true).
@@ -196,10 +196,10 @@ resource "kubectl_manifest" "argocd_project_bu" {
 
 
 #------------------------------------------------------------------------------
-# Per-BU Workload ApplicationSets — git-directory-generator creates Applications
-# automatically when new app deployment directories appear in the monorepo.
-# Path: namespaces/<bu>/<product>/<app>/deployment/<env>
-# Segments: [namespaces, <bu>, <product>, <app>, deployment, <env>]
+# Per-BU Workload ApplicationSets — git-generator creates Applications
+# automatically when new app deployment values-files appear in the monorepo.
+# Uses per-service environment values files.
+# Path: namespaces/<bu>/<product>/<service>/deployment/values/<tier>/<env>.yaml
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_applicationset_bu" {
   for_each = local.is_argocd_hub ? local.hub_registered_spokes : {}
@@ -225,9 +225,8 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
           git = {
             repoURL  = each.value.source_repo
             revision = "main"
-            # One values file per (service, environment) on this cluster tier.
-            # File path: namespaces/<bu>/<product>/<service>/deployment/values/<tier>/<env>.yaml
             files = [
+              # File path: namespaces/<bu>/<product>/<service>/deployment/values/<tier>/<env>.yaml
               { path = "${each.value.path_prefix}/*/*/deployment/values/${each.value.environment}/*.yaml" }
             ]
           }
@@ -286,7 +285,7 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
 
 
 #------------------------------------------------------------------------------
-# Per-BU Baseline ApplicationSets — git-file-generator reads product.yaml
+# Per-BU Baseline ApplicationSets — git-generator reads each product.yaml
 # and renders the app-baseline Helm chart to create Namespace + RoleBinding +
 # default-deny NetworkPolicy for each environment on this cluster tier.
 #
