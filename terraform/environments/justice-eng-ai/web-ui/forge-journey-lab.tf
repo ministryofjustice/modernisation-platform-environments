@@ -254,7 +254,7 @@ data "aws_iam_policy_document" "forge_ecs_task_build_details" {
     condition {
       test     = "ForAllValues:StringEquals"
       variable = "dynamodb:Attributes"
-      values   = ["AppID", "SysKey", "BuildID", "UserName", "JobStage", "JobStatus", "Date", "ReviewReason"]
+      values   = ["AppID", "SysKey", "BuildID", "UserName", "JobStage", "JobStatus", "Date", "ReviewReason", "Reasons"]
     }
     condition {
       test     = "Null"

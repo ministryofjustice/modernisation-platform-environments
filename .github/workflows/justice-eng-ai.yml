@@ -31,7 +31,8 @@ name: justice-eng-ai
         default: "root"
         type: string
 
-permissions: {}
+permissions:
+  issues: write
 
 jobs:
   strategy:
@@ -46,6 +47,7 @@ jobs:
     needs: strategy
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     permissions:
+      issues: write
       id-token: write
       contents: read
     strategy:
@@ -64,6 +66,7 @@ jobs:
   destroy-development:
     if: inputs.action == 'destroy'
     permissions:
+      issues: write
       id-token: write
       contents: read
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml

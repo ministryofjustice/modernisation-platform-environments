@@ -3691,6 +3691,29 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
   }
 
   statement {
+    sid    = "ListReconciliationState"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-logging-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        "downstream-reconciliation/${local.environment_shorthand}",
+        "downstream-reconciliation/${local.environment_shorthand}/*",
+      ]
+    }
+  }
+
+  statement {
     sid    = "StoreReconciliationApprovalToken"
     effect = "Allow"
 
