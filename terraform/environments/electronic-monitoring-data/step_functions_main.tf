@@ -15,24 +15,6 @@ module "get_zipped_file_api" {
   type = "EXPRESS"
 }
 
-# ------------------------------------------
-# DMS Validation Step Function
-# ------------------------------------------
-
-module "dms_validation_step_function" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-
-  source       = "./modules/step_function"
-  name         = "dms_validation"
-  iam_policies = tomap({ "dms_validation_step_function_policy" = aws_iam_policy.dms_validation_step_function_policy[0] })
-  variable_dictionary = tomap(
-    {
-      "dms_retrieve_metadata" = module.dms_retrieve_metadata[0].lambda_function_name,
-      "dms_validation"        = module.dms_validation[0].lambda_function_name,
-    }
-  )
-  type = "STANDARD"
-}
 
 # ------------------------------------------
 # DLT Iceberg Maintenance Step Function
@@ -184,6 +166,26 @@ module "merge_into_mdss_ac_position" {
   reconciliation_consumer         = "AC"
   reconciliation_state_prefix_arn = "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}"
 }
+
+# ------------------------------------------
+# Downstream reconciliation audit
+# ------------------------------------------
+
+module "downstream_reconciliation_audit" {
+  source       = "./modules/step_function"
+  name         = "downstream-reconciliation-audit"
+  type         = "STANDARD"
+  iam_policies = tomap({
+    downstream_reconciliation_audit = (
+      aws_iam_policy.downstream_reconciliation_audit
+    )
+  })
+
+  variable_dictionary = tomap({
+    planner_function_name = module.merge_redrive_planner.lambda_function_name
+  })
+}
+
 
 # ------------------------------------------------------------------------------
 # Staging DB janitor Step Function
@@ -432,3 +434,7 @@ module "trigger_cadt_step_function" {
   )
   type = "STANDARD"
 }
+# ------------------------------------------
+# Downstream reconciliation audit
+# ------------------------------------------
+

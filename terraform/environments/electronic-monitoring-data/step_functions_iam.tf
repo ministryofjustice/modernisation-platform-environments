@@ -19,29 +19,6 @@ resource "aws_iam_policy" "trigger_unzip_lambda" {
 }
 
 # ------------------------------------------
-# DMS Validation
-# ------------------------------------------
-
-data "aws_iam_policy_document" "dms_validation_step_function_policy_document" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-  statement {
-    effect  = "Allow"
-    actions = ["lambda:InvokeFunction"]
-    resources = [
-      module.dms_retrieve_metadata[0].lambda_function_arn,
-    module.dms_validation[0].lambda_function_arn]
-  }
-}
-
-resource "aws_iam_policy" "dms_validation_step_function_policy" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-
-  name   = "dms_validation_step_function_role"
-  policy = data.aws_iam_policy_document.dms_validation_step_function_policy_document[0].json
-}
-
-
-# ------------------------------------------
 # Data Cut Back
 # ------------------------------------------
 
@@ -327,6 +304,26 @@ resource "aws_iam_policy" "dlt_iceberg_maintenance_invoke" {
 }
 
 # ------------------------------------------------------------------------------
+# Downstream reconciliation audit Step Function
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "downstream_reconciliation_audit" {
+  statement {
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+
+    resources = [
+      module.merge_redrive_planner.lambda_function_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "downstream_reconciliation_audit" {
+  name   = "downstream_reconciliation_audit_step_function_policy"
+  policy = data.aws_iam_policy_document.downstream_reconciliation_audit.json
+}
+
+# ------------------------------------------------------------------------------
 # Downstream position reconciliation scheduler
 # ------------------------------------------------------------------------------
 
@@ -379,7 +376,20 @@ resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
           module.merge_into_emdi_position.arn,
         ]
       },
+      {
+        Effect = "Allow"
+
+        Action = [
+          "lambda:InvokeFunction",
+        ]
+
+        Resource = [
+          module.merge_redrive_planner.lambda_function_arn,
+        ]
+      },
     ]
   })
 }
+
+
 

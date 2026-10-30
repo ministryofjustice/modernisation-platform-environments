@@ -84,10 +84,10 @@ resource "aws_iam_role_policy_attachment" "maat_ec2_instance_role_policy_attachm
   policy_arn = aws_iam_policy.maat_ec2_instance_role_policy.arn
 }
 
-# resource "aws_iam_role_policy_attachment" "SSM_ec2_role_policy_attachment" {
-#   role       = aws_iam_role.maat_ec2_instance_role.name
-#   policy_arn = local.application_data.accounts[local.environment].SSM_managed_core_policy_arn
-# }
+resource "aws_iam_role_policy_attachment" "SSM_ec2_role_policy_attachment" {
+  role       = aws_iam_role.maat_ec2_instance_role.name
+  policy_arn = local.application_data.accounts[local.environment].SSM_managed_core_policy_arn
+}
 
 ##### EC2 Instance Profile ------
 

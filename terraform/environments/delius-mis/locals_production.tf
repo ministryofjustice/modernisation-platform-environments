@@ -449,7 +449,7 @@ locals {
   }
 
   db_backup_config_production = {
-    object_lock_days             = 1
+    object_lock_days             = 54
     expire_current_after_days    = 200
     expire_noncurrent_after_days = 10
     transition = [

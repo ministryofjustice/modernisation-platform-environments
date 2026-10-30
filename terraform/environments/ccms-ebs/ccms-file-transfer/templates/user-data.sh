@@ -5,6 +5,8 @@ yum update ecs-init -y
 start ecs
 
 yum install -y awscli
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
 
 deploy_cortex() {
   CORTEX_DIR=/tmp/CortexAgent

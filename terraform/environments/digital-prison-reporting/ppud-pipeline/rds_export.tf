@@ -90,7 +90,7 @@ resource "aws_vpc_security_group_ingress_rule" "ppud_db_ingress" {
 module "ppud_rds_export" {
   count = local.is-test ? 0 : 1
 
-  source = "git::https://github.com/ministryofjustice/terraform-rds-export?ref=ce7ce1ad5cddf85f96fc175154d54097b1ca66c8"
+  source = "git::https://github.com/ministryofjustice/terraform-rds-export?ref=e0e81707a9d35360b7bc4246b2e5601adcf9d119"
 
   providers = {
     aws = aws
@@ -109,7 +109,7 @@ module "ppud_rds_export" {
   bucket_namespace               = "account-regional"
   lifecycle_rule_backup_uploads  = local.rds_backup_uploads_bucket_lifecycle_rule
   lifecycle_rule_parquet_exports = local.rds_parquet_export_bucket_lifecycle_rule
-  parquet_exports_bucket_policy  = local.is-test ? ["{}"] : [data.aws_iam_policy_document.batch_replication_destination[0].json]
+  engine_version                 = local.application_data.accounts[local.environment].rds_module_sql_engine_version
 
   tags = merge(
     local.tags,
