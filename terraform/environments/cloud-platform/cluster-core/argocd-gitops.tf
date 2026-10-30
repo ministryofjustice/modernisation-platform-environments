@@ -122,9 +122,9 @@ resource "kubectl_manifest" "argocd_project_bu" {
       name      = each.key
       namespace = "argocd"
       labels = {
-        "argocd.argoproj.io/managed-by"  = "terraform"
-        "container-platform/bu"          = each.value.bu_name
-        "container-platform/environment" = each.value.environment
+        "argocd.argoproj.io/managed-by" = "terraform"
+        "container-platform/bu"         = each.value.bu_name
+        "container-platform/tier"       = each.value.environment
       }
     }
     spec = {
@@ -211,10 +211,10 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
       name      = "${each.key}-apps"
       namespace = "argocd"
       labels = {
-        "argocd.argoproj.io/managed-by"  = "terraform"
-        "container-platform/bu"          = each.value.bu_name
-        "container-platform/environment" = each.value.environment
-        "container-platform/type"        = "workload"
+        "argocd.argoproj.io/managed-by" = "terraform"
+        "container-platform/bu"         = each.value.bu_name
+        "container-platform/tier"       = each.value.environment
+        "container-platform/type"       = "workload"
       }
     }
     spec = {
@@ -239,6 +239,7 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
           name = "${each.value.bu_name}-{{ index .path.segments 3 }}-{{ trimSuffix \".yaml\" .path.filename }}"
           labels = {
             "container-platform/bu"          = each.value.bu_name
+            "container-platform/tier"        = each.value.environment
             "container-platform/environment" = "{{ trimSuffix \".yaml\" .path.filename }}"
             "container-platform/product"     = "{{ index .path.segments 2 }}"
             "container-platform/app"         = "{{ index .path.segments 3 }}"
@@ -302,10 +303,10 @@ resource "kubectl_manifest" "argocd_applicationset_baseline" {
       name      = "${each.key}-baselines"
       namespace = "argocd"
       labels = {
-        "argocd.argoproj.io/managed-by"  = "terraform"
-        "container-platform/bu"          = each.value.bu_name
-        "container-platform/environment" = each.value.environment
-        "container-platform/type"        = "baseline"
+        "argocd.argoproj.io/managed-by" = "terraform"
+        "container-platform/bu"         = each.value.bu_name
+        "container-platform/tier"       = each.value.environment
+        "container-platform/type"       = "baseline"
       }
     }
     spec = {
@@ -326,10 +327,10 @@ resource "kubectl_manifest" "argocd_applicationset_baseline" {
         metadata = {
           name = "baseline-${each.value.bu_name}-{{ .product }}-${each.value.environment}"
           labels = {
-            "container-platform/bu"          = each.value.bu_name
-            "container-platform/environment" = each.value.environment
-            "container-platform/type"        = "baseline"
-            "container-platform/product"     = "{{ .product }}"
+            "container-platform/bu"      = each.value.bu_name
+            "container-platform/tier"    = each.value.environment
+            "container-platform/type"    = "baseline"
+            "container-platform/product" = "{{ .product }}"
           }
         }
         spec = {
@@ -402,7 +403,7 @@ resource "kubectl_manifest" "argocd_cluster_secret_bu" {
         "argocd.argoproj.io/secret-type" = "cluster"
         "argocd.argoproj.io/managed-by"  = "terraform"
         "container-platform/bu"          = each.value.bu_name
-        "container-platform/environment" = each.value.environment
+        "container-platform/tier"        = each.value.environment
       }
     }
     type = "Opaque"
