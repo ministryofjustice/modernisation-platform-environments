@@ -59,6 +59,20 @@ data "aws_iam_policy_document" "ai_gateway" {
   }
 
   statement {
+    sid       = "DaybreakLogS3Access"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["${module.prompt_logs.s3_bucket_arn}/*"]
+  }
+
+  statement {
+    sid       = "DaybreakLogKMSAccess"
+    effect    = "Allow"
+    actions   = ["kms:GenerateDataKey"]
+    resources = [module.ai_gateway_prompt_logs_kms_key.key_arn]
+  }
+
+  statement {
     sid    = "RDSIAMConnect"
     effect = "Allow"
     actions = [

@@ -58,6 +58,11 @@ resource "helm_release" "litellm_admin" {
         googleWorkloadIdentityAudience        = local.google_workload_identity_audience
         googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
 
+        # OpenAI
+        openai_identity_provider_id    = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["identity_provider_id"]
+        openai_service_account_id      = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["service_account_id"]
+        openaiWorkloadIdentityAudience = local.openai_workload_identity_audience
+
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
         masterkeySecretKey  = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
@@ -141,10 +146,21 @@ resource "helm_release" "litellm" {
         googleWorkloadIdentityAudience        = local.google_workload_identity_audience
         googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
 
+        # OpenAI
+        openai_identity_provider_id    = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["identity_provider_id"]
+        openai_service_account_id      = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["service_account_id"]
+        openaiWorkloadIdentityAudience = local.openai_workload_identity_audience
+
         # Autoscaling
         minReplicas                    = local.environment_configuration.ai_gateway_autoscaling.min_replicas
         maxReplicas                    = local.environment_configuration.ai_gateway_autoscaling.max_replicas
         targetCPUUtilizationPercentage = local.environment_configuration.ai_gateway_autoscaling.target_cpu_utilization_percentage
+
+        # Prompt Logs
+        litellmCallbacksConfigMap = kubernetes_config_map_v1.litellm_callbacks.metadata[0].name
+        promptLogsBucket          = module.prompt_logs.s3_bucket_id
+        promptLogsRegion          = data.aws_region.current.region
+        promptLoggingModels       = local.ai_gateway_prompt_logging_models
 
         # LiteLLM models are stored in the database; no model list is templated here.
         # Admin
@@ -167,6 +183,7 @@ resource "helm_release" "litellm" {
     kubernetes_service_account_v1.ai_gateway,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_config_map_v1.google_application_credentials,
+    kubernetes_config_map_v1.litellm_callbacks,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_registry,
     kubernetes_manifest.external_secret_litellm_salt_key,

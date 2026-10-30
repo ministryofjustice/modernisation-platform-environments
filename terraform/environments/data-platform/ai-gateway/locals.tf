@@ -30,6 +30,20 @@ locals {
   # checkov:skip=CKV_SECRET_6: Dummy placeholder for IAM auth flow, not a real secret
   dummy_password = "iam-auth-dummy-password"
 
+  # OpenAI workload identity federation
+  openai_identity_provider_id = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["identity_provider_id"]
+  openai_service_account_id   = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["service_account_id"]
+  # Must match the Audience configured on the OpenAI Workload Identity Provider exactly, otherwise the
+  # projected token fails subject token verification before any mapping is resolved.
+  openai_workload_identity_audience = "https://api.openai.com/v1"
+  openai_identity_token_directory   = "/var/run/secrets/api.openai.com"
+  openai_identity_token_file        = "${local.openai_identity_token_directory}/openai-identity-token"
+
+  ai_gateway_prompt_logging_models = [
+    for model in values(try(local.ai_gateway_models_filtered.openai, {})) : model.model_id
+    if try(model.log_prompts_to_s3, false)
+  ]
+
   # Google workload identity federation (used by LiteLLM to call Google Gemini Enterprise Agent Platform)
   google_cloud_project_name         = jsondecode(data.aws_secretsmanager_secret_version.google_cloud_ai_gateway.secret_string)["project_name"]
   google_cloud_project_id           = jsondecode(data.aws_secretsmanager_secret_version.google_cloud_ai_gateway.secret_string)["project_id"]

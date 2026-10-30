@@ -78,6 +78,7 @@ proxy_config:
       s3_path: litellm-audit
     cache: false
     require_auth_for_metrics_endpoint: false
+    store_prompts_in_spend_logs: false
     callbacks: ["prometheus"]
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
@@ -148,6 +149,14 @@ volumes:
             path: google-identity-token
             audience: ${googleWorkloadIdentityAudience}
             expirationSeconds: 3600
+  - name: openai-workload-identity-token
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: openai-identity-token
+            audience: ${openaiWorkloadIdentityAudience}
+            expirationSeconds: 3600
 
 volumeMounts:
   - name: ui
@@ -166,6 +175,9 @@ volumeMounts:
     readOnly: true
   - name: google-workload-identity-token
     mountPath: /var/run/secrets/sts.googleapis.com
+    readOnly: true
+  - name: openai-workload-identity-token
+    mountPath: /var/run/secrets/api.openai.com
     readOnly: true
 
 extraInitContainers:
@@ -199,6 +211,8 @@ extraInitContainers:
       seccompProfile:
         type: RuntimeDefault
 
+# With migrationJob enabled the chart appends its own DISABLE_SCHEMA_UPDATE after envVars, so do not
+# set that key in envVars below: duplicate env names break the strategic merge patch on helm upgrade.
 migrationJob:
   enabled: true
   hooks:
@@ -220,7 +234,6 @@ envVars: {
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
     LITELLM_MODE: "PRODUCTION",
-    DISABLE_SCHEMA_UPDATE: "True",
     LITELLM_UI_API_DOC_BASE_URL: "https://${proxyHostname}",
     LITELLM_UI_PATH: "/app/var/litellm/ui",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
@@ -234,5 +247,8 @@ envVars: {
     AZURE_CLIENT_ID: "${microsoft_foundry_client_id}",
     AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token",
     AZURE_AD_TOKEN: "oidc/azure/",
-    GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/iamcredentials.googleapis.com/credentials/credentials.json"
+    GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/iamcredentials.googleapis.com/credentials/credentials.json",
+    OPENAI_IDENTITY_PROVIDER_ID: "${openai_identity_provider_id}",
+    OPENAI_SERVICE_ACCOUNT_ID: "${openai_service_account_id}",
+    OPENAI_IDENTITY_TOKEN_FILE: "/var/run/secrets/api.openai.com/openai-identity-token"
 }

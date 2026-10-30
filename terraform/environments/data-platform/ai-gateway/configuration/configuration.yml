@@ -27,6 +27,13 @@ teams:
         model: "bedrock-jeaie-claude-opus-5"
       - alias: "claude-sonnet-5"
         model: "bedrock-jeaie-claude-sonnet-5"
+  justice-ai-unit:
+    alias: Justice AI Unit
+    organisation: ministryofjustice
+    max_budget: 1000
+    models: ["no-default-models"]
+    unified_access_groups:
+      - openai-daybreak-red
 
 models:
   amazon_bedrock:
@@ -480,6 +487,14 @@ models:
       location: "europe-west2"
       generally_available: false
       environments_available: ["development", "production"]
+    vertex-gemini-3-5-flash:
+      model_id: "vertex_ai/gemini-3.5-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.5 Flash"
+      model_location: "United Kingdom"
+      location: "europe-west2"
+      generally_available: false
+      environments_available: ["test"]
     gemini-3-5-transcribe-preview:
       model_id: "gemini-3.5-transcribe-preview"
       model_family: "Google Gemini"
@@ -562,3 +577,13 @@ models:
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction", "production"]
+  openai:
+    daybreak-red:
+      model_id: "gpt-5.5-cyber-preview"
+      model_family: "OpenAI Daybreak"
+      model_name: "OpenAI Cyber Preview"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      log_prompts_to_s3: true
+      environments_available: ["test"]
