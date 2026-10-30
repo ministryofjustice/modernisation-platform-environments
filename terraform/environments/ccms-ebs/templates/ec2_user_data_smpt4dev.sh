@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
+
 # Install Docker
 sudo su
 sudo yum -y install docker

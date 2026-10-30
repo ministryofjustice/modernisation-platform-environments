@@ -22,10 +22,47 @@ resource "aws_wafv2_web_acl" "ebsapps_internal_web_acl" {
     block {}
   }
 
+  # Block any request to AppsTCFServer, evaluated before the trusted IP allow rule
+  rule {
+    name = "ebs-block-appstcfserver-uri"
+
+    priority = 1
+    action {
+      block {}
+    }
+
+    statement {
+      byte_match_statement {
+        search_string         = "/oa_html/appstcfserver"
+        positional_constraint = "CONTAINS"
+
+        field_to_match {
+          uri_path {}
+        }
+
+        text_transformation {
+          priority = 0
+          type     = "URL_DECODE"
+        }
+
+        text_transformation {
+          priority = 1
+          type     = "LOWERCASE"
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ebs_internal_waf_block_appstcfserver"
+      sampled_requests_enabled   = true
+    }
+  }
+
   rule {
     name = "ebs-trusted-rule-ip-set"
 
-    priority = 1
+    priority = 2
     action {
       allow {}
     }
