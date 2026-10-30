@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
   container_definitions = jsonencode([
     {
       name      = "first"
-      image     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/create-a-derived-table:hmpps_electronic_monitoring_data_tables-123"
+      image     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/create-a-derived-table:hmpps_electronic_monitoring_data_tables-${local.environment_shorthand}"
       cpu       = 2048
       memory    = 4096
       essential = true
