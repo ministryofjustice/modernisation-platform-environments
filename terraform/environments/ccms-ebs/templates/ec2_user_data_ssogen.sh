@@ -153,7 +153,7 @@ umount /mnt/efs
 WEBLOGIC_UID=$(id -u oracle)
 iptables -I OUTPUT 1 \
 -m owner --uid-owner "$WEBLOGIC_UID" \
--d 169.254.169.254
+-d 169.254.169.254 \
 -j REJECT
 
 echo "SSOGEN instance bootstrap completed" >> /var/log/user-data.log
