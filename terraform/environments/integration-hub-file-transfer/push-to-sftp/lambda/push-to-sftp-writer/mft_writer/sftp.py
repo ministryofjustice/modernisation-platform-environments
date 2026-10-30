@@ -16,10 +16,11 @@ from contextlib import ExitStack
 from typing import Any
 
 import paramiko
+from paramiko.ssh_exception import IncompatiblePeer, MessageOrderError
 
 from mft_writer.config import json_object
-from mft_writer.diagnostics import ensure_time
-from mft_writer.errors import InvalidMessage
+from mft_writer.diagnostics import ensure_time, logger
+from mft_writer.errors import DeadlineExceeded, InvalidMessage
 
 # Keep each write within one non-pipelined SFTP request.
 CHUNK_BYTES = 32 * 1024
@@ -69,41 +70,67 @@ def connect_sftp(destination: Mapping[str, Any], private_key: paramiko.PKey, con
             ssh_logger.addHandler(logging.NullHandler())
         ssh_logger.propagate = False
     pins = trusted_host_keys(destination["host_public_keys"])
+    pinned_types = {pin.get_name() for pin in pins}
+    if "ssh-rsa" in pinned_types:
+        # RSA SHA-2 algorithms authenticate the same pinned RSA public key.
+        pinned_types.update({"rsa-sha2-512", "rsa-sha2-256"})
     addresses = approved_addresses(destination)
-    for address in addresses:
+    last_error: Exception | None = None
+    for attempt_number, address in enumerate(addresses, start=1):
         ensure_time(context, "SFTP connection")
+        stage = "connect"
         try:
-            connection = socket.create_connection((address, destination["port"]), timeout=CONNECT_TIMEOUT)
-        except OSError:
-            continue
-        break
-    else:
-        raise ConnectionError("no approved SFTP address is reachable")
-    stack.callback(connection.close)
-    if connection.getpeername()[0] != address:
-        raise InvalidMessage("SFTP peer address does not match the approved destination")
-    transport = paramiko.Transport(connection)
-    stack.callback(transport.close)
-    transport.banner_timeout = CONNECT_TIMEOUT
-    transport.auth_timeout = CONNECT_TIMEOUT
-    transport.channel_timeout = IO_TIMEOUT
-    transport.start_client(timeout=CONNECT_TIMEOUT)
-    remote_key = transport.get_remote_server_key()
-    if not any(hmac.compare_digest(remote_key.asbytes(), pin.asbytes()) for pin in pins):
-        raise InvalidMessage("SFTP server host key is not trusted")
-    ensure_time(context, "SFTP authentication")
-    transport.auth_publickey(destination["username"], private_key)
-    ensure_time(context, "SFTP session setup")
-    setup_deadline = threading.Timer(IO_TIMEOUT, transport.close)
-    setup_deadline.daemon = True
-    setup_deadline.start()
-    try:
-        client = paramiko.SFTPClient.from_transport(transport)
-    finally:
-        setup_deadline.cancel()
-    stack.callback(client.close)
-    client.get_channel().settimeout(IO_TIMEOUT)
-    return client
+            with ExitStack() as attempt:
+                connection = socket.create_connection((address, destination["port"]), timeout=CONNECT_TIMEOUT)
+                attempt.callback(connection.close)
+                if connection.getpeername()[0] != address:
+                    raise InvalidMessage("SFTP peer address does not match the approved destination")
+                transport = paramiko.Transport(connection)
+                attempt.callback(transport.close)
+                transport.banner_timeout = CONNECT_TIMEOUT
+                transport.auth_timeout = CONNECT_TIMEOUT
+                transport.channel_timeout = IO_TIMEOUT
+                options = transport.get_security_options()
+                algorithms = tuple(name for name in options.key_types if name in pinned_types)
+                if not algorithms:
+                    raise InvalidMessage("trusted SSH host keys have no supported negotiation algorithms")
+                options.key_types = algorithms
+                stage = "negotiate"
+                ensure_time(context, "SSH negotiation")
+                transport.start_client(timeout=CONNECT_TIMEOUT)
+                remote_key = transport.get_remote_server_key()
+                if not any(hmac.compare_digest(remote_key.asbytes(), pin.asbytes()) for pin in pins):
+                    raise InvalidMessage("SFTP server host key is not trusted")
+                stage = "authenticate"
+                ensure_time(context, "SFTP authentication")
+                transport.auth_publickey(destination["username"], private_key)
+                stage = "open-session"
+                ensure_time(context, "SFTP session setup")
+                setup_deadline = threading.Timer(IO_TIMEOUT, transport.close)
+                setup_deadline.daemon = True
+                setup_deadline.start()
+                try:
+                    client = paramiko.SFTPClient.from_transport(transport)
+                finally:
+                    setup_deadline.cancel()
+                if client is None:
+                    raise paramiko.SSHException("SFTP session setup returned no client")
+                attempt.callback(client.close)
+                client.get_channel().settimeout(IO_TIMEOUT)
+                stack.enter_context(attempt.pop_all())
+                return client
+        except (
+            DeadlineExceeded, InvalidMessage, paramiko.AuthenticationException,
+            paramiko.BadHostKeyException, IncompatiblePeer, MessageOrderError,
+        ):
+            raise
+        except (OSError, EOFError, paramiko.SSHException) as error:
+            last_error = error
+            logger.warning(
+                "SFTP session setup failed for an approved address",
+                attemptNumber=attempt_number, stage=stage, errorType=type(error).__name__,
+            )
+    raise ConnectionError("no approved SFTP address completed session setup") from last_error
 
 
 def checked_directory(client: Any, root: str, relative: str, context: Any, *, create: bool) -> str:

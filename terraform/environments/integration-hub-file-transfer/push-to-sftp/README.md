@@ -32,6 +32,16 @@ For the interface endpoints, check private DNS and allow inbound TCP/443 from th
 
 Check DNS and the route to the recipient's SFTP server before testing a delivery.
 
+The writer tries the next approved address if TCP connection, SSH negotiation or SFTP session setup fails with a connection, timeout or SSH session error. Failed attempts are closed before another address is tried. Fallback has these restrictions:
+
+- Every resolved IPv4 address must be within the configured recipient CIDRs; one unapproved result rejects the destination before any connection. IPv6 is not supported.
+- Host-key or peer-address mismatches, authentication failures, incompatible SSH algorithms and protocol-order violations stop the attempt without trying another address. Paramiko authentication failures, including authentication timeouts, are treated as fatal rather than assumed transient.
+- Each address attempt uses the existing connection/session timeouts and the same Lambda time budget. No new attempt starts with 90 seconds or less remaining; a healthy alternative might therefore not be reached.
+- Fallback ends once an SFTP session is ready. Upload, rename and later checkpoint/publication failures follow the normal retry and recovery path; they do not trigger another address attempt within the same invocation. An upload is not resumed on another address.
+
+SSH host-key negotiation is limited to the configured pin types and Paramiko's supported default algorithms, preserving their preference order. An `ssh-rsa` pin also allows the `rsa-sha2-512` and `rsa-sha2-256` signature algorithms for that same RSA key. These aliases do not authorise a different RSA key: the negotiated public-key bytes must still match a configured pin before authentication. Pins
+with no supported negotiation algorithm are rejected before SSH negotiation.
+
 ## How delivery works
 
 An EventBridge rule sends `FileActionExecutionRequested.v1` events for this pattern through an encrypted SNS topic and SQS queue to the writer Lambda. EventBridge, SNS and the processing queue each have an encrypted dead-letter queue (DLQ). A separate Lambda reports terminal failures from those queues to the event bus.

@@ -1,6 +1,7 @@
 import errno
 import io
 import stat
+from contextlib import ExitStack
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -81,8 +82,11 @@ def test_untrusted_host_is_rejected_before_authentication(monkeypatch):
     connection.getpeername.return_value = ("192.0.2.1", 22)
     transport = Mock()
     transport.get_remote_server_key.return_value.asbytes.return_value = b"wrong-server-key"
+    transport.get_security_options.return_value.key_types = ("ssh-ed25519",)
     monkeypatch.setattr(sftp, "approved_addresses", lambda destination: ["192.0.2.1"])
-    monkeypatch.setattr(sftp, "trusted_host_keys", lambda keys: [SimpleNamespace(asbytes=lambda: b"trusted-server-key")])
+    monkeypatch.setattr(sftp, "trusted_host_keys", lambda keys: [
+        SimpleNamespace(asbytes=lambda: b"trusted-server-key", get_name=lambda: "ssh-ed25519"),
+    ])
     monkeypatch.setattr(sftp.socket, "create_connection", lambda *args, **kwargs: connection)
     monkeypatch.setattr(sftp.paramiko, "Transport", lambda connection: transport)
     with ExitStack() as stack, pytest.raises(InvalidMessage):
@@ -301,8 +305,11 @@ def test_session_setup_is_time_bounded_and_resources_close(monkeypatch, setup_fa
     connection, transport, client, timer = Mock(), Mock(), Mock(), Mock()
     connection.getpeername.return_value = ("192.0.2.1", 22)
     transport.get_remote_server_key.return_value.asbytes.return_value = b"trusted"
+    transport.get_security_options.return_value.key_types = ("ssh-ed25519",)
     monkeypatch.setattr(sftp, "approved_addresses", lambda destination: ["192.0.2.1"])
-    monkeypatch.setattr(sftp, "trusted_host_keys", lambda keys: [SimpleNamespace(asbytes=lambda: b"trusted")])
+    monkeypatch.setattr(sftp, "trusted_host_keys", lambda keys: [
+        SimpleNamespace(asbytes=lambda: b"trusted", get_name=lambda: "ssh-ed25519"),
+    ])
     monkeypatch.setattr(sftp.socket, "create_connection", lambda *args, **kwargs: connection)
     monkeypatch.setattr(sftp.paramiko, "Transport", lambda connection: transport)
     timer_factory = Mock(return_value=timer)
@@ -311,8 +318,9 @@ def test_session_setup_is_time_bounded_and_resources_close(monkeypatch, setup_fa
     monkeypatch.setattr(sftp.paramiko.SFTPClient, "from_transport", open_client)
     destination = {"port": 22, "host_public_keys": [], "username": "delivery"}
     if setup_fails:
-        with ExitStack() as stack, pytest.raises(TimeoutError):
+        with ExitStack() as stack, pytest.raises(ConnectionError) as error:
             sftp.connect_sftp(destination, Mock(), None, stack)
+        assert isinstance(error.value.__cause__, TimeoutError)
     else:
         with ExitStack() as stack:
             assert sftp.connect_sftp(destination, Mock(), None, stack) is client
@@ -323,3 +331,302 @@ def test_session_setup_is_time_bounded_and_resources_close(monkeypatch, setup_fa
     timer.cancel.assert_called_once()
     transport.close.assert_called_once()
     connection.close.assert_called_once()
+
+
+@pytest.fixture
+def sftp_attempts(monkeypatch):
+    addresses = ["192.0.2.1", "192.0.2.2"]
+    connections = [Mock() for _ in addresses]
+    transports = [Mock() for _ in addresses]
+    clients = [Mock() for _ in addresses]
+    timers = [Mock() for _ in addresses]
+    options = [
+        SimpleNamespace(key_types=(
+            "ssh-ed25519", "ecdsa-sha2-nistp256", "rsa-sha2-512", "rsa-sha2-256", "ssh-rsa",
+        )) for _ in addresses
+    ]
+    pins = [SimpleNamespace(asbytes=lambda: b"trusted", get_name=lambda: "ssh-ed25519")]
+    for index, address in enumerate(addresses):
+        connections[index].getpeername.return_value = (address, 22)
+        transports[index].get_remote_server_key.return_value.asbytes.return_value = b"trusted"
+        transports[index].get_security_options.return_value = options[index]
+    monkeypatch.setattr(sftp, "approved_addresses", lambda destination: addresses)
+    monkeypatch.setattr(sftp, "trusted_host_keys", lambda keys: pins)
+    socket_factory = Mock(side_effect=connections)
+    transport_factory = Mock(side_effect=transports)
+    client_factory = Mock(side_effect=clients)
+    timer_factory = Mock(side_effect=timers)
+    warnings = Mock()
+    monkeypatch.setattr(sftp.socket, "create_connection", socket_factory)
+    monkeypatch.setattr(sftp.paramiko, "Transport", transport_factory)
+    monkeypatch.setattr(sftp.paramiko.SFTPClient, "from_transport", client_factory)
+    monkeypatch.setattr(sftp.threading, "Timer", timer_factory)
+    monkeypatch.setattr(sftp.logger, "warning", warnings)
+    return SimpleNamespace(
+        addresses=addresses, connections=connections, transports=transports,
+        clients=clients, timers=timers, options=options, pins=pins,
+        socket_factory=socket_factory, transport_factory=transport_factory,
+        client_factory=client_factory, timer_factory=timer_factory, warnings=warnings,
+        destination={"port": 22, "host_public_keys": [], "username": "delivery"},
+    )
+
+
+@pytest.mark.parametrize("stage, error", [
+    ("connect", ConnectionRefusedError("private endpoint details")),
+    ("negotiate", TimeoutError("private endpoint details")),
+    ("negotiate", EOFError("private endpoint details")),
+    ("negotiate", sftp.paramiko.SSHException("private endpoint details")),
+    ("host-key-read", sftp.paramiko.SSHException("private endpoint details")),
+    ("authenticate", ConnectionResetError("private endpoint details")),
+    ("open-session", TimeoutError("private endpoint details")),
+    ("open-session", EOFError("private endpoint details")),
+    ("open-session", sftp.paramiko.SSHException("private endpoint details")),
+    ("channel-timeout", OSError("private endpoint details")),
+])
+def test_transient_setup_failure_tries_the_next_address_after_cleanup(sftp_attempts, stage, error):
+    setup = sftp_attempts
+    if stage == "negotiate":
+        setup.transports[0].start_client.side_effect = error
+    elif stage == "host-key-read":
+        setup.transports[0].get_remote_server_key.side_effect = error
+    elif stage == "authenticate":
+        setup.transports[0].auth_publickey.side_effect = error
+    elif stage == "open-session":
+        setup.client_factory.side_effect = [error, setup.clients[1]]
+    elif stage == "channel-timeout":
+        setup.clients[0].get_channel.return_value.settimeout.side_effect = error
+    if stage not in {"open-session", "channel-timeout"}:
+        setup.client_factory.side_effect = [setup.clients[1]]
+
+    def connect(address, *, timeout):
+        index = setup.addresses.index(address[0])
+        assert timeout == sftp.CONNECT_TIMEOUT
+        if index == 0 and stage == "connect":
+            raise error
+        if index == 1 and stage != "connect":
+            setup.connections[0].close.assert_called_once()
+            setup.transports[0].close.assert_called_once()
+            if stage == "channel-timeout":
+                setup.clients[0].close.assert_called_once()
+        return setup.connections[index]
+
+    setup.socket_factory.side_effect = connect
+    if stage == "connect":
+        setup.transport_factory.side_effect = [setup.transports[1]]
+    with ExitStack() as stack:
+        assert sftp.connect_sftp(setup.destination, Mock(), None, stack) is setup.clients[1]
+        assert [call.args[0][0] for call in setup.socket_factory.call_args_list] == setup.addresses
+        setup.clients[1].close.assert_not_called()
+        setup.transports[1].close.assert_not_called()
+        setup.connections[1].close.assert_not_called()
+    setup.clients[1].close.assert_called_once()
+    setup.transports[1].close.assert_called_once()
+    setup.connections[1].close.assert_called_once()
+    for timer in setup.timers[:setup.timer_factory.call_count]:
+        timer.start.assert_called_once()
+        timer.cancel.assert_called_once()
+    setup.warnings.assert_called_once()
+    assert setup.warnings.call_args.kwargs["errorType"] == type(error).__name__
+    assert "private endpoint details" not in str(setup.warnings.call_args)
+
+
+@pytest.mark.parametrize("failure", [
+    "host-key", "peer-address", "authentication", "authentication-timeout", "incompatible-algorithms",
+    "protocol-order", "deadline-authentication", "deadline-session",
+])
+def test_fatal_setup_failures_never_try_another_address(sftp_attempts, failure):
+    setup = sftp_attempts
+    context = SimpleNamespace(get_remaining_time_in_millis=lambda: 900_000)
+    if failure == "host-key":
+        setup.transports[0].get_remote_server_key.return_value.asbytes.return_value = b"wrong"
+        expected = InvalidMessage
+    elif failure == "peer-address":
+        setup.connections[0].getpeername.return_value = ("203.0.113.1", 22)
+        expected = InvalidMessage
+    elif failure in {"authentication", "authentication-timeout"}:
+        message = "Authentication timeout." if failure == "authentication-timeout" else "rejected"
+        setup.transports[0].auth_publickey.side_effect = sftp.paramiko.AuthenticationException(message)
+        expected = sftp.paramiko.AuthenticationException
+    elif failure == "incompatible-algorithms":
+        setup.transports[0].start_client.side_effect = sftp.IncompatiblePeer("no common algorithms")
+        expected = sftp.IncompatiblePeer
+    elif failure == "protocol-order":
+        setup.transports[0].start_client.side_effect = sftp.MessageOrderError("unexpected message")
+        expected = sftp.MessageOrderError
+    else:
+        def exhaust_time(*_args, **_kwargs):
+            context.get_remaining_time_in_millis = lambda: 90_000
+        operation = (
+            setup.transports[0].get_remote_server_key
+            if failure == "deadline-authentication" else setup.transports[0].auth_publickey
+        )
+        if failure == "deadline-authentication":
+            def read_key():
+                exhaust_time()
+                return SimpleNamespace(asbytes=lambda: b"trusted")
+            operation.side_effect = read_key
+        else:
+            operation.side_effect = exhaust_time
+        expected = DeadlineExceeded
+    with ExitStack() as stack, pytest.raises(expected):
+        sftp.connect_sftp(setup.destination, Mock(), context, stack)
+    setup.socket_factory.assert_called_once()
+    setup.connections[0].close.assert_called_once()
+    if failure != "peer-address":
+        setup.transports[0].close.assert_called_once()
+    setup.client_factory.assert_not_called()
+    setup.warnings.assert_not_called()
+    if failure in {"host-key", "peer-address", "deadline-authentication"}:
+        setup.transports[0].auth_publickey.assert_not_called()
+
+
+def test_fallback_stops_when_the_remaining_time_is_exhausted(sftp_attempts):
+    setup = sftp_attempts
+    context = SimpleNamespace(get_remaining_time_in_millis=lambda: 91_000)
+
+    def fail_handshake(*_args, **_kwargs):
+        context.get_remaining_time_in_millis = lambda: 90_000
+        raise TimeoutError("negotiation timeout")
+
+    setup.transports[0].start_client.side_effect = fail_handshake
+    with ExitStack() as stack, pytest.raises(DeadlineExceeded):
+        sftp.connect_sftp(setup.destination, Mock(), context, stack)
+    setup.socket_factory.assert_called_once()
+    setup.transports[0].close.assert_called_once()
+    setup.connections[0].close.assert_called_once()
+
+
+def test_exhausted_approved_addresses_raise_with_the_last_error(sftp_attempts):
+    setup = sftp_attempts
+    errors = [TimeoutError("timeout"), EOFError("disconnected")]
+    for transport, error in zip(setup.transports, errors):
+        transport.start_client.side_effect = error
+    with ExitStack() as stack, pytest.raises(ConnectionError) as error:
+        sftp.connect_sftp(setup.destination, Mock(), None, stack)
+    assert error.value.__cause__ is errors[-1]
+    assert setup.socket_factory.call_count == 2
+    assert setup.warnings.call_count == 2
+    setup.client_factory.assert_not_called()
+    for connection, transport in zip(setup.connections, setup.transports):
+        connection.close.assert_called_once()
+        transport.close.assert_called_once()
+
+
+@pytest.mark.parametrize("pinned_types, expected", [
+    (["ssh-rsa"], ("rsa-sha2-512", "rsa-sha2-256", "ssh-rsa")),
+    (["ssh-ed25519"], ("ssh-ed25519",)),
+    (["ecdsa-sha2-nistp256"], ("ecdsa-sha2-nistp256",)),
+    (["ssh-rsa", "ssh-ed25519"], ("ssh-ed25519", "rsa-sha2-512", "rsa-sha2-256", "ssh-rsa")),
+])
+def test_host_key_negotiation_uses_only_pinned_types(sftp_attempts, pinned_types, expected):
+    setup = sftp_attempts
+    setup.pins[:] = [
+        SimpleNamespace(asbytes=lambda: b"trusted", get_name=lambda name=name: name)
+        for name in pinned_types
+    ]
+
+    def negotiate(*, timeout):
+        assert setup.options[0].key_types == expected
+        assert timeout == sftp.CONNECT_TIMEOUT
+
+    setup.transports[0].start_client.side_effect = negotiate
+    with ExitStack() as stack:
+        assert sftp.connect_sftp(setup.destination, Mock(), None, stack) is setup.clients[0]
+    setup.transports[0].get_remote_server_key.assert_called_once()
+    setup.transports[0].auth_publickey.assert_called_once()
+    setup.socket_factory.assert_called_once()
+
+
+def test_unsupported_pin_type_fails_before_negotiation(sftp_attempts):
+    setup = sftp_attempts
+    setup.pins[:] = [SimpleNamespace(get_name=lambda: "unsupported-key-type")]
+    with ExitStack() as stack, pytest.raises(InvalidMessage, match="no supported"):
+        sftp.connect_sftp(setup.destination, Mock(), None, stack)
+    setup.socket_factory.assert_called_once()
+    setup.transports[0].start_client.assert_not_called()
+    setup.transports[0].auth_publickey.assert_not_called()
+    setup.transports[0].close.assert_called_once()
+    setup.connections[0].close.assert_called_once()
+
+
+def test_missing_sftp_client_tries_the_next_address(sftp_attempts):
+    setup = sftp_attempts
+    setup.client_factory.side_effect = [None, setup.clients[1]]
+    with ExitStack() as stack:
+        assert sftp.connect_sftp(setup.destination, Mock(), None, stack) is setup.clients[1]
+        setup.transports[0].close.assert_called_once()
+        setup.connections[0].close.assert_called_once()
+        setup.clients[0].close.assert_not_called()
+    assert setup.socket_factory.call_count == 2
+    for timer in setup.timers:
+        timer.cancel.assert_called_once()
+
+
+def test_upload_error_does_not_trigger_address_fallback(sftp_attempts, monkeypatch):
+    setup = sftp_attempts
+    body = io.BytesIO(b"abc")
+    s3, secrets = Mock(), Mock()
+    s3.get_object.return_value = {"VersionId": "v1", "ContentLength": 3, "Body": body}
+    monkeypatch.setattr(sftp, "load_private_key", Mock())
+    monkeypatch.setattr(sftp, "upload_stream", Mock(side_effect=OSError("upload failed")))
+    route = {"credential_arn": "test-key", "destination": setup.destination}
+    source = {"bucket": "clean", "key": "identity/file.csv", "versionId": "v1", "sizeBytes": 3}
+    with pytest.raises(OSError, match="upload failed"):
+        sftp.transfer_versioned_object(s3, secrets, source, route, None)
+    setup.socket_factory.assert_called_once()
+    setup.clients[0].close.assert_called_once()
+    setup.transports[0].close.assert_called_once()
+    setup.connections[0].close.assert_called_once()
+    assert body.closed
+
+
+@pytest.mark.parametrize("algorithm", ["rsa-sha2-512", "rsa-sha2-256", "ssh-ed25519"])
+def test_real_ssh_negotiation_selects_a_pinned_key_from_multiple_server_keys(monkeypatch, algorithm):
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+    rsa = sftp.paramiko.RSAKey.generate(2048)
+    ed25519 = sftp.paramiko.Ed25519Key.from_private_key(io.StringIO(
+        Ed25519PrivateKey.generate().private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.OpenSSH,
+            serialization.NoEncryption(),
+        ).decode()
+    ))
+    pin = ed25519 if algorithm == "ssh-ed25519" else rsa
+    with ExitStack() as stack:
+        client_socket, server_socket = sftp.socket.socketpair()
+        stack.callback(client_socket.close)
+        stack.callback(server_socket.close)
+        server = sftp.paramiko.Transport(server_socket)
+        transport = sftp.paramiko.Transport(client_socket)
+        stack.callback(server.close)
+        stack.callback(transport.close)
+        server.add_server_key(rsa)
+        server.add_server_key(ed25519)
+        server.get_security_options().key_types = (
+            ("ssh-ed25519",) if algorithm == "ssh-ed25519" else ("ssh-ed25519", algorithm)
+        )
+        server.start_server(event=sftp.threading.Event())
+        connection = Mock()
+        connection.getpeername.return_value = ("192.0.2.1", 22)
+        connection.close.side_effect = client_socket.close
+        client = Mock()
+        monkeypatch.setattr(sftp.socket, "create_connection", Mock(return_value=connection))
+        monkeypatch.setattr(sftp.paramiko, "Transport", Mock(return_value=transport))
+        monkeypatch.setattr(sftp.paramiko.SFTPClient, "from_transport", Mock(return_value=client))
+        authenticate = Mock()
+        monkeypatch.setattr(transport, "auth_publickey", authenticate)
+        monkeypatch.setattr(sftp, "approved_addresses", lambda destination: ["192.0.2.1"])
+        destination = {
+            "port": 22, "username": "delivery",
+            "host_public_keys": [f"{pin.get_name()} {pin.get_base64()}"],
+        }
+        assert sftp.connect_sftp(destination, Mock(), None, stack) is client
+        assert transport.host_key_type == algorithm
+        assert transport.get_remote_server_key().asbytes() == pin.asbytes()
+        authenticate.assert_called_once()
+    transport.join(timeout=5)
+    server.join(timeout=5)
+    assert not transport.is_alive()
+    assert not server.is_alive()
