@@ -4,8 +4,8 @@
 # Deploys ArgoCD control plane resources (Level 1) on the hub cluster:
 # - Per-BU AppProjects with sourceRepos and destination restrictions
 # - Platform AppProject for infrastructure add-ons and namespace baselines
-# - Per-BU ApplicationSets using git-directory-generator (workloads)
-# - Per-BU baseline ApplicationSets using git-file-generator (product.yaml)
+# - Per-BU ApplicationSets using git-generator over service values YAML files
+# - Per-BU baseline ApplicationSets using git-generator over product.yaml files
 #
 # Only created when the cluster has the argocd-role=hub tag (set by the
 # cluster component when enable_argocd=true).
@@ -122,9 +122,9 @@ resource "kubectl_manifest" "argocd_project_bu" {
       name      = each.key
       namespace = "argocd"
       labels = {
-        "argocd.argoproj.io/managed-by"  = "terraform"
-        "container-platform/bu"          = each.value.bu_name
-        "container-platform/environment" = each.value.environment
+        "argocd.argoproj.io/managed-by" = "terraform"
+        "container-platform/bu"         = each.value.bu_name
+        "container-platform/tier"       = each.value.environment
       }
     }
     spec = {
@@ -196,10 +196,10 @@ resource "kubectl_manifest" "argocd_project_bu" {
 
 
 #------------------------------------------------------------------------------
-# Per-BU Workload ApplicationSets — git-directory-generator creates Applications
-# automatically when new app deployment directories appear in the monorepo.
-# Path: namespaces/<bu>/<product>/<app>/deployment/<env>
-# Segments: [namespaces, <bu>, <product>, <app>, deployment, <env>]
+# Per-BU Workload ApplicationSets — git-generator creates Applications
+# automatically when new app deployment values-files appear in the monorepo.
+# Uses per-service environment values files.
+# Path: namespaces/<bu>/<product>/<service>/deployment/values/<tier>/<env>.yaml
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_applicationset_bu" {
   for_each = local.is_argocd_hub ? local.hub_registered_spokes : {}
@@ -211,10 +211,10 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
       name      = "${each.key}-apps"
       namespace = "argocd"
       labels = {
-        "argocd.argoproj.io/managed-by"  = "terraform"
-        "container-platform/bu"          = each.value.bu_name
-        "container-platform/environment" = each.value.environment
-        "container-platform/type"        = "workload"
+        "argocd.argoproj.io/managed-by" = "terraform"
+        "container-platform/bu"         = each.value.bu_name
+        "container-platform/tier"       = each.value.environment
+        "container-platform/type"       = "workload"
       }
     }
     spec = {
@@ -225,9 +225,8 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
           git = {
             repoURL  = each.value.source_repo
             revision = "main"
-            # One values file per (service, environment) on this cluster tier.
-            # File path: namespaces/<bu>/<product>/<service>/deployment/values/<tier>/<env>.yaml
             files = [
+              # File path: namespaces/<bu>/<product>/<service>/deployment/values/<tier>/<env>.yaml
               { path = "${each.value.path_prefix}/*/*/deployment/values/${each.value.environment}/*.yaml" }
             ]
           }
@@ -235,11 +234,12 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
       ]
       template = {
         metadata = {
-          # dir segments: [namespaces, bu, product, service, deployment, values, tier]
-          # filename: <env>.yaml (dev|staging|prod)
+          # File path: namespaces/<bu>/<product>/<service>/deployment/values/<tier>/<env>.yaml
+          # Segments: ["namespaces", <bu>, <product>, <service>, "deployment", "values", <tier>]
           name = "${each.value.bu_name}-{{ index .path.segments 3 }}-{{ trimSuffix \".yaml\" .path.filename }}"
           labels = {
             "container-platform/bu"          = each.value.bu_name
+            "container-platform/tier"        = each.value.environment
             "container-platform/environment" = "{{ trimSuffix \".yaml\" .path.filename }}"
             "container-platform/product"     = "{{ index .path.segments 2 }}"
             "container-platform/app"         = "{{ index .path.segments 3 }}"
@@ -286,11 +286,11 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
 
 
 #------------------------------------------------------------------------------
-# Per-BU Baseline ApplicationSets — git-file-generator reads product.yaml
+# Per-BU Baseline ApplicationSets — git-generator reads each product.yaml
 # and renders the app-baseline Helm chart to create Namespace + RoleBinding +
 # default-deny NetworkPolicy for each environment on this cluster tier.
 #
-# Runs under the platform-<env> AppProject (can create Namespaces).
+# Runs under the platform-<tier> AppProject (can create Namespaces).
 # Always auto-syncs with self-heal to enforce baseline compliance.
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_applicationset_baseline" {
@@ -303,10 +303,10 @@ resource "kubectl_manifest" "argocd_applicationset_baseline" {
       name      = "${each.key}-baselines"
       namespace = "argocd"
       labels = {
-        "argocd.argoproj.io/managed-by"  = "terraform"
-        "container-platform/bu"          = each.value.bu_name
-        "container-platform/environment" = each.value.environment
-        "container-platform/type"        = "baseline"
+        "argocd.argoproj.io/managed-by" = "terraform"
+        "container-platform/bu"         = each.value.bu_name
+        "container-platform/tier"       = each.value.environment
+        "container-platform/type"       = "baseline"
       }
     }
     spec = {
@@ -327,10 +327,10 @@ resource "kubectl_manifest" "argocd_applicationset_baseline" {
         metadata = {
           name = "baseline-${each.value.bu_name}-{{ .product }}-${each.value.environment}"
           labels = {
-            "container-platform/bu"          = each.value.bu_name
-            "container-platform/environment" = each.value.environment
-            "container-platform/type"        = "baseline"
-            "container-platform/product"     = "{{ .product }}"
+            "container-platform/bu"      = each.value.bu_name
+            "container-platform/tier"    = each.value.environment
+            "container-platform/type"    = "baseline"
+            "container-platform/product" = "{{ .product }}"
           }
         }
         spec = {
@@ -403,7 +403,7 @@ resource "kubectl_manifest" "argocd_cluster_secret_bu" {
         "argocd.argoproj.io/secret-type" = "cluster"
         "argocd.argoproj.io/managed-by"  = "terraform"
         "container-platform/bu"          = each.value.bu_name
-        "container-platform/environment" = each.value.environment
+        "container-platform/tier"        = each.value.environment
       }
     }
     type = "Opaque"
