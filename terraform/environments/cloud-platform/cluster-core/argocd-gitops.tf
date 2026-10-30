@@ -290,7 +290,7 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
 # and renders the app-baseline Helm chart to create Namespace + RoleBinding +
 # default-deny NetworkPolicy for each environment on this cluster tier.
 #
-# Runs under the platform-<env> AppProject (can create Namespaces).
+# Runs under the platform-<tier> AppProject (can create Namespaces).
 # Always auto-syncs with self-heal to enforce baseline compliance.
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_applicationset_baseline" {
