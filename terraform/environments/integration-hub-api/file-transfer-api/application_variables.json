@@ -5,9 +5,7 @@
         "tenant_id": "0bb413d7-160d-4839-868a-f3d46537f6af",
         "api_audience": "e42002c9-c785-4d89-ba44-a280596f6fbd",
         "application_clients": {
-          "0ded1120-7c5c-46ab-b0bb-1811a107f191": [
-            "products-poc"
-          ]
+          "0ded1120-7c5c-46ab-b0bb-1811a107f191": ["products-poc"]
         }
       },
       "api_configuration": {
