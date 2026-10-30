@@ -26,7 +26,7 @@ locals {
       [
         "sts.${data.aws_region.current.region}.amazonaws.com",
         "${module.audit_logs.s3_bucket_id}.s3.${data.aws_region.current.region}.amazonaws.com",
-        "${module.prompt_logs.s3_bucket_id}.s3.${data.aws_region.current.region}.amazonaws.com"
+        "${module.prompt_logs.s3_bucket_id}.s3.${data.aws_region.current.region}.amazonaws.com",
         "truststore.pki.rds.amazonaws.com", # CA bundle for the rds_iam grant job
       ],
       [

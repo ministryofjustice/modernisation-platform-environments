@@ -80,7 +80,13 @@ proxy_config:
       port: 6379
       password: os.environ/auth_token
     require_auth_for_metrics_endpoint: false
-    callbacks: ["prometheus"]
+    # prompt_logging.prompt_logger is loaded from the litellm-callbacks ConfigMap mounted at /app/callbacks
+    callbacks: ["prometheus", "prompt_logging.prompt_logger"]
+    s3_callback_params:
+      s3_bucket_name: ${promptLogsBucket}
+      s3_region_name: ${promptLogsRegion}
+      s3_path: litellm-prompt
+      prompt_logging_models: ${jsonencode(promptLoggingModels)}
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
     prometheus_initialize_budget_metrics: true

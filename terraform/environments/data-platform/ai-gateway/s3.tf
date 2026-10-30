@@ -1,7 +1,7 @@
 locals {
   alb_access_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-alb-logs"
   audit_logs_bucket_name      = "mojdp-${local.environment}-${local.component_name}-audit-logs"
-  daybreak_logs_bucket_name   = "mojdp-${local.environment}-${local.component_name}-daybreak-logs"
+  prompt_logs_bucket_name     = "mojdp-${local.environment}-${local.component_name}-prompt-logs"
 }
 
 data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
@@ -108,7 +108,7 @@ module "audit_logs" {
 module "prompt_logs" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
 
-  bucket = local.daybreak_logs_bucket_name
+  bucket = local.prompt_logs_bucket_name
 
   force_destroy = false
 
@@ -116,7 +116,7 @@ module "prompt_logs" {
     rule = {
       apply_server_side_encryption_by_default = {
         sse_algorithm     = "aws:kms"
-        kms_master_key_id = module.ai_gateway_daybreak_logs_kms_key.key_arn
+        kms_master_key_id = module.ai_gateway_prompt_logs_kms_key.key_arn
       }
       bucket_key_enabled = true
     }
