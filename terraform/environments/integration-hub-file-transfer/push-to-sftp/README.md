@@ -32,15 +32,16 @@ For the interface endpoints, check private DNS and allow inbound TCP/443 from th
 
 Check DNS and the route to the recipient's SFTP server before testing a delivery.
 
-The writer tries the next approved address if TCP connection, SSH negotiation or SFTP session setup fails with a connection, timeout or SSH session error. Failed attempts are closed before another address is tried. Fallback has these restrictions:
+Only IPv4 is supported. Every IPv4 address returned by DNS must be within the recipient's configured CIDRs. If any address is outside those ranges, the writer does not connect.
 
-- Every resolved IPv4 address must be within the configured recipient CIDRs; one unapproved result rejects the destination before any connection. IPv6 is not supported.
-- Host-key or peer-address mismatches, authentication failures, incompatible SSH algorithms and protocol-order violations stop the attempt without trying another address. Paramiko authentication failures, including authentication timeouts, are treated as fatal rather than assumed transient.
-- Each address attempt uses the existing connection/session timeouts and the same Lambda time budget. No new attempt starts with 90 seconds or less remaining; a healthy alternative might therefore not be reached.
-- Fallback ends once an SFTP session is ready. Upload, rename and later checkpoint/publication failures follow the normal retry and recovery path; they do not trigger another address attempt within the same invocation. An upload is not resumed on another address.
+If a connection, timeout or SSH session error occurs while setting up a connection, the writer closes the failed attempt before trying the next approved address. It does not try another address for a host-key or peer-address mismatch, an authentication failure, incompatible SSH algorithms or a protocol-order violation. This includes timeouts that Paramiko reports as authentication failures.
 
-SSH host-key negotiation is limited to the configured pin types and Paramiko's supported default algorithms, preserving their preference order. An `ssh-rsa` pin also allows the `rsa-sha2-512` and `rsa-sha2-256` signature algorithms for that same RSA key. These aliases do not authorise a different RSA key: the negotiated public-key bytes must still match a configured pin before authentication. Pins
-with no supported negotiation algorithm are rejected before SSH negotiation.
+All attempts share the same Lambda time budget and use the existing connection and session timeouts. The writer does not start another attempt with 90 seconds or less remaining, so it may not reach a working alternative.
+
+Trying other addresses stops once the SFTP session is ready. Failures during upload, rename or later checkpoint and publication steps follow the normal retry and recovery path; they do not trigger a switch within the same invocation. A partial upload is not resumed on another address.
+
+The server's public key must match a configured host-key pin before authentication. The writer negotiates only algorithms supported by Paramiko's defaults for the configured pin types, keeping their preference order. An `ssh-rsa` pin also permits `rsa-sha2-512` and `rsa-sha2-256` for the same pinned RSA key; it does not permit a different key. If none of the pins has a supported negotiation
+algorithm, the writer rejects the connection before SSH negotiation.
 
 ## How delivery works
 
