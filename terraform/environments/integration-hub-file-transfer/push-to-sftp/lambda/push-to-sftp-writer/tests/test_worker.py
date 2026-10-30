@@ -8,10 +8,15 @@ import jsonschema
 import pytest
 from botocore.exceptions import ClientError
 
-from mft_writer import worker
+from mft_writer import services as aws_services, worker
 from mft_writer.completion import build_completion_detail
 from mft_writer.config import WriterConfig, validate_route
-from mft_writer.errors import InvalidMessage
+from mft_writer.diagnostics import (
+    AWS_OPERATION_SAFETY_MILLIS,
+    REPORTER_OPERATION_SAFETY_MILLIS,
+    REPORTER_RECORD_SAFETY_MILLIS,
+)
+from mft_writer.errors import DeadlineExceeded, InvalidMessage
 from mft_writer.events import extract_requested_action
 from mft_writer.services import AwsServices
 from mft_writer.store import ActionStore
@@ -213,3 +218,253 @@ def test_record_failures_emit_partial_batch_metric_without_secret_text(setup, mo
     assert worker.process_writer_event({"Records": [setup.record]}, None, setup.services) == {"batchItemFailures": [{"itemIdentifier": "message-1"}]}
     assert any(call.kwargs.get("name") == "WriterRecordFailed" for call in metrics.add_metric.call_args_list)
     assert "PRIVATE-KEY-SHOULD-NOT-APPEAR" not in capsys.readouterr().out
+
+
+def test_reporter_clients_have_separate_cached_timeout_configuration(monkeypatch):
+    session_factory = Mock()
+    monkeypatch.setattr(aws_services.boto3.session, "Session", session_factory)
+    aws_services._base_aws_clients.cache_clear()
+    try:
+        writer = aws_services._base_aws_clients("eu-west-2", "actions", reporter=False)
+        reporter = aws_services._base_aws_clients("eu-west-2", "actions", reporter=True)
+        assert aws_services._base_aws_clients("eu-west-2", "actions", reporter=False) is writer
+        assert aws_services._base_aws_clients("eu-west-2", "actions", reporter=True) is reporter
+        assert session_factory.call_count == 2
+        for clients, connect, read, margin in (
+            (writer, 5, 15, AWS_OPERATION_SAFETY_MILLIS),
+            (reporter, 2, 3, REPORTER_OPERATION_SAFETY_MILLIS),
+        ):
+            config = clients[-1]
+            assert (config.connect_timeout, config.read_timeout) == (connect, read)
+            assert config.retries == {"mode": "standard", "total_max_attempts": 2}
+            assert margin == (2 * (connect + read) + 1 + 4) * 1000
+        session = session_factory.return_value
+        assert [call.kwargs["config"] for call in session.client.call_args_list] == [
+            writer[-1], writer[-1], writer[-1], reporter[-1], reporter[-1], reporter[-1],
+        ]
+        assert [call.kwargs["config"] for call in session.resource.call_args_list] == [
+            writer[-1], reporter[-1],
+        ]
+    finally:
+        aws_services._base_aws_clients.cache_clear()
+
+
+@pytest.mark.parametrize("reporter", [False, True])
+def test_event_selects_the_correct_client_configuration(setup, monkeypatch, reporter):
+    factory = Mock(return_value=setup.services)
+    monkeypatch.setattr(worker, "create_aws_services", factory)
+    monkeypatch.setattr(worker, "metrics", Mock())
+    process = worker.process_reporter_event if reporter else worker.process_writer_event
+    assert process({"Records": [setup.record]}, None) == {"batchItemFailures": []}
+    factory.assert_called_once()
+    assert factory.call_args.kwargs == {"reporter": reporter}
+
+
+@pytest.mark.parametrize("remaining", [REPORTER_RECORD_SAFETY_MILLIS - 1, REPORTER_RECORD_SAFETY_MILLIS])
+def test_reporter_defers_all_records_at_the_admission_boundary(setup, monkeypatch, remaining):
+    metrics = Mock()
+    monkeypatch.setattr(worker, "metrics", metrics)
+    table = Mock()
+    setup.services.table = table
+    context = SimpleNamespace(get_remaining_time_in_millis=lambda: remaining)
+    records = [dict(setup.record, messageId=f"message-{index}") for index in range(3)]
+    assert worker.process_reporter_event({"Records": records}, context, setup.services) == {
+        "batchItemFailures": [{"itemIdentifier": record["messageId"]} for record in records]
+    }
+    assert not table.method_calls
+    setup.services.eventbridge.put_events.assert_not_called()
+    assert [call.kwargs["name"] for call in metrics.add_metric.call_args_list] == [
+        "ReporterRecordDeferred",
+    ] * 3
+
+
+def test_reporter_admits_a_record_above_the_boundary(setup, monkeypatch):
+    monkeypatch.setattr(worker, "metrics", Mock())
+    context = SimpleNamespace(
+        get_remaining_time_in_millis=lambda: REPORTER_RECORD_SAFETY_MILLIS + 1
+    )
+    assert worker.process_reporter_event(
+        {"Records": [setup.record]}, context, setup.services
+    ) == {"batchItemFailures": []}
+    assert stored_item(setup)["state"] == "FAILED"
+    setup.services.eventbridge.put_events.assert_called_once()
+
+
+def test_reporter_preserves_successes_and_failures_when_the_batch_runs_out_of_time(setup, monkeypatch):
+    metrics = Mock()
+    monkeypatch.setattr(worker, "metrics", metrics)
+    remaining = Mock(return_value=60_000)
+    context = SimpleNamespace(get_remaining_time_in_millis=remaining)
+    records = [dict(setup.record, messageId=f"message-{index}") for index in range(4)]
+
+    def process_record(record, *_args):
+        if record["messageId"] == "message-0":
+            return "already-succeeded"
+        remaining.return_value = REPORTER_RECORD_SAFETY_MILLIS
+        raise TimeoutError("AWS operation timed out")
+
+    process = Mock(side_effect=process_record)
+    monkeypatch.setattr(worker, "process_reporter_record", process)
+    assert worker.process_reporter_event({"Records": records}, context, setup.services) == {
+        "batchItemFailures": [
+            {"itemIdentifier": "message-1"},
+            {"itemIdentifier": "message-2"},
+            {"itemIdentifier": "message-3"},
+        ]
+    }
+    assert process.call_count == 2
+    assert [call.kwargs["name"] for call in metrics.add_metric.call_args_list] == [
+        "ReporterRecordAlready-Succeeded", "ReporterRecordFailed",
+        "ReporterRecordDeferred", "ReporterRecordDeferred",
+    ]
+
+
+@pytest.mark.parametrize("exhaust_after", ["put_item", "get_item", "update_item", "put_events"])
+def test_reporter_guards_each_copied_recovery_call_and_retains_the_checkpoint(
+    setup, monkeypatch, exhaust_after
+):
+    setup.services.eventbridge.put_events.side_effect = RuntimeError("publish failed")
+    with pytest.raises(RuntimeError):
+        worker.process_writer_record(setup.record, setup.config, setup.services, None)
+    stored_item(setup)["leaseUntil"] = 0
+    original_owner = stored_item(setup)["ownerToken"]
+    publisher = setup.services.eventbridge.put_events
+    publisher.side_effect = None
+    publisher.reset_mock()
+    metrics = Mock()
+    monkeypatch.setattr(worker, "metrics", metrics)
+    remaining = Mock(return_value=60_000)
+    context = SimpleNamespace(get_remaining_time_in_millis=remaining)
+    calls = []
+    exhausted = False
+
+    def wrap_call(name, original):
+        def guarded_call(*args, **kwargs):
+            nonlocal exhausted
+            calls.append(name)
+            try:
+                return original(*args, **kwargs)
+            finally:
+                if name == exhaust_after and not exhausted:
+                    exhausted = True
+                    remaining.return_value = REPORTER_OPERATION_SAFETY_MILLIS
+        return guarded_call
+
+    for name in ("put_item", "get_item", "update_item"):
+        monkeypatch.setattr(setup.services.table, name, wrap_call(name, getattr(setup.services.table, name)))
+    monkeypatch.setattr(setup.services.eventbridge, "put_events", wrap_call("put_events", publisher))
+    records = [setup.record, dict(setup.record, messageId="message-2")]
+    assert worker.process_reporter_event({"Records": records}, context, setup.services) == {
+        "batchItemFailures": [{"itemIdentifier": "message-1"}, {"itemIdentifier": "message-2"}]
+    }
+    expected_calls = ["put_item", "get_item", "update_item", "put_events"]
+    assert calls == expected_calls[:expected_calls.index(exhaust_after) + 1]
+    assert stored_item(setup)["state"] == "COPIED"
+    if exhaust_after in {"put_item", "get_item"}:
+        assert stored_item(setup)["ownerToken"] == original_owner
+    else:
+        assert stored_item(setup)["ownerToken"] != original_owner
+        assert stored_item(setup)["leaseUntil"] > 0
+    assert [call.kwargs["name"] for call in metrics.add_metric.call_args_list] == [
+        "ReporterRecordDeferred", "ReporterRecordDeferred",
+    ]
+
+    stored_item(setup)["leaseUntil"] = 0
+    remaining.return_value = 60_000
+    assert worker.process_reporter_event(
+        {"Records": [setup.record]}, context, setup.services
+    ) == {"batchItemFailures": []}
+    assert stored_item(setup)["state"] == "SUCCEEDED"
+    setup.transfer.assert_called_once()
+    setup.services.clients_for_role.assert_called_once()
+    assert publisher.call_count == (2 if exhaust_after == "put_events" else 1)
+    details = [json.loads(call.kwargs["Entries"][0]["Detail"]) for call in publisher.call_args_list]
+    assert all(detail == details[0] for detail in details)
+
+
+@pytest.mark.parametrize("exhaust_after, expected_state", [("put_item", "IN_PROGRESS"), ("update_item", "FAILED")])
+def test_reporter_deadline_preserves_failed_outcome_recovery(
+    setup, monkeypatch, exhaust_after, expected_state
+):
+    metrics = Mock()
+    monkeypatch.setattr(worker, "metrics", metrics)
+    remaining = Mock(return_value=60_000)
+    context = SimpleNamespace(get_remaining_time_in_millis=remaining)
+    original = getattr(setup.services.table, exhaust_after)
+
+    def exhaust_time(*args, **kwargs):
+        result = original(*args, **kwargs)
+        remaining.return_value = REPORTER_OPERATION_SAFETY_MILLIS
+        return result
+
+    monkeypatch.setattr(setup.services.table, exhaust_after, exhaust_time)
+    assert worker.process_reporter_event(
+        {"Records": [setup.record]}, context, setup.services
+    ) == {"batchItemFailures": [{"itemIdentifier": "message-1"}]}
+    assert stored_item(setup)["state"] == expected_state
+    setup.services.eventbridge.put_events.assert_not_called()
+    assert [call.kwargs["name"] for call in metrics.add_metric.call_args_list] == [
+        "ReporterRecordDeferred",
+    ]
+    monkeypatch.setattr(setup.services.table, exhaust_after, original)
+    remaining.return_value = 60_000
+    stored_item(setup)["leaseUntil"] = 0
+    assert worker.process_reporter_event(
+        {"Records": [setup.record]}, context, setup.services
+    ) == {"batchItemFailures": []}
+    assert stored_item(setup)["state"] == "FAILED"
+    setup.services.eventbridge.put_events.assert_called_once()
+    setup.transfer.assert_not_called()
+    assert any(call.kwargs["name"] == "DeliveryFailed" for call in metrics.add_metric.call_args_list)
+
+
+def test_writer_checkpoints_the_upload_before_deferring_completion(setup, monkeypatch):
+    remaining = Mock(return_value=900_000)
+    context = SimpleNamespace(get_remaining_time_in_millis=remaining)
+    metrics = Mock()
+    monkeypatch.setattr(worker, "metrics", metrics)
+
+    def uploaded(*_args):
+        remaining.return_value = 75_000
+        return 3
+
+    setup.transfer.side_effect = uploaded
+    original_update = setup.services.table.update_item
+
+    def checkpoint(*args, **kwargs):
+        result = original_update(*args, **kwargs)
+        if ":copied" in kwargs["ExpressionAttributeValues"]:
+            remaining.return_value = AWS_OPERATION_SAFETY_MILLIS
+        return result
+
+    monkeypatch.setattr(setup.services.table, "update_item", checkpoint)
+    assert worker.process_writer_event(
+        {"Records": [setup.record]}, context, setup.services
+    ) == {"batchItemFailures": [{"itemIdentifier": "message-1"}]}
+    assert stored_item(setup)["state"] == "COPIED"
+    setup.services.eventbridge.put_events.assert_not_called()
+    assert any(call.kwargs["name"] == "WriterRecordFailed" for call in metrics.add_metric.call_args_list)
+
+    stored_item(setup)["leaseUntil"] = 0
+    remaining.return_value = 900_000
+    assert worker.process_writer_event(
+        {"Records": [setup.record]}, context, setup.services
+    ) == {"batchItemFailures": []}
+    assert stored_item(setup)["state"] == "SUCCEEDED"
+    setup.transfer.assert_called_once()
+    setup.services.clients_for_role.assert_called_once()
+    setup.services.eventbridge.put_events.assert_called_once()
+
+
+@pytest.mark.parametrize("remaining, succeeds", [(REPORTER_OPERATION_SAFETY_MILLIS, False), (REPORTER_OPERATION_SAFETY_MILLIS + 1, True)])
+def test_reporter_operation_boundary(setup, remaining, succeeds):
+    context = SimpleNamespace(get_remaining_time_in_millis=lambda: remaining)
+    if succeeds:
+        assert worker.process_reporter_record(
+            setup.record, setup.config, setup.services, context
+        ) == "failed-reported"
+    else:
+        with pytest.raises(DeadlineExceeded):
+            worker.process_reporter_record(setup.record, setup.config, setup.services, context)
+        assert not setup.services.table.items
+        setup.services.eventbridge.put_events.assert_not_called()

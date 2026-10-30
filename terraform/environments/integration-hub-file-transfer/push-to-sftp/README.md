@@ -38,8 +38,17 @@ An EventBridge rule sends `FileActionExecutionRequested.v1` events for this patt
 
 The writer handles one message at a time, with a 900-second timeout and a maximum concurrency of five. The processing queue has a 5,400-second visibility timeout and sends a message to its DLQ after five receives. The reporter handles batches of up to ten, with a 60-second timeout and a maximum concurrency of two per DLQ. DLQ visibility is 360 seconds. Both functions return partial batch failures.
 
+The reporter does not start another record with 30 seconds or less remaining, or another DynamoDB or EventBridge call with 15 seconds or less remaining. Its AWS clients use a two-second connection timeout, a three-second read timeout and two total attempts. Unfinished and unstarted records are returned for retry; earlier successful records are acknowledged. Powertools emits
+`ReporterRecordDeferred` and a warning for deadline deferrals, separately from processing failures. Deferral does not mean delivery failed, and existing leases and checkpoints remain in place.
+
 The writer reads the exact clean S3 object version and streams it to a temporary file on the SFTP server. It checks the byte count, then renames the temporary file over the destination. The destination path combines the configured destination prefix with the source key relative to its authorised source prefix. The clean S3 object is retained under the parent component's lifecycle policy; the
 recipient manages retention on their server.
+
+The writer checks its 90-second reserve before reading or writing each 32 KiB chunk and before the final SFTP checks and rename. DynamoDB and completion-publication calls require more than 45 seconds remaining, allowing a checkpointed upload to defer publication without reconnecting. Writer AWS clients retain five-second connection and 15-second read timeouts with two total attempts. The SFTP
+connection timeout remains ten seconds and its I/O timeout remains 15 seconds.
+
+These are cooperative deadline checks, not hard end-to-end operation limits: DNS and repeated socket reads can outlast the nominal timeouts. Setup consumes part of the transfer window, and a retry before the `COPIED` checkpoint starts the upload again rather than resuming it. Validate the largest expected files against measured recipient throughput before agreeing a supported operating envelope;
+these settings do not establish a maximum supported file size or delivery-time guarantee.
 
 The EventBridge publish grant is scoped to the SNS topic, and its KMS grant to the transport key. Source-account and source-ARN conditions are omitted from those grants in line with [SNS topic-policy](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#sns-permissions) and
 [KMS](https://docs.aws.amazon.com/sns/latest/dg/sns-key-management.html#compatibility-with-aws-services) guidance.
@@ -51,6 +60,8 @@ DynamoDB stores leases, a `COPIED` checkpoint and terminal outcomes. If a retry 
 If delivery fails before the `COPIED` checkpoint, the file may already be on the server. A retry may overwrite it. Check with the recipient before taking further action; a failed completion does not prove that the file is absent. Do not delete idempotency records, bypass leases or manufacture requests to force a retry. Malformed or unauthorised DLQ messages remain in the queue for investigation.
 
 The [CloudWatch alarms](./locals-cloudwatch.tf) cover DLQ backlogs, record failures, Lambda errors, throttles and duration, processing-message age, and terminal delivery failures. They use the parent component's PagerDuty routing. Terminal delivery failure alarms do not send OK notifications: resolve the incident after investigation, not just because the metric goes quiet.
+
+Duration alarms use the maximum invocation duration over one five-minute period, warning above 720 seconds for the writer and 48 seconds for the reporter. These are retrospective capacity warnings, not evidence that a delivery failed. Deadline deferrals remain visible through `ReporterRecordDeferred` and the existing DLQ backlog alarms.
 
 ## Terraform outputs
 

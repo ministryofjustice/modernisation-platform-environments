@@ -68,21 +68,13 @@ action = {
 
 Replace the example CIDR with the recipient's approved IPv4 CIDRs and the host-key placeholder with the server public key verified through an independent channel. The port defaults to `22`. The destination prefix is relative to the SFTP account's starting directory and must be empty or end with `/`; a non-empty base directory must already exist.
 
-Keep the SSH client keypair in the delivery component's separate private/public Secrets Manager secrets, not in this action. The shared SFTP pipeline is always enabled, including when there are no configured entries; requests without an authorised entry are rejected. Complete recipient onboarding and interoperability checks before sending files through a configured route. See the [SFTP component](../../push-to-sftp/README.md) for deployment and credential handling.
+Keep the SSH client keypair in the delivery component's separate private/public Secrets Manager secrets, not in this action. The shared SFTP pipeline is always enabled, including when there are no configured entries; requests without an authorised entry are rejected. Complete recipient onboarding and interoperability checks before sending files through a configured route. See the
+[SFTP component](../../push-to-sftp/README.md) for deployment and credential handling.
 
 ## Slack pickup configuration
 
-Add a `pickup` block beside `action` and `notifications` in the relevant source
-prefix entry. Set `recipient_id` to the same value as `notifications.slack`, and
-provide `authorised_groups` (group name to Identity Center group ID),
-`slack_channel_id` and `slack_team_id`.
+Add a `pickup` block beside `action` and `notifications` in the relevant source prefix entry. Set `recipient_id` to the same value as `notifications.slack`, and provide `authorised_groups` (group name to Identity Center group ID), `slack_channel_id` and `slack_team_id`.
 
-`pickup_recipients` exports those settings with the source prefix, keyed by the
-recipient ID. The pickup component uses them to configure Slack delivery and
-read-only grants to `<recipient_id>/*`. The `pickup` block is not written to the
-dispatch secret. Existing web-app assignments remain in the root configuration;
-the group IDs here must refer to groups already assigned to that application.
+`pickup_recipients` exports those settings with the source prefix, keyed by the recipient ID. The pickup component uses them to configure Slack delivery and read-only grants to `<recipient_id>/*`. The `pickup` block is not written to the dispatch secret. Existing web-app assignments remain in the root configuration; the group IDs here must refer to groups already assigned to that application.
 
-Keep recipient IDs and group names stable: they form resource keys and pickup
-folder paths. Adding pickup access does not grant upload/delete permission or
-change the existing incoming-folder grants.
+Keep recipient IDs and group names stable: they form resource keys and pickup folder paths. Adding pickup access does not grant upload/delete permission or change the existing incoming-folder grants.

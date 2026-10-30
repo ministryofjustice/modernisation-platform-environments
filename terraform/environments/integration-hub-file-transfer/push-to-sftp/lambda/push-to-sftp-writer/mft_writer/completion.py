@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from datetime import datetime, timezone
 from typing import Any
 
-from mft_writer.diagnostics import _sanitised_error_text
+from mft_writer.diagnostics import AWS_OPERATION_SAFETY_MILLIS, _sanitised_error_text, ensure_time
 from mft_writer.errors import AwsResponseError
 from mft_writer.events import EVENT_SOURCE
 
@@ -48,11 +48,22 @@ def build_completion_detail(
     }
 
 
-def publish_completion(eventbridge: Any, event_bus_name: str, item: Mapping[str, Any], status: str) -> None:
+def publish_completion(
+    eventbridge: Any,
+    event_bus_name: str,
+    item: Mapping[str, Any],
+    status: str,
+    *,
+    context: Any = None,
+    minimum_remaining_millis: int = AWS_OPERATION_SAFETY_MILLIS,
+) -> None:
     detail = build_completion_detail(
         item,
         status,
         completed_at=item.get("completedAt"),
+    )
+    ensure_time(
+        context, "EventBridge.PutEvents", minimum_remaining_millis=minimum_remaining_millis
     )
     response = eventbridge.put_events(
         Entries=[

@@ -8,9 +8,13 @@ from typing import Any
 from aws_lambda_powertools import Logger
 from botocore.exceptions import ClientError
 
-from mft_writer.errors import AwsResponseError
+from mft_writer.errors import AwsResponseError, DeadlineExceeded
 
 DEADLINE_SAFETY_MILLIS = 90_000
+# Allow two connection/read attempts, retry backoff and time to return the batch.
+AWS_OPERATION_SAFETY_MILLIS = 45_000
+REPORTER_OPERATION_SAFETY_MILLIS = 15_000
+REPORTER_RECORD_SAFETY_MILLIS = 30_000
 logger = Logger(service=os.environ.get("POWERTOOLS_SERVICE_NAME", "push-to-sftp-writer"))
 
 
@@ -79,6 +83,11 @@ def _remaining_millis(context: Any) -> int:
     return int(context.get_remaining_time_in_millis())
 
 
-def ensure_time(context: Any, operation: str) -> None:
-    if _remaining_millis(context) <= DEADLINE_SAFETY_MILLIS:
-        raise TimeoutError(f"insufficient Lambda time remaining before {operation}")
+def ensure_time(
+    context: Any,
+    operation: str,
+    *,
+    minimum_remaining_millis: int = DEADLINE_SAFETY_MILLIS,
+) -> None:
+    if _remaining_millis(context) <= minimum_remaining_millis:
+        raise DeadlineExceeded(f"insufficient Lambda time remaining before {operation}")

@@ -21,7 +21,8 @@ from mft_writer.config import json_object
 from mft_writer.diagnostics import ensure_time
 from mft_writer.errors import InvalidMessage
 
-CHUNK_BYTES = 256 * 1024
+# Keep each write within one non-pipelined SFTP request.
+CHUNK_BYTES = 32 * 1024
 CONNECT_TIMEOUT = 10
 IO_TIMEOUT = 15
 
@@ -158,7 +159,9 @@ def upload_stream(client: Any, body: Any, source_size: int, route: Mapping[str, 
                 size += len(chunk)
                 if size > source_size:
                     raise InvalidMessage("source object exceeds its recorded size")
+                ensure_time(context, "SFTP write")
                 remote_file.write(chunk)
+        ensure_time(context, "SFTP uploaded-file verification")
         if size != source_size or client.stat(temporary).st_size != source_size:
             raise InvalidMessage("uploaded file size does not match the exact source version")
         ensure_time(context, "SFTP overwrite rename")

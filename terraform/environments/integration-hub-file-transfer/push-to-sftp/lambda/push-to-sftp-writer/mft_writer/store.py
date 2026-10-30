@@ -4,6 +4,7 @@ from typing import Any
 
 from botocore.exceptions import ClientError
 
+from mft_writer.diagnostics import AWS_OPERATION_SAFETY_MILLIS, ensure_time
 from mft_writer.errors import InvalidMessage
 
 
@@ -17,10 +18,24 @@ def _conditional_failure(error: Exception) -> bool:
 class ActionStore:
     """Atomic action claims and durable copy/terminal markers in the shared table."""
 
-    def __init__(self, table: Any):
+    def __init__(
+        self,
+        table: Any,
+        context: Any = None,
+        *,
+        minimum_remaining_millis: int = AWS_OPERATION_SAFETY_MILLIS,
+    ):
         self.table = table
+        self.context = context
+        self.minimum_remaining_millis = minimum_remaining_millis
+
+    def _ensure_time(self, operation: str) -> None:
+        ensure_time(
+            self.context, operation, minimum_remaining_millis=self.minimum_remaining_millis
+        )
 
     def get(self, action_id: str) -> dict[str, Any] | None:
+        self._ensure_time("DynamoDB.GetItem")
         return self.table.get_item(Key={"id": action_id}, ConsistentRead=True).get("Item")
 
     def claim(
@@ -44,6 +59,7 @@ class ActionStore:
                 "expiration": now + idempotency_seconds,
             }
         )
+        self._ensure_time("DynamoDB.PutItem")
         try:
             self.table.put_item(Item=new_item, ConditionExpression="attribute_not_exists(id)")
             return "claimed", new_item, owner_token
@@ -75,6 +91,7 @@ class ActionStore:
             if state == "COPIED"
             else max(int(existing.get("deduplicationExpiresAt", existing.get("expiration", 0))), now + lease_seconds)
         )
+        self._ensure_time("DynamoDB.UpdateItem claim")
         try:
             result = self.table.update_item(
                 Key={"id": new_item["id"]},
@@ -133,6 +150,7 @@ class ActionStore:
         if version_id:
             update += ", destinationVersionId = :version"
             values[":version"] = version_id
+        self._ensure_time("DynamoDB.UpdateItem copied")
         response = self.table.update_item(
             Key={"id": item["id"]},
             UpdateExpression=update,
@@ -144,6 +162,7 @@ class ActionStore:
         return response["Attributes"]
 
     def mark_succeeded(self, item: Mapping[str, Any], owner_token: str, expiry: int) -> dict[str, Any]:
+        self._ensure_time("DynamoDB.UpdateItem succeeded")
         response = self.table.update_item(
             Key={"id": item["id"]},
             UpdateExpression="SET #state = :success, expiration = :expiry REMOVE ownerToken, leaseUntil",
@@ -168,6 +187,7 @@ class ActionStore:
         expiry: int,
         failure_message: str = "Delivery attempts exhausted; destination outcome is uncertain.",
     ) -> dict[str, Any]:
+        self._ensure_time("DynamoDB.UpdateItem failed")
         response = self.table.update_item(
             Key={"id": item["id"]},
             UpdateExpression=(

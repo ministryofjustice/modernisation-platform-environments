@@ -22,6 +22,9 @@ from mft_writer.config import (
 )
 from mft_writer.sftp import transfer_versioned_object
 from mft_writer.diagnostics import (
+    AWS_OPERATION_SAFETY_MILLIS,
+    REPORTER_OPERATION_SAFETY_MILLIS,
+    REPORTER_RECORD_SAFETY_MILLIS,
     _aws_error_fields,
     _remaining_millis,
     _sanitised_error_text,
@@ -31,7 +34,7 @@ from mft_writer.diagnostics import (
     logger,
     structured_record_context,
 )
-from mft_writer.errors import InvalidMessage
+from mft_writer.errors import DeadlineExceeded, InvalidMessage
 from mft_writer.events import extract_requested_action
 from mft_writer.services import AwsServices, create_aws_services
 from mft_writer.store import ActionStore
@@ -90,7 +93,10 @@ def _lease_seconds(context: Any) -> int:
     return max(30, math.ceil(_remaining_millis(context) / 1000) + 30)
 
 
-def _read_dispatch_secret(services: AwsServices, action: Mapping[str, Any]) -> str:
+def _read_dispatch_secret(services: AwsServices, action: Mapping[str, Any], context: Any) -> str:
+    ensure_time(
+        context, "read-dispatch-secret", minimum_remaining_millis=AWS_OPERATION_SAFETY_MILLIS
+    )
     response = services.secrets.get_secret_value(
         SecretId=action["secret_arn"], VersionId=action["secret_version_id"]
     )
@@ -127,10 +133,16 @@ def _publish_copied(
     item: Mapping[str, Any],
     owner_token: str,
     config: WriterConfig,
+    context: Any,
     log_fields: dict[str, Any] | None = None,
+    *,
+    minimum_remaining_millis: int = AWS_OPERATION_SAFETY_MILLIS,
 ) -> None:
     _update_log_fields(log_fields, operation="publish-completion")
-    publish_completion(services.eventbridge, config.event_bus_name, item, "succeeded")
+    publish_completion(
+        services.eventbridge, config.event_bus_name, item, "succeeded",
+        context=context, minimum_remaining_millis=minimum_remaining_millis,
+    )
     _update_log_fields(log_fields, operation="checkpoint-mark-succeeded")
     store.mark_succeeded(
         item,
@@ -165,11 +177,11 @@ def process_writer_record(
         roleArn=route["role_arn"],
         operation="read-dispatch-secret",
     )
-    secret_value = _read_dispatch_secret(services, action)
+    secret_value = _read_dispatch_secret(services, action, context)
     validate_secret_configuration(secret_value, config.action_name, route)
     fingerprint = action_fingerprint(action, route, config)
     item = action_snapshot(action, route, config, fingerprint)
-    store = ActionStore(services.table)
+    store = ActionStore(services.table, context)
     _update_log_fields(log_fields, operation="claim-action")
     claim_status, stored, owner_token = _claim_action(store, item, config, context)
     if claim_status == "terminal":
@@ -179,7 +191,7 @@ def process_writer_record(
     if claim_status == "active" or stored is None or owner_token is None:
         raise RuntimeError("another invocation holds the action lease")
     if stored.get("state") == "COPIED":
-        _publish_copied(store, services, stored, owner_token, config)
+        _publish_copied(store, services, stored, owner_token, config, context, log_fields)
         return "published"
 
     _update_log_fields(log_fields, operation="AssumeRole")
@@ -202,7 +214,7 @@ def process_writer_record(
         now + config.terminal_seconds,
         now + _lease_seconds(context),
     )
-    _publish_copied(store, services, stored, owner_token, config, log_fields)
+    _publish_copied(store, services, stored, owner_token, config, context, log_fields)
     return "copied"
 
 
@@ -263,7 +275,9 @@ def process_reporter_record(
     )
     fingerprint = action_fingerprint(action, route, config)
     item = action_snapshot(action, route, config, fingerprint)
-    store = ActionStore(services.table)
+    store = ActionStore(
+        services.table, context, minimum_remaining_millis=REPORTER_OPERATION_SAFETY_MILLIS
+    )
     claim_status, stored, owner_token = _claim_action(
         store, item, config, context, allow_expired=True
     )
@@ -274,13 +288,19 @@ def process_reporter_record(
             return "already-succeeded"
         if stored.get("state") == "FAILED":
             _update_log_fields(log_fields, operation="publish-completion")
-            publish_completion(services.eventbridge, config.event_bus_name, stored, "failed")
+            publish_completion(
+                services.eventbridge, config.event_bus_name, stored, "failed",
+                context=context, minimum_remaining_millis=REPORTER_OPERATION_SAFETY_MILLIS,
+            )
             return "failed-republished"
         raise InvalidMessage("stored terminal action state is invalid")
     if owner_token is None:
         raise RuntimeError("reporter did not acquire the action lease")
     if stored.get("state") == "COPIED":
-        _publish_copied(store, services, stored, owner_token, config, log_fields)
+        _publish_copied(
+            store, services, stored, owner_token, config, context, log_fields,
+            minimum_remaining_millis=REPORTER_OPERATION_SAFETY_MILLIS,
+        )
         return "copied-reported"
 
     completed_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -293,7 +313,10 @@ def process_reporter_record(
         "Delivery attempts exhausted; destination outcome may be uncertain.",
     )
     _update_log_fields(log_fields, operation="publish-completion")
-    publish_completion(services.eventbridge, config.event_bus_name, stored, "failed")
+    publish_completion(
+        services.eventbridge, config.event_bus_name, stored, "failed",
+        context=context, minimum_remaining_millis=REPORTER_OPERATION_SAFETY_MILLIS,
+    )
     return "failed-reported"
 
 
@@ -313,7 +336,7 @@ def _process_event(
 ) -> dict[str, list[dict[str, str]]]:
     config = WriterConfig.from_environment(os.environ, reporter=reporter)
     if services is None:
-        services = create_aws_services(config)
+        services = create_aws_services(config, reporter=reporter)
     records = event.get("Records")
     if not isinstance(records, list):
         raise InvalidMessage("Lambda input must contain an SQS Records array")
@@ -329,6 +352,12 @@ def _process_event(
         started_at = time.perf_counter()
         try:
             with structured_record_context(fields):
+                if reporter:
+                    _update_log_fields(fields, operation="start-reporter-record")
+                    ensure_time(
+                        context, "reporter record",
+                        minimum_remaining_millis=REPORTER_RECORD_SAFETY_MILLIS,
+                    )
                 result = process_record(record, config, services, context, fields)
                 metrics.add_metric(name=f"{metric_prefix}Record{result.title()}", unit=MetricUnit.Count, value=1)
                 if reporter and result in {"failed-reported", "failed-republished"}:
@@ -340,11 +369,19 @@ def _process_event(
                     remainingTimeMillis=_remaining_millis(context),
                 )
         except Exception as error:  # noqa: BLE001
+            deferred = reporter and isinstance(error, DeadlineExceeded)
             with structured_record_context(fields):
                 _update_log_fields(fields, remainingTimeMillis=_remaining_millis(context))
-                _log_record_failure(
-                    error, context, round((time.perf_counter() - started_at) * 1000)
-                )
-            metrics.add_metric(name=f"{metric_prefix}RecordFailed", unit=MetricUnit.Count, value=1)
+                if deferred:
+                    logger.warning("reporter record deferred before deadline", reason=str(error))
+                else:
+                    _log_record_failure(
+                        error, context, round((time.perf_counter() - started_at) * 1000)
+                    )
+            metrics.add_metric(
+                name=f"{metric_prefix}Record{'Deferred' if deferred else 'Failed'}",
+                unit=MetricUnit.Count,
+                value=1,
+            )
             failures.append({"itemIdentifier": message_id})
     return {"batchItemFailures": failures}

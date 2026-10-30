@@ -7,7 +7,7 @@ from unittest.mock import Mock
 import pytest
 
 from mft_writer import sftp
-from mft_writer.errors import InvalidMessage
+from mft_writer.errors import DeadlineExceeded, InvalidMessage
 
 
 @pytest.fixture
@@ -211,6 +211,66 @@ def test_stream_deadline_prevents_upload(client, route):
     with pytest.raises(TimeoutError):
         sftp.upload_stream(client, io.BytesIO(b"abc"), 3, route, context)
     client.open.assert_not_called()
+
+
+def test_slow_writes_recheck_the_deadline_between_sftp_requests(client, route):
+    remaining = Mock(return_value=91_000)
+    context = SimpleNamespace(get_remaining_time_in_millis=remaining)
+    payload = b"x" * (256 * 1024)
+    body = Mock(wraps=io.BytesIO(payload))
+    client.stat.return_value.st_size = len(payload)
+
+    def slow_write(_chunk):
+        remaining.return_value -= 14_000
+
+    remote = client.open.return_value
+    remote.write.side_effect = slow_write
+    assert sftp.CHUNK_BYTES <= sftp.paramiko.SFTPFile.MAX_REQUEST_SIZE
+    with pytest.raises(DeadlineExceeded, match="SFTP streaming"):
+        sftp.upload_stream(client, body, len(payload), route, context)
+    remote.write.assert_called_once_with(payload[:32 * 1024])
+    assert body.read.call_count == 1
+    assert remaining.return_value == 77_000
+    client.posix_rename.assert_not_called()
+    client.remove.assert_called_once()
+
+
+def test_deadline_is_rechecked_after_reading_the_source(client, route):
+    remaining = Mock(return_value=91_000)
+    context = SimpleNamespace(get_remaining_time_in_millis=remaining)
+
+    def slow_read(_size):
+        remaining.return_value = 90_000
+        return b"abc"
+
+    body = Mock()
+    body.read.side_effect = slow_read
+    with pytest.raises(DeadlineExceeded, match="SFTP write"):
+        sftp.upload_stream(client, body, 3, route, context)
+    client.open.return_value.write.assert_not_called()
+    client.posix_rename.assert_not_called()
+    client.remove.assert_called_once()
+
+
+@pytest.mark.parametrize("exhaust_after", ["close", "stat"])
+def test_sftp_finalisation_preserves_the_deadline_reserve(client, route, exhaust_after):
+    remaining = Mock(return_value=91_000)
+    context = SimpleNamespace(get_remaining_time_in_millis=remaining)
+
+    def exhaust_time(*_args):
+        remaining.return_value = 90_000
+        return SimpleNamespace(st_size=3) if exhaust_after == "stat" else None
+
+    if exhaust_after == "close":
+        client.open.return_value.__exit__.side_effect = exhaust_time
+    else:
+        client.stat.side_effect = exhaust_time
+    with pytest.raises(DeadlineExceeded):
+        sftp.upload_stream(client, io.BytesIO(b"abc"), 3, route, context)
+    if exhaust_after == "close":
+        client.stat.assert_not_called()
+    client.posix_rename.assert_not_called()
+    client.remove.assert_called_once()
 
 
 def test_raw_paramiko_logs_do_not_propagate(monkeypatch):

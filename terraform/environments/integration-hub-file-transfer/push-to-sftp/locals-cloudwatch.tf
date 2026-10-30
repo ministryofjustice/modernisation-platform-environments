@@ -53,14 +53,14 @@ locals {
       threshold          = 0
     }
     "file-mover-duration" = {
-      alarm_description   = "The SFTP writer is approaching its 900-second timeout"
-      datapoints_to_alarm = 2
+      alarm_description   = "An SFTP writer invocation exceeded the 720-second capacity warning"
+      datapoints_to_alarm = 1
       dimensions          = { FunctionName = module.lambda_file_mover.lambda_function_name }
-      evaluation_periods  = 2
+      evaluation_periods  = 1
       metric_name         = "Duration"
       namespace           = "AWS/Lambda"
-      statistic           = "Average"
-      threshold           = 840000
+      statistic           = "Maximum"
+      threshold           = 720000
     }
     "dlq-reporter-errors" = {
       alarm_description  = "The push-to-sftp DLQ reporter failed to process messages"
@@ -90,14 +90,14 @@ locals {
       threshold          = 0
     }
     "dlq-reporter-duration" = {
-      alarm_description   = "The SFTP DLQ reporter is approaching its 60-second timeout"
-      datapoints_to_alarm = 2
+      alarm_description   = "An SFTP DLQ reporter invocation exceeded the 48-second capacity warning"
+      datapoints_to_alarm = 1
       dimensions          = { FunctionName = module.lambda_dlq_reporter.lambda_function_name }
-      evaluation_periods  = 2
+      evaluation_periods  = 1
       metric_name         = "Duration"
       namespace           = "AWS/Lambda"
-      statistic           = "Average"
-      threshold           = 55000
+      statistic           = "Maximum"
+      threshold           = 48000
     }
     "processing-oldest-message-age" = {
       alarm_description  = "The oldest SFTP processing message has been waiting for 15 minutes"

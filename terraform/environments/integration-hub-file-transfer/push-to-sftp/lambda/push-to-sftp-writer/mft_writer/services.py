@@ -18,12 +18,14 @@ class AwsServices:
 
 
 @lru_cache(maxsize=8)
-def _base_aws_clients(region: str, table_name: str) -> tuple[Any, Any, Any, Any, Config]:
+def _base_aws_clients(
+    region: str, table_name: str, *, reporter: bool = False
+) -> tuple[Any, Any, Any, Any, Config]:
     session = boto3.session.Session(region_name=region)
     client_config = Config(
         retries={"mode": "standard", "total_max_attempts": 2},
-        connect_timeout=5,
-        read_timeout=15,
+        connect_timeout=2 if reporter else 5,
+        read_timeout=3 if reporter else 15,
         max_pool_connections=4,
         tcp_keepalive=True,
     )
@@ -34,9 +36,9 @@ def _base_aws_clients(region: str, table_name: str) -> tuple[Any, Any, Any, Any,
     return secrets, sts, table, eventbridge, client_config
 
 
-def create_aws_services(config: WriterConfig) -> AwsServices:
+def create_aws_services(config: WriterConfig, *, reporter: bool = False) -> AwsServices:
     secrets, sts, table, eventbridge, client_config = _base_aws_clients(
-        config.region, config.table_name
+        config.region, config.table_name, reporter=reporter
     )
 
     def clients_for_role(role_arn: str, action_id: str) -> tuple[Any, Any]:
