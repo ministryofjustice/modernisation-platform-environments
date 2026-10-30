@@ -69,10 +69,17 @@ def connect_sftp(destination: Mapping[str, Any], private_key: paramiko.PKey, con
         ssh_logger.propagate = False
     pins = trusted_host_keys(destination["host_public_keys"])
     addresses = approved_addresses(destination)
-    ensure_time(context, "SFTP connection")
-    connection = socket.create_connection((addresses[0], destination["port"]), timeout=CONNECT_TIMEOUT)
+    for address in addresses:
+        ensure_time(context, "SFTP connection")
+        try:
+            connection = socket.create_connection((address, destination["port"]), timeout=CONNECT_TIMEOUT)
+        except OSError:
+            continue
+        break
+    else:
+        raise ConnectionError("no approved SFTP address is reachable")
     stack.callback(connection.close)
-    if connection.getpeername()[0] != addresses[0]:
+    if connection.getpeername()[0] != address:
         raise InvalidMessage("SFTP peer address does not match the approved destination")
     transport = paramiko.Transport(connection)
     stack.callback(transport.close)
