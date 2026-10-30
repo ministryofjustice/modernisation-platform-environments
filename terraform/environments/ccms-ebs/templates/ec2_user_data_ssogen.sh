@@ -18,6 +18,8 @@ if [[ ! -f $B ]]; then
   exit 1
 fi
 
+V="n"
+
 if [[ -d "$S/blacklist" ]]; then
   L=$S/blacklist
   V="a"
