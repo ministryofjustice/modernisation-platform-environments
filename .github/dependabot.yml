@@ -909,6 +909,7 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/integration-hub-events"
+      - "terraform/environments/integration-hub-events/api"
     schedule:
       interval: "daily"
     groups:
