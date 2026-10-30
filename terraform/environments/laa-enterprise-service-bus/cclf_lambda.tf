@@ -40,7 +40,6 @@ resource "aws_security_group_rule" "cclf_provider_load_egress_https_sm" {
 ######################################
 
 resource "aws_lambda_function" "cclf_provider_load" {
-
   description       = "Connects to CCLF DB and invokes the Load procedure to load the provider data."
   function_name     = "cclf_provider_load_function"
   role              = aws_iam_role.cclf_provider_load_role.arn
@@ -50,10 +49,10 @@ resource "aws_lambda_function" "cclf_provider_load" {
   s3_object_version = data.aws_s3_object.provider_load_zip.version_id
   timeout           = 100
   memory_size       = 128
-  runtime           = "python3.10"
+  runtime           = "python3.14"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn
+    aws_lambda_layer_version.lambda_layer_p314_oic21.arn
   ]
 
   vpc_config {
@@ -61,13 +60,12 @@ resource "aws_lambda_function" "cclf_provider_load" {
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
 
-
   environment {
     variables = {
       DB_SECRET_NAME         = aws_secretsmanager_secret.cclf_db_mp_credentials.name
       PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.cclf_procedures_config.name
-      LD_LIBRARY_PATH        = "/opt/instantclient_12_1"
-      ORACLE_HOME            = "/opt/instantclient_12_1"
+      LD_LIBRARY_PATH        = "/opt/instantclient_21_23"
+      ORACLE_HOME            = "/opt/instantclient_21_23"
       SERVICE_NAME           = "cclf-load-service"
       NAMESPACE              = "HUB20-CCLF-NS"
       ENVIRONMENT            = local.environment
