@@ -88,7 +88,7 @@ resource "litellm_model" "microsoft_foundry" {
 }
 
 resource "litellm_model" "openai_daybreak" {
-  for_each = try(local.ai_gateway_models_filtered.openai_daybreak, {})
+  for_each = try(local.ai_gateway_models_filtered.openai, {})
 
   custom_llm_provider = "openai"
   model_name          = "openai-${each.key}"
@@ -107,8 +107,11 @@ resource "litellm_model" "openai_daybreak" {
 
   lifecycle {
     precondition {
-      condition     = can(local.environment_configuration.openai_workload_identity.ai_gateway.identity_provider_id) && can(local.environment_configuration.openai_workload_identity.ai_gateway.service_account_id)
-      error_message = "OpenAI models enabled in ${local.environment} but openai_workload_identity.ai_gateway IDs are missing."
+      condition = alltrue([
+        for id in [local.openai_identity_provider_id, local.openai_service_account_id] :
+        id != "" && id != "CHANGEME"
+      ])
+      error_message = "OpenAI models enabled in ${local.environment} but identity_provider_id/service_account_id are not set in the ${local.component_name}/openai/moj-openai-ai-gateway secret."
     }
   }
 

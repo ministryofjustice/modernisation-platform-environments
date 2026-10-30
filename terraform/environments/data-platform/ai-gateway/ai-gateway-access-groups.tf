@@ -47,22 +47,21 @@ resource "litellm_unified_access_group" "microsoft_foundry" {
 }
 
 resource "litellm_unified_access_group" "openai_daybreak" {
-  count = length(litellm_model.openai_daybreak) > 0 ? 1 : 0
+  for_each = try(local.ai_gateway_models_filtered.openai, {})
 
-  access_group_name  = "openai-daybreak-${each.key}"
-  access_model_names = [litellm_model.openai[each.key].model_name]
+  access_group_name  = "openai-${each.key}"
+  access_model_names = [litellm_model.openai_daybreak[each.key].model_name]
   assigned_team_ids = [
     for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id
-    if contains(try(team.unified_access_groups, []), "openai-daybreak-${each.key}")
+    if contains(try(team.unified_access_groups, []), "openai-${each.key}")
   ]
 
   lifecycle {
+    ignore_changes = [assigned_team_ids]
+
     precondition {
-      condition = alltrue([
-        for key, model in try(local.ai_gateway_models_filtered.openai_daybreak, {}) :
-        !try(model.generally_available, false)
-      ])
-      error_message = "Daybreak models must never be generally_available."
+      condition     = !try(each.value.generally_available, false)
+      error_message = "Daybreak model \"${each.key}\" must never be generally_available."
     }
   }
 }
@@ -90,10 +89,10 @@ resource "litellm_unified_access_group" "generally_available_models" {
       litellm_model.microsoft_foundry[key].model_name
       if try(local.ai_gateway_models_filtered.microsoft_foundry[key].generally_available, false)
     ],
-        [
+    [
       for key in sort(keys(litellm_model.openai_daybreak)) :
       litellm_model.openai_daybreak[key].model_name
-      if try(local.ai_gateway_models_filtered.openai_daybreak[key].generally_available, false)
+      if try(local.ai_gateway_models_filtered.openai[key].generally_available, false)
     ]
   )
 

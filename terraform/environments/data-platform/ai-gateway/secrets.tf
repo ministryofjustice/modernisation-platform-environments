@@ -76,14 +76,14 @@ module "google_cloud_ai_gateway_secret" {
   ignore_secret_changes = true
 }
 
-module "openai_gateway_secret" {
+module "openai_ai_gateway_secret" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
   name = "${local.component_name}/openai/moj-openai-ai-gateway"
 
   secret_string = jsonencode({
-    project_name = "CHANGEME"
-    project_id   = "CHANGEME"
+    identity_provider_id = "CHANGEME"
+    service_account_id   = "CHANGEME"
   })
   ignore_secret_changes = true
 }

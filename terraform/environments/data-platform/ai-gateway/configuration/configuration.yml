@@ -487,6 +487,14 @@ models:
       location: "europe-west2"
       generally_available: false
       environments_available: ["development", "production"]
+    vertex-gemini-3-5-flash:
+      model_id: "vertex_ai/gemini-3.5-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.5 Flash"
+      model_location: "United Kingdom"
+      location: "europe-west2"
+      generally_available: false
+      environments_available: ["test"]
     gemini-3-5-transcribe-preview:
       model_id: "gemini-3.5-transcribe-preview"
       model_family: "Google Gemini"
@@ -571,11 +579,11 @@ models:
       environments_available: ["development", "test", "preproduction", "production"]
   openai:
     daybreak-red:
-      model_id: "daybreak-red"
+      model_id: "gpt-5.5-cyber"
       model_family: "OpenAI Daybreak"
-      model_name: "OpenAI Daybreak Red"
+      model_name: "OpenAI cyber"
       model_location: "Global"
       model_provider: "OpenAI"
       generally_available: false
       log_prompts_to_s3: true
-      environments_available: ["development"]
+      environments_available: ["test"]
