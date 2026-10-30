@@ -79,6 +79,7 @@ env:
   SKIP_PLAN_EVALUATOR: "[]"
   SKIP_PLAN_EVALUATOR_FILE: ".github/config/skip-plan-evaluator-workspaces.json"
 permissions:
+  pull-requests: write
   id-token: write
   contents: read
 concurrency:
