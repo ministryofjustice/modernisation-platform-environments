@@ -159,7 +159,7 @@ volumes:
       sources:
         - serviceAccountToken:
             path: openai-identity-token
-            audience: https://api.openai.com
+            audience: ${openaiWorkloadIdentityAudience}
             expirationSeconds: 3600
   - name: litellm-callbacks
     configMap:

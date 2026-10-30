@@ -155,7 +155,7 @@ volumes:
       sources:
         - serviceAccountToken:
             path: openai-identity-token
-            audience: https://api.openai.com
+            audience: ${openaiWorkloadIdentityAudience}
             expirationSeconds: 3600
 
 volumeMounts:
@@ -211,6 +211,8 @@ extraInitContainers:
       seccompProfile:
         type: RuntimeDefault
 
+# With migrationJob enabled the chart appends its own DISABLE_SCHEMA_UPDATE after envVars, so do not
+# set that key in envVars below: duplicate env names break the strategic merge patch on helm upgrade.
 migrationJob:
   enabled: true
   hooks:
@@ -232,7 +234,6 @@ envVars: {
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
     LITELLM_MODE: "PRODUCTION",
-    DISABLE_SCHEMA_UPDATE: "True",
     LITELLM_UI_API_DOC_BASE_URL: "https://${proxyHostname}",
     LITELLM_UI_PATH: "/app/var/litellm/ui",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",

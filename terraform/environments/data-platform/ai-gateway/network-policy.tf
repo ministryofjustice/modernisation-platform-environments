@@ -51,7 +51,8 @@ locals {
         "nodejs.org",
       ],
       [
-        "api.openai.com"
+        "api.openai.com",
+        "auth.openai.com",
       ]
     )),
     local.ai_gateway_microsoft_foundry_fqdns

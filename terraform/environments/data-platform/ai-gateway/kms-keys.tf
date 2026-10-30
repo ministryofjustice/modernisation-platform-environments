@@ -134,7 +134,7 @@ module "ai_gateway_aurora_kms_key" {
 module "ai_gateway_prompt_logs_kms_key" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
 
-  description           = "KMS key for AI Gateway Daybreak logs S3 bucket encryption"
+  description = "KMS key for AI Gateway Daybreak logs S3 bucket encryption"
 
   # will revisit the policy to lock it down once testing is done - LTB
   enable_default_policy = true
