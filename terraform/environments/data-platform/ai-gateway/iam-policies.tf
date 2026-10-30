@@ -1,4 +1,7 @@
 locals {
+  ai_gateway_bedrock_batch_region  = try(local.ai_gateway_batch_storage.region, data.aws_region.current.region)
+  ai_gateway_bedrock_batch_job_arn = "arn:aws:bedrock:${local.ai_gateway_bedrock_batch_region}:${data.aws_caller_identity.current.account_id}:model-invocation-job/*"
+
   ai_gateway_bedrock_assume_role_arns = distinct([
     for model in values(try(local.ai_gateway_models_filtered.amazon_bedrock, {})) :
     "arn:aws:iam::${local.environment_management.account_ids[model.aws_account_name]}:role/${model.aws_role_name}"
@@ -39,6 +42,99 @@ data "aws_iam_policy_document" "ai_gateway" {
       "arn:aws:bedrock:*:${data.aws_caller_identity.current.account_id}:guardrail/*",
       "arn:aws:bedrock:eu-west-2:${data.aws_caller_identity.current.account_id}:guardrail-profile/uk.guardrail.v1:0"
     ]
+  }
+
+  dynamic "statement" {
+    for_each = { for sid, permissions in {
+      BedrockCreateBatchInferenceJob = {
+        actions = ["bedrock:CreateModelInvocationJob"]
+        resources = concat(
+          formatlist("arn:aws:bedrock:%s:${data.aws_caller_identity.current.account_id}:inference-profile/*", ["eu-west-1", "eu-west-2"]),
+          ["arn:aws:bedrock:eu-*::foundation-model/*"],
+          [local.ai_gateway_bedrock_batch_job_arn]
+        )
+      }
+      BedrockManageBatchInferenceJobs = {
+        actions = [
+          "bedrock:GetModelInvocationJob",
+          "bedrock:StopModelInvocationJob",
+          "bedrock:TagResource",
+          "bedrock:UntagResource",
+          "bedrock:ListTagsForResource"
+        ]
+        resources = [local.ai_gateway_bedrock_batch_job_arn]
+      }
+      BedrockListBatchInferenceJobs = {
+        actions   = ["bedrock:ListModelInvocationJobs"]
+        resources = ["*"]
+      }
+    } : sid => permissions if local.ai_gateway_batch_storage != null }
+
+    content {
+      sid       = statement.key
+      effect    = "Allow"
+      actions   = statement.value.actions
+      resources = statement.value.resources
+    }
+  }
+
+  dynamic "statement" {
+    for_each = local.ai_gateway_batch_storage != null ? [1] : []
+
+    content {
+      sid       = "PassBedrockBatchExecutionRole"
+      effect    = "Allow"
+      actions   = ["iam:PassRole"]
+      resources = [aws_iam_role.bedrock_batch_execution[0].arn]
+
+      condition {
+        test     = "StringEquals"
+        variable = "iam:PassedToService"
+        values   = ["bedrock.amazonaws.com"]
+      }
+    }
+  }
+
+  dynamic "statement" {
+    for_each = local.ai_gateway_batch_storage == null ? {} : {
+      BatchInferenceListBuckets = {
+        actions   = ["s3:ListBucket"]
+        resources = distinct(values(local.ai_gateway_batch_bucket_arns))
+      }
+      BatchInferenceReadWriteInput = {
+        actions   = ["s3:GetObject", "s3:PutObject"]
+        resources = [local.ai_gateway_batch_object_arns.input]
+      }
+      BatchInferenceReadOutput = {
+        actions   = ["s3:GetObject"]
+        resources = [local.ai_gateway_batch_object_arns.output]
+      }
+    }
+
+    content {
+      sid       = statement.key
+      effect    = "Allow"
+      actions   = statement.value.actions
+      resources = statement.value.resources
+
+      # Bucket names are global; reject a same-named bucket recreated in another account
+      condition {
+        test     = "StringEquals"
+        variable = "s3:ResourceAccount"
+        values   = [local.ai_gateway_batch_storage.bucket_owner]
+      }
+    }
+  }
+
+  dynamic "statement" {
+    for_each = local.ai_gateway_batch_storage == null ? [] : [local.ai_gateway_batch_storage.output_kms_key_arn]
+
+    content {
+      sid       = "BatchInferenceKMSAccess"
+      effect    = "Allow"
+      actions   = ["kms:GenerateDataKey", "kms:Decrypt", "kms:DescribeKey"]
+      resources = [statement.value]
+    }
   }
 
   statement {

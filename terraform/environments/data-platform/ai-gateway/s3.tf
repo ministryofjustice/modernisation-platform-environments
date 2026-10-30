@@ -1,6 +1,20 @@
 locals {
   alb_access_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-alb-logs"
   audit_logs_bucket_name      = "mojdp-${local.environment}-${local.component_name}-audit-logs"
+
+  # Batch buckets are managed externally; these references do not create them.
+  ai_gateway_batch_storage_configuration = try(local.environment_configuration.ai_gateway_batch_storage, null)
+  ai_gateway_batch_storage = local.ai_gateway_batch_storage_configuration == null ? null : merge(local.ai_gateway_batch_storage_configuration, {
+    output_bucket_name = coalesce(try(local.ai_gateway_batch_storage_configuration.output_bucket_name, null), local.ai_gateway_batch_storage_configuration.input_bucket_name)
+  })
+  ai_gateway_batch_bucket_arns = local.ai_gateway_batch_storage == null ? {} : {
+    input  = "arn:aws:s3:::${local.ai_gateway_batch_storage.input_bucket_name}"
+    output = "arn:aws:s3:::${local.ai_gateway_batch_storage.output_bucket_name}"
+  }
+  ai_gateway_batch_object_arns = local.ai_gateway_batch_storage == null ? {} : {
+    input  = "${local.ai_gateway_batch_bucket_arns.input}/litellm-bedrock-files-*"
+    output = "${local.ai_gateway_batch_bucket_arns.output}/litellm-batch-outputs/*"
+  }
 }
 
 data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
