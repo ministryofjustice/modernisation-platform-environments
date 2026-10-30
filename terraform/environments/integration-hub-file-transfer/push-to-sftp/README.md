@@ -20,13 +20,13 @@ The writer uses one shared private subnet in development and test, and all selec
 
 Check that the shared VPC has the following endpoints. This component does not create them.
 
-| Service | Endpoint | What to check |
-| --- | --- | --- |
-| S3 | `com.amazonaws.eu-west-2.s3` | Gateway endpoint associated with the writer's private-subnet route tables |
-| DynamoDB | `com.amazonaws.eu-west-2.dynamodb` | Gateway endpoint associated with the writer's private-subnet route tables |
-| Secrets Manager | `com.amazonaws.eu-west-2.secretsmanager` | Interface endpoint in an allowed protected subnet |
-| STS | `com.amazonaws.eu-west-2.sts` | Interface endpoint in an allowed protected subnet; the client uses the regional STS endpoint |
-| EventBridge | `com.amazonaws.eu-west-2.events` | Interface endpoint in an allowed protected subnet |
+| Service         | Endpoint                                 | What to check                                                                                |
+| --------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------- |
+| S3              | `com.amazonaws.eu-west-2.s3`             | Gateway endpoint associated with the writer's private-subnet route tables                    |
+| DynamoDB        | `com.amazonaws.eu-west-2.dynamodb`       | Gateway endpoint associated with the writer's private-subnet route tables                    |
+| Secrets Manager | `com.amazonaws.eu-west-2.secretsmanager` | Interface endpoint in an allowed protected subnet                                            |
+| STS             | `com.amazonaws.eu-west-2.sts`            | Interface endpoint in an allowed protected subnet; the client uses the regional STS endpoint |
+| EventBridge     | `com.amazonaws.eu-west-2.events`         | Interface endpoint in an allowed protected subnet                                            |
 
 For the interface endpoints, check private DNS and allow inbound TCP/443 from the writer in the endpoint security groups. Check endpoint policies and network ACLs too. For the gateway endpoints, check the routes: security-group rules alone do not create them. Gateway endpoints use regional service IP addresses rather than subnet network interfaces, so the writer also needs the prefix-list rules.
 
@@ -38,9 +38,11 @@ An EventBridge rule sends `FileActionExecutionRequested.v1` events for this patt
 
 The writer handles one message at a time, with a 900-second timeout and a maximum concurrency of five. The processing queue has a 5,400-second visibility timeout and sends a message to its DLQ after five receives. The reporter handles batches of up to ten, with a 60-second timeout and a maximum concurrency of two per DLQ. DLQ visibility is 360 seconds. Both functions return partial batch failures.
 
-The writer reads the exact clean S3 object version and streams it to a temporary file on the SFTP server. It checks the byte count, then renames the temporary file over the destination. The destination path combines the configured destination prefix with the source key relative to its authorised source prefix. The clean S3 object is retained under the parent component's lifecycle policy; the recipient manages retention on their server.
+The writer reads the exact clean S3 object version and streams it to a temporary file on the SFTP server. It checks the byte count, then renames the temporary file over the destination. The destination path combines the configured destination prefix with the source key relative to its authorised source prefix. The clean S3 object is retained under the parent component's lifecycle policy; the
+recipient manages retention on their server.
 
-The EventBridge publish grant is scoped to the SNS topic, and its KMS grant to the transport key. Source-account and source-ARN conditions are omitted from those grants in line with [SNS topic-policy](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#sns-permissions) and [KMS](https://docs.aws.amazon.com/sns/latest/dg/sns-key-management.html#compatibility-with-aws-services) guidance.
+The EventBridge publish grant is scoped to the SNS topic, and its KMS grant to the transport key. Source-account and source-ARN conditions are omitted from those grants in line with [SNS topic-policy](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#sns-permissions) and
+[KMS](https://docs.aws.amazon.com/sns/latest/dg/sns-key-management.html#compatibility-with-aws-services) guidance.
 
 ## Failures and recovery
 
@@ -77,4 +79,5 @@ env AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy AWS_SESSION_TOKEN=dummy 
   python -m pytest -q terraform/environments/integration-hub-file-transfer/push-to-sftp/lambda/push-to-sftp-writer/tests
 ```
 
-The tests use dummy credentials and disable EC2 metadata lookup. Neither these tests nor `terraform plan` builds the deployment packages. When changing dependencies or build settings, check that both packages build and their native libraries import on the ARM64 Lambda runtime. Run plans and deployments through the existing Terraform workflow; a failed package build during apply can leave other resources in place.
+The tests use dummy credentials and disable EC2 metadata lookup. Neither these tests nor `terraform plan` builds the deployment packages. When changing dependencies or build settings, check that both packages build and their native libraries import on the ARM64 Lambda runtime. Run plans and deployments through the existing Terraform workflow; a failed package build during apply can leave other
+resources in place.
