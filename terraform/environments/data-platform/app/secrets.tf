@@ -12,6 +12,7 @@ module "app_secrets" {
     notify_api_key                            = "CHANGEME"
     notify_project_member_added_template_id   = "CHANGEME"
     notify_project_member_removed_template_id = "CHANGEME"
+    notify_budget_alert_template_id           = "CHANGEME"
     secret_key                                = random_password.app_secrets.result
     sentry_dsn                                = "CHANGEME"
   })
