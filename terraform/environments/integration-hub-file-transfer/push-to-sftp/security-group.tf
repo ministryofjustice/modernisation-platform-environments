@@ -1,4 +1,4 @@
-module "security_group_writer" {
+module "security_group_lambda_file_mover" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"
   version = "6.0.0"

@@ -35,7 +35,7 @@ module "eventbridge_push_to_sftp" {
     "push-to-sftp" = [{
       name            = "push-to-sftp"
       arn             = module.sns_push_to_sftp.topic_arn
-      dead_letter_arn = module.sqs_dlq["eventbridge"].queue_arn
+      dead_letter_arn = module.sqs_push_to_sftp_dlq["eventbridge"].queue_arn
       retry_policy = {
         maximum_event_age_in_seconds = 21600
         maximum_retry_attempts       = 185

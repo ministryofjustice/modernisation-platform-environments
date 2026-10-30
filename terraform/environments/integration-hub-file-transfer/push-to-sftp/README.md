@@ -1,60 +1,66 @@
 # Push to SFTP
 
-This component delivers exact clean S3 object versions to configured SFTP recipients in a separate Terraform state in the parent file-transfer account. It operates in `eu-west-2`.
+This component sends clean files from S3 to a recipient's SFTP server. It runs in `eu-west-2` and has its own Terraform state in the file-transfer account.
 
-## Architecture
+## Set up a recipient
 
-The component selects `push-to-sftp` entries from the shared [file-dispatch configuration](../modules/file-dispatch-configuration/README.md#action-configuration). One EventBridge rule routes `FileActionExecutionRequested.v1` events through encrypted SNS and SQS to the writer Lambda. EventBridge, SNS and processing each have a separate encrypted DLQ; a reporter consumes these and publishes terminal outcomes to the existing event bus.
+1. Deploy the parent file-transfer component first. This component looks up its event bus, clean bucket, KMS keys and PagerDuty topics.
+2. Add a `push-to-sftp` action to the shared [file-dispatch configuration](../modules/file-dispatch-configuration/README.md#action-configuration), then deploy the parent and this component. For an existing dispatch secret, update its action in Secrets Manager through the approved operator process: Terraform ignores subsequent changes to the secret value.
+3. Use the `credential_secrets` and `operator_policy_arns` outputs to populate the keypair secrets through approved operator tooling. The private secret contains JSON with `private_key` and an optional `passphrase`; the public secret contains the OpenSSH client public key. The operator policies are created but not attached. Do not put private keys or passphrases in Terraform, events or logs.
+4. Ask the recipient to install the client public key. Verify the server host keys through a separate channel, agree the allowed IPv4 CIDRs and check that the destination directory exists. The server must support exclusive temporary-file creation and POSIX overwrite rename.
+5. Test with a non-sensitive file. Check both the file on the recipient's server and the completion event before sending service files.
 
-The SNS topic is module-managed; its policy and subscription are explicit resources.
+The shared pipeline is enabled even when no recipients are configured. In that case, no per-entry roles or keypair secrets are created, and both Lambdas reject requests without an authorised configuration. Having the infrastructure deployed does not mean a recipient is ready or the service is available to customers.
 
-EventBridge grants follow the [SNS topic-policy guidance](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#sns-permissions) and [SNS KMS guidance](https://docs.aws.amazon.com/sns/latest/dg/sns-key-management.html#compatibility-with-aws-services): the publish grant is scoped to this topic and the encryption grant to its transport key, both for `events.amazonaws.com`. Source-account/ARN conditions are omitted from these grants; AWS does not support them for EventBridge-to-encrypted-topic KMS access.
+The writer reads the dispatch secret version named in the request and checks its settings against those authorised by Terraform. It assumes the entry's delivery role to read its clean source prefix and private-key secret. The writer uses the `AWSCURRENT` credential version; coordinate key rotation with the recipient before changing it.
 
-The shared pipeline remains deployed and enabled with no entries. Per-entry roles and keypair secrets are then absent, and both Lambdas reject requests without an authorised configuration. There is no manual enablement switch. Deployed infrastructure alone does not establish recipient readiness or customer-supported availability.
+## Network access
 
-The writer processes one message at a time, with a 900-second timeout, maximum concurrency of five, 5,400-second queue visibility and five receives before dead-lettering. The reporter uses batches of ten, a 60-second timeout and maximum concurrency of two per DLQ; DLQ visibility is 360 seconds. Both return partial batch failures.
+The writer uses one shared private subnet in development and test, and all selected private subnets in preproduction and production. Its security group allows SFTP to the configured recipient CIDRs and ports, HTTPS to shared protected-subnet CIDRs, and HTTPS to the regional S3 and DynamoDB managed prefix lists.
 
-## Configuration and deployment
+Check that the shared VPC has the following endpoints. This component does not create them.
 
-1. Deploy the parent state first: this component looks up its event bus, clean bucket, KMS keys and PagerDuty topics by name.
-2. Configure the recipient in the shared module and deploy the parent dispatch secret and this component. For an existing dispatch secret, update its action through the approved Secrets Manager process: the parent ignores subsequent secret-value changes.
-3. Use `credential_secrets` and `operator_policy_arns` to populate the per-entry keypair secrets through approved operator tooling. Policies are created but not attached. The private secret contains JSON with `private_key` and an optional `passphrase`; the public secret holds the OpenSSH client public key for the recipient. Never put private keys or passphrases in Terraform, events or logs.
-4. Have the recipient install the client public key. Verify server host keys independently, approved IPv4 CIDRs, the account's existing destination directory and support for exclusive temporary-file creation and POSIX overwrite rename.
-5. Before sending service files, validate the route with a non-sensitive fixture and confirm the remote file and completion event. Terraform provisioning is not an interoperability test.
-
-The writer retrieves the exact dispatch secret version referenced by the request and compares it with Terraform-authorised destination settings. It assumes the entry's delivery role to read only its clean source prefix and private-key secret. Credentials use `AWSCURRENT`; rotate through approved custodians, coordinating recipient authorisation before switching the current key.
-
-The writer uses shared private subnets: one deterministically selected subnet in development/test, all selected subnets in preproduction/production. Egress permits approved SFTP CIDRs/ports, HTTPS to shared protected-subnet CIDRs, and HTTPS to the regional AWS-managed S3 and DynamoDB prefix lists. SFTP rules use the same normalised destinations as the writer, with one rule per unique CIDR/port pair across all entries. Prefix-list rules permit traffic but do not create routes or endpoints: verify S3/DynamoDB gateway endpoint routes and reachable private endpoints for STS, Secrets Manager and EventBridge, plus the recipient path.
-
-For this private endpoint path, verify the following shared-VPC prerequisites; this component does not provision them:
-
-| Service | Endpoint service name | Connectivity requirement |
+| Service | Endpoint | What to check |
 | --- | --- | --- |
 | S3 | `com.amazonaws.eu-west-2.s3` | Gateway endpoint associated with the writer's private-subnet route tables |
 | DynamoDB | `com.amazonaws.eu-west-2.dynamodb` | Gateway endpoint associated with the writer's private-subnet route tables |
-| Secrets Manager | `com.amazonaws.eu-west-2.secretsmanager` | Interface endpoint in the allowed protected subnets |
-| STS | `com.amazonaws.eu-west-2.sts` | Interface endpoint in the allowed protected subnets; client uses the regional STS endpoint |
-| EventBridge | `com.amazonaws.eu-west-2.events` | Interface endpoint in the allowed protected subnets |
+| Secrets Manager | `com.amazonaws.eu-west-2.secretsmanager` | Interface endpoint in an allowed protected subnet |
+| STS | `com.amazonaws.eu-west-2.sts` | Interface endpoint in an allowed protected subnet; the client uses the regional STS endpoint |
+| EventBridge | `com.amazonaws.eu-west-2.events` | Interface endpoint in an allowed protected subnet |
 
-Interface endpoints need private DNS enabled and endpoint security groups allowing inbound TCP/443 from the writer. Verify endpoint policies and network ACLs also permit the required requests and return traffic. Gateway endpoints do not have subnet network interfaces: service addresses remain regional public IPs, which is why the managed prefix-list egress rules are needed alongside the gateway routes.
+For the interface endpoints, check private DNS and allow inbound TCP/443 from the writer in the endpoint security groups. Check endpoint policies and network ACLs too. For the gateway endpoints, check the routes: security-group rules alone do not create them. Gateway endpoints use regional service IP addresses rather than subnet network interfaces, so the writer also needs the prefix-list rules.
 
-## Delivery and recovery
+Check DNS and the route to the recipient's SFTP server before testing a delivery.
 
-The destination path is the configured relative prefix plus the source key relative to its authorised source prefix. The writer streams the exact S3 version into a temporary remote file, verifies byte counts and renames it over the destination. The clean source is retained under the parent's lifecycle policy; remote retention belongs to the recipient.
+## How delivery works
 
-DynamoDB stores leases, a `COPIED` checkpoint and terminal outcomes. A retry after `COPIED` republishes completion without uploading again. Deduplication and terminal retention use seven-day windows; TTL removal is asynchronous and does not extend source-file availability.
+An EventBridge rule sends `FileActionExecutionRequested.v1` events for this pattern through an encrypted SNS topic and SQS queue to the writer Lambda. EventBridge, SNS and the processing queue each have an encrypted dead-letter queue (DLQ). A separate Lambda reports terminal failures from those queues to the event bus.
 
-A failure before the checkpoint may leave an uncertain remote outcome, and a retry may overwrite the destination. This is not exactly-once delivery. Do not delete idempotency records, bypass leases or manufacture requests to force recovery. Investigate uncertain outcomes with the recipient before further delivery; a failed completion does not prove the remote file is absent. Malformed or unauthorised DLQ messages remain for investigation.
+The writer handles one message at a time, with a 900-second timeout and a maximum concurrency of five. The processing queue has a 5,400-second visibility timeout and sends a message to its DLQ after five receives. The reporter handles batches of up to ten, with a 60-second timeout and a maximum concurrency of two per DLQ. DLQ visibility is 360 seconds. Both functions return partial batch failures.
 
-## Outputs and monitoring
+The writer reads the exact clean S3 object version and streams it to a temporary file on the SFTP server. It checks the byte count, then renames the temporary file over the destination. The destination path combines the configured destination prefix with the source key relative to its authorised source prefix. The clean S3 object is retained under the parent component's lifecycle policy; the recipient manages retention on their server.
 
-`pipeline` exposes the rule, topic, processing queue, three DLQs and reporter ARNs. `delivery_roles` maps entries to their identity, source prefix, destination hostname/prefix and role ARN. Existing role-ARN, queue-URL, credential and operator-policy outputs remain available.
+The EventBridge publish grant is scoped to the SNS topic, and its KMS grant to the transport key. Source-account and source-ARN conditions are omitted from those grants in line with [SNS topic-policy](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#sns-permissions) and [KMS](https://docs.aws.amazon.com/sns/latest/dg/sns-key-management.html#compatibility-with-aws-services) guidance.
 
-[CloudWatch alarms](./locals-cloudwatch.tf) cover DLQ backlogs, record failures, Lambda errors/throttles/duration, processing-message age and terminal delivery failures. They use the parent's PagerDuty priority routing. Terminal delivery failure alarms do not send OK notifications: resolve incidents after investigation, not when the metric goes quiet.
+## Failures and recovery
 
-## Local validation
+DynamoDB stores leases, a `COPIED` checkpoint and terminal outcomes. If a retry finds the `COPIED` checkpoint, it republishes the completion event without uploading the file again. Deduplication and terminal records use seven-day retention windows. DynamoDB TTL removal is asynchronous, and a record may outlive the source file.
 
-The ARM64 Python 3.12 packages are built in Docker using pinned runtime dependencies. Run from the repository root without contacting AWS:
+If delivery fails before the `COPIED` checkpoint, the file may already be on the server. A retry may overwrite it. Check with the recipient before taking further action; a failed completion does not prove that the file is absent. Do not delete idempotency records, bypass leases or manufacture requests to force a retry. Malformed or unauthorised DLQ messages remain in the queue for investigation.
+
+The [CloudWatch alarms](./locals-cloudwatch.tf) cover DLQ backlogs, record failures, Lambda errors, throttles and duration, processing-message age, and terminal delivery failures. They use the parent component's PagerDuty routing. Terminal delivery failure alarms do not send OK notifications: resolve the incident after investigation, not just because the metric goes quiet.
+
+## Terraform outputs
+
+- `pipeline`: EventBridge rule, SNS topic, processing queue, DLQs and reporter ARNs.
+- `delivery_roles`: each entry's identity, source prefix, destination hostname and prefix, and role ARN.
+- `credential_secrets`: the private and public key secret ARNs for each entry.
+- `operator_policy_arns`: the unattached public-key reader and key-custodian policies for each entry.
+- `delivery_role_arns`, `processing_queue_url` and `dead_letter_queue_urls`: role ARNs and queue URLs.
+
+## Local checks
+
+Terraform builds the ARM64 Python 3.12 packages in Docker using pinned runtime dependencies. Run these checks from the repository root:
 
 ```shell
 terraform fmt -check -recursive terraform/environments/integration-hub-file-transfer/push-to-sftp
@@ -67,4 +73,4 @@ env AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy AWS_SESSION_TOKEN=dummy 
   python -m pytest -q terraform/environments/integration-hub-file-transfer/push-to-sftp/lambda/push-to-sftp-writer/tests
 ```
 
-Tests use dummy credentials and disable EC2 metadata lookup. Run plans and deployments through the existing Terraform workflow, not as part of these local checks.
+The tests use dummy credentials and disable EC2 metadata lookup. Run plans and deployments through the existing Terraform workflow.

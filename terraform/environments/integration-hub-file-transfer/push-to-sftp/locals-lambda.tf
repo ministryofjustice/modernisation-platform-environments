@@ -2,7 +2,7 @@ locals {
   pattern_name     = "${local.application_name}-${local.component_name}"
   lambda_role_name = local.pattern_name
 
-  dlq_arns = { for name, queue in module.sqs_dlq : name => queue.queue_arn }
+  dlq_arns = { for name, queue in module.sqs_push_to_sftp_dlq : name => queue.queue_arn }
 
   lambda_source_path = [{
     path             = "${path.module}/lambda/push-to-sftp-writer"
@@ -13,7 +13,7 @@ locals {
     ]
   }]
 
-  lambda_environment = {
+  lambda_environment_variables = {
     ACTION_NAME                     = "push-to-sftp"
     AUTHORISED_DESTINATION_MAP      = jsonencode(local.sftp_destinations_by_secret)
     CREDENTIAL_SECRET_MAP           = jsonencode(local.credential_arns_by_secret)

@@ -1,4 +1,4 @@
-module "kms_transport" {
+module "kms_push_to_sftp" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
   version = "4.2.2"

@@ -4,7 +4,7 @@ module "sns_push_to_sftp" {
   version = "7.2.0"
 
   name                = local.pattern_name
-  kms_master_key_id   = module.kms_transport.key_arn
+  kms_master_key_id   = module.kms_push_to_sftp.key_arn
   create_topic_policy = false
 
   tags = local.tags
@@ -33,9 +33,9 @@ resource "aws_sns_topic_policy" "push_to_sftp" {
 resource "aws_sns_topic_subscription" "push_to_sftp" {
   topic_arn            = module.sns_push_to_sftp.topic_arn
   protocol             = "sqs"
-  endpoint             = module.sqs_processing.queue_arn
+  endpoint             = module.sqs_push_to_sftp.queue_arn
   raw_message_delivery = false
   redrive_policy = jsonencode({
-    deadLetterTargetArn = module.sqs_dlq["sns"].queue_arn
+    deadLetterTargetArn = module.sqs_push_to_sftp_dlq["sns"].queue_arn
   })
 }

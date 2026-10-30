@@ -22,7 +22,7 @@ data "aws_ec2_managed_prefix_list" "aws_services" {
 locals {
   private_subnet_ids = sort(data.aws_subnets.shared-private.ids)
 
-  https_egress_rules = {
+  protected_subnet_https_egress_rules = {
     for subnet_id, subnet in data.aws_subnet.shared_protected : "https-${subnet_id}" => {
       name        = "${local.pattern_name}-https"
       description = "HTTPS to shared protected VPC endpoint subnets"
@@ -33,7 +33,7 @@ locals {
     }
   }
 
-  aws_service_egress_rules = {
+  prefix_list_egress_rules = {
     for service, prefix_list in data.aws_ec2_managed_prefix_list.aws_services : "https-${service}" => {
       name           = "${local.pattern_name}-${service}-https"
       description    = "HTTPS to the regional ${service} managed prefix list"
@@ -65,8 +65,8 @@ locals {
   }
 
   egress_rules = merge(
-    local.https_egress_rules,
-    local.aws_service_egress_rules,
+    local.protected_subnet_https_egress_rules,
+    local.prefix_list_egress_rules,
     local.sftp_egress_rules,
   )
 }

@@ -1,15 +1,15 @@
-module "sqs_dlq" {
+module "sqs_push_to_sftp_dlq" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.2"
 
   for_each = toset(["eventbridge", "sns", "processing"])
 
-  name                       = "${local.pattern_name}-${each.key}-dlq"
+  name                       = each.key == "processing" ? "${local.pattern_name}-dlq" : "${local.pattern_name}-${each.key}-dlq"
   use_name_prefix            = false
   create_dlq                 = false
   create_queue_policy        = each.key != "processing"
-  kms_master_key_id          = module.kms_transport.key_arn
+  kms_master_key_id          = module.kms_push_to_sftp.key_arn
   message_retention_seconds  = 1209600
   visibility_timeout_seconds = 360
   receive_wait_time_seconds  = 20
@@ -40,14 +40,14 @@ module "sqs_dlq" {
   redrive_allow_policy = {
     for key, value in {
       redrivePermission = "byQueue"
-      sourceQueueArns   = [module.sqs_processing.queue_arn]
+      sourceQueueArns   = [module.sqs_push_to_sftp.queue_arn]
     } : key => value if each.key == "processing"
   }
 
   tags = local.tags
 }
 
-module "sqs_processing" {
+module "sqs_push_to_sftp" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.2"
@@ -56,12 +56,12 @@ module "sqs_processing" {
   use_name_prefix            = false
   create_dlq                 = false
   create_queue_policy        = true
-  kms_master_key_id          = module.kms_transport.key_arn
+  kms_master_key_id          = module.kms_push_to_sftp.key_arn
   message_retention_seconds  = 345600
   visibility_timeout_seconds = 5400
   receive_wait_time_seconds  = 20
   redrive_policy = {
-    deadLetterTargetArn = module.sqs_dlq["processing"].queue_arn
+    deadLetterTargetArn = module.sqs_push_to_sftp_dlq["processing"].queue_arn
     maxReceiveCount     = 5
   }
 

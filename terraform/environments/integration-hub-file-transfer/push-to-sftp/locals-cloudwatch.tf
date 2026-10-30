@@ -1,3 +1,9 @@
+data "aws_sns_topic" "pagerduty" {
+  for_each = toset(["high-priority", "low-priority"])
+
+  name = "pagerduty-${each.key}"
+}
+
 locals {
   cloudwatch_metric_alarms = merge({
     for stage, queue_arn in local.dlq_arns : "${stage}-dlq-backlog" => {
@@ -95,7 +101,7 @@ locals {
     }
     "processing-oldest-message-age" = {
       alarm_description  = "The oldest SFTP processing message has been waiting for 15 minutes"
-      dimensions         = { QueueName = module.sqs_processing.queue_name }
+      dimensions         = { QueueName = module.sqs_push_to_sftp.queue_name }
       evaluation_periods = 1
       metric_name        = "ApproximateAgeOfOldestMessage"
       namespace          = "AWS/SQS"

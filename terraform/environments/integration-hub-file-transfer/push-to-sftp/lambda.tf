@@ -31,15 +31,15 @@ module "lambda_file_mover" {
   timeout                           = 900
   tracing_mode                      = "Active"
   vpc_subnet_ids                    = contains(["preproduction", "production"], local.environment) ? local.private_subnet_ids : [local.private_subnet_ids[0]]
-  vpc_security_group_ids            = [module.security_group_writer.id]
+  vpc_security_group_ids            = [module.security_group_lambda_file_mover.id]
 
-  environment_variables = merge(local.lambda_environment, {
+  environment_variables = merge(local.lambda_environment_variables, {
     POWERTOOLS_SERVICE_NAME = local.pattern_name
   })
 
   event_source_mapping = {
     processing = {
-      event_source_arn        = module.sqs_processing.queue_arn
+      event_source_arn        = module.sqs_push_to_sftp.queue_arn
       enabled                 = true
       batch_size              = 1
       function_response_types = ["ReportBatchItemFailures"]
@@ -59,12 +59,12 @@ module "lambda_file_mover" {
         "sqs:GetQueueAttributes",
         "sqs:ReceiveMessage",
       ]
-      resources = [module.sqs_processing.queue_arn]
+      resources = [module.sqs_push_to_sftp.queue_arn]
     }
     decrypt_queue = {
       effect    = "Allow"
       actions   = ["kms:Decrypt"]
-      resources = [module.kms_transport.key_arn]
+      resources = [module.kms_push_to_sftp.key_arn]
     }
     publish_completion = {
       effect    = "Allow"
@@ -165,7 +165,7 @@ module "lambda_dlq_reporter" {
   timeout                           = 60
   tracing_mode                      = "Active"
 
-  environment_variables = merge(local.lambda_environment, {
+  environment_variables = merge(local.lambda_environment_variables, {
     DLQ_ARNS                = jsonencode(local.dlq_arns)
     POWERTOOLS_SERVICE_NAME = "${local.pattern_name}-dlq-reporter"
   })
@@ -192,7 +192,7 @@ module "lambda_dlq_reporter" {
     decrypt_dlqs = {
       effect    = "Allow"
       actions   = ["kms:Decrypt"]
-      resources = [module.kms_transport.key_arn]
+      resources = [module.kms_push_to_sftp.key_arn]
     }
     terminal_outcomes = {
       effect    = "Allow"

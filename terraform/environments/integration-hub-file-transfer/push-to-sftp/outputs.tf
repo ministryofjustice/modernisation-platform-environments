@@ -16,11 +16,11 @@ output "pipeline" {
   value = {
     eventbridge_rule_arn = module.eventbridge_push_to_sftp.eventbridge_rule_arns["push-to-sftp"]
     sns_topic_arn        = module.sns_push_to_sftp.topic_arn
-    sqs_queue_arn        = module.sqs_processing.queue_arn
-    sqs_dlq_arn          = module.sqs_dlq["processing"].queue_arn
-    eventbridge_dlq_arn  = module.sqs_dlq["eventbridge"].queue_arn
-    sns_dlq_arn          = module.sqs_dlq["sns"].queue_arn
-    processing_dlq_arn   = module.sqs_dlq["processing"].queue_arn
+    sqs_queue_arn        = module.sqs_push_to_sftp.queue_arn
+    sqs_dlq_arn          = module.sqs_push_to_sftp_dlq["processing"].queue_arn
+    eventbridge_dlq_arn  = module.sqs_push_to_sftp_dlq["eventbridge"].queue_arn
+    sns_dlq_arn          = module.sqs_push_to_sftp_dlq["sns"].queue_arn
+    processing_dlq_arn   = module.sqs_push_to_sftp_dlq["processing"].queue_arn
     dlq_reporter_arn     = module.lambda_dlq_reporter.lambda_function_arn
   }
 }
@@ -52,10 +52,10 @@ output "delivery_role_arns" {
 
 output "processing_queue_url" {
   description = "SFTP processing queue URL."
-  value       = module.sqs_processing.queue_url
+  value       = module.sqs_push_to_sftp.queue_url
 }
 
 output "dead_letter_queue_urls" {
   description = "EventBridge, SNS subscription and processing dead-letter queues."
-  value       = { for name, queue in module.sqs_dlq : name => queue.queue_url }
+  value       = { for name, queue in module.sqs_push_to_sftp_dlq : name => queue.queue_url }
 }
