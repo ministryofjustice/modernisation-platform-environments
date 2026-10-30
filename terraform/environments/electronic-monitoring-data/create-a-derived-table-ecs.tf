@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
   container_definitions = jsonencode([
     {
       name      = "first"
-      image     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/create-a-derived-table:hmpps_electronic_monitoring_data_tables-123"
+      image     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/create-a-derived-table:hmpps_electronic_monitoring_data_tables-${local.environment_shorthand}"
       cpu       = 2048
       memory    = 4096
       essential = true
@@ -46,11 +46,11 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
           value = module.s3-create-a-derived-table-bucket.bucket.id
         },
         {
-          name  = "STATE_MODE"
-          value = "false"
+          name  = "WORKFLOW_NAME"
+          value = "cadet-em-${local.environment_shorthand}"
         },
         {
-          name  = "WORKFLOW_NAME"
+          name  = "GITHUB_STATE_WORKFLOW_REF"
           value = "cadet-em-${local.environment_shorthand}"
         },
         {
@@ -68,6 +68,14 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         {
           name  = "DEPLOY_ENV"
           value = local.environment_shorthand
+        },
+        {
+          name = "ARTEFACT_TARGET"
+          value = local.environment_shorthand
+        },
+        {
+          name = "RUN_IN_DF"
+          value = "True"
         }
       ]
     }
