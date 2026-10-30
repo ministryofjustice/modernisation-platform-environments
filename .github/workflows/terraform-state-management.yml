@@ -49,6 +49,7 @@ name: Terraform State Management
         description: "Component (Optional: subfolder in 'terraform/environments/<application>' if present)"
 
 permissions:
+  pull-requests: write
   id-token: write
   contents: read
   actions: read

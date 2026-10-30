@@ -17,6 +17,7 @@ jobs:
     name: Validate Data Platform Network Firewall Schemas
     runs-on: ubuntu-latest
     permissions:
+      pull-requests: write
       contents: read
     strategy:
       fail-fast: false
