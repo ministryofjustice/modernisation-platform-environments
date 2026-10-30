@@ -88,7 +88,7 @@ data "aws_iam_policy_document" "bedrock_batch_execution_permissions" {
 module "bedrock_batch_execution_iam_policy" {
   count = local.ai_gateway_batch_storage != null ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=1d73bcb359419e1b41872ac5ccaf8808b8f1150e" # v6.6.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=55514b7873c411040395e024a422684998da77c2" # v6.8.2
 
   name_prefix = "${local.component_name}-bedrock-batch-execution"
 
