@@ -1,7 +1,7 @@
 module "lambda_file_received_adapter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.12.0"
 
   architectures                     = ["arm64"]
   attach_dead_letter_policy         = true
@@ -68,7 +68,7 @@ module "lambda_file_received_adapter" {
 module "lambda_file_scan_result_recorded_adapter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.12.0"
 
   architectures                     = ["arm64"]
   attach_dead_letter_policy         = true
@@ -147,7 +147,7 @@ module "lambda_file_scan_result_recorded_adapter" {
 module "lambda_stage" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.12.0"
 
   architectures                     = ["arm64"]
   attach_dead_letter_policy         = true
@@ -272,7 +272,7 @@ module "lambda_stage" {
 module "lambda_route" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.12.0"
 
   architectures                     = ["arm64"]
   attach_dead_letter_policy         = true
@@ -396,7 +396,7 @@ module "lambda_route" {
 module "lambda_file_action_execution_requested_adapter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.12.0"
 
   architectures                     = ["arm64"]
   attach_dead_letter_policy         = true
