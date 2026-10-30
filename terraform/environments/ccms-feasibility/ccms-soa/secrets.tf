@@ -26,6 +26,7 @@ resource "aws_secretsmanager_secret_version" "soa" {
     admin_ebssms_ds_url                   = ""
     admin_ebssms_ds_username              = ""
     admin_ebs_user_username               = ""
+    deploy-github-ssh-key                 = ""
   })
 
   lifecycle {
