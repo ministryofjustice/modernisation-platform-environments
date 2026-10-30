@@ -90,7 +90,7 @@ resource "aws_vpc_security_group_ingress_rule" "ppud_db_ingress" {
 module "ppud_rds_export" {
   count = local.is-test ? 0 : 1
 
-  source = "git::https://github.com/ministryofjustice/terraform-rds-export?ref=ce7ce1ad5cddf85f96fc175154d54097b1ca66c8"
+  source = "git::https://github.com/ministryofjustice/terraform-rds-export?ref=e0e81707a9d35360b7bc4246b2e5601adcf9d119"
 
   providers = {
     aws = aws
