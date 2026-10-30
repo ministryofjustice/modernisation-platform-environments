@@ -31,10 +31,10 @@ data "aws_iam_policy_document" "bedrock_batch_execution_permissions" {
   count = local.ai_gateway_batch_storage != null ? 1 : 0
 
   dynamic "statement" {
-    for_each = local.ai_gateway_batch_storage == null ? {} : {
+    for_each = {
       BatchInferenceListBuckets = {
         actions   = ["s3:ListBucket"]
-        resources = values(local.ai_gateway_batch_bucket_arns)
+        resources = distinct(values(local.ai_gateway_batch_bucket_arns))
       }
       BatchInferenceReadInput = {
         actions   = ["s3:GetObject"]
@@ -44,10 +44,6 @@ data "aws_iam_policy_document" "bedrock_batch_execution_permissions" {
         actions   = ["s3:PutObject"]
         resources = [local.ai_gateway_batch_object_arns.output]
       }
-      BatchInferenceOutputKMSAccess = {
-        actions   = ["kms:GenerateDataKey", "kms:Decrypt", "kms:DescribeKey"]
-        resources = [local.ai_gateway_batch_storage.output_kms_key_arn]
-      }
     }
 
     content {
@@ -55,7 +51,21 @@ data "aws_iam_policy_document" "bedrock_batch_execution_permissions" {
       effect    = "Allow"
       actions   = statement.value.actions
       resources = statement.value.resources
+
+      # Bucket names are global; reject a same-named bucket recreated in another account
+      condition {
+        test     = "StringEquals"
+        variable = "s3:ResourceAccount"
+        values   = [local.ai_gateway_batch_storage.bucket_owner]
+      }
     }
+  }
+
+  statement {
+    sid       = "BatchInferenceOutputKMSAccess"
+    effect    = "Allow"
+    actions   = ["kms:GenerateDataKey", "kms:Decrypt", "kms:DescribeKey"]
+    resources = [local.ai_gateway_batch_storage.output_kms_key_arn]
   }
 
   # Bedrock invokes the model using this role during the job, mirroring the invoke

@@ -55,11 +55,17 @@ data "aws_iam_policy_document" "ai_gateway" {
         )
       }
       BedrockManageBatchInferenceJobs = {
-        actions   = ["bedrock:GetModelInvocationJob", "bedrock:StopModelInvocationJob"]
+        actions = [
+          "bedrock:GetModelInvocationJob",
+          "bedrock:StopModelInvocationJob",
+          "bedrock:TagResource",
+          "bedrock:UntagResource",
+          "bedrock:ListTagsForResource"
+        ]
         resources = [local.ai_gateway_bedrock_batch_job_arn]
       }
       BedrockListBatchInferenceJobs = {
-        actions   = ["bedrock:ListModelInvocationJobs", "bedrock:TagResource", "bedrock:UntagResource", "bedrock:ListTagsForResource"]
+        actions   = ["bedrock:ListModelInvocationJobs"]
         resources = ["*"]
       }
     } : sid => permissions if local.ai_gateway_batch_storage != null }
@@ -93,7 +99,7 @@ data "aws_iam_policy_document" "ai_gateway" {
     for_each = local.ai_gateway_batch_storage == null ? {} : {
       BatchInferenceListBuckets = {
         actions   = ["s3:ListBucket"]
-        resources = values(local.ai_gateway_batch_bucket_arns)
+        resources = distinct(values(local.ai_gateway_batch_bucket_arns))
       }
       BatchInferenceReadWriteInput = {
         actions   = ["s3:GetObject", "s3:PutObject"]
@@ -103,10 +109,6 @@ data "aws_iam_policy_document" "ai_gateway" {
         actions   = ["s3:GetObject"]
         resources = [local.ai_gateway_batch_object_arns.output]
       }
-      BatchInferenceKMSAccess = {
-        actions   = ["kms:GenerateDataKey", "kms:Decrypt", "kms:DescribeKey"]
-        resources = [local.ai_gateway_batch_storage.output_kms_key_arn]
-      }
     }
 
     content {
@@ -114,6 +116,24 @@ data "aws_iam_policy_document" "ai_gateway" {
       effect    = "Allow"
       actions   = statement.value.actions
       resources = statement.value.resources
+
+      # Bucket names are global; reject a same-named bucket recreated in another account
+      condition {
+        test     = "StringEquals"
+        variable = "s3:ResourceAccount"
+        values   = [local.ai_gateway_batch_storage.bucket_owner]
+      }
+    }
+  }
+
+  dynamic "statement" {
+    for_each = local.ai_gateway_batch_storage == null ? [] : [local.ai_gateway_batch_storage.output_kms_key_arn]
+
+    content {
+      sid       = "BatchInferenceKMSAccess"
+      effect    = "Allow"
+      actions   = ["kms:GenerateDataKey", "kms:Decrypt", "kms:DescribeKey"]
+      resources = [statement.value]
     }
   }
 
