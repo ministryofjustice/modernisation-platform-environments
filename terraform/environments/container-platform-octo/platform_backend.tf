@@ -1,14 +1,12 @@
 # Backend
 terraform {
-  # `backend` blocks do not support variables, so the following are hard-coded here:
-  # - S3 bucket name, which is created in modernisation-platform-account/s3.tf
+  # The state bucket lives in the BU live account, not the shared MP account.
   backend "s3" {
-    acl                  = "bucket-owner-full-control"
-    bucket               = "modernisation-platform-terraform-state"
+    bucket               = "container-platform-octo-live-tf-state-bucket"
     encrypt              = true
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
     use_lockfile         = true
-    workspace_key_prefix = "environments/members/container-platform-octo" # This will store the object as environments/members/container-platform-octo/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/container-platform-octo-live" # This will store the object as environments/members/container-platform-octo-live/${workspace}/terraform.tfstate
   }
 }
