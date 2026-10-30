@@ -1,8 +1,8 @@
 {
   "Comment": "TriggerCreateADerivedTable",
-  "StartAt": "${environment != "development" ? "WaitUntil11pm" : "Lambda Invoke"}",
+  "StartAt": "${environment == "production" ? "WaitUntil11pm" : "Lambda Invoke"}",
   "States": {
-    %{ if environment != "development" }
+    %{ if environment == "production" }
     "WaitUntil11pm": {
       "Type": "Wait",
       "Timestamp": "{% $substringBefore($now(), 'T') & 'T23:00:00Z' %}",
