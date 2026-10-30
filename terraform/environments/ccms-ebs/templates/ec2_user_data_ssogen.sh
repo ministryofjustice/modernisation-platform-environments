@@ -18,8 +18,6 @@ if [[ ! -f $B ]]; then
   exit 1
 fi
 
-V="n"
-
 if [[ -d "$S/blacklist" ]]; then
   L=$S/blacklist
   V="a"
@@ -67,7 +65,7 @@ done
 echo -e "\nRunning extraction.\n"
 update-ca-trust extract
 echo "Run these commands now:"
-echo "trust list --filter=bl${V}cklist"
+echo "trust list --filter=bl$${V}cklist"
 echo "curl -v https://dv-g3b-emudhra.we-have-a-problem.com/"
 echo
 
