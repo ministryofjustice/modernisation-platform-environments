@@ -14,7 +14,8 @@
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current_logs": 90,
       "s3_lifecycle_days_expiration_noncurrent_logs": 90,
-      "wallet_file_ccms": "wallet_dir_ccms_development-AWS_CA.zip"
+      "wallet_file_ccms": "wallet_dir_ccms_development-AWS_CA.zip",
+      "wallet_file_cwa": "no_cwa_wallet_in_development"
     },
     "test": {
       "cwa_database_ip": ["10.206.1.60/32"],
