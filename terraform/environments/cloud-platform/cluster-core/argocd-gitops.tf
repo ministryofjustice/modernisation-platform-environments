@@ -234,8 +234,8 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
       ]
       template = {
         metadata = {
-          # dir segments: [namespaces, bu, product, service, deployment, values, tier]
-          # filename: <env>.yaml (dev|staging|prod)
+          # File path: namespaces/<bu>/<product>/<service>/deployment/values/<tier>/<env>.yaml
+          # Segments: ["namespaces", <bu>, <product>, <service>, "deployment", "values", <tier>]
           name = "${each.value.bu_name}-{{ index .path.segments 3 }}-{{ trimSuffix \".yaml\" .path.filename }}"
           labels = {
             "container-platform/bu"          = each.value.bu_name
