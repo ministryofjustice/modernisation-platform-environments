@@ -64,18 +64,18 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
           title  = "Current reconciliation status"
           region = data.aws_region.current.name
           view   = "table"
-          query = <<-EOT
+          query  = <<-EOT
             SOURCE '${module.merge_redrive_planner.cloudwatch_log_group.name}'
-            \| filter message.event =
+            | filter message.event =
                 "DOWNSTREAM_RECONCILIATION_CONSUMER_STATUS"
-            \| stats
+            | stats
                 latest(message.display_status) as status,
                 latest(message.assurance_status) as assurance,
                 latest(message.active_modes) as activity,
                 latest(message.known_missing_positions) as missing,
                 latest(message.rolling_age_minutes) as age_minutes
               by message.consumer
-            \| sort message.consumer asc
+            | sort message.consumer asc
           EOT
         }
       },
@@ -92,11 +92,11 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
           title  = "Current reconciliation activity and recovery progress"
           region = data.aws_region.current.name
           view   = "table"
-          query = <<-EOT
+          query  = <<-EOT
             SOURCE '${module.merge_redrive_planner.cloudwatch_log_group.name}'
-            \| filter message.event =
+            | filter message.event =
                 "DOWNSTREAM_RECONCILIATION_CONSUMER_STATUS"
-            \| stats
+            | stats
                 latest(message.active_modes) as mode,
                 latest(message.active_status) as status,
                 latest(message.missing_positions_discovered) as discovered,
@@ -108,8 +108,8 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
                 latest(message.started_at_utc) as started,
                 latest(message.execution_id) as execution
               by message.consumer
-            \| filter mode != "IDLE"
-            \| sort message.consumer asc
+            | filter mode != "IDLE"
+            | sort message.consumer asc
           EOT
         }
       },
@@ -740,12 +740,12 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
 
           query = <<-EOT
             SOURCE '${module.merge_redrive_planner.cloudwatch_log_group.name}'
-            \| filter message.event =
+            | filter message.event =
                 "DOWNSTREAM_RECONCILIATION_CONSUMER_STATUS"
-            \| filter
+            | filter
                 message.consumer = "AC"
                 or message.consumer = "EMDI"
-            \| stats
+            | stats
                 latest(message.historical_audit_status) as status,
                 latest(
                   message.historical_audit_missing_positions
@@ -766,7 +766,7 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
                   message.historical_audit_age_hours
                 ) as age_hours
               by message.consumer
-            \| sort message.consumer asc
+            | sort message.consumer asc
           EOT
         }
       },
@@ -785,16 +785,16 @@ resource "aws_cloudwatch_dashboard" "downstream_reconciliation_ops" {
           title  = "Historical audit waits - selected dashboard time range"
           region = data.aws_region.current.name
           view   = "table"
-          
+
           query = <<-EOT
             SOURCE '${module.merge_redrive_planner.cloudwatch_log_group.name}'
-            \| filter message.event = "DOWNSTREAM_RECONCILIATION_AUDIT_BLOCKED"
-            \| fields
+            | filter message.event = "DOWNSTREAM_RECONCILIATION_AUDIT_BLOCKED"
+            | fields
                 @timestamp,
                 message.consumer,
                 message.reason
-            \| sort @timestamp desc
-            \| limit 50
+            | sort @timestamp desc
+            | limit 50
           EOT
         }
       }
