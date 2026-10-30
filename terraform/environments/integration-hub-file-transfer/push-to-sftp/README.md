@@ -60,7 +60,11 @@ The [CloudWatch alarms](./locals-cloudwatch.tf) cover DLQ backlogs, record failu
 
 ## Local checks
 
-Terraform builds the ARM64 Python 3.12 packages in Docker using pinned runtime dependencies. Run these checks from the repository root:
+Terraform builds both Python 3.12 packages in an x86 Docker container, so the workflow does not need ARM emulation. Pip installs only ARM64 Linux wheels compatible with the Lambda runtime; the build fails if a dependency has no compatible wheel.
+
+The Lambda module uses its default SAM build image. Do not set `docker_image` to the SAM image tag without also providing a local image or a Docker build configuration: the module tries to build a missing custom image rather than pulling it.
+
+Run these checks from the repository root:
 
 ```shell
 terraform fmt -check -recursive terraform/environments/integration-hub-file-transfer/push-to-sftp
@@ -73,4 +77,4 @@ env AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy AWS_SESSION_TOKEN=dummy 
   python -m pytest -q terraform/environments/integration-hub-file-transfer/push-to-sftp/lambda/push-to-sftp-writer/tests
 ```
 
-The tests use dummy credentials and disable EC2 metadata lookup. Run plans and deployments through the existing Terraform workflow.
+The tests use dummy credentials and disable EC2 metadata lookup. Neither these tests nor `terraform plan` builds the deployment packages. When changing dependencies or build settings, check that both packages build and their native libraries import on the ARM64 Lambda runtime. Run plans and deployments through the existing Terraform workflow; a failed package build during apply can leave other resources in place.

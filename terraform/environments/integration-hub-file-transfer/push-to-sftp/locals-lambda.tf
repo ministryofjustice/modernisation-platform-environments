@@ -4,6 +4,13 @@ locals {
 
   dlq_arns = { for name, queue in module.sqs_push_to_sftp_dlq : name => queue.queue_arn }
 
+  # Use an x86 build container on CI, but install wheels for the ARM64 Lambda runtime.
+  lambda_docker_additional_options = [
+    "--platform", "linux/amd64",
+    "-e", "PIP_PLATFORM=manylinux_2_34_aarch64 manylinux_2_28_aarch64 manylinux_2_17_aarch64 manylinux2014_aarch64",
+    "-e", "PIP_ONLY_BINARY=:all:",
+  ]
+
   lambda_source_path = [{
     path             = "${path.module}/lambda/push-to-sftp-writer"
     pip_requirements = true

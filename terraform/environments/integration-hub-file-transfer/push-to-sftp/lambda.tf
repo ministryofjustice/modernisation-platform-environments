@@ -15,8 +15,7 @@ module "lambda_file_mover" {
   attach_tracing_policy             = true
   attach_network_policy             = true
   build_in_docker                   = true
-  docker_image                      = "public.ecr.aws/sam/build-python3.12:latest-arm64"
-  docker_additional_options         = ["--platform", "linux/arm64"]
+  docker_additional_options         = local.lambda_docker_additional_options
   cloudwatch_logs_kms_key_id        = data.aws_kms_key.logs.arn
   cloudwatch_logs_retention_in_days = 90
   description                       = "Deliver exact clean object versions to configured SFTP destinations"
@@ -27,7 +26,7 @@ module "lambda_file_mover" {
   role_name                         = local.lambda_role_name
   runtime                           = "python3.12"
   source_path                       = local.lambda_source_path
-  hash_extra                        = "file-mover"
+  hash_extra                        = "file-mover-${sha256(jsonencode(local.lambda_docker_additional_options))}"
   timeout                           = 900
   tracing_mode                      = "Active"
   vpc_subnet_ids                    = contains(["preproduction", "production"], local.environment) ? local.private_subnet_ids : [local.private_subnet_ids[0]]
@@ -149,8 +148,7 @@ module "lambda_dlq_reporter" {
   architectures                     = ["arm64"]
   attach_tracing_policy             = true
   build_in_docker                   = true
-  docker_image                      = "public.ecr.aws/sam/build-python3.12:latest-arm64"
-  docker_additional_options         = ["--platform", "linux/arm64"]
+  docker_additional_options         = local.lambda_docker_additional_options
   cloudwatch_logs_kms_key_id        = data.aws_kms_key.logs.arn
   cloudwatch_logs_retention_in_days = 90
   description                       = "Report terminal push-to-sftp delivery outcomes from the three DLQs"
@@ -161,7 +159,7 @@ module "lambda_dlq_reporter" {
   role_name                         = "${local.pattern_name}-dlq"
   runtime                           = "python3.12"
   source_path                       = local.lambda_source_path
-  hash_extra                        = "dlq-reporter"
+  hash_extra                        = "dlq-reporter-${sha256(jsonencode(local.lambda_docker_additional_options))}"
   timeout                           = 60
   tracing_mode                      = "Active"
 
