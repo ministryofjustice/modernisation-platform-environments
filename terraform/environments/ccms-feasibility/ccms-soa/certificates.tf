@@ -1,5 +1,43 @@
-data "aws_acm_certificate" "wildcard" {
-  domain      = "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  statuses    = ["ISSUED"]
-  most_recent = true
+# Dedicated cert with the exact admin/managed FQDNs as SANs. WebLogic's default
+# SSLWLSHostnameVerifier does not match wildcard certs, so the shared wildcard
+# cannot be used on the NLB TLS listeners (t3s connections fail verification).
+locals {
+  admin_fqdn   = "${local.component_name}-admin-${local.env_label}.${trim(data.aws_route53_zone.external.name, ".")}"
+  managed_fqdn = "${local.component_name}-managed-${local.env_label}.${trim(data.aws_route53_zone.external.name, ".")}"
+}
+
+resource "aws_acm_certificate" "soa" {
+  # CN is capped at 64 chars, so use the zone apex and carry the long FQDNs as SANs
+  domain_name               = trim(data.aws_route53_zone.external.name, ".")
+  subject_alternative_names = [local.admin_fqdn, local.managed_fqdn]
+  validation_method         = "DNS"
+
+  tags = local.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "soa_cert_validation" {
+  provider = aws.core-vpc
+  for_each = {
+    for dvo in aws_acm_certificate.soa.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+resource "aws_acm_certificate_validation" "soa" {
+  certificate_arn         = aws_acm_certificate.soa.arn
+  validation_record_fqdns = [for record in aws_route53_record.soa_cert_validation : record.fqdn]
 }

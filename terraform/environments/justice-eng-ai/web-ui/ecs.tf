@@ -291,6 +291,7 @@ resource "aws_ecs_service" "app" {
   launch_type                       = "FARGATE"
   health_check_grace_period_seconds = 60
   enable_execute_command            = false
+  wait_for_steady_state             = true
   tags                              = local.tags
 
   deployment_circuit_breaker {
@@ -314,11 +315,9 @@ resource "aws_ecs_service" "app" {
     aws_lb_listener.https
   ]
 
-  # Task-def revisions get rolled forward by CI/CD (or by the emergency
-  # ``aws ecs update-service`` we used to recover from the middleware
-  # bug); leaving this attribute unmanaged stops terraform dragging the
-  # service back to an older revision.
+  # Apply the image and authentication settings together.
+  # Desired count remains operator-managed.
   lifecycle {
-    ignore_changes = [task_definition, desired_count]
+    ignore_changes = [desired_count]
   }
 }

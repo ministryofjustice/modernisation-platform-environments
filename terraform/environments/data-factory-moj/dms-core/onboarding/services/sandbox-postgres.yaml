@@ -1,0 +1,31 @@
+configuration_version: 1
+
+service: sandbox-postgres
+parent_domain: probation
+
+source:
+  engine: postgres
+  database_name: dms_test
+  secret_ref: sandbox-postgres-source
+
+task_groups:
+  integration:
+    mode: full-load-and-cdc
+
+    tables:
+      - schema_name: public
+        table_name: dms_integration_test
+
+        contract:
+          strategy: generate_if_missing
+          namespace: uk.gov.justice.contracts
+
+        processing_profile: standard
+        history_profile: standard
+        publication_profile: sandbox
+
+destination_profile: sandbox-postgres
+concurrency_profile: sandbox-small
+
+schedule:
+  enabled: false

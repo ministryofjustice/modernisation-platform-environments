@@ -354,7 +354,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_desired_task_count_warning" {
 ###      Target Group Alarms       ###
 ######################################
 resource "aws_cloudwatch_metric_alarm" "alb_response_time_critical" {
-  count               = var.microservice_lb != null ? 1 : 0
+  count               = var.microservice_lb != null && var.name != "weblogic-eis" ? 1 : 0 # weblogic-eis response time is inconsistent and regularly > 60 seconds due to file uploads
   alarm_name          = "${var.name}-${var.env_name}-response-time-critical"
   alarm_description   = "P9 response time for the `${var.name}` service exceeded 10 seconds."
   namespace           = "AWS/ApplicationELB"

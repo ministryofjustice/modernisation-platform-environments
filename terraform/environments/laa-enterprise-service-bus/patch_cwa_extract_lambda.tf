@@ -116,7 +116,7 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
       LOG_LEVEL         = "DEBUG"
       TNS_ADMIN         = "/tmp/wallet_dir"
       WALLET_BUCKET     = data.aws_s3_bucket.lambda_files.bucket
-      WALLET_OBJ        = "wallet_files/CWA/wallet_dir.zip"
+      WALLET_OBJ        = "wallet_files/CWA/${local.application_data.accounts[local.environment].wallet_file_cwa}"
     }
   }
 
@@ -161,7 +161,7 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
       LOG_LEVEL         = "DEBUG"
       TNS_ADMIN         = "/tmp/wallet_dir"
       WALLET_BUCKET     = data.aws_s3_bucket.lambda_files.bucket
-      WALLET_OBJ        = "wallet_files/CWA/wallet_dir.zip"
+      WALLET_OBJ        = "wallet_files/CWA/${local.application_data.accounts[local.environment].wallet_file_cwa}"
     }
   }
 

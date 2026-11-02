@@ -52,7 +52,7 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = aws_db_instance.tipstaff_db.address
+          value = local.tipstaff_db.address
         },
         {
           name  = "RDS_PORT"
@@ -60,15 +60,15 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
         },
         {
           name  = "RDS_USERNAME"
-          value = aws_db_instance.tipstaff_db.username
+          value = local.tipstaff_db.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = aws_db_instance.tipstaff_db.password
+          value = local.tipstaff_db.password
         },
         {
           name  = "DB_NAME"
-          value = aws_db_instance.tipstaff_db.db_name
+          value = local.tipstaff_db.db_name
         },
         {
           name  = "supportEmail"

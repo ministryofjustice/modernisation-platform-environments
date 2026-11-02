@@ -27,3 +27,7 @@ output "database_application_passwords_secret_arn" {
 output "db_ec2_sg_id" {
   value = aws_security_group.db_ec2.id
 }
+
+output "alarm_names" {
+  value = try(module.oracle_observer[0].alarm_names, [])
+}

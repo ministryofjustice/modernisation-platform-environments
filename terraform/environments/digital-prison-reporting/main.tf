@@ -762,6 +762,11 @@ module "s3_working_bucket" {
       id     = "dpr"
       prefix = "dpr/"
       days   = 7
+    },
+    {
+      id     = "athena-output"
+      prefix = "athena-output/"
+      days   = 7
     }
   ]
 

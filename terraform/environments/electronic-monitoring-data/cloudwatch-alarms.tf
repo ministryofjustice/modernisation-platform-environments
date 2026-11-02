@@ -568,3 +568,166 @@ resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_execution_fail
     aws_sns_topic.emds_alerts.arn,
   ]
 }
+# ------------------------------------------------------------------------------
+# Downstream reconciliation assurance health
+# Provide dashboard-only clean, unhealthy and unknown assurance indicators.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_assurance_consumers = toset([
+    "STAGED",
+    "AC",
+    "EMDI",
+  ])
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_assurance_not_clean" {
+  for_each = local.downstream_reconciliation_assurance_consumers
+
+  alarm_name = (
+    "downstream_reconciliation_${lower(each.value)}_assurance_not_clean"
+  )
+
+  alarm_description = (
+    "${each.value} latest reconciliation assurance is not clean"
+  )
+
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 1
+  treat_missing_data  = "missing"
+
+  actions_enabled = false
+
+  metric_name = "ReconciliationAssuranceClean"
+  namespace   = "EM/DownstreamReconciliation"
+  period      = 300
+  statistic   = "Minimum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+    Consumer    = each.value
+    Mode        = "status"
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Downstream historical assurance
+# Alert when an audit finds gaps, becomes stale, or the audit workflow fails.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_audit_consumers = toset([
+    "AC",
+    "EMDI",
+  ])
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_gaps" {
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_audit_consumers
+    : toset([])
+  )
+
+  alarm_name = (
+    "downstream_reconciliation_${lower(each.value)}_historical_audit_gaps"
+  )
+
+  alarm_description = (
+    "Triggered when ${each.value} historical assurance finds missing positions"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "HistoricalAuditMissingPositions"
+  namespace   = "EM/DownstreamReconciliation"
+  period      = 300
+  statistic   = "Maximum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+    Consumer    = each.value
+    Mode        = "status"
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_stale" {
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_audit_consumers
+    : toset([])
+  )
+
+  alarm_name = (
+    "downstream_reconciliation_${lower(each.value)}_historical_audit_stale"
+  )
+
+  alarm_description = (
+    "Triggered when ${each.value} historical assurance is over 48 hours old"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 48
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "HistoricalAuditAgeHours"
+  namespace   = "EM/DownstreamReconciliation"
+  period      = 300
+  statistic   = "Maximum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+    Consumer    = each.value
+    Mode        = "status"
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_execution_failed" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  alarm_name = "downstream_reconciliation_historical_audit_execution_failed"
+
+  alarm_description = (
+    "Triggered when the downstream historical assurance workflow fails"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "ExecutionsFailed"
+  namespace   = "AWS/States"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    StateMachineArn = module.downstream_reconciliation_audit.arn
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+

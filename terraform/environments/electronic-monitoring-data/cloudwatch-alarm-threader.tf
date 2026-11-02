@@ -77,6 +77,11 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
             for alarm in aws_cloudwatch_metric_alarm.specials_guard_lambda_errors :
             alarm.alarm_name
           ],
+          [
+            {
+              prefix = "downstream_reconciliation_"
+            }
+          ],
         )
       }
     }

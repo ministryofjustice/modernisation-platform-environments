@@ -1,6 +1,6 @@
 # Base envoy installation, includes gateway api CRDs
 module "envoy_gateway" {
-  source = "github.com/ministryofjustice/container-platform-terraform-envoy-gateway?ref=54df47381507b0998f397d4d5a64d1245320c6a1" #1.1.0
+  source = "github.com/ministryofjustice/container-platform-terraform-envoy-gateway?ref=6e777a2325f1424a6ac4f79bf52a509503a4234e" #1.2.0
 
   depends_on = [module.gatekeeper]
 }

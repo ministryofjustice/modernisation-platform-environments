@@ -103,6 +103,11 @@ resource "aws_launch_template" "weblogic_eis" {
     http_tokens                 = "required"
     http_put_response_hop_limit = 2
   }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = var.tags
+  }
 }
 
 resource "aws_autoscaling_group" "weblogic_eis" {
@@ -195,11 +200,6 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
 
 locals {
   weblogic_eis_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic-eis"
-}
-
-moved {
-  from = module.ecs_nightly_restart_weblogic_eis
-  to   = module.ecs_nightly_restart_weblogic_eis[0]
 }
 
 module "ecs_nightly_restart_weblogic_eis" {

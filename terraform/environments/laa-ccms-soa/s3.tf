@@ -1,80 +1,14 @@
 # S3 Bucket - Logging
 module "s3-bucket-logging" {
-  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
+  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
-  bucket_policy = [
-    jsonencode({
-      Version = "2012-10-17",
-      Statement = [
-        {
-          Sid    = "EnforceTLSv12orHigher",
-          Effect = "Deny",
-          Principal = {
-            AWS = "*"
-          },
-          Action = "s3:*",
-          Resource = [
-            "${module.s3-bucket-logging.bucket.arn}/*",
-            module.s3-bucket-logging.bucket.arn
-          ],
-          Condition = {
-            NumericLessThan = {
-              "s3:TlsVersion" = "1.2"
-            }
-          }
-        },
-        {
-          Sid    = "AWSLogDeliveryWrite",
-          Effect = "Allow",
-          Principal = {
-            Service = "delivery.logs.amazonaws.com"
-          },
-          Action   = "s3:PutObject",
-          Resource = "${module.s3-bucket-logging.bucket.arn}/*",
-          Condition = {
-            StringEquals = {
-              "s3:x-amz-acl"      = "bucket-owner-full-control",
-              "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-            }
-          }
-        },
-        {
-          Sid    = "AWSLogDeliveryAclCheck",
-          Effect = "Allow",
-          Principal = {
-            Service = "delivery.logs.amazonaws.com"
-          },
-          Action   = "s3:GetBucketAcl",
-          Resource = module.s3-bucket-logging.bucket.arn,
-          Condition = {
-            StringEquals = {
-              "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-            }
-          }
-        },
-        {
-          Sid    = "AllowS3Logging Shared Bucket"
-          Effect = "Allow"
-          Principal = {
-            Service = "logging.s3.amazonaws.com"
-          }
-          Action   = "s3:PutObject"
-          Resource = "${module.s3-bucket-logging.bucket.arn}/*"
-          Condition = {
-            ArnLike = {
-              "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
-            }
-          }
-        }
-      ]
-  })]
+  bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
 
-  manage_log_bucket_policy = false
-
-
+  log_bucket     = local.logging_bucket_name
+  log_prefix     = "s3access/${local.logging_bucket_name}"
   sse_algorithm  = "AES256"
   custom_kms_key = ""
   # Refer to the below section "Replication" before enabling replication
@@ -88,7 +22,7 @@ module "s3-bucket-logging" {
     # Platform team to add a new provider for the additional Region.
     aws.bucket-replication = aws
   }
-  # No transitions as log files < 128Kb generally, so not supported
+
   lifecycle_rule = [
     {
       id      = "main"
@@ -100,12 +34,32 @@ module "s3-bucket-logging" {
         autoclean = "true"
       }
 
+      transition = [
+        {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
+          storage_class = "GLACIER"
+        }
+      ]
+
       expiration = {
-        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current_logs
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
       }
 
+      noncurrent_version_transition = [
+        {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
+          storage_class = "GLACIER"
+        }
+      ]
+
       noncurrent_version_expiration = {
-        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent_logs
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
       }
 
       abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
@@ -113,6 +67,59 @@ module "s3-bucket-logging" {
   ]
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-logging", local.application_data.accounts[local.environment].app_name, local.environment)) }
+    { Name = lower(format("s3-%s-%s-logging", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
   )
+}
+
+resource "aws_s3_bucket_policy" "lb_access_logs" {
+  bucket = module.s3-bucket-logging.bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action   = "s3:*",
+        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
+      },
+      {
+        Sid    = "AWSLogDeliveryWrite",
+        Effect = "Allow",
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        },
+        Action   = "s3:PutObject",
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl"      = "bucket-owner-full-control",
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        Sid    = "AWSLogDeliveryAclCheck",
+        Effect = "Allow",
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        },
+        Action   = "s3:GetBucketAcl",
+        Resource = module.s3-bucket-logging.bucket.arn,
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
 }
