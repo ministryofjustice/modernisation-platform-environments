@@ -32,7 +32,7 @@ module "data_lake_settings" {
   read_only_admins = local.environments[local.environment].lakeformation_read_only_admins
 }
 
-resource "aws_glue_data_catalog_encryption_settings" "example" {
+resource "aws_glue_data_catalog_encryption_settings" "catalog_encryption" {
   data_catalog_encryption_settings {
     connection_password_encryption {
       aws_kms_key_id                       = aws_kms_key.data_lake_kms_key.arn
