@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_log_group" "ecs" {
   #checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   #checkov:skip=CKV_AWS_338: "Log retention varies by env"
-  name              = "${var.env_name}-${var.name}"
+  name = can(regex("weblogic", var.name)) ? "delius-core-${var.env_name}-${var.name}" : "${var.env_name}-${var.name}"
   retention_in_days = var.log_retention
   tags              = var.tags
 }
