@@ -304,7 +304,7 @@ locals {
     }
 
     # Allow Pre-Production RMAN Catalog to import Production RMAN Catalog for refreshes
-    s3_buckets = {
+    s3_buckets = contains(keys(module.baseline_presets.s3_buckets), "prod-hmpps-oem-db-backup-bucket-") ? {
       "prod-hmpps-oem-db-backup-bucket-" = merge(
         module.baseline_presets.s3_buckets["prod-hmpps-oem-db-backup-bucket-"],
         {
@@ -341,7 +341,7 @@ locals {
           ]
         }
       )
-    }
+    } : {}
 
     secretsmanager_secrets = {
       "/oracle/oem"              = local.secretsmanager_secrets.oem
