@@ -25,6 +25,10 @@ data "aws_secretsmanager_secret_version" "aws_accounts" {
   secret_id = var.aws_accounts_secret_name
 }
 
-# data "aws_secretsmanager_secret_version" "ignore_finding" {
-#   secret_id = var.ignore_finding_secret_name
+# data "aws_ssm_parameter" "aws_accounts" {
+#   name = var.aws_accounts_parameter_name
+# }
+#
+# data "aws_ssm_parameter" "ignore_findings" {
+#   name = var.ignore_findings_parameter_name
 # }
