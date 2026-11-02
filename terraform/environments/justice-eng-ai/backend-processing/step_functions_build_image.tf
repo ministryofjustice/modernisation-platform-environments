@@ -26,6 +26,7 @@ locals {
         { name = "AWS_REGION", value = local.aws_region },
         { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
         { name = "FORGE_RUNTIME_BASE_ECR_REPOSITORY_URI", value = local.forge_runtime_base_ecr_repository_uri },
+        { name = "FORGE_RUNTIME_BASE_IMAGE_TAG", value = local.script_runner_forge_runtime_version },
       ]
       result_path     = "$.image_build_task"
       outputs         = true
