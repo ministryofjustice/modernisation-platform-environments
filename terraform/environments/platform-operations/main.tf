@@ -78,10 +78,10 @@ resource "aws_secretsmanager_secret" "aws_health_lambda_ignore_findings" {
 }
 
 module "aws_health_lambda" {
-  count                      = local.enable_aws_health_lambda ? 1 : 0
-  source                     = "../../modules/aws_health_lambda"
-  aws_account_id             = data.aws_caller_identity.current.id
-  aws_accounts_secret_name   = aws_secretsmanager_secret.aws_health_lambda_accounts[count.index].name
-  github_repo                = "platform-operations"
+  count                    = local.enable_aws_health_lambda ? 1 : 0
+  source                   = "../../modules/aws_health_lambda"
+  aws_account_id           = data.aws_caller_identity.current.id
+  aws_accounts_secret_name = aws_secretsmanager_secret.aws_health_lambda_accounts[count.index].name
+  github_repo              = "platform-operations"
   # ignore_finding_secret_name = aws_secretsmanager_secret.aws_health_lambda_ignore_findings[count.index].name
 }

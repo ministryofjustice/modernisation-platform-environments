@@ -24,9 +24,9 @@ resource "aws_lambda_function" "github_workflow_trigger" {
 
   environment {
     variables = {
-      GITHUB_IDENTITY                = var.github_identity
-      GITHUB_ORG                     = var.github_org
-      GITHUB_REPO                    = var.github_repo
+      GITHUB_IDENTITY = var.github_identity
+      GITHUB_ORG      = var.github_org
+      GITHUB_REPO     = var.github_repo
       # IGNORE_FINDINGS                = data.aws_secretsmanager_secret_version.ignore_finding.secret_string
       WEB_IDENTITY_AUDIENCE          = var.web_identity_audience
       WEB_IDENTITY_DURATION_SECONDS  = var.web_identity_duration_seconds
