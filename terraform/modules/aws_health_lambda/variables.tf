@@ -31,6 +31,11 @@ variable "github_repo" {
   type        = string
 }
 
+variable "ignore_finding_secret_name" {
+  description = "The name of the AWS Secrets Manager secret that contains the findings to ignore"
+  type        = string
+}
+
 variable "lambda_memory_size" {
   description = "Amount of memory available to the Lambda function"
   type        = number
