@@ -15,11 +15,7 @@ locals {
   # local.application_data in platform_locals.tf) so dev and prod stay distinct.
   # Only used for real when forge_internal -- see local.forge_url above for
   # what the UI actually gets handed as MPAPB_FORGE_URL.
-  forge_hostname = local.application_data.accounts[local.environment].forge_hostname
-  # The Forge version is owned by the stack-level application_variables.json
-  # (forge_runtime_version, e.g. forge-runtime-v0.4.2[-suffix]), the same value the
-  # build-app-image step function uses, so the runner and the image build agree.
-  forge_runtime_version    = regex("^forge-runtime-v([0-9]+\\.[0-9]+\\.[0-9]+)", jsondecode(file("${path.module}/../application_variables.json")).accounts[local.environment].forge_runtime_version)[0]
+  forge_hostname           = local.application_data.accounts[local.environment].forge_hostname
   forge_ecr_repository_url = local.ui_ecr_repository_url
   forge_container_port     = 3000
   forge_task_cpu           = 1024
@@ -446,7 +442,6 @@ resource "aws_ecs_task_definition" "forge" {
         { name = "ENTRA_AUTH_ENABLED", value = "true" },
         { name = "ENTRA_POST_LOGOUT_REDIRECT_URI", value = "https://${local.forge_hostname}/" },
         { name = "ENTRA_REDIRECT_URI", value = "https://${local.forge_hostname}/auth/callback" },
-        { name = "FORGE_RUNTIME_VERSION", value = local.forge_runtime_version },
         { name = "FORGE_PACKAGE_S3_BUCKET", value = local.forge_package_s3_bucket },
         { name = "FORGE_PACKAGE_KEY_VERSION", value = "2" },
         { name = "FORGE_PACKAGE_S3_PREFIX", value = var.forge_package_s3_prefix },
