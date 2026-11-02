@@ -271,6 +271,30 @@ locals {
         timezone = "Europe/London"
         workflow = "github_workflow_monitoring.yml"
       }
+      mp-automation-ndh-offloc-cloudplatform-am = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy_cloudplatform"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 0,3 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cloudplatfom_copy.yml"
+      }
+      mp-automation-ndh-offloc-cloudplatform-pm = {
+        identity = "platops"
+        inputs   = {
+          scheduled_run = "ndh_offloc_copy_cloudplatform"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 0,23 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cloudplatfom_copy.yml"
+      }
       mp-automation-ndh-offloc-copy = {
         identity = "platops"
         inputs   = {
