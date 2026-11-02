@@ -578,10 +578,10 @@ models:
       generally_available: false
       environments_available: ["development", "test", "preproduction", "production"]
   openai:
-    daybreak-red:
+    gpt-5-5-cyber-preview:
       model_id: "gpt-5.5-cyber-preview"
-      model_family: "OpenAI Daybreak"
-      model_name: "OpenAI Cyber Preview"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.5 Cyber Preview"
       model_location: "Global"
       model_provider: "OpenAI"
       generally_available: false

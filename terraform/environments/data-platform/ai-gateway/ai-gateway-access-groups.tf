@@ -66,6 +66,32 @@ resource "litellm_unified_access_group" "openai_daybreak" {
   }
 }
 
+resource "litellm_unified_access_group" "openai_models" {
+  count = length(try(local.ai_gateway_models_filtered.openai, {})) > 0 ? 1 : 0
+
+  access_group_name = "openai-models"
+  assigned_team_ids = [
+    for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id
+    if contains(try(team.unified_access_groups, []), "openai-models")
+  ]
+
+  access_model_names = [
+    for key in sort(keys(litellm_model.openai_daybreak)) :
+    litellm_model.openai_daybreak[key].model_name
+  ]
+
+  # Teams can be assigned to access groups out-of-band via the LiteLLM UI/API; don't revoke those.
+  lifecycle {
+    ignore_changes = [assigned_team_ids]
+
+    # Per-model groups are named "openai-<key>", so a model keyed "models" would collide with this group.
+    precondition {
+      condition     = !contains(keys(local.ai_gateway_models_filtered.openai), "models")
+      error_message = "An OpenAI model may not use the key \"models\"; it collides with the \"openai-models\" access group."
+    }
+  }
+}
+
 resource "litellm_unified_access_group" "generally_available_models" {
   access_group_name = "generally-available-models"
   assigned_team_ids = [
