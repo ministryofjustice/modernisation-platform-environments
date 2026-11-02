@@ -275,6 +275,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess
           role-chaining: true
+          role-skip-session-tagging: true
           role-session-name: ingestionpublication
           aws-region: eu-west-2
 
