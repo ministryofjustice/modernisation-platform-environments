@@ -271,6 +271,30 @@ locals {
         timezone = "Europe/London"
         workflow = "github_workflow_monitoring.yml"
       }
+      mp-automation-ndh-offloc-copy = {
+        identity = "platops"
+        inputs   = {
+          scheduled_run = "ndh_offloc_copy"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(45 23 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_copy.yml"
+      }
+      mp-automation-ndh-offloc-copy-backup = {
+        identity = "platops"
+        inputs   = {
+          scheduled_run = "ndh_offloc_copy"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(20 2 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_copy.yml"
+      }
       mp-automation-planetfm-gfsl-data-extract-am = {
         identity = "platops"
         inputs   = {}
