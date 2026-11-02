@@ -69,7 +69,7 @@ module "github_workflow_scheduler" {
 
 resource "aws_ssm_parameter" "aws_health_lambda_accounts" {
   count       = local.enable_aws_health_lambda ? 1 : 0
-  name        = "aws_health_lambda_accounts"
+  name        = "health_lambda_accounts"
   description = "AWS Health Lambda accounts"
   type        = "SecureString"
   value       = "TO_BE_UPDATED"
@@ -83,7 +83,7 @@ resource "aws_ssm_parameter" "aws_health_lambda_accounts" {
 
 resource "aws_ssm_parameter" "aws_health_lambda_ignore_findings" {
   count       = local.enable_aws_health_lambda ? 1 : 0
-  name        = "aws_health_lambda_ignore_findings"
+  name        = "health_lambda_ignore_findings"
   description = "AWS Health Lambda ignore findings"
   type        = "SecureString"
   value       = "TO_BE_UPDATED"
