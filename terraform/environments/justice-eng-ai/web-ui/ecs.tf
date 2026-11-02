@@ -78,6 +78,10 @@ resource "aws_ecs_task_definition" "app" {
           name  = "BEDROCK_MODEL_ID"
           value = var.bedrock_model_id
         },
+        {
+          name  = "BEDROCK_MAX_TOKENS"
+          value = var.bedrock_max_tokens 
+        },
         # GitHub App -- non-sensitive values (installation id + pem are in
         # the ``secrets`` block below).
         {

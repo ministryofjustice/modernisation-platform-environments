@@ -22,6 +22,12 @@ variable "bedrock_model_id" {
   default     = "eu.anthropic.claude-sonnet-5-5"
 }
 
+variable "bedrock_max_tokens" {
+  type        = string
+  description = "The maximum output tokens allocated for Amazon Bedrock generation payloads to prevent JSON truncation."
+  default     = "32768"
+}
+
 variable "enable_oidc_auth" {
   type        = bool
   description = "Whether to provision Entra ID OIDC secrets (and, in a follow-up, wire the ALB `authenticate-oidc` listener action). Secrets are created empty by Terraform and populated out-of-band; see oidc.tf."
