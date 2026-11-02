@@ -70,11 +70,11 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
           value = local.environment_shorthand
         },
         {
-          name = "ARTEFACT_TARGET"
+          name  = "ARTEFACT_TARGET"
           value = local.environment_shorthand
         },
         {
-          name = "RUN_IN_DF"
+          name  = "RUN_IN_DF"
           value = "True"
         }
       ]

@@ -17,11 +17,11 @@ moved {
 }
 
 resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_1521" {
-  security_group_id = aws_security_group.oem_app_security_group.id
-  description       = "Allow traffic from app servers to the database on port 1521"
-  ip_protocol       = "tcp"
-  from_port         = 1521
-  to_port           = 1521
+  security_group_id            = aws_security_group.oem_app_security_group.id
+  description                  = "Allow traffic from app servers to the database on port 1521"
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1521
   referenced_security_group_id = aws_security_group.oem_db_security_group.id
 
   tags = {
@@ -30,11 +30,11 @@ resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_1521" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_1522" {
-  security_group_id = aws_security_group.oem_app_security_group.id
-  description       = "Allow traffic from app servers to the database on port 1522"
-  ip_protocol       = "tcp"
-  from_port         = 1522
-  to_port           = 1522
+  security_group_id            = aws_security_group.oem_app_security_group.id
+  description                  = "Allow traffic from app servers to the database on port 1522"
+  ip_protocol                  = "tcp"
+  from_port                    = 1522
+  to_port                      = 1522
   referenced_security_group_id = aws_security_group.oem_db_security_group.id
 
   tags = {
@@ -43,11 +43,11 @@ resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_1522" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_3872" {
-  security_group_id = aws_security_group.oem_app_security_group.id
-  description       = "Allow traffic from app servers to the database on port 3872"
-  ip_protocol       = "tcp"
-  from_port         = 3872
-  to_port           = 3872
+  security_group_id            = aws_security_group.oem_app_security_group.id
+  description                  = "Allow traffic from app servers to the database on port 3872"
+  ip_protocol                  = "tcp"
+  from_port                    = 3872
+  to_port                      = 3872
   referenced_security_group_id = aws_security_group.oem_db_security_group.id
 
   tags = {
@@ -66,7 +66,7 @@ resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_1521_sub
   ip_protocol       = "tcp"
   from_port         = 1521
   to_port           = 1521
-  cidr_ipv4 = each.value
+  cidr_ipv4         = each.value
 
   tags = {
     Name = "Allow traffic from app servers to the database on port 1521"
@@ -102,7 +102,7 @@ resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_3872_sub
   ip_protocol       = "tcp"
   from_port         = 3872
   to_port           = 3872
-  cidr_ipv4 = each.value
+  cidr_ipv4         = each.value
 
   tags = {
     Name = "Allow traffic from app servers to the database on port 3872"
