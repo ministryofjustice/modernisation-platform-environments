@@ -38,6 +38,9 @@ data "aws_iam_policy_document" "prototype_database" {
     actions = [
       "dynamodb:Scan",
       "dynamodb:PutItem",
+      "dynamodb:GetItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:DeleteItem"
     ]
     resources = [
       "arn:${data.aws_partition.prototype_database.partition}:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*",
