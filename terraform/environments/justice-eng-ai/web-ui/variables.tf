@@ -96,6 +96,10 @@ variable "entra_reviewer_group_id" {
     true. See ``entra_admin_group_id`` for why this isn't a secret. Leave
     empty to fall back on ``MPAPB_REVIEWER_USER_IDS`` for break-glass
     reviewer authorisation.
+
+    Defaults to the SAME GUID as ``entra_admin_group_id`` -- intentional
+    for the MVP, not a copy-paste placeholder: admins are the only group
+    with reviewer-page access for now.
   EOT
   default     = "d0c842bc-1581-47b6-af5c-409db76fbbf2"
   validation {
