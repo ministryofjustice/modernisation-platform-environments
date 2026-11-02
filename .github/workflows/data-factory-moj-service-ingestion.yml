@@ -101,7 +101,7 @@ jobs:
         id: prepare
         uses: ./.github/actions/prepare-service-ingestion
         with:
-          repository-token: ${{ env.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+          repository-token: ${{ github.token }}
           runtime-reference: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
 
       - name: Terraform plan
@@ -239,7 +239,7 @@ jobs:
       - name: Prepare matching ingestion deployment
         uses: ./.github/actions/prepare-service-ingestion
         with:
-          repository-token: ${{ env.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+          repository-token: ${{ github.token }}
           runtime-reference: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
           expected-fingerprint: ${{ needs.plan.outputs.fingerprint }}
 
