@@ -137,10 +137,10 @@ wrong audience/issuer, expired/invalid signature, delegated user, missing applic
 unmapped application, and cross-client access on all multipart operations. Unit tests in
 the application cover handler authorisation, not AWS cryptographic token validation.
 
-Production acceptance additionally needs payload/encryption/connectivity evidence,
-zero-critical-error smoke results and Buyer SecOps/Infra sign-off. This authentication
-change alone does not complete D07. Development alarm actions reuse the existing platform topic. Confirm delivery and
-configure production destinations before activation.
+Before production release, verify file integrity, encryption and connectivity,
+run the smoke tests, and agree the results with the security and infrastructure
+leads. Development alarms use the existing platform topic; test message delivery
+and configure production destinations before release.
 
 
 ## IDAM registrations and automated development testing

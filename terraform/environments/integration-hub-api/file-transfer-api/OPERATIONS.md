@@ -1,57 +1,64 @@
-# File-transfer API operations
+# File-transfer API runbook
 
-The API account and the file-processing account are separate. Use an SSO profile for
-the account being investigated; a profile name alone doesn't prove it points there.
+Use this guide to check alerts, investigate a failed upload and verify cleanup.
+The API and file-processing resources are in separate AWS accounts:
 
-| Development resource | Account |
+| Development resources | Account |
 | --- | --- |
-| API Gateway, upload/docs Lambdas, session table, API alarms | 732169940576 |
-| Incoming S3 bucket, scanning/routing and pickup | 346568122691 |
+| API Gateway, API Lambdas, session table and API alarms | 732169940576 |
+| Incoming bucket, scanning, routing and pickup | 346568122691 |
 
-## Verify after apply
+Check the account behind your SSO profile before running commands:
 
-From this component directory:
+```sh
+aws sts get-caller-identity --profile YOUR_PROFILE
+```
+
+Some older profiles still point to the retired integration-hub account. Use a
+profile for the current file-transfer account when checking its bucket.
+
+## Check the deployment
+
+From this component directory, run:
 
 ```sh
 python3 scripts/verify-operations.py --api-profile integration-hub-api-development \
-  --mft-profile YOUR_CURRENT_FILE_TRANSFER_DEVELOPMENT_PROFILE
+  --mft-profile YOUR_FILE_TRANSFER_DEVELOPMENT_PROFILE
 ```
 
-The script is read-only. It checks account IDs, JWT routes, enabled alarm actions,
-notification-topic subscribers/encryption, session TTL and bucket multipart cleanup.
-It prints only check results and writes `operations-results.json`. Exit 1 means a
-failed check; exit 2 means some evidence is still unverified. Read permissions or an
-expired SSO session can prevent a check; that isn't evidence that cleanup works.
+This reads the account IDs, JWT routes, alarms, notification topics, session TTL
+and bucket cleanup rules. It doesn't change resources or send messages.
 
-The locally available `integration-hub-development` profile was found to point to
-retired account 508564776517, not the current file-transfer account. Configure/use
-the correct SSO profile before verifying the bucket. Don't change credentials in code.
+Results are printed and saved to `operations-results.json`. Exit code 1 means a
+check failed; 2 means something still needs verification. For example, the script
+can't prove notification delivery, and missing AWS read permissions leave the
+bucket check unverified.
 
-## Notifications
+## Alarm destinations
 
-Alarm destinations are existing SNS topic **names** under each environment's
-`observability_configuration.alarm_topic_names`, with `high_priority` and `low_priority`.
-Terraform looks them up in this component's account and fails if a named topic is
-missing. Preproduction and production require both destinations before deployment.
+Set topic names under each environment's
+`observability_configuration.alarm_topic_names`, using `high_priority` and
+`low_priority`. Terraform looks up those topics in the API account. A missing
+configured topic fails the plan. Both destinations are required for preproduction
+and production.
 
-Development uses the existing platform `high-priority-alarms-topic` for both priorities.
-It has an encrypted key permitting CloudWatch and a confirmed HTTPS subscriber.
-This does not prove message delivery or identify a Slack channel. Confirm the subscriber
-route with the platform team and exercise delivery below. No new Slack app, webhook,
-SNS subscription, topic policy or encryption key is created by this component.
+Development uses the existing platform `high-priority-alarms-topic` for both
+priorities. The topic is encrypted, permits CloudWatch to use its key and has a
+confirmed HTTPS subscriber. Confirm where that subscription delivers messages
+before relying on it for support.
 
-Alarms cover API 5xx and latency, sustained 4xx, and active Lambda errors/throttles/duration.
-The retired Lambda authorizer has no route traffic, so its three alarms are removed.
-The 4xx alarm defaults to over 100 responses in each of two five-minute periods; it
-includes expected authentication/client failures, not just attacks. Tune it against
-customer traffic. It does not by itself identify 429s or every missing-role rejection.
-Use access logs to distinguish status codes. Keep security-test runs below that threshold.
+Alarms cover API server errors, latency, sustained client errors, and active Lambda
+errors, throttles and duration. The unused Lambda authorizer's alarms are removed.
+The new 4xx alarm fires when there are more than 100 client-error responses in each
+of two consecutive five-minute periods. These may include ordinary validation or
+login failures, so check the access logs before treating them as a security incident.
+Tune the threshold once there is a representative traffic baseline.
 
-## Exercise the notification path
+## Test an alert
 
-Arrange a development test window with the existing topic's operational recipient.
-Use a temporary custom metric/alarm so no application failure needs to be induced.
-This produces real ALARM/OK notifications and must use the development account.
+Let the alert recipient know you're testing. Create a temporary alarm on a test
+metric, rather than breaking the API. The following commands send real ALARM and
+OK notifications through the development topic:
 
 ```sh
 api_profile=integration-hub-api-development
@@ -69,76 +76,89 @@ aws cloudwatch put-metric-data --profile "$api_profile" --region eu-west-2 \
   --metric-data MetricName=NotificationCanary,Value=1,Unit=Count
 ```
 
-Wait for the canary to enter ALARM and confirm delivery with its intended recipient.
-After that minute has passed, publish Value=0 or let missing data return the alarm to
-OK; confirm the recovery notification. Record timestamps and alarm history. Verify the
-actual API alarm actions point to the same tested topic. If delivery fails, inspect
-alarm history, SNS subscriber delivery and SNS/KMS policies; do not loosen policies
-or enable public publish access as a workaround.
+Wait for the alarm to enter ALARM and confirm the message arrived. Once that minute
+has passed, publish the same metric with `Value=0`, or let missing data return it to
+OK. Confirm the recovery message too, and save the timestamps and alarm history.
 
-Remove only the temporary canary after recording the result:
+If no message arrives, check CloudWatch alarm history, the SNS subscription and
+SNS/KMS permissions. Confirm the API's alarms use the same topic you tested.
+
+Remove the temporary alarm when finished:
 
 ```sh
 aws cloudwatch delete-alarms --profile "$api_profile" --region eu-west-2 \
   --alarm-names integration-hub-api-file-transfer-api-notification-canary
 ```
 
-A confirmed subscription is not a substitute for this end-to-end check. This procedure
-has not been run by the PR. The read-only verification report keeps delivery unverified.
+The read-only checker leaves delivery unverified until this test is recorded.
 
-## Follow a failed transfer
+## Investigate an upload
 
-Start with time, API request ID and transfer ticket. In the API account inspect:
+Start with the time, API request ID and transfer ticket. In the API account, check:
 
-- `/aws/apigateway/integration-hub-api-file-transfer-api`: status, latency and integration error.
-- `/aws/lambda/integration-hub-api-file-transfer-api-upload-ticket`: validation, customer mapping, multipart/S3 failures.
-- `/aws/lambda/integration-hub-api-file-transfer-api-docs`: documentation access only.
+| Log group | What it shows |
+| --- | --- |
+| `/aws/apigateway/integration-hub-api-file-transfer-api` | HTTP status, latency and integration errors |
+| `/aws/lambda/integration-hub-api-file-transfer-api-upload-ticket` | Validation, customer permissions and multipart/S3 failures |
+| `/aws/lambda/integration-hub-api-file-transfer-api-docs` | Documentation access |
 
-A 401 points to token validation. For 403, inspect the application role and explicit
-consumer/customer mapping. Do not restore Basic authentication. For 429, reduce client
-concurrency and retry with backoff. For 5xx, correlate the request with Lambda logs and
-S3/DynamoDB failures. Never log a token, secret or full presigned URL.
+- **401:** check token expiry, issuer and audience.
+- **403:** check the application's upload role and customer mapping.
+- **429:** reduce request concurrency and use retry backoff.
+- **5xx:** follow the request into Lambda logs and check S3 or DynamoDB errors.
 
-In the file-transfer account follow file-received, scan-result, stage and route logs,
-then the relevant pickup worker and its queue/DLQ. The API alarms do not cover those
-separate components. Check queue age, visible messages and DLQ alarms there; confirm
-their operational recipients before production sign-off.
+Keep secrets, tokens and signed URLs out of logs and shared screenshots.
 
-## Cleanup and recovery
+For a file that uploaded but hasn't reached pickup, switch to the file-transfer
+account. Follow file-received, scan-result, stage and route logs, then the pickup
+worker. Check its queue age, pending messages and dead-letter queue. Those components
+have separate monitoring; confirm their alert recipients before release.
 
-The session table has TTL on `expires_at_epoch`; deletion is asynchronous. Current API
-main retains session records for seven days independently of signed URL expiry.
-The incoming bucket's Terraform has a global one-day abort-incomplete-multipart rule.
-That lifecycle rule may remove S3 parts before the session record expires. A remaining
-session record therefore isn't a promise that an upload can resume for seven days.
+## Incomplete uploads and cleanup
 
-For a controlled incomplete transfer, record the ticket/upload ID and confirm that its
-parts disappear after lifecycle processing. Use the current file-transfer account to
-list multipart uploads and the API account for the session record. Verify both; TTL
-only removes the DynamoDB item. Don't delete customer objects or globally abort uploads.
-For active test sessions, use the authenticated abort API. For ambiguous completion,
-check the session/object outcome before retrying or starting another transfer.
+DynamoDB session records use TTL on `expires_at_epoch`. The API currently keeps
+records for seven days; removal after expiry is asynchronous. The incoming bucket
+has a one-day rule for aborting incomplete S3 multipart uploads.
 
-The development recovery test in the API repo exercises interrupted PUT/retry,
-invalid ETags, abort and repeat completion. Repeated completion currently returns 409.
-Missing checksum, expiry-fixture or cleanup evidence remains incomplete until recorded.
+These are separate lifetimes. A session record can remain after its S3 parts have
+been removed, so seven-day record retention doesn't promise seven-day upload resume.
 
-## Capacity and rollout
+For a controlled incomplete test upload, record its ticket and S3 upload ID. Check
+that lifecycle processing removes the parts, and check the session record separately.
+DynamoDB TTL doesn't remove S3 parts. Use the authenticated abort endpoint to cancel
+an active test upload without waiting for lifecycle processing.
 
-The verified development gateway baseline is 10 requests/second with burst 20. These
-limits govern API control requests, not bytes uploaded directly to S3. Run an agreed,
-bounded development load test with representative file sizes and few simultaneous
-customers first. Record throughput, API p95/p99 latency, 4xx/5xx/429 counts, Lambda
-throttles/duration, queue age and cost. Increase concurrency gradually; don't change
-production limits from a laptop benchmark or a single successful upload.
+If completion times out, inspect the session and object before trying again. The
+file may already have completed. Repeated completion currently returns 409. The
+API repo's recovery suite covers this along with interrupted PUTs, retries, invalid
+ETags and aborts.
 
-Before release, name the operational owner/on-call, agree alarm thresholds/destinations,
-and attach the security/recovery/capacity results. This PR does not create production
-identities/accounts or constitute production sign-off.
+## Capacity testing
 
-Deploy application and Terraform revisions together. To recover from a regression,
-prefer a reviewed forward fix; otherwise redeploy the last compatible application
-revision and apply a reviewed matching Terraform revert. Do not independently roll
-back the JWT gateway while leaving a handler expecting different authorizer claims.
-Keep access denied during an uncertain rollback rather than re-enable obsolete auth.
-Verify a small upload, multipart completion and alarms after recovery.
+Development is configured for 10 API requests/second with burst 20. These limits
+apply to ticket and multipart operations, not the bytes sent directly to S3.
+
+Agree a test window and data volume, then start with a few simultaneous uploads.
+Use representative file sizes and record:
+
+- Upload throughput and API p95/p99 latency.
+- HTTP 4xx, 5xx and 429 counts.
+- Lambda throttles and duration.
+- Downstream queue age and test cost.
+
+Increase concurrency gradually. Use those results to choose production limits;
+a single laptop upload doesn't establish service capacity.
+
+## Release and rollback
+
+Before release, agree the support owner, alert destinations and thresholds. Keep
+the security, recovery and capacity results with the release record, including
+any checks still outstanding.
+
+Treat the application and Terraform as a coordinated deployment. Prefer a reviewed
+forward fix. If a rollback is needed, redeploy the last compatible application
+revision and apply its matching reviewed Terraform revert. Don't roll back the
+JWT gateway independently of the handler's authentication expectations or restore
+Basic authentication as a shortcut.
+
+After recovery, check a small upload, multipart completion and alert delivery.
