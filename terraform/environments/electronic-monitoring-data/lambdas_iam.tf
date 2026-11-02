@@ -1391,6 +1391,39 @@ data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
   }
 
   statement {
+    sid    = "AllowSendAlarmDebounceConfirmations"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [
+      aws_sqs_queue.cloudwatch_alarm_debounce.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowConsumeAlarmDebounceConfirmations"
+    effect = "Allow"
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:ReceiveMessage",
+    ]
+    resources = [
+      aws_sqs_queue.cloudwatch_alarm_debounce.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowReadCloudWatchAlarmState"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DescribeAlarms",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "ReadDownstreamReconciliationStatus"
     effect = "Allow"
 
