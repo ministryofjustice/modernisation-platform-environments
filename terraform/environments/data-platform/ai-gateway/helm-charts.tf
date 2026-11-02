@@ -157,10 +157,8 @@ resource "helm_release" "litellm" {
         targetCPUUtilizationPercentage = local.environment_configuration.ai_gateway_autoscaling.target_cpu_utilization_percentage
 
         # Prompt Logs
-        litellmCallbacksConfigMap = kubernetes_config_map_v1.litellm_callbacks.metadata[0].name
-        promptLogsBucket          = module.prompt_logs.s3_bucket_id
-        promptLogsRegion          = data.aws_region.current.region
-        promptLoggingModels       = local.ai_gateway_prompt_logging_models
+        promptLogsBucket = module.prompt_logs.s3_bucket_id
+        promptLogsRegion = data.aws_region.current.region
 
         # LiteLLM models are stored in the database; no model list is templated here.
         # Admin
@@ -183,7 +181,6 @@ resource "helm_release" "litellm" {
     kubernetes_service_account_v1.ai_gateway,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_config_map_v1.google_application_credentials,
-    kubernetes_config_map_v1.litellm_callbacks,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_registry,
     kubernetes_manifest.external_secret_litellm_salt_key,

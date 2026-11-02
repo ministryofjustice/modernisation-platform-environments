@@ -39,11 +39,6 @@ locals {
   openai_identity_token_directory   = "/var/run/secrets/api.openai.com"
   openai_identity_token_file        = "${local.openai_identity_token_directory}/openai-identity-token"
 
-  ai_gateway_prompt_logging_models = [
-    for model in values(try(local.ai_gateway_models_filtered.openai, {})) : model.model_id
-    if try(model.log_prompts_to_s3, false)
-  ]
-
   # Google workload identity federation (used by LiteLLM to call Google Gemini Enterprise Agent Platform)
   google_cloud_project_name         = jsondecode(data.aws_secretsmanager_secret_version.google_cloud_ai_gateway.secret_string)["project_name"]
   google_cloud_project_id           = jsondecode(data.aws_secretsmanager_secret_version.google_cloud_ai_gateway.secret_string)["project_id"]
