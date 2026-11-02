@@ -284,9 +284,11 @@ jobs:
           set -euo pipefail
           umask 077
 
-          terraform output -json deployments > .generated/deployments.json
+          terraform output -json deployments \
+            > .generated/deployments.json
 
-          "${INGESTION_PYTHON}" -m ingestion_config finalize-deployment \
+          "${RUNNER_TEMP}/ingestion-deployment-venv/bin/python" \
+            -m ingestion_config finalize-deployment \
             --deployments .generated/deployments.json \
             --account-id "${ACCOUNT_NUMBER}" \
             --bucket-name "$(jq -er '.published_documents.bucket_name' .generated/foundations.json)" \
@@ -294,5 +296,5 @@ jobs:
             --registry-table-arn "$(jq -er '.registry.table_arn' .generated/foundations.json)" \
             --output .generated/deployment-receipt.json
 
-          printf '%s\n' "Development ingestion deployment finalized." \
+          echo "Deployment documents verified and references registered." \
             >> "${GITHUB_STEP_SUMMARY}"
