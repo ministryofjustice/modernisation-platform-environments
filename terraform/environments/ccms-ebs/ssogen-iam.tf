@@ -166,9 +166,11 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
         "ds:DescribeDirectories",
         "ec2:DescribeInstanceStatus",
         "ec2:DescribeTags",
-        "logs:*",
-        "ssm:*",
-        "ec2messages:*"
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
       ],
       "Resource": "*"
     },
