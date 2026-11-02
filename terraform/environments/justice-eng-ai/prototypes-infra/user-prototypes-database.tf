@@ -38,6 +38,9 @@ data "aws_iam_policy_document" "prototype_database" {
     actions = [
       "dynamodb:Scan",
       "dynamodb:PutItem",
+      "dynamodb:GetItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:DeleteItem",
     ]
     resources = [
       "arn:${data.aws_partition.prototype_database.partition}:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*",
@@ -47,7 +50,7 @@ data "aws_iam_policy_document" "prototype_database" {
 
 resource "aws_iam_policy" "prototype_database" {
   name        = "${local.application_name}-prototype-database"
-  description = "Read draft history and append prototype drafts and submissions."
+  description = "Read draft history and create, read, update and delete prototype submissions."
   policy      = data.aws_iam_policy_document.prototype_database.json
   tags        = local.tags
 }
