@@ -139,8 +139,8 @@ the application cover handler authorisation, not AWS cryptographic token validat
 
 Production acceptance additionally needs payload/encryption/connectivity evidence,
 zero-critical-error smoke results and Buyer SecOps/Infra sign-off. This authentication
-change alone does not complete D07. Existing alarm actions are not wired; agree the
-operational alert destinations before production activation.
+change alone does not complete D07. Development alarm actions reuse the existing platform topic. Confirm delivery and
+configure production destinations before activation.
 
 
 ## IDAM registrations and automated development testing
@@ -169,3 +169,5 @@ complete the coordinated API cutover, then run **Test Entra development authenti
 from `main`. It checks basic authentication failures and uploads a harmless file.
 It does not replace the broader token, multipart, scan and download acceptance tests.
 No changes to platform-managed workflows are needed for these tests.
+
+See [operations](OPERATIONS.md) for notification checks, cleanup verification, capacity testing and rollout/rollback steps.
