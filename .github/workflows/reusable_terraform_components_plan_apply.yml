@@ -4,6 +4,11 @@ name: terraform plan apply
 "on":
   workflow_call:
     inputs:
+      prepare_service_ingestion:
+        type: boolean
+        required: false
+        default: false
+        description: "Enable preparation and publication for data-factory-moj/service-ingestion in development."
       application:
         type: string
         required: true
@@ -62,6 +67,9 @@ name: terraform plan apply
         default: false
         description: "Optional: set to true when the component manages Amazon Managed Grafana objects with the Grafana provider. Mints a short-lived AMG service account token into GRAFANA_AUTH and sets TF_VAR_grafana_url. No-op when the workspace has no AMG workspace."
     secrets:
+      DMS_DEVELOPMENT_RUNTIME_REFERENCE:
+        required: false
+        description: "Complete pinned runtime deployment-reference JSON for development ingestion."
       MODERNISATION_PLATFORM_ACCOUNT_ID:
         required: true
       PASSPHRASE:
@@ -100,6 +108,7 @@ jobs:
     if: ${{ !cancelled() && !failure() }}
     outputs:
       plan_exitcode: "${{ steps.plan.outputs.exitcode }}"
+      ingestion_fingerprint: "${{ steps.prepare_ingestion.outputs.fingerprint }}"
     steps:
       - name: Debug
         run: |
@@ -114,6 +123,26 @@ jobs:
 
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validate ingestion extension scope
+        if: inputs.prepare_service_ingestion == true
+        shell: bash
+        env:
+          APPLICATION: ${{ inputs.application }}
+          TARGET_ENVIRONMENT: ${{ inputs.environment }}
+          COMPONENT: ${{ inputs.component }}
+          ACCOUNT_OVERRIDE: ${{ inputs.account_name }}
+          EXTRA_ARGUMENTS: ${{ inputs.plan_apply_tfargs }}
+          REFRESH_ENABLED: ${{ inputs.do_state_refresh_on_plan }}
+        run: |
+          set -euo pipefail
+
+          test "${APPLICATION}" = "data-factory-moj"
+          test "${TARGET_ENVIRONMENT}" = "development"
+          test "${COMPONENT}" = "service-ingestion"
+          test -z "${ACCOUNT_OVERRIDE}"
+          test -z "${EXTRA_ARGUMENTS}"
+          test "${REFRESH_ENABLED}" = "false"
 
       - name: Load skip plan evaluator list
         run: |
@@ -172,6 +201,14 @@ jobs:
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
         run: |
           terraform workspace select "${WORKSPACE_NAME}"
+
+      - name: Prepare ingestion deployment
+        id: prepare_ingestion
+        if: inputs.prepare_service_ingestion == true
+        uses: ./.github/actions/prepare-service-ingestion
+        with:
+          repository-token: ${{ env.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+          runtime-reference: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
 
       - name: Validate Tags
         id: validate
@@ -352,7 +389,22 @@ jobs:
     name: "apply"
     needs: [plan, fetch-secrets]
     # fetch-secrets is intentionally skipped when secrets_prefetched is true, so don't rely on the default success() check
-    if: ${{ !cancelled() && !failure() && inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2' }}
+    if: >-
+      ${{
+        !cancelled() &&
+        !failure() &&
+        inputs.action == 'plan_apply' &&
+        (
+          needs.plan.outputs.plan_exitcode == '2' ||
+          (
+            needs.plan.outputs.plan_exitcode == '0' &&
+            inputs.prepare_service_ingestion == true &&
+            inputs.application == 'data-factory-moj' &&
+            inputs.environment == 'development' &&
+            inputs.component == 'service-ingestion'
+          )
+        )
+      }}
     runs-on: ${{ inputs.runner }}
     environment: ${{ inputs.account_name && (inputs.component != 'root' && format('{0}-{1}', inputs.account_name, inputs.component) || inputs.account_name) || (inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment)) }}
     steps:
@@ -363,6 +415,14 @@ jobs:
         uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management || secrets.ENVIRONMENT_MANAGEMENT }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+      - name: Decrypt ingestion repository token
+        if: inputs.prepare_service_ingestion == true
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management || secrets.ENVIRONMENT_MANAGEMENT }}
+          github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat || secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Get AWS Account Number
@@ -402,6 +462,27 @@ jobs:
         run: |
           terraform workspace select "${WORKSPACE_NAME}"
 
+      - name: Check ingestion plan fingerprint
+        if: inputs.prepare_service_ingestion == true
+        shell: bash
+        env:
+          EXPECTED_FINGERPRINT: ${{ needs.plan.outputs.ingestion_fingerprint }}
+        run: |
+          set -euo pipefail
+
+          [[ "${EXPECTED_FINGERPRINT}" =~ ^[a-f0-9]{64}$ ]] || {
+            echo "::error::A valid ingestion preparation fingerprint is required from the plan job."
+            exit 1
+          }
+
+      - name: Prepare ingestion deployment
+        if: inputs.prepare_service_ingestion == true
+        uses: ./.github/actions/prepare-service-ingestion
+        with:
+          repository-token: ${{ env.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+          runtime-reference: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
+          expected-fingerprint: ${{ needs.plan.outputs.ingestion_fingerprint }}
+
       # See the equivalent step in the plan job for rationale. Runs before
       # Terraform Plan so GRAFANA_AUTH/TF_VAR_grafana_url are set when the
       # Grafana provider is evaluated.
@@ -410,12 +491,36 @@ jobs:
         run: bash "${GITHUB_WORKSPACE}/scripts/mint-grafana-token.sh"
 
       - name: Terraform Plan
+        env:
+          PREPARE_SERVICE_INGESTION: ${{ inputs.prepare_service_ingestion }}
+          REVIEWED_PLAN_EXITCODE: ${{ needs.plan.outputs.plan_exitcode }}
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
         run: |
           set -o pipefail
-          tf_args="-out x.tfplan ${{ inputs.plan_apply_tfargs }}"
-          echo "terraform plan ${tf_args}"
-          terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+          if [[ "${PREPARE_SERVICE_INGESTION}" == "true" ]]; then
+            exitcode=0
+
+            terraform plan \
+              -detailed-exitcode \
+              -out=x.tfplan \
+              | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh" \
+              || exitcode=$?
+
+            if [[ "${exitcode}" != "0" && "${exitcode}" != "2" ]]; then
+              echo "::error::Terraform plan failed."
+              exit 1
+            fi
+
+            if [[ "${REVIEWED_PLAN_EXITCODE}" == "0" && "${exitcode}" != "0" ]]; then
+              echo "::error::Infrastructure changes appeared during a publication retry. Run a new workflow to review the changes."
+              exit 1
+            fi
+          else
+            tf_args="-out x.tfplan ${{ inputs.plan_apply_tfargs }}"
+            echo "terraform plan ${tf_args}"
+            terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+          fi
 
       - name: Terraform Apply
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
@@ -424,6 +529,37 @@ jobs:
           tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
           echo "terraform apply ${tf_args}"
           terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+      - name: Configure ingestion publication credentials
+        if: inputs.prepare_service_ingestion == true
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
+          role-chaining: true
+          role-session-name: ingestionpublication
+          aws-region: eu-west-2
+
+      - name: Finalize ingestion deployment
+        if: inputs.prepare_service_ingestion == true
+        working-directory: terraform/environments/data-factory-moj/service-ingestion
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+
+          terraform output -json deployments \
+            > .generated/deployments.json
+
+          "${INGESTION_PYTHON}" -m ingestion_config finalize-deployment \
+            --deployments .generated/deployments.json \
+            --account-id "${ACCOUNT_NUMBER}" \
+            --bucket-name "$(jq -er '.published_documents.bucket_name' .generated/foundations.json)" \
+            --kms-key-arn "$(jq -er '.published_documents.kms_key_arns[0]' .generated/foundations.json)" \
+            --registry-table-arn "$(jq -er '.registry.table_arn' .generated/foundations.json)" \
+            --output .generated/deployment-receipt.json
+
+          echo "Deployment documents verified and references registered." \
+            >> "${GITHUB_STEP_SUMMARY}"
 
       # See the equivalent step in the plan job for rationale.
       - name: Delete AMG Service Account Token (Optional)
