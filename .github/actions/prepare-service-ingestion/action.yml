@@ -1,0 +1,276 @@
+name: Prepare service ingestion
+description: Prepare and verify development ingestion deployment inputs
+
+inputs:
+  repository-token:
+    description: Token with read access to the modules repository
+    required: true
+
+  runtime-reference:
+    description: Complete JSON reference from the successful runtime publication
+    required: true
+
+  expected-fingerprint:
+    description: Expected preparation fingerprint from the plan job
+    required: false
+    default: ""
+
+outputs:
+  fingerprint:
+    description: Fingerprint of the prepared deployment and publication settings
+    value: ${{ steps.prepare.outputs.fingerprint }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check deployment scope
+      shell: bash
+      env:
+        RUNTIME_REFERENCE: ${{ inputs.runtime-reference }}
+      run: |
+        set -euo pipefail
+
+        test "${WORKSPACE_NAME}" = "data-factory-moj-development"
+        test -n "${ACCOUNT_NUMBER}"
+        test -n "${RUNTIME_REFERENCE}" || {
+          echo "::error::The development runtime deployment reference is missing."
+          exit 1
+        }
+
+    - name: Check out the pinned ingestion implementation
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        repository: ministryofjustice/terraform-aws-moj-data-factory-modules
+        ref: dd5ce0a19a50988bcc6e4d641ee59f769d13a632
+        token: ${{ inputs.repository-token }}
+        path: .ingestion-modules
+        persist-credentials: false
+
+    - name: Set up Python
+      uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+      with:
+        python-version: "3.12"
+
+    - name: Install the pinned ingestion packages
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        modules="${GITHUB_WORKSPACE}/.ingestion-modules/modules/database-migration-service"
+        tools="${RUNNER_TEMP}/ingestion-deployment-venv"
+
+        test "$(git -C "${GITHUB_WORKSPACE}/.ingestion-modules" rev-parse HEAD)" \
+          = "dd5ce0a19a50988bcc6e4d641ee59f769d13a632"
+
+        python -m venv "${tools}"
+
+        "${tools}/bin/python" -m pip install \
+          --require-hashes \
+          -r "${modules}/runtime-controller/requirements-build.lock" \
+          -r "${modules}/runtime-controller/requirements-runtime.lock"
+
+        "${tools}/bin/python" -m pip install \
+          --no-deps \
+          --no-build-isolation \
+          "${modules}/configuration" \
+          "${modules}/ingestion-registry"
+
+        echo "INGESTION_PYTHON=${tools}/bin/python" >> "${GITHUB_ENV}"
+
+    - name: Read platform outputs and prepare deployment
+      id: prepare
+      shell: bash
+      env:
+        RUNTIME_REFERENCE: ${{ inputs.runtime-reference }}
+        EXPECTED_FINGERPRINT: ${{ inputs.expected-fingerprint }}
+      run: |
+        set -euo pipefail
+        umask 077
+
+        root="${GITHUB_WORKSPACE}/terraform/environments/data-factory-moj"
+        component="${root}/service-ingestion"
+        generated="${component}/.generated"
+        prepared="${component}/deployment.generated.auto.tfvars.json"
+        compiler_commit="dd5ce0a19a50988bcc6e4d641ee59f769d13a632"
+
+        mkdir -p "${generated}"
+
+        test ! -e "${prepared}" || {
+          echo "::error::Prepared deployment inputs already exist."
+          exit 1
+        }
+
+        printf '%s' "${RUNTIME_REFERENCE}" \
+          > "${generated}/runtime-reference.json"
+
+        jq -e 'type == "object"' \
+          "${generated}/runtime-reference.json" > /dev/null
+
+        # Read named outputs only. No foundation plan or apply is run.
+        for foundation in dms-core ingestion-registry ingestion-artifacts; do
+          terraform -chdir="${root}/${foundation}" init \
+            -input=false \
+            -no-color \
+            > "${generated}/${foundation}-init.log" 2>&1 || {
+              cat "${generated}/${foundation}-init.log" >&2
+              exit 1
+            }
+
+          terraform -chdir="${root}/${foundation}" workspace select \
+            "${WORKSPACE_NAME}" > /dev/null
+        done
+
+        terraform -chdir="${root}/dms-core" output \
+          -json onboarding_platform_bindings \
+          > "${generated}/platform.json"
+
+        terraform -chdir="${root}/dms-core" output \
+          -json onboarding_source_credentials \
+          > "${generated}/source-credentials.json"
+
+        terraform -chdir="${root}/dms-core" output \
+          -json onboarding_replication_capacities \
+          > "${generated}/capacities.json"
+
+        terraform -chdir="${root}/ingestion-registry" output \
+          -json ingestion_registry_table_name \
+          > "${generated}/registry-name.json"
+
+        terraform -chdir="${root}/ingestion-registry" output \
+          -json ingestion_registry_table_arn \
+          > "${generated}/registry-arn.json"
+
+        terraform -chdir="${root}/ingestion-registry" output \
+          -json ingestion_configuration_bucket_name \
+          > "${generated}/configuration-bucket.json"
+
+        terraform -chdir="${root}/ingestion-registry" output \
+          -json ingestion_configuration_kms_key_arn \
+          > "${generated}/configuration-key.json"
+
+        terraform -chdir="${root}/ingestion-artifacts" output \
+          -json artifact_bucket_name \
+          > "${generated}/artifact-bucket.json"
+
+        terraform -chdir="${root}/ingestion-artifacts" output \
+          -json artifact_kms_key_arn \
+          > "${generated}/artifact-key.json"
+
+        jq -n \
+          --arg account "${ACCOUNT_NUMBER}" \
+          --slurpfile registry_name "${generated}/registry-name.json" \
+          --slurpfile registry_arn "${generated}/registry-arn.json" \
+          --slurpfile bucket "${generated}/configuration-bucket.json" \
+          --slurpfile key "${generated}/configuration-key.json" \
+          --slurpfile credentials "${generated}/source-credentials.json" \
+          --slurpfile capacities "${generated}/capacities.json" \
+          '{
+            environment: "development",
+            account_id: $account,
+            region: "eu-west-2",
+            registry: {
+              table_name: $registry_name[0],
+              table_arn: $registry_arn[0]
+            },
+            published_documents: {
+              bucket_name: $bucket[0],
+              bucket_owner: $account,
+              kms_key_arns: [$key[0]]
+            },
+            source_credentials: $credentials[0],
+            replication_capacities: $capacities[0]
+          }' > "${generated}/foundations.json"
+
+        # These are outputs from our own deployment component.
+        # Never substitute empty retained configuration for an existing
+        # deployment whose retention outputs cannot be read.
+        terraform -chdir="${component}" output -json \
+          > "${generated}/previous-outputs.json"
+
+        if jq -e 'length == 0' \
+          "${generated}/previous-outputs.json" > /dev/null; then
+
+          if terraform -chdir="${component}" state list \
+            > "${generated}/state-addresses.txt" \
+            2> "${generated}/state-error.txt"; then
+
+            if awk '
+              NF && $0 !~ /^data\./ { found = 1 }
+              END { exit(found ? 0 : 1) }
+            ' "${generated}/state-addresses.txt"; then
+              echo "::error::Managed deployment resources exist but retention outputs are missing."
+              exit 1
+            fi
+          else
+            grep -Fq "No state file was found" \
+              "${generated}/state-error.txt" || {
+                cat "${generated}/state-error.txt" >&2
+                exit 1
+              }
+          fi
+
+          printf '{"compiled_artifacts":{}}\n' \
+            > "${generated}/retained-inventory.json"
+
+          printf '{}\n' \
+            > "${generated}/retained-assignments.json"
+        else
+          jq -e '
+            .retained_inventory.value
+            | select(type == "object")
+            | select(.compiled_artifacts | type == "object")
+          ' "${generated}/previous-outputs.json" \
+            > "${generated}/retained-inventory.json"
+
+          jq -e '
+            .deployed_capacity_assignments.value
+            | select(type == "object")
+          ' "${generated}/previous-outputs.json" \
+            > "${generated}/retained-assignments.json"
+        fi
+
+        "${INGESTION_PYTHON}" -m ingestion_config compile-directory \
+          --services "${root}/dms-core/onboarding/services" \
+          --platform "${generated}/platform.json" \
+          --generations "${root}/dms-core/onboarding/generations.json" \
+          --retained "${generated}/retained-inventory.json" \
+          --output "${generated}/inventory.json"
+
+        "${INGESTION_PYTHON}" -m ingestion_config prepare-deployment \
+          --inventory "${generated}/inventory.json" \
+          --foundations "${generated}/foundations.json" \
+          --runtime-package "${generated}/runtime-reference.json" \
+          --capacity-assignments "${component}/capacity_assignments.json" \
+          --retained-inventory "${generated}/retained-inventory.json" \
+          --retained-assignments "${generated}/retained-assignments.json" \
+          --compiler-commit "${compiler_commit}" \
+          --output "${prepared}"
+
+        "${INGESTION_PYTHON}" -m ingestion_config verify-runtime-package \
+          --prepared-deployment "${prepared}" \
+          --expected-account-id "${ACCOUNT_NUMBER}" \
+          --expected-region "eu-west-2" \
+          --expected-bucket-name "$(jq -er . "${generated}/artifact-bucket.json")" \
+          --expected-kms-key-arn "$(jq -er . "${generated}/artifact-key.json")" \
+          --output "${generated}/runtime-verification.json"
+
+        fingerprint="$(
+          sha256sum \
+            "${prepared}" \
+            "${generated}/foundations.json" \
+            "${generated}/runtime-reference.json" \
+            "${generated}/artifact-bucket.json" \
+            "${generated}/artifact-key.json" \
+            | awk '{print $1}' \
+            | sha256sum \
+            | cut -d ' ' -f 1
+        )"
+
+        if [[ -n "${EXPECTED_FINGERPRINT}" ]]; then
+          test "${fingerprint}" = "${EXPECTED_FINGERPRINT}" || {
+            echo "::error::Deployment inputs changed after the plan. Run a new plan before applying."
+            exit 1
+          }
+        fi
+
+        echo "fingerprint=${fingerprint}" >> "${GITHUB_OUTPUT}"

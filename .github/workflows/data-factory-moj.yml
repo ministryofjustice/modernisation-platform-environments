@@ -55,9 +55,11 @@ jobs:
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
       component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
+      prepare_service_ingestion: ${{ matrix.component == 'service-ingestion' && matrix.target == 'development' }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      DMS_DEVELOPMENT_RUNTIME_REFERENCE: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
 
   destroy-development:
     if: inputs.action == 'destroy'
