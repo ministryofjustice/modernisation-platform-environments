@@ -56,16 +56,7 @@ locals {
   # Native Identity Center SSO for Dashboards. See ADR-017.
   opensearch_idc_enabled = local.enable_opensearch
 
-<<<<<<< ours
-  # Accounts whose cluster Fluent Bit roles may write to the shared domain, keyed by account name.
-  opensearch_log_writer_account_ids = {
-    for name in concat(
-      ["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-nonlive", "cloud-platform-live"],
-      jsondecode(file("${path.module}/accounts.json")).accounts
-    ) : name => local.environment_management.account_ids[name]
-    if contains(keys(local.environment_management.account_ids), name)
-  }
-=======
+
   #-----------------------------------------------------------------------------
   # Container Platform identity OIDC role ARNs (privilege-escalation hardening,
   # ministryofjustice/cloud-platform#8612).
@@ -80,5 +71,4 @@ locals {
   #-----------------------------------------------------------------------------
   cp_identity_apply_role_arn = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-live"]}:role/github-actions-container-platform-identity-apply"
   cp_identity_plan_role_arn  = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-live"]}:role/github-actions-container-platform-identity-plan"
->>>>>>> theirs
 }

@@ -19,15 +19,7 @@ provider "grafana" {
   url = var.grafana_url == "" ? null : "https://${var.grafana_url}"
 }
 
-<<<<<<< ours
-# Workspaces without the domain have no OpenSearch resources, so the placeholder URL is never called.
-provider "opensearch" {
-  url               = local.enable_opensearch ? "https://${aws_opensearch_domain.logs[0].endpoint}" : "https://localhost"
-  aws_region        = "eu-west-2"
-  sign_aws_requests = true
-  healthcheck       = false
-  sniff             = false
-=======
+
 # OpenSearch provider — manages security roles and role mappings inside the
 # shared log domain for per-BU index isolation (cloud-platform#8592). See ADR-017.
 #
@@ -54,5 +46,4 @@ provider "opensearch" {
   # behind an endpoint, so both stay off.
   healthcheck = false
   sniff       = false
->>>>>>> theirs
 }
