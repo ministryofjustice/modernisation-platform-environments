@@ -1,75 +1,197 @@
 ---
 name: data-factory-moj
-on:
+
+"on":
   push:
     branches:
       - main
     paths:
-      - 'terraform/environments/data-factory-moj/**'
-      - '.github/workflows/data-factory-moj.yml'
+      - "terraform/environments/data-factory-moj/**"
+      - ".github/workflows/data-factory-moj.yml"
+      - ".github/workflows/data-factory-moj-service-ingestion.yml"
+      - ".github/actions/prepare-service-ingestion/**"
 
   pull_request:
     branches:
       - main
     paths:
-      - 'terraform/environments/data-factory-moj/**'
-      - '.github/workflows/data-factory-moj.yml'
+      - "terraform/environments/data-factory-moj/**"
+      - ".github/workflows/data-factory-moj.yml"
+      - ".github/workflows/data-factory-moj-service-ingestion.yml"
+      - ".github/actions/prepare-service-ingestion/**"
 
   workflow_dispatch:
     inputs:
       action:
-        description: 'Set either [deploy|destroy].'
-        default: 'deploy'
+        description: "Set either deploy or destroy."
+        default: deploy
         required: true
-        type: string
+        type: choice
         options:
           - deploy
           - destroy
       component:
-        description: "Optional: Target a specific component for destroy. Defaults to 'root' to destroy the root or <application> folder."
+        description: "Optional component for destroy. Defaults to root."
         required: false
-        default: "root"
+        default: root
         type: string
 
-permissions:
-  pull-requests: write
-  id-token: write  # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+permissions: {}
 
 jobs:
   strategy:
-    uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     with:
       application: "${{ github.workflow }}"
 
-  terraform:
+  deployment-routing:
     needs: strategy
-    if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      legacy_matrix: ${{ steps.route.outputs.legacy_matrix }}
+      has_legacy: ${{ steps.route.outputs.has_legacy }}
+      has_ingestion: ${{ steps.route.outputs.has_ingestion }}
+      ingestion_action: ${{ steps.route.outputs.ingestion_action }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Route only development service ingestion
+        id: route
+        shell: bash
+        env:
+          ORIGINAL_MATRIX: ${{ needs.strategy.outputs.matrix }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BASE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          force_ingestion=false
+
+          if [[ "${GITHUB_EVENT_NAME}" != "workflow_dispatch" ]]; then
+            if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+              head="${PR_HEAD_SHA}"
+              base="$(git merge-base origin/main "${head}")"
+            else
+              head="${GITHUB_SHA}"
+              base="${PUSH_BASE_SHA}"
+            fi
+
+            diff_exitcode=0
+
+            git diff --quiet "${base}" "${head}" -- \
+              .github/workflows/data-factory-moj-service-ingestion.yml \
+              .github/actions/prepare-service-ingestion \
+              terraform/environments/data-factory-moj/dms-core/onboarding/services \
+              terraform/environments/data-factory-moj/dms-core/onboarding/generations.json \
+              || diff_exitcode=$?
+
+            if [[ "${diff_exitcode}" == "1" ]]; then
+              force_ingestion=true
+            elif [[ "${diff_exitcode}" != "0" ]]; then
+              exit "${diff_exitcode}"
+            fi
+          fi
+
+          routing="$(
+            jq -ce --argjson force "${force_ingestion}" '
+              .include as $all
+              | [$all[] | select(
+                  .component == "service-ingestion"
+                  and .target == "development"
+                )] as $ingestion
+              | [$all[] | select(
+                  (.component == "service-ingestion"
+                   and .target == "development") | not
+                )] as $legacy
+              | if ($ingestion | length) > 1 then
+                  error("Duplicate service-ingestion development entries")
+                else
+                  {
+                    legacy_matrix: {include: $legacy},
+                    has_legacy: (($legacy | length) > 0),
+                    has_ingestion: (($ingestion | length) > 0 or $force),
+                    ingestion_action: (
+                      $ingestion[0].action //
+                      (if $force then "plan_apply" else "plan" end)
+                    )
+                  }
+                end
+            ' <<< "${ORIGINAL_MATRIX}"
+          )"
+
+          {
+            printf 'legacy_matrix=%s\n' "$(jq -c '.legacy_matrix' <<< "${routing}")"
+            printf 'has_legacy=%s\n' "$(jq -r '.has_legacy' <<< "${routing}")"
+            printf 'has_ingestion=%s\n' "$(jq -r '.has_ingestion' <<< "${routing}")"
+            printf 'ingestion_action=%s\n' "$(jq -r '.ingestion_action' <<< "${routing}")"
+          } >> "${GITHUB_OUTPUT}"
+
+  terraform:
+    needs: deployment-routing
+    if: needs.deployment-routing.outputs.has_legacy == 'true'
+    permissions:
+      pull-requests: write
+      id-token: write
+      contents: read
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.deployment-routing.outputs.legacy_matrix) }}
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
-      prepare_service_ingestion: ${{ matrix.component == 'service-ingestion' && matrix.target == 'development' }}
+      component: "${{ matrix.component }}"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  service-ingestion:
+    needs: deployment-routing
+    if: needs.deployment-routing.outputs.has_ingestion == 'true'
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/data-factory-moj-service-ingestion.yml
+    with:
+      action: ${{ needs.deployment-routing.outputs.ingestion_action }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
       DMS_DEVELOPMENT_RUNTIME_REFERENCE: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
 
   destroy-development:
-    if: inputs.action == 'destroy'
+    if: inputs.action == 'destroy' && inputs.component != 'service-ingestion'
+    permissions:
+      pull-requests: write
+      id-token: write
+      contents: read
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
-      environment: "development"
-      action: "plan_apply"
+      environment: development
+      action: plan_apply
       plan_apply_tfargs: "-destroy"
-      component: "${{ inputs.component }}"  # Targets a specific component for the destroy operation; defaults to 'root' if not specified.
+      component: "${{ inputs.component }}"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  reject-service-ingestion-destroy:
+    if: inputs.action == 'destroy' && inputs.component == 'service-ingestion'
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Reject unsupported generation retirement
+        shell: bash
+        run: |
+          echo "::error::Service-ingestion generation retirement is not supported by this destroy operation."
+          exit 1

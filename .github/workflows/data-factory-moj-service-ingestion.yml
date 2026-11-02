@@ -1,0 +1,297 @@
+---
+name: data-factory-moj service-ingestion
+
+"on":
+  workflow_call:
+    inputs:
+      action:
+        description: "Use the action selected by the application deployment matrix."
+        type: string
+        required: true
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID:
+        required: true
+      PASSPHRASE:
+        required: true
+      DMS_DEVELOPMENT_RUNTIME_REFERENCE:
+        required: true
+
+permissions: {}
+
+concurrency:
+  group: data-factory-moj-development-service-ingestion
+  cancel-in-progress: false
+
+env:
+  ACCOUNT_NAME: data-factory-moj-development
+  WORKSPACE_NAME: data-factory-moj-development
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  fetch-secrets:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      id-token: write
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@5ec14e836f3de882a84f1c0b919645846a9d4f8e
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  plan:
+    needs: fetch-secrets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        shell: bash
+        working-directory: terraform/environments/data-factory-moj/service-ingestion
+    outputs:
+      exitcode: ${{ steps.plan.outputs.exitcode }}
+      fingerprint: ${{ steps.prepare.outputs.fingerprint }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Decrypt deployment settings
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+      - name: Resolve development account
+        run: |
+          set -euo pipefail
+
+          account="$(
+            jq -er --arg name "${ACCOUNT_NAME}" \
+              '.account_ids[$name]' <<< "${ENVIRONMENT_MANAGEMENT}"
+          )"
+
+          [[ "${account}" =~ ^[0-9]{12}$ ]]
+
+          echo "::add-mask::${account}"
+          printf 'ACCOUNT_NUMBER=%s\n' "${account}" >> "${GITHUB_ENV}"
+
+      - name: Configure plan credentials
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd
+        with:
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-plan
+          role-session-name: githubactionsplanrolesession
+          aws-region: eu-west-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e
+        with:
+          terraform_version: "1.15.8"
+          terraform_wrapper: false
+
+      - name: Initialise development component
+        run: |
+          set -euo pipefail
+          terraform init -input=false
+          terraform workspace select "${WORKSPACE_NAME}"
+
+      - name: Prepare ingestion deployment
+        id: prepare
+        uses: ./.github/actions/prepare-service-ingestion
+        with:
+          repository-token: ${{ env.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+          runtime-reference: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
+
+      - name: Terraform plan
+        id: plan
+        run: |
+          set -euo pipefail
+          exitcode=0
+
+          terraform plan -input=false -detailed-exitcode -out=tfplan \
+            | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh" \
+            || exitcode=$?
+
+          if [[ "${exitcode}" != "0" && "${exitcode}" != "2" ]]; then
+            exit 1
+          fi
+
+          terraform show -json tfplan > tfplan.json
+
+          printf 'exitcode=%s\n' "${exitcode}" >> "${GITHUB_OUTPUT}"
+
+      - name: Evaluate Terraform plan
+        id: evaluate
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2'
+        run: |
+          set -euo pipefail
+          bash "${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh" tfplan.json
+
+      - name: Check required platform review
+        if: github.event_name == 'pull_request' && steps.evaluate.outputs.resources_found == 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        with:
+          github-token: ${{ env.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+          script: |
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100
+            });
+
+            const members = await github.paginate(github.rest.teams.listMembersInOrg, {
+              org: 'ministryofjustice',
+              team_slug: 'modernisation-platform',
+              per_page: 100
+            });
+
+            const team = new Set(members.map(member => member.login));
+            const latest = new Map();
+
+            for (const review of reviews) {
+              if (['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(review.state)) {
+                latest.set(review.user.login, review.state);
+              }
+            }
+
+            if (![...latest].some(([login, state]) => team.has(login) && state === 'APPROVED')) {
+              core.setFailed('The Terraform plan requires review from the Modernisation Platform team.');
+            }
+
+  apply:
+    needs: [fetch-secrets, plan]
+    if: >-
+      ${{
+        !cancelled() &&
+        needs.fetch-secrets.result == 'success' &&
+        needs.plan.result == 'success' &&
+        inputs.action == 'plan_apply'
+      }}
+    runs-on: ubuntu-latest
+    environment: data-factory-moj-development-service-ingestion
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        shell: bash
+        working-directory: terraform/environments/data-factory-moj/service-ingestion
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Decrypt deployment settings
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+      - name: Resolve development account
+        run: |
+          set -euo pipefail
+
+          account="$(
+            jq -er --arg name "${ACCOUNT_NAME}" \
+              '.account_ids[$name]' <<< "${ENVIRONMENT_MANAGEMENT}"
+          )"
+
+          [[ "${account}" =~ ^[0-9]{12}$ ]]
+
+          echo "::add-mask::${account}"
+          printf 'ACCOUNT_NUMBER=%s\n' "${account}" >> "${GITHUB_ENV}"
+
+      - name: Configure apply credentials
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd
+        with:
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-apply
+          role-session-name: githubactionsrolesession
+          aws-region: eu-west-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e
+        with:
+          terraform_version: "1.15.8"
+          terraform_wrapper: false
+
+      - name: Initialise development component
+        run: |
+          set -euo pipefail
+          terraform init -input=false
+          terraform workspace select "${WORKSPACE_NAME}"
+
+      - name: Check plan fingerprint
+        env:
+          EXPECTED_FINGERPRINT: ${{ needs.plan.outputs.fingerprint }}
+        run: |
+          set -euo pipefail
+
+          [[ "${EXPECTED_FINGERPRINT}" =~ ^[a-f0-9]{64}$ ]] || {
+            echo "::error::The plan preparation fingerprint is missing."
+            exit 1
+          }
+
+      - name: Prepare matching ingestion deployment
+        uses: ./.github/actions/prepare-service-ingestion
+        with:
+          repository-token: ${{ env.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+          runtime-reference: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
+          expected-fingerprint: ${{ needs.plan.outputs.fingerprint }}
+
+      - name: Plan approved deployment
+        env:
+          REVIEWED_PLAN_EXITCODE: ${{ needs.plan.outputs.exitcode }}
+        run: |
+          set -euo pipefail
+          exitcode=0
+
+          terraform plan -input=false -detailed-exitcode -out=x.tfplan \
+            | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh" \
+            || exitcode=$?
+
+          if [[ "${exitcode}" != "0" && "${exitcode}" != "2" ]]; then
+            exit 1
+          fi
+
+          if [[ "${REVIEWED_PLAN_EXITCODE}" == "0" && "${exitcode}" != "0" ]]; then
+            echo "::error::Infrastructure changes appeared during a publication retry. Run a new workflow to review them."
+            exit 1
+          fi
+
+      - name: Apply deployment
+        run: |
+          set -euo pipefail
+
+          terraform apply -input=false x.tfplan 2>&1 \
+            | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh"
+
+      - name: Configure publication credentials
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd
+        with:
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess
+          role-chaining: true
+          role-session-name: ingestionpublication
+          aws-region: eu-west-2
+
+      - name: Publish and register deployment references
+        run: |
+          set -euo pipefail
+          umask 077
+
+          terraform output -json deployments > .generated/deployments.json
+
+          "${INGESTION_PYTHON}" -m ingestion_config finalize-deployment \
+            --deployments .generated/deployments.json \
+            --account-id "${ACCOUNT_NUMBER}" \
+            --bucket-name "$(jq -er '.published_documents.bucket_name' .generated/foundations.json)" \
+            --kms-key-arn "$(jq -er '.published_documents.kms_key_arns[0]' .generated/foundations.json)" \
+            --registry-table-arn "$(jq -er '.registry.table_arn' .generated/foundations.json)" \
+            --output .generated/deployment-receipt.json
+
+          printf '%s\n' "Development ingestion deployment finalized." \
+            >> "${GITHUB_STEP_SUMMARY}"

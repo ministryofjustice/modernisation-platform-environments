@@ -75,8 +75,6 @@ runs:
           "${modules}/configuration" \
           "${modules}/ingestion-registry"
 
-        echo "INGESTION_PYTHON=${tools}/bin/python" >> "${GITHUB_ENV}"
-
     - name: Read platform outputs and prepare deployment
       id: prepare
       shell: bash
@@ -229,14 +227,14 @@ runs:
             > "${generated}/retained-assignments.json"
         fi
 
-        "${INGESTION_PYTHON}" -m ingestion_config compile-directory \
+        "${RUNNER_TEMP}/ingestion-deployment-venv/bin/python" -m ingestion_config compile-directory \
           --services "${root}/dms-core/onboarding/services" \
           --platform "${generated}/platform.json" \
           --generations "${root}/dms-core/onboarding/generations.json" \
           --retained "${generated}/retained-inventory.json" \
           --output "${generated}/inventory.json"
 
-        "${INGESTION_PYTHON}" -m ingestion_config prepare-deployment \
+        "${RUNNER_TEMP}/ingestion-deployment-venv/bin/python" -m ingestion_config prepare-deployment \
           --inventory "${generated}/inventory.json" \
           --foundations "${generated}/foundations.json" \
           --runtime-package "${generated}/runtime-reference.json" \
@@ -246,7 +244,7 @@ runs:
           --compiler-commit "${compiler_commit}" \
           --output "${prepared}"
 
-        "${INGESTION_PYTHON}" -m ingestion_config verify-runtime-package \
+        "${RUNNER_TEMP}/ingestion-deployment-venv/bin/python" -m ingestion_config verify-runtime-package \
           --prepared-deployment "${prepared}" \
           --expected-account-id "${ACCOUNT_NUMBER}" \
           --expected-region "eu-west-2" \
