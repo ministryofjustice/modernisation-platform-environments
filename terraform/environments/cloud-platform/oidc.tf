@@ -171,9 +171,9 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       # Amazon Managed Prometheus (AMP) workspace lifecycle — the ADOT metrics
       # collectors in cluster-components create/manage a per-cluster AMP
       # workspace, applied on ephemeral dev clusters via this role.
-      # AMG (grafana:*) is NOT included here: AMG is deployed at the
-      # cloud-platform root component via the main pipeline's apply role, not by
-      # this dev-cluster role.
+      # AMG (grafana:*) is NOT included here: AMG is deployed by the
+      # cloud-platform cluster-observability component via the main pipeline's
+      # apply role, not by this dev-cluster role.
       "aps:CreateWorkspace",
       "aps:DeleteWorkspace",
       "aps:DescribeWorkspace",

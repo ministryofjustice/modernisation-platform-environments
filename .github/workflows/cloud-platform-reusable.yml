@@ -44,11 +44,10 @@ on:
 
 permissions:
   pull-requests: write
-  id-token: write  # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
 
 jobs:
-
   plan-terraform:
     if: inputs.action == 'plan'
     strategy:
@@ -74,7 +73,7 @@ jobs:
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
       runner: "ubuntu-latest"
       terraform_version: ${{ inputs.terraform_version }}
-      mint_grafana_token: ${{ matrix.component == 'root' }}
+      mint_grafana_token: ${{ matrix.component == 'cluster-observability' }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -94,10 +93,6 @@ jobs:
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
       runner: "octo-production"
       terraform_version: ${{ inputs.terraform_version }}
-      # Root manages the centralised AMG workspace and its Grafana-internal
-      # objects (teams, data sources, permissions), so the Grafana provider needs
-      # a short-lived service account token. No-op on workspaces without AMG.
-      mint_grafana_token: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}

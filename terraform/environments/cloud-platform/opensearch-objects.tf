@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 # OpenSearch per-BU index isolation on the shared cluster (cloud-platform#8592).
-# Same pattern as grafana-objects.tf (#8509). Design: ADR-017, OpenSearch section.
+# Same pattern as cluster-observability/grafana-objects.tf (#8509). Design: ADR-017, OpenSearch section.
 #
 # For each BU: an index template for its daily indexes (<bu>-<env>-*), a
 # read-only role scoped to those indexes, and a role mapping that grants it to
@@ -20,8 +20,9 @@ locals {
   opensearch_env_label = local.opensearch_is_live ? "live" : "non-live"
 
   # Real BUs from the shared business-units.json (#8558), the same list Grafana
-  # uses, so both grant the same groups. local.business_units is loaded in
-  # grafana-objects.tf.
+  # (cluster-observability/) uses, so both grant the same groups.
+  business_units = jsondecode(file("${path.module}/business-units.json")).business_units
+
   opensearch_bus_real = {
     for k, bu in local.business_units : k => { idc_group_names = [bu.parent_group] }
   }

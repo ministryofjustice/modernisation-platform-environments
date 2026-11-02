@@ -2,8 +2,9 @@ locals {
   bu_accounts = jsondecode(file("${path.module}/../accounts.json"))
 
   # Shared BU -> parent IdC group mapping, sourced from the single
-  # business-units.json consumed by this component, the root grafana component
-  # and cluster-core/ (cloud-platform#8558). octo->office-of-the-cto and
+  # business-units.json consumed by this component, cluster-core/,
+  # cluster-observability/ (Grafana) and the root OpenSearch objects
+  # (cloud-platform#8558). octo->office-of-the-cto and
   # cd->central-digital are inferred from child-team naming; hmpps/laa are exact
   # (see ADR-002 "Groups in use"). JSON cannot carry this note, so it lives here.
   business_units = jsondecode(file("${path.module}/../business-units.json")).business_units

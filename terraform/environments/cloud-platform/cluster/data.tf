@@ -41,7 +41,7 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
 # ListGroups path works under the ModernisationPlatformSSOReadOnly role, unlike
 # the singular data.aws_identitystore_group (GetGroupId), which returns
 # ResourceNotFoundException for this role. This mirrors the working pattern in
-# the root component's grafana-objects.tf (cloud-platform#8509).
+# the cluster-observability component's grafana-objects.tf (cloud-platform#8509).
 #
 # Only fetched on hub clusters (where ArgoCD — and therefore the RBAC mapping —
 # is enabled); spokes create no ArgoCD RBAC and do not need the lookup.

@@ -8,10 +8,6 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
-    grafana = {
-      source  = "grafana/grafana"
-      version = "~> 4.46"
-    }
     opensearch = {
       source  = "opensearch-project/opensearch"
       version = "~> 2.6"

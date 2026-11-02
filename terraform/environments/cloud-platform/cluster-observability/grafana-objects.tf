@@ -34,12 +34,12 @@ locals {
   # team sync needs IDs, so resolving here avoids hardcoding IDs.
   #
   # Shared BU -> parent IdC group mapping, sourced from the single
-  # business-units.json consumed by this component, cluster/ and cluster-core/
+  # business-units.json consumed by this component, cluster/, cluster-core/ and the root OpenSearch objects
   # (cloud-platform#8558). Real production BUs ONLY — simulated BUs for the
   # #8509 ephemeral-cluster PoC are kept out of this file (see
   # grafana_simulated_bus_dev below) so the ArgoCD components, which read the
   # same file, never see them.
-  business_units = jsondecode(file("${path.module}/business-units.json")).business_units
+  business_units = jsondecode(file("${path.module}/../business-units.json")).business_units
 
   # Real-BU Grafana map for cloud-platform-live, derived from the shared file.
   # idc_group_names stays a LIST (a BU has many delivery teams); here it holds

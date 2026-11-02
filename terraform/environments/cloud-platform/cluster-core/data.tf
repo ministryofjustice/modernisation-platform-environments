@@ -62,7 +62,7 @@ data "aws_eks_cluster_auth" "cluster" {
 # Resolved from group NAMES via the plural aws_identitystore_groups (ListGroups)
 # data source. ListGroups works under ModernisationPlatformSSOReadOnly, unlike
 # the singular GetGroupId path, which returns ResourceNotFoundException for this
-# role — same working pattern as the root component's grafana-objects.tf
+# role — same working pattern as the cluster-observability component's grafana-objects.tf
 # (cloud-platform#8509) and the cluster component's layer-1 VIEWER mapping.
 #
 # Hub-only: AppProjects (and therefore their roles) are created only on hub

@@ -32,7 +32,7 @@ locals {
   # because the ModernisationPlatformSSOReadOnly role returns
   # ResourceNotFoundException when calling GetGroupId despite having
   # identitystore:Get*. This mirrors the same workaround (and the same two
-  # groups) used for AMG RBAC in amg.tf and for ArgoCD RBAC in cluster/locals.tf.
+  # groups) used for AMG RBAC in cluster-observability/amg.tf and for ArgoCD RBAC in cluster/locals.tf.
   # TODO: switch back to a data.aws_identitystore_group lookup once the read role
   # permissions are fixed.
   opensearch_ui_admin_group_ids_list = [
