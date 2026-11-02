@@ -27,13 +27,6 @@ teams:
         model: "bedrock-jeaie-claude-opus-5"
       - alias: "claude-sonnet-5"
         model: "bedrock-jeaie-claude-sonnet-5"
-  justice-ai-unit:
-    alias: Justice AI Unit
-    organisation: ministryofjustice
-    max_budget: 1000
-    models: ["no-default-models"]
-    unified_access_groups:
-      - openai-daybreak-red
 
 models:
   amazon_bedrock:
@@ -585,5 +578,4 @@ models:
       model_location: "Global"
       model_provider: "OpenAI"
       generally_available: false
-      log_prompts_to_s3: true
       environments_available: ["test"]

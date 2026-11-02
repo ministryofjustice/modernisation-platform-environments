@@ -46,26 +46,6 @@ resource "litellm_unified_access_group" "microsoft_foundry" {
   }
 }
 
-resource "litellm_unified_access_group" "openai_daybreak" {
-  for_each = try(local.ai_gateway_models_filtered.openai, {})
-
-  access_group_name  = "openai-${each.key}"
-  access_model_names = [litellm_model.openai_daybreak[each.key].model_name]
-  assigned_team_ids = [
-    for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id
-    if contains(try(team.unified_access_groups, []), "openai-${each.key}")
-  ]
-
-  lifecycle {
-    ignore_changes = [assigned_team_ids]
-
-    precondition {
-      condition     = !try(each.value.generally_available, false)
-      error_message = "Daybreak model \"${each.key}\" must never be generally_available."
-    }
-  }
-}
-
 resource "litellm_unified_access_group" "openai_models" {
   count = length(try(local.ai_gateway_models_filtered.openai, {})) > 0 ? 1 : 0
 
