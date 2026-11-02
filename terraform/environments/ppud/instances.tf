@@ -1213,7 +1213,7 @@ resource "aws_instance" "internal-mail-relay" {
   tags = {
     Name              = "internal-mail-relay"
     is-production     = true
-    patch_group       = "prod_lin_patch_al2023"
+    patch_group       = "prod_lin_patch"
     docker_service    = "true"
     container_service = "true"
     archive_volume    = "true"
@@ -1243,7 +1243,7 @@ resource "aws_instance" "non-cjsm-mail-relay" {
   tags = {
     Name              = "non-cjsm-mail-relay"
     is-production     = true
-    patch_group       = "prod_lin_patch_al2023"
+    patch_group       = "prod_lin_patch"
     docker_service    = "true"
     container_service = "true"
     port25_check      = "true"
@@ -1273,7 +1273,7 @@ resource "aws_instance" "cjsm-mail-relay" {
   tags = {
     Name              = "cjsm-mail-relay"
     is-production     = true
-    patch_group       = "prod_lin_patch_al2023"
+    patch_group       = "prod_lin_patch"
     docker_service    = "true"
     container_service = "true"
     port25_check      = "true"
@@ -1303,7 +1303,7 @@ resource "aws_instance" "docker-build-instance" {
   tags = {
     Name          = "docker-build-instance"
     is-production = true
-    patch_group   = "prod_lin_patch_al2023"
+    patch_group   = "prod_lin_patch"
   }
 }
 

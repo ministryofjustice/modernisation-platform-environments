@@ -33,6 +33,7 @@ module "ecs_cluster" {
         server          = "admin"
         inbound_bucket  = data.aws_s3_bucket.inbound.id
         outbound_bucket = data.aws_s3_bucket.outbound.id
+        secret_id       = aws_secretsmanager_secret.soa.name
       }))
     }
     managed = {
@@ -53,6 +54,7 @@ module "ecs_cluster" {
         server          = "managed"
         inbound_bucket  = data.aws_s3_bucket.inbound.id
         outbound_bucket = data.aws_s3_bucket.outbound.id
+        secret_id       = aws_secretsmanager_secret.soa.name
       }))
     }
   }

@@ -3,8 +3,6 @@ resource "aws_db_instance" "tipstaff_db" {
   #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
   #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances"
-  #checkov:skip=CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled"
-
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
   db_name                         = local.application_data.accounts[local.environment].db_name
@@ -15,8 +13,10 @@ resource "aws_db_instance" "tipstaff_db" {
   instance_class                  = local.application_data.accounts[local.environment].instance_class
   username                        = local.application_data.accounts[local.environment].db_username
   password                        = random_password.password.result
-  skip_final_snapshot             = true
-  publicly_accessible             = local.is-development ? true : false
+  skip_final_snapshot             = false
+  final_snapshot_identifier       = "${local.application_data.accounts[local.environment].identifier}-final-snapshot"
+  deletion_protection             = true
+  publicly_accessible             = false
   vpc_security_group_ids          = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
   allow_major_version_upgrade     = false
@@ -33,6 +33,48 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
   subnet_ids = data.aws_subnets.shared-public.ids
 }
 
+resource "aws_db_subnet_group" "dbsubnetgroup_data" {
+  name       = "dbsubnetgroup-data"
+  subnet_ids = data.aws_subnets.shared-data.ids
+}
+
+# Replacement for tipstaff_db in the data subnets, restored from an encrypted copy of a tipstaff_db snapshot.
+# Only created once restore_snapshot_identifier is set for the environment in application_variables.json.
+resource "aws_db_instance" "tipstaff_db_v2" {
+  #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
+  #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances"
+  #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
+  count                           = local.restore_snapshot_identifier == "" ? 0 : 1
+  snapshot_identifier             = local.restore_snapshot_identifier
+  allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
+  db_name                         = local.application_data.accounts[local.environment].db_name
+  storage_type                    = local.application_data.accounts[local.environment].storage_type
+  storage_encrypted               = true
+  engine                          = local.application_data.accounts[local.environment].engine
+  identifier                      = "${local.application_data.accounts[local.environment].identifier}-v2"
+  engine_version                  = local.application_data.accounts[local.environment].engine_version
+  instance_class                  = local.application_data.accounts[local.environment].instance_class
+  username                        = local.application_data.accounts[local.environment].db_username
+  password                        = random_password.password.result
+  skip_final_snapshot             = false
+  final_snapshot_identifier       = "${local.application_data.accounts[local.environment].identifier}-v2-final-snapshot"
+  deletion_protection             = true
+  publicly_accessible             = false
+  vpc_security_group_ids          = [aws_security_group.postgresql_db_sc.id]
+  db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup_data.name
+  allow_major_version_upgrade     = false
+  auto_minor_version_upgrade      = true
+  ca_cert_identifier              = "rds-ca-rsa2048-g1"
+  apply_immediately               = local.is-production ? false : true
+  copy_tags_to_snapshot           = true
+  maintenance_window              = local.is-production ? "sun:04:00-sun:04:30" : "wed:19:20-wed:19:50"
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+
+  lifecycle {
+    ignore_changes = [snapshot_identifier]
+  }
+}
+
 resource "aws_security_group" "postgresql_db_sc" {
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   name        = "postgres_security_group"
@@ -44,13 +86,6 @@ resource "aws_security_group" "postgresql_db_sc" {
     protocol        = "tcp"
     description     = "Allows ECS service to access RDS"
     security_groups = [aws_security_group.ecs_service.id]
-  }
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
   }
   ingress {
     protocol    = "tcp"
@@ -67,30 +102,5 @@ resource "aws_security_group" "postgresql_db_sc" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-data "http" "myip" {
-  url = "http://ipinfo.io/json"
-}
-
-resource "null_resource" "setup_db" {
-  count = local.is-development ? 1 : 0
-
-  depends_on = [aws_db_instance.tipstaff_db]
-
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
-
-    environment = {
-      DB_HOSTNAME          = aws_db_instance.tipstaff_db.address
-      DB_NAME              = aws_db_instance.tipstaff_db.db_name
-      TIPSTAFF_DB_USERNAME = aws_db_instance.tipstaff_db.username
-      TIPSTAFF_DB_PASSWORD = random_password.password.result
-    }
-  }
-  triggers = {
-    always_run = timestamp()
   }
 }

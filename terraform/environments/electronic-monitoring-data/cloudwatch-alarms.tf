@@ -569,6 +569,49 @@ resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_execution_fail
   ]
 }
 # ------------------------------------------------------------------------------
+# Downstream reconciliation assurance health
+# Provide dashboard-only clean, unhealthy and unknown assurance indicators.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_assurance_consumers = toset([
+    "STAGED",
+    "AC",
+    "EMDI",
+  ])
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_assurance_not_clean" {
+  for_each = local.downstream_reconciliation_assurance_consumers
+
+  alarm_name = (
+    "downstream_reconciliation_${lower(each.value)}_assurance_not_clean"
+  )
+
+  alarm_description = (
+    "${each.value} latest reconciliation assurance is not clean"
+  )
+
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 1
+  treat_missing_data  = "missing"
+
+  actions_enabled = false
+
+  metric_name = "ReconciliationAssuranceClean"
+  namespace   = "EM/DownstreamReconciliation"
+  period      = 300
+  statistic   = "Minimum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+    Consumer    = each.value
+    Mode        = "status"
+  }
+}
+
+# ------------------------------------------------------------------------------
 # Downstream historical assurance
 # Alert when an audit finds gaps, becomes stale, or the audit workflow fails.
 # ------------------------------------------------------------------------------
@@ -687,3 +730,4 @@ resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_executio
     aws_sns_topic.emds_alerts.arn,
   ]
 }
+

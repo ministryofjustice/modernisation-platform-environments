@@ -322,6 +322,16 @@ resource "aws_security_group" "cluster_ec2" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
+resource "aws_security_group_rule" "cluster_ec2_workspace_ssh" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "ingress"
+  description       = "SSH - AWS Workspaces"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
+}
+
 resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
