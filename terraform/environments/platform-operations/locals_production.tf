@@ -285,7 +285,7 @@ locals {
       }
       mp-automation-ndh-offloc-cloudplatform-pm = {
         identity = "platops"
-        inputs   = {
+        inputs = {
           scheduled_run = "ndh_offloc_copy_cloudplatform"
         }
 
@@ -297,7 +297,7 @@ locals {
       }
       mp-automation-ndh-offloc-copy = {
         identity = "platops"
-        inputs   = {
+        inputs = {
           scheduled_run = "ndh_offloc_copy"
         }
 
@@ -309,7 +309,7 @@ locals {
       }
       mp-automation-ndh-offloc-copy-backup = {
         identity = "platops"
-        inputs   = {
+        inputs = {
           scheduled_run = "ndh_offloc_copy"
         }
 
