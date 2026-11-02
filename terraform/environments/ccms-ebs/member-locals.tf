@@ -82,7 +82,6 @@ locals {
   prod_sans = [
     format("ccmsebs.%s", local.prod_domain),
     format("ccms-ebs-db-nlb.%s", local.prod_domain),
-    format("ccmsebs-sso.%s", local.prod_domain),
   ]
 
   subject_alternative_names = local.is-production ? local.prod_sans : local.nonprod_sans
