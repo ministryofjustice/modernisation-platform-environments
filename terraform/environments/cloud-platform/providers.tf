@@ -18,3 +18,12 @@
 provider "grafana" {
   url = var.grafana_url == "" ? null : "https://${var.grafana_url}"
 }
+
+# Workspaces without the domain have no OpenSearch resources, so the placeholder URL is never called.
+provider "opensearch" {
+  url               = local.enable_opensearch ? "https://${aws_opensearch_domain.logs[0].endpoint}" : "https://localhost"
+  aws_region        = "eu-west-2"
+  sign_aws_requests = true
+  healthcheck       = false
+  sniff             = false
+}

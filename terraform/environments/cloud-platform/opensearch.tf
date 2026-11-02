@@ -151,15 +151,27 @@ resource "aws_opensearch_domain" "logs" {
     }
   }
 
-  # Allow the master role; FGAC does the fine-grained part.
+  # Allow the master role and cluster Fluent Bit roles from every cloud-platform account; FGAC does the fine-grained part.
   access_policies = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect    = "Allow"
-      Principal = { AWS = local.opensearch_master_role_arn }
-      Action    = "es:*"
-      Resource  = "arn:aws:es:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:domain/${local.opensearch_domain_name}/*"
-    }]
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = { AWS = local.opensearch_master_role_arn }
+        Action    = "es:*"
+        Resource  = "arn:aws:es:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:domain/${local.opensearch_domain_name}/*"
+      },
+      {
+        Sid       = "FluentBitBulkWrite"
+        Effect    = "Allow"
+        Principal = { AWS = [for id in values(local.opensearch_log_writer_account_ids) : "arn:aws:iam::${id}:root"] }
+        Action    = "es:ESHttpPost"
+        Resource  = "arn:aws:es:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:domain/${local.opensearch_domain_name}/_bulk"
+        Condition = {
+          ArnLike = { "aws:PrincipalArn" = "arn:aws:iam::*:role/*-fluent-bit" }
+        }
+      }
+    ]
   })
 
   # depends_on below: the resource policy must exist before the domain publishes.
@@ -174,6 +186,28 @@ resource "aws_opensearch_domain" "logs" {
   })
 
   depends_on = [aws_cloudwatch_log_resource_policy.opensearch_audit]
+}
+
+# One writer role per account so each account's clusters can only write their own indices.
+resource "opensearch_role" "fluent_bit_writer" {
+  for_each = local.enable_opensearch ? local.opensearch_log_writer_account_ids : {}
+
+  role_name = "${each.key}-fluent-bit-writer"
+
+  cluster_permissions = ["indices:data/write/bulk"]
+
+  index_permissions {
+    # Dev-account clusters are ephemeral cp-<id> workspaces; MP cluster workspaces match the account name.
+    index_patterns  = [each.key == "cloud-platform-development" ? "cp-*" : "${each.key}-*"]
+    allowed_actions = ["write", "create_index"]
+  }
+}
+
+resource "opensearch_roles_mapping" "fluent_bit_writer" {
+  for_each = opensearch_role.fluent_bit_writer
+
+  role_name     = each.value.role_name
+  backend_roles = ["arn:aws:iam::${local.opensearch_log_writer_account_ids[each.key]}:role/*-fluent-bit"]
 }
 
 output "opensearch_domain_endpoint" {

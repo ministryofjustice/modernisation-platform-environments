@@ -2,14 +2,14 @@ data "aws_s3_bucket" "fluent_bit" {
   bucket = "${terraform.workspace}-fluentbit"
 }
 
-data "aws_opensearch_domain" "fluent_bit" {
-  domain_name = "cp-development-logs"
-}
-
 locals {
   fluent_bit_namespace       = "logging"
   fluent_bit_service_account = "fluent-bit"
   fluent_bit_state_dir       = "/var/fluent-bit/state"
+
+  # Shared log domain in cloud-platform-development; every account's clusters write to it. See ../opensearch.tf.
+  opensearch_endpoint   = "search-cp-development-logs-i7ywrjvebzyz7nftwhy2jgkzzi.eu-west-2.es.amazonaws.com"
+  opensearch_domain_arn = "arn:aws:es:eu-west-2:${local.environment_management.account_ids["cloud-platform-development"]}:domain/cp-development-logs"
 }
 
 #------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "fluent_bit_logs" {
     sid       = "WriteOpenSearchLogs"
     effect    = "Allow"
     actions   = ["es:ESHttpPost"]
-    resources = ["${data.aws_opensearch_domain.fluent_bit.arn}/_bulk"]
+    resources = ["${local.opensearch_domain_arn}/_bulk"]
   }
 }
 
@@ -67,22 +67,6 @@ resource "aws_iam_role_policy" "fluent_bit_logs" {
   name   = "fluent-bit-log-write"
   role   = aws_iam_role.fluent_bit.id
   policy = data.aws_iam_policy_document.fluent_bit_logs.json
-}
-
-resource "opensearch_role" "fluent_bit" {
-  role_name = "fluentbit-${terraform.workspace}-writer"
-
-  cluster_permissions = ["indices:data/write/bulk"]
-
-  index_permissions {
-    index_patterns  = ["${terraform.workspace}-*"]
-    allowed_actions = ["write", "create_index"]
-  }
-}
-
-resource "opensearch_roles_mapping" "fluent_bit" {
-  role_name     = opensearch_role.fluent_bit.role_name
-  backend_roles = [aws_iam_role.fluent_bit.arn]
 }
 
 moved {
@@ -325,7 +309,7 @@ resource "helm_release" "fluent_bit" {
         [OUTPUT]
             Name                     opensearch
             Match                    kube.*
-            Host                     ${data.aws_opensearch_domain.fluent_bit.endpoint}
+            Host                     ${local.opensearch_endpoint}
             Port                     443
             TLS                      On
             TLS.Verify               On
@@ -345,6 +329,5 @@ resource "helm_release" "fluent_bit" {
   depends_on = [
     time_sleep.fluent_bit_pod_identity,
     aws_iam_role_policy.fluent_bit_logs,
-    opensearch_roles_mapping.fluent_bit,
   ]
 }

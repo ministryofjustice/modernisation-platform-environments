@@ -55,4 +55,13 @@ locals {
 
   # Native Identity Center SSO for Dashboards. See ADR-017.
   opensearch_idc_enabled = local.enable_opensearch
+
+  # Accounts whose cluster Fluent Bit roles may write to the shared domain, keyed by account name.
+  opensearch_log_writer_account_ids = {
+    for name in concat(
+      ["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-nonlive", "cloud-platform-live"],
+      jsondecode(file("${path.module}/accounts.json")).accounts
+    ) : name => local.environment_management.account_ids[name]
+    if contains(keys(local.environment_management.account_ids), name)
+  }
 }
