@@ -271,6 +271,74 @@ locals {
         timezone = "Europe/London"
         workflow = "github_workflow_monitoring.yml"
       }
+      mp-automation-ndh-offloc-cloudplatform-am = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy_cloudplatform"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 0,3 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cloudplatfom_copy.yml"
+      }
+      mp-automation-ndh-offloc-cloudplatform-pm = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy_cloudplatform"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 0,23 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cloudplatfom_copy.yml"
+      }
+      mp-automation-ndh-offloc-copy = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(45 23 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_copy.yml"
+      }
+      mp-automation-ndh-offloc-copy-backup = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(20 2 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_copy.yml"
+      }
+      mp-automation-planetfm-gfsl-data-extract-am = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(10,30 5 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "planetfm_gfsl_data_extract.yml"
+      }
+      mp-automation-planetfm-gfsl-data-extract-pm = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 12,13 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "planetfm_gfsl_data_extract.yml"
+      }
       mp-automation-security-hub-alerting = {
         identity = "platops"
         inputs = {
