@@ -271,6 +271,26 @@ locals {
         timezone = "Europe/London"
         workflow = "github_workflow_monitoring.yml"
       }
+      mp-automation-planetfm-gfsl-data-extract-am = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(10,30 5 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "planetfm_gfsl_data_extract.yml"
+      }
+      mp-automation-planetfm-gfsl-data-extract-pm = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 12,13 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "planetfm_gfsl_data_extract.yml"
+      }
       mp-automation-security-hub-alerting = {
         identity = "platops"
         inputs = {
