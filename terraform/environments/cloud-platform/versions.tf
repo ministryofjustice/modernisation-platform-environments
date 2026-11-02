@@ -14,7 +14,11 @@ terraform {
     }
     opensearch = {
       source  = "opensearch-project/opensearch"
+<<<<<<< ours
       version = "~> 2.3"
+=======
+      version = "~> 2.6"
+>>>>>>> theirs
     }
   }
   required_version = "~> 1.0"
