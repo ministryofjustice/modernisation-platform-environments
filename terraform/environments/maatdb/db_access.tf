@@ -30,7 +30,7 @@ module "bastion_linux" {
   subnet_set         = local.subnet_set
   environment        = local.environment
   region             = "eu-west-2"
-  extra_user_data_content = "dnf update -y ca-certificates --releasever 2023.12.20261026 && update-ca-trust"
+  # extra_user_data_content = "dnf update -y ca-certificates --releasever 2023.12.20261026 && update-ca-trust"
   # Autoscaling
   autoscaling_cron = local.crontab
 
