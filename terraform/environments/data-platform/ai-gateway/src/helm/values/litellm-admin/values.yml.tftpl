@@ -211,8 +211,6 @@ extraInitContainers:
       seccompProfile:
         type: RuntimeDefault
 
-# With migrationJob enabled the chart appends its own DISABLE_SCHEMA_UPDATE after envVars, so do not
-# set that key in envVars below: duplicate env names break the strategic merge patch on helm upgrade.
 migrationJob:
   enabled: true
   hooks:
@@ -227,6 +225,7 @@ ingress:
 envVars: {
     AUTO_REDIRECT_UI_LOGIN_TO_SSO: "True",
     DISABLE_LLM_API_ENDPOINTS: "True",
+    DISABLE_SCHEMA_UPDATE: "True",
     DOCS_DESCRIPTION: "Administration interface for the AI Gateway.",
     DOCS_FILTERED: "True",
     DOCS_TITLE: "Justice AI Gateway Admin",
