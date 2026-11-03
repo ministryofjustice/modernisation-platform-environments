@@ -45,7 +45,7 @@ module "mwaa_alb" {
     https = {
       port            = 443
       protocol        = "HTTPS"
-      certificate_arn = data.aws_acm_certificate.certificate.arn
+      certificate_arn = module.acm_airflow.acm_certificate_arn
 
       forward = {
         target_group_key = "mwaa"
