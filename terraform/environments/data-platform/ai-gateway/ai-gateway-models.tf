@@ -87,7 +87,7 @@ resource "litellm_model" "microsoft_foundry" {
   ]
 }
 
-resource "litellm_model" "openai_daybreak" {
+resource "litellm_model" "openai" {
   for_each = try(local.ai_gateway_models_filtered.openai, {})
 
   custom_llm_provider = "openai"
