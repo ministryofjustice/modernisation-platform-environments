@@ -37,10 +37,6 @@ provider "aws" {
   allowed_account_ids = [
     local.bu_live_accounts["octo"].account_id
   ]
-
-  assume_role {
-    role_arn = "arn:aws:iam::${local.bu_live_accounts["octo"].account_id}:role/github-actions-apply"
-  }
 }
 
 provider "aws" {
@@ -50,10 +46,6 @@ provider "aws" {
   allowed_account_ids = [
     local.bu_live_accounts["laa"].account_id
   ]
-
-  assume_role {
-    role_arn = "arn:aws:iam::${local.bu_live_accounts["laa"].account_id}:role/github-actions-apply"
-  }
 }
 
 provider "aws" {
@@ -63,10 +55,6 @@ provider "aws" {
   allowed_account_ids = [
     local.bu_live_accounts["hmpps"].account_id
   ]
-
-  assume_role {
-    role_arn = "arn:aws:iam::${local.bu_live_accounts["hmpps"].account_id}:role/github-actions-apply"
-  }
 }
 
 provider "aws" {
@@ -76,10 +64,6 @@ provider "aws" {
   allowed_account_ids = [
     local.bu_live_accounts["cd"].account_id
   ]
-
-  assume_role {
-    role_arn = "arn:aws:iam::${local.bu_live_accounts["cd"].account_id}:role/github-actions-apply"
-  }
 }
 
 # -----------------------------------------------------------------------------
@@ -148,7 +132,6 @@ module "octo_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
   providers = {
-    aws                    = aws.octo
     aws.bucket-replication = aws.octo
   }
 
