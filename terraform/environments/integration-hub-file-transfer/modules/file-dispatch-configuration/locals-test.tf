@@ -28,7 +28,7 @@ locals {
         }
       }
 
-      "/push-to-s3-with-hosted-pickup/" = {
+      "/hosted-pickup/" = {
         action = {
           name = "push-to-s3-with-hosted-pickup"
           push_to_s3_with_hosted_pickup = {
