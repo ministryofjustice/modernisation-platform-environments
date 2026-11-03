@@ -101,8 +101,8 @@ locals {
       "source_environment" = "prod"
     },
     "prod" = {
-      #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
-      #       "source_environment" = "preprod"
+      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
+      "target_environment" = "stage"
     },
     "training" = {
     }
