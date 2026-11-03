@@ -239,7 +239,7 @@ SSOGEN is deployed as a highly available infrastructure with the following key c
    - Referenced in launch template IAM instance profile
 
 3. **Managed Policies**:
-   - `AmazonSSMManagedInstanceCore`:
+   - `CustomSSMManagedInstanceCore`:
      - Session Manager access for remote connection
      - CloudWatch agent deployment
      - AWS Systems Manager patching
