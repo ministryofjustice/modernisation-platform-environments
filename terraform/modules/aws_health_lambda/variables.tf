@@ -3,8 +3,8 @@ variable "aws_account_id" {
   type        = string
 }
 
-variable "aws_accounts_secret_name" {
-  description = "The name of the AWS Secrets Manager secret that contains the AWS account IDs"
+variable "aws_accounts_parameter_name" {
+  description = "The name of the AWS SSM parameter that contains the AWS account IDs"
   type        = string
 }
 
@@ -28,6 +28,11 @@ variable "github_identity" {
 
 variable "github_repo" {
   description = "The name of the GitHub repository where AWS Health issues are created"
+  type        = string
+}
+
+variable "ignore_findings_parameter_name" {
+  description = "The name of the AWS SSM parameter that contains the ignore findings value"
   type        = string
 }
 

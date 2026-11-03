@@ -328,6 +328,94 @@ class HandlerTests(unittest.TestCase):
     @patch.object(handler, "create_github_issue")
     @patch.object(handler, "get_github_token")
     @patch.object(handler, "get_web_identity_token")
+    def test_ignored_finding_skips_ticket_and_authentication(
+        self, web_token, github_token, create
+    ):
+        findings = {
+            "another-account": "Unrelated finding",
+            "test-account": "description",
+        }
+        event = copy.deepcopy(self.event)
+        event["detail"]["eventArn"] = "arn:aws:health:example"
+        original = copy.deepcopy(event)
+        with patch.dict(
+            os.environ, {"IGNORE_FINDINGS": json.dumps(findings)}, clear=True
+        ):
+            with self.assertLogs(handler.logger, level="INFO") as logs:
+                result = handler.lambda_handler(event, None)
+        self.assertEqual(result["statusCode"], 200)
+        self.assertIn("ignored finding", json.loads(result["body"])["message"])
+        output = "\n".join(logs.output)
+        self.assertIn("not generating a ticket", output)
+        self.assertIn("arn:aws:health:example", output)
+        self.assertIn("test-account", output)
+        self.assertEqual(event, original)
+        web_token.assert_not_called()
+        github_token.assert_not_called()
+        create.assert_not_called()
+
+    @patch.object(handler, "create_github_issue")
+    @patch.object(handler, "get_github_token", return_value="github-token")
+    @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
+    def test_ignored_findings_require_account_and_case_sensitive_substring(
+        self, web_token, github_token, create
+    ):
+        create.return_value = {"number": 42, "html_url": "https://example/42"}
+        cases = [
+            {},
+            {"another-account": "Description"},
+            {"test-account": "Unrelated finding"},
+            {"test-account": "DESCRIPTION"},
+            {
+                "another-account": "Description",
+                "test-account": "Unrelated finding",
+            },
+            {"test-account": "here\n\nAnother"},
+        ]
+        for findings in cases:
+            with self.subTest(findings=findings):
+                web_token.reset_mock()
+                github_token.reset_mock()
+                create.reset_mock()
+                with patch.dict(os.environ, {"IGNORE_FINDINGS": json.dumps(findings)}):
+                    result = handler.lambda_handler(self.event, None)
+                self.assertEqual(json.loads(result["body"])["issue_number"], 42)
+                web_token.assert_called_once()
+                github_token.assert_called_once()
+                create.assert_called_once()
+
+    @patch.object(handler, "create_github_issue")
+    @patch.object(handler, "get_github_token")
+    @patch.object(handler, "get_web_identity_token")
+    def test_invalid_ignored_findings_are_logged_and_stop_processing(
+        self, web_token, github_token, create
+    ):
+        invalid_values = [
+            "",
+            "not-json",
+            "null",
+            "[]",
+            '"text"',
+            "true",
+            '{"": "Description"}',
+            '{" ": "Description"}',
+        ]
+        for value in (None, "", " \t", 123, True, [], {}):
+            invalid_values.append(json.dumps({"test-account": value}))
+        for raw in invalid_values:
+            with self.subTest(raw=raw):
+                with patch.dict(os.environ, {"IGNORE_FINDINGS": raw}):
+                    with self.assertLogs(handler.logger, level="ERROR") as logs:
+                        with self.assertRaisesRegex(ValueError, "IGNORE_FINDINGS"):
+                            handler.lambda_handler(self.event, None)
+                self.assertIn("IGNORE_FINDINGS", "\n".join(logs.output))
+        web_token.assert_not_called()
+        github_token.assert_not_called()
+        create.assert_not_called()
+
+    @patch.object(handler, "create_github_issue")
+    @patch.object(handler, "get_github_token")
+    @patch.object(handler, "get_web_identity_token")
     def test_resolved_entities_skip_ticket_and_authentication(
         self, web_token, github_token, create
     ):
