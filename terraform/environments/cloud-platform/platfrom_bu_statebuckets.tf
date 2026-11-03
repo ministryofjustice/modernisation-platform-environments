@@ -161,7 +161,7 @@ module "octo_state_bucket" {
   versioning_enabled  = true
 
   sse_algorithm              = "aws:kms"
-  custom_kms_key             = module.octo_state_kms.kms_key_arn
+  custom_kms_key             = aws_kms_key.octo_state.arn
   enforce_kms_request_headers = false
 
   bucket_policy_v2 = [
