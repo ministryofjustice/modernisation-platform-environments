@@ -480,14 +480,6 @@ models:
       location: "europe-west2"
       generally_available: false
       environments_available: ["development", "production"]
-    vertex-gemini-3-5-flash:
-      model_id: "vertex_ai/gemini-3.5-flash"
-      model_family: "Google Gemini"
-      model_name: "Google Gemini 3.5 Flash"
-      model_location: "United Kingdom"
-      location: "europe-west2"
-      generally_available: false
-      environments_available: ["test"]
     gemini-3-5-transcribe-preview:
       model_id: "gemini-3.5-transcribe-preview"
       model_family: "Google Gemini"
@@ -578,4 +570,4 @@ models:
       model_location: "Global"
       model_provider: "OpenAI"
       generally_available: false
-      environments_available: ["test"]
+      environments_available: ["development", "test"]
