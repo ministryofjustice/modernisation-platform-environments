@@ -42,7 +42,7 @@ defines three routes under the `test-harness` identity.
 | Route | Incoming prefix | Destination bucket | Destination prefix |
 | --- | --- | --- | --- |
 | Push to S3 | `test-harness/push-to-s3/` | `integration-hub-file-transfer-test-test-harness` | `push-to-s3/` |
-| Hosted pickup | `test-harness/push-to-s3-with-hosted-pickup/` | `integration-hub-test-test-harness-pickup` | `pickup/` |
+| Hosted pickup | `test-harness/hosted-pickup/` | `integration-hub-test-test-harness-pickup` | `pickup/` |
 | Presigned pickup | `test-harness/pull-from-presigned-url/` | `integration-hub-file-transfer-pickup-test-<account-id>` | `test-harness-presigned/` |
 
 Push-to-S3 and hosted pickup use their respective delivery actions, with no
