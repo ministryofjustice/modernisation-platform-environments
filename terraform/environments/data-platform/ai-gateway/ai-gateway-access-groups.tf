@@ -57,7 +57,7 @@ resource "litellm_unified_access_group" "openai_models" {
 
   access_model_names = [
     for key in sort(keys(litellm_model.openai)) :
-    litellm_model.openai_[key].model_name
+    litellm_model.openai[key].model_name
   ]
 
   # Teams can be assigned to access groups out-of-band via the LiteLLM UI/API; don't revoke those.
