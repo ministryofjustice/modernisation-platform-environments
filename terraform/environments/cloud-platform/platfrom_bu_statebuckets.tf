@@ -135,8 +135,7 @@ module "octo_state_bucket" {
     aws.bucket-replication = aws.octo
   }
 
-  bucket_prefix    = "container-platform-octo-live-tf-state-bucket"
-  bucket_namespace = "account-regional"
+  bucket_prefix    = "cp-octo-live-tf-state-bucket"
 
   ownership_controls = "BucketOwnerEnforced"
 
@@ -179,8 +178,7 @@ module "laa_state_bucket" {
     aws.bucket-replication = aws.laa
   }
 
-  bucket_prefix    = "container-platform-laa-live-tf-state-bucket"
-  bucket_namespace = "account-regional"
+  bucket_prefix    = "cp-laa-live-tf-state-bucket"
 
   ownership_controls = "BucketOwnerEnforced"
 
@@ -224,8 +222,7 @@ module "hmpps_state_bucket" {
     aws.bucket-replication = aws.hmpps
   }
 
-  bucket_prefix    = "container-platform-hmpps-live-tf-state-bucket"
-  bucket_namespace = "account-regional"
+  bucket_prefix    = "cp-hmpps-live-tf-state-bucket"
 
   ownership_controls = "BucketOwnerEnforced"
 
@@ -268,8 +265,7 @@ module "cd_state_bucket" {
     aws.bucket-replication = aws.cd
   }
 
-  bucket_prefix    = "container-platform-octo-live-tf-state-bucket"
-  bucket_namespace = "account-regional"
+  bucket_prefix    = "cp-cd-live-tf-state-bucket"
 
   ownership_controls = "BucketOwnerEnforced"
 
