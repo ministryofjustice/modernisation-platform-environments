@@ -111,10 +111,6 @@ module "pwm" {
   log_error_pattern = "ERROR"
 
   log_error_threshold_config = {
-    warning = {
-      threshold = 10
-      period    = 60
-    }
     critical = {
       threshold = 20
       period    = 180
