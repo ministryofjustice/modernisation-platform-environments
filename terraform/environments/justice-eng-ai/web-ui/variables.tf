@@ -123,7 +123,7 @@ variable "builder_hostname" {
 variable "container_image_tag" {
   type        = string
   description = "SHA-tagged UI build deployed with the Terraform task-definition settings across all environments. Update this shared release tag in a reviewed PR after verifying the application build."
-  default     = "ui-build-f0a35e6"
+  default     = "ui-build-latest"
 }
 
 variable "forge_container_image_tag" {
