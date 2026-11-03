@@ -211,6 +211,8 @@ extraInitContainers:
       seccompProfile:
         type: RuntimeDefault
 
+# The chart sets DISABLE_SCHEMA_UPDATE when this job is enabled; keep it out of envVars
+# to avoid duplicate names that can cause Helm upgrade patch ordering failures.
 migrationJob:
   enabled: true
   hooks:
@@ -225,7 +227,6 @@ ingress:
 envVars: {
     AUTO_REDIRECT_UI_LOGIN_TO_SSO: "True",
     DISABLE_LLM_API_ENDPOINTS: "True",
-    DISABLE_SCHEMA_UPDATE: "True",
     DOCS_DESCRIPTION: "Administration interface for the AI Gateway.",
     DOCS_FILTERED: "True",
     DOCS_TITLE: "Justice AI Gateway Admin",
