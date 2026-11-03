@@ -3,21 +3,24 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
   #checkov:skip=CKV_AWS_108 "ignore"
   #checkov:skip=CKV_AWS_111 "ignore"
   #checkov:skip=CKV_AWS_356 "ignore"
-  count   = lookup(local.oracle_duplicate_map[var.env_name], "target_account_id", false) != false ? 1 : 0
+  count   = length(lookup(local.oracle_duplicate_map[var.env_name], "targets", [])) > 0 ? 1 : 0
   version = "2012-10-17"
 
-  statement {
-    sid     = "OracleBackupAccess"
-    effect  = "Allow"
-    actions = ["s3:*"]
-    resources = [
-      module.s3_bucket_oracledb_backups.bucket.arn,
-      "${module.s3_bucket_oracledb_backups.bucket.arn}/*"
-    ]
+  dynamic "statement" {
+    for_each = local.oracle_duplicate_map[var.env_name]["targets"]
+    content {
+      sid     = "OracleBackupAccess${title(statement.value.environment)}"
+      effect  = "Allow"
+      actions = ["s3:*"]
+      resources = [
+        module.s3_bucket_oracledb_backups.bucket.arn,
+        "${module.s3_bucket_oracledb_backups.bucket.arn}/*"
+      ]
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_duplicate_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_duplicate_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${statement.value.account_id}:role/instance-role-${var.account_info.application_name}-${statement.value.environment}-${var.db_suffix}-1"]
+      }
     }
   }
 
@@ -168,50 +171,64 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
 
 
 data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
-  count = lookup(local.oracle_statistics_map[var.env_name], "source_account_id", null) != null ? 1 : 0
-  statement {
-    sid    = "allowAccessToListOracleStatistics${title(local.oracle_statistics_map[var.env_name]["source_environment"])}Bucket"
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket"
-    ]
-    resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-${var.db_suffix}-statistics-backup-data"]
+  count = length(lookup(local.oracle_statistics_map[var.env_name], "sources", [])) > 0 ? 1 : 0
+
+  dynamic "statement" {
+    for_each = local.oracle_statistics_map[var.env_name]["sources"]
+    content {
+      sid    = "allowAccessToListOracleStatistics${title(statement.value.environment)}Bucket"
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket"
+      ]
+      resources = ["arn:aws:s3:::${var.account_info.application_name}-${statement.value.environment}-oracle-${var.db_suffix}-statistics-backup-data"]
+    }
   }
 
-  statement {
-    sid    = "allowAccessToOracleStatistics${title(local.oracle_statistics_map[var.env_name]["source_environment"])}BucketObjects"
-    effect = "Allow"
-    actions = [
-      "s3:PutObjectAcl",
-      "s3:PutObject",
-      "s3:GetObjectTagging",
-      "s3:GetObject"
-    ]
-    resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-${var.db_suffix}-statistics-backup-data/*"]
+  dynamic "statement" {
+    for_each = local.oracle_statistics_map[var.env_name]["sources"]
+    content {
+      sid    = "allowAccessToOracleStatistics${title(statement.value.environment)}BucketObjects"
+      effect = "Allow"
+      actions = [
+        "s3:PutObjectAcl",
+        "s3:PutObject",
+        "s3:GetObjectTagging",
+        "s3:GetObject"
+      ]
+      resources = ["arn:aws:s3:::${var.account_info.application_name}-${statement.value.environment}-oracle-${var.db_suffix}-statistics-backup-data/*"]
+    }
   }
 }
 
 data "aws_iam_policy_document" "oracle_remote_rat_capture_bucket_access" {
-  count = (lookup(local.oracle_rat_capture_map[var.env_name], "source_account_id", null) != null) && var.deploy_oracle_rat ? 1 : 0
-  statement {
-    sid    = "allowAccessToListOracleRatCapture${title(local.oracle_rat_capture_map[var.env_name]["source_environment"])}Bucket"
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket"
-    ]
-    resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_rat_capture_map[var.env_name]["source_environment"]}-oracle-${var.db_suffix}-rat-capture"]
+  count = (length(lookup(local.oracle_rat_capture_map[var.env_name], "sources", [])) > 0) && var.deploy_oracle_rat ? 1 : 0
+
+  dynamic "statement" {
+    for_each = local.oracle_rat_capture_map[var.env_name]["sources"]
+    content {
+      sid    = "allowAccessToListOracleRatCapture${title(statement.value.environment)}Bucket"
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket"
+      ]
+      resources = ["arn:aws:s3:::${var.account_info.application_name}-${statement.value.environment}-oracle-${var.db_suffix}-rat-capture"]
+    }
   }
 
-  statement {
-    sid    = "allowAccessToOracleRatCapture${title(local.oracle_rat_capture_map[var.env_name]["source_environment"])}BucketObjects"
-    effect = "Allow"
-    actions = [
-      "s3:PutObjectAcl",
-      "s3:PutObject",
-      "s3:GetObjectTagging",
-      "s3:GetObject"
-    ]
-    resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_rat_capture_map[var.env_name]["source_environment"]}-oracle-${var.db_suffix}-rat-capture/*"]
+  dynamic "statement" {
+    for_each = local.oracle_rat_capture_map[var.env_name]["sources"]
+    content {
+      sid    = "allowAccessToOracleRatCapture${title(statement.value.environment)}BucketObjects"
+      effect = "Allow"
+      actions = [
+        "s3:PutObjectAcl",
+        "s3:PutObject",
+        "s3:GetObjectTagging",
+        "s3:GetObject"
+      ]
+      resources = ["arn:aws:s3:::${var.account_info.application_name}-${statement.value.environment}-oracle-${var.db_suffix}-rat-capture/*"]
+    }
   }
 }
 
@@ -350,35 +367,41 @@ resource "aws_s3_bucket_inventory" "oracledb_backup_pieces" {
 # Bucket for storing Oracle Statistics Backup Dump Files
 
 data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
-  count   = (lookup(local.oracle_statistics_map[var.env_name], "target_account_id", null) != null) && var.deploy_oracle_stats ? 1 : 0
+  count   = (length(lookup(local.oracle_statistics_map[var.env_name], "targets", [])) > 0) && var.deploy_oracle_stats ? 1 : 0
   version = "2012-10-17"
 
-  statement {
-    sid       = "OracleStatisticsListPolicy"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = [module.s3_bucket_oracle_statistics[0].bucket.arn]
+  dynamic "statement" {
+    for_each = local.oracle_statistics_map[var.env_name]["targets"]
+    content {
+      sid       = "OracleStatisticsListPolicy${title(statement.value.environment)}"
+      effect    = "Allow"
+      actions   = ["s3:ListBucket"]
+      resources = [module.s3_bucket_oracle_statistics[0].bucket.arn]
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${statement.value.account_id}:role/instance-role-${var.account_info.application_name}-${statement.value.environment}-${var.db_suffix}-1"]
+      }
     }
   }
 
-  statement {
-    sid    = "OracleStatisticsObjectPolicy"
-    effect = "Allow"
-    actions = [
-      "s3:PutObjectAcl",
-      "s3:PutObject",
-      "s3:GetObjectTagging",
-      "s3:GetObject"
-    ]
-    resources = ["${module.s3_bucket_oracle_statistics[0].bucket.arn}/*"]
+  dynamic "statement" {
+    for_each = local.oracle_statistics_map[var.env_name]["targets"]
+    content {
+      sid    = "OracleStatisticsObjectPolicy${title(statement.value.environment)}"
+      effect = "Allow"
+      actions = [
+        "s3:PutObjectAcl",
+        "s3:PutObject",
+        "s3:GetObjectTagging",
+        "s3:GetObject"
+      ]
+      resources = ["${module.s3_bucket_oracle_statistics[0].bucket.arn}/*"]
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${statement.value.account_id}:role/instance-role-${var.account_info.application_name}-${statement.value.environment}-${var.db_suffix}-1"]
+      }
     }
   }
 }
@@ -427,35 +450,41 @@ module "s3_bucket_oracle_statistics" {
 }
 
 data "aws_iam_policy_document" "s3_bucket_oracle_rat_capture" {
-  count   = (lookup(local.oracle_rat_capture_map[var.env_name], "target_account_id", null) != null) && var.deploy_oracle_rat ? 1 : 0
+  count   = (length(lookup(local.oracle_rat_capture_map[var.env_name], "targets", [])) > 0) && var.deploy_oracle_rat ? 1 : 0
   version = "2012-10-17"
 
-  statement {
-    sid       = "OracleRatCaptureListPolicy"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = [module.s3_bucket_oracle_rat_capture[0].bucket.arn]
+  dynamic "statement" {
+    for_each = local.oracle_rat_capture_map[var.env_name]["targets"]
+    content {
+      sid       = "OracleRatCaptureListPolicy${title(statement.value.environment)}"
+      effect    = "Allow"
+      actions   = ["s3:ListBucket"]
+      resources = [module.s3_bucket_oracle_rat_capture[0].bucket.arn]
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_rat_capture_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_rat_capture_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${statement.value.account_id}:role/instance-role-${var.account_info.application_name}-${statement.value.environment}-${var.db_suffix}-1"]
+      }
     }
   }
 
-  statement {
-    sid    = "OracleRatCaptureObjectPolicy"
-    effect = "Allow"
-    actions = [
-      "s3:PutObjectAcl",
-      "s3:PutObject",
-      "s3:GetObjectTagging",
-      "s3:GetObject"
-    ]
-    resources = ["${module.s3_bucket_oracle_rat_capture[0].bucket.arn}/*"]
+  dynamic "statement" {
+    for_each = local.oracle_rat_capture_map[var.env_name]["targets"]
+    content {
+      sid    = "OracleRatCaptureObjectPolicy${title(statement.value.environment)}"
+      effect = "Allow"
+      actions = [
+        "s3:PutObjectAcl",
+        "s3:PutObject",
+        "s3:GetObjectTagging",
+        "s3:GetObject"
+      ]
+      resources = ["${module.s3_bucket_oracle_rat_capture[0].bucket.arn}/*"]
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_rat_capture_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_rat_capture_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${statement.value.account_id}:role/instance-role-${var.account_info.application_name}-${statement.value.environment}-${var.db_suffix}-1"]
+      }
     }
   }
 }
