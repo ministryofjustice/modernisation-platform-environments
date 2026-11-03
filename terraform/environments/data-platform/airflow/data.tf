@@ -43,10 +43,10 @@ data "aws_subnet" "dp_private_subnet_b" {
   }
 }
 
-# ACM
-data "aws_acm_certificate" "certificate" {
-  domain   = local.environment_configuration.route53_zone
-  statuses = ["ISSUED"]
+# Route53
+data "aws_route53_zone" "main" {
+  name         = "${local.environment_configuration.route53_zone}."
+  private_zone = false
 }
 
 # EKS
