@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      version = "~> 6.0"
+      version = "~> 6.67"
       source  = "hashicorp/aws"
     }
     dns = {
@@ -17,5 +17,5 @@ terraform {
       source  = "hashicorp/http"
     }
   }
-  required_version = "~> 1.0"
+  required_version = ">= 1.11, < 2.0"
 }

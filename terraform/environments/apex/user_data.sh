@@ -1,6 +1,9 @@
 #!/bin/bash -xe
 echo ECS_CLUSTER=${app_name} >> /etc/ecs/ecs.config
 echo ECS_IMAGE_PULL_BEHAVIOR=always >> /etc/ecs/ecs.config
+# Distrust eMudhra/emSign and Comodo AAA roots (AL2023 fixed ca-certificates release)
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
 yum install -y aws-cfn-bootstrap awslogs
 cat >/etc/awslogs/awslogs.conf <<-EOF
 [general]

@@ -560,6 +560,50 @@ resource "aws_lambda_event_source_mapping" "live_feed_incident_events" {
   ]
 }
 
+# ------------------------------------------------------------------------------
+# CloudWatch alarm confirmation queue
+# Delay human notifications while CloudWatch confirms the alarm is persistent.
+# ------------------------------------------------------------------------------
+
+resource "aws_sqs_queue" "cloudwatch_alarm_debounce_dlq" {
+  name                      = "cloudwatch-alarm-debounce-dlq"
+  message_retention_seconds = 1209600
+  sqs_managed_sse_enabled   = true
+}
+
+resource "aws_sqs_queue" "cloudwatch_alarm_debounce" {
+  name                       = "cloudwatch-alarm-debounce"
+  visibility_timeout_seconds = 365
+  message_retention_seconds  = 86400
+  sqs_managed_sse_enabled    = true
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+resource "aws_sqs_queue_redrive_allow_policy" "cloudwatch_alarm_debounce" {
+  queue_url = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.id
+
+  redrive_allow_policy = jsonencode({
+    redrivePermission = "byQueue"
+    sourceQueueArns = [
+      aws_sqs_queue.cloudwatch_alarm_debounce.arn,
+    ]
+  })
+}
+
+resource "aws_lambda_event_source_mapping" "cloudwatch_alarm_debounce" {
+  event_source_arn = aws_sqs_queue.cloudwatch_alarm_debounce.arn
+  function_name    = module.cloudwatch_alarm_threader.lambda_function_name
+  batch_size       = 1
+
+  depends_on = [
+    aws_iam_role_policy_attachment.cloudwatch_alarm_threader_attach,
+  ]
+}
+
 #-----------------------------------------------------------------------------------
 # FMS validation reporter schedules
 #-----------------------------------------------------------------------------------
@@ -717,6 +761,81 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
     aws_iam_role_policy_attachment.merge_redrive_planner,
   ]
 }
+
+# ------------------------------------------------------------------------------
+# Historical assurance audit
+# Trigger at midnight and let the planner defer around higher-priority workloads.
+# ------------------------------------------------------------------------------
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_audit" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_audit_midnight"
+
+  description = (
+    "Starts the downstream historical assurance audit at midnight"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(0 0 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.merge_redrive_planner.lambda_function_arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      action = "launch_historical_audit"
+    })
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+    module.downstream_reconciliation_audit,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation status publisher
+# Refresh low-cost operational metrics without running Athena queries.
+# ------------------------------------------------------------------------------
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_status" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_status"
+
+  description = (
+    "Publishes current downstream reconciliation status every five minutes"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = "rate(5 minutes)"
+
+  target {
+    arn      = module.merge_redrive_planner.lambda_function_arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      action = "publish_reconciliation_status"
+    })
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+  ]
+}
+
 
 # ------------------------------------------------------------------------------
 # Rota channel notifier schedule

@@ -105,12 +105,6 @@ resource "aws_db_instance" "soa_db" {
     delete = "40m"
     update = "80m"
   }
-
-  lifecycle {
-    ignore_changes = [
-      password
-    ]
-  }
 }
 
 # RDS Minor upgrade notification changes

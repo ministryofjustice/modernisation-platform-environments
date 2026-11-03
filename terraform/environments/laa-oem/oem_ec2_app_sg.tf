@@ -29,6 +29,19 @@ resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_1521" {
   }
 }
 
+resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_1522" {
+  security_group_id = aws_security_group.oem_app_security_group.id
+  description       = "Allow traffic from app servers to the database on port 1522"
+  ip_protocol       = "tcp"
+  from_port         = 1522
+  to_port           = 1522
+  referenced_security_group_id = aws_security_group.oem_db_security_group.id
+
+  tags = {
+    Name = "Allow traffic from app servers to the database on port 1522"
+  }
+}
+
 resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_3872" {
   security_group_id = aws_security_group.oem_app_security_group.id
   description       = "Allow traffic from app servers to the database on port 3872"
@@ -57,6 +70,24 @@ resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_1521_sub
 
   tags = {
     Name = "Allow traffic from app servers to the database on port 1521"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_vpc_db_1522_subnets" {
+  for_each = toset([
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
+  ])
+  security_group_id = aws_security_group.oem_app_security_group.id
+  description       = "Allow traffic from app servers to the database on port 1522"
+  ip_protocol       = "tcp"
+  from_port         = 1522
+  to_port           = 1522
+  cidr_ipv4         = each.value
+
+  tags = {
+    Name = "Allow traffic from app servers to the database on port 1522"
   }
 }
 

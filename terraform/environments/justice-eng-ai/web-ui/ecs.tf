@@ -78,6 +78,10 @@ resource "aws_ecs_task_definition" "app" {
           name  = "BEDROCK_MODEL_ID"
           value = var.bedrock_model_id
         },
+        {
+          name  = "BEDROCK_MAX_TOKENS"
+          value = var.bedrock_max_tokens 
+        },
         # GitHub App -- non-sensitive values (installation id + pem are in
         # the ``secrets`` block below).
         {
@@ -144,12 +148,27 @@ resource "aws_ecs_task_definition" "app" {
           value = local.oidc_wired ? "true" : "false"
         },
         {
+          name  = "MPAPB_ALB_GROUP_AUTHORIZATION_ENABLED"
+          value = local.alb_group_authorization_enabled ? "true" : "false"
+        },
+        {
           name  = "MPAPB_ALB_SIGNER_ARN"
           value = local.oidc_wired ? aws_lb.app.arn : ""
         },
         {
           name  = "MPAPB_FORGE_URL"
           value = local.forge_url
+        },
+        # Private same-VPC address Builder's own proxy forwards /forge-app/
+        # requests to (see local.forge_upstream_url in forge-journey-lab.tf,
+        # service-discovery.tf). Empty unless forge_single_url_enabled.
+        {
+          name  = "MPAPB_FORGE_UPSTREAM_URL"
+          value = local.forge_upstream_url
+        },
+        {
+          name  = "FORGE_BASE_PATH"
+          value = local.forge_base_path
         },
         # In-app Entra OIDC feature flag. When true (see local.in_app_oidc_
         # enabled) the app runs its own login handshake and the ALB
@@ -210,6 +229,12 @@ resource "aws_ecs_task_definition" "app" {
           {
             name      = "MPAPB_ENTRA_CLIENT_SECRET"
             valueFrom = aws_secretsmanager_secret.entra_oidc_client_secret[0].arn
+          },
+        ] : [],
+        local.forge_single_url_enabled ? [
+          {
+            name      = "MPAPB_FORGE_PROXY_TOKEN"
+            valueFrom = aws_secretsmanager_secret.forge_proxy_token[0].arn
           },
         ] : []
       )
@@ -287,6 +312,7 @@ resource "aws_ecs_service" "app" {
   launch_type                       = "FARGATE"
   health_check_grace_period_seconds = 60
   enable_execute_command            = false
+  wait_for_steady_state             = true
   tags                              = local.tags
 
   deployment_circuit_breaker {
@@ -310,11 +336,9 @@ resource "aws_ecs_service" "app" {
     aws_lb_listener.https
   ]
 
-  # Task-def revisions get rolled forward by CI/CD (or by the emergency
-  # ``aws ecs update-service`` we used to recover from the middleware
-  # bug); leaving this attribute unmanaged stops terraform dragging the
-  # service back to an older revision.
+  # Apply the image and authentication settings together.
+  # Desired count remains operator-managed.
   lifecycle {
-    ignore_changes = [task_definition, desired_count]
+    ignore_changes = [desired_count]
   }
 }

@@ -1,5 +1,7 @@
 #!/bin/bash -xe
 echo ECS_CLUSTER=${app_ecs_cluster} >> /etc/ecs/ecs.config
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
 # Install CloudWatch Agent
 yum install -y amazon-cloudwatch-agent
 # Write CloudWatch Agent config (provided via Terraform)

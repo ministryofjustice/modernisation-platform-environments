@@ -11,6 +11,12 @@ module "github_backup_role" {
 
   create_inline_policy = true
   inline_policy_permissions = {
+    github_app_secret_read = {
+      sid       = "GitHubAppSecretRead"
+      effect    = "Allow"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [module.github_app_secret[0].secret_arn]
+    }
     github_backup_destination_read = {
       sid       = "GitHubBackupDestinationRead"
       effect    = "Allow"

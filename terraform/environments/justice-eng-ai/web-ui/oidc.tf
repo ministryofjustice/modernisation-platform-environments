@@ -37,6 +37,10 @@ locals {
 
   oidc_wired       = var.enable_oidc_auth && var.oidc_configured && !local.in_app_oidc_requested
   oidc_wired_count = local.oidc_wired ? 1 : 0
+  alb_group_authorization_enabled = try(
+    local.application_data.accounts[local.environment].alb_group_authorization_enabled,
+    false,
+  )
 }
 
 # ---------- Entra OIDC secrets ----------

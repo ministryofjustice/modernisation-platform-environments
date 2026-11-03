@@ -103,7 +103,7 @@ resource "aws_autoscaling_group" "main_cluster_scaling_group" {
 
 resource "aws_launch_template" "ec2_launch_template_additional" {
   name_prefix   = local.second_cluster_name
-  image_id      = local.application_data.accounts[local.environment].ami_image_id
+  image_id      = local.application_data.accounts[local.environment].conn_saa_ami_image_id
   instance_type = local.application_data.accounts[local.environment].ec2_instance_type
   ebs_optimized = true
 
