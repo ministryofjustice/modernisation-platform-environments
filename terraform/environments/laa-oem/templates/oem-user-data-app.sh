@@ -49,7 +49,7 @@ done
 echo -e "\nRunning extraction.\n"
 update-ca-trust extract
 echo "Run these commands now:"
-echo "trust list --filter=bl${V}cklist"
+echo "trust list --filter=bl$${V}cklist"
 echo "curl -v https://dv-g3b-emudhra.we-have-a-problem.com/"
 echo
 cd / && rm -rf "$D"
