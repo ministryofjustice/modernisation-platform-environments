@@ -243,6 +243,7 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
             "container-platform/environment" = "{{ trimSuffix \".yaml\" .path.filename }}"
             "container-platform/product"     = "{{ index .path.segments 2 }}"
             "container-platform/app"         = "{{ index .path.segments 3 }}"
+            "container-platform/type"        = "workload"
           }
         }
         spec = {
