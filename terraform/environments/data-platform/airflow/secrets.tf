@@ -33,3 +33,27 @@ resource "aws_secretsmanager_secret_version" "airflow_smtp_default" {
     }
   })
 }
+
+/*
+  Slack connection used by apache-airflow-providers-slack (SlackHook / SlackNotifier).
+*/
+module "airflow_connections_slack_api_default_secret" {
+  #checkov:skip=CKV2_AWS_57:Slack bot tokens are rotated manually in the Slack app
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
+
+  name        = "airflow/connections/slack_api_default"
+  description = "Airflow Slack connection (slack_api_default) for task notifications"
+  kms_key_id  = data.aws_kms_key.common_secrets_manager_kms.arn
+
+  secret_string = jsonencode({
+    conn_type = "slack"
+    password  = "CHANGEME"
+  })
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "none" }
+  )
+}
