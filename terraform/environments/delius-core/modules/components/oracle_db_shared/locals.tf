@@ -129,17 +129,15 @@ locals {
   oracle_duplicate_map = {
     "poc" = {
       targets = []
+      sources = []
     },
     "dev" = {
-      #       targets = [
-      #         {
-      #           account_id  = var.platform_vars.environment_management.account_ids["delius-core-test"]
-      #           environment = "test"
-      #         }
-      #       ]
+      targets = []
+      sources = []
     }
     "test" = {
-      targets = [
+      targets = []
+      sources = [
         {
           account_id  = var.platform_vars.environment_management.account_ids["delius-core-development"]
           environment = "dev"
@@ -147,7 +145,8 @@ locals {
       ]
     },
     "stage" = {
-      targets = [
+      targets = []
+      sources = [
         {
           account_id  = var.platform_vars.environment_management.account_ids["delius-core-production"]
           environment = "prod"
@@ -155,7 +154,8 @@ locals {
       ]
     },
     "preprod" = {
-      targets = [
+      targets = []
+      sources = [
         {
           account_id  = var.platform_vars.environment_management.account_ids["delius-core-production"]
           environment = "prod"
@@ -173,9 +173,11 @@ locals {
           environment = "preprod"
         }
       ]
+      sources = []
     },
     "training" = {
       targets = []
+      sources = []
     }
   }
 
