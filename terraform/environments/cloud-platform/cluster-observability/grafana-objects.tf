@@ -41,13 +41,22 @@ locals {
   # same file, never see them.
   business_units = jsondecode(file("${path.module}/../business-units.json")).business_units
 
-  # Real-BU Grafana map for cloud-platform-live, derived from the shared file.
+  # Real-BU Grafana maps, one per environment, derived from the shared file.
+  # Each workspace only gets data sources for its own environment's AMP
+  # workspaces, so there is one data source per BU per workspace.
   # idc_group_names stays a LIST (a BU has many delivery teams); here it holds
-  # the BU's single parent group. Gated OFF on live by grafana_objects_enabled
-  # (see environment-configuration.tf) until per-BU AMP workspaces exist (#8517).
-  grafana_bus_real = {
+  # the BU's single parent group. Gated OFF by grafana_objects_enabled (see
+  # environment-configuration.tf) until per-BU AMP workspaces exist (#8517).
+  grafana_bus_live = {
     for k, bu in local.business_units : k => {
-      amp_workspace_alias = bu.amp_workspace_alias
+      amp_workspace_alias = bu.amp_workspace_alias.live
+      idc_group_names     = [bu.parent_group]
+    }
+  }
+
+  grafana_bus_nonlive = {
+    for k, bu in local.business_units : k => {
+      amp_workspace_alias = bu.amp_workspace_alias.nonlive
       idc_group_names     = [bu.parent_group]
     }
   }
@@ -61,12 +70,19 @@ locals {
   # Left empty on commit so no stale alias can fail a plan.
   grafana_simulated_bus_dev = {}
 
-  # Per-workspace BU map. Live carries the real BUs (but is gated OFF, see
-  # above); development carries only the dev simulated BUs.
+  # Per-workspace BU map. Live and non-live carry the real BUs for their own
+  # environment (both gated OFF, see above); development carries only the dev
+  # simulated BUs.
   bus_by_workspace = {
-    "cloud-platform-live"        = local.grafana_bus_real
+    "cloud-platform-live"        = local.grafana_bus_live
+    "cloud-platform-nonlive"     = local.grafana_bus_nonlive
     "cloud-platform-development" = local.grafana_simulated_bus_dev
   }
+
+  # Dashboards are developed in non-live (and the dev test workspace), so BU
+  # teams can edit and save there. Live stays view-only so production
+  # dashboards cannot be edited by mistake.
+  bu_folder_permission = terraform.workspace == "cloud-platform-live" ? "View" : "Edit"
 
   # Phase-2 gate. The Grafana provider authenticates with a token minted from
   # the iac-grafana-objects service account (amg.tf). On the first apply of a
@@ -205,7 +221,7 @@ resource "grafana_folder_permission" "bu" {
 
   permissions {
     team_id    = grafana_team.bu[each.key].id
-    permission = "View"
+    permission = local.bu_folder_permission
   }
 }
 

@@ -4,6 +4,7 @@ locals {
   # AMG is account-level, so it is only deployed in these workspaces.
   amg_host_workspaces = [
     "cloud-platform-live",
+    "cloud-platform-nonlive",
     "cloud-platform-development",
   ]
   enable_amg         = contains(local.amg_host_workspaces, terraform.workspace)
