@@ -368,7 +368,7 @@ module "s3-observability-athena-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix = (
-    "grafana-athena-query-results-${local.env_account_id}-"
+    "grafana-athena-query-results-${local.environment_shorthand}-"
   )
   versioning_enabled = true
 
