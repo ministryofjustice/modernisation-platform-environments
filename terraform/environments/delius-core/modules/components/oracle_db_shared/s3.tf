@@ -236,17 +236,21 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
   #checkov:skip=CKV_AWS_108 "ignore"
   #checkov:skip=CKV_AWS_111 "ignore"
   #checkov:skip=CKV_AWS_356 "ignore"
-  count = lookup(local.oracle_duplicate_map[var.env_name], "source_account_id", null) != null ? 1 : 0
-  statement {
-    sid    = "allowAccessToOracleDb${title(local.oracle_duplicate_map[var.env_name]["source_environment"])}Bucket"
-    effect = "Allow"
-    actions = [
-      "s3:*"
-    ]
-    resources = [
-      "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, local.oracle_duplicate_map[var.env_name]["source_environment"])}",
-      "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, local.oracle_duplicate_map[var.env_name]["source_environment"])}/*"
-    ]
+  count = length(lookup(local.oracle_duplicate_map[var.env_name], "sources", [])) > 0 ? 1 : 0
+
+  dynamic "statement" {
+    for_each = local.oracle_duplicate_map[var.env_name]["sources"]
+    content {
+      sid    = "allowAccessToOracleDb${title(statement.value.environment)}Bucket"
+      effect = "Allow"
+      actions = [
+        "s3:*"
+      ]
+      resources = [
+        "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, statement.value.environment)}",
+        "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, statement.value.environment)}/*"
+      ]
+    }
   }
 }
 
