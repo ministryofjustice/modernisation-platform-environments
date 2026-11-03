@@ -27,12 +27,12 @@ locals {
       "source_environment" = "dev"
     },
     "stage" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+      "source_environment" = "prod"
     },
     "preprod" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+      "source_environment" = "prod"
     },
     "prod" = {
       #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
@@ -63,12 +63,12 @@ locals {
       "source_environment" = "dev"
     },
     "stage" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+      "source_environment" = "prod"
     },
     "preprod" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+      "source_environment" = "prod"
     },
     "prod" = {
       #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
@@ -93,12 +93,12 @@ locals {
       "source_environment" = "dev"
     },
     "stage" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+      "source_environment" = "prod"
     },
     "preprod" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+      "source_environment" = "prod"
     },
     "prod" = {
       #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
