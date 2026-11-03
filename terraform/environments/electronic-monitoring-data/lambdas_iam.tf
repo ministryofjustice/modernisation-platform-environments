@@ -3812,6 +3812,20 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
   }
 
   statement {
+    sid    = "StartHistoricalRecovery"
+    effect = "Allow"
+
+    actions = [
+      "states:StartExecution",
+    ]
+
+    resources = [
+      module.merge_into_mdss_ac_position.arn,
+      module.merge_into_emdi_position.arn,
+    ]
+  }
+
+  statement {
     sid    = "ReadCadtActivity"
     effect = "Allow"
 
