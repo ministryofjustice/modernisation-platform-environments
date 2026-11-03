@@ -28,7 +28,7 @@ cd "$D"
 csplit -s -z -f cert- "$B" '/-----BEGIN TRUSTED CERTIFICATE-----/' '{*}'
 for f in cert-*; do
   echo -n "Processing: $f ... "
-  O=$(openssl x509 -noout -subject -in "$f"  2>/dev/null |grep -iE ', cn=(aaa|emsign|emudhra)')
+  O=$(openssl x509 -noout -subject -in "$f"  2>/dev/null |grep -iE 'cn=(aaa|emsign|emudhra)')
   if [[ -n $O ]]; then
     echo "dirty."
     F=$(openssl x509 -in "$f" -noout -fingerprint -sha256 |cut -d= -f2 | tr -d :)
