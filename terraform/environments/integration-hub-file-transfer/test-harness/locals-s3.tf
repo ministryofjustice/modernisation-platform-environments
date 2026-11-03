@@ -7,7 +7,7 @@ locals {
   push_to_s3_destination_bucket_name = "${local.application_name}-${local.environment}-${local.component_name}"
 
   # The hosted bucket is created by the push-to-s3-with-hosted-pickup component from the dispatch entry.
-  hosted_pickup_incoming_prefix    = "${local.component_name}/push-to-s3-with-hosted-pickup/"
+  hosted_pickup_incoming_prefix    = "${local.component_name}/hosted-pickup/"
   hosted_pickup_destination_prefix = "pickup/"
   hosted_pickup_bucket_name        = "integration-hub-${local.environment}-${local.component_name}-pickup"
 
