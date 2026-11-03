@@ -359,6 +359,52 @@ module "s3-athena-bucket" {
   tags = local.tags
 }
 
+
+# ----------------------------------
+# Observability Platform Athena query results
+# ----------------------------------
+
+module "s3-observability-athena-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
+
+  bucket_prefix = (
+    "grafana-athena-query-results-${local.env_account_id}-"
+  )
+  versioning_enabled = true
+
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  replication_enabled = false
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 1
+      }
+
+      noncurrent_version_expiration = {
+        days = 1
+      }
+    }
+  ]
+
+  tags = local.tags
+}
+
 # ----------------------------------
 # Unzipped Data Store and log bucket
 # ----------------------------------
