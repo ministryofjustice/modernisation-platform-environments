@@ -71,6 +71,7 @@
       "northgate_proxy": "10.120.0.147/32",
       "aws_workspace_cidr": "10.200.0.0/20",
       "mp_v1_workspaces_cidr": "10.26.130.0/24",
+      "mp_azure_virtual_desktop_cidr": "10.192.64.0/21",
       "cloud_platform_cidr": "172.20.0.0/16",
       "oem": {
         "agent_port": "3872",
