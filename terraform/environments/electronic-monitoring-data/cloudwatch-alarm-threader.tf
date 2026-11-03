@@ -15,6 +15,14 @@ locals {
   alarm_thread_state_bucket = module.s3-logging-bucket.bucket.id
 
   alarm_thread_state_prefix = "alarm-threading/current"
+
+  alarm_debounce_seconds      = 120
+  alarm_debounce_bypass_names = concat(
+    [
+      aws_cloudwatch_metric_alarm.glue_database_count_high.alarm_name,
+    ],
+    keys(local.landing_dlq_redriver_config),
+  )
 }
 
 # ------------------------------------------------------------------------------
@@ -78,20 +86,9 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
             alarm.alarm_name
           ],
           [
-            for _, alarm in aws_cloudwatch_metric_alarm.downstream_reconciliation_execution_failed :
-            alarm.alarm_name
-          ],
-          [
-            for _, alarm in aws_cloudwatch_metric_alarm.downstream_reconciliation_audit_gaps :
-            alarm.alarm_name
-          ],
-          [
-            for _, alarm in aws_cloudwatch_metric_alarm.downstream_reconciliation_audit_stale :
-            alarm.alarm_name
-          ],
-          [
-            for alarm in aws_cloudwatch_metric_alarm.downstream_reconciliation_audit_execution_failed :
-            alarm.alarm_name
+            {
+              prefix = "downstream_reconciliation_"
+            }
           ],
         )
       }
@@ -110,4 +107,22 @@ resource "aws_lambda_permission" "alarm_state_change_threader_allow_eventbridge"
   function_name = module.cloudwatch_alarm_threader.lambda_function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.alarm_state_change_threader.arn
+}
+
+
+# ------------------------------------------------------------------------------
+# Transient alarm suppression metric
+# Track alarms that recovered before human notification was required.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_log_metric_filter" "alarm_transient_suppressed" {
+  name           = "cloudwatch-alarm-transient-suppressed"
+  log_group_name = module.cloudwatch_alarm_threader.cloudwatch_log_group.name
+  pattern        = "{ $.message.event = \"CW_ALARM_TRANSIENT_SUPPRESSED\" }"
+
+  metric_transformation {
+    name      = "TransientAlarmSuppressedCount"
+    namespace = "EMDS/CloudWatch"
+    value     = "1"
+  }
 }

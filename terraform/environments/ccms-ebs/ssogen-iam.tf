@@ -166,9 +166,11 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
         "ds:DescribeDirectories",
         "ec2:DescribeInstanceStatus",
         "ec2:DescribeTags",
-        "logs:*",
-        "ssm:*",
-        "ec2messages:*"
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
       ],
       "Resource": "*"
     },
@@ -199,7 +201,7 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:*"]
+      "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}-dev-account-secrets"]
     },
     {
       "Effect": "Allow",

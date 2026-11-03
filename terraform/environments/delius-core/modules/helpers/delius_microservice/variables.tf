@@ -560,10 +560,6 @@ variable "log_error_threshold_config" {
     period    = number
   }))
   default = {
-    warning = {
-      threshold = 5
-      period    = 120
-    }
     critical = {
       threshold = 10
       period    = 300

@@ -1,5 +1,5 @@
 locals {
-  irsa_name = local.is-development || local.is-test ? "cloud-platform-irsa-8d7b7a42d840ce59-live" : local.is-preproduction ? "cloud-platform-irsa-91f1480099494185-live" : ""
+  irsa_name = local.is-development || local.is-test ? "cloud-platform-irsa-8d7b7a42d840ce59-live" : local.is-preproduction ? "cloud-platform-irsa-91f1480099494185-live" : "cloud-platform-irsa-dd6ef71b563575c8-live"
   api_integration_databases = {
     person_record = aws_glue_catalog_database.person_record
     cemo          = aws_glue_catalog_database.cemo

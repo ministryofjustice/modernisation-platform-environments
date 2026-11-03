@@ -15,24 +15,6 @@ module "get_zipped_file_api" {
   type = "EXPRESS"
 }
 
-# ------------------------------------------
-# DMS Validation Step Function
-# ------------------------------------------
-
-module "dms_validation_step_function" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-
-  source       = "./modules/step_function"
-  name         = "dms_validation"
-  iam_policies = tomap({ "dms_validation_step_function_policy" = aws_iam_policy.dms_validation_step_function_policy[0] })
-  variable_dictionary = tomap(
-    {
-      "dms_retrieve_metadata" = module.dms_retrieve_metadata[0].lambda_function_name,
-      "dms_validation"        = module.dms_validation[0].lambda_function_name,
-    }
-  )
-  type = "STANDARD"
-}
 
 # ------------------------------------------
 # DLT Iceberg Maintenance Step Function
@@ -312,20 +294,18 @@ resource "aws_sfn_state_machine" "staging_db_janitor" {
 # Landing DLQ redriver Step Function
 # ------------------------------------------------------------------------------
 
+locals {
+  landing_dlq_redrive_settle_seconds = 300
+}
+
 resource "aws_sfn_state_machine" "landing_dlq_redriver" {
   name     = "landing_dlq_redriver"
   role_arn = aws_iam_role.landing_dlq_redriver_state_machine.arn
 
   definition = jsonencode({
     Comment = "Redrives landing DLQ messages after CloudWatch DLQ alarms."
-    StartAt = "WaitForThreadState"
+    StartAt = "RedriverBatch"
     States = {
-      WaitForThreadState = {
-        Type    = "Wait"
-        Seconds = 600
-        Next    = "RedriverBatch"
-      }
-
       RedriverBatch = {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke"
@@ -418,7 +398,7 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
 
       WaitAfterReplay = {
         Type    = "Wait"
-        Seconds = 300
+        Seconds = local.landing_dlq_redrive_settle_seconds
         Next    = "RedriverBatch"
       }
 
@@ -436,7 +416,7 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
 }
 
 # ------------------------------------------
-# Trigger cadt Step funtion
+# Trigger cadt Step function
 # ------------------------------------------
 
 module "trigger_cadt_step_function" {
@@ -452,7 +432,5 @@ module "trigger_cadt_step_function" {
   )
   type = "STANDARD"
 }
-# ------------------------------------------
-# Downstream reconciliation audit
-# ------------------------------------------
+
 

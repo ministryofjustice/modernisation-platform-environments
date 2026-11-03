@@ -67,3 +67,47 @@ data "aws_kms_key" "common_secrets_manager_kms" {
 data "aws_eks_cluster" "eks" {
   name = local.eks_cluster_name
 }
+
+# >>> TEMPORARY (Airflow 3 durability test): START
+data "aws_iam_policy_document" "mwaa_bucket" {
+  /* Airflow workflow roles: read, write and delete objects under their prefix only */
+  dynamic "statement" {
+    for_each = local.mwaa_bucket_workflow_role_arns
+    content {
+      sid    = "WorkflowObjects${replace(title(statement.key), "/[^A-Za-z0-9]/", "")}"
+      effect = "Allow"
+      principals {
+        type        = "AWS"
+        identifiers = statement.value
+      }
+      actions = [
+        "s3:DeleteObject",
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:PutObject"
+      ]
+      resources = ["arn:aws:s3:::mojdp-${local.environment}-mwaa/${statement.key}/*"]
+    }
+  }
+
+  /* Airflow workflow roles: list their prefix only */
+  dynamic "statement" {
+    for_each = local.mwaa_bucket_workflow_role_arns
+    content {
+      sid    = "WorkflowList${replace(title(statement.key), "/[^A-Za-z0-9]/", "")}"
+      effect = "Allow"
+      principals {
+        type        = "AWS"
+        identifiers = statement.value
+      }
+      actions   = ["s3:ListBucket"]
+      resources = ["arn:aws:s3:::mojdp-${local.environment}-mwaa"]
+      condition {
+        test     = "StringLike"
+        variable = "s3:prefix"
+        values   = ["${statement.key}/*"]
+      }
+    }
+  }
+}
+# <<< TEMPORARY (Airflow 3 durability test): END

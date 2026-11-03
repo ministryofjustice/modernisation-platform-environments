@@ -223,6 +223,146 @@ locals {
         timezone = "Europe/London"
         workflow = "laa-concierge-to-slack.yml"
       }
+      mp-automation-certificate-renewal-thursday = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "thursday"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 6 ? * THU *)"
+        timezone = "Europe/London"
+        workflow = "certificate_renewal.yml"
+      }
+      mp-automation-certificate-renewal-tuesday = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "tuesday"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 6 ? * TUE *)"
+        timezone = "Europe/London"
+        workflow = "certificate_renewal.yml"
+      }
+      mp-automation-certificate-renewal-wednesday = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "wednesday"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 6 ? * WED *)"
+        timezone = "Europe/London"
+        workflow = "certificate_renewal.yml"
+      }
+      mp-automation-github-workflow-monitoring = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "monitoring"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0/30 * * * ? *)"
+        timezone = "Europe/London"
+        workflow = "github_workflow_monitoring.yml"
+      }
+      mp-automation-ndh-offloc-cloudplatform-am = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy_cloudplatform"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 0,3 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cloudplatfom_copy.yml"
+      }
+      mp-automation-ndh-offloc-cloudplatform-pm = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy_cloudplatform"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 0,23 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cloudplatfom_copy.yml"
+      }
+      mp-automation-ndh-offloc-copy = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(45 23 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cdecopy.yml"
+      }
+      mp-automation-ndh-offloc-copy-backup = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(20 2 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cdecopy.yml"
+      }
+      mp-automation-planetfm-gfsl-data-extract-am = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(10,30 5 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "planetfm_gfsl_data_extract.yml"
+      }
+      mp-automation-planetfm-gfsl-data-extract-pm = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 12,13 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "planetfm_gfsl_data_extract.yml"
+      }
+      mp-automation-security-hub-alerting = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "security_hub_alerting"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 7 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "security_hub_alerting.yml"
+      }
+      mp-automation-ssm-command-monitoring = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ssm_command_monitoring"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 * * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ssm_command_monitoring.yml"
+      }
     }
   }
 }

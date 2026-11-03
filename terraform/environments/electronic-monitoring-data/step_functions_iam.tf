@@ -19,29 +19,6 @@ resource "aws_iam_policy" "trigger_unzip_lambda" {
 }
 
 # ------------------------------------------
-# DMS Validation
-# ------------------------------------------
-
-data "aws_iam_policy_document" "dms_validation_step_function_policy_document" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-  statement {
-    effect  = "Allow"
-    actions = ["lambda:InvokeFunction"]
-    resources = [
-      module.dms_retrieve_metadata[0].lambda_function_arn,
-    module.dms_validation[0].lambda_function_arn]
-  }
-}
-
-resource "aws_iam_policy" "dms_validation_step_function_policy" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-
-  name   = "dms_validation_step_function_role"
-  policy = data.aws_iam_policy_document.dms_validation_step_function_policy_document[0].json
-}
-
-
-# ------------------------------------------
 # Data Cut Back
 # ------------------------------------------
 

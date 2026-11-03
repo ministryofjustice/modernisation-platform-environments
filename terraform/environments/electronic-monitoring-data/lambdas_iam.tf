@@ -526,66 +526,6 @@ resource "aws_iam_role_policy" "calculate_checksum" {
   policy = data.aws_iam_policy_document.calculate_checksum.json
 }
 
-#-----------------------------------------------------------------------------------
-# DMS Validation Lambda Iam Role
-#-----------------------------------------------------------------------------------
-
-data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
-  statement {
-    sid    = "S3Permissions"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:GetBucketLocation",
-      "s3:ListBucket",
-      "s3:PutObject",
-    ]
-    resources = [
-      "${module.s3-dms-target-store-bucket.bucket.arn}/*",
-      module.s3-dms-target-store-bucket.bucket.arn,
-    ]
-  }
-  statement {
-    sid    = "DMSPersmissions"
-    effect = "Allow"
-    actions = [
-      "dms:DescribeReplicationTasks",
-      "dms:DescribeEndpoints",
-    ]
-    resources = [
-      "*",
-    ]
-  }
-
-  statement {
-    sid    = "SecretManager"
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-    ]
-    resources = ["arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:*"]
-  }
-}
-
-resource "aws_iam_role" "dms_validation_lambda_role" {
-  count              = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
-  name               = "dms_validation_lambda_role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-resource "aws_iam_policy" "dms_validation_lambda_role_policy" {
-  count  = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
-  name   = "dms_validation_lambda_policy"
-  policy = data.aws_iam_policy_document.dms_validation_lambda_role_policy_document.json
-}
-
-resource "aws_iam_role_policy_attachment" "validation_lambda_policy_attachment" {
-  count      = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
-  role       = aws_iam_role.dms_validation_lambda_role[0].name
-  policy_arn = aws_iam_policy.dms_validation_lambda_role_policy[0].arn
-}
-
-
 
 #-----------------------------------------------------------------------------------
 # Process FMS metadata IAM Role
@@ -1448,6 +1388,39 @@ data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
       "kms:Decrypt",
     ]
     resources = [aws_kms_key.emds_alerts.arn]
+  }
+
+  statement {
+    sid    = "AllowSendAlarmDebounceConfirmations"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [
+      aws_sqs_queue.cloudwatch_alarm_debounce.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowConsumeAlarmDebounceConfirmations"
+    effect = "Allow"
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:ReceiveMessage",
+    ]
+    resources = [
+      aws_sqs_queue.cloudwatch_alarm_debounce.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowReadCloudWatchAlarmState"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DescribeAlarms",
+    ]
+    resources = ["*"]
   }
 
   statement {
@@ -2899,6 +2872,13 @@ data "aws_iam_policy_document" "cadt_policy_document" {
       "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.create_a_derived_table.family}:*"
     ]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:DescribeTaskDefinition"
+    ]
+    resources = ["*"]
+  }
 
   statement {
     effect = "Allow"
@@ -3748,6 +3728,29 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
     resources = [
       "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*",
     ]
+  }
+
+  statement {
+    sid    = "ListReconciliationState"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-logging-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        "downstream-reconciliation/${local.environment_shorthand}",
+        "downstream-reconciliation/${local.environment_shorthand}/*",
+      ]
+    }
   }
 
   statement {
