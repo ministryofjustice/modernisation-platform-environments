@@ -88,7 +88,7 @@ locals {
       }
       elasticache_node_type = "cache.t4g.medium"
 
-      ai_gateway_egress_policy_enabled = true
+      ai_gateway_egress_policy_enabled = false
     }
     preproduction = {
       litellm_version           = "1.104.0"
