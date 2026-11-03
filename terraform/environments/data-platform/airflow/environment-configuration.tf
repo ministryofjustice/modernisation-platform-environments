@@ -6,9 +6,9 @@ locals {
 
       /* Airflow UI access (ALB ingress) - name => CIDR */
       airflow_allowed_ingress_cidrs = {
-        "prisma_corporate"   = "128.77.75.64/26"
-        "office_102PF" = "213.121.161.112/28"
-        "office_10SC" =  "51.149.2.0/24"
+        "prisma_corporate" = "128.77.75.64/26"
+        "office_102PF"     = "213.121.161.112/28"
+        "office_10SC"      = "51.149.2.0/24"
       }
 
 
