@@ -168,26 +168,48 @@ module "octo_state_bucket" {
   ]
 
   tags = merge(local.tags, {
-    BusinessUnit = "OCTO"
+    BusinessUnit = "octo"
     Purpose      = "Terraform state"
   })
 }
 
 module "laa_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
-
   providers = {
-    aws = aws.laa
-    aws.bucket-replication  = aws.laa
+    aws.bucket-replication = aws.laa
   }
 
-  bucket_name   = local.bu_state_bucket_names["laa"]
-  bucket_policy = [data.aws_iam_policy_document.bu_state_bucket["laa"].json]
+  bucket_prefix    = "container-platform-laa-live-tf-state-bucket"
+  bucket_namespace = "account-regional"
 
-  sse_algorithm               = "aws:kms"
-  custom_kms_key              = aws_kms_key.laa_state.arn
+  ownership_controls = "BucketOwnerEnforced"
+
+  replication_enabled = false
+  versioning_enabled  = true
+
+  sse_algorithm              = "aws:kms"
+  custom_kms_key             = aws_kms_key.laa_state.arn
   enforce_kms_request_headers = false
-  replication_enabled         = false
+
+  bucket_policy_v2 = [
+    {
+      effect = "Deny"
+      actions = ["s3:*"]
+
+      principals = {
+        type        = "*"
+        identifiers = ["*"]
+      }
+
+      conditions = [
+        {
+          test     = "Bool"
+          variable = "aws:SecureTransport"
+          values   = ["false"]
+        }
+      ]
+    }
+  ]
 
   tags = merge(local.tags, {
     BusinessUnit = "laa"
@@ -199,17 +221,40 @@ module "hmpps_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
   providers = {
-    aws = aws.hmpps
-    aws.bucket-replication  = aws.hmpps
+    aws.bucket-replication = aws.hmpps
   }
 
-  bucket_name   = local.bu_state_bucket_names["hmpps"]
-  bucket_policy = [data.aws_iam_policy_document.bu_state_bucket["hmpps"].json]
+  bucket_prefix    = "container-platform-hmpps-live-tf-state-bucket"
+  bucket_namespace = "account-regional"
 
-  sse_algorithm               = "aws:kms"
-  custom_kms_key              = aws_kms_key.hmpps_state.arn
+  ownership_controls = "BucketOwnerEnforced"
+
+  replication_enabled = false
+  versioning_enabled  = true
+
+  sse_algorithm              = "aws:kms"
+  custom_kms_key             = aws_kms_key.hmpps_state.arn
   enforce_kms_request_headers = false
-  replication_enabled         = false
+
+  bucket_policy_v2 = [
+    {
+      effect = "Deny"
+      actions = ["s3:*"]
+
+      principals = {
+        type        = "*"
+        identifiers = ["*"]
+      }
+
+      conditions = [
+        {
+          test     = "Bool"
+          variable = "aws:SecureTransport"
+          values   = ["false"]
+        }
+      ]
+    }
+  ]
 
   tags = merge(local.tags, {
     BusinessUnit = "hmpps"
@@ -219,21 +264,41 @@ module "hmpps_state_bucket" {
 
 module "cd_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
-
-   bucket_prefix      = "s3-bucket"
-
   providers = {
-    aws = aws.cd
-    aws.bucket-replication  = aws.cd
+    aws.bucket-replication = aws.cd
   }
 
-  bucket_name   = local.bu_state_bucket_names["cd"]
-  bucket_policy = [data.aws_iam_policy_document.bu_state_bucket["cd"].json]
+  bucket_prefix    = "container-platform-octo-live-tf-state-bucket"
+  bucket_namespace = "account-regional"
 
-  sse_algorithm               = "aws:kms"
-  custom_kms_key              = aws_kms_key.cd_state.arn
+  ownership_controls = "BucketOwnerEnforced"
+
+  replication_enabled = false
+  versioning_enabled  = true
+
+  sse_algorithm              = "aws:kms"
+  custom_kms_key             = aws_kms_key.cd_state.arn
   enforce_kms_request_headers = false
-  replication_enabled           = false
+
+  bucket_policy_v2 = [
+    {
+      effect = "Deny"
+      actions = ["s3:*"]
+
+      principals = {
+        type        = "*"
+        identifiers = ["*"]
+      }
+
+      conditions = [
+        {
+          test     = "Bool"
+          variable = "aws:SecureTransport"
+          values   = ["false"]
+        }
+      ]
+    }
+  ]
 
   tags = merge(local.tags, {
     BusinessUnit = "cd"
