@@ -40,8 +40,8 @@ data "aws_subnets" "private" {
 
 #ECS security group
 data "aws_security_group" "prototype_deployment" {
-  count  = local.prototype_deployment_enabled ? 1 : 0
-  name   = "${local.application_name}-prototypes-app"
+  count = local.prototype_deployment_enabled ? 1 : 0
+  name  = "${local.application_name}-prototypes-app"
 }
 
 #Load Balancer
