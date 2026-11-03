@@ -21,8 +21,8 @@
       "forge_single_url_enabled": true,
       "forge_base_path": "/",
       "forge_upstream_port": 3000,
-      "forge_public_endpoint_enabled": true,
-      "forge_embedded_entra_enabled": true
+      "forge_public_endpoint_enabled": false,
+      "forge_embedded_entra_enabled": false
     },
     "production": {
       "builder_auth_mode": "alb",
@@ -33,8 +33,8 @@
       "forge_single_url_enabled": true,
       "forge_base_path": "/",
       "forge_upstream_port": 3000,
-      "forge_public_endpoint_enabled": true,
-      "forge_embedded_entra_enabled": true
+      "forge_public_endpoint_enabled": false,
+      "forge_embedded_entra_enabled": false
     }
   }
 }
