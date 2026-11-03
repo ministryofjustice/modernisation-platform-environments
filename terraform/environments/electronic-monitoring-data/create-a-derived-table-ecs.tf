@@ -82,7 +82,11 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
   ])
   task_role_arn      = aws_iam_role.dataapi_cross_role.arn
   execution_role_arn = module.ecs_execution_role.arn
-
+   lifecycle {
+      ignore_changes = [
+         container_definitions
+      ]  
+   }
 }
 
 module "ecs_execution_role" {

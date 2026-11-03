@@ -2872,6 +2872,13 @@ data "aws_iam_policy_document" "cadt_policy_document" {
       "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.create_a_derived_table.family}:*"
     ]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:DescribeTaskDefinition"
+    ]
+    resources = ["*"]
+  }
 
   statement {
     effect = "Allow"

@@ -92,6 +92,10 @@ prisons-de @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-oem @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/integration-hub-api @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/integration-hub-events @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
+/terraform/environments/integration-hub-events/api @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
+/terraform/environments/integration-hub-events/api-client-lib @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
+/terraform/environments/integration-hub-events/event-subscriber-admin-ui @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
+/terraform/environments/integration-hub-events/kafka @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/integration-hub-file-transfer @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/integration-hub @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/justice-eng-ai @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
