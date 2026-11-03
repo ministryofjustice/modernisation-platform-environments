@@ -1,4 +1,26 @@
-#trivy:ignore:AVD-AWS-0053: this needs to be public
+locals {
+  /* Two rules (HTTP redirect + HTTPS) per allowed CIDR */
+  mwaa_alb_ingress_rules = merge([
+    for name, cidr in local.environment_configuration.airflow_allowed_ingress_cidrs : {
+      "${name}-http" = {
+        from_port   = 80
+        to_port     = 80
+        ip_protocol = "tcp"
+        description = "HTTP (redirect) from ${name}"
+        cidr_ipv4   = cidr
+      }
+      "${name}-https" = {
+        from_port   = 443
+        to_port     = 443
+        ip_protocol = "tcp"
+        description = "HTTPS from ${name}"
+        cidr_ipv4   = cidr
+      }
+    }
+  ]...)
+}
+
+#trivy:ignore:AVD-AWS-0053: internet-facing so users can reach it, ingress is restricted to allowed CIDRs
 module "mwaa_alb" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -10,25 +32,13 @@ module "mwaa_alb" {
   vpc_id  = data.aws_vpc.dp_vpc.id
   subnets = data.aws_subnets.dp_public_subnets.ids
 
-  security_group_ingress_rules = {
-    all_http = {
-      from_port   = 80
-      to_port     = 80
-      ip_protocol = "tcp"
-      description = "HTTP"
-      cidr_ipv4   = "0.0.0.0/0"
-    }
-    all_https = {
+  security_group_ingress_rules = local.mwaa_alb_ingress_rules
+  security_group_egress_rules = {
+    mwaa_https = {
       from_port   = 443
       to_port     = 443
       ip_protocol = "tcp"
-      description = "HTTPS"
-      cidr_ipv4   = "0.0.0.0/0"
-    }
-  }
-  security_group_egress_rules = {
-    all = {
-      ip_protocol = "-1"
+      description = "HTTPS to MWAA webserver endpoint"
       cidr_ipv4   = data.aws_vpc.dp_vpc.cidr_block
     }
   }
