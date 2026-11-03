@@ -9,9 +9,13 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
   dynamic "statement" {
     for_each = local.oracle_duplicate_map[var.env_name]["targets"]
     content {
-      sid     = "OracleBackupAccess${title(statement.value.environment)}"
-      effect  = "Allow"
-      actions = ["s3:*"]
+      sid    = "OracleBackupAccess${title(statement.value.environment)}"
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:GetObjectVersion"
+      ]
       resources = [
         module.s3_bucket_oracledb_backups.bucket.arn,
         "${module.s3_bucket_oracledb_backups.bucket.arn}/*"
@@ -244,7 +248,9 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
       sid    = "allowAccessToOracleDb${title(statement.value.environment)}Bucket"
       effect = "Allow"
       actions = [
-        "s3:*"
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:GetObjectVersion"
       ]
       resources = [
         "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, statement.value.environment)}",
