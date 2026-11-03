@@ -35,6 +35,31 @@ module "cloudwatch_api_gateway_5xx" {
   tags = local.tags
 }
 
+module "cloudwatch_api_gateway_4xx" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
+  source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
+  version = "5.7.2"
+
+  alarm_name          = "${local.resource_name_prefix}-api-gateway-4xx"
+  alarm_description   = "Sustained client/authentication errors; inspect status codes before retrying"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = local.observability_configuration.api_gateway_4xx_evaluation_periods
+  metric_name         = "4xx"
+  namespace           = "AWS/ApiGateway"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = local.observability_configuration.api_gateway_4xx_threshold
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = local.cloudwatch_alarm_actions_low_priority
+  ok_actions          = local.cloudwatch_alarm_actions_low_priority
+
+  dimensions = {
+    ApiId = module.api_gateway.api_id
+    Stage = aws_apigatewayv2_stage.default.name
+  }
+  tags = local.tags
+}
+
 module "cloudwatch_api_gateway_latency" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"

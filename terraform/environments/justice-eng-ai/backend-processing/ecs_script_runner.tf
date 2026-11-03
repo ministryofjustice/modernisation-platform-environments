@@ -189,6 +189,13 @@ data "aws_iam_policy_document" "script_runner_ecs_task" {
       "arn:${data.aws_partition.current.partition}:ecs:*:${data.aws_caller_identity.current.account_id}:cluster/*",
     ]
   }
+  
+  statement {
+    sid       = "AllowDescribeTaskDefinition"
+    effect    = "Allow"
+    actions   = ["ecs:DescribeTaskDefinition"]
+    resources = ["*"]
+  }
 
   statement {
     sid    = "ManageEcsServicesInCurrentAccount"
@@ -330,6 +337,7 @@ data "aws_iam_policy_document" "script_runner_ecs_task" {
       "logs:PutLogEvents",
       "logs:DescribeLogStreams",
       "logs:ListTagsForResource",
+      "logs:ListTagsLogGroup"
     ]
     resources = [
       "arn:${data.aws_partition.current.partition}:logs:*:${data.aws_caller_identity.current.account_id}:log-group:*",

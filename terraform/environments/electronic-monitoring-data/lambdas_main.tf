@@ -640,6 +640,12 @@ module "cloudwatch_alarm_threader" {
     ENABLE_CUSTOM_ACTIONS = "false"
     INCIDENT_QUEUE_URL    = aws_sqs_queue.live_feed_incident_events.id
 
+    DEBOUNCE_QUEUE_URL           = aws_sqs_queue.cloudwatch_alarm_debounce.id
+    DEBOUNCE_SECONDS             = tostring(local.alarm_debounce_seconds)
+    DEBOUNCE_BYPASS_ALARM_NAMES = jsonencode(
+      local.alarm_debounce_bypass_names
+    )
+
     RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
     RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
 
@@ -1104,10 +1110,10 @@ module "trigger_cadt" {
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   environment_variables = {
-    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
-    TASK_DEFINITION_ARN = aws_ecs_task_definition.create_a_derived_table.arn
-    SUBNET_IDS          = jsonencode(data.aws_subnets.shared-private.ids)
-    SECURITY_GROUPS     = jsonencode([aws_security_group.gdpr_batch_sg[0].id])
+    CLUSTER_NAME           = aws_ecs_cluster.cadt.name
+    TASK_DEFINITION_FAMILY = "create-a-derived-table"
+    SUBNET_IDS             = jsonencode(data.aws_subnets.shared-private.ids)
+    SECURITY_GROUPS        = jsonencode([aws_security_group.gdpr_batch_sg[0].id])
   }
 }
 

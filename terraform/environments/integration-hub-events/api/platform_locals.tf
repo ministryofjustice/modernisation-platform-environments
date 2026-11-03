@@ -1,5 +1,7 @@
 locals {
-  application_name = "cdpt-chaps"
+
+  application_name = "integration-hub-events"
+  component_name   = "api"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 

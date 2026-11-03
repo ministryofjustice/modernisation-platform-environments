@@ -251,18 +251,6 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
-      - "terraform/environments/cdpt-chaps"
-    schedule:
-      interval: "daily"
-    groups:
-      cdpt-chaps:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
       - "terraform/environments/cdpt-ifs"
     schedule:
       interval: "daily"
@@ -911,6 +899,10 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/integration-hub-events"
+      - "terraform/environments/integration-hub-events/api"
+      - "terraform/environments/integration-hub-events/api-client-lib"
+      - "terraform/environments/integration-hub-events/event-subscriber-admin-ui"
+      - "terraform/environments/integration-hub-events/kafka"
     schedule:
       interval: "daily"
     groups:

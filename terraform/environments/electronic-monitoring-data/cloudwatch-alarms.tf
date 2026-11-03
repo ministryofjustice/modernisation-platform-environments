@@ -396,6 +396,38 @@ resource "aws_cloudwatch_metric_alarm" "live_feed_incident_events_dlq" {
 }
 
 # ------------------------------------------------------------------------------
+# Alarm notification confirmation DLQ
+# Notify directly if delayed alarm confirmation cannot recover.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "cloudwatch_alarm_debounce_dlq" {
+  alarm_name = "cloudwatch_alarm_debounce_dlq_has_messages"
+
+  alarm_description = (
+    "Triggered when CloudWatch alarm confirmations reach the DLQ"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+  actions_enabled     = true
+
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+  period      = 60
+  statistic   = "Maximum"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
 # Downstream specials remediation guard
 # ------------------------------------------------------------------------------
 

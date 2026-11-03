@@ -9,6 +9,6 @@ terraform {
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
     use_lockfile         = true
-    workspace_key_prefix = "environments/members/cdpt-chaps" # This will store the object as environments/members/cdpt-chaps/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/integration-hub-events/kafka" # This will store the object as environments/members/<application>/<component>/${workspace}/terraform.tfstate
   }
 }
