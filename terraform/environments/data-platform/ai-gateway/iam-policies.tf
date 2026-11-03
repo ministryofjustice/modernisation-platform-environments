@@ -59,14 +59,14 @@ data "aws_iam_policy_document" "ai_gateway" {
   }
 
   statement {
-    sid       = "DaybreakLogS3Access"
+    sid       = "OpenAIPromptLogS3Access"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
     resources = ["${module.prompt_logs.s3_bucket_arn}/*"]
   }
 
   statement {
-    sid       = "DaybreakLogKMSAccess"
+    sid       = "OpenAIPromptLogKMSAccess"
     effect    = "Allow"
     actions   = ["kms:GenerateDataKey"]
     resources = [module.ai_gateway_prompt_logs_kms_key.key_arn]
