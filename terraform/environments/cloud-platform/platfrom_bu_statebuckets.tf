@@ -34,36 +34,36 @@ provider "aws" {
   alias  = "octo"
   region = "eu-west-2"
 
-  allowed_account_ids = [
-    local.bu_live_accounts["octo"].account_id
-  ]
+#   allowed_account_ids = [
+#     local.bu_live_accounts["octo"].account_id
+#   ]
 }
 
 provider "aws" {
   alias  = "laa"
   region = "eu-west-2"
 
-  allowed_account_ids = [
-    local.bu_live_accounts["laa"].account_id
-  ]
+#   allowed_account_ids = [
+#     local.bu_live_accounts["laa"].account_id
+#   ]
 }
 
 provider "aws" {
   alias  = "hmpps"
   region = "eu-west-2"
 
-  allowed_account_ids = [
-    local.bu_live_accounts["hmpps"].account_id
-  ]
+#   allowed_account_ids = [
+#     local.bu_live_accounts["hmpps"].account_id
+#   ]
 }
 
 provider "aws" {
   alias  = "cd"
   region = "eu-west-2"
 
-  allowed_account_ids = [
-    local.bu_live_accounts["cd"].account_id
-  ]
+#   allowed_account_ids = [
+#     local.bu_live_accounts["cd"].account_id
+#   ]
 }
 
 # -----------------------------------------------------------------------------
