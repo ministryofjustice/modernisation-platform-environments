@@ -56,8 +56,8 @@ resource "litellm_unified_access_group" "openai_models" {
   ]
 
   access_model_names = [
-    for key in sort(keys(litellm_model.openai_daybreak)) :
-    litellm_model.openai_daybreak[key].model_name
+    for key in sort(keys(litellm_model.openai)) :
+    litellm_model.openai_[key].model_name
   ]
 
   # Teams can be assigned to access groups out-of-band via the LiteLLM UI/API; don't revoke those.
@@ -96,8 +96,8 @@ resource "litellm_unified_access_group" "generally_available_models" {
       if try(local.ai_gateway_models_filtered.microsoft_foundry[key].generally_available, false)
     ],
     [
-      for key in sort(keys(litellm_model.openai_daybreak)) :
-      litellm_model.openai_daybreak[key].model_name
+      for key in sort(keys(litellm_model.openai)) :
+      litellm_model.openai[key].model_name
       if try(local.ai_gateway_models_filtered.openai[key].generally_available, false)
     ]
   )
