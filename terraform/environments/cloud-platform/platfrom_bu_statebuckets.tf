@@ -148,22 +148,46 @@ module "octo_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
   providers = {
-    aws = aws.octo
+    aws                    = aws.octo
+    aws.bucket-replication = aws.octo
   }
 
-  bucket_name   = local.bu_state_bucket_names["octo"]
-  bucket_policy = [data.aws_iam_policy_document.bu_state_bucket["octo"].json]
-  sse_algorithm               = "aws:kms"
-  custom_kms_key              = aws_kms_key.octo_state.arn
+  bucket_prefix    = "container-platform-octo-live-tf-state-bucket"
+  bucket_namespace = "account-regional"
+
+  ownership_controls = "BucketOwnerEnforced"
+
+  replication_enabled = false
+  versioning_enabled  = true
+
+  sse_algorithm              = "aws:kms"
+  custom_kms_key             = module.octo_state_kms.kms_key_arn
   enforce_kms_request_headers = false
-  replication_enabled         = false
+
+  bucket_policy_v2 = [
+    {
+      effect = "Deny"
+      actions = ["s3:*"]
+
+      principals = {
+        type        = "*"
+        identifiers = ["*"]
+      }
+
+      conditions = [
+        {
+          test     = "Bool"
+          variable = "aws:SecureTransport"
+          values   = ["false"]
+        }
+      ]
+    }
+  ]
 
   tags = merge(local.tags, {
-    BusinessUnit = "octo"
+    BusinessUnit = "OCTO"
     Purpose      = "Terraform state"
   })
-
-  
 }
 
 module "laa_state_bucket" {
@@ -171,6 +195,7 @@ module "laa_state_bucket" {
 
   providers = {
     aws = aws.laa
+    aws.bucket-replication  = aws.laa
   }
 
   bucket_name   = local.bu_state_bucket_names["laa"]
@@ -192,6 +217,7 @@ module "hmpps_state_bucket" {
 
   providers = {
     aws = aws.hmpps
+    aws.bucket-replication  = aws.hmpps
   }
 
   bucket_name   = local.bu_state_bucket_names["hmpps"]
@@ -211,8 +237,11 @@ module "hmpps_state_bucket" {
 module "cd_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
+   bucket_prefix      = "s3-bucket"
+
   providers = {
     aws = aws.cd
+    aws.bucket-replication  = aws.cd
   }
 
   bucket_name   = local.bu_state_bucket_names["cd"]
@@ -228,6 +257,8 @@ module "cd_state_bucket" {
     Purpose      = "Terraform state"
   })
 }
+
+
 
 resource "aws_kms_key" "octo_state" {
   provider = aws.octo
@@ -288,16 +319,6 @@ module "laa_state_controls" {
   bucket_id = module.laa_state_bucket.bucket.id
 }
 
-module "hmpps_state_controls" {
-  source = "../../modules/state_bucket_controls"
-
-  providers = {
-    aws = aws.hmpps
-  }
-
-  bucket_id = module.hmpps_state_bucket.bucket.id
-}
-
 module "cd_state_controls" {
   source = "../../modules/state_bucket_controls"
 
@@ -306,4 +327,14 @@ module "cd_state_controls" {
   }
 
   bucket_id = module.cd_state_bucket.bucket.id
+}
+
+module "hmpps_state_controls" {
+  source = "../../modules/state_bucket_controls"
+
+  providers = {
+    aws = aws.hmpps
+  }
+
+  bucket_id = module.hmpps_state_bucket.bucket.id
 }
