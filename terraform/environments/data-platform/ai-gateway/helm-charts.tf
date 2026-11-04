@@ -60,7 +60,7 @@ resource "helm_release" "litellm_admin" {
 
         # OpenAI
         openai_identity_provider_id    = local.openai_identity_provider_id
-        openai_service_account_id      = local.service_account_id
+        openai_service_account_id      = local.openai_service_account_id
         openaiWorkloadIdentityAudience = local.openai_workload_identity_audience
 
         # LiteLLM
