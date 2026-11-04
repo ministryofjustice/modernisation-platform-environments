@@ -139,7 +139,7 @@ locals {
       targets = []
       sources = [
         {
-          account_id  = var.platform_vars.environment_management.account_ids["delius-core-development"]
+          account_id  = var.platform_vars.environment_management.account_ids[join("-", [var.account_info.application_name, "development"])]
           environment = "dev"
         }
       ]
@@ -148,7 +148,7 @@ locals {
       targets = []
       sources = [
         {
-          account_id  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+          account_id  = var.platform_vars.environment_management.account_ids[join("-", [var.account_info.application_name, "production"])]
           environment = "prod"
         }
       ]
@@ -157,7 +157,7 @@ locals {
       targets = []
       sources = [
         {
-          account_id  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+          account_id  = var.platform_vars.environment_management.account_ids[join("-", [var.account_info.application_name, "production"])]
           environment = "prod"
         }
       ]
@@ -165,11 +165,11 @@ locals {
     "prod" = {
       targets = [
         {
-          account_id  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
+          account_id  = var.platform_vars.environment_management.account_ids[join("-", [var.account_info.application_name, "preproduction"])]
           environment = "stage"
         },
         {
-          account_id  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
+          account_id  = var.platform_vars.environment_management.account_ids[join("-", [var.account_info.application_name, "preproduction"])]
           environment = "preprod"
         }
       ]
