@@ -112,8 +112,6 @@ resource "aws_instance" "sftp_server" {
     http_endpoint = "enabled"  # Enable IMDS access
   }
 
-  user_data = base64encode("./templates/ftp-ec2-user-data.sh")
-
   tags = merge(
     local.tags,
     {
