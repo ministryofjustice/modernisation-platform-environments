@@ -1391,6 +1391,39 @@ data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
   }
 
   statement {
+    sid    = "AllowSendAlarmDebounceConfirmations"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [
+      aws_sqs_queue.cloudwatch_alarm_debounce.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowConsumeAlarmDebounceConfirmations"
+    effect = "Allow"
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:ReceiveMessage",
+    ]
+    resources = [
+      aws_sqs_queue.cloudwatch_alarm_debounce.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowReadCloudWatchAlarmState"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DescribeAlarms",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "ReadDownstreamReconciliationStatus"
     effect = "Allow"
 
@@ -2839,6 +2872,13 @@ data "aws_iam_policy_document" "cadt_policy_document" {
       "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.create_a_derived_table.family}:*"
     ]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:DescribeTaskDefinition"
+    ]
+    resources = ["*"]
+  }
 
   statement {
     effect = "Allow"
@@ -3691,6 +3731,29 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
   }
 
   statement {
+    sid    = "ListReconciliationState"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-logging-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        "downstream-reconciliation/${local.environment_shorthand}",
+        "downstream-reconciliation/${local.environment_shorthand}/*",
+      ]
+    }
+  }
+
+  statement {
     sid    = "StoreReconciliationApprovalToken"
     effect = "Allow"
 
@@ -3745,6 +3808,20 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
 
     resources = [
       module.downstream_reconciliation_audit.arn,
+    ]
+  }
+
+  statement {
+    sid    = "StartHistoricalRecovery"
+    effect = "Allow"
+
+    actions = [
+      "states:StartExecution",
+    ]
+
+    resources = [
+      module.merge_into_mdss_ac_position.arn,
+      module.merge_into_emdi_position.arn,
     ]
   }
 

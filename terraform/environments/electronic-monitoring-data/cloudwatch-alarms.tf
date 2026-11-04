@@ -396,6 +396,38 @@ resource "aws_cloudwatch_metric_alarm" "live_feed_incident_events_dlq" {
 }
 
 # ------------------------------------------------------------------------------
+# Alarm notification confirmation DLQ
+# Notify directly if delayed alarm confirmation cannot recover.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "cloudwatch_alarm_debounce_dlq" {
+  alarm_name = "cloudwatch_alarm_debounce_dlq_has_messages"
+
+  alarm_description = (
+    "Triggered when CloudWatch alarm confirmations reach the DLQ"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+  actions_enabled     = true
+
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+  period      = 60
+  statistic   = "Maximum"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
 # Downstream specials remediation guard
 # ------------------------------------------------------------------------------
 
@@ -569,6 +601,49 @@ resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_execution_fail
   ]
 }
 # ------------------------------------------------------------------------------
+# Downstream reconciliation assurance health
+# Provide dashboard-only clean, unhealthy and unknown assurance indicators.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_assurance_consumers = toset([
+    "STAGED",
+    "AC",
+    "EMDI",
+  ])
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_assurance_not_clean" {
+  for_each = local.downstream_reconciliation_assurance_consumers
+
+  alarm_name = (
+    "downstream_reconciliation_${lower(each.value)}_assurance_not_clean"
+  )
+
+  alarm_description = (
+    "${each.value} latest reconciliation assurance is not clean"
+  )
+
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 1
+  treat_missing_data  = "missing"
+
+  actions_enabled = false
+
+  metric_name = "ReconciliationAssuranceClean"
+  namespace   = "EM/DownstreamReconciliation"
+  period      = 300
+  statistic   = "Minimum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+    Consumer    = each.value
+    Mode        = "status"
+  }
+}
+
+# ------------------------------------------------------------------------------
 # Downstream historical assurance
 # Alert when an audit finds gaps, becomes stale, or the audit workflow fails.
 # ------------------------------------------------------------------------------
@@ -687,3 +762,4 @@ resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_executio
     aws_sns_topic.emds_alerts.arn,
   ]
 }
+

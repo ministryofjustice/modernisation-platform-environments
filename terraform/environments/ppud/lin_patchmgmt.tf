@@ -10,42 +10,9 @@ resource "aws_ssm_patch_group" "lin_patch_group" {
   patch_group = local.application_data.accounts[local.environment].lin_patch_group
 }
 
-resource "aws_ssm_patch_group" "lin_patch_group_al2023" {
-  count       = local.is-production == true ? 1 : 0
-  baseline_id = aws_ssm_patch_baseline.linux_os_baseline_al2023[0].id
-  patch_group = "${local.application_data.accounts[local.environment].lin_patch_group}-al2023"
-}
-
-# Amazon Linux 2 Patch Baseline
-
-resource "aws_ssm_patch_baseline" "linux_os_baseline" {
-  count            = local.is-production == true ? 1 : 0
-  name             = "LinuxOS-AmazonLinux2"
-  description      = "Patch Amazon Linux 2"
-  operating_system = "AMAZON_LINUX_2"
-
-  approval_rule {
-    approve_after_days  = 5
-    enable_non_security = false
-
-    patch_filter {
-      key    = "PRODUCT"
-      values = ["AmazonLinux2"]
-    }
-    patch_filter {
-      key    = "CLASSIFICATION"
-      values = ["Security", "Bugfix"]
-    }
-    patch_filter {
-      key    = "SEVERITY"
-      values = ["Critical", "Important", "Medium"]
-    }
-  }
-}
-
 # Amazon Linux 2023 Patch Baseline
 
-resource "aws_ssm_patch_baseline" "linux_os_baseline_al2023" {
+resource "aws_ssm_patch_baseline" "linux_os_baseline" {
   count            = local.is-production == true ? 1 : 0
   name             = "LinuxOS-AmazonLinux2023"
   description      = "Patch Amazon Linux 2023"
@@ -83,7 +50,7 @@ resource "aws_ssm_maintenance_window" "prod_lin_patch_maintenance_window" {
   schedule_timezone = "Europe/London"
 }
 
-# Maintenance Window Target for Amazon Linux 2 Instances
+# Maintenance Window Target for Amazon Linux 2023 Instances
 
 resource "aws_ssm_maintenance_window_target" "prod_lin_maintenance_window_target" {
   count         = local.is-production == true ? 1 : 0
@@ -98,7 +65,7 @@ resource "aws_ssm_maintenance_window_target" "prod_lin_maintenance_window_target
   }
 }
 
-# Maintenance Window Task for Amazon Linux 2 Instances
+# Maintenance Window Task for Amazon Linux 2023 Instances
 
 resource "aws_ssm_maintenance_window_task" "prod_lin_patch_maintenance_window_task" {
   count            = local.is-production == true ? 1 : 0
@@ -130,66 +97,20 @@ resource "aws_ssm_maintenance_window_task" "prod_lin_patch_maintenance_window_ta
   }
 }
 
-# Maintenance Window Target for Amazon Linux 2023 Instances
 
-resource "aws_ssm_maintenance_window_target" "prod_lin_maintenance_window_target_al2023" {
-  count         = local.is-production == true ? 1 : 0
-  window_id     = aws_ssm_maintenance_window.prod_lin_patch_maintenance_window[0].id
-  name          = "${local.application_data.accounts[local.environment].maintenance_lin_window_target_name}-al2023"
-  description   = local.application_data.accounts[local.environment].maintenance_lin_window_target_description
-  resource_type = "INSTANCE"
-
-  targets {
-    key    = "tag:patch_group"
-    values = [aws_ssm_patch_group.lin_patch_group_al2023[0].patch_group]
-  }
-}
-
-# Maintenance Window Task for Amazon Linux 2023 Instances
-
-resource "aws_ssm_maintenance_window_task" "prod_lin_patch_maintenance_window_task_al2023" {
-  count            = local.is-production == true ? 1 : 0
-  window_id        = aws_ssm_maintenance_window.prod_lin_patch_maintenance_window[0].id
-  name             = "${local.application_data.accounts[local.environment].maintenance_lin_window_task_name}-al2023"
-  description      = "Apply patch management"
-  task_type        = "RUN_COMMAND"
-  task_arn         = "AWS-RunPatchBaseline"
-  priority         = 10
-  service_role_arn = aws_iam_role.patching_role.arn
-  max_concurrency  = "15"
-  max_errors       = "1"
-
-  targets {
-    key    = "WindowTargetIds"
-    values = aws_ssm_maintenance_window_target.prod_lin_maintenance_window_target_al2023[0].*.id
-  }
-  task_invocation_parameters {
-    run_command_parameters {
-      parameter {
-        name   = "Operation"
-        values = ["Install"]
-      }
-      parameter {
-        name   = "RebootOption"
-        values = ["RebootIfNeeded"]
-      }
-    }
-  }
-}
-
-# Pre Patch Health Check Document (all OS)
+# Pre Patch Health Check Document
 
 data "aws_ssm_document" "pre_patch_lin_healthcheck" {
   name = "Pre_Patch_Linux_Health_Check_Report"
 }
 
-# Post Patch Health Check Document (all OS)
+# Post Patch Health Check Document
 
 data "aws_ssm_document" "post_patch_lin_healthcheck" {
   name = "Post_Patch_Linux_Health_Check_Report"
 }
 
-# Maintenance Window Pre Health Check Task for Amazon Linux 2
+# Maintenance Window Pre Health Check Task for Amazon Linux 2023
 
 resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_window_task" {
   count            = local.is-production == true ? 1 : 0
@@ -215,7 +136,7 @@ resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_wind
   }
 }
 
-# Maintenance Window Post Health Check Task for Amazon Linux 2
+# Maintenance Window Post Health Check Task for Amazon Linux 2023
 
 resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_window_task" {
   count            = local.is-production == true ? 1 : 0
@@ -232,58 +153,6 @@ resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_win
   targets {
     key    = "WindowTargetIds"
     values = aws_ssm_maintenance_window_target.prod_lin_maintenance_window_target[0].*.id
-  }
-
-  task_invocation_parameters {
-    run_command_parameters {
-      timeout_seconds = 600
-    }
-  }
-}
-
-# Maintenance Window Pre Health Check Task for Amazon Linux 2023
-
-resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_window_task_al2023" {
-  count            = local.is-production == true ? 1 : 0
-  window_id        = aws_ssm_maintenance_window.prod_lin_patch_maintenance_window[0].id
-  name             = "Pre-Health-Check-Report-Instance-Patch-AL2023"
-  description      = "Export Health Check Report to S3"
-  task_type        = "RUN_COMMAND"
-  task_arn         = data.aws_ssm_document.pre_patch_lin_healthcheck.arn
-  priority         = local.application_data.accounts[local.environment].pre_healthcheck_Priority
-  service_role_arn = aws_iam_role.patching_role.arn
-  max_concurrency  = "100%"
-  max_errors       = 0
-
-  targets {
-    key    = "WindowTargetIds"
-    values = aws_ssm_maintenance_window_target.prod_lin_maintenance_window_target_al2023[0].*.id
-  }
-
-  task_invocation_parameters {
-    run_command_parameters {
-      timeout_seconds = 600
-    }
-  }
-}
-
-# Maintenance Window Post Health Check Task for Amazon Linux 2023
-
-resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_window_task_al2023" {
-  count            = local.is-production == true ? 1 : 0
-  window_id        = aws_ssm_maintenance_window.prod_lin_patch_maintenance_window[0].id
-  name             = "Post-Health-Check-Report-Instance-Patch-AL2023"
-  description      = "Export Health Check Report to S3"
-  task_type        = "RUN_COMMAND"
-  task_arn         = data.aws_ssm_document.post_patch_lin_healthcheck.arn
-  priority         = local.application_data.accounts[local.environment].post_healthcheck_Priority
-  service_role_arn = aws_iam_role.patching_role.arn
-  max_concurrency  = "100%"
-  max_errors       = 0
-
-  targets {
-    key    = "WindowTargetIds"
-    values = aws_ssm_maintenance_window_target.prod_lin_maintenance_window_target_al2023[0].*.id
   }
 
   task_invocation_parameters {

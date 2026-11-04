@@ -1,0 +1,13 @@
+{
+  "accounts": {
+    "development": {
+      "prototype_domain_name": "ai-builder-dev.modernisation-platform.service.justice.gov.uk"
+    },
+    "test": {
+      "prototype_domain_name": "ai-builder-test.modernisation-platform.service.justice.gov.uk"
+    },
+    "production": {
+      "prototype_domain_name": "ai-builder.modernisation-platform.service.justice.gov.uk"
+    }
+  }
+}

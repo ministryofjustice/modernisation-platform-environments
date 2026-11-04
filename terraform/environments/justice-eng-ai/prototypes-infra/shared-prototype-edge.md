@@ -1,8 +1,8 @@
 # Shared prototype edge
 
 The `justice-eng-ai/prototypes-infra` component owns one CloudFront distribution,
-CloudFront-scope WAF web ACL, and public ALB in each development and production
-workspace. Prototype subdomains route through the ALB to independently deployed
+CloudFront-scope WAF web ACL, and public ALB in each environment that sets
+`prototype_domain_name` in `application_variables.json`. Prototype subdomains route through the ALB to independently deployed
 ECS/Fargate services. Creating a prototype does not create another distribution,
 WAF ACL, or ALB.
 
