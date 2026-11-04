@@ -520,6 +520,14 @@ module "live_feed_daily_handover" {
     RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
     RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
 
+    GITHUB_SECRET_ARN = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER      = "moj-analytical-services"
+    GITHUB_REPOSITORY = "dmet-em"
+
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
+
     DOWNSTREAM_RECONCILIATION_DASHBOARD_NAME = (
       "downstream-reconciliation-ops-${local.environment_shorthand}"
     )
@@ -1211,8 +1219,9 @@ module "live_feed_incident_manager" {
     GITHUB_PROJECT_DONE_OPTION     = "✅ Done"
     GITHUB_PROJECT_PRIORITY_OPTION = "🚨 Urgent"
 
-    PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
-    PAGERDUTY_TIME_ZONE   = "Europe/London"
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
     PAGERDUTY_TO_GITHUB = jsonencode(
       local.live_feed_pagerduty_to_github
     )
@@ -1287,8 +1296,9 @@ module "rota_personal_digest" {
     GITHUB_OWNER      = "moj-analytical-services"
     GITHUB_REPOSITORY = "dmet-em"
 
-    PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
-    PAGERDUTY_TIME_ZONE   = "Europe/London"
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
     PAGERDUTY_TO_GITHUB = jsonencode(
       local.live_feed_pagerduty_to_github
     )
