@@ -1,6 +1,21 @@
 locals {
   alb_access_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-alb-logs"
   audit_logs_bucket_name      = "mojdp-${local.environment}-${local.component_name}-audit-logs"
+
+  # Batch buckets are managed externally; these references do not create them.
+  ai_gateway_batch_storage_configuration = try(local.environment_configuration.ai_gateway_batch_storage, null)
+  ai_gateway_batch_storage = local.ai_gateway_batch_storage_configuration == null ? null : merge(local.ai_gateway_batch_storage_configuration, {
+    output_bucket_name = coalesce(try(local.ai_gateway_batch_storage_configuration.output_bucket_name, null), local.ai_gateway_batch_storage_configuration.input_bucket_name)
+  })
+  ai_gateway_batch_bucket_arns = local.ai_gateway_batch_storage == null ? {} : {
+    input  = "arn:aws:s3:::${local.ai_gateway_batch_storage.input_bucket_name}"
+    output = "arn:aws:s3:::${local.ai_gateway_batch_storage.output_bucket_name}"
+  }
+  ai_gateway_batch_object_arns = local.ai_gateway_batch_storage == null ? {} : {
+    input  = "${local.ai_gateway_batch_bucket_arns.input}/litellm-bedrock-files-*"
+    output = "${local.ai_gateway_batch_bucket_arns.output}/litellm-batch-outputs/*"
+  }
+  prompt_logs_bucket_name     = "mojdp-${local.environment}-${local.component_name}-prompt-logs"
 }
 
 data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
@@ -88,6 +103,46 @@ module "audit_logs" {
   lifecycle_rule = [
     {
       id      = "transition-audit-logs"
+      enabled = true
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "GLACIER"
+        }
+      ]
+
+      expiration = {
+        days = 365
+      }
+    }
+  ]
+}
+
+module "prompt_logs" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
+
+  bucket = local.prompt_logs_bucket_name
+
+  force_destroy = false
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = module.ai_gateway_prompt_logs_kms_key.key_arn
+      }
+      bucket_key_enabled = true
+    }
+  }
+
+  versioning = {
+    status = "Enabled"
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "transition-daybreak-logs"
       enabled = true
 
       transition = [
