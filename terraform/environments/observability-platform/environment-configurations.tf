@@ -569,24 +569,8 @@ locals {
               xray_enabled                    = false
               athena_enabled                  = true
               athena_config = {
-                allied-mdss = {
-                  database  = "allied_mdss_dev"
-                  workgroup = "800964199911-observability-platform"
-                }
-                serco-fms = {
-                  database  = "serco_fms_dev"
-                  workgroup = "800964199911-observability-platform"
-                }
-                staged-mdss = {
-                  database  = "staged_mdss_dev_dbt"
-                  workgroup = "800964199911-observability-platform"
-                }
-                acquisitive-crime = {
-                  database  = "acquisitive_crime_dev_dbt"
-                  workgroup = "800964199911-observability-platform"
-                }
-                data-insights = {
-                  database  = "data_insights_dev_dbt"
+                ops-monitoring = {
+                  database  = "ops_monitoring_dev_dbt"
                   workgroup = "800964199911-observability-platform"
                 }
               }
@@ -598,24 +582,8 @@ locals {
               xray_enabled                    = false
               athena_enabled                  = true
               athena_config = {
-                allied-mdss = {
-                  database  = "allied_mdss_test"
-                  workgroup = "396913731313-observability-platform"
-                }
-                serco-fms = {
-                  database  = "serco_fms_test"
-                  workgroup = "396913731313-observability-platform"
-                }
-                staged-mdss = {
-                  database  = "staged_mdss_test_dbt"
-                  workgroup = "396913731313-observability-platform"
-                }
-                acquisitive-crime = {
-                  database  = "acquisitive_crime_test_dbt"
-                  workgroup = "396913731313-observability-platform"
-                }
-                data-insights = {
-                  database  = "data_insights_test_dbt"
+                ops-monitoring = {
+                  database  = "ops_monitoring_test_dbt"
                   workgroup = "396913731313-observability-platform"
                 }
               }
@@ -627,24 +595,8 @@ locals {
               xray_enabled                    = false
               athena_enabled                  = true
               athena_config = {
-                allied-mdss = {
-                  database  = "allied_mdss_preprod"
-                  workgroup = "443370694497-observability-platform"
-                }
-                serco-fms = {
-                  database  = "serco_fms_preprod"
-                  workgroup = "443370694497-observability-platform"
-                }
-                staged-mdss = {
-                  database  = "staged_mdss_preprod_dbt"
-                  workgroup = "443370694497-observability-platform"
-                }
-                acquisitive-crime = {
-                  database  = "acquisitive_crime_preprod_dbt"
-                  workgroup = "443370694497-observability-platform"
-                }
-                data-insights = {
-                  database  = "data_insights_preprod_dbt"
+                ops-monitoring = {
+                  database  = "ops_monitoring_preprod_dbt"
                   workgroup = "443370694497-observability-platform"
                 }
               }
@@ -656,24 +608,8 @@ locals {
               xray_enabled                    = false
               athena_enabled                  = true
               athena_config = {
-                allied-mdss = {
-                  database  = "allied_mdss"
-                  workgroup = "976799291502-observability-platform"
-                }
-                serco-fms = {
-                  database  = "serco_fms"
-                  workgroup = "976799291502-observability-platform"
-                }
-                staged-mdss = {
-                  database  = "staged_mdss"
-                  workgroup = "976799291502-observability-platform"
-                }
-                acquisitive-crime = {
-                  database  = "acquisitive_crime"
-                  workgroup = "976799291502-observability-platform"
-                }
-                data-insights = {
-                  database  = "data_insights"
+                ops-monitoring = {
+                  database  = "ops_monitoring"
                   workgroup = "976799291502-observability-platform"
                 }
               }
