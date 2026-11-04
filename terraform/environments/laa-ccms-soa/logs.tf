@@ -117,7 +117,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_benefit_checker_rollback_error_
 # Spilting out custom checks errors for easier alerting in Slack channel
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_test_paths" {
   name           = "SOACustomCheckTestPaths"
-  pattern        = "\"Composite\" \"failed to respond\""
+  pattern        = "\"<Local Script Error>\" \"failed to respond\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
@@ -129,7 +129,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_test_paths" {
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_server_health" {
   name           = "SOACustomChecksCheckServerHealth"
-  pattern        = "\"Weblogic\" \"Managed server health status\""
+  pattern        = "\"<Local Script Error>\" \"health status\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
@@ -141,7 +141,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_server_health" {
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_percentage_heap_free_memory" {
   name           = "SOACustomCheckPercentageHeapFreeMemory"
-  pattern        = "\"Weblogic\" \"heap free memory\""
+  pattern        = "\"<Local Script Error>\" \"heap free memory\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
@@ -153,7 +153,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_percentage_heap_fr
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_stuck_threads" {
   name           = "SOACustomCheckStuckThreads"
-  pattern        = "\"Weblogic\" \"stuck threads\""
+  pattern        = "\"<Local Script Error>\" \"stuck threads\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
@@ -165,7 +165,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_stuck_threads" {
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_hogging_threads" {
   name           = "SOACustomCheckHoggingThreads"
-  pattern        = "\"Weblogic\" \"hogging threads\""
+  pattern        = "\"<Local Script Error>\" \"hogging threads\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
@@ -177,7 +177,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_hogging_threads" {
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebs_state" {
   name           = "SOACustomCheckJDBCebsState"
-  pattern        = "\"Weblogic\" \"Managed server EBS JDBC datasource state\""
+  pattern        = "\"<Local Script Error>\" \"Managed server EBS JDBC datasource state\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
@@ -189,7 +189,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebs_state" {
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebssms_state" {
   name           = "SOACustomCheckJDBCebssmsState"
-  pattern        = "\"Weblogic\" \"Managed server EBSSMS JDBC datasource state\""
+  pattern        = "\"<Local Script Error>\" \"Managed server EBSSMS JDBC datasource state\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
@@ -201,7 +201,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebssms_state"
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_failed_reserve_request_count" {
   name           = "SOACustomCheckJDBCFailedReserveRequestCount"
-  pattern        = "\"Weblogic\" \"JDBC datasource failedReserveRequestCount\""
+  pattern        = "\"<Local Script Error>\" \"JDBC datasource failedReserveRequestCount\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
