@@ -305,7 +305,7 @@ locals {
         repo     = "dso-modernisation-platform-automation"
         schedule = "cron(45 23 * * ? *)"
         timezone = "Europe/London"
-        workflow = "ndh_offloc_copy.yml"
+        workflow = "ndh_offloc_cdecopy.yml"
       }
       mp-automation-ndh-offloc-copy-backup = {
         identity = "platops"
@@ -317,7 +317,7 @@ locals {
         repo     = "dso-modernisation-platform-automation"
         schedule = "cron(20 2 * * ? *)"
         timezone = "Europe/London"
-        workflow = "ndh_offloc_copy.yml"
+        workflow = "ndh_offloc_cdecopy.yml"
       }
       mp-automation-planetfm-gfsl-data-extract-am = {
         identity = "platops"

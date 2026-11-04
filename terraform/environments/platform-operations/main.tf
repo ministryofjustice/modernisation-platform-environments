@@ -67,15 +67,39 @@ module "github_workflow_scheduler" {
   github_workflows           = local.github_actions_lambda_environment_specific.github_workflows
 }
 
-resource "aws_secretsmanager_secret" "aws_health_lambda_accounts" {
-  count = local.enable_aws_health_lambda ? 1 : 0
-  name  = "aws_health_lambda_accounts"
+resource "aws_ssm_parameter" "aws_health_lambda_accounts" {
+  count       = local.enable_aws_health_lambda ? 1 : 0
+  name        = "health_lambda_accounts"
+  description = "AWS Health Lambda accounts"
+  type        = "SecureString"
+  value       = "TO_BE_UPDATED"
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "aws_health_lambda_ignore_findings" {
+  count       = local.enable_aws_health_lambda ? 1 : 0
+  name        = "health_lambda_ignore_findings"
+  description = "AWS Health Lambda ignore findings"
+  type        = "SecureString"
+  value       = "TO_BE_UPDATED"
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
 }
 
 module "aws_health_lambda" {
-  count                    = local.enable_aws_health_lambda ? 1 : 0
-  source                   = "../../modules/aws_health_lambda"
-  aws_account_id           = data.aws_caller_identity.current.id
-  aws_accounts_secret_name = aws_secretsmanager_secret.aws_health_lambda_accounts[count.index].name
-  github_repo              = "platform-operations"
+  count                          = local.enable_aws_health_lambda ? 1 : 0
+  source                         = "../../modules/aws_health_lambda"
+  aws_account_id                 = data.aws_caller_identity.current.id
+  aws_accounts_parameter_name    = aws_ssm_parameter.aws_health_lambda_accounts[count.index].name
+  github_repo                    = "platform-operations"
+  ignore_findings_parameter_name = aws_ssm_parameter.aws_health_lambda_ignore_findings[count.index].name
 }

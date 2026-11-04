@@ -24,7 +24,9 @@
       "auth_configuration": {
         "roles": {
           "products-poc-upload": {
-            "allowed_client_ids": ["products-poc"]
+            "allowed_client_ids": [
+              "products-poc"
+            ]
           }
         },
         "users": {
@@ -45,6 +47,12 @@
           "enabled": true,
           "key_prefix": "products-poc/uploads",
           "max_upload_size_bytes": 107374182400
+        }
+      },
+      "observability_configuration": {
+        "alarm_topic_names": {
+          "high_priority": "high-priority-alarms-topic",
+          "low_priority": "high-priority-alarms-topic"
         }
       }
     },

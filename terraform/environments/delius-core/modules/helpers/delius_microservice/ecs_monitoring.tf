@@ -96,7 +96,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_critical" {
 
 resource "aws_cloudwatch_log_metric_filter" "ecs_log_error_filter" {
   count          = var.log_error_pattern != "" ? 1 : 0
-  log_group_name = aws_cloudwatch_log_group.ecs.name
+  log_group_name = can(regex("weblogic", var.name)) ? "delius-core-${var.env_name}-${var.name}" : aws_cloudwatch_log_group.ecs.name # Weblogic log group configured in delius-releases
   name           = "${var.name}-${var.env_name}-logged-errors"
   pattern        = var.log_error_pattern
   metric_transformation {
@@ -119,7 +119,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_error_critical" {
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   threshold           = var.log_error_threshold_config.critical.threshold
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
   comparison_operator = "GreaterThanThreshold"
 
   tags = merge(var.tags, { "service" = "${var.env_name}-${var.name}" })
