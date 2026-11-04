@@ -23,9 +23,9 @@ locals {
   }
   prototype_deployment_state_machine_name = "${local.application_name}-deploy-prototype"
   prototype_deployment_variables = [
-    { name = "IMAGE_URI", path = "$.image_uri" },
-    { name = "REQUEST_ID", path = "$.request_id" },
-    { name = "BASE_PATH", path = "$.base_path" },
+    { name = "IMAGE_URI", path = "States.Format('{}:{}-{}', '${aws_ecr_repository.user_applications.repository_url}', $.appId, $.buildNumber)" },
+    { name = "REQUEST_ID", path = "$.appId" },
+    { name = "BASE_PATH", path = "$.image_build_task.index_html_path" },
     { name = "AWS_REGION", value = data.aws_region.current.region },
     { name = "TASK_EXECUTION_ROLE_ARN", value = aws_iam_role.script_runner_ecs_execution.arn },
     { name = "ECS_CLUSTER_ARN", value = local.prototype_deployment.cluster_arn },
