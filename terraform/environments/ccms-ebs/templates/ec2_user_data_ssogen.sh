@@ -81,7 +81,7 @@ nmcli con up "System eth0"
 # === Base updates and packages ===
 yum update -y
 
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:ssogen-cloud-watch-config
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:ssogen-"${seq}"-cloud-watch-config
 
 # Wait for disks to appear
 sleep 25

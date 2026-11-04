@@ -14,18 +14,42 @@ resource "aws_cloudwatch_log_group" "ssogen_groups" {
   )
 }
 
-resource "aws_ssm_parameter" "ssogen_cw_agent_config" {
+resource "aws_ssm_parameter" "ssogen_1_cw_agent_config" {
   count       = local.ssogen_enabled ? 1 : 0
   description = "SSOGEN cloud watch agent config"
-  name        = "ssogen-cloud-watch-config"
+  name        = "ssogen-1-cloud-watch-config"
   type        = "String"
-  value       = file("./templates/cw_agent_config_ssogen.json")
+  value       = templatefile("./templates/cw_agent_config_ssogen.json", {
+    ADMIN_LOG_PATH        = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs"
+    OHS_LOG_PATH          = "/u01/product/runtime/Domain/mserver/instances/OHS_inst1/diagnostics/logs/OHS/ohs1"
+    MSERVER_LOG_PATH      = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG1/logs"
+  })
 
   tags = merge(local.tags,
     { Name = "cw-config" }
   )
 }
 
+moved {
+  from = aws_ssm_parameter.ssogen_cw_agent_config
+  to   = aws_ssm_parameter.ssogen_1_cw_agent_config
+}
+
+resource "aws_ssm_parameter" "ssogen_2_cw_agent_config" {
+  count       = local.ssogen_enabled ? 1 : 0
+  description = "SSOGEN cloud watch agent config"
+  name        = "ssogen-2-cloud-watch-config"
+  type        = "String"
+  value       = templatefile("./templates/cw_agent_config_ssogen.json", {
+    ADMIN_LOG_PATH        = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs"
+    OHS_LOG_PATH          = "/u01/product/runtime/Domain/mserver/instances/OHS_inst2/diagnostics/logs/OHS/ohs2"
+    MSERVER_LOG_PATH      = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG2/logs"
+  })
+
+  tags = merge(local.tags,
+    { Name = "cw-config" }
+  )
+}
 resource "aws_iam_role_policy_attachment" "ssogen_cloudwatch_datasource_policy_attach" {
   count      = local.ssogen_enabled ? 1 : 0
   policy_arn = aws_iam_policy.cloudwatch_datasource_policy.arn
