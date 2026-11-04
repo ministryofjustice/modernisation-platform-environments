@@ -570,4 +570,4 @@ models:
       model_location: "Global"
       model_provider: "OpenAI"
       generally_available: false
-      environments_available: ["development", "test"]
+      environments_available: ["development", "production"]

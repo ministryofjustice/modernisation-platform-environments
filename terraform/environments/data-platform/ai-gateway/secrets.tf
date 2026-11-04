@@ -86,4 +86,5 @@ module "openai_ai_gateway_secret" {
     service_account_id   = "CHANGEME"
   })
   ignore_secret_changes = true
+
 }
