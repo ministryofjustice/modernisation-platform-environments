@@ -82,7 +82,7 @@ while true; do
   if systemctl is-active --quiet sshd.service; then
     # Temporary upload files are excluded: only completed renames reach the read-back bucket.
     aws s3 sync /srv/sftp/${username}/incoming "s3://${bucket_name}/${readback_prefix}" \
-      --region "${region}" --exclude ".mft-*" --only-show-errors || echo "read-back sync failed"
+      --region "${region}" --exclude ".mft-*" --exclude "*/.mft-*" --only-show-errors || echo "read-back sync failed"
   fi
   sleep 5
 done

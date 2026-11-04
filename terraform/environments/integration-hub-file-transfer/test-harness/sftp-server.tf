@@ -1,3 +1,9 @@
+data "aws_kms_alias" "sftp_credentials" {
+  count = local.create_test_harness ? 1 : 0
+
+  name = "alias/${local.application_name}-push-to-sftp-credentials"
+}
+
 data "aws_iam_policy_document" "sftp_server" {
   count = local.create_test_harness ? 1 : 0
 
@@ -22,6 +28,25 @@ data "aws_iam_policy_document" "sftp_server" {
       test     = "StringEquals"
       variable = "kms:ViaService"
       values   = ["secretsmanager.${data.aws_region.current.region}.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid       = "DecryptSftpClientPublicKey"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [data.aws_kms_alias.sftp_credentials[0].target_key_arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["secretsmanager.${data.aws_region.current.region}.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:SecretARN"
+      values   = [local.sftp_client_public_key_secret_arn]
     }
   }
 
