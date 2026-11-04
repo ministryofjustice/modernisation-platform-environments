@@ -3,7 +3,7 @@ locals {
   sftp_bucket_name = "${local.application_name}-${local.environment}-${local.component_name}-sftp"
 
   sftp_incoming_prefix = "${local.component_name}/push-to-sftp/"
-  sftp_username        = "hubtest"
+  sftp_username        = "ihubtest"
 
   # Files the server receives are copied to this prefix so the tests can read deliveries through S3.
   sftp_readback_prefix = "push-to-sftp/"
