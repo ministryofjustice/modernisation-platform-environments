@@ -130,6 +130,15 @@ resource "aws_kms_key" "ssogen_kms_key" {
         "Resource" : "*"
       },
       {
+        "Sid" : "AllowRootAccountAdminForTestAccount",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${jsondecode(data.aws_secretsmanager_secret_version.test_account_secret[count.index].secret_string).test_account_id}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
         "Sid" : "AllowRootAccountAdminForDevAccount",
         "Effect" : "Allow",
         "Principal" : {
