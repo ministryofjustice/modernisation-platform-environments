@@ -8,8 +8,6 @@ name: data-factory-moj
     paths:
       - "terraform/environments/data-factory-moj/**"
       - ".github/workflows/data-factory-moj.yml"
-      - ".github/workflows/data-factory-moj-service-ingestion.yml"
-      - ".github/actions/prepare-service-ingestion/**"
 
   pull_request:
     branches:
@@ -17,8 +15,6 @@ name: data-factory-moj
     paths:
       - "terraform/environments/data-factory-moj/**"
       - ".github/workflows/data-factory-moj.yml"
-      - ".github/workflows/data-factory-moj-service-ingestion.yml"
-      - ".github/actions/prepare-service-ingestion/**"
 
   workflow_dispatch:
     inputs:
@@ -87,8 +83,7 @@ jobs:
             diff_exitcode=0
 
             git diff --quiet "${base}" "${head}" -- \
-              .github/workflows/data-factory-moj-service-ingestion.yml \
-              .github/actions/prepare-service-ingestion \
+              .github/workflows/data-factory-moj.yml \
               terraform/environments/data-factory-moj/dms-core/onboarding/services \
               terraform/environments/data-factory-moj/dms-core/onboarding/generations.json \
               || diff_exitcode=$?
@@ -160,7 +155,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: ./.github/workflows/data-factory-moj-service-ingestion.yml
+    uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/workflows/data-factory-moj-service-ingestion.yml@c7b03021b809f7c0b2809c2faedd14baaf9f45f8
     with:
       action: ${{ needs.deployment-routing.outputs.ingestion_action }}
     secrets:
