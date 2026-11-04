@@ -171,3 +171,7 @@ It does not replace the broader token, multipart, scan and download acceptance t
 No changes to platform-managed workflows are needed for these tests.
 
 See [operations](OPERATIONS.md) for notification checks, cleanup verification, capacity testing and rollout/rollback steps.
+
+Uploads up to and including 100 MiB (104,857,600 bytes) use a single S3 PUT.
+Larger files use multipart upload. This threshold is separate from the part-size
+setting; clients must follow the upload instructions returned by the ticket API.
