@@ -167,6 +167,46 @@ resource "aws_athena_workgroup" "cadt-historic-dev" {
   }
 }
 
+
+# ----------------------------------
+# Observability Platform Athena
+# ----------------------------------
+
+resource "aws_athena_workgroup" "observability_platform" {
+  name = format(
+    "%s-observability-platform",
+    local.env_account_id,
+  )
+
+  description = "Athena workgroup for Observability Platform queries"
+  state       = "ENABLED"
+
+  configuration {
+    bytes_scanned_cutoff_per_query     = 10737418240 # 10 GB
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${module.s3-observability-athena-bucket.bucket.id}/output/"
+
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+
+      acl_configuration {
+        s3_acl_option = "BUCKET_OWNER_FULL_CONTROL"
+      }
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      GrafanaDataSource = "true"
+    },
+  )
+}
+
 resource "aws_glue_catalog_database" "ears_sars_audit_db" {
   count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   name  = "ears_sars_audit"
