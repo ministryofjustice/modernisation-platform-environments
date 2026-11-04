@@ -92,7 +92,7 @@ resource "aws_cloudwatch_log_metric_filter" "MailQueue-NotExceeded" {
   count          = local.is-production == true ? 1 : 0
   name           = "MailQueue-NotExceeded"
   log_group_name = aws_cloudwatch_log_group.Mail-Queue-Logs[count.index].name
-  pattern        = "[date, time, Instance, MailQueue, status!=NotExceeded]"
+  pattern        = "[date, time, Instance, MailQueue, status=NotExceeded]"
   metric_transformation {
     name      = "MailQueueThreshold"
     namespace = "MailQueue"
