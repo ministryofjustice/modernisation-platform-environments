@@ -61,7 +61,7 @@ locals {
           push_to_sftp = {
             hostname           = local.test_sftp_server_ip
             port               = 22
-            username           = "hubtest"
+            username           = "ihubtest"
             destination_prefix = "incoming/"
             # Public host key; the matching private key is in the test-harness host-key secret.
             host_public_keys        = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILYvbJuLvL2auHSZe83WPDgW7Hs03eeblJY4uM1bNeVN"]

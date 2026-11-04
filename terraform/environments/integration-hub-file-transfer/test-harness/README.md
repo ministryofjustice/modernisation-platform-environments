@@ -110,7 +110,7 @@ administrative access. Direct writer invocations remain subject to the
 writers' request and source/destination validation.
 
 The SFTP server accepts port 22 only from the push-to-SFTP writer's security
-group. The `hubtest` account requires public-key authentication and is confined
+group. The `ihubtest` account requires public-key authentication and is confined
 to an SFTP-only chroot, with shell access and forwarding disabled. The harness
 does not configure an SSH shell or SSM administration path. Outbound security
 group rules allow HTTPS to shared protected endpoint subnets and regional S3.
