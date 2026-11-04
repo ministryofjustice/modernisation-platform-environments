@@ -21,7 +21,7 @@ on:
         description: 'Set either [deploy|destroy].'
         default: 'deploy'
         required: true
-        type: string
+        type: choice
         options:
           - deploy
           - destroy
@@ -32,8 +32,6 @@ on:
         type: string
 
 permissions:
-  pull-requests: write
-  id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
 jobs:
@@ -116,6 +114,10 @@ jobs:
   terraform:
     needs: ingestion-routing
     if: inputs.action != 'destroy' && needs.ingestion-routing.outputs.has_terraform == 'true'
+    permissions:
+      pull-requests: write
+      id-token: write
+      contents: read
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.ingestion-routing.outputs.matrix) }}
@@ -145,6 +147,10 @@ jobs:
 
   destroy-development:
     if: inputs.action == 'destroy' && inputs.component != 'service-ingestion'
+    permissions:
+      pull-requests: write
+      id-token: write
+      contents: read
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
