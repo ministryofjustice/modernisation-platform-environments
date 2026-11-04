@@ -1,5 +1,5 @@
 {
-  "Comment": "Run bounded read-only downstream historical assurance checks.",
+  "Comment": "Run bounded downstream historical assurance checks.",
   "StartAt": "PrepareAuditConsumers",
   "States": {
     "PrepareAuditConsumers": {
@@ -351,7 +351,63 @@
         }
       },
       "ResultPath": "$.consumer_results",
-      "Next": "AuditComplete"
+      "Next": "StartRecommendedHistoricalRecoveries"
+    },
+    "StartRecommendedHistoricalRecoveries": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${planner_function_name}",
+        "Payload": {
+          "action": "start_audit_recoveries"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "Next": "CheckHistoricalRecoveryStart"
+    },
+    "CheckHistoricalRecoveryStart": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "blocked",
+          "Next": "WaitForHistoricalRecoveryStart"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "started",
+          "Next": "AuditComplete"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "not_required",
+          "Next": "AuditComplete"
+        }
+      ],
+      "Default": "UnexpectedRecoveryStartResult"
+    },
+    "WaitForHistoricalRecoveryStart": {
+      "Type": "Wait",
+      "Seconds": 300,
+      "Next": "StartRecommendedHistoricalRecoveries"
+    },
+    "UnexpectedRecoveryStartResult": {
+      "Type": "Fail",
+      "Error": "UnexpectedHistoricalRecoveryStartResult",
+      "Cause": "The planner returned an unexpected recovery start status."
     },
     "AuditComplete": {
       "Type": "Succeed"

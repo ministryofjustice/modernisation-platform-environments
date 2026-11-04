@@ -562,3 +562,12 @@ models:
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction", "production"]
+  openai:
+    gpt-5-5-cyber-preview:
+      model_id: "gpt-5.5-cyber-preview"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.5 Cyber Preview"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
