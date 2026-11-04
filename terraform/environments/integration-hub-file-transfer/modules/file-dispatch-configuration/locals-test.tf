@@ -65,7 +65,7 @@ locals {
             destination_prefix = "incoming/"
             # Public host key; the matching private key is in the test-harness host-key secret.
             host_public_keys        = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILYvbJuLvL2auHSZe83WPDgW7Hs03eeblJY4uM1bNeVN"]
-            destination_cidr_blocks = ["${local.test_sftp_server_ip}/32"]
+            destination_cidr_blocks = var.environment == "test" ? ["${local.test_sftp_server_ip}/32"] : []
           }
         }
         notifications = {

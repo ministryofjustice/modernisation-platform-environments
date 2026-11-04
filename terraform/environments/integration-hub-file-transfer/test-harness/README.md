@@ -76,9 +76,10 @@ the destination network to that address's `/32`.
 
 The writer uploads temporary files and renames them into their completed paths
 under `incoming/`. A server agent runs `aws s3 sync` to the read-back prefix,
-excluding `.mft-*` files, with a five-second pause between iterations. GitHub
-Actions observes this S3 copy without requiring direct access to the private
-SFTP endpoint. The agent copies files; it does not delete the server originals.
+excluding `.mft-*` files at the root and in nested directories, with a
+five-second pause between iterations. GitHub Actions observes this S3 copy
+without requiring direct access to the private SFTP endpoint. The agent copies
+files; it does not delete the server originals.
 
 ## Access boundaries
 
@@ -179,10 +180,11 @@ and delivery services.
 The harness depends on the parent incoming and clean buckets, the incoming
 encryption key, the hosted key at
 `alias/s3/integration-hub-test-test-harness-pickup`, the shared secrets key at
-`alias/secrets/integration-hub-file-transfer-test`, and the push-to-SFTP writer's
-security group. The SFTP server also needs the shared private networking and
-connectivity to Secrets Manager and S3. The shared test dispatch module in turn
-looks up the harness destination key at
+`alias/secrets/integration-hub-file-transfer-test`, the push-to-SFTP credentials
+key at `alias/integration-hub-file-transfer-push-to-sftp-credentials`, and the
+push-to-SFTP writer's security group. The SFTP server also needs the shared
+private networking and connectivity to Secrets Manager and S3. The shared test
+dispatch module in turn looks up the harness destination key at
 `alias/s3/integration-hub-file-transfer-test-test-harness`.
 
 For the existing test installation, keep the shared routes present on `main`
