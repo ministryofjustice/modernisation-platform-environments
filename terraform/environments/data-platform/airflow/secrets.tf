@@ -43,7 +43,7 @@ module "airflow_connections_slack_api_default_secret" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
 
   name        = "airflow/connections/slack_api_default"
-  description = "Airflow Slack connection (slack_api_default) for task notifications"
+  description = "Airflow Slack connection (slack_api_default) for task notifications - https://api.slack.com/apps/A06NU3WMDSS/"
   kms_key_id  = data.aws_kms_key.common_secrets_manager_kms.arn
 
   secret_string = jsonencode({
