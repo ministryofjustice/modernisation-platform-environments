@@ -558,6 +558,127 @@ locals {
               athena_enabled                  = false
             }
           }
+        },
+        "electronic-monitoring-data" = {
+          identity_centre_team = "hmpps-electronic-monitoring-data-store"
+          aws_accounts = {
+            "electronic-monitoring-data-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = true
+              athena_config = {
+                allied-mdss = {
+                  database  = "allied_mdss_dev"
+                  workgroup = "800964199911-observability-platform"
+                }
+                serco-fms = {
+                  database  = "serco_fms_dev"
+                  workgroup = "800964199911-observability-platform"
+                }
+                staged-mdss = {
+                  database  = "staged_mdss_dev_dbt"
+                  workgroup = "800964199911-observability-platform"
+                }
+                acquisitive-crime = {
+                  database  = "acquisitive_crime_dev_dbt"
+                  workgroup = "800964199911-observability-platform"
+                }
+                data-insights = {
+                  database  = "data_insights_dev_dbt"
+                  workgroup = "800964199911-observability-platform"
+                }
+              }
+            },
+            "electronic-monitoring-data-test" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = true
+              athena_config = {
+                allied-mdss = {
+                  database  = "allied_mdss_test"
+                  workgroup = "396913731313-observability-platform"
+                }
+                serco-fms = {
+                  database  = "serco_fms_test"
+                  workgroup = "396913731313-observability-platform"
+                }
+                staged-mdss = {
+                  database  = "staged_mdss_test_dbt"
+                  workgroup = "396913731313-observability-platform"
+                }
+                acquisitive-crime = {
+                  database  = "acquisitive_crime_test_dbt"
+                  workgroup = "396913731313-observability-platform"
+                }
+                data-insights = {
+                  database  = "data_insights_test_dbt"
+                  workgroup = "396913731313-observability-platform"
+                }
+              }
+            },
+            "electronic-monitoring-data-preproduction" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = true
+              athena_config = {
+                allied-mdss = {
+                  database  = "allied_mdss_preprod"
+                  workgroup = "443370694497-observability-platform"
+                }
+                serco-fms = {
+                  database  = "serco_fms_preprod"
+                  workgroup = "443370694497-observability-platform"
+                }
+                staged-mdss = {
+                  database  = "staged_mdss_preprod_dbt"
+                  workgroup = "443370694497-observability-platform"
+                }
+                acquisitive-crime = {
+                  database  = "acquisitive_crime_preprod_dbt"
+                  workgroup = "443370694497-observability-platform"
+                }
+                data-insights = {
+                  database  = "data_insights_preprod_dbt"
+                  workgroup = "443370694497-observability-platform"
+                }
+              }
+            },
+            "electronic-monitoring-data-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = true
+              athena_config = {
+                allied-mdss = {
+                  database  = "allied_mdss"
+                  workgroup = "976799291502-observability-platform"
+                }
+                serco-fms = {
+                  database  = "serco_fms"
+                  workgroup = "976799291502-observability-platform"
+                }
+                staged-mdss = {
+                  database  = "staged_mdss"
+                  workgroup = "976799291502-observability-platform"
+                }
+                acquisitive-crime = {
+                  database  = "acquisitive_crime"
+                  workgroup = "976799291502-observability-platform"
+                }
+                data-insights = {
+                  database  = "data_insights"
+                  workgroup = "976799291502-observability-platform"
+                }
+              }
+            }
+          }
         }
       }
       grafana_version                 = "10.4"
