@@ -20,5 +20,6 @@ locals {
     local.push_to_s3_incoming_prefix,
     local.hosted_pickup_incoming_prefix,
     local.presigned_incoming_prefix,
+    local.sftp_incoming_prefix,
   ]
 }

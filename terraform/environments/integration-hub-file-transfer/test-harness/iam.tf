@@ -152,7 +152,28 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     resources = [
       local.test_writer_function_arn,
       local.test_hosted_pickup_function_arn,
+      local.test_sftp_function_arn,
     ]
+  }
+
+  statement {
+    sid       = "CheckSftpDelivery"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [module.s3_sftp_readback.s3_bucket_arn]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["${local.sftp_readback_prefix}*"]
+    }
+  }
+
+  statement {
+    sid       = "ReadSftpDelivery"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${module.s3_sftp_readback.s3_bucket_arn}/${local.sftp_readback_prefix}*"]
   }
 
   statement {
