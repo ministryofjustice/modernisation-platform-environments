@@ -30,41 +30,41 @@ locals {
 # The role name follows the github-actions-apply role used in the MP workflow.
 # -----------------------------------------------------------------------------
 
-provider "aws" {
-  alias  = "octo"
-  region = "eu-west-2"
+# provider "aws" {
+#   alias  = "octo"
+#   region = "eu-west-2"
 
-#   allowed_account_ids = [
-#     local.bu_live_accounts["octo"].account_id
-#   ]
-}
+# #   allowed_account_ids = [
+# #     local.bu_live_accounts["octo"].account_id
+# #   ]
+# }
 
-provider "aws" {
-  alias  = "laa"
-  region = "eu-west-2"
+# provider "aws" {
+#   alias  = "laa"
+#   region = "eu-west-2"
 
-#   allowed_account_ids = [
-#     local.bu_live_accounts["laa"].account_id
-#   ]
-}
+# #   allowed_account_ids = [
+# #     local.bu_live_accounts["laa"].account_id
+# #   ]
+# }
 
-provider "aws" {
-  alias  = "hmpps"
-  region = "eu-west-2"
+# provider "aws" {
+#   alias  = "hmpps"
+#   region = "eu-west-2"
 
-#   allowed_account_ids = [
-#     local.bu_live_accounts["hmpps"].account_id
-#   ]
-}
+# #   allowed_account_ids = [
+# #     local.bu_live_accounts["hmpps"].account_id
+# #   ]
+# }
 
-provider "aws" {
-  alias  = "cd"
-  region = "eu-west-2"
+# provider "aws" {
+#   alias  = "cd"
+#   region = "eu-west-2"
 
-#   allowed_account_ids = [
-#     local.bu_live_accounts["cd"].account_id
-#   ]
-}
+# #   allowed_account_ids = [
+# #     local.bu_live_accounts["cd"].account_id
+# #   ]
+# }
 
 # -----------------------------------------------------------------------------
 # TLS-only bucket policies
@@ -131,9 +131,9 @@ data "aws_iam_policy_document" "bu_state_bucket" {
 module "octo_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
-  providers = {
-    aws.bucket-replication = aws.octo
-  }
+    #   providers = {
+    #     aws.bucket-replication = aws.octo
+    #   }
 
   bucket_prefix    = "cp-octo-live-tf-state-bucket"
 
@@ -174,9 +174,9 @@ module "octo_state_bucket" {
 
 module "laa_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
-  providers = {
-    aws.bucket-replication = aws.laa
-  }
+    #   providers = {
+    #     aws.bucket-replication = aws.laa
+    #   }
 
   bucket_prefix    = "cp-laa-live-tf-state-bucket"
 
@@ -218,9 +218,9 @@ module "laa_state_bucket" {
 module "hmpps_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
-  providers = {
-    aws.bucket-replication = aws.hmpps
-  }
+    #   providers = {
+    #     aws.bucket-replication = aws.hmpps
+    #   }
 
   bucket_prefix    = "cp-hmpps-live-tf-state-bucket"
 
@@ -261,9 +261,9 @@ module "hmpps_state_bucket" {
 
 module "cd_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
-  providers = {
-    aws.bucket-replication = aws.cd
-  }
+    #   providers = {
+    #     aws.bucket-replication = aws.cd
+    #   }
 
   bucket_prefix    = "cp-cd-live-tf-state-bucket"
 
@@ -346,9 +346,9 @@ resource "aws_kms_key" "cd_state" {
 module "octo_state_controls" {
   source = "../../modules/state_bucket_controls"
 
-  providers = {
-    aws = aws.octo
-  }
+#   providers = {
+#     aws = aws.octo
+#   }
 
   bucket_id = module.octo_state_bucket.bucket.id
 }
@@ -356,9 +356,9 @@ module "octo_state_controls" {
 module "laa_state_controls" {
   source = "../../modules/state_bucket_controls"
 
-  providers = {
-    aws = aws.laa
-  }
+  # providers = {
+  #   aws = aws.laa
+  # }
 
   bucket_id = module.laa_state_bucket.bucket.id
 }
@@ -366,9 +366,9 @@ module "laa_state_controls" {
 module "cd_state_controls" {
   source = "../../modules/state_bucket_controls"
 
-  providers = {
-    aws = aws.cd
-  }
+  # providers = {
+  #   aws = aws.cd
+  # }
 
   bucket_id = module.cd_state_bucket.bucket.id
 }
@@ -376,9 +376,9 @@ module "cd_state_controls" {
 module "hmpps_state_controls" {
   source = "../../modules/state_bucket_controls"
 
-  providers = {
-    aws = aws.hmpps
-  }
+  # providers = {
+  #   aws = aws.hmpps
+  # }
 
   bucket_id = module.hmpps_state_bucket.bucket.id
 }
