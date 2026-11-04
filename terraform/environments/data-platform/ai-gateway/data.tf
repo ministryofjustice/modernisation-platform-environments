@@ -48,3 +48,7 @@ data "aws_secretsmanager_secret_version" "microsoft_foundry_jedi_gateway" {
 data "aws_secretsmanager_secret_version" "google_cloud_ai_gateway" {
   secret_id = module.google_cloud_ai_gateway_secret.secret_id
 }
+
+data "aws_secretsmanager_secret_version" "openai_ai_gateway" {
+  secret_id = module.openai_ai_gateway_secret.secret_id
+}
