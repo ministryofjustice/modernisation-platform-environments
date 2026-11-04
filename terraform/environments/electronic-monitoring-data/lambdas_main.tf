@@ -528,6 +528,18 @@ module "live_feed_daily_handover" {
     PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
     PAGERDUTY_TIME_ZONE        = "Europe/London"
 
+    MDSS_DASHBOARD_NAME = (
+      "mdss-ops-${local.environment_shorthand}"
+    )
+
+    FMS_DASHBOARD_NAME = (
+      "fms-ops-${local.environment_shorthand}"
+    )
+
+    LANDING_DASHBOARD_NAME = (
+      "landing-ops-${local.environment_shorthand}"
+    )
+
     DOWNSTREAM_RECONCILIATION_DASHBOARD_NAME = (
       "downstream-reconciliation-ops-${local.environment_shorthand}"
     )
@@ -536,6 +548,7 @@ module "live_feed_daily_handover" {
     CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
     ROTA_GUIDE_URL             = "https://jubilant-adventure-g65j3om.pages.github.io/hmpps/electronic_monitoring/data_engineering_guides/rota_duties/"
     EARS_SARS_TALLY_URL        = "https://justiceuk.sharepoint.com/:x:/r/sites/EMExpansionProgrammeteam/_layouts/15/doc2.aspx?sourcedoc=%7B25644699-3837-4A02-9C09-020EF0ECA744%7D&file=Monthly%20Tally%20of%20EARs%20and%20SARs.xlsx&action=default&mobileredirect=true"
+    OPEN_PRS_URL               = "https://github.com/ministryofjustice/electronic-monitoring-data/pulls"
   }
 }
 
@@ -648,8 +661,8 @@ module "cloudwatch_alarm_threader" {
     ENABLE_CUSTOM_ACTIONS = "false"
     INCIDENT_QUEUE_URL    = aws_sqs_queue.live_feed_incident_events.id
 
-    DEBOUNCE_QUEUE_URL           = aws_sqs_queue.cloudwatch_alarm_debounce.id
-    DEBOUNCE_SECONDS             = tostring(local.alarm_debounce_seconds)
+    DEBOUNCE_QUEUE_URL = aws_sqs_queue.cloudwatch_alarm_debounce.id
+    DEBOUNCE_SECONDS   = tostring(local.alarm_debounce_seconds)
     DEBOUNCE_BYPASS_ALARM_NAMES = jsonencode(
       local.alarm_debounce_bypass_names
     )
