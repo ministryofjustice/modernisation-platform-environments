@@ -6,7 +6,8 @@ module "github_backup_function" {
   function_name = local.component_name
   description   = "Backs up GitHub repositories that opt in with the backup custom property"
   handler       = "main.handler"
-  runtime       = "python3.13"
+  # Must match the Python version on the CI runner, which installs requirements.txt.
+  runtime = "python3.12"
 
   # Each repository is backed up in its own invocation, so size for the largest repository.
   timeout                = 900
