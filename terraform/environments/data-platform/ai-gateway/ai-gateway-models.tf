@@ -30,6 +30,43 @@ resource "litellm_model" "amazon_bedrock" {
   ]
 }
 
+# Companion "batch" mode deployment for models that support Bedrock batch inference; a separate
+# model_name is required because LiteLLM routes batch vs. real-time traffic by model deployment.
+resource "litellm_model" "amazon_bedrock_batch" {
+  for_each = local.ai_gateway_bedrock_batch_models
+
+  custom_llm_provider = "bedrock"
+  model_name          = "bedrock-batch-${each.key}"
+  base_model          = each.value.model_id
+  tier                = "paid"
+  mode                = "batch"
+
+  aws_region_name = local.ai_gateway_bedrock_batch_region
+  aws_role_name   = module.iam_role.arn
+
+  additional_litellm_params_json = jsonencode({
+    s3_bucket_name        = local.ai_gateway_batch_storage.input_bucket_name
+    s3_output_bucket_name = local.ai_gateway_batch_storage.output_bucket_name
+    s3_encryption_key_id  = local.ai_gateway_batch_storage.output_kms_key_arn
+    s3_bucket_owner       = local.ai_gateway_batch_storage.bucket_owner
+    s3_region_name        = local.ai_gateway_batch_storage.region
+    aws_batch_role_arn    = aws_iam_role.bedrock_batch_execution[0].arn
+
+    ai_model_provider            = try(each.value.model_provider, "Amazon Bedrock")
+    ai_model_family              = each.value.model_family
+    ai_model_name                = "${each.value.model_name} (Batch)"
+    ai_model_location            = each.value.model_location
+    ai_model_generally_available = each.value.generally_available
+    additional_drop_params       = ["ai_model_provider", "ai_model_family", "ai_model_name", "ai_model_location", "ai_model_generally_available"]
+  })
+
+  depends_on = [
+    helm_release.ai_gateway_configuration,
+    helm_release.litellm,
+    helm_release.litellm_admin
+  ]
+}
+
 resource "litellm_model" "google_gemini_enterprise_agent_platform" {
   for_each = try(local.ai_gateway_models_filtered.google_gemini_enterprise_agent_platform, {})
 
@@ -85,4 +122,35 @@ resource "litellm_model" "microsoft_foundry" {
     helm_release.litellm,
     helm_release.litellm_admin
   ]
+}
+
+resource "litellm_model" "openai" {
+  for_each = try(local.ai_gateway_models_filtered.openai, {})
+
+  custom_llm_provider = "openai"
+  model_name          = "openai-${each.key}"
+  base_model          = each.value.model_id
+  tier                = "paid"
+  model_api_base      = "https://api.openai.com/v1"
+
+  additional_litellm_params = {
+    ai_model_provider            = "OpenAI"
+    ai_model_family              = each.value.model_family
+    ai_model_name                = each.value.model_name
+    ai_model_location            = each.value.model_location
+    ai_model_generally_available = each.value.generally_available
+    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_location\",\"ai_model_generally_available\"]"
+  }
+
+  lifecycle {
+    precondition {
+      condition = alltrue([
+        for id in [local.openai_identity_provider_id, local.openai_service_account_id] :
+        id != "" && id != "CHANGEME"
+      ])
+      error_message = "OpenAI models enabled in ${local.environment} but identity_provider_id/service_account_id are not set in the ${local.component_name}/openai/moj-openai-ai-gateway secret."
+    }
+  }
+
+  depends_on = [helm_release.ai_gateway_configuration, helm_release.litellm, helm_release.litellm_admin]
 }

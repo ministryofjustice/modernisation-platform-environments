@@ -1435,6 +1435,20 @@ data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
       "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*/status/*.json",
     ]
   }
+
+  statement {
+    sid    = "ReadLiveFeedGitHubAppSecret"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+    ]
+  }
 }
 
 resource "aws_iam_role" "mdss_daily_failure_digest" {
@@ -3808,6 +3822,20 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
 
     resources = [
       module.downstream_reconciliation_audit.arn,
+    ]
+  }
+
+  statement {
+    sid    = "StartHistoricalRecovery"
+    effect = "Allow"
+
+    actions = [
+      "states:StartExecution",
+    ]
+
+    resources = [
+      module.merge_into_mdss_ac_position.arn,
+      module.merge_into_emdi_position.arn,
     ]
   }
 

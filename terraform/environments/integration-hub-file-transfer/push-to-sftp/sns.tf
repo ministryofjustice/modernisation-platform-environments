@@ -22,6 +22,12 @@ data "aws_iam_policy_document" "sns_push_to_sftp" {
     }
 
     resources = [module.sns_push_to_sftp.topic_arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
   }
 }
 
