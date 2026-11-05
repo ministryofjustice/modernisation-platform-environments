@@ -15,7 +15,7 @@ locals {
     input  = "${local.ai_gateway_batch_bucket_arns.input}/litellm-bedrock-files-*"
     output = "${local.ai_gateway_batch_bucket_arns.output}/litellm-batch-outputs/*"
   }
-  prompt_logs_bucket_name     = "mojdp-${local.environment}-${local.component_name}-prompt-logs"
+  prompt_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-prompt-logs"
 }
 
 data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {

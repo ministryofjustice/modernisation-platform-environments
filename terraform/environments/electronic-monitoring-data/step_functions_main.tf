@@ -148,10 +148,10 @@ module "merge_into_mdss_staged_event" {
 # ------------------------------------------
 
 module "merge_into_emdi_position" {
-  source                  = "./modules/merge_into_reconciler"
-  function_to_iterate     = module.merge_emdi_position[0]
-  planner_function_arn    = module.merge_redrive_planner.lambda_function_arn
-  reconciliation_consumer = "EMDI"
+  source                          = "./modules/merge_into_reconciler"
+  function_to_iterate             = module.merge_emdi_position[0]
+  planner_function_arn            = module.merge_redrive_planner.lambda_function_arn
+  reconciliation_consumer         = "EMDI"
   reconciliation_state_prefix_arn = "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}"
 }
 
@@ -172,9 +172,9 @@ module "merge_into_mdss_ac_position" {
 # ------------------------------------------
 
 module "downstream_reconciliation_audit" {
-  source       = "./modules/step_function"
-  name         = "downstream-reconciliation-audit"
-  type         = "STANDARD"
+  source = "./modules/step_function"
+  name   = "downstream-reconciliation-audit"
+  type   = "STANDARD"
   iam_policies = tomap({
     downstream_reconciliation_audit = (
       aws_iam_policy.downstream_reconciliation_audit
