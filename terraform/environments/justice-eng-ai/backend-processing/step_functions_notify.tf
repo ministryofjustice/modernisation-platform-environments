@@ -12,6 +12,7 @@ locals {
       variables = [
         { name = "TEMPLATE_ID", value = local.application_data.accounts[local.environment].notify_template_id },
         { name = "USER_EMAIL", path = "$.latest.UserName" },
+        { name = "CC_EMAIL", value = "ModernisationPlatform-gg@justice.gov.uk" },
         { name = "EMAIL_SUBJECT", value = "Your application has been built and deployed" },
         { name = "EMAIL_BODY_FILE", value = "scripts/notification/email-body.md" },
         {
