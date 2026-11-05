@@ -37,7 +37,7 @@ module "eks" {
 
   authentication_mode = "API_AND_CONFIG_MAP"
 
-  access_entries = {
+  access_entries = merge({
     ## Cloud Platform Platform Engineer access to cluster
     sso-platform-engineer-admin = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
@@ -74,7 +74,8 @@ module "eks" {
         }
       }
     }
-    ## CP GitHub actions access to cluster
+    }, local.cluster_environment == "development_cluster" ? {
+    ## CP GitHub actions access to development cluster only
     cpgha-administrator = {
       principal_arn = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-development"]}:role/github-actions-development-cluster"
       policy_associations = {
@@ -86,7 +87,7 @@ module "eks" {
         }
       }
     }
-  }
+  } : {})
 
   # Hardcode the KMS principals otherwise they fall back to current identity
   kms_key_administrators = [
