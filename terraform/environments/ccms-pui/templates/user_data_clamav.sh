@@ -35,7 +35,9 @@ StreamMaxLength 320M
 User clamscan
 EOF
 
+# Initial ClamAV database update before enabling services
 freshclam
 
-systemctl enable clamd@scan.service
-systemctl start clamd@scan.service
+# Enable ClamAV Scan Daemon and Freshclam Services
+systemctl enable --now clamav-freshclam.service
+systemctl enable --now clamd@scan.service
