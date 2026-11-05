@@ -6,16 +6,22 @@ locals {
   ai_gateway_batch_storage_configuration = try(local.environment_configuration.ai_gateway_batch_storage, null)
   ai_gateway_batch_storage = local.ai_gateway_batch_storage_configuration == null ? null : merge(local.ai_gateway_batch_storage_configuration, {
     output_bucket_name = coalesce(try(local.ai_gateway_batch_storage_configuration.output_bucket_name, null), local.ai_gateway_batch_storage_configuration.input_bucket_name)
+    input_prefix       = try(trim(local.ai_gateway_batch_storage_configuration.input_prefix, "/"), "")
+    output_prefix      = try(trim(local.ai_gateway_batch_storage_configuration.output_prefix, "/"), "")
   })
+  ai_gateway_batch_storage_locations = local.ai_gateway_batch_storage == null ? {} : {
+    input  = join("/", compact([local.ai_gateway_batch_storage.input_bucket_name, local.ai_gateway_batch_storage.input_prefix]))
+    output = join("/", compact([local.ai_gateway_batch_storage.output_bucket_name, local.ai_gateway_batch_storage.output_prefix]))
+  }
   ai_gateway_batch_bucket_arns = local.ai_gateway_batch_storage == null ? {} : {
     input  = "arn:aws:s3:::${local.ai_gateway_batch_storage.input_bucket_name}"
     output = "arn:aws:s3:::${local.ai_gateway_batch_storage.output_bucket_name}"
   }
   ai_gateway_batch_object_arns = local.ai_gateway_batch_storage == null ? {} : {
-    input  = "${local.ai_gateway_batch_bucket_arns.input}/litellm-bedrock-files-*"
-    output = "${local.ai_gateway_batch_bucket_arns.output}/litellm-batch-outputs/*"
+    input  = "arn:aws:s3:::${local.ai_gateway_batch_storage_locations.input}/litellm-bedrock-files-*"
+    output = "arn:aws:s3:::${local.ai_gateway_batch_storage_locations.output}/litellm-batch-outputs/*"
   }
-  prompt_logs_bucket_name     = "mojdp-${local.environment}-${local.component_name}-prompt-logs"
+  prompt_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-prompt-logs"
 }
 
 data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {

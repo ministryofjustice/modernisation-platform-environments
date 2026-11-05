@@ -1,13 +1,13 @@
 {
   "accounts": {
     "development": {
-      "admin_ami_image_id": "ami-02f77a03ec776dc35",
+      "admin_ami_image_id": "ami-0ff750c02625633f5",
       "admin_ec2_instance_type": "m5.xlarge",
       "admin_ec2_min_capacity": 1,
       "admin_ec2_max_capacity": 1,
       "admin_ec2_desired_capacity": 1,
       "admin_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-admin",
-      "admin_container_version": "0.0.17",
+      "admin_container_version": "0.0.18-CVE-2026-91403",
       "admin_ssl_port": 7002,
       "admin_container_cpu": 2048,
       "admin_container_memory": 6144,
@@ -18,13 +18,13 @@
       "admin_caab_user": "caab_soa_gateway_api",
       "admin_apply_user": "apply_user",
 
-      "managed_ami_image_id": "ami-02f77a03ec776dc35",
+      "managed_ami_image_id": "ami-0ff750c02625633f5",
       "managed_ec2_instance_type": "m5.2xlarge",
       "managed_ec2_min_capacity": 1,
       "managed_ec2_max_capacity": 1,
       "managed_ec2_desired_capacity": 1,
       "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed",
-      "managed_container_version": "0.0.18",
+      "managed_container_version": "0.0.18-CVE-2026-91403",
       "managed_ssl_port": 7002,
       "managed_container_cpu": 2048,
       "managed_container_memory": 6144,
