@@ -31,6 +31,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 GITHUB_API_URL = "https://api.github.com"
+# Set by Terraform in lambda-functions.tf; a missing value fails at cold start.
 GITHUB_ORGANISATION = os.environ["GITHUB_ORGANISATION"]
 GITHUB_APP_SECRET_ARN = os.environ["GITHUB_APP_SECRET_ARN"]
 BACKUP_BUCKET = os.environ["BACKUP_BUCKET"]
@@ -38,12 +39,14 @@ BACKUP_PROPERTY = "backup"
 REPOSITORY_NAME_PATTERN = re.compile(r"^[A-Za-z0-9_.-]+$")
 WORK_DIR = "/tmp/repository-backup"
 
+# Created once per execution environment and reused by warm invocations.
 secrets_manager = boto3.client("secretsmanager")
 s3 = boto3.client("s3")
 lambda_client = boto3.client("lambda")
 
 
 def _b64(data: bytes) -> str:
+    """Base64url-encode without padding, as JWTs require."""
     return urlsafe_b64encode(data).rstrip(b"=").decode()
 
 
@@ -60,9 +63,11 @@ def get_installation_token() -> str:
         json.dumps({"iat": now - 60, "exp": now + 540, "iss": secret["client_id"]}).encode()
     )
     signing_input = f"{header}.{payload}".encode()
+    # GitHub issues App keys as PKCS#1 PEM ("BEGIN RSA PRIVATE KEY").
     private_key = rsa.PrivateKey.load_pkcs1(secret["private_key"].encode())
     jwt = f"{header}.{payload}.{_b64(rsa.sign(signing_input, private_key, 'SHA-256'))}"
 
+    # The installation token lasts one hour and is scoped to the App's installation.
     response, _ = github_request(
         f"/app/installations/{secret['installation_id']}/access_tokens",
         jwt,
@@ -73,6 +78,7 @@ def get_installation_token() -> str:
 
 def github_request(path: str, token: str, method: str = "GET"):
     """Call the GitHub API and return the decoded body and the next page URL, if any."""
+    # Accept both API paths and the absolute next-page URLs GitHub returns.
     url = path if path.startswith(GITHUB_API_URL) else f"{GITHUB_API_URL}{path}"
     request = urllib.request.Request(
         url,
@@ -90,6 +96,7 @@ def github_request(path: str, token: str, method: str = "GET"):
 
 
 def is_backup_enabled(properties: list) -> bool:
+    """Return True only if the `backup` custom property is true; missing means opted out."""
     # GitHub returns true_false property values as strings.
     return any(
         item.get("property_name") == BACKUP_PROPERTY and str(item.get("value")).lower() == "true"
@@ -98,6 +105,7 @@ def is_backup_enabled(properties: list) -> bool:
 
 
 def discover_repositories(token: str) -> list[str]:
+    """List opted-in repositories the App can see, from one paginated org-wide call."""
     repositories = set()
     next_url = f"/orgs/{GITHUB_ORGANISATION}/properties/values?per_page=100"
     while next_url:
@@ -109,6 +117,8 @@ def discover_repositories(token: str) -> list[str]:
 
 
 def validate_repository(repository: str) -> str:
+    """Return the repository name, rejecting other organisations and unsafe path segments."""
+    # The name is used in a clone URL, a local path and the S3 key.
     owner, _, name = repository.partition("/")
     if (
         owner.lower() != GITHUB_ORGANISATION.lower()
@@ -120,10 +130,12 @@ def validate_repository(repository: str) -> str:
 
 
 def dispatch_backups(context) -> dict:
+    """Discovery mode: find opted-in repositories and start one backup invocation for each."""
     token = get_installation_token()
     repositories = discover_repositories(token)
     logger.info("Discovered %d opted-in repositories", len(repositories))
 
+    # Async invocations are queued by Lambda and limited by reserved concurrency.
     for repository in repositories:
         lambda_client.invoke(
             FunctionName=context.invoked_function_arn,
@@ -135,6 +147,7 @@ def dispatch_backups(context) -> dict:
 
 def mirror_repository(repository: str, token: str, mirror_dir: str) -> None:
     """Fetch every ref and its reachable history into a bare repository, like `git clone --mirror`."""
+    # Basic auth keeps the token out of the URL and the mirror's config.
     client, path = get_transport_and_path(
         f"https://github.com/{repository}.git",
         username="x-access-token",
@@ -149,6 +162,7 @@ def mirror_repository(repository: str, token: str, mirror_dir: str) -> None:
             determine_wants=repo.object_store.determine_wants_all,
             protocol_version=0,
         )
+        # fetch() downloads objects but doesn't create refs; skip peeled tag entries (^{}).
         for ref, sha in result.refs.items():
             if ref != b"HEAD" and not ref.endswith(b"^{}") and sha is not None:
                 repo.refs[ref] = sha
@@ -167,6 +181,7 @@ def mirror_repository(repository: str, token: str, mirror_dir: str) -> None:
 def check_connectivity(repo: Repo) -> None:
     """Fail if any object reachable from a ref is missing; dulwich's fsck doesn't walk the graph."""
     store = repo.object_store
+    # Iterative walk from every ref; `seen` avoids revisiting shared history.
     pending = list(repo.get_refs().values())
     seen = set()
     while pending:
@@ -198,7 +213,9 @@ def check_connectivity(repo: Repo) -> None:
 
 
 def backup_repository(repository: str) -> dict:
+    """Backup mode: mirror one repository, verify it and upload a compressed archive to S3."""
     name = validate_repository(repository)
+    # Fetch a fresh token here so none is ever stored in a queued Lambda event.
     token = get_installation_token()
 
     # Re-check the opt-in in case it changed after discovery.
@@ -216,6 +233,7 @@ def backup_repository(repository: str) -> dict:
         mirror_repository(repository, token, mirror_dir)
 
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        # The random suffix stops runs in the same second overwriting each other.
         archive_name = f"{name}-{timestamp}-{uuid.uuid4().hex[:8]}.tar.gz"
         archive_path = os.path.join(WORK_DIR, archive_name)
         with tarfile.open(archive_path, "w:gz") as archive:
@@ -232,11 +250,13 @@ def backup_repository(repository: str) -> dict:
 
 
 def handler(event, context):
+    """Lambda entry point (`main.handler`): an empty event discovers, `repository` backs one up."""
     repository = (event or {}).get("repository")
     try:
         if repository:
             return backup_repository(repository)
         return dispatch_backups(context)
     except urllib.error.HTTPError as error:
+        # Log only the status, never the token; re-raise so Lambda records the error and retries.
         logger.error("GitHub API request failed: %s %s", error.code, error.reason)
         raise
