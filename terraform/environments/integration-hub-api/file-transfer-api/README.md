@@ -172,6 +172,11 @@ No changes to platform-managed workflows are needed for these tests.
 
 See [operations](OPERATIONS.md) for notification checks, cleanup verification, capacity testing and rollout/rollback steps.
 
-Uploads up to and including 100 MiB (104,857,600 bytes) use a single S3 PUT.
-Larger files use multipart upload. This threshold is separate from the part-size
-setting; clients must follow the upload instructions returned by the ticket API.
+Files below 1 GiB (1,073,741,824 bytes) use a single S3 PUT. Files at or above
+1 GiB use multipart upload with a default part size of 100 MiB (104,857,600 bytes).
+The API can increase the part size for very large files to stay within the part
+count limit; clients must always use the returned `partSizeBytes`.
+
+Deploy the matching API change before applying this configuration: multipart now
+starts at the threshold, including a file of exactly 1 GiB. A 1 GiB file uses ten
+100 MiB parts and a final 24 MiB part.
