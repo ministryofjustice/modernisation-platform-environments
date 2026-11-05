@@ -1,27 +1,56 @@
-module "ecs_cluster" {
+module "ecs_cluster_opa" {
   # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
   source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=10d2292"
 
-  cluster_name = "${local.component_name}-${local.env_label}-cluster"
+  cluster_name = local.opa_cluster_name
   tags         = local.tags
 
   capacity_providers = {
     ec2 = {
-      instance_type         = local.application_data.accounts[local.environment].ec2_instance_type
+      instance_type         = local.application_data.accounts[local.environment].opa_ec2_instance_type
       image_id              = local.application_data.accounts[local.environment].ami_image_id
-      min_size              = local.application_data.accounts[local.environment].ec2_min_capacity
-      max_size              = local.application_data.accounts[local.environment].ec2_max_capacity
-      desired_capacity      = local.application_data.accounts[local.environment].ec2_desired_capacity
+      min_size              = local.application_data.accounts[local.environment].opa_ec2_min_capacity
+      max_size              = local.application_data.accounts[local.environment].opa_ec2_max_capacity
+      desired_capacity      = local.application_data.accounts[local.environment].opa_ec2_desired_capacity
       root_volume_size      = local.application_data.accounts[local.environment].root_volume_size
       instance_profile_name = aws_iam_instance_profile.ecs_ec2.name
-      security_group_ids    = [aws_security_group.cluster_ec2.id]
+      security_group_ids    = [aws_security_group.opa_cluster_ec2.id]
       subnet_ids            = data.aws_subnets.shared-private.ids
       ebs_encrypted         = true
       kms_key_id            = data.aws_kms_key.ebs_shared.arn
       user_data = base64encode(templatefile("${path.module}/templates/user-data.sh", {
-        cluster_name       = "${local.component_name}-${local.env_label}-cluster"
-        efs_id             = module.efs.file_system_id
-        deploy_environment = local.environment
+        cluster_name = local.opa_cluster_name
+      }))
+    }
+  }
+
+  alarms = {
+    topic_arn = data.aws_sns_topic.alerts.arn
+  }
+}
+
+module "ecs_cluster_conn_saa" {
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=10d2292"
+
+  cluster_name = local.conn_saa_cluster_name
+  tags         = local.tags
+
+  capacity_providers = {
+    ec2 = {
+      instance_type         = local.application_data.accounts[local.environment].conn_saa_ec2_instance_type
+      image_id              = local.application_data.accounts[local.environment].ami_image_id
+      min_size              = local.application_data.accounts[local.environment].conn_saa_ec2_min_capacity
+      max_size              = local.application_data.accounts[local.environment].conn_saa_ec2_max_capacity
+      desired_capacity      = local.application_data.accounts[local.environment].conn_saa_ec2_desired_capacity
+      root_volume_size      = local.application_data.accounts[local.environment].root_volume_size
+      instance_profile_name = aws_iam_instance_profile.ecs_ec2.name
+      security_group_ids    = [aws_security_group.conn_saa_cluster_ec2.id]
+      subnet_ids            = data.aws_subnets.shared-private.ids
+      ebs_encrypted         = true
+      kms_key_id            = data.aws_kms_key.ebs_shared.arn
+      user_data = base64encode(templatefile("${path.module}/templates/user-data.sh", {
+        cluster_name = local.conn_saa_cluster_name
       }))
     }
   }
@@ -36,7 +65,7 @@ module "ecs_service_opahub" {
   source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.opahub_name}-${local.env_label}"
-  cluster_id         = module.ecs_cluster.cluster_id
+  cluster_id         = module.ecs_cluster_opa.cluster_id
   execution_role_arn = aws_iam_role.ecs_task_execution.arn
   desired_count      = local.application_data.accounts[local.environment].opa_app_count
   cpu                = local.application_data.accounts[local.environment].opa_container_cpu
@@ -45,33 +74,39 @@ module "ecs_service_opahub" {
 
   health_check_grace_period_seconds = 300
 
-  volumes = [{
-    name           = "opa_volume"
-    file_system_id = module.efs.file_system_id
-  }]
+  network_mode = "awsvpc"
+  network_configuration = {
+    subnets         = data.aws_subnets.shared-private.ids
+    security_groups = [aws_security_group.ecs_tasks_opahub.id]
+  }
 
   container_definitions = templatefile("${path.module}/templates/task_definition_opahub.json.tpl", {
-    app_name          = local.opahub_name
-    app_image         = local.application_data.accounts[local.environment].opa_app_image
-    container_version = local.application_data.accounts[local.environment].opa_container_version
-    server_port       = local.application_data.accounts[local.environment].opa_server_port
-    aws_region        = data.aws_region.current.region
-    log_group_name    = aws_cloudwatch_log_group.opahub.name
-    db_host           = module.rds.db_endpoint
-    wl_mem_args       = local.application_data.accounts[local.environment].wl_mem_args
-    create_database   = local.application_data.accounts[local.environment].create_database
-    opahub_password   = "${aws_secretsmanager_secret.opahub.arn}:opahub_password::"
-    db_user           = "${aws_secretsmanager_secret.opahub.arn}:db_user::"
-    db_password       = "${aws_secretsmanager_secret.opahub.arn}:db_password::"
-    wl_user           = "${aws_secretsmanager_secret.opahub.arn}:wl_user::"
-    wl_password       = "${aws_secretsmanager_secret.opahub.arn}:wl_password::"
-    secret_key        = "${aws_secretsmanager_secret.opahub.arn}:secret_key::"
+    app_name            = local.opahub_name
+    app_image           = local.application_data.accounts[local.environment].opa_app_image
+    container_version   = local.application_data.accounts[local.environment].opa_container_version
+    server_port         = local.application_data.accounts[local.environment].opa_server_port
+    ssl_port            = local.application_data.accounts[local.environment].opa_ssl_port
+    health_check_port   = local.application_data.accounts[local.environment].opa_health_check_port
+    aws_region          = data.aws_region.current.region
+    log_group_name      = aws_cloudwatch_log_group.opahub.name
+    db_host             = module.rds.db_endpoint
+    wl_mem_args         = local.application_data.accounts[local.environment].wl_mem_args
+    create_database     = local.application_data.accounts[local.environment].create_database
+    opahub_password     = "${aws_secretsmanager_secret.opahub.arn}:opahub_password::"
+    db_user             = "${aws_secretsmanager_secret.opahub.arn}:db_user::"
+    db_password         = "${aws_secretsmanager_secret.opahub.arn}:db_password::"
+    wl_user             = "${aws_secretsmanager_secret.opahub.arn}:wl_user::"
+    wl_password         = "${aws_secretsmanager_secret.opahub.arn}:wl_password::"
+    secret_key          = "${aws_secretsmanager_secret.opahub.arn}:secret_key::"
+    keystore_password   = "${aws_secretsmanager_secret.opahub.arn}:keystore_password::"
+    truststore_password = "${aws_secretsmanager_secret.opahub.arn}:truststore_password::"
   })
 
+  # WebLogic terminates TLS itself; the ALB re-encrypts to the SSL port
   load_balancer = {
     target_group_arn = module.alb_opahub.target_group_arn
     container_name   = "${local.opahub_name}-container"
-    container_port   = local.application_data.accounts[local.environment].opa_server_port
+    container_port   = local.application_data.accounts[local.environment].opa_ssl_port
   }
 
   alarms = {
@@ -81,8 +116,7 @@ module "ecs_service_opahub" {
   depends_on = [
     module.alb_opahub,
     aws_iam_role_policy_attachment.ecs_task_execution,
-    module.ecs_cluster,
-    module.efs,
+    module.ecs_cluster_opa,
   ]
 }
 
@@ -91,7 +125,7 @@ module "ecs_service_connector" {
   source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.connector_name}-${local.env_label}"
-  cluster_id         = module.ecs_cluster.cluster_id
+  cluster_id         = module.ecs_cluster_conn_saa.cluster_id
   execution_role_arn = aws_iam_role.ecs_task_execution.arn
   task_role_arn      = aws_iam_role.connector_task.arn
   desired_count      = local.application_data.accounts[local.environment].connector_desired_count
@@ -100,6 +134,12 @@ module "ecs_service_connector" {
   tags               = local.tags
 
   health_check_grace_period_seconds = 300
+
+  network_mode = "awsvpc"
+  network_configuration = {
+    subnets         = data.aws_subnets.shared-private.ids
+    security_groups = [aws_security_group.ecs_tasks_connector.id]
+  }
 
   container_definitions = templatefile("${path.module}/templates/task_definition_connector.json.tpl", {
     connector_app_name                           = local.connector_name
@@ -152,7 +192,7 @@ module "ecs_service_connector" {
   depends_on = [
     module.alb_connector,
     aws_iam_role_policy_attachment.ecs_task_execution,
-    module.ecs_cluster,
+    module.ecs_cluster_conn_saa,
   ]
 }
 
@@ -161,7 +201,7 @@ module "ecs_service_adaptor" {
   source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
 
   name               = "${local.adaptor_name}-${local.env_label}"
-  cluster_id         = module.ecs_cluster.cluster_id
+  cluster_id         = module.ecs_cluster_conn_saa.cluster_id
   execution_role_arn = aws_iam_role.ecs_task_execution.arn
   desired_count      = local.application_data.accounts[local.environment].adaptor_desired_count
   cpu                = local.application_data.accounts[local.environment].adaptor_container_cpu
@@ -169,6 +209,12 @@ module "ecs_service_adaptor" {
   tags               = local.tags
 
   health_check_grace_period_seconds = 300
+
+  network_mode = "awsvpc"
+  network_configuration = {
+    subnets         = data.aws_subnets.shared-private.ids
+    security_groups = [aws_security_group.ecs_tasks_adaptor.id]
+  }
 
   container_definitions = templatefile("${path.module}/templates/task_definition_service_adaptor.json.tpl", {
     adaptor_app_name                          = local.adaptor_name
@@ -202,6 +248,6 @@ module "ecs_service_adaptor" {
   depends_on = [
     module.alb_adaptor,
     aws_iam_role_policy_attachment.ecs_task_execution,
-    module.ecs_cluster,
+    module.ecs_cluster_conn_saa,
   ]
 }
