@@ -43,3 +43,8 @@ data "aws_secretsmanager_secret_version" "github_app_installation_id" {
 data "aws_secretsmanager_secret_version" "github_app_private_key" {
   secret_id = "grafana/data-sources/github-app-private-key"
 }
+
+
+data "aws_secretsmanager_secret_version" "grafana_cloud_access_policy_token" {
+  secret_id = "grafana-cloud/terraform-access-policy-token"
+}

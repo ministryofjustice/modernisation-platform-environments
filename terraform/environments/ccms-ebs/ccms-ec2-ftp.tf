@@ -2,7 +2,7 @@ resource "aws_instance" "ec2_ftp" {
   instance_type               = local.application_data.accounts[local.environment].ec2_instance_type_ftp
   ami                         = local.application_data.accounts[local.environment].ftp_ami_id
   key_name                    = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids      = compact([aws_security_group.ec2_sg_ftp.id, one(aws_security_group.ftp_sg_kpmg[*].id)])
+  vpc_security_group_ids      = [aws_security_group.ec2_sg_ftp.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
@@ -14,10 +14,11 @@ resource "aws_instance" "ec2_ftp" {
     ignore_changes = [
       ebs_block_device,
       root_block_device,
-      ebs_optimized
+      ebs_optimized,
+      user_data
     ]
   }
-  user_data_replace_on_change = true
+#  user_data_replace_on_change = true
   user_data = templatefile("./templates/ec2_user_data_ftp.sh", {
     environment               = "${local.environment}"
     lz_aws_account_id_env     = "${local.application_data.accounts[local.environment].lz_aws_account_id_env}"

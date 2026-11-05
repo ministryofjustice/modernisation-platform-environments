@@ -13,7 +13,9 @@
       "ccr_rds_role_arn": "arn:aws:iam::754256621582:role/ccr-rds-hub20-s3-access",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current_logs": 90,
-      "s3_lifecycle_days_expiration_noncurrent_logs": 90
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
+      "wallet_file_ccms": "wallet_dir_ccms_development-AWS_CA.zip",
+      "wallet_file_cwa": "no_cwa_wallet_in_development"
     },
     "test": {
       "cwa_database_ip": ["10.206.1.60/32"],
@@ -28,7 +30,9 @@
       "ccr_rds_role_arn": "arn:aws:iam::754256621582:role/ccr-rds-hub20-uat-s3-access",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current_logs": 90,
-      "s3_lifecycle_days_expiration_noncurrent_logs": 90
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
+      "wallet_file_ccms": "wallet_dir_ccms_test-AWS_CA.zip",
+      "wallet_file_cwa": "wallet_dir_cwa_test-AWS_CA.zip"
     },
     "preproduction": {
       "example_var": "preproduction-data"
@@ -46,7 +50,9 @@
       "ccr_rds_role_arn": "arn:aws:iam::754256621582:role/ccr-rds-hub20-prod-s3-access",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current_logs": 90,
-      "s3_lifecycle_days_expiration_noncurrent_logs": 90
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
+      "wallet_file_ccms": "wallet_dir_ccms_production-AWS_CA.zip",
+      "wallet_file_cwa": "wallet_dir_cwa_production-AWS_CA.zip"
     }
   }
 }

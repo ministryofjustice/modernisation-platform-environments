@@ -53,3 +53,27 @@ resource "aws_secretsmanager_secret" "non_modernisation_platform_account_ids" {
 
   name = "observability-platform/non-modernisation-platform-account-ids"
 }
+
+#tfsec:ignore:avd-aws-0098 CMK not required currently
+resource "aws_secretsmanager_secret" "grafana_cloud_user" {
+  #checkov:skip=CKV_AWS_149:CMK not required currently
+  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
+
+  name = "grafana/grafana-cloud-user"
+}
+
+#tfsec:ignore:avd-aws-0098 CMK not required currently
+resource "aws_secretsmanager_secret" "grafana_cloud_password" {
+  #checkov:skip=CKV_AWS_149:CMK not required currently
+  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
+
+  name = "grafana/grafana-cloud-password"
+}
+
+#tfsec:ignore:avd-aws-0098 CMK not required currently
+resource "aws_secretsmanager_secret" "grafana_cloud_access_policy_token" {
+  #checkov:skip=CKV_AWS_149:CMK not required currently
+  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
+
+  name = "grafana-cloud/terraform-access-policy-token"
+}

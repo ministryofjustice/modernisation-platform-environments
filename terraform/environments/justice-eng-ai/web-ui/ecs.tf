@@ -78,6 +78,10 @@ resource "aws_ecs_task_definition" "app" {
           name  = "BEDROCK_MODEL_ID"
           value = var.bedrock_model_id
         },
+        {
+          name  = "BEDROCK_MAX_TOKENS"
+          value = var.bedrock_max_tokens 
+        },
         # GitHub App -- non-sensitive values (installation id + pem are in
         # the ``secrets`` block below).
         {
@@ -155,6 +159,17 @@ resource "aws_ecs_task_definition" "app" {
           name  = "MPAPB_FORGE_URL"
           value = local.forge_url
         },
+        # Private same-VPC address Builder's own proxy forwards /forge-app/
+        # requests to (see local.forge_upstream_url in forge-journey-lab.tf,
+        # service-discovery.tf). Empty unless forge_single_url_enabled.
+        {
+          name  = "MPAPB_FORGE_UPSTREAM_URL"
+          value = local.forge_upstream_url
+        },
+        {
+          name  = "FORGE_BASE_PATH"
+          value = local.forge_base_path
+        },
         # In-app Entra OIDC feature flag. When true (see local.in_app_oidc_
         # enabled) the app runs its own login handshake and the ALB
         # forwards plainly. The tenant / client id / client secret come
@@ -214,6 +229,12 @@ resource "aws_ecs_task_definition" "app" {
           {
             name      = "MPAPB_ENTRA_CLIENT_SECRET"
             valueFrom = aws_secretsmanager_secret.entra_oidc_client_secret[0].arn
+          },
+        ] : [],
+        local.forge_single_url_enabled ? [
+          {
+            name      = "MPAPB_FORGE_PROXY_TOKEN"
+            valueFrom = aws_secretsmanager_secret.forge_proxy_token[0].arn
           },
         ] : []
       )

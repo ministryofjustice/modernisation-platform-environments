@@ -13,10 +13,11 @@ locals {
     kms_key_arn = data.aws_kms_key.incoming.arn
   }
 
-  # No MFT alarm topics are wired to this component, so alarms have no actions.
+  # Reuse platform-managed alarm topics; no new Slack app or webhook.
+  alarm_topic_names = try(local.application_configuration.observability_configuration.alarm_topic_names, {})
   alarm_topic_arns = {
-    high_priority = null
-    low_priority  = null
+    high_priority = try(data.aws_sns_topic.api_alarms[local.alarm_topic_names.high_priority].arn, null)
+    low_priority  = try(data.aws_sns_topic.api_alarms[local.alarm_topic_names.low_priority].arn, null)
   }
 
   application_configuration = try(jsondecode(file("${path.module}/application_variables.json")).accounts[local.environment], {})
@@ -30,8 +31,8 @@ locals {
     basic_auth_username = try(local.application_configuration.api_configuration.docs.basic_auth_username, "api-docs")
   }
   multipart_configuration = {
-    single_put_limit_bytes            = try(local.application_configuration.api_configuration.multipart_upload.single_put_limit_bytes, 5368709120)
-    multipart_default_part_size_bytes = try(local.application_configuration.api_configuration.multipart_upload.multipart_default_part_size_bytes, 67108864)
+    single_put_limit_bytes            = try(local.application_configuration.api_configuration.multipart_upload.single_put_limit_bytes, 1073741824)
+    multipart_default_part_size_bytes = try(local.application_configuration.api_configuration.multipart_upload.multipart_default_part_size_bytes, 104857600)
     multipart_max_parts               = try(local.application_configuration.api_configuration.multipart_upload.multipart_max_parts, 10000)
     multipart_initial_presign_parts   = try(local.application_configuration.api_configuration.multipart_upload.multipart_initial_presign_parts, 10)
   }
@@ -63,6 +64,8 @@ locals {
   }
 
   observability_configuration = {
+    api_gateway_4xx_threshold              = try(local.application_configuration.observability_configuration.api_gateway_4xx_threshold, 100)
+    api_gateway_4xx_evaluation_periods     = try(local.application_configuration.observability_configuration.api_gateway_4xx_evaluation_periods, 2)
     api_gateway_latency_threshold_ms       = try(local.application_configuration.observability_configuration.api_gateway_latency_threshold_ms, 5000)
     api_gateway_latency_evaluation_periods = try(local.application_configuration.observability_configuration.api_gateway_latency_evaluation_periods, 2)
     lambda_duration_threshold_ms           = try(local.application_configuration.observability_configuration.lambda_duration_threshold_ms, 2000)
@@ -77,11 +80,6 @@ locals {
       alarm_name_prefix = "${local.resource_name_prefix}-upload-ticket"
       description       = "Upload ticket Lambda"
       function_name     = module.lambda_upload_ticket.lambda_function_name
-    }
-    "authorizer" = {
-      alarm_name_prefix = "${local.resource_name_prefix}-authorizer"
-      description       = "Request authorizer Lambda"
-      function_name     = module.lambda_api_authorizer.lambda_function_name
     }
     "docs" = {
       alarm_name_prefix = "${local.resource_name_prefix}-docs"

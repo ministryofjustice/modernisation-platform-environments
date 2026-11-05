@@ -168,4 +168,9 @@ resource "aws_autoscaling_group" "conn_saa_cluster_scaling_group" {
     value               = ""
     propagate_at_launch = true
   }
+
+  # Desired capacity is managed by the ECS capacity provider (managed scaling).
+  lifecycle {
+    ignore_changes = [desired_capacity]
+  }
 }

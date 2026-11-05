@@ -53,6 +53,7 @@ models:
       region: eu-west-2
       generally_available: true
     # Anthropic
+    # Batch inference is explicitly enabled per model for the configured batch Region.
     claude-haiku-4-5:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_family: "Anthropic Claude"
@@ -60,6 +61,7 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      batch_available: true
     claude-opus-4-5:
       model_id: "eu.anthropic.claude-opus-4-5-20251101-v1:0"
       model_family: "Anthropic Claude"
@@ -116,6 +118,7 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      batch_available: true
     claude-sonnet-5:
       model_id: eu.anthropic.claude-sonnet-5
       model_family: "Anthropic Claude"
@@ -242,7 +245,8 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: false
-      environments_available: ["development"]
+      batch_available: true
+      environments_available: ["development", "production"]
     # Justice Engineering AI Enablement
     jeaie-claude-haiku-4-5:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
@@ -488,6 +492,14 @@ models:
       location: "global"
       generally_available: false
       environments_available: ["development", "production"]
+    gemini-3-5-transcribe:
+      model_id: "gemini-3.5-transcribe"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.5 Transcribe"
+      model_location: "EU"
+      location: "EU"
+      generally_available: false
+      environments_available: ["development", "production"]
     gemini-3-6-flash:
       model_id: "gemini-3.6-flash"
       model_family: "Google Gemini"
@@ -562,3 +574,12 @@ models:
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction", "production"]
+  openai:
+    gpt-5-5-cyber-preview:
+      model_id: "gpt-5.5-cyber-preview"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.5 Cyber Preview"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]

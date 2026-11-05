@@ -393,29 +393,6 @@ module "kms_sqs" {
 
   key_statements = [
     {
-      sid = "AllowCloudWatchAlarmPublishers"
-      actions = [
-        "kms:Decrypt",
-        "kms:GenerateDataKey*",
-      ]
-      resources = ["*"]
-
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["cloudwatch.amazonaws.com"]
-        }
-      ]
-
-      condition = [
-        {
-          test     = "StringEquals"
-          variable = "aws:SourceAccount"
-          values   = [data.aws_caller_identity.current.account_id]
-        }
-      ]
-    },
-    {
       sid = "AllowEventBridgePublishers"
       actions = [
         "kms:Decrypt",
@@ -496,29 +473,6 @@ module "kms_sns" {
         {
           type        = "Service"
           identifiers = ["cloudwatch.amazonaws.com"]
-        }
-      ]
-
-      condition = [
-        {
-          test     = "StringEquals"
-          variable = "aws:SourceAccount"
-          values   = [data.aws_caller_identity.current.account_id]
-        }
-      ]
-    },
-    {
-      sid = "AllowEventBridgePublishers"
-      actions = [
-        "kms:Decrypt",
-        "kms:GenerateDataKey*",
-      ]
-      resources = ["*"]
-
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["events.amazonaws.com"]
         }
       ]
 
