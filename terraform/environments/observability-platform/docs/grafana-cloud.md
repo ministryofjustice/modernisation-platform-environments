@@ -62,15 +62,63 @@ Stack destruction and replacement are blocked by `prevent_destroy`, including
 the existing workflow's development destroy action. Any intentional stack
 deletion requires an explicitly reviewed change to this protection.
 
-## Private connectivity follow-up
+## Private Data Source Connect (PDC) over PrivateLink
 
-The `grafana_cloud_stack` output exposes the new stack's ID, slug, URL, and
-region. The `grafana_cloud_pdc_private_connectivity` output exposes the PDC
-API and SSH gateway service names and private DNS names returned by Grafana.
-Use these values rather than copying the pilot stack's endpoint identifiers.
+`grafana-cloud-pdc.tf` connects each environment's stack to its
+`platforms-<environment>` VPC:
 
-The VPC owner must provision the interface endpoints in the shared VPC,
-selecting supported availability zones and allowing the agent to reach the
-API on TCP 443 and the SSH gateway on TCP 22. PDC networks, agent credentials,
-agents, and target security-group rules are a separate deployment. Grafana
-Cloud management API calls and browser access remain public HTTPS.
+- a PDC network named `platforms-<environment>`
+- a PDC network token, stored in the `grafana-cloud/pdc-agent-token` secret
+- two PDC agent tasks on ECS Fargate in the general private subnets
+
+PDC is switched on per environment with `enabled` in the `grafana_cloud_pdc`
+local. Only development is enabled.
+
+The agent image is `grafana/pdc-agent`, mirrored into the
+`observability-platform-pdc-agent` ECR repository in core-shared-services.
+The task pins the image by digest.
+
+The agents call the PDC API on TCP 443 and keep an SSH tunnel open to the
+gateway on TCP 22. Both connections go through interface endpoints in the VPC.
+Grafana sends queries back down the tunnel. Nothing connects inbound to the
+VPC, and the PDC traffic doesn't use NAT or the network firewall.
+
+All stacks in `prod-gb-south-1` share the same endpoint services, so one
+endpoint pair per VPC serves both stacks. The
+`grafana_cloud_pdc_private_connectivity` output shows the service names.
+
+### Prerequisites
+
+1. Add the `accesspolicies` Read, Write and Delete scopes to the Terraform
+   access policy. PDC networks and their tokens are access policies.
+2. In the `modernisation-platform` repository:
+   - `core-vpc/custom_endpoints.tf` adds the two PDC endpoints for the VPC.
+     Each endpoint gets its own security group, and the gateway's group allows
+     TCP 22 from the VPC CIDR. Check first that Grafana's endpoint services
+     cover eu-west-2a, 2b and 2c.
+   - `core-shared-services/observability-platform.tf` creates the
+     `observability-platform-pdc-agent` ECR repository.
+3. Mirror the agent image into ECR. Run the "Mirror PDC Agent" workflow in
+   `observability-platform-grafana-api-key-rotator` with the version and its
+   Docker Hub digest. The workflow checks the digest, copies the image, and
+   signs it with cosign.
+
+### Rollout
+
+1. Apply. This creates the PDC network, the token secret and the agents.
+2. Check from inside the VPC that `*.vpce.grafana.net` resolves to private IP
+   addresses.
+3. Check that the agent logs in `/ecs/grafana-pdc-agent` show a connection,
+   and that the PDC network in Grafana Cloud shows two agents.
+4. Data-source owners allow the agent security group (the `agent_sg_id` value
+   in the `grafana_cloud_pdc_network` output) into their data sources.
+5. Optionally set `permit_remote_open` to restrict which `host:port`
+   destinations the agent will forward queries to.
+
+### Upgrading the agent
+
+1. Run the "Mirror PDC Agent" workflow with the new version and digest.
+2. Update the digest in `grafana_cloud_pdc_agent_image` and apply.
+
+Grafana Cloud management API calls, browser access and alert notifications
+still go over public HTTPS.
