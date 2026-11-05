@@ -6,8 +6,6 @@ dnf update -y
 # Install dependencies
 dnf install -y perl-Digest-SHA icu curl tar git git-lfs java-17-amazon-corretto java-17-amazon-corretto-devel
 
-# eMudhra CA certificate vulnerability fix. The ec2 module ignores user_data changes, so the
-# running instance isn't replaced; these were run manually on the existing box.
 dnf update -y ca-certificates --releasever 2023.12.20261026
 update-ca-trust
 
