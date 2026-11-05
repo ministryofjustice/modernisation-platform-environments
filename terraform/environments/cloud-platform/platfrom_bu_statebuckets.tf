@@ -23,12 +23,7 @@ locals {
 
 
 
-# -----------------------------------------------------------------------------
-# AWS providers
-#
-# Each provider targets the live account for one BU.
-# The role name follows the github-actions-apply role used in the MP workflow.
-# -----------------------------------------------------------------------------
+
 
 # provider "aws" {
 #   alias  = "octo"
@@ -122,11 +117,6 @@ data "aws_iam_policy_document" "bu_state_bucket" {
   }
 }
 
-# -----------------------------------------------------------------------------
-# BU Terraform state buckets
-#
-# One bucket per business unit, provisioned in that BU's live account.
-# -----------------------------------------------------------------------------
 
 module "octo_state_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
@@ -336,12 +326,7 @@ resource "aws_kms_key" "cd_state" {
   deletion_window_in_days = 30
 }
 
-# -----------------------------------------------------------------------------
-# Bucket controls
-#
-# Versioning and public access blocking are managed in a dedicated module so
-# the bucket module only owns the bucket and its KMS configuration.
-# -----------------------------------------------------------------------------
+-------------------------------------------------------------------------
 
 module "octo_state_controls" {
   source = "../../modules/state_bucket_controls"
