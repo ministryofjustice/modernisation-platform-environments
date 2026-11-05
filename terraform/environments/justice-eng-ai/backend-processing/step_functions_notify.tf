@@ -16,12 +16,29 @@ locals {
         { name = "EMAIL_BODY_FILE", value = "scripts/notification/email-body.md" },
         {
           # Braces are escaped for States.Format; builder_url comes from Terraform.
-          # The input is the build_app_infra child's final state, passed on by the root.
+          # The input is the deploy_prototype child's final state, passed on by the root.
           name = "EMAIL_VARS"
-          path = "States.Format('\\{\"endpoint_url\":\"{}\",\"app_id\":\"{}\",\"build_id\":\"{}\",\"builder_url\":\"${local.notify_builder_url}\"\\}', $.build_infra_task.endpoint_url, ${local.script_runner_app_id_path}, $.latest.BuildID)"
+          path = "States.Format('\\{\"endpoint_url\":\"{}\",\"app_id\":\"{}\",\"build_id\":\"{}\",\"builder_url\":\"${local.notify_builder_url}\"\\}', $.dns.url, ${local.script_runner_app_id_path}, $.latest.BuildID)"
         },
       ]
       result_path     = "$.notify_task"
+      timeout_seconds = 300
+    },
+    {
+      # AWS Chatbot delivers the job completion topic to Slack.
+      name        = "send_slack_alert"
+      type        = "script_runner"
+      script_path = "scripts/notification/send_slack_alert.py"
+      shell_type  = "python3"
+      variables = [
+        { name = "TOPIC_ARN", value = aws_sns_topic.job_completion.arn },
+        { name = "AWS_REGION", value = local.aws_region },
+        { name = "USER_EMAIL", path = "$.latest.UserName" },
+        { name = "APP_ID", path = local.script_runner_app_id_path },
+        { name = "BUILD_ID", path = "$.latest.BuildID" },
+        { name = "APP_URL", path = "$.dns.url" },
+      ]
+      result_path     = "$.slack_task"
       timeout_seconds = 300
     }
   ]

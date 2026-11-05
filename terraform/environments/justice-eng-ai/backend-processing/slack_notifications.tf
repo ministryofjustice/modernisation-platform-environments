@@ -44,7 +44,7 @@ resource "aws_sns_topic" "job_completion" {
 # Nothing is created until a channel ID is set for the environment.
 module "job_completion_chatbot" {
   count  = local.slack_channel_id == "" ? 0 : 1
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=8815b853108d0801e75afce8630971232366bf57"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0
 
   slack_channel_id = local.slack_channel_id
   sns_topic_arns   = [aws_sns_topic.job_completion.arn]
@@ -57,7 +57,8 @@ resource "aws_iam_role_policy" "job_completion_chatbot_decrypt" {
   count = local.slack_channel_id == "" ? 0 : 1
 
   name = "${local.application_name}-job-completion-decrypt"
-  role = module.job_completion_chatbot[0].aws_chatbot_iam_role.name
+  # v3.0.0 outputs the role ARN rather than the role object
+  role = element(split("/", module.job_completion_chatbot[0].aws_chatbot_iam_role), -1)
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{

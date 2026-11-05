@@ -415,6 +415,48 @@ data "aws_iam_policy_document" "script_runner_ecs_task_build_flow" {
     resources = [aws_dynamodb_table.build_review.arn]
   }
 
+  # prototype_deployment.py creates one table per prototype application.
+  statement {
+    sid    = "ManagePrototypeAppTables"
+    effect = "Allow"
+    actions = [
+      "dynamodb:CreateTable",
+      "dynamodb:DescribeTable",
+      "dynamodb:DescribeTimeToLive",
+      "dynamodb:UpdateTimeToLive",
+      "dynamodb:ListTagsOfResource",
+      "dynamodb:TagResource",
+    ]
+    resources = [local.prototype_app_table_arn_pattern]
+  }
+
+  statement {
+    sid       = "PassPrototypeAppTaskRole"
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = [aws_iam_role.prototype_app_task.arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid       = "PublishJobCompletionAlert"
+    effect    = "Allow"
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.job_completion.arn]
+  }
+
+  statement {
+    sid       = "UseJobCompletionKey"
+    effect    = "Allow"
+    actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
+    resources = [aws_kms_key.job_completion.arn]
+  }
+
   statement {
     sid       = "ReportScriptResult"
     effect    = "Allow"
@@ -461,6 +503,40 @@ resource "aws_iam_policy" "script_runner_ecs_task_build_flow" {
 resource "aws_iam_role_policy_attachment" "script_runner_ecs_task_build_flow" {
   role       = aws_iam_role.script_runner_ecs_task.name
   policy_arn = aws_iam_policy.script_runner_ecs_task_build_flow.arn
+}
+
+# ---------- Prototype application task role ----------
+# Shared by every deployed prototype app (prototype_deployment.py sets it as the
+# task role). Access is limited to the per-app tables, named prototype-<request id>.
+locals {
+  prototype_app_table_arn_pattern = "arn:${data.aws_partition.current.partition}:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/prototype-*"
+}
+
+resource "aws_iam_role" "prototype_app_task" {
+  name               = "${local.application_name}-prototype-app-task"
+  assume_role_policy = data.aws_iam_policy_document.script_runner_ecs_assume_role.json
+  tags               = local.tags
+}
+
+data "aws_iam_policy_document" "prototype_app_task" {
+  statement {
+    sid    = "ReadWritePrototypeAppTables"
+    effect = "Allow"
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:DeleteItem",
+      "dynamodb:Scan",
+    ]
+    resources = [local.prototype_app_table_arn_pattern]
+  }
+}
+
+resource "aws_iam_role_policy" "prototype_app_task" {
+  name   = "${local.application_name}-prototype-app-task"
+  role   = aws_iam_role.prototype_app_task.id
+  policy = data.aws_iam_policy_document.prototype_app_task.json
 }
 
 # ---------- EC2 capacity: gives the task access to a Docker daemon ----------

@@ -36,15 +36,8 @@ locals {
       name               = "notify_user"
       type               = "step_function"
       state_machine_name = local.notify_state_machine_name
-      input_path         = "$.build_app_infra.Output"
+      input_path         = "$.deploy_prototype_app.Output"
       result_path        = "$.notify_user"
-    },
-    {
-      name      = "notify_slack"
-      type      = "sns_publish"
-      topic_arn = aws_sns_topic.job_completion.arn
-      subject   = "Application build completed"
-      message   = "States.Format('Build {} of application {} completed successfully: {}', $.latest.BuildID, ${local.script_runner_app_id_path}, $.build_app_infra.Output.build_infra_task.endpoint_url)"
     },
   ]
 }
