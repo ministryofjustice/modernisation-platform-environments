@@ -28,7 +28,7 @@ resource "aws_launch_template" "ec2_launch_template_opa" {
   }
 
   user_data = base64encode(templatefile("${path.module}/templates/user-data-opa.sh", {
-    cluster_name       = "${local.first_cluster_name}"
+    cluster_name       = local.first_cluster_name
     deploy_environment = local.environment
   }))
 
@@ -109,7 +109,7 @@ resource "aws_launch_template" "ec2_launch_template_conn_saa" {
   }
 
   user_data = base64encode(templatefile("${path.module}/templates/user-data-conn-saa.sh", {
-    cluster_name       = "${local.second_cluster_name}"
+    cluster_name       = local.second_cluster_name
     deploy_environment = local.environment
   }))
 
