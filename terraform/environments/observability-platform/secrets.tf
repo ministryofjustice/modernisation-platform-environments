@@ -70,7 +70,6 @@ resource "aws_secretsmanager_secret" "grafana_cloud_password" {
   name = "grafana/grafana-cloud-password"
 }
 
-
 #tfsec:ignore:avd-aws-0098 CMK not required currently
 resource "aws_secretsmanager_secret" "grafana_cloud_access_policy_token" {
   #checkov:skip=CKV_AWS_149:CMK not required currently
