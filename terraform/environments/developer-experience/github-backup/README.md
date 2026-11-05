@@ -51,7 +51,9 @@ s3://<bucket>/<owner>/<repository>/<YYYYMMDD>/<repository>-<UTC timestamp>-<suff
 
 ### Authentication
 
-The function uses the dedicated GitHub App stored in Secrets Manager (`github-backup/github-app`), in line with the [GitHub authentication guidance for automated workloads](https://developer-portal.service.justice.gov.uk/github/github-authentication-for-automated-workloads.html). It signs a short-lived JWT with the App's private key and exchanges it for a one-hour installation token. No personal access token is used.
+The function uses the dedicated GitHub App stored in Secrets Manager (`github-backup/github-app`), in line with the [GitHub authentication guidance for automated workloads](https://developer-portal.service.justice.gov.uk/github/github-authentication-for-automated-workloads.html).
+
+It signs a short-lived JWT with the App's private key and exchanges it for a one-hour installation token. No personal access token is used.
 
 The App needs:
 
