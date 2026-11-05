@@ -6,6 +6,9 @@ dnf update -y
 # Install dependencies
 dnf install -y perl-Digest-SHA icu curl tar git git-lfs java-17-amazon-corretto java-17-amazon-corretto-devel
 
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
+
 cd /home/ec2-user
 
 # Download the runner
