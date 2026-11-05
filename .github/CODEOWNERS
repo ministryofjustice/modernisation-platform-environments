@@ -48,7 +48,7 @@
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-corporate @ministryofjustice/corporate-data-factory-admins @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-corporate/people @ministryofjustice/corporate-data-factory-admins @ministryofjustice/modernisation-platform
-/terraform/environments/data-factory-laa @ministryofjustice/laa-data-factory-engineering @ministryofjustice/modernisation-platform
+/terraform/environments/data-factory-laa @ministryofjustice/data-factory-laa @ministryofjustice/laa-data-factory-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj @ministryofjustice/data-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/streaming-poc @ministryofjustice/justice-data-factory-administrators @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/streaming-poc-msk @ministryofjustice/justice-data-factory-administrators @ministryofjustice/modernisation-platform
@@ -108,7 +108,7 @@ prisons-de @ministryofjustice/modernisation-platform
 /terraform/environments/laa-oem @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-ccms-migration-team @ministryofjustice/laa-dba @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/laa-pui-secure-browser @ministryofjustice/ecp-admin @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-pui-secure-browser/networking @ministryofjustice/ecp-admin @ministryofjustice/modernisation-platform
-/terraform/environments/laa-pui-secure-browser/workspaces-secure-browser @ministryofjustice/ecp-admin @ministryofjustice/modernisation-platform
+/terraform/environments/laa-pui-secure-browser/workspaces-secure-browser @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-stabilisation-cdc-poc @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-sre-admins @ministryofjustice/laa-stabilisation-cdc @ministryofjustice/v1-hub20-developers @ministryofjustice/modernisation-platform
 /terraform/environments/laa-workspaces @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/london-unpaid-work @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
