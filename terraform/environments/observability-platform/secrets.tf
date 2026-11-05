@@ -69,3 +69,10 @@ resource "aws_secretsmanager_secret" "grafana_cloud_password" {
 
   name = "grafana/grafana-cloud-password"
 }
+
+resource "aws_secretsmanager_secret" "grafana_cloud_access_policy_token" {
+  #checkov:skip=CKV_AWS_149:CMK not required currently
+  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
+
+  name = "grafana-cloud/terraform-access-policy-token"
+}
