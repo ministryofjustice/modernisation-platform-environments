@@ -2,8 +2,8 @@
 
 `grafana-cloud.tf` creates a new Grafana Cloud stack alongside the existing
 Amazon Managed Grafana platform. It does not import or modify the `mojdigital`
-test stack, migrate dashboards, configure data sources, or deploy PDC agents
-and VPC endpoints.
+test stack, migrate dashboards, or configure data sources. Private
+connectivity is in `grafana-cloud-pdc.tf`, described below.
 
 | Terraform workspace | AWS account | Grafana Cloud stack |
 | --- | --- | --- |
@@ -74,9 +74,10 @@ deletion requires an explicitly reviewed change to this protection.
 PDC is switched on per environment with `enabled` in the `grafana_cloud_pdc`
 local. Only development is enabled.
 
-The agent image is `grafana/pdc-agent`, mirrored into the
-`observability-platform-pdc-agent` ECR repository in core-shared-services.
-The task pins the image by digest.
+For the pilot, the agent image is `grafana/pdc-agent`, pulled from Docker Hub
+through the Modernisation Platform network firewall. The task pins the image by
+digest. The tenant module will move the image to an ECR repository in
+core-shared-services.
 
 The agents call the PDC API on TCP 443 and keep an SSH tunnel open to the
 gateway on TCP 22. Both connections go through interface endpoints in the VPC.
@@ -91,17 +92,10 @@ endpoint pair per VPC serves both stacks. The
 
 1. Add the `accesspolicies` Read, Write and Delete scopes to the Terraform
    access policy. PDC networks and their tokens are access policies.
-2. In the `modernisation-platform` repository:
-   - `core-vpc/custom_endpoints.tf` adds the two PDC endpoints for the VPC.
-     Each endpoint gets its own security group, and the gateway's group allows
-     TCP 22 from the VPC CIDR. Check first that Grafana's endpoint services
-     cover eu-west-2a, 2b and 2c.
-   - `core-shared-services/observability-platform.tf` creates the
-     `observability-platform-pdc-agent` ECR repository.
-3. Mirror the agent image into ECR. Run the "Mirror PDC Agent" workflow in
-   `observability-platform-grafana-api-key-rotator` with the version and its
-   Docker Hub digest. The workflow checks the digest, copies the image, and
-   signs it with cosign.
+2. In the `modernisation-platform` repository, `core-vpc/custom_endpoints.tf`
+   adds the two PDC endpoints for the VPC. Each endpoint gets its own security
+   group, and the gateway's group allows TCP 22 from the VPC CIDR. Check first
+   that Grafana's endpoint services cover eu-west-2a, 2b and 2c.
 
 ### Rollout
 
@@ -117,8 +111,9 @@ endpoint pair per VPC serves both stacks. The
 
 ### Upgrading the agent
 
-1. Run the "Mirror PDC Agent" workflow with the new version and digest.
-2. Update the digest in `grafana_cloud_pdc_agent_image` and apply.
+1. Get the image index digest for the new version, for example with
+   `docker buildx imagetools inspect grafana/pdc-agent:<version>`.
+2. Update the version and digest in `grafana_cloud_pdc_agent_image` and apply.
 
 Grafana Cloud management API calls, browser access and alert notifications
 still go over public HTTPS.
