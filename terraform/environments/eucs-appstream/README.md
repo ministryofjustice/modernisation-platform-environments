@@ -10,7 +10,7 @@ The Terraform is structured as a reusable local module so that adding or removin
 
 ## Architecture
 
-```
+```text
 User → Entra App (launch portal) → AWS WorkSpaces Web Access
                                         │
                                         ▼
@@ -30,7 +30,7 @@ SAML, IAM federation (the SAML provider and IAM role), and networking (VPC, subn
 
 ## File Structure
 
-```
+```text
 eucs-appstream/
 ├── application_variables.json          # Per-environment configuration
 ├── locals.tf                           # deploy_workspaces flag
@@ -79,7 +79,7 @@ This means `application_variables.json` is the single place to configure environ
 The central configuration file. Contains an `accounts` object keyed by environment name (`development`, `test`, `preproduction`, `production`). Each environment can define:
 
 | Key | Type | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `deploy_workspaces` | `bool` | Whether to deploy the WorkSpaces infrastructure in this environment. If `false`, nothing is created. |
 | `ad_connector_secret_name` | `string` | Name of the Secrets Manager secret holding the AD Connector service account password. |
 | `security_group_name` | `string` | Override the security group name (to match existing click-ops resources). If omitted, defaults to `{app}-{env}-workspaces-sg`. |
@@ -130,7 +130,7 @@ The root module call. Uses `count` with `local.deploy_workspaces` to conditional
 Exposes key values from the module after `terraform apply`:
 
 | Output | Purpose |
-|---|---|
+| --- | --- |
 | `equip_workspaces_registration_code` | The WorkSpaces registration code — needed for the Entra app relay state URL (`https://workspaces.euc-sso.eu-west-2.aws.amazon.com/sso-idp?registrationCode=<CODE>`) |
 | `equip_workspaces_directory_id` | The WorkSpaces directory ID |
 | `equip_workspaces_security_group_id` | The security group ID attached to WorkSpaces |
@@ -228,7 +228,7 @@ A single-purpose local module containing all AWS resources needed for the WorkSp
 ### Module Inputs (`variables.tf`)
 
 | Variable | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `application_name` | `string` | Used for resource naming (e.g. `eucs-appstream`) |
 | `environment` | `string` | Current environment (e.g. `development`, `production`) |
 | `vpc_id` | `string` | The shared HMPPS VPC ID |
@@ -253,7 +253,7 @@ A single-purpose local module containing all AWS resources needed for the WorkSp
 ### Module Outputs (`outputs.tf`)
 
 | Output | Description |
-|---|---|
+| --- | --- |
 | `directory_id` | The AD Connector directory ID |
 | `equip_workspaces_directory_id` | The WorkSpaces directory registration ID |
 | `registration_code` | The WorkSpaces registration code — used in the Entra app relay state URL and by the WorkSpaces client |
@@ -301,7 +301,7 @@ Remove the user's entry from `workspace_users` and deploy. Terraform will destro
 ## What Is NOT Managed Here
 
 | Component | Managed By |
-|---|---|
+| --- | --- |
 | VPC, subnets, routing | Modernisation Platform (core-vpc) |
 | SAML identity provider in AWS | Pre-provisioned (IAM) |
 | IAM role for SAML federation | Pre-provisioned (IAM) |
@@ -361,7 +361,7 @@ EQuiP authors cannot access the EQuiP Authoring application. No alternative acce
 ### **How to resolve specific issues:**
 
 | Issue | Check |
-|---|---|
+| --- | --- |
 | User cannot see the Entra app | Verify user is in the `MoJO-G-Users-AWS-EQuiP` Entra group |
 | User cannot log in to desktop | Verify equip.local credentials; check AD Connector health in AWS console |
 | WorkSpace stuck launching | Check AD Connector connectivity, subnet routing, and domain controller availability |
