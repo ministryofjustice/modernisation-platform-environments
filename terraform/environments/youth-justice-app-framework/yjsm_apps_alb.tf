@@ -46,6 +46,19 @@ module "yjsm_apps_alb" {
   enable_zonal_shift         = true
 }
 
+# NLB -> ALB, for the NLB's health checks. These come from the NLB's own IPs, which
+# the Juniper prefix list above doesn't cover.
+resource "aws_security_group_rule" "yjsm_apps_nlb_to_alb" {
+  for_each                 = local.yjsm_juniper_facing_apps
+  type                     = "ingress"
+  from_port                = each.value.port
+  to_port                  = each.value.port
+  protocol                 = "tcp"
+  security_group_id        = module.yjsm_apps_alb.alb_security_group_id
+  source_security_group_id = module.yjsm_apps_nlb.nlb_security_group_id
+  description              = "yjsm apps NLB to yjsm apps ALB (${each.key})"
+}
+
 # Management server -> yjsm-ui, as it could reach the UI on the EC2 host's port
 # 8400 (modules/yjsm/security-groups.tf). The ingress rule lets it into the UI
 # listener; the egress rule is needed because the management server's security
