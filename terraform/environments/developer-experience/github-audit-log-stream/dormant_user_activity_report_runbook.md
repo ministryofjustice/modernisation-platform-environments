@@ -14,7 +14,7 @@ an account or reclaim a licence. Any account action must continue to follow the
 separately approved human review and account-removal process.
 
 The [developer-experience#331 issue](https://github.com/ministryofjustice/developer-experience/issues/331)
-contains the DuckDB prototype handover and its known limitations. That
+contains the report prototype handover and its known limitations. That
 prototype used a 30-day window ending at 00:00 UTC on 8 October 2026 and
 current GitHub API snapshots for `ministryofjustice` and
 `moj-analytical-services`. Its outputs and counts are historical exploratory
@@ -112,11 +112,44 @@ approved.
    new report feeds its review process and cannot trigger automatic account
    removal.
 
-### 2. Prepare dated GitHub API snapshots
+### 2. Implement the report with Lambda, Athena and Glue
 
-Implement a repeatable preparation job or operator-run script, separately
-from the report Lambda unless an approved design combines them. It must fetch
-data from GitHub APIs for every approved organisation:
+Use a scheduled or manually invoked Lambda as the report runner. It should
+validate the approved configuration and latest complete GitHub population
+snapshot, submit partition-pruned SQL to the existing Athena workgroup, read
+the query results, render the agreed report files and publish them to a
+separately approved destination. Athena should read the existing
+`github_audit_logs.enterprise_audit_logs` Glue table over the streamed audit
+logs. The Lambda, its execution role, trigger and report destination do not
+currently exist in this component and must be designed, reviewed and added
+through a separate implementation change; this runbook does not make those
+changes.
+
+The existing catalog and workgroup are the starting point, not a guarantee
+that they need no changes. Inspect real records and validate the deployed
+configuration before deciding:
+
+| Resource | Required approach | Change only if validation shows it is needed |
+| --- | --- | --- |
+| Glue database and table in [`athena.tf`](./athena.tf) | Reuse `github_audit_logs.enterprise_audit_logs` and its `datehour` projection when its deployed location, partition layout and schema match the production data. | If required event properties are absent, update the table's `storage_descriptor.columns` with verified types and SerDe mappings in Terraform. For unstable or nested event shapes, prefer a separately managed derived table or view over changing the existing table in a way that could break its consumers. Change the S3 location or partition projection only if the actual log layout requires it. Test schema compatibility and malformed-record effects before rollout. |
+| Population snapshot and Glue registration | No report population snapshot or corresponding Glue table is defined in this component. | Store a complete, approved snapshot in its approved S3 location and register a separate Glue table with at least `snapshot_run_id`, `user_id`, `login` and `org`. Define its schema, partitioning and retention to match the actual snapshot format. Do not mix membership snapshots into the audit-log table or infer the population from activity events. |
+| Athena workgroup and results bucket in [`athena.tf`](./athena.tf) | Use `github-audit-logs` and its enforced configuration, encrypted result location, metrics and 10 GiB per-query scan cutoff. Design queries to prune `datehour` partitions and remain within that cutoff. | Change the workgroup cutoff, result location or encryption only through reviewed Terraform changes if the approved report design cannot operate with the current settings. Update the associated bucket/KMS permissions consistently. Do not bypass the cutoff or treat the query-results bucket as final report storage. |
+| Lambda execution role and report destination | Create a separate least-privilege report identity and an approved destination for published files; keep the existing audit-log uploader role dedicated to ingestion. | Add only the required query, Glue metadata, audit-data, snapshot, result, report-write and KMS permissions to the relevant identities and resource policies. These resources and permissions are not currently defined for a report in this component. |
+
+No Glue or Athena Terraform change should be made pre-emptively. Any required
+change must be based on verified deployed schemas and representative data,
+reviewed for effects on existing consumers, and validated in the authorised
+environment. Live report-query validation remains outstanding.
+
+### 3. Prepare dated GitHub API snapshots
+
+Provide the Lambda with a complete, dated population snapshot. The preferred
+boundary is a separately operated preparation job or operator-run script
+which writes to an approved location; combining snapshot collection with the
+report Lambda is an implementation choice that needs to account for network
+access, runtime limits, permissions and failure isolation. The report Lambda
+must reject a missing or incomplete snapshot. The preparation process must
+fetch data from GitHub APIs for every approved organisation:
 
 1. **Membership:** paginate through organisation members and outside
    collaborators, retaining stable GitHub user IDs, logins, organisation,
@@ -157,12 +190,12 @@ building it. A date-oriented layout such as
 `snapshots/as_of=<UTC-date>/run_id=<unique-id>/` is illustrative only, not an
 approved bucket or path.
 
-### 3. Port the prototype rules into Athena
+### 4. Port the prototype rules into Athena SQL
 
 The existing Glue table currently declares these top-level fields in
 [`athena.tf`](./athena.tf):
 
-| Glue field | Type in Terraform | Prototype/report use |
+| Glue field | Type in Terraform | Report use |
 | --- | --- | --- |
 | `event_timestamp` | `bigint` | UTC event-time filtering for the agreed window and last qualifying activity. Confirm units and conversion against actual records. |
 | `action` | `string` | Event type/action matching for the rule catalogue. |
@@ -175,15 +208,16 @@ The existing Glue table currently declares these top-level fields in
 | `programmatic_access_type` | `string` | Excluding PAT, SSH-key and GitHub App activity where the prototype rules require it. |
 | `datehour` partition | `string` | Projected audit-log path partition used to limit scanned data. |
 
-Preserve the prototype's event-property extraction and filters as well as
-these top-level fields. The handover requires distinguishing HTTP(S) pushes
-from SSH, internal from private/public repository visibility, and PR activity
-from issue activity. Add or derive any required Glue fields only after checking
-real audit event payloads and documenting schema compatibility; do not assume
-all event-specific properties are top-level columns. The JSON SerDe is
-configured to ignore malformed JSON, so include checks for parse/coverage
-effects rather than treating a successful query as proof that no records were
-skipped.
+Preserve the prototype's event-property extraction and filters in the Lambda's
+Athena SQL as well as these top-level fields. The handover requires
+distinguishing HTTP(S) pushes from SSH, internal from private/public
+repository visibility, and PR activity from issue activity. Check real audit
+event payloads before deciding whether the Glue table needs additional typed
+columns or mappings. Do not assume event-specific properties are top-level
+columns. The JSON SerDe is configured to ignore malformed JSON, so include
+checks for parse/coverage effects rather than treating a successful query as
+proof that no records were skipped. Any table or workgroup changes must follow
+the conditional Terraform guidance above.
 
 Port the 20 documented GitHub qualifying activities as a versioned rule
 catalogue. The prototype says 14 have audit-event mappings; several are
@@ -251,13 +285,112 @@ collection gaps or partial mappings. A report with incomplete coverage must
 be marked incomplete and must not present unobserved activity as proof of
 dormancy.
 
-### 4. Build the Lambda/Athena/rendering flow
+#### Illustrative Athena candidate query
 
-Use the agreed schedule or an approved manual trigger to start a report run.
+The audit-log table contains events, not the complete set of users. It cannot
+return users with no qualifying events unless the query also starts from a
+complete population snapshot. The example below assumes a separately
+registered Glue table named `github_audit_logs.report_population_snapshot`
+with `snapshot_run_id`, `user_id`, `login` and `org` columns. That table does
+not currently exist in this component; its approved S3 location and Glue
+definition are prerequisites described above.
+
+This is a **SQL template, not a validated production query**. Replace both
+marked rule placeholders with the complete, reviewed event predicates from
+the versioned rule catalogue, including event-property filters, exclusions
+and recipient attribution for membership-add events. Check every column and
+predicate against live Glue metadata and real records. Do not execute it or
+publish its results until the placeholders have been replaced and the query
+has passed the validation and prototype-comparison steps below.
+
+```sql
+-- Illustrative only: replace the marked rule placeholders before execution.
+WITH snapshot_rows AS (
+    SELECT user_id, login, org
+    FROM github_audit_logs.report_population_snapshot
+    WHERE snapshot_run_id = ?
+),
+population AS (
+    SELECT
+        user_id,
+        max(login) AS login,
+        array_sort(array_agg(DISTINCT org)) AS organisations
+    FROM snapshot_rows
+    GROUP BY user_id
+),
+approved_scope AS (
+    SELECT DISTINCT org
+    FROM snapshot_rows
+),
+qualifying_events AS (
+    SELECT
+        CASE
+            WHEN (<verified membership-add event predicate>) THEN e.user_id
+            ELSE e.actor_id
+        END AS report_user_id,
+        e.event_timestamp
+    FROM github_audit_logs.enterprise_audit_logs AS e
+    INNER JOIN approved_scope AS s
+        ON e.org = s.org
+    WHERE e.datehour >= ?
+      AND e.datehour < ?
+      AND e.event_timestamp >= ?
+      AND e.event_timestamp < ?
+      AND (
+          <complete verified qualifying-event predicates and exclusions>
+      )
+),
+activity AS (
+    SELECT
+        report_user_id,
+        max(event_timestamp) AS last_qualifying_event_timestamp,
+        count(*) AS qualifying_event_count
+    FROM qualifying_events
+    WHERE report_user_id IS NOT NULL
+    GROUP BY report_user_id
+)
+SELECT
+    p.user_id,
+    p.login,
+    p.organisations
+FROM population AS p
+LEFT JOIN activity AS a
+    ON a.report_user_id = p.user_id
+WHERE a.report_user_id IS NULL
+ORDER BY p.login, p.user_id;
+```
+
+After verifying that the chosen Athena engine and Lambda API path support
+execution parameters, bind values in this order: snapshot run ID; inclusive
+lower `datehour`; exclusive upper `datehour`; inclusive lower event timestamp;
+exclusive upper event timestamp. Derive the snapshot run ID and organisation
+scope from validated, approved configuration—not request input.
+Format partition bounds as UTC `yyyy/MM/dd/HH` strings matching the deployed
+projection, rounding the lower bound down and the exclusive upper bound up to
+cover every intersecting hour. Keep the exact UTC window in the timestamp
+bounds. Confirm whether `event_timestamp` is in seconds or milliseconds from
+live records before converting the agreed UTC boundaries to its integer units.
+The `?` markers are value parameters, not text substitution. If the selected
+Athena API/engine path does not support execution parameters, construct SQL
+only from validated configuration and an explicit organisation allowlist,
+with correct SQL literal escaping; never concatenate unchecked input.
+
+This example returns candidates only from the selected snapshot and approved
+scope. Deduplicate and attribute activity by stable GitHub user ID, not login.
+An incomplete snapshot, missing actor/recipient IDs, malformed records,
+unavailable event mappings or uncovered audit partitions must mark the run
+incomplete rather than cause the Lambda to publish users as candidates.
+
+### 5. Implement the Lambda/Athena/rendering flow
+
+Implement the report runner as a Lambda invoked by the agreed schedule or an
+approved manual trigger. The Lambda coordinates snapshot validation, Athena
+queries against the existing Glue table, report rendering and publication.
 The proposed flow is:
 
 1. Load and validate configuration, reporting-window boundaries, scope and
-   the latest complete membership/team/repository-visibility snapshot.
+   the latest complete membership/team/repository-visibility snapshot from
+   the approved location.
    Refuse to publish if the snapshot is missing, stale, incomplete or outside
    the approved scope.
 2. Start a parameterised or safely constructed Athena query in the existing
@@ -281,14 +414,14 @@ The proposed flow is:
    non-sensitive metadata for diagnosis, notify the agreed operational owner
    and leave the last successful report intact.
 
-Athena query execution is asynchronous. Decide whether the implementation
-uses bounded polling within Lambda's configured timeout or a separate,
-approved continuation/orchestration mechanism. Do not make a Lambda wait
-indefinitely or assume its timeout, memory, networking or concurrency
-settings. If result volume may exceed Lambda limits, agree a streaming or
-Athena-side output design before implementation.
+Athena query execution is asynchronous. Implement bounded polling within the
+Lambda's configured timeout or use a separately approved continuation or
+orchestration mechanism. Do not make a Lambda wait indefinitely or assume its
+timeout, memory, networking or concurrency settings. If result volume may
+exceed Lambda limits, agree a streaming or Athena-side output design before
+implementation.
 
-### 5. Add configuration, security and operations
+### 6. Add configuration, security and operations
 
 Keep the following as explicit, reviewed configuration rather than implicit
 constants: approved organisation/repository scope; reporting window and UTC
@@ -300,8 +433,11 @@ values. Do not put secrets in Terraform variables, source control, Lambda
 environment values in plaintext, or logs.
 
 The proposed Lambda role should be separate from the GitHub log uploader role
-and scoped to only the required operations and exact resources. Review, at
-minimum:
+and scoped to only the required operations and exact resources. It needs
+permission to start and inspect Athena queries in the selected workgroup, read
+the required Glue catalog metadata, and access the S3/KMS locations used for
+source data, snapshots, query results and published reports as appropriate.
+Review, at minimum:
 
 - read access to the approved snapshot prefix and the audit bucket objects
   needed by Athena, plus only the required Glue catalog metadata access;
@@ -360,7 +496,8 @@ Do not mark the implementation complete until all of the following pass:
    independent checks. Investigate missing actor IDs, malformed JSON,
    missing days and organisation mismatches. Do not claim complete delivery
    based only on the absence of an observed gap.
-5. **Prototype comparison:** run both implementations for the same
+5. **Prototype comparison:** run the proposed Lambda/Athena report and the
+   existing prototype for the same
    organisations, membership snapshot/as-of time, UTC window, exclusions and
    cutoff. Compare population, active/candidate classifications, per-user
    differences, rule counts and organisation summaries. Investigate every
@@ -401,7 +538,7 @@ The issue handover reports that:
   and some mappings are partial or proxies.
 - For the exploratory 8 October comparison, 744 of 775 users in GitHub's
   export were also candidates, one was classified active, 30 were absent from
-  the two-organisation population, and the prototype had 113 additional
+  the two-organisation population, and the prototype produced 113 additional
   candidates. Investigated discrepancy groups overlapped and did not establish
   a single cause.
 
