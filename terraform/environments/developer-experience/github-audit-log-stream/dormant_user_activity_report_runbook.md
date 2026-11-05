@@ -37,7 +37,7 @@ All of this is in this Terraform component and only created in production
 | KMS key | [`kms-keys.tf`](./kms-keys.tf) | Encrypts both buckets. |
 | VPC and subnet lookups | [`platform_data.tf`](./platform_data.tf) | Shared data sources. The report may not need a VPC at all. |
 
-Not built yet: the report Lambda and its role, the schedule, the snapshot job
+Not built yet: the report Lambda and its role, the schedule, the preparation jobs
 and its storage, the report bucket and alerting.
 
 The prototype's four outputs (`dormant_report.csv`, `rules.csv`,
@@ -103,36 +103,59 @@ work for the report. If changes are needed, make them in Terraform, check the
 effect on existing consumers, and don't raise the scan limit or use the
 results bucket for report output.
 
-### 2. Snapshot job
+### 2. Prepare and publish snapshots
 
 The audit log can't show who has *no* activity, so the report needs a dated
-snapshot of everyone in scope. Run this as its own job or operator script
-rather than inside the report Lambda, so API limits and failures stay
-separate.
+snapshot of everyone in scope. Implement separate preparation scripts or
+jobs outside the report Lambda for these three inputs:
 
-For each organisation in scope, collect:
+| Input | Preparation and checks |
+| --- | --- |
+| Approved organisation user/membership list | Fetch members and outside collaborators for every approved organisation, with stable user ID, login, organisation and membership type. Fetch team membership where the report requires it, keyed by user ID. Complete all pagination and record any organisation or team that could not be read. |
+| Repository visibility | Fetch repository names, organisations and visibility for the approved scope, with complete pagination. Check unique repository identities and allowed visibility values. Missing or unknown visibility must not be assumed internal. |
+| Reviewed allowlist | Publish the account list curated and approved by the report owner, retaining stable user ID, owner and reason for each entry and review metadata in its manifest. Check duplicate IDs, missing owners/reasons and whether entries still match the population. Flag unmatched entries for review rather than silently dropping them. |
 
-- **members and outside collaborators:** user ID, login, org and membership
-  type. Join on user ID, never login.
-- **team membership:** keyed by user ID. Record any team or org that couldn't
-  be read.
-- **repository visibility:** repo, org and visibility, so internal pushes can
-  be told apart from private and public ones.
+The allowlist is a reviewed reporting exception, not a list inferred from bot
+flags or lack of activity. An entry does not establish that an account is
+automatically safe, unneeded or approved for removal. Its owner and reason
+must stay current and it must be reviewed periodically. No real allowlist or
+preparation job is supplied by this PR; the test fixtures are synthetic.
 
-The job should:
+The API preparation jobs should:
 
 - page through every response and retry rate limits and transient errors with
   backoff
 - fail the whole snapshot on permission errors, incomplete pagination,
   unexpected empty results or a missing org
 - check required fields, duplicate IDs and big swings from the previous run
-- write to a unique run prefix such as
-  `snapshots/as_of=<date>/run_id=<id>/` (layout to be agreed), with a
-  manifest (run ID, as-of time, scope, per-org counts, checksums, script
-  version) written last as the completion marker
-- never overwrite the last good snapshot
 - keep the GitHub credential in Secrets Manager and out of logs, and skip
   email addresses unless that use is approved
+
+Each preparation job must validate required fields, data types, uniqueness,
+scope and plausible changes from the previous snapshot before publishing.
+For membership and teams, check user-ID references and per-organisation
+coverage; for the allowlist, record the reviewer and review date. API failures,
+partial coverage or missing approval must produce a failed/incomplete run,
+not a successful empty dataset.
+
+Upload each validated dataset to a unique dated run prefix in the approved,
+access-controlled S3 bucket, for example
+`snapshots/as_of=<date>/run_id=<id>/`. The actual bucket, dataset prefixes,
+encryption, readers, retention and layout still need configuration and
+approval; this example is not an existing destination, and the Athena results
+bucket must not be assumed suitable. Verify uploaded sizes and checksums,
+then write a manifest/completion marker last with run ID, as-of time, scope,
+counts, checksums, preparation version and validation/review status. Never
+overwrite the last good snapshot with partial data.
+
+The report Lambda consumes only completed snapshots from these S3 locations.
+It validates their manifests, approved scope, freshness and compatibility
+before querying the Glue tables over those objects. Select a compatible
+population and visibility run, and record the approved allowlist version used
+for the report. The baseline allowlist table has no run-ID filter, so its
+approved location must expose only the selected complete version, not a
+mixture of dated versions. Dataset uploads without completion markers must
+not be visible to report queries.
 
 The report reads three Glue tables over the snapshot data. None exist yet:
 
@@ -240,8 +263,10 @@ scanned; the timestamp filter does the exact cut.
 
 Each run:
 
-1. loads config and the latest complete snapshot, and stops if it's missing,
-   stale or out of scope
+1. loads config and the completed membership/team, repository-visibility and
+   reviewed allowlist snapshots from approved S3 locations; validates their
+   manifests and stops if any required input is missing, incomplete, stale,
+   unreviewed or out of scope
 2. runs the query in the `github-audit-logs` workgroup with tight `datehour`
    and timestamp filters, logging the query execution ID and run IDs
 3. polls Athena with a bounded wait inside the Lambda timeout, or hands off
@@ -295,9 +320,12 @@ but no usernames, tokens or report rows.
 
 ## Acceptance
 
-1. **Snapshots:** pagination, ID joins, member, collaborator, team and
-   visibility coverage, rate limits, retries and empty results are tested. A
-   partial snapshot fails and can't replace the last good one.
+1. **Snapshots:** separate membership/team, repository-visibility and reviewed
+   allowlist preparation jobs are checked for pagination, ID joins, scope,
+   required fields, duplicate handling, review metadata, rate limits, retries
+   and empty results. Upload checksums and completion markers are verified;
+   the Lambda rejects incomplete or unapproved inputs. A partial snapshot
+   fails and can't replace the last good one.
 2. **Rules:** fixtures cover every rule, exclusion, proxy and membership-add
    case, plus UTC boundaries, duplicates, multi-org users, missing IDs and the
    score denominator.
