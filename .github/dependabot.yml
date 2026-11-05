@@ -642,6 +642,7 @@ updates:
     directories:
       - "terraform/environments/developer-experience"
       - "terraform/environments/developer-experience/auth0-event-stream"
+      - "terraform/environments/developer-experience/dns"
       - "terraform/environments/developer-experience/github-audit-log-stream"
       - "terraform/environments/developer-experience/github-backup"
       - "terraform/environments/developer-experience/github-management"
