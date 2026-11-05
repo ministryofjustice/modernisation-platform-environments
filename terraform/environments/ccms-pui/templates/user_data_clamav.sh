@@ -38,6 +38,6 @@ EOF
 # Initial ClamAV database update before enabling services
 freshclam
 
-# Enable ClamAV Scan Daemon and Freshclam Services
+# Enable and Activate ClamAV Scan Daemon and Freshclam Services
 systemctl enable --now clamav-freshclam.service
 systemctl enable --now clamd@scan.service
