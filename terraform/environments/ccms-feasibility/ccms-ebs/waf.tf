@@ -1,11 +1,14 @@
 module "waf" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/waf?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/ab13c35
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/waf?ref=ab13c35"
 
   name                 = "${local.component_name}-${local.env_label}"
   alb_arn              = module.alb.alb_arn
   enable_managed_rules = false
   tags                 = local.tags
+
+  # Block AppsTCFServer for all callers, matching ccms-ebs (SRE-211)
+  blocked_uri_paths = ["/oa_html/appstcfserver"]
 
   ip_allowlist = [
     data.aws_vpc.shared.cidr_block,

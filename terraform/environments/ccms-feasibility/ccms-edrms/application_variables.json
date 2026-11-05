@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "ami_image_id": "ami-02f77a03ec776dc35",
+      "ami_image_id": "ami-0ff750c02625633f5",
       "ec2_instance_type": "m5.large",
       "ec2_min_capacity": 1,
       "ec2_max_capacity": 3,

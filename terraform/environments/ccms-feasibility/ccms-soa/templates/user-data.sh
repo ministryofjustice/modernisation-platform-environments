@@ -59,8 +59,8 @@ chmod 777 $OUTBOUND_S3_MOUNT_POINT
 chown -R 1000:1000 $INBOUND_S3_MOUNT_POINT
 chown -R 1000:1000 $OUTBOUND_S3_MOUNT_POINT
 
-mount-s3 ${inbound_bucket} $INBOUND_S3_MOUNT_POINT --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
-mount-s3 ${outbound_bucket} $OUTBOUND_S3_MOUNT_POINT --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
+mount-s3 ${inbound_bucket} $INBOUND_S3_MOUNT_POINT --allow-delete --allow-overwrite --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
+mount-s3 ${outbound_bucket} $OUTBOUND_S3_MOUNT_POINT --allow-delete --allow-overwrite --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
 
 #--Create essential subdirs in S3 Bucket
 mkdir -p \

@@ -1,12 +1,13 @@
 {
   "accounts": {
     "development": {
-      "ami_image_id": "ami-02f77a03ec776dc35",
+      "ami_image_id": "ami-0ff750c02625633f5",
       "gh_runner_ami_id": "ami-002aab1cab5a08e35",
 
       "ec2_instance_type": "m5.xlarge",
       "ec2_instance_type_gh_runner": "t2.small",
       "instance_role_gh_runner": "gh-runner",
+      "gh_runner_root_volume_size": 30,
       "ec2_min_capacity": 1,
       "ec2_max_capacity": 2,
       "ec2_desired_capacity": 1,
@@ -14,7 +15,7 @@
 
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "ccms-oia-dev-bf589eb-SNAPSHOT",
-      "opa_app_count": 0,
+      "opa_app_count": 1,
       "opa_server_port": 7001,
       "opa_container_cpu": 2048,
       "opa_container_memory": 6144,
@@ -26,7 +27,7 @@
       "connector_server_port": 8080,
       "connector_container_cpu": 512,
       "connector_container_memory": 2048,
-      "connector_desired_count": 0,
+      "connector_desired_count": 1,
       "environment_connector": "feasibility",
       "ccms_soa_url_ebsReferenceDataEndpoint": "",
       "ccms_pui_connector_assessservice_url_means": "",
@@ -47,7 +48,7 @@
       "adaptor_server_port": 8080,
       "adaptor_container_cpu": 512,
       "adaptor_container_memory": 2048,
-      "adaptor_desired_count": 0,
+      "adaptor_desired_count": 1,
       "adaptor_spring_profile": "aws",
       "client_opa12assess_means_address": "",
       "client_opa12assess_billing_address": "",
@@ -59,7 +60,8 @@
       "db_storage_gb": 100,
       "db_deletion_protection": true,
       "db_log_retention_days": 30,
-      "alb_deletion_protection": true
+      "alb_deletion_protection": true,
+      "aws_workspace": "10.200.0.0/19"
     }
   }
 }
