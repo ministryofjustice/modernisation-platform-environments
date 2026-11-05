@@ -73,4 +73,4 @@ The VPC owner must provision the interface endpoints in the shared VPC,
 selecting supported availability zones and allowing the agent to reach the
 API on TCP 443 and the SSH gateway on TCP 22. PDC networks, agent credentials,
 agents, and target security-group rules are a separate deployment. Grafana
-Cloud management API calls and browser access remain public HTTPS.grafana-cloud.md
+Cloud management API calls and browser access remain public HTTPS.
