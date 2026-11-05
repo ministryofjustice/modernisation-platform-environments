@@ -303,6 +303,46 @@ locals {
       }
     }
 
+    # Allow Pre-Production RMAN Catalog to import Production RMAN Catalog for refreshes
+    s3_buckets = contains(keys(module.baseline_presets.s3_buckets), "prod-hmpps-oem-db-backup-bucket-") ? {
+      "prod-hmpps-oem-db-backup-bucket-" = merge(
+        module.baseline_presets.s3_buckets["prod-hmpps-oem-db-backup-bucket-"],
+        {
+          bucket_policy_v2 = [
+            {
+              sid    = "S3ReadProdPreprod"
+              effect = "Allow"
+              actions = [
+                "s3:Get*",
+                "s3:ListBucket",
+              ]
+              principals = {
+                type = "AWS"
+                identifiers = [
+                  "arn:aws:iam::128485831926:root",
+                  "arn:aws:iam::411333525523:root"
+                ]
+              }
+            },
+            {
+              sid    = "AllowEC2DatabaseRolePreprodOEM"
+              effect = "Allow"
+              actions = [
+                "s3:Get*",
+                "s3:ListBucket",
+              ]
+              principals = {
+                type = "AWS"
+                identifiers = [
+                  "arn:aws:iam::128485831926:role/ec2-database-role-preprod-oem-a"
+                ]
+              }
+            }
+          ]
+        }
+      )
+    } : {}
+
     secretsmanager_secrets = {
       "/oracle/oem"              = local.secretsmanager_secrets.oem
       "/oracle/database/EMREP"   = local.secretsmanager_secrets.oem

@@ -27,12 +27,75 @@ resource "aws_iam_instance_profile" "ssogen_instance_profile" {
   })
 }
 
-# Attach SSM permissions (Session Manager, logging, patching, etc.)
-resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
+# Customer-managed equivalent of AmazonSSMManagedInstanceCore.
+resource "aws_iam_policy" "ssogen_ssm_custom" {
   count = local.ssogen_enabled ? 1 : 0
 
-  role       = aws_iam_role.ssogen_ec2[0].name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  name        = "CustomSSMManagedInstanceCore"
+  description = "Standard Systems Manager core permissions for SSOGEN EC2 instances"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:DescribeAssociation",
+          "ssm:GetDeployablePatchSnapshotForInstance",
+          "ssm:GetDocument",
+          "ssm:DescribeDocument",
+          "ssm:GetManifest",
+          "ssm:ListAssociations",
+          "ssm:ListInstanceAssociations",
+          "ssm:PutInventory",
+          "ssm:PutComplianceItems",
+          "ssm:PutConfigurePackageResult",
+          "ssm:UpdateAssociationStatus",
+          "ssm:UpdateInstanceAssociationStatus",
+          "ssm:UpdateInstanceInformation"
+        ]
+        Resource = "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ],
+        "Resource" : ["arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/*"]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2messages:AcknowledgeMessage",
+          "ec2messages:DeleteMessage",
+          "ec2messages:FailMessage",
+          "ec2messages:GetEndpoint",
+          "ec2messages:GetMessages",
+          "ec2messages:SendReply"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# Attach the customer-managed SSM core policy to the SSOGEN EC2 role.
+resource "aws_iam_role_policy_attachment" "ssogen_ssm_custom" {
+  count = local.ssogen_enabled ? 1 : 0
+
+  role       = aws_iam_role.ssogen_ec2[count.index].name
+  policy_arn = aws_iam_policy.ssogen_ssm_custom[count.index].arn
 }
 
 resource "aws_kms_alias" "a" {
@@ -62,6 +125,15 @@ resource "aws_kms_key" "ssogen_kms_key" {
         "Effect" : "Allow",
         "Principal" : {
           "AWS" : "arn:aws:iam::${jsondecode(data.aws_secretsmanager_secret_version.dev_account_secret[count.index].secret_string).dev_account_id}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "AllowRootAccountAdminForTestAccount",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${jsondecode(data.aws_secretsmanager_secret_version.dev_account_secret[count.index].secret_string).test_account_id}:root"
         },
         "Action" : "kms:*",
         "Resource" : "*"
@@ -156,8 +228,18 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource": "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/*"
+      "Resource": [
+        "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:*ssogen*:*",
+        "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:*var-log*:*"
+      ]
     },
+    {
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup"
+        ],
+        "Resource": "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"
+      },
     {
       "Effect": "Allow",
       "Action": [
@@ -166,9 +248,8 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
         "ds:DescribeDirectories",
         "ec2:DescribeInstanceStatus",
         "ec2:DescribeTags",
-        "logs:*",
-        "ssm:*",
-        "ec2messages:*"
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
       ],
       "Resource": "*"
     },
@@ -199,11 +280,11 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:*"]
+      "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}-dev-account-secrets"]
     },
     {
       "Effect": "Allow",
-      "Action": ["kms:CreateGrant", "kms:DescribeKey", "kms:ReEncrypt", "kms:GenerateDataKeyWithoutPlainText", "kms:Decrypt"],
+      "Action": ["kms:DescribeKey", "kms:ReEncrypt", "kms:GenerateDataKeyWithoutPlainText", "kms:Decrypt"],
       "Resource": "${aws_kms_key.ssogen_kms_key[count.index].arn}"
     }
   ]

@@ -92,6 +92,11 @@ app:
         secretKeyRef:
           name: app-secrets
           key: notify-project-member-removed-template-id
+    - name: NOTIFY_BUDGET_ALERT_TEMPLATE_ID
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: notify-budget-alert-template-id
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool

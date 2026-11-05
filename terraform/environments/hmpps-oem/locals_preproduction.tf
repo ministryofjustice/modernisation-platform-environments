@@ -277,6 +277,25 @@ locals {
       })
     }
 
+    iam_policies = {
+      Ec2OracleEnterpriseManagerPolicy = merge(local.baseline_all_environments.iam_policies.Ec2OracleEnterpriseManagerPolicy, {
+        statements = concat(local.baseline_all_environments.iam_policies.Ec2OracleEnterpriseManagerPolicy.statements, [
+          {
+            sid    = "S3ReadProductionBackup"
+            effect = "Allow"
+            actions = [
+              "s3:ListBucket",
+              "s3:GetObject",
+            ]
+            resources = [
+              "arn:aws:s3:::prod-hmpps-oem-db-backup-bucket-20230815102157276300000001",
+              "arn:aws:s3:::prod-hmpps-oem-db-backup-bucket-20230815102157276300000001/*",
+            ]
+          }
+        ])
+      })
+    }
+
     oam_sinks = {
       "CloudWatchMetricOamSink" = {
         resource_types = ["AWS::CloudWatch::Metric"]

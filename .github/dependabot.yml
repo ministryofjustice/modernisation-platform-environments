@@ -251,18 +251,6 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
-      - "terraform/environments/cdpt-chaps"
-    schedule:
-      interval: "daily"
-    groups:
-      cdpt-chaps:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
       - "terraform/environments/cdpt-ifs"
     schedule:
       interval: "daily"
@@ -475,6 +463,9 @@ updates:
       - "terraform/environments/data-factory-moj/dms-core/modules/dms-test-harness"
       - "terraform/environments/data-factory-moj/dms-core/modules/oracle-test-harness"
       - "terraform/environments/data-factory-moj/genesys-data-ingestion"
+      - "terraform/environments/data-factory-moj/ingestion-artifacts"
+      - "terraform/environments/data-factory-moj/ingestion-registry"
+      - "terraform/environments/data-factory-moj/service-ingestion"
       - "terraform/environments/data-factory-moj/streaming-poc"
       - "terraform/environments/data-factory-moj/streaming-poc-devops"
       - "terraform/environments/data-factory-moj/streaming-poc-maf"
@@ -737,7 +728,6 @@ updates:
       - "terraform/environments/electronic-monitoring-data/modules/ap_airflow_iam_role"
       - "terraform/environments/electronic-monitoring-data/modules/ap_airflow_load_data_iam_role"
       - "terraform/environments/electronic-monitoring-data/modules/api_step_function"
-      - "terraform/environments/electronic-monitoring-data/modules/dms"
       - "terraform/environments/electronic-monitoring-data/modules/export_bucket_presigned_url"
       - "terraform/environments/electronic-monitoring-data/modules/export_bucket_push"
       - "terraform/environments/electronic-monitoring-data/modules/glue_table_optimiser"
@@ -909,6 +899,10 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/integration-hub-events"
+      - "terraform/environments/integration-hub-events/api"
+      - "terraform/environments/integration-hub-events/api-client-lib"
+      - "terraform/environments/integration-hub-events/event-subscriber-admin-ui"
+      - "terraform/environments/integration-hub-events/kafka"
     schedule:
       interval: "daily"
     groups:
