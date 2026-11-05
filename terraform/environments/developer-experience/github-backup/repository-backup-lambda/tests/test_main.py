@@ -1,8 +1,12 @@
 import os
 import sys
+import tempfile
 import unittest
 from base64 import urlsafe_b64decode
 from unittest import mock
+
+from dulwich.objects import Blob, Commit, Tree
+from dulwich.repo import Repo
 
 os.environ.update(
     {
@@ -14,7 +18,9 @@ os.environ.update(
 )
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-import main  # noqa: E402
+# Avoid the AWS credential chain (and instance metadata lookups) at import time.
+with mock.patch("boto3.client"):
+    import main  # noqa: E402
 
 PAGE_ONE = [
     {"repository_full_name": "example/public", "properties": [{"property_name": "backup", "value": "true"}]},
@@ -83,15 +89,22 @@ class BackupTests(unittest.TestCase):
 
     def test_uploads_date_partitioned_archive(self):
         properties = ([{"property_name": "backup", "value": "true"}], None)
+        work_dir = os.path.join(tempfile.mkdtemp(), "work")
+        os.makedirs(work_dir)
+        stale_file = os.path.join(work_dir, "left-by-timed-out-run.tar.gz")
+        open(stale_file, "w").close()
 
         def fake_mirror(_repository, _token, mirror_dir):
+            self.assertFalse(os.path.exists(stale_file))
             os.makedirs(mirror_dir)
             with open(os.path.join(mirror_dir, "HEAD"), "w") as head:
                 head.write("ref: refs/heads/main\n")
 
-        with mock.patch.object(main, "get_installation_token", return_value="token"), mock.patch.object(
-            main, "github_request", return_value=properties
-        ), mock.patch.object(main, "mirror_repository", side_effect=fake_mirror), mock.patch.object(
+        with mock.patch.object(main, "WORK_DIR", work_dir), mock.patch.object(
+            main, "get_installation_token", return_value="token"
+        ), mock.patch.object(main, "github_request", return_value=properties), mock.patch.object(
+            main, "mirror_repository", side_effect=fake_mirror
+        ), mock.patch.object(
             main, "s3"
         ) as s3:
             result = main.handler({"repository": "example/repo"}, None)
@@ -100,6 +113,37 @@ class BackupTests(unittest.TestCase):
         self.assertEqual(bucket, "approved-bucket")
         self.assertRegex(key, r"^example/repo/\d{8}/repo-\d{8}T\d{6}Z-[0-9a-f]{8}\.tar\.gz$")
         self.assertEqual(result["key"], key)
+        self.assertFalse(os.path.exists(work_dir))
+
+
+class ConnectivityTests(unittest.TestCase):
+    def setUp(self):
+        self.repo = Repo.init_bare(tempfile.mkdtemp())
+        self.addCleanup(self.repo.close)
+        blob = Blob.from_string(b"content")
+        self.tree = Tree()
+        self.tree.add(b"file.txt", 0o100644, blob.id)
+        self.repo.object_store.add_objects([(blob, None), (self.tree, None)])
+
+    def commit(self, parents=()):
+        commit = Commit()
+        commit.tree = self.tree.id
+        commit.parents = list(parents)
+        commit.author = commit.committer = b"Test <test@example.com>"
+        commit.author_time = commit.commit_time = 0
+        commit.author_timezone = commit.commit_timezone = 0
+        commit.message = b"test"
+        self.repo.object_store.add_object(commit)
+        return commit
+
+    def test_accepts_complete_history(self):
+        self.repo.refs[b"refs/heads/main"] = self.commit(parents=[self.commit().id]).id
+        main.check_connectivity(self.repo)
+
+    def test_rejects_missing_parent(self):
+        self.repo.refs[b"refs/heads/main"] = self.commit(parents=[b"0" * 40]).id
+        with self.assertRaisesRegex(RuntimeError, "Missing object"):
+            main.check_connectivity(self.repo)
 
 
 if __name__ == "__main__":

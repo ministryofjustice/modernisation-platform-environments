@@ -10,8 +10,8 @@ import logging
 import os
 import re
 import shutil
+import stat
 import tarfile
-import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -24,6 +24,7 @@ import boto3
 import rsa
 from dulwich import porcelain
 from dulwich.client import get_transport_and_path
+from dulwich.objects import S_ISGITLINK, Commit, Tag, Tree
 from dulwich.repo import Repo
 
 logger = logging.getLogger()
@@ -35,6 +36,7 @@ GITHUB_APP_SECRET_ARN = os.environ["GITHUB_APP_SECRET_ARN"]
 BACKUP_BUCKET = os.environ["BACKUP_BUCKET"]
 BACKUP_PROPERTY = "backup"
 REPOSITORY_NAME_PATTERN = re.compile(r"^[A-Za-z0-9_.-]+$")
+WORK_DIR = "/tmp/repository-backup"
 
 secrets_manager = boto3.client("secretsmanager")
 s3 = boto3.client("s3")
@@ -153,12 +155,46 @@ def mirror_repository(repository: str, token: str, mirror_dir: str) -> None:
         head_target = (result.symrefs or {}).get(b"HEAD")
         if head_target:
             repo.refs.set_symbolic_ref(b"HEAD", head_target)
+        check_connectivity(repo)
     finally:
         repo.close()
 
     errors = list(porcelain.fsck(mirror_dir))
     if errors:
         raise RuntimeError(f"Integrity check failed for {repository}: {errors[:5]}")
+
+
+def check_connectivity(repo: Repo) -> None:
+    """Fail if any object reachable from a ref is missing; dulwich's fsck doesn't walk the graph."""
+    store = repo.object_store
+    pending = list(repo.get_refs().values())
+    seen = set()
+    while pending:
+        sha = pending.pop()
+        if sha in seen:
+            continue
+        seen.add(sha)
+        try:
+            obj = store[sha]
+        except KeyError:
+            raise RuntimeError(f"Missing object {sha.decode()}") from None
+
+        if isinstance(obj, Commit):
+            pending.append(obj.tree)
+            pending.extend(obj.parents)
+        elif isinstance(obj, Tag):
+            pending.append(obj.object[1])
+        elif isinstance(obj, Tree):
+            for entry in obj.iteritems():
+                if S_ISGITLINK(entry.mode):
+                    continue  # Submodule commits live in another repository.
+                if stat.S_ISDIR(entry.mode):
+                    pending.append(entry.sha)
+                elif entry.sha not in seen:
+                    # Check blobs exist without reading their contents.
+                    if entry.sha not in store:
+                        raise RuntimeError(f"Missing object {entry.sha.decode()}")
+                    seen.add(entry.sha)
 
 
 def backup_repository(repository: str) -> dict:
@@ -171,15 +207,17 @@ def backup_repository(repository: str) -> dict:
         logger.info("Skipping %s: backup is not set to true", repository)
         return {"repository": repository, "skipped": True}
 
-    work_dir = tempfile.mkdtemp(dir="/tmp")
+    # A timed-out run skips `finally`, and /tmp persists across warm invocations.
+    shutil.rmtree(WORK_DIR, ignore_errors=True)
+    os.makedirs(WORK_DIR)
     try:
-        mirror_dir = os.path.join(work_dir, f"{name}.git")
+        mirror_dir = os.path.join(WORK_DIR, f"{name}.git")
         logger.info("Creating repository mirror [ %s ]", repository)
         mirror_repository(repository, token, mirror_dir)
 
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         archive_name = f"{name}-{timestamp}-{uuid.uuid4().hex[:8]}.tar.gz"
-        archive_path = os.path.join(work_dir, archive_name)
+        archive_path = os.path.join(WORK_DIR, archive_name)
         with tarfile.open(archive_path, "w:gz") as archive:
             archive.add(mirror_dir, arcname=f"{name}.git")
 
@@ -188,7 +226,7 @@ def backup_repository(repository: str) -> dict:
         # Rely on the bucket's default KMS encryption and enforced ownership.
         s3.upload_file(archive_path, BACKUP_BUCKET, key)
     finally:
-        shutil.rmtree(work_dir, ignore_errors=True)
+        shutil.rmtree(WORK_DIR, ignore_errors=True)
 
     return {"repository": repository, "key": key}
 

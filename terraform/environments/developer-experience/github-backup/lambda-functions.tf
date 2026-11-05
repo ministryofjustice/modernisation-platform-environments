@@ -4,8 +4,10 @@ module "github_backup_function" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda.git?ref=b842374147fc07731d79028517223e9e0cbaab6d" # v8.8.0
 
   function_name = local.component_name
-  description   = "Backs up GitHub repositories that opt in with the backup custom property"
-  handler       = "main.handler"
+  # The github-backup name is already used by the OIDC role in iam-roles.tf.
+  role_name   = "${local.component_name}-lambda"
+  description = "Backs up GitHub repositories that opt in with the backup custom property"
+  handler     = "main.handler"
   # Must match the Python version on the CI runner, which installs requirements.txt.
   runtime = "python3.12"
 
