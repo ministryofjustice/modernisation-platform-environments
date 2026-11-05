@@ -38,6 +38,11 @@ locals {
 
     environment = local.script_runner_environment_variables
 
+    # Used by scripts/notification/send_notification.py.
+    secrets = [{
+      name      = "API_KEY"
+      valueFrom = aws_secretsmanager_secret.gov_uk_notify_api_key.arn
+    }]
     logConfiguration = {
       logDriver = "awslogs"
       options = {
@@ -189,7 +194,7 @@ data "aws_iam_policy_document" "script_runner_ecs_task" {
       "arn:${data.aws_partition.current.partition}:ecs:*:${data.aws_caller_identity.current.account_id}:cluster/*",
     ]
   }
-  
+
   statement {
     sid       = "AllowDescribeTaskDefinition"
     effect    = "Allow"

@@ -6,7 +6,10 @@
       "step_function_retry_attempts": 3,
       "forge_runtime_version": "forge-runtime-v0.4.2",
       "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
-      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
+      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core",
+      "notify_template_id": "",
+      "slack_channel_id": "",
+      "builder_hostname": "ai-builder-dev.modernisation-platform.service.justice.gov.uk"
     },
     "test": {
       "vpc_cidr": "10.0.0.0/16",
@@ -14,7 +17,10 @@
       "step_function_retry_attempts": 3,
       "forge_runtime_version": "forge-runtime-v0.4.2-database",
       "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
-      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
+      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core",
+      "notify_template_id": "",
+      "slack_channel_id": "",
+      "builder_hostname": "ai-builder-test.modernisation-platform.service.justice.gov.uk"
     },
     "preproduction": {
       "vpc_cidr": "10.0.0.0/16",
@@ -22,7 +28,9 @@
       "step_function_retry_attempts": 3,
       "forge_runtime_version": "forge-runtime-v0.4.2",
       "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
-      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
+      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core",
+      "notify_template_id": "",
+      "slack_channel_id": ""
     },
     "production": {
       "vpc_cidr": "10.0.0.0/16",
@@ -30,7 +38,10 @@
       "step_function_retry_attempts": 3,
       "forge_runtime_version": "forge-runtime-v0.4.2",
       "bedrock_model_id": "eu.anthropic.claude-sonnet-5-5",
-      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core"
+      "forge_runtime_base_ecr_repository_name": "modernisation-platform-ai-builder-core",
+      "notify_template_id": "",
+      "slack_channel_id": "",
+      "builder_hostname": "ai-builder.modernisation-platform.service.justice.gov.uk"
     }
   }
 }

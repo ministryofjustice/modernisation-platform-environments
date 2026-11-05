@@ -31,6 +31,21 @@ locals {
       input_path         = "$.build_test_deploy_app_image.Output"
       result_path        = "$.deploy_prototype_app"
     },
+    {
+      # Runs only if build_app_infra succeeded; a failed child fails the root.
+      name               = "notify_user"
+      type               = "step_function"
+      state_machine_name = local.notify_state_machine_name
+      input_path         = "$.build_app_infra.Output"
+      result_path        = "$.notify_user"
+    },
+    {
+      name      = "notify_slack"
+      type      = "sns_publish"
+      topic_arn = aws_sns_topic.job_completion.arn
+      subject   = "Application build completed"
+      message   = "States.Format('Build {} of application {} completed successfully: {}', $.latest.BuildID, ${local.script_runner_app_id_path}, $.build_app_infra.Output.build_infra_task.endpoint_url)"
+    },
   ]
 }
 
@@ -47,5 +62,7 @@ module "step_functions_root" {
     module.step_functions_build_image,
     module.step_functions_deploy_prototype,
     module.step_functions_control_plane,
+    module.step_functions_notify,
+    aws_iam_role_policy.step_functions_common,
   ]
 }
