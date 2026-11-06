@@ -560,6 +560,7 @@ resource "aws_ecs_task_definition" "forge" {
           { name = "FORGE_PACKAGE_S3_REGION", value = data.aws_region.current.region },
           { name = "REVIEW_TABLE_NAME", value = local.build_review_table_name },
           { name = "LLM_MODEL", value = var.bedrock_model_id },
+          { name = "BEDROCK_MAX_TOKENS", value = var.bedrock_max_tokens },
           { name = "LLM_PROVIDER", value = "bedrock" },
           { name = "NODE_ENV", value = "production" },
           { name = "PLAYWRIGHT_BROWSERS_PATH", value = "/ms-playwright" },
