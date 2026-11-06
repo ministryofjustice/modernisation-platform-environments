@@ -28,6 +28,7 @@ locals {
     { name = "BASE_PATH", path = "$.image_build_task.index_html_path" },
     { name = "AWS_REGION", value = data.aws_region.current.region },
     { name = "TASK_EXECUTION_ROLE_ARN", value = aws_iam_role.script_runner_ecs_execution.arn },
+    { name = "TASK_ROLE_ARN", value = aws_iam_role.prototype_app_task.arn },
     { name = "ECS_CLUSTER_ARN", value = local.prototype_deployment.cluster_arn },
     { name = "VPC_ID", value = local.prototype_deployment.vpc_id },
     { name = "PRIVATE_SUBNET_IDS", value = jsonencode(local.prototype_deployment.private_subnet_ids) },
@@ -39,6 +40,7 @@ locals {
     { name = "CNAME_TARGET", value = local.prototype_deployment.load_balancer_dns_name },
   ]
   prototype_deployment_stage_inputs = {
+    table           = []
     task_definition = []
     target_group    = []
     listener_rule   = [{ name = "TARGET_GROUP_ARN", path = "$.target_group.target_group_arn" }]
@@ -48,7 +50,7 @@ locals {
     ]
     dns = []
   }
-  prototype_deployment_steps = [for stage in ["task_definition", "target_group", "listener_rule", "service", "dns"] : {
+  prototype_deployment_steps = [for stage in ["table", "task_definition", "target_group", "listener_rule", "service", "dns"] : {
     name        = "deploy_${stage}"
     type        = "script_runner"
     script_path = "scripts/deployment/prototype_deployment.py"

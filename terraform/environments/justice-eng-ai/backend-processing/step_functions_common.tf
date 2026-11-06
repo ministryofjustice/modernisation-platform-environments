@@ -179,6 +179,20 @@ data "aws_iam_policy_document" "step_functions_common" {
   }
 
   statement {
+    sid       = "PublishJobCompletion"
+    effect    = "Allow"
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.job_completion.arn]
+  }
+
+  statement {
+    sid       = "UseJobCompletionKey"
+    effect    = "Allow"
+    actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
+    resources = [aws_kms_key.job_completion.arn]
+  }
+
+  statement {
     sid       = "StartChildStateMachines"
     effect    = "Allow"
     actions   = ["states:StartExecution"]
