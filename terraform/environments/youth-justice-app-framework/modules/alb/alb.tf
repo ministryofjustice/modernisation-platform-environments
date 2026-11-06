@@ -3,7 +3,7 @@
 module "alb" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/alb/aws"
-  version = "9.9.0"
+  version = "9.17.0"
 
   name               = "${var.alb_name}-${local.alb_suffix}"
   internal           = var.internal
@@ -13,6 +13,7 @@ module "alb" {
   subnets = var.alb_subnets_ids
 
   enable_deletion_protection = false
+  enable_zonal_shift         = var.enable_zonal_shift
 
   create_security_group = false
   security_groups       = [module.alb_sg.security_group_id]
@@ -69,6 +70,8 @@ module "alb_sg" {
 
   computed_ingress_with_source_security_group_id = var.alb_ingress_with_source_security_group_id_rules
   ingress_with_cidr_blocks                       = var.alb_ingress_with_cidr_blocks_rules
+  ingress_prefix_list_ids                        = var.alb_ingress_prefix_list_ids
+  ingress_with_prefix_list_ids                   = var.alb_ingress_with_prefix_list_ids_rules
 
 
   number_of_computed_ingress_with_source_security_group_id = var.count_alb_ingress_with_source_security_group_id_rules

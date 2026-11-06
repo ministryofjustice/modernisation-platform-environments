@@ -5,8 +5,6 @@ module "codedeploy" {
   tags             = local.tags
   cluster_name     = "yjaf-cluster"
   environment      = local.environment
-  ec2_enabled      = true
-  ec2_applications = ["yjsm-hub", "yjsm-hubadmin", "yjsm-ui"]
   services = [
     { "auth" = "internal" },
     { "assets" = "internal" },
@@ -31,18 +29,25 @@ module "codedeploy" {
     { "views" = "internal" },
     { "workflow" = "internal" },
     { "yp" = "internal" },
-    { "yjsm-hub-svc" = "yjsm-hub-svc" }
+    { "yjsm-hub-svc" = "yjsm-hub-svc" },
+    { "yjsm-hub" = "yjsm-hub" },
+    { "yjsm-hubadmin" = "yjsm-hubadmin" },
+    { "yjsm-ui" = "yjsm-ui" }
   ]
 
   internal_alb_name     = "yjaf-int-internal"
   external_alb_name     = "yjaf-ext-external"
   connectivity_alb_name = "yjaf-connectivity-internal"
   yjsm_hub_svc_alb_name = "yjsm-hub-svc-ext-external"
+  yjsm_apps_alb_name    = "yjaf-yjsm-apps-alb-internal"
+  # each yjsm app has its own listener on the yjsm apps ALB
+  yjsm_apps_listener_ports = { for name, app in merge(local.yjsm_juniper_facing_apps, local.yjsm_internal_apps) : name => app.port }
   depends_on = [
     module.internal_alb,
     module.external_alb,
     module.connectivity_alb,
     module.yjsm_hub_svc_alb,
+    module.yjsm_apps_alb,
     module.ecs
   ]
 }
