@@ -86,7 +86,7 @@ module "octo_access_slack_secret" {
   )
 }
 
-module "github_app_secret" {
+module "blueprint_github_app_secret" {
   count = local.is-development ? 1 : 0
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f3d3da1c801816563080065c5f37f212c8dee444" # v2.2.0
