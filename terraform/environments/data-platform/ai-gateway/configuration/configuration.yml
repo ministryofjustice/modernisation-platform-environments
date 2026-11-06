@@ -54,6 +54,13 @@ models:
       generally_available: true
     # Anthropic
     # Batch inference is explicitly enabled per model for the configured batch Region.
+    claude-haiku-5-5:
+      model_id: "eu.anthropic.claude-haiku-5-5"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 5.5"
+      model_location: "United Kingdom"
+      region: eu-west-2
+      generally_available: true
     claude-haiku-4-5:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_family: "Anthropic Claude"
