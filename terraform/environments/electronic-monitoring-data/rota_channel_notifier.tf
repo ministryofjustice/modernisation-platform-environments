@@ -31,7 +31,7 @@ locals {
 
 module "rota_channel_notifier_slack" {
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.2.0"
 
   name = "rota-channel-notifier-slack-${local.environment_shorthand}"
 
