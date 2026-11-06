@@ -73,3 +73,9 @@ Before sign-off, verify a valid token returns an assessment; missing, expired,
 invalid-signature and wrong-audience tokens receive 401 from API Gateway; valid
 tokens with no assessment role or an unapproved consumer receive 403 from the
 application. Unit tests exercise claim policy only, not JWT signature validation.
+
+The dedicated registrations are requested in
+[IDAM #1014](https://github.com/ministryofjustice/staff-identity-idam-entra-infra/pull/1014).
+After IDAM applies it, use the `pilot_api_configuration` output to populate this
+component's `entra.api_audience` and `entra.allowed_client_ids`. The client uses
+its `token_scope`. No credentials belong in application_variables.json.
