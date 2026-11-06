@@ -1,25 +1,14 @@
 locals {
-  prototype_deployment_enabled = local.is-development || local.is-production
-  prototype_deployment = local.prototype_deployment_enabled ? {
-    cluster_arn            = data.aws_ecs_cluster.prototype_deployment[0].arn
+  prototype_deployment = {
+    cluster_arn            = data.aws_ecs_cluster.prototype_deployment.arn
     vpc_id                 = data.aws_vpc.vpc.id
     private_subnet_ids     = data.aws_subnets.private.ids
-    ecs_security_group_id  = data.aws_security_group.prototype_deployment[0].id
-    load_balancer_arn      = data.aws_lb.prototype_deployment[0].arn
-    listener_arn           = data.aws_lb_listener.prototype_deployment[0].arn
-    hosted_zone_id         = data.aws_route53_zone.prototype_deployment[0].zone_id
-    domain_name            = local.is-production ? "ai-builder.modernisation-platform.service.justice.gov.uk" : "ai-builder-dev.modernisation-platform.service.justice.gov.uk"
-    load_balancer_dns_name = data.aws_lb.prototype_deployment[0].dns_name
-    } : {
-    cluster_arn            = ""
-    vpc_id                 = ""
-    private_subnet_ids     = []
-    ecs_security_group_id  = ""
-    load_balancer_arn      = ""
-    listener_arn           = ""
-    hosted_zone_id         = ""
-    domain_name            = ""
-    load_balancer_dns_name = ""
+    ecs_security_group_id  = data.aws_security_group.prototype_deployment.id
+    load_balancer_arn      = data.aws_lb.prototype_deployment.arn
+    listener_arn           = data.aws_lb_listener.prototype_deployment.arn
+    hosted_zone_id         = data.aws_route53_zone.prototype_deployment.zone_id
+    domain_name            = local.application_data.accounts[local.environment].builder_hostname
+    load_balancer_dns_name = data.aws_lb.prototype_deployment.dns_name
   }
   prototype_deployment_state_machine_name = "${local.application_name}-deploy-prototype"
   prototype_deployment_variables = [
@@ -73,7 +62,6 @@ locals {
 }
 
 module "step_functions_deploy_prototype" {
-  count  = local.prototype_deployment_enabled ? 1 : 0
   source = "../modules/step_function_builder"
 
   step_function_retry_attempts = local.step_function_retry_attempts
