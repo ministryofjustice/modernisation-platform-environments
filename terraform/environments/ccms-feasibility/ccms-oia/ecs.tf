@@ -1,6 +1,6 @@
 module "ecs_cluster_opa" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/337a98f
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=337a98f"
 
   cluster_name = local.opa_cluster_name
   tags         = local.tags
@@ -18,6 +18,7 @@ module "ecs_cluster_opa" {
       subnet_ids            = data.aws_subnets.shared-private.ids
       ebs_encrypted         = true
       kms_key_id            = data.aws_kms_key.ebs_shared.arn
+      managed_scaling       = {}
       user_data = base64encode(templatefile("${path.module}/templates/user-data.sh", {
         cluster_name = local.opa_cluster_name
       }))
@@ -30,8 +31,8 @@ module "ecs_cluster_opa" {
 }
 
 module "ecs_cluster_conn_saa" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/337a98f
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=337a98f"
 
   cluster_name = local.conn_saa_cluster_name
   tags         = local.tags
@@ -49,6 +50,7 @@ module "ecs_cluster_conn_saa" {
       subnet_ids            = data.aws_subnets.shared-private.ids
       ebs_encrypted         = true
       kms_key_id            = data.aws_kms_key.ebs_shared.arn
+      managed_scaling       = {}
       user_data = base64encode(templatefile("${path.module}/templates/user-data.sh", {
         cluster_name = local.conn_saa_cluster_name
       }))
@@ -61,11 +63,15 @@ module "ecs_cluster_conn_saa" {
 }
 
 module "ecs_service_opahub" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/337a98f
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=337a98f"
 
-  name               = "${local.opahub_name}-${local.env_label}"
-  cluster_id         = module.ecs_cluster_opa.cluster_id
+  name       = "${local.opahub_name}-${local.env_label}"
+  cluster_id = module.ecs_cluster_opa.cluster_id
+  capacity_provider_strategy = [{
+    capacity_provider = module.ecs_cluster_opa.capacity_provider_names["ec2"]
+    base              = 1
+  }]
   execution_role_arn = aws_iam_role.ecs_task_execution.arn
   desired_count      = local.application_data.accounts[local.environment].opa_app_count
   cpu                = local.application_data.accounts[local.environment].opa_container_cpu
@@ -121,11 +127,15 @@ module "ecs_service_opahub" {
 }
 
 module "ecs_service_connector" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/337a98f
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=337a98f"
 
-  name               = "${local.connector_name}-${local.env_label}"
-  cluster_id         = module.ecs_cluster_conn_saa.cluster_id
+  name       = "${local.connector_name}-${local.env_label}"
+  cluster_id = module.ecs_cluster_conn_saa.cluster_id
+  capacity_provider_strategy = [{
+    capacity_provider = module.ecs_cluster_conn_saa.capacity_provider_names["ec2"]
+    base              = 1
+  }]
   execution_role_arn = aws_iam_role.ecs_task_execution.arn
   task_role_arn      = aws_iam_role.connector_task.arn
   desired_count      = local.application_data.accounts[local.environment].connector_desired_count
@@ -148,28 +158,28 @@ module "ecs_service_connector" {
     connector_server_port                        = local.application_data.accounts[local.environment].connector_server_port
     aws_region                                   = data.aws_region.current.region
     log_group_name                               = aws_cloudwatch_log_group.connector.name
-    environment_connector                        = local.application_data.accounts[local.environment].environment_connector
-    ccms_soa_url_ebsReferenceDataEndpoint        = local.application_data.accounts[local.environment].ccms_soa_url_ebsReferenceDataEndpoint
-    ccms_pui_connector_assessservice_url_means   = local.application_data.accounts[local.environment].ccms_pui_connector_assessservice_url_means
-    ccms_pui_connector_assessservice_url_merits  = local.application_data.accounts[local.environment].ccms_pui_connector_assessservice_url_merits
-    ccms_pui_connector_assessservice_url_billing = local.application_data.accounts[local.environment].ccms_pui_connector_assessservice_url_billing
-    ccms_pui_connector_answerservice_url_means   = local.application_data.accounts[local.environment].ccms_pui_connector_answerservice_url_means
-    ccms_pui_connector_answerservice_url_merits  = local.application_data.accounts[local.environment].ccms_pui_connector_answerservice_url_merits
-    ccms_pui_connector_answerservice_url_billing = local.application_data.accounts[local.environment].ccms_pui_connector_answerservice_url_billing
-    aws_endpoint                                 = local.application_data.accounts[local.environment].aws_endpoint
+    environment_connector                        = "https://${local.connector_hostname}"
+    ccms_soa_url_ebsReferenceDataEndpoint        = "${local.soa_services_url}/GetReferenceData/getreferencedata_ep"
+    ccms_pui_connector_assessservice_url_means   = "${local.opa_assess_url}/MeansAssessment"
+    ccms_pui_connector_assessservice_url_merits  = "${local.opa_assess_url}/MeritsAssessment"
+    ccms_pui_connector_assessservice_url_billing = "${local.opa_assess_url}/BillingAssessment"
+    ccms_pui_connector_answerservice_url_means   = "${local.opa_answer_url}/MeansAssessment"
+    ccms_pui_connector_answerservice_url_merits  = "${local.opa_answer_url}/MeritsAssessment"
+    ccms_pui_connector_answerservice_url_billing = "${local.opa_answer_url}/BillingAssessment"
+    aws_endpoint                                 = "http://${aws_s3_bucket.connector_docs.bucket}"
     ccms_s3_documents                            = aws_s3_bucket.connector_docs.bucket
     logging_level_root                           = local.application_data.accounts[local.environment].logging_level_root
     logging_level_com_ezgov_model                = local.application_data.accounts[local.environment].logging_level_com_ezgov_model
     logging_level_com_ezgov_opa                  = local.application_data.accounts[local.environment].logging_level_com_ezgov_opa
     logging_level_oracle_ocs_opa_laa             = local.application_data.accounts[local.environment].logging_level_oracle_ocs_opa_laa
     logging_level_uk_gov_laa_opa                 = local.application_data.accounts[local.environment].logging_level_uk_gov_laa_opa
-    spring_datasource_url                        = module.rds.db_endpoint
     ccms_soa_soapHeaderUserName                  = "${aws_secretsmanager_secret.connector.arn}:ccms_soa_soapHeaderUserName::"
     ccms_soa_soapHeaderUserPassword              = "${aws_secretsmanager_secret.connector.arn}:ccms_soa_soapHeaderUserPassword::"
     ccms_connector_service_userid                = "${aws_secretsmanager_secret.connector.arn}:ccms_connector_service_userid::"
     ccms_connector_service_password              = "${aws_secretsmanager_secret.connector.arn}:ccms_connector_service_password::"
     client_opa12assess_security_user_name        = "${aws_secretsmanager_secret.connector.arn}:client_opa12assess_security_user_name::"
     client_opa12assess_security_user_password    = "${aws_secretsmanager_secret.connector.arn}:client_opa12assess_security_user_password::"
+    spring_datasource_url                        = "${aws_secretsmanager_secret.connector.arn}:spring_datasource_url::"
     spring_datasource_username                   = "${aws_secretsmanager_secret.connector.arn}:spring_datasource_username::"
     spring_datasource_password                   = "${aws_secretsmanager_secret.connector.arn}:spring_datasource_password::"
     opa_security_password                        = "${aws_secretsmanager_secret.connector.arn}:opa_security_password::"
@@ -197,11 +207,15 @@ module "ecs_service_connector" {
 }
 
 module "ecs_service_adaptor" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/337a98f
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=337a98f"
 
-  name               = "${local.adaptor_name}-${local.env_label}"
-  cluster_id         = module.ecs_cluster_conn_saa.cluster_id
+  name       = "${local.adaptor_name}-${local.env_label}"
+  cluster_id = module.ecs_cluster_conn_saa.cluster_id
+  capacity_provider_strategy = [{
+    capacity_provider = module.ecs_cluster_conn_saa.capacity_provider_names["ec2"]
+    base              = 1
+  }]
   execution_role_arn = aws_iam_role.ecs_task_execution.arn
   desired_count      = local.application_data.accounts[local.environment].adaptor_desired_count
   cpu                = local.application_data.accounts[local.environment].adaptor_container_cpu
@@ -224,8 +238,8 @@ module "ecs_service_adaptor" {
     aws_region                                = data.aws_region.current.region
     log_group_name                            = aws_cloudwatch_log_group.adaptor.name
     adaptor_spring_profile                    = local.application_data.accounts[local.environment].adaptor_spring_profile
-    client_opa12assess_means_address          = local.application_data.accounts[local.environment].client_opa12assess_means_address
-    client_opa12assess_billing_address        = local.application_data.accounts[local.environment].client_opa12assess_billing_address
+    client_opa12assess_means_address          = "${local.opa_assess_url}/MeansAssessment"
+    client_opa12assess_billing_address        = "${local.opa_assess_url}/BillingAssessment"
     logging_config                            = local.application_data.accounts[local.environment].logging_config
     logging_level_root                        = local.application_data.accounts[local.environment].logging_level_root
     logging_level_uk_gov_justice_laa_ccms     = local.application_data.accounts[local.environment].logging_level_uk_gov_justice_laa_ccms

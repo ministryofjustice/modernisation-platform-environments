@@ -191,14 +191,13 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_https"
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-# The feasibility Connector datasource is the OPAHub MySQL database (see task_definition_connector.json.tpl)
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_rds" {
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_ebsdb" {
   security_group_id            = aws_security_group.ecs_tasks_connector.id
-  description                  = "Allow outbound to the OPAHub MySQL database"
+  description                  = "Allow outbound to the EBS DB Oracle listener"
   ip_protocol                  = "tcp"
-  from_port                    = 3306
-  to_port                      = 3306
-  referenced_security_group_id = aws_security_group.rds.id
+  from_port                    = 1521
+  to_port                      = 1522
+  referenced_security_group_id = data.aws_security_group.ebsdb.id
 }
 
 # Adaptor ECS Task Security Group (awsvpc mode - attached to the task ENI)
@@ -276,6 +275,15 @@ resource "aws_vpc_security_group_egress_rule" "conn_saa_cluster_ec2_egress_https
   cidr_ipv4         = "0.0.0.0/0"
 }
 
+resource "aws_vpc_security_group_egress_rule" "conn_saa_cluster_ec2_egress_ebsdb" {
+  security_group_id            = aws_security_group.conn_saa_cluster_ec2.id
+  description                  = "Allow outbound to the EBS DB Oracle listener"
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1522
+  referenced_security_group_id = data.aws_security_group.ebsdb.id
+}
+
 # RDS Security Group
 
 resource "aws_security_group" "rds" {
@@ -317,18 +325,15 @@ resource "aws_vpc_security_group_ingress_rule" "rds_from_ecs_tasks_opahub" {
   referenced_security_group_id = aws_security_group.ecs_tasks_opahub.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "rds_from_ecs_tasks_connector" {
-  security_group_id            = aws_security_group.rds.id
-  description                  = "MySQL from the Connector ECS tasks"
-  ip_protocol                  = "tcp"
-  from_port                    = 3306
-  to_port                      = 3306
-  referenced_security_group_id = aws_security_group.ecs_tasks_connector.id
-}
-
 resource "aws_vpc_security_group_egress_rule" "rds_egress_all" {
   security_group_id = aws_security_group.rds.id
   description       = "Allow all outbound traffic"
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
+}
+
+# EBS DB SG, managed in the ccms-feasibility/ccms-ebs stack
+data "aws_security_group" "ebsdb" {
+  vpc_id = data.aws_vpc.shared.id
+  name   = "ccms-ebs-${local.env_label}-ebsdb-sg"
 }
