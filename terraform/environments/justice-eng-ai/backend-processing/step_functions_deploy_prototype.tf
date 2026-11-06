@@ -51,7 +51,7 @@ locals {
   prototype_deployment_steps = [for stage in ["task_definition", "target_group", "listener_rule", "service", "dns"] : {
     name        = "deploy_${stage}"
     type        = "script_runner"
-    script_path = "scripts/deployment/proto.py"
+    script_path = "scripts/deployment/prototype_deployment.py"
     shell_type  = "python3"
     variables = concat(
       local.prototype_deployment_variables,
