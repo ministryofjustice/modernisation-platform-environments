@@ -70,6 +70,9 @@ module "nlb" {
         path     = "/actuator/health"
         port     = "traffic-port"
         matcher  = "200"
+        # Max interval. The NLB's only target is the ALB, and with one target it fails
+        # open, so a slow check costs little and cuts health-check noise in the ALB logs.
+        interval = 300
       }
     }
   }
