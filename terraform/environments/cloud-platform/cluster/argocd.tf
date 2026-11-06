@@ -304,10 +304,16 @@ resource "kubernetes_cluster_role_binding_v1" "argocd_hub_deploy" {
 # Enforce the spoke's BU boundary at admission time. AppProject destination
 # rules match namespace names, not namespace labels; the baseline chart labels
 # each product namespace with container-platform/bu from product.yaml.
-resource "kubernetes_manifest" "argocd_bu_namespace_policy" {
+#
+# kubectl_manifest rather than kubernetes_manifest: kubernetes_manifest asks the
+# API server for the resource schema while planning, so it fails with "no
+# client config" on a brand-new cluster, where the provider endpoint is only
+# known after apply (see providers.tf). kubectl_manifest plans a create without
+# calling the API server and only connects at apply, once the cluster exists.
+resource "kubectl_manifest" "argocd_bu_namespace_policy" {
   count = local.is_argocd_spoke ? 1 : 0
 
-  manifest = {
+  yaml_body = yamlencode({
     apiVersion = "admissionregistration.k8s.io/v1"
     kind       = "ValidatingAdmissionPolicy"
     metadata = {
@@ -351,7 +357,7 @@ resource "kubernetes_manifest" "argocd_bu_namespace_policy" {
         }
       ]
     }
-  }
+  })
 
   lifecycle {
     precondition {
@@ -363,10 +369,10 @@ resource "kubernetes_manifest" "argocd_bu_namespace_policy" {
   depends_on = [aws_eks_access_entry.argocd_spoke_capability]
 }
 
-resource "kubernetes_manifest" "argocd_bu_namespace_policy_binding" {
+resource "kubectl_manifest" "argocd_bu_namespace_policy_binding" {
   count = local.is_argocd_spoke ? 1 : 0
 
-  manifest = {
+  yaml_body = yamlencode({
     apiVersion = "admissionregistration.k8s.io/v1"
     kind       = "ValidatingAdmissionPolicyBinding"
     metadata = {
@@ -377,10 +383,40 @@ resource "kubernetes_manifest" "argocd_bu_namespace_policy_binding" {
       }
     }
     spec = {
-      policyName        = kubernetes_manifest.argocd_bu_namespace_policy[0].object.metadata.name
+      # kubectl_manifest parses yaml_body while planning, so name is known at
+      # plan even on a brand-new cluster.
+      policyName        = kubectl_manifest.argocd_bu_namespace_policy[0].name
       validationActions = ["Deny"]
     }
-  }
+  })
 
-  depends_on = [kubernetes_manifest.argocd_bu_namespace_policy]
+  depends_on = [kubectl_manifest.argocd_bu_namespace_policy]
+}
+
+# One-time migration off kubernetes_manifest. #19661 created both objects as
+# kubernetes_manifest on the registered permanent spokes, so their state still
+# holds the old addresses. destroy = false drops those addresses from state
+# without deleting anything in the cluster. The kubectl_manifest resources above
+# then "create" the objects with kubectl apply, which patches the existing
+# objects in place, so the policy is never deleted and enforcement has no gap.
+# Where the old addresses are not in state (hubs, new or ephemeral spokes,
+# unregistered clusters) these blocks do nothing.
+#
+# Keep these blocks until every registered spoke has applied this change.
+# Deleting them while an old address is still in state would make Terraform
+# destroy that object.
+removed {
+  from = kubernetes_manifest.argocd_bu_namespace_policy
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = kubernetes_manifest.argocd_bu_namespace_policy_binding
+
+  lifecycle {
+    destroy = false
+  }
 }

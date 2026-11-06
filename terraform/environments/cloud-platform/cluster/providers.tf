@@ -1,5 +1,5 @@
-# Kubernetes/Helm providers are configured from module.eks outputs rather than a
-# data.aws_eks_cluster lookup.
+# Kubernetes, Helm and kubectl providers are configured from module.eks outputs
+# rather than a data.aws_eks_cluster lookup.
 #
 # Module outputs resolve from state for an existing cluster (endpoint/CA known at
 # plan, so the providers reach the real API server and plan-time refresh of
@@ -24,4 +24,22 @@ provider "helm" {
     cluster_ca_certificate = try(base64decode(module.eks.cluster_certificate_authority_data), null)
     token                  = try(data.aws_eks_cluster_auth.cluster.token, null)
   }
+}
+
+# kubectl manages the Argo CD BU namespace-boundary admission policy in
+# argocd.tf (kubernetes_manifest needs the API server at plan; see argocd.tf).
+#
+# lazy_load = true is required on a brand-new cluster. Since alekc/kubectl
+# 2.3.0 the provider fails at configure time when host/CA/token are unknown
+# ("invalid provider configuration: no configuration has been provided"), which
+# is always the case at plan before module.eks has created the cluster.
+# lazy_load (2.4.0+) defers that error so the plan succeeds; the real client is
+# built at apply, after the cluster exists. On existing clusters the module
+# outputs are known at plan, so the provider connects as normal.
+provider "kubectl" {
+  host                   = try(module.eks.cluster_endpoint, null)
+  cluster_ca_certificate = try(base64decode(module.eks.cluster_certificate_authority_data), null)
+  token                  = try(data.aws_eks_cluster_auth.cluster.token, null)
+  load_config_file       = false
+  lazy_load              = true
 }
