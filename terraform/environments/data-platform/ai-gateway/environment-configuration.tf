@@ -4,6 +4,7 @@ locals {
   environment_configurations = {
     development = {
       litellm_version     = "1.106.5"
+      litellm_tmpdir      = "/app/cache"
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
         input_bucket_name  = "alpha-airflow-aigw-example-input"
@@ -58,6 +59,7 @@ locals {
     }
     test = {
       litellm_version     = "1.106.5"
+      litellm_tmpdir      = "/app/cache"
       ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
