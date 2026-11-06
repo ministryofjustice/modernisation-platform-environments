@@ -44,7 +44,7 @@
       "deletion_protection": "true",
       "pagerduty_integration_key_name": "laa_mojfin_prod_alarms",
       "allocated_storage_size": "5000",
-      "max_allocated_storage_size": "7000",
+      "max_allocated_storage_size": "6600",
       "bastion_bucket_suffix": "7mxtlk",
       "engine_version": "19.0.0.0.ru-2026-07.mrp-2026-07.r1",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
