@@ -106,6 +106,29 @@ data "aws_iam_policy_document" "data_lake_kms_key" {
 
     resources = ["*"]
   }
+
+  # ALlow key to be used by CloudWatch for logs
+  statement {
+    sid    = "AllowCloudwatchLogs"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "logs.${local.current_account_region}.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*",
+    ]
+
+    resources = ["*"]
+  }
 }
 
 resource "aws_kms_key" "data_lake_kms_key" {
