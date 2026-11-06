@@ -1773,7 +1773,7 @@ module "s3-gems-general-landing-bucket-iam-user" {
   data_feed  = "gems"
   order_type = "general"
 
-  landing_bucket_arn        = module.s3-gems-general-landing-bucket.bucket_arn
+  landing_bucket_arn        = module.s3-gems-general-landing-bucket[0].bucket_arn
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
   rotation_lambda           = module.rotate_iam_key
