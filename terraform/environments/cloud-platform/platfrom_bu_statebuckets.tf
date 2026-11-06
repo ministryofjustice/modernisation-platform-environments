@@ -9,8 +9,8 @@ locals {
       replace(account, "container-platform-", ""),
       "-live"
     ) => {
-      workspace  = account
-      account_id = local.environment_management.account_ids[account]
+      workspace   = account
+      account_id  = local.environment_management.account_ids[account]
       bucket_name = "${account}-tf-state-bucket"
     }
     if endswith(account, "-live")
@@ -22,67 +22,16 @@ locals {
   )
 }
 
-# data "aws_iam_policy_document" "bu_state_bucket" {
-
-#   statement {
-#     sid    = "DenyInsecureTransport"
-#     effect = "Deny"
-#     actions = [
-#       "s3:*"
-#     ]
-
-#     resources = [
-#       "arn:aws:s3:::${local.bu_live_accounts[each.key].bucket_name}",
-#       "arn:aws:s3:::${local.bu_live_accounts[each.key].bucket_name}/*"
-#     ]
-
-#     principals {
-#       type        = "*"
-#       identifiers = ["*"]
-#     }
-
-#     condition {
-#       test     = "Bool"
-#       variable = "aws:SecureTransport"
-#       values   = ["false"]
-#     }
-#   }
-
-#   statement {
-#     sid    = "DenyInsecureTLS"
-#     effect = "Deny"
-#     actions = [
-#       "s3:*"
-#     ]
-
-#     resources = [
-#       "arn:aws:s3:::${local.bu_live_accounts[each.key].bucket_name}",
-#       "arn:aws:s3:::${local.bu_live_accounts[each.key].bucket_name}/*"
-#     ]
-
-#     principals {
-#       type        = "*"
-#       identifiers = ["*"]
-#     }
-
-#     condition {
-#       test     = "NumericLessThan"
-#       variable = "s3:TlsVersion"
-#       values   = ["1.2"]
-#     }
-#   }
-# }
-
-
 module "state_bucket" {
-  count = local.state_bucket_enabled ? 1 : 0
-
+  count  = local.state_bucket_enabled ? 1 : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
   providers = {
     aws.bucket-replication = aws
   }
-  bucket_prefix      = "${terraform.workspace}-tf-state-bucket"
+
+  # Keep the prefix within the S3 module's 37-character limit.
+  bucket_prefix      = "${terraform.workspace}-tf-state"
   ownership_controls = "BucketOwnerEnforced"
 
   replication_enabled = false
@@ -104,6 +53,11 @@ module "state_bucket" {
 
       conditions = [
         {
+          test     = "Bool"
+          variable = "aws:SecureTransport"
+          values   = ["false"]
+        },
+        {
           test     = "NumericLessThan"
           variable = "s3:TlsVersion"
           values   = ["1.2"]
@@ -118,17 +72,16 @@ module "state_bucket" {
   })
 }
 
-
 resource "aws_kms_key" "state" {
   count = local.state_bucket_enabled ? 1 : 0
+
   description             = "KMS key for Terraform state bucket"
   enable_key_rotation     = true
   deletion_window_in_days = 30
 }
 
 module "state_controls" {
-  count = local.state_bucket_enabled ? 1 : 0
-
+  count  = local.state_bucket_enabled ? 1 : 0
   source = "../../modules/state_bucket_controls"
 
   bucket_id = module.state_bucket[0].bucket.id
