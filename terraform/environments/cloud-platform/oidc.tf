@@ -138,10 +138,54 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "logs:CreateLogGroup",
       "logs:DeleteLogGroup",
       "logs:CreateLogStream",
+      "logs:CreateLogDelivery",
+      # DeleteLogDelivery/UpdateLogDelivery are required for AMP's CloudWatch
+      # Logs (vended-log) delivery: deleting a workspace that has a rules/alerting
+      # logging configuration tears down the log delivery as the caller, so
+      # without these DeleteWorkspace fails with a misleading 403 AccessDenied.
+      # See ministryofjustice/cloud-platform#8611 and the AMP CloudWatch Logs
+      # required-permissions policy.
+      "logs:DeleteLogDelivery",
+      "logs:UpdateLogDelivery",
+      "logs:CreateDelivery",
+      "logs:DeleteDelivery*",
+      "logs:GetDelivery*",
       "logs:PutLogEvents",
+      "logs:PutResourcePolicy",
       "logs:PutRetentionPolicy",
+      "logs:DeleteResourcePolicy",
+      "logs:DeleteRetentionPolicy",
       "logs:Describe*",
+      "logs:PutDelivery*",
+      "logs:UpdateDeliveryConfiguration",
+      "logs:TagResource",
       "cloudwatch:PutMetricData"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "ObservabilityAMP"
+    effect = "Allow"
+    actions = [
+      # Amazon Managed Prometheus (AMP) workspace lifecycle — the ADOT metrics
+      # collectors in cluster-components create/manage a per-cluster AMP
+      # workspace, applied on ephemeral dev clusters via this role.
+      # AMG (grafana:*) is NOT included here: AMG is deployed at the
+      # cloud-platform root component via the main pipeline's apply role, not by
+      # this dev-cluster role.
+      "aps:CreateWorkspace",
+      "aps:DeleteWorkspace",
+      "aps:DescribeWorkspace",
+      "aps:ListWorkspaces",
+      "aps:UpdateWorkspaceAlias",
+      "aps:DescribeLoggingConfiguration",
+      "aps:CreateLoggingConfiguration",
+      "aps:UpdateLoggingConfiguration",
+      "aps:DeleteLoggingConfiguration",
+      "aps:TagResource",
+      "aps:UntagResource",
+      "aps:ListTagsForResource",
     ]
     resources = ["*"]
   }
@@ -170,6 +214,35 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     ]
     resources = [
       "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform*/*"
+    ]
+  }
+
+  statement {
+    sid    = "LogArchiveBucketManagement"
+    effect = "Allow"
+    actions = [
+      "s3:CreateBucket",
+      "s3:DeleteBucket",
+      "s3:Get*",
+      "s3:List*",
+      "s3:PutBucketPolicy",
+      "s3:DeleteBucketPolicy",
+      "s3:PutBucketTagging",
+      "s3:PutBucketVersioning",
+      "s3:PutBucketPublicAccessBlock",
+      "s3:PutBucketNotification",
+      "s3:PutEncryptionConfiguration",
+      "s3:PutLifecycleConfiguration",
+      "s3:PutBucketOwnershipControls",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion"
+    ]
+    resources = [
+      "arn:aws:s3:::container-platform-*-fluentbit",
+      "arn:aws:s3:::container-platform-*-fluentbit/*",
+      "arn:aws:s3:::cp-*-fluentbit",
+      "arn:aws:s3:::cp-*-fluentbit/*"
     ]
   }
 
@@ -223,6 +296,27 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     resources = ["*"]
   }
 
+  statement {
+    sid    = "SSOForArgoCDCapability"
+    effect = "Allow"
+    actions = [
+      "sso:CreateApplication",
+      "sso:DeleteApplication",
+      "sso:DescribeApplication",
+      "sso:PutApplicationAccessScope",
+      "sso:PutApplicationAuthenticationMethod",
+      "sso:PutApplicationGrant",
+      "sso:DeleteApplicationAccessScope",
+      "sso:DeleteApplicationAuthenticationMethod",
+      "sso:DeleteApplicationGrant",
+      "sso:PutApplicationAssignmentConfiguration",
+      "sso:CreateApplicationAssignment",
+      "sso:DeleteApplicationAssignment",
+      "sso:ListApplicationAssignments"
+    ]
+    resources = ["*"]
+  }
+
 }
 
 
@@ -246,5 +340,194 @@ data "aws_iam_policy_document" "github_actions_cluster_reminder_oidc_policy" {
       "iam:ListAccountAliases"
     ]
     resources = ["*"]
+  }
+}
+
+# OIDC Role for GitHub Actions - Container Platform Identity Workflow Plan
+module "github_actions_container_platform_identity_oidc_role_plan" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-container-platform-identity-plan"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_policy_plan.json]
+  subject_claim       = "pull_request"
+  tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_policy_plan" {
+  statement {
+    sid    = "AssumeSSOReadOnlyRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ContainerPlatformSSOReadOnly"]
+  }
+
+  statement {
+    sid    = "AssumeModernisationPlatformReadOnlyRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${data.aws_ssm_parameter.modernisation_platform_account_id.value}:role/modernisation-account-limited-read-member-access"]
+  }
+
+  statement {
+    sid    = "AssumeContainerPlatformEKSAccessRolesInOrganisation"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    # Plan path is scoped to the READ-ONLY EKS access role; the write role
+    # (ContainerPlatformEKSAccess) is reserved for the apply path
+    # (ministryofjustice/cloud-platform#8612).
+    resources = ["arn:aws:iam::*:role/ContainerPlatformEKSAccessReadOnly"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceOrgID"
+      values   = [data.aws_organizations_organization.root_account.id]
+    }
+  }
+  statement {
+    sid    = "IdentityRoleClusterStateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform/container-platform-identity/*"
+    ]
+  }
+
+  statement {
+    sid    = "IdentityRoleClusterKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:*"
+    ]
+    resources = ["*"]
+  }
+}
+
+# OIDC Role for GitHub Actions - Container Platform Identity Workflow Apply
+module "github_actions_container_platform_identity_oidc_role_apply" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-container-platform-identity-apply"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_policy_apply.json]
+  # Only main may mint this apply token. The identity-apply workflow applies
+  # exclusively on main, so this closes the any-branch escalation path
+  # (ministryofjustice/cloud-platform#8612) with no change to normal behaviour.
+  subject_claim = "ref:refs/heads/main"
+  tags          = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_policy_apply" {
+  statement {
+    sid    = "AssumeSSOAdminRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ContainerPlatformSSOAdministrator"]
+  }
+
+  statement {
+    sid    = "AssumeModernisationPlatformReadOnlyRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${data.aws_ssm_parameter.modernisation_platform_account_id.value}:role/modernisation-account-limited-read-member-access"]
+  }
+
+  statement {
+    sid    = "AssumeContainerPlatformEKSAccessRolesInOrganisation"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    # Apply path keeps the WRITE EKS access role (ContainerPlatformEKSAccess);
+    # the plan path is deliberately scoped to the read-only variant instead
+    # (ministryofjustice/cloud-platform#8612).
+    resources = ["arn:aws:iam::*:role/ContainerPlatformEKSAccess"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceOrgID"
+      values   = [data.aws_organizations_organization.root_account.id]
+    }
+  }
+  statement {
+    sid    = "IdentityRoleClusterStateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform/container-platform-identity/*"
+    ]
+  }
+
+  statement {
+    sid    = "IdentityRoleClusterKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:*"
+    ]
+    resources = ["*"]
+  }
+}
+
+# OIDC Roles for GitHub Actions - Secret fetch (pull requests and main share one policy)
+module "github_actions_container_platform_identity_oidc_secret_role_plan" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-container-platform-identity-secrets-plan"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_secret_policy[0].json]
+  subject_claim       = "pull_request"
+  tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Secrets Fetch Plan Role" }, local.tags)
+}
+
+module "github_actions_container_platform_identity_oidc_secret_role_main" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-container-platform-identity-secrets-apply"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_secret_policy[0].json]
+  subject_claim       = "ref:refs/heads/main"
+  tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Secrets Fetch Apply Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_secret_policy" {
+  count = terraform.workspace == "cloud-platform-live" ? 1 : 0
+
+  statement {
+    sid       = "ReadEnvironmentManagementSecret"
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [data.aws_ssm_parameter.environment_management_arn[0].value]
+  }
+
+  statement {
+    sid       = "ReadEnvironmentManagementArnParameter"
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter"]
+    resources = [data.aws_ssm_parameter.environment_management_arn[0].arn]
+  }
+
+  statement {
+    sid       = "DecryptEnvironmentManagementSecretKey"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = ["arn:aws:kms:eu-west-2:${local.modernisation_platform_account_id}:key/${data.aws_secretsmanager_secret.environment_management.kms_key_id}"]
   }
 }

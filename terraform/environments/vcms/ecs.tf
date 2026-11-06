@@ -6,15 +6,6 @@ module "ecs" {
   tags = local.tags
 }
 
-resource "aws_security_group" "cluster" {
-  name_prefix = "ecs-cluster-${local.environment}"
-  vpc_id      = local.account_config.shared_vpc_id
-  description = "ECS cluster SG"
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 module "ecs_service" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v6.0.0"
 
@@ -74,8 +65,8 @@ module "container_definition" {
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v6.0.0"
   name                     = "vcms"
   image                    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.app_config.image_tag}"
-  memory                   = 512
-  cpu                      = 256
+  memory                   = local.app_config.task_memory
+  cpu                      = local.app_config.container_cpu
   essential                = true
   readonly_root_filesystem = false
 
@@ -111,6 +102,42 @@ module "container_definition" {
     {
       name  = "DB_USERNAME"
       value = "vcms"
+    },
+    {
+      name  = "APP_DEBUG"
+      value = local.app_config.APP_DEBUG
+    },
+    {
+      name  = "DIR_DOCUMENTS"
+      value = "/mnt/s3fs"
+    },
+    {
+      name  = "SESSION_DRIVER"
+      value = "redis"
+    },
+    {
+      name  = "CACHE_DRIVER"
+      value = "redis"
+    },
+    {
+      name  = "EFS_SHARE_ID"
+      value = aws_efs_file_system.vcms.id
+    },
+    {
+      name  = "EFS_ACCESS_POINT"
+      value = aws_efs_access_point.vcms.id
+    },
+    {
+      name  = "EFS_DNS"
+      value = aws_efs_file_system.vcms.dns_name
+    },
+    {
+      name  = "S3_BUCKET"
+      value = "vcms-test-20260612133259586300000001"
+    },
+    {
+      name  = "S3_ENDPOINT_URL"
+      value = "https://s3.eu-west-2.amazonaws.com"
     }
   ]
 
@@ -131,7 +158,7 @@ module "container_definition" {
   mount_points = [
     {
       sourceVolume  = "vcms"
-      containerPath = "/mnt/vcmsdocs"
+      containerPath = "/mnt/s3fs"
       readOnly      = false
     }
   ]
@@ -151,28 +178,4 @@ resource "aws_cloudwatch_log_group" "vcms" {
   retention_in_days = local.app_config.log_retention_in_days
   tags              = local.tags
 }
-
-resource "aws_security_group" "ecs_service" {
-  name        = "vcms-ecs"
-  description = "Security group for ECS service"
-  vpc_id      = local.account_info.vpc_id
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
-
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = local.tags
-}
-
 

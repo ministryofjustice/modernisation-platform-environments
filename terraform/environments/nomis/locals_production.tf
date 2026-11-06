@@ -6,6 +6,10 @@ locals {
     maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
+  aws_health_lambda_configuration_production = {
+    enabled = false
+  }
+
   baseline_presets_production = {
     options = {
       db_backup_object_lock_days          = 14
@@ -48,7 +52,6 @@ locals {
         start          = "-PT6H"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
-          local.cloudwatch_dashboard_widget_groups.connectivity,
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.xtag,
           local.cloudwatch_dashboard_widget_groups.asg,
@@ -242,7 +245,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "662853f289cc0053f99ba458c3d9d3c4820f3640" # 2025-08-19 crypto requirement fix
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -285,7 +288,7 @@ locals {
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
             # Comment in instance refresh above if changing branch + want automated instance refresh
-            branch = "662853f289cc0053f99ba458c3d9d3c4820f3640" # 2025-08-19 crypto requirement fix
+            branch = "8eae91591f2a76dd9fa45cb029bbff3241b142ff" # 2026-09-02 Bump github/codeql-action/upload-sarif
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -445,7 +448,6 @@ locals {
         cloudwatch_metric_alarms = merge(
           local.cloudwatch_metric_alarms.db,
           local.cloudwatch_metric_alarms.db_connected,
-          local.cloudwatch_metric_alarms.db_connectivity_test,
         )
         config = merge(local.ec2_instances.db.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -469,8 +471,6 @@ locals {
           instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          connectivity-tests = "10.40.0.133:53 10.40.129.79:22"
-          # connectivity-tests = "10.40.128.196:53 10.40.10.132:22" # cannot correct due to provider bug, see TM-1715
           description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
           misload-dbname    = "DRMIS"
           nomis-environment = "prod"

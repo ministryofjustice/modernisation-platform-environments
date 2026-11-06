@@ -52,7 +52,7 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = aws_db_instance.tipstaff_db.address
+          value = local.tipstaff_db.address
         },
         {
           name  = "RDS_PORT"
@@ -60,15 +60,15 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
         },
         {
           name  = "RDS_USERNAME"
-          value = aws_db_instance.tipstaff_db.username
+          value = local.tipstaff_db.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = aws_db_instance.tipstaff_db.password
+          value = local.tipstaff_db.password
         },
         {
           name  = "DB_NAME"
-          value = aws_db_instance.tipstaff_db.db_name
+          value = local.tipstaff_db.db_name
         },
         {
           name  = "supportEmail"
@@ -437,7 +437,8 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.tipstaff_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
+  //v3.0.0
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=d88bd90d490268896670a898edfaba24bba2f8ab"
   sns_topics                = [aws_sns_topic.tipstaff_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["tipstaff_non_prod_alarms"]
 }
@@ -448,7 +449,8 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.tipstaff_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
+  //v3.0.0
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=d88bd90d490268896670a898edfaba24bba2f8ab"
   sns_topics                = [aws_sns_topic.tipstaff_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["tipstaff_prod_alarms"]
 }

@@ -15,23 +15,20 @@ module "get_zipped_file_api" {
   type = "EXPRESS"
 }
 
+
 # ------------------------------------------
-# DMS Validation Step Function
+# DLT Iceberg Maintenance Step Function
 # ------------------------------------------
 
-module "dms_validation_step_function" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-
+module "dlt_iceberg_maintenance" {
   source       = "./modules/step_function"
-  name         = "dms_validation"
-  iam_policies = tomap({ "dms_validation_step_function_policy" = aws_iam_policy.dms_validation_step_function_policy[0] })
-  variable_dictionary = tomap(
-    {
-      "dms_retrieve_metadata" = module.dms_retrieve_metadata[0].lambda_function_name,
-      "dms_validation"        = module.dms_validation[0].lambda_function_name,
-    }
-  )
-  type = "STANDARD"
+  name         = "dlt-iceberg-maintenance"
+  type         = "STANDARD"
+  iam_policies = tomap({ "invoke_maintenance_lambdas" = aws_iam_policy.dlt_iceberg_maintenance_invoke })
+  variable_dictionary = tomap({
+    "trigger_arn" = module.trigger_dlt_iceberg_maintenance.lambda_function_arn,
+    "poll_arn"    = module.poll_dlt_iceberg_maintenance.lambda_function_arn,
+  })
 }
 
 
@@ -66,7 +63,9 @@ module "ears_sars_step_function" {
   iam_policies = tomap({ "ears_sars_step_function_policy" = aws_iam_policy.ears_sars_step_function_policy[0] })
   variable_dictionary = tomap(
     {
-      "ears_sars_request" = module.ears_sars_request[0].lambda_function_name,
+      "ears_sars_request"   = module.ears_sars_request[0].lambda_function_name,
+      "write_to_sharepoint" = module.write_to_sharepoint[0].lambda_function_name,
+      "send_email"          = module.send_ear_sar_response[0].lambda_function_name,
     }
   )
   type = "STANDARD"
@@ -78,22 +77,28 @@ module "ears_sars_step_function" {
 # ------------------------------------------
 
 module "gdpr_deletion_step_function" {
-  count        = local.is-development || local.is-preproduction ? 1 : 0
+  count        = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source       = "./modules/step_function"
   name         = "gdpr_deletion"
   iam_policies = tomap({ "gdpr_deletion_step_function_policy" = aws_iam_policy.gdpr_delete_iam_policy[0] })
   variable_dictionary = tomap(
     {
-      "cluster_arn"            = aws_ecs_cluster.emds-gdpr-cluster[0].arn
-      "task_definition_family" = aws_ecs_task_definition.emds-gdpr-structured-data-deletion[0].family
-      "container_name"         = "emds_gdpr_structured_data_deletion_job"
-      "security_groups_json"   = jsonencode([aws_security_group.ecs_generic.id])
-      "subnets_json"           = jsonencode(data.aws_subnets.shared-private.ids)
-      "athena_output_bucket"   = "s3://${module.s3-athena-bucket.bucket.id}/output/"
+      "cluster_arn"              = aws_ecs_cluster.emds-gdpr-cluster[0].arn
+      "task_definition_family"   = aws_ecs_task_definition.emds-gdpr-structured-data-deletion[0].family
+      "container_name"           = "emds_gdpr_structured_data_deletion_job"
+      "security_groups_json"     = jsonencode([aws_security_group.ecs_generic.id])
+      "subnets_json"             = jsonencode(data.aws_subnets.shared-private.ids)
+      "athena_output_bucket"     = "s3://${module.s3-athena-bucket.bucket.id}/output/"
+      "control_lambda_arn"       = module.gdpr_unstructured_control_lambda[0].lambda_function_arn
+      "batch_job_queue_arn"      = aws_batch_job_queue.shred_unstructured_from_zip_batch_queue[0].arn
+      "batch_job_definition_arn" = aws_batch_job_definition.shred_unstructured_from_zip_job.arn
+      "sns_topic_arn"            = aws_sns_topic.emds_alerts.arn
+      "environment_name"         = local.environment_shorthand
     }
   )
   type = "STANDARD"
 }
+
 
 # ------------------------------------------
 # Iceberg Step Function
@@ -101,7 +106,7 @@ module "gdpr_deletion_step_function" {
 
 
 module "iceberg_table_maintenance_step_function" {
-  count        = local.is-development || local.is-preproduction ? 1 : 0
+  count        = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source       = "./modules/step_function"
   name         = "iceberg_table_maintenance"
   iam_policies = tomap({ "gdpr_deletion_step_function_policy" = aws_iam_policy.gdpr_delete_iam_policy[0] })
@@ -117,6 +122,70 @@ module "iceberg_table_maintenance_step_function" {
   )
   type = "STANDARD"
 }
+
+# ------------------------------------------
+# Merge into staged position step function
+# ------------------------------------------
+
+module "merge_into_mdss_staged_position" {
+  source                  = "./modules/merge_into_reconciler"
+  function_to_iterate     = module.merge_mdss_staged_position[0]
+  planner_function_arn    = module.merge_redrive_planner.lambda_function_arn
+  reconciliation_consumer = "STAGED"
+}
+
+# ------------------------------------------
+# Merge into staged event step function
+# ------------------------------------------
+
+module "merge_into_mdss_staged_event" {
+  source              = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_mdss_staged_event[0]
+}
+
+# ------------------------------------------
+# Merge into emdi position step function
+# ------------------------------------------
+
+module "merge_into_emdi_position" {
+  source                  = "./modules/merge_into_reconciler"
+  function_to_iterate     = module.merge_emdi_position[0]
+  planner_function_arn    = module.merge_redrive_planner.lambda_function_arn
+  reconciliation_consumer = "EMDI"
+  reconciliation_state_prefix_arn = "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}"
+}
+
+# ------------------------------------------
+# Merge into ac position step function
+# ------------------------------------------
+
+module "merge_into_mdss_ac_position" {
+  source                          = "./modules/merge_into_reconciler"
+  function_to_iterate             = module.merge_ac_position[0]
+  planner_function_arn            = module.merge_redrive_planner.lambda_function_arn
+  reconciliation_consumer         = "AC"
+  reconciliation_state_prefix_arn = "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}"
+}
+
+# ------------------------------------------
+# Downstream reconciliation audit
+# ------------------------------------------
+
+module "downstream_reconciliation_audit" {
+  source       = "./modules/step_function"
+  name         = "downstream-reconciliation-audit"
+  type         = "STANDARD"
+  iam_policies = tomap({
+    downstream_reconciliation_audit = (
+      aws_iam_policy.downstream_reconciliation_audit
+    )
+  })
+
+  variable_dictionary = tomap({
+    planner_function_name = module.merge_redrive_planner.lambda_function_name
+  })
+}
+
 
 # ------------------------------------------------------------------------------
 # Staging DB janitor Step Function
@@ -225,25 +294,23 @@ resource "aws_sfn_state_machine" "staging_db_janitor" {
 # Landing DLQ redriver Step Function
 # ------------------------------------------------------------------------------
 
+locals {
+  landing_dlq_redrive_settle_seconds = 300
+}
+
 resource "aws_sfn_state_machine" "landing_dlq_redriver" {
   name     = "landing_dlq_redriver"
   role_arn = aws_iam_role.landing_dlq_redriver_state_machine.arn
 
   definition = jsonencode({
     Comment = "Redrives landing DLQ messages after CloudWatch DLQ alarms."
-    StartAt = "WaitForThreadState"
+    StartAt = "RedriverBatch"
     States = {
-      WaitForThreadState = {
-        Type    = "Wait"
-        Seconds = 600
-        Next    = "RedriverBatch"
-      }
-
       RedriverBatch = {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke"
         Parameters = {
-          FunctionName = module.landing_dlq_redriver.lambda_function_arn
+          FunctionName = module.landing_file_dlq_redriver.lambda_function_arn
           "Payload.$"  = "$"
         }
         OutputPath = "$.Payload"
@@ -331,7 +398,7 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
 
       WaitAfterReplay = {
         Type    = "Wait"
-        Seconds = 300
+        Seconds = local.landing_dlq_redrive_settle_seconds
         Next    = "RedriverBatch"
       }
 
@@ -348,8 +415,22 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
   })
 }
 
-resource "aws_cloudwatch_event_target" "landing_dlq_redriver" {
-  rule     = aws_cloudwatch_event_rule.alarm_state_change_threader.name
-  arn      = aws_sfn_state_machine.landing_dlq_redriver.arn
-  role_arn = aws_iam_role.landing_dlq_redriver_eventbridge.arn
+# ------------------------------------------
+# Trigger cadt Step function
+# ------------------------------------------
+
+module "trigger_cadt_step_function" {
+  source       = "./modules/step_function"
+  name         = "trigger-create-a-derived-table"
+  iam_policies = tomap({ "trigger_cadt_step_function_policy" = aws_iam_policy.trigger_cadt_step_function_policy })
+  variable_dictionary = tomap(
+    {
+      "trigger_cadt" = module.trigger_cadt.lambda_function_name,
+      "environment"  = local.environment,
+      "poll_cadt"    = module.poll_cadt.lambda_function_name,
+    }
+  )
+  type = "STANDARD"
 }
+
+

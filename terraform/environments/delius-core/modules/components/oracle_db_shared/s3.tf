@@ -3,29 +3,36 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
   #checkov:skip=CKV_AWS_108 "ignore"
   #checkov:skip=CKV_AWS_111 "ignore"
   #checkov:skip=CKV_AWS_356 "ignore"
-  count   = lookup(local.oracle_duplicate_map[var.env_name], "target_account_id", false) != false ? 1 : 0
+  count   = length(lookup(local.oracle_duplicate_map[var.env_name], "targets", [])) > 0 ? 1 : 0
   version = "2012-10-17"
 
-  statement {
-    sid     = "OracleBackupAccess"
-    effect  = "Allow"
-    actions = ["s3:*"]
-    resources = [
-      module.s3_bucket_oracledb_backups.bucket.arn,
-      "${module.s3_bucket_oracledb_backups.bucket.arn}/*"
-    ]
+  dynamic "statement" {
+    for_each = local.oracle_duplicate_map[var.env_name]["targets"]
+    content {
+      sid    = "OracleBackupAccess${title(statement.value.environment)}"
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:GetBucketLocation"
+      ]
+      resources = [
+        module.s3_bucket_oracledb_backups.bucket.arn,
+        "${module.s3_bucket_oracledb_backups.bucket.arn}/*"
+      ]
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_duplicate_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_duplicate_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${statement.value.account_id}:role/instance-role-${var.account_info.application_name}-${statement.value.environment}-${var.db_suffix}-1"]
+      }
     }
   }
 
 }
 
 module "s3_bucket_oracledb_backups" {
-  #checkov:skip=CKV_TF_1 "ignore"
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
   bucket_name         = local.oracle_backup_bucket_prefix
   versioning_enabled  = true
   ownership_controls  = "BucketOwnerEnforced"
@@ -113,7 +120,7 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
   statement {
     sid    = "AllowAccessToLegacyS3OracleBackups"
     effect = "Allow"
-    actions = [
+    actions = var.environment_config.migration_environment_full_name == "del-prod" ? ["s3:*"] : [
       "s3:Get*",
       "s3:List*"
     ]
@@ -150,30 +157,83 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
     }
   }
 
+  dynamic "statement" {
+    for_each = var.deploy_oracle_rat == true ? [1] : []
+    content {
+      sid    = "allowAccessToOracleRatCaptureBucket"
+      effect = "Allow"
+      actions = [
+        "s3:*"
+      ]
+      resources = [
+        module.s3_bucket_oracle_rat_capture[0].bucket.arn,
+        "${module.s3_bucket_oracle_rat_capture[0].bucket.arn}/*"
+      ]
+    }
+  }
+
 }
 
 
 data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
-  count = lookup(local.oracle_statistics_map[var.env_name], "source_account_id", null) != null ? 1 : 0
-  statement {
-    sid    = "allowAccessToListOracleStatistics${title(local.oracle_statistics_map[var.env_name]["source_environment"])}Bucket"
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket"
-    ]
-    resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-${var.db_suffix}-statistics-backup-data"]
+  count = length(lookup(local.oracle_statistics_map[var.env_name], "sources", [])) > 0 ? 1 : 0
+
+  dynamic "statement" {
+    for_each = local.oracle_statistics_map[var.env_name]["sources"]
+    content {
+      sid    = "allowAccessToListOracleStatistics${title(statement.value.environment)}Bucket"
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket"
+      ]
+      resources = ["arn:aws:s3:::${var.account_info.application_name}-${statement.value.environment}-oracle-${var.db_suffix}-statistics-backup-data"]
+    }
   }
 
-  statement {
-    sid    = "allowAccessToOracleStatistics${title(local.oracle_statistics_map[var.env_name]["source_environment"])}BucketObjects"
-    effect = "Allow"
-    actions = [
-      "s3:PutObjectAcl",
-      "s3:PutObject",
-      "s3:GetObjectTagging",
-      "s3:GetObject"
-    ]
-    resources = ["arn:aws:s3:::${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["source_environment"]}-oracle-${var.db_suffix}-statistics-backup-data/*"]
+  dynamic "statement" {
+    for_each = local.oracle_statistics_map[var.env_name]["sources"]
+    content {
+      sid    = "allowAccessToOracleStatistics${title(statement.value.environment)}BucketObjects"
+      effect = "Allow"
+      actions = [
+        "s3:PutObjectAcl",
+        "s3:PutObject",
+        "s3:GetObjectTagging",
+        "s3:GetObject"
+      ]
+      resources = ["arn:aws:s3:::${var.account_info.application_name}-${statement.value.environment}-oracle-${var.db_suffix}-statistics-backup-data/*"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "oracle_remote_rat_capture_bucket_access" {
+  count = (length(lookup(local.oracle_rat_capture_map[var.env_name], "sources", [])) > 0) && var.deploy_oracle_rat ? 1 : 0
+
+  dynamic "statement" {
+    for_each = local.oracle_rat_capture_map[var.env_name]["sources"]
+    content {
+      sid    = "allowAccessToListOracleRatCapture${title(statement.value.environment)}Bucket"
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket"
+      ]
+      resources = ["arn:aws:s3:::${var.account_info.application_name}-${statement.value.environment}-oracle-${var.db_suffix}-rat-capture"]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = local.oracle_rat_capture_map[var.env_name]["sources"]
+    content {
+      sid    = "allowAccessToOracleRatCapture${title(statement.value.environment)}BucketObjects"
+      effect = "Allow"
+      actions = [
+        "s3:PutObjectAcl",
+        "s3:PutObject",
+        "s3:GetObjectTagging",
+        "s3:GetObject"
+      ]
+      resources = ["arn:aws:s3:::${var.account_info.application_name}-${statement.value.environment}-oracle-${var.db_suffix}-rat-capture/*"]
+    }
   }
 }
 
@@ -181,17 +241,24 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
   #checkov:skip=CKV_AWS_108 "ignore"
   #checkov:skip=CKV_AWS_111 "ignore"
   #checkov:skip=CKV_AWS_356 "ignore"
-  count = lookup(local.oracle_duplicate_map[var.env_name], "source_account_id", null) != null ? 1 : 0
-  statement {
-    sid    = "allowAccessToOracleDb${title(local.oracle_duplicate_map[var.env_name]["source_environment"])}Bucket"
-    effect = "Allow"
-    actions = [
-      "s3:*"
-    ]
-    resources = [
-      "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, local.oracle_duplicate_map[var.env_name]["source_environment"])}",
-      "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, local.oracle_duplicate_map[var.env_name]["source_environment"])}/*"
-    ]
+  count = length(lookup(local.oracle_duplicate_map[var.env_name], "sources", [])) > 0 ? 1 : 0
+
+  dynamic "statement" {
+    for_each = local.oracle_duplicate_map[var.env_name]["sources"]
+    content {
+      sid    = "allowAccessToOracleDb${title(statement.value.environment)}Bucket"
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:GetBucketLocation"
+      ]
+      resources = [
+        "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, statement.value.environment)}",
+        "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, statement.value.environment)}/*"
+      ]
+    }
   }
 }
 
@@ -200,6 +267,7 @@ data "aws_iam_policy_document" "combined" {
   source_policy_documents = compact([
     try(data.aws_iam_policy_document.oracledb_backup_bucket_access.json, null),
     try(data.aws_iam_policy_document.oracle_remote_statistics_bucket_access[0].json, null),
+    try(data.aws_iam_policy_document.oracle_remote_rat_capture_bucket_access[0].json, null),
     try(data.aws_iam_policy_document.oracledb_remote_backup_bucket_access[0].json, null),
     try(data.aws_iam_policy_document.db_uplift_bucket_access[0].json, null)
   ])
@@ -213,8 +281,7 @@ resource "aws_iam_policy" "oracledb_backup_bucket_access" {
 }
 
 module "s3_bucket_oracledb_backups_inventory" {
-  #checkov:skip=CKV_TF_1 "ignore"
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
   bucket_name         = "${local.oracle_backup_bucket_prefix}-inventory"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
@@ -312,44 +379,49 @@ resource "aws_s3_bucket_inventory" "oracledb_backup_pieces" {
 # Bucket for storing Oracle Statistics Backup Dump Files
 
 data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
-  count   = (lookup(local.oracle_statistics_map[var.env_name], "target_account_id", null) != null) && var.deploy_oracle_stats ? 1 : 0
+  count   = (length(lookup(local.oracle_statistics_map[var.env_name], "targets", [])) > 0) && var.deploy_oracle_stats ? 1 : 0
   version = "2012-10-17"
 
-  statement {
-    sid       = "OracleStatisticsListPolicy"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = [module.s3_bucket_oracle_statistics[0].bucket.arn]
+  dynamic "statement" {
+    for_each = local.oracle_statistics_map[var.env_name]["targets"]
+    content {
+      sid       = "OracleStatisticsListPolicy${title(statement.value.environment)}"
+      effect    = "Allow"
+      actions   = ["s3:ListBucket"]
+      resources = [module.s3_bucket_oracle_statistics[0].bucket.arn]
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${statement.value.account_id}:role/instance-role-${var.account_info.application_name}-${statement.value.environment}-${var.db_suffix}-1"]
+      }
     }
   }
 
-  statement {
-    sid    = "OracleStatisticsObjectPolicy"
-    effect = "Allow"
-    actions = [
-      "s3:PutObjectAcl",
-      "s3:PutObject",
-      "s3:GetObjectTagging",
-      "s3:GetObject"
-    ]
-    resources = ["${module.s3_bucket_oracle_statistics[0].bucket.arn}/*"]
+  dynamic "statement" {
+    for_each = local.oracle_statistics_map[var.env_name]["targets"]
+    content {
+      sid    = "OracleStatisticsObjectPolicy${title(statement.value.environment)}"
+      effect = "Allow"
+      actions = [
+        "s3:PutObjectAcl",
+        "s3:PutObject",
+        "s3:GetObjectTagging",
+        "s3:GetObject"
+      ]
+      resources = ["${module.s3_bucket_oracle_statistics[0].bucket.arn}/*"]
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oracle_statistics_map[var.env_name]["target_account_id"]}:role/instance-role-${var.account_info.application_name}-${local.oracle_statistics_map[var.env_name]["target_environment"]}-${var.db_suffix}-1"]
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${statement.value.account_id}:role/instance-role-${var.account_info.application_name}-${statement.value.environment}-${var.db_suffix}-1"]
+      }
     }
   }
 }
 
 module "s3_bucket_oracle_statistics" {
-  #checkov:skip=CKV_TF_1 "ignore"
   count = var.deploy_oracle_stats ? 1 : 0
 
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
   bucket_name         = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-statistics-backup-data"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
@@ -389,9 +461,93 @@ module "s3_bucket_oracle_statistics" {
   tags = var.tags
 }
 
+data "aws_iam_policy_document" "s3_bucket_oracle_rat_capture" {
+  count   = (length(lookup(local.oracle_rat_capture_map[var.env_name], "targets", [])) > 0) && var.deploy_oracle_rat ? 1 : 0
+  version = "2012-10-17"
+
+  dynamic "statement" {
+    for_each = local.oracle_rat_capture_map[var.env_name]["targets"]
+    content {
+      sid       = "OracleRatCaptureListPolicy${title(statement.value.environment)}"
+      effect    = "Allow"
+      actions   = ["s3:ListBucket"]
+      resources = [module.s3_bucket_oracle_rat_capture[0].bucket.arn]
+
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${statement.value.account_id}:role/instance-role-${var.account_info.application_name}-${statement.value.environment}-${var.db_suffix}-1"]
+      }
+    }
+  }
+
+  dynamic "statement" {
+    for_each = local.oracle_rat_capture_map[var.env_name]["targets"]
+    content {
+      sid    = "OracleRatCaptureObjectPolicy${title(statement.value.environment)}"
+      effect = "Allow"
+      actions = [
+        "s3:PutObjectAcl",
+        "s3:PutObject",
+        "s3:GetObjectTagging",
+        "s3:GetObject"
+      ]
+      resources = ["${module.s3_bucket_oracle_rat_capture[0].bucket.arn}/*"]
+
+      principals {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${statement.value.account_id}:role/instance-role-${var.account_info.application_name}-${statement.value.environment}-${var.db_suffix}-1"]
+      }
+    }
+  }
+}
+
+module "s3_bucket_oracle_rat_capture" {
+  #checkov:skip=CKV_TF_1 "ignore"
+  count = var.deploy_oracle_rat ? 1 : 0
+
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  bucket_name         = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-rat-capture"
+  versioning_enabled  = false
+  ownership_controls  = "BucketOwnerEnforced"
+  replication_enabled = false
+  custom_kms_key      = var.account_config.kms_keys.general_shared
+  bucket_policy = try([data.aws_iam_policy_document.s3_bucket_oracle_rat_capture[0].json], [
+    "{}"
+  ])
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = try(var.db_backup_config.transition, [])
+
+      expiration = {
+        days = var.db_backup_config.expire_current_after_days
+      }
+
+      noncurrent_version_expiration = {
+        days = var.db_backup_config.expire_noncurrent_after_days
+      }
+
+    }
+  ]
+
+  tags = var.tags
+}
+
 module "s3_bucket_db_uplift" {
   count  = contains(["delius-mis"], var.app_name) ? 0 : 1
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
 
   providers = {
     aws.bucket-replication = aws.bucket-replication

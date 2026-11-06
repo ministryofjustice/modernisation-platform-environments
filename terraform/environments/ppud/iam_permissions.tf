@@ -29,9 +29,12 @@ locals {
       description = "Lambda Function Role for invoking SSM & powershell on EC2 instances"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
+        "get_command_invocation",
         "invoke_ssm_powershell",
         "invoke_ssm_ec2_instances",
+        "ec2_permissions",
         "lambda_invoke"
       ]
     }
@@ -39,11 +42,11 @@ locals {
       description = "Lambda Function Role for retrieving data and metrics from cloudwatch"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "get_cloudwatch_metrics",
         "invoke_ses",
-        "get_data_s3",
-        "get_klayers"
+        "get_data_s3"
       ]
       prod_policies = [
         "ec2_permissions"
@@ -54,6 +57,7 @@ locals {
       description = "Lambda Function Role for retrieving security hub data"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "invoke_ses",
         "get_securityhub_data"
@@ -63,14 +67,25 @@ locals {
       description = "Lambda Function Role for sending emails via SES"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "invoke_ses"
+      ]
+    }
+    start_stop_ec2_instances = {
+      description = "Lambda Function Role for starting and stopping an EC2 instance"
+      policies = [
+        "send_message_to_sqs",
+        "sns_publish",
+        "send_logs_to_cloudwatch",
+        "start_stop_ec2_instances"
       ]
     }
     ssm_patch_notification = {
       description = "Lambda Function Role for sending SSM patch notifications via SES"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "invoke_ses",
         "ssm_patch_notification"
@@ -80,6 +95,7 @@ locals {
       description = "Lambda Function Role for SES logging"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "publish_to_sns",
         "put_data_s3"
@@ -89,6 +105,7 @@ locals {
       description = "Lambda Function Role for retrieving ELB metrics from S3"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "get_data_s3",
         "get_cloudwatch_metrics"
@@ -99,10 +116,12 @@ locals {
       description = "Lambda Function Role for retrieving certificate expiration"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "publish_to_sns",
         "get_certificate_parameters",
         "get_cloudwatch_metrics",
+        "list_certificate_expiry",
         "get_certificate_expiry"
       ]
     }
@@ -110,8 +129,10 @@ locals {
       description = "Lambda Function Role for syncing SSM parameter stores to WAF ip sets"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "get_ssm_parameter",
+        "list_waf_ipset",
         "update_waf_ipset"
       ]
     }
@@ -119,6 +140,7 @@ locals {
       description = "Lambda Function Role for checking cloudwatch alarm and generating subsequent alerts"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "publish_to_sns",
         "describe_cloudwatch"
@@ -128,6 +150,7 @@ locals {
       description = "Lambda Function Role for suppressing securityhub findings with a Compliance Status of NOT_AVAILABLE"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "publish_to_sns",
         "put_data_s3",
@@ -138,10 +161,53 @@ locals {
       description = "Lambda Function Role for retrieving and analysing waf web acl data"
       policies = [
         "send_message_to_sqs",
+        "sns_publish",
         "publish_to_sns",
+        "send_logs_to_cloudwatch",
         "invoke_ses",
         "get_cloudwatch_metrics",
-        "get_list_waf_web_acls"
+        "get_waf_web_acls",
+        "list_waf_web_acls"
+      ]
+    }
+    filter_waf_log_events = {
+      description = "Lambda Function Role for retrieving and analysing waf log data"
+      policies = [
+        "send_message_to_sqs",
+        "sns_publish",
+        "publish_to_sns",
+        "send_logs_to_cloudwatch",
+        "filter_waf_log_events",
+        "get_data_s3",
+        "get_cloudwatch_metrics"
+      ]
+    }
+    file_server_analysis = {
+      description = "Lambda Function Role for retrieving and analysing data from S3"
+      policies = [
+        "send_message_to_sqs",
+        "sns_publish",
+        "publish_to_sns",
+        "send_logs_to_cloudwatch",
+        "invoke_ses",
+        "get_data_s3"
+      ]
+    }
+    rotate_ses_access_key = {
+      description = "Lambda Function Role for rotating ses access key and secret key and then derive the new smtp password"
+      policies = [
+        "send_message_to_sqs",
+        "sns_publish",
+        "send_logs_to_cloudwatch",
+        "publish_to_sns",
+        "update_ses_access_key",
+        "update_ses_secrets_value",
+        "invoke_ssm_powershell",
+        "ssm_send_command",
+        "ssm_read_command",
+        "ec2_permissions",
+        "invoke_ses"
+        # ssm_ec2_send_command is attached separately via aws_iam_role_policy_attachment.attach_ssm_ec2_send_command
       ]
     }
   }
@@ -153,24 +219,24 @@ locals {
       condition   = local.is-development
       account_key = "ppud-development" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
       s3_bucket_names = {
-        infrastructure = "moj-infrastructure-dev"
-        log_files      = "moj-log-files-dev"
+        infrastructure = "moj-general-infrastructure-dev"
+        log_files      = "moj-general-logs-dev"
       }
     }
     preproduction = {
       condition   = local.is-preproduction
       account_key = "ppud-preproduction" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
       s3_bucket_names = {
-        infrastructure = "moj-infrastructure-uat"
-        log_files      = "moj-log-files-uat"
+        infrastructure = "moj-general-infrastructure-uat"
+        log_files      = "moj-general-logs-uat"
       }
     }
     production = {
       condition   = local.is-production
       account_key = "ppud-production" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
       s3_bucket_names = {
-        infrastructure = "moj-infrastructure"
-        log_files      = "moj-log-files-prod"
+        infrastructure = "moj-general-infrastructure-prod"
+        log_files      = "moj-general-logs-prod"
       }
     }
   }
@@ -225,26 +291,36 @@ locals {
       for env_key, env_config in local.iam_environments : [
         for policy_name in [
           "send_message_to_sqs",
+          "sns_publish",
           "send_logs_to_cloudwatch",
           "get_cloudwatch_metrics",
           "invoke_ses",
+          "start_stop_ec2_instances",
           "ssm_patch_notification",
           "publish_to_sns",
+          "get_command_invocation",
           "invoke_ssm_powershell",
           "invoke_ssm_ec2_instances",
           "lambda_invoke",
           "get_securityhub_data",
           "get_data_s3",
           "put_data_s3",
-          "get_klayers",
           "ec2_permissions",
           "get_certificate_expiry",
+          "list_certificate_expiry",
           "get_certificate_parameters",
           "get_ssm_parameter",
           "update_waf_ipset",
+          "list_waf_ipset",
           "describe_cloudwatch",
           "suppress_sechub_findings",
-          "get_list_waf_web_acls"
+          "get_waf_web_acls",
+          "list_waf_web_acls",
+          "filter_waf_log_events",
+          "update_ses_access_key",
+          "update_ses_secrets_value",
+          "ssm_send_command",
+          "ssm_read_command"
           ] : {
           key         = "${policy_name}_${env_key}"
           policy_name = policy_name
@@ -268,13 +344,17 @@ resource "aws_iam_policy" "lambda_policies_v2" {
     Statement = [
       each.value.policy_name == "send_message_to_sqs" ? {
         Effect   = "Allow"
-        Action   = ["sqs:SendMessage", "sqs:ChangeMessageVisibility", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl", "sqs:ListQueueTags", "sqs:ReceiveMessage", "sns:Publish"]
+        Action   = ["sqs:SendMessage", "sqs:ChangeMessageVisibility", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl", "sqs:ListQueueTags", "sqs:ReceiveMessage"]
         Resource = ["arn:aws:sqs:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "sns_publish" ? {
+        Effect   = "Allow"
+        Action   = ["sns:Publish"]
+        Resource = ["arn:aws:sns:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "send_logs_to_cloudwatch" ? {
         Effect   = "Allow"
         Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
         Resource = ["arn:aws:logs:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
-        } : each.value.policy_name == "get_cloudwatch_metrics" ? {
+        } : each.value.policy_name == "get_cloudwatch_metrics" ? { ## Tighten this down at a later date
         Effect   = "Allow"
         Action   = ["cloudwatch:*"]
         Resource = ["arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
@@ -282,25 +362,33 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["ses:*"]
         Resource = ["arn:aws:ses:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "start_stop_ec2_instances" ? {
+        Effect   = "Allow"
+        Action   = ["ec2:DescribeInstances", "ec2:StartInstances", "ec2:StopInstances"]
+        Resource = ["*"]
         } : each.value.policy_name == "ssm_patch_notification" ? {
         Effect   = "Allow"
         Action   = ["ssm:DescribeMaintenanceWindows", "ssm:DescribeMaintenanceWindowExecutions", "ssm:DescribeMaintenanceWindowExecutionTasks"]
-        Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        Resource = ["*"]
         } : each.value.policy_name == "publish_to_sns" ? {
         Effect   = "Allow"
         Action   = ["sns:Publish"]
         Resource = ["arn:aws:sns:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "get_command_invocation" ? {
+        Effect   = "Allow"
+        Action   = ["ssm:GetCommandInvocation"]
+        Resource = ["*"]
         } : each.value.policy_name == "invoke_ssm_powershell" ? {
         Effect   = "Allow"
-        Action   = ["ssm:SendCommand", "ssm:GetCommandInvocation"]
+        Action   = ["ssm:SendCommand"]
         Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*", "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"]
         } : each.value.policy_name == "invoke_ssm_ec2_instances" ? {
         Effect   = "Allow"
-        Action   = ["ec2:DescribeInstances", "ssm:SendCommand", "ssm:GetCommandInvocation"]
-        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        Action   = ["ssm:SendCommand"]
+        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:instance/*"]
         } : each.value.policy_name == "lambda_invoke" ? {
         Effect   = "Allow"
-        Action   = ["lambda:InvokeAsync", "lambda:InvokeFunction", "ssm:SendCommand", "ssm:GetCommandInvocation"]
+        Action   = ["lambda:InvokeAsync", "lambda:InvokeFunction"]
         Resource = ["arn:aws:lambda:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "get_securityhub_data" ? {
         Effect   = "Allow"
@@ -314,26 +402,26 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["s3:PutObject", "s3:PutObjectAcl", "s3:ListBucket"]
         Resource = [data.aws_s3_bucket.log_file_buckets[each.value.env_key].arn, "${data.aws_s3_bucket.log_file_buckets[each.value.env_key].arn}/*"]
-        } : each.value.policy_name == "get_klayers" ? {
-        Effect   = "Allow"
-        Action   = ["ssm:GetParameter"]
-        Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:parameter/klayers-account"]
         } : each.value.policy_name == "ec2_permissions" ? {
         Effect   = "Allow"
-        Action   = ["ec2:CreateNetworkInterface", "ec2:DescribeNetworkInterface"]
-        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        Action   = ["ec2:CreateNetworkInterface", "ec2:DescribeNetworkInterfaces", "ec2:DescribeInstances"]
+        Resource = ["*"]
         } : each.value.policy_name == "get_ssm_parameter" ? {
         Effect   = "Allow"
         Action   = ["ssm:GetParameter"]
         Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "list_waf_ipset" ? {
+        Effect   = "Allow"
+        Action   = ["wafv2:ListIPSets"]
+        Resource = ["*"]
         } : each.value.policy_name == "update_waf_ipset" ? {
         Effect   = "Allow"
-        Action   = ["wafv2:GetIPSet", "wafv2:ListIPSets", "wafv2:UpdateIPSet"]
+        Action   = ["wafv2:GetIPSet", "wafv2:UpdateIPSet"]
         Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "describe_cloudwatch" ? {
         Effect   = "Allow"
         Action   = ["cloudwatch:DescribeAlarms"]
-        Resource = ["arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        Resource = ["*"]
         } : each.value.policy_name == "suppress_sechub_findings" ? {
         Effect   = "Allow"
         Action   = ["securityhub:GetFindings", "securityhub:BatchUpdateFindings"]
@@ -344,16 +432,105 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:parameter/certificates/*"]
         } : each.value.policy_name == "get_certificate_expiry" ? {
         Effect   = "Allow"
-        Action   = ["acm:DescribeCertificate", "acm:GetCertificate", "acm:ListCertificates", "acm:ListTagsForCertificate"]
+        Action   = ["acm:DescribeCertificate", "acm:GetCertificate", "acm:ListTagsForCertificate"]
         Resource = ["arn:aws:acm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:certificate/*"]
-        } : each.value.policy_name == "get_list_waf_web_acls" ? {
+        } : each.value.policy_name == "list_certificate_expiry" ? {
         Effect   = "Allow"
-        Action   = ["wafv2:GetWebACL", "wafv2:ListWebACLs"]
+        Action   = ["acm:ListCertificates"]
+        Resource = ["*"]
+        } : each.value.policy_name == "list_waf_web_acls" ? {
+        Effect   = "Allow"
+        Action   = ["wafv2:ListWebACLs"]
+        Resource = ["*"]
+        } : each.value.policy_name == "get_waf_web_acls" ? {
+        Effect   = "Allow"
+        Action   = ["wafv2:GetWebACL"]
         Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "filter_waf_log_events" ? {
+        Effect   = "Allow"
+        Action   = ["logs:FilterLogEvents"]
+        Resource = ["arn:aws:logs:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "update_ses_access_key" ? {
+        Effect   = "Allow"
+        Action   = ["iam:CreateAccessKey", "iam:DeleteAccessKey", "iam:ListAccessKeys", "iam:UpdateAccessKey"]
+        Resource = ["arn:aws:iam::${local.environment_management.account_ids[each.value.env_config.account_key]}:user/${local.ses_iam_user}"]
+        } : each.value.policy_name == "update_ses_secrets_value" ? {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue", "secretsmanager:PutSecretValue", "secretsmanager:UpdateSecret"]
+        Resource = ["arn:aws:secretsmanager:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:secret:${local.ses_secret_name}-*"]
+        } : each.value.policy_name == "ssm_send_command" ? {
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand"]
+        Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:command/*"]
+        } : each.value.policy_name == "ssm_read_command" ? {
+        Effect   = "Allow"
+        Action   = ["ssm:GetCommandInvocation", "ssm:ListCommandInvocations", "ssm:ListCommands"]
+        Resource = ["*"]
         } : {
         Effect   = "Deny" # Fallback deny for any unexpected policy names
         Action   = ["*"]
         Resource = ["*"]
+      }
+    ]
+  })
+}
+
+# Separate statement for this IAM policy due to the condition reference
+
+resource "aws_iam_policy" "ssm_ec2_send_command" {
+  for_each = {
+    for env_key, env_config in local.iam_environments : env_key => env_config
+    if env_config.condition
+  }
+
+  name        = "aws_iam_policy_ssm_ec2_send_command_${each.key}_v2"
+  path        = "/"
+  description = "Lambda policy for ssm_ec2_send_command in ${each.key} environment"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["ec2:DescribeInstances"]
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand"]
+        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
+        Condition = {
+          StringEquals = {
+            "ssm:resourceTag/role" = [
+              "ses_web_config",
+              "ses_tfs_config",
+              "ses_sql_config"
+            ]
+          }
+        }
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand"]
+        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
+        Condition = {
+          StringEquals = {
+            "ssm:resourceTag/ses_service_restart" = [
+              "PPUDAutomatedProcessManagerTEST",
+              "PPUDAutomatedProcessManagerUAT"
+            ]
+          }
+        }
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand"]
+        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
+        Condition = {
+          StringEquals = {
+            "ssm:resourceTag/test_role" = "ses_test_config"
+          }
+        }
       }
     ]
   })
@@ -387,6 +564,16 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_v2" {
 
   role       = aws_iam_role.lambda_role_v2[each.value.role_key].name
   policy_arn = aws_iam_policy.lambda_policies_v2[each.value.policy_key].arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_ssm_ec2_send_command" {
+  for_each = {
+    for role_key, role_instance in local.lambda_role_instances_map : role_key => role_instance
+    if role_instance.role_key == "rotate_ses_access_key"
+  }
+
+  role       = aws_iam_role.lambda_role_v2[each.key].name
+  policy_arn = aws_iam_policy.ssm_ec2_send_command[each.value.env_key].arn
 }
 
 # Managed policy attachments

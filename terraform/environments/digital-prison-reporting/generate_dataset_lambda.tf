@@ -20,6 +20,7 @@ module "generate_dataset_lambda" {
     "DB_NAME"               = local.lambda_generate_dataset_database_name
     "CREDENTIAL_SECRET_ARN" = local.lambda_generate_dataset_secret_arn
     "DPD_DDB_TABLE_ARN"     = local.lambda_generate_dataset_dpd_ddb_table_arn
+    "S3_REPORT_LOCATION"    = local.lambda_generate_dataset_s3_rep_location
   }
 
   vpc_settings = {

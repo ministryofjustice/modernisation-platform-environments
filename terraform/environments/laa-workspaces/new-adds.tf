@@ -11,6 +11,9 @@ resource "aws_directory_service_directory" "workspaces_ad" {
   edition    = local.application_data.accounts[local.environment].ad_edition
   type       = "MicrosoftAD"
 
+  # Enable Directory Service Data API for programmatic user management
+  enable_directory_data_access = true
+
   vpc_settings {
     vpc_id     = data.terraform_remote_state.workspace_components.outputs.vpc_id
     subnet_ids = data.terraform_remote_state.workspace_components.outputs.private_subnet_ids

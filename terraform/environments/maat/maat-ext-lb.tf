@@ -13,7 +13,7 @@ locals {
 
 module "lb-s3-access-logs" {
   count  = local.existing_bucket_name == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=494aa4438cec612e45387109caa832aff4cac1ce" # v9.0.1
 
   providers = {
     aws.bucket-replication = aws
@@ -69,6 +69,24 @@ module "lb-s3-access-logs" {
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      local.existing_bucket_name != "" ? "arn:aws:s3:::${local.existing_bucket_name}" : module.lb-s3-access-logs[0].bucket.arn,
+      local.existing_bucket_name != "" ? "arn:aws:s3:::${local.existing_bucket_name}/*" : "${module.lb-s3-access-logs[0].bucket.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
   statement {
     effect = "Allow"
     actions = [

@@ -14,12 +14,14 @@ resource "aws_security_group" "oem_app_efs_sg" {
 
 resource "aws_vpc_security_group_egress_rule" "oem_app_efs_sg_egress_all_0_0_cidr" {
   security_group_id = aws_security_group.oem_app_efs_sg.id
-  description       = "Allow all outbound traffic"
+  description       = "Allow outbound traffic within the VPC"
   ip_protocol       = "-1"
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+
+
 
   tags = {
-    Name = "Allow all outbound traffic"
+    Name = "Allow outbound traffic within the VPC"
   }
 }
 

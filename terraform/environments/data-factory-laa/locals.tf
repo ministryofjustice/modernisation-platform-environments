@@ -1,1 +1,32 @@
 #### This file can be used to store locals specific to the member account ####
+locals {
+  current_account_id     = data.aws_caller_identity.current.account_id
+  current_account_region = data.aws_region.current.region
+
+  fabric_oidc_enabled_environments = [
+    "development",
+    "test"
+  ]
+
+  fabric_oidc_enabled = contains(
+    local.fabric_oidc_enabled_environments,
+    local.environment
+  )
+
+  fabric_curated_bucket_enabled = local.environment == "development"
+
+  # Existing processedraw buckets follow an account-specific naming convention.
+  fabric_processedraw_bucket_arn = "arn:aws:s3:::laa-data-factory-processedraw-${local.current_account_id}-eu-west-2-an"
+
+  fabric_tenant_id = (
+    local.fabric_oidc_enabled
+    ? trimspace(data.aws_secretsmanager_secret_version.fabric_tenant_id[0].secret_string)
+    : null
+  )
+
+  fabric_enterprise_app_object_id = (
+    local.fabric_oidc_enabled
+    ? trimspace(data.aws_secretsmanager_secret_version.fabric_enterprise_app_object_id[0].secret_string)
+    : null
+  )
+}

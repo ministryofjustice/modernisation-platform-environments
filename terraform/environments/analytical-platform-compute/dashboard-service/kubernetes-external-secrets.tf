@@ -8,7 +8,7 @@ resource "kubernetes_manifest" "dashboard_service_app_secrets_secret" {
     "kind"       = "ExternalSecret"
     "metadata" = {
       "name"      = "dashboard-service-app-secrets"
-      "namespace" = kubernetes_namespace.dashboard_service[0].metadata[0].name
+      "namespace" = kubernetes_namespace_v1.dashboard_service[0].metadata[0].name
     }
     "spec" = {
       "refreshInterval" = "1m"

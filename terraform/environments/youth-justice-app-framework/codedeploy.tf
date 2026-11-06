@@ -43,7 +43,6 @@ module "codedeploy" {
     module.external_alb,
     module.connectivity_alb,
     module.yjsm_hub_svc_alb,
-    module.ecs,
-    module.yjsm
+    module.ecs
   ]
 }

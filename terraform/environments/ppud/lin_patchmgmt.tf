@@ -1,7 +1,8 @@
-# Create Patch Group
-# PROD LINUX
-# Linux instances only exist in production but using the local.environment variable allows
-# for future linux instances to be added into dev and uat with their own patch groups
+################################################################################################
+# LINUX SSM Patch Management Groups, Baselines, Maintenance Windows and Maintenance Window Tasks
+################################################################################################
+
+# SSM Patch Groups - Production
 
 resource "aws_ssm_patch_group" "lin_patch_group" {
   count       = local.is-production == true ? 1 : 0
@@ -9,13 +10,13 @@ resource "aws_ssm_patch_group" "lin_patch_group" {
   patch_group = local.application_data.accounts[local.environment].lin_patch_group
 }
 
-# Create Linux Patch Baseline
+# Amazon Linux 2023 Patch Baseline
 
 resource "aws_ssm_patch_baseline" "linux_os_baseline" {
   count            = local.is-production == true ? 1 : 0
-  name             = "LinuxOS"
-  description      = "Patch Linux OS"
-  operating_system = "AMAZON_LINUX_2"
+  name             = "LinuxOS-AmazonLinux2023"
+  description      = "Patch Amazon Linux 2023"
+  operating_system = "AMAZON_LINUX_2023"
 
   approval_rule {
     approve_after_days  = 5
@@ -23,13 +24,12 @@ resource "aws_ssm_patch_baseline" "linux_os_baseline" {
 
     patch_filter {
       key    = "PRODUCT"
-      values = ["AmazonLinux2"]
+      values = ["AmazonLinux2023"]
     }
     patch_filter {
       key    = "CLASSIFICATION"
       values = ["Security", "Bugfix"]
     }
-
     patch_filter {
       key    = "SEVERITY"
       values = ["Critical", "Important", "Medium"]
@@ -37,7 +37,7 @@ resource "aws_ssm_patch_baseline" "linux_os_baseline" {
   }
 }
 
-# Create Maintenance Windows
+# Patching Maintenance Windows
 # Production Linux
 # Fourth Wednesday of the month at 20:00
 
@@ -49,6 +49,8 @@ resource "aws_ssm_maintenance_window" "prod_lin_patch_maintenance_window" {
   cutoff            = 1
   schedule_timezone = "Europe/London"
 }
+
+# Maintenance Window Target for Amazon Linux 2023 Instances
 
 resource "aws_ssm_maintenance_window_target" "prod_lin_maintenance_window_target" {
   count         = local.is-production == true ? 1 : 0
@@ -63,8 +65,7 @@ resource "aws_ssm_maintenance_window_target" "prod_lin_maintenance_window_target
   }
 }
 
-# Create Maintenance Window Task
-# PROD LINUX
+# Maintenance Window Task for Amazon Linux 2023 Instances
 
 resource "aws_ssm_maintenance_window_task" "prod_lin_patch_maintenance_window_task" {
   count            = local.is-production == true ? 1 : 0
@@ -96,7 +97,20 @@ resource "aws_ssm_maintenance_window_task" "prod_lin_patch_maintenance_window_ta
   }
 }
 
-# Maintenance Window Pre Health Check Task for Linux
+
+# Pre Patch Health Check Document
+
+data "aws_ssm_document" "pre_patch_lin_healthcheck" {
+  name = "Pre_Patch_Linux_Health_Check_Report"
+}
+
+# Post Patch Health Check Document
+
+data "aws_ssm_document" "post_patch_lin_healthcheck" {
+  name = "Post_Patch_Linux_Health_Check_Report"
+}
+
+# Maintenance Window Pre Health Check Task for Amazon Linux 2023
 
 resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_window_task" {
   count            = local.is-production == true ? 1 : 0
@@ -104,7 +118,7 @@ resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_wind
   name             = "Pre-Health-Check-Report-Instance-Patch"
   description      = "Export Health Check Report to S3"
   task_type        = "RUN_COMMAND"
-  task_arn         = aws_ssm_document.linux_health_check_s3[0].arn
+  task_arn         = data.aws_ssm_document.pre_patch_lin_healthcheck.arn
   priority         = local.application_data.accounts[local.environment].pre_healthcheck_Priority
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "100%"
@@ -117,14 +131,12 @@ resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_wind
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
-      output_s3_key_prefix = "health-check-reports/linux/"
-      timeout_seconds      = 600
+      timeout_seconds = 600
     }
   }
 }
 
-# Maintenance Window Post Health Check Task for Linux
+# Maintenance Window Post Health Check Task for Amazon Linux 2023
 
 resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_window_task" {
   count            = local.is-production == true ? 1 : 0
@@ -132,7 +144,7 @@ resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_win
   name             = "Post-Health-Check-Report-Instance-Patch"
   description      = "Export Health Check Report to S3"
   task_type        = "RUN_COMMAND"
-  task_arn         = aws_ssm_document.linux_health_check_s3[0].arn
+  task_arn         = data.aws_ssm_document.post_patch_lin_healthcheck.arn
   priority         = local.application_data.accounts[local.environment].post_healthcheck_Priority
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "100%"
@@ -145,32 +157,7 @@ resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_win
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
-      output_s3_key_prefix = "health-check-reports/linux/"
-      timeout_seconds      = 600
+      timeout_seconds = 600
     }
   }
-}
-
-# Create perform_healthcheck_S3 document
-
-resource "aws_ssm_document" "linux_health_check_s3" {
-  count         = local.is-production == true ? 1 : 0
-  name          = "linux_health_check"
-  document_type = "Command"
-  content = jsonencode(
-    {
-      "schemaVersion" = "2.2",
-      "description"   = "Execute Shell Command",
-      "mainSteps" = [
-        {
-          "action" = "aws:runShellScript",
-          "name"   = "linux_health_check",
-          "inputs" = {
-            "runCommand" = ["/usr/local/bin/Linux_Health_Check.sh"]
-          }
-        }
-      ]
-    }
-  )
 }

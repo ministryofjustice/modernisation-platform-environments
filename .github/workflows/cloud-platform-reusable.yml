@@ -16,28 +16,92 @@ on:
         required: false
         description: "Set to plan or plan_apply"
         default: plan
+      account_name:
+        type: string
+        required: false
+        description: "Optional: account name override for ACCOUNT_NAME env var."
+      secrets_prefetched:
+        type: boolean
+        required: false
+        default: false
+        description: "Optional: set to true when the caller already fetched secrets and is passing them in via ENVIRONMENT_MANAGEMENT/GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT secrets."
+      terraform_version:
+        type: string
+        required: false
+        description: "Optional: specify the Terraform version to use."
+        default: "1.16.6"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID:
         required: true
       PASSPHRASE:
         required: true
+      ENVIRONMENT_MANAGEMENT:
+        required: false
+        description: "Optional: pre-fetched environment_management secret, passed down to skip re-fetching in each component's plan/apply workflow."
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT:
+        required: false
+        description: "Optional: pre-fetched github_ci_user_environments_repo_pat secret, passed down to skip re-fetching in each component's plan/apply workflow."
 
 permissions:
+  pull-requests: write
   id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
 jobs:
 
+  plan-terraform:
+    if: inputs.action == 'plan'
+    strategy:
+      fail-fast: false
+      matrix:
+        component:
+          - root
+          - network
+          - cluster
+          - cluster-base
+          - cluster-core
+          - cluster-components
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: ${{ inputs.application }}
+      environment: ${{ inputs.environment }}
+      action: plan
+      post_plan_to_pr: true
+      plan_apply_tfargs: ${{ matrix.component == 'cluster' && format('-var=created_by={0}/{1}/actions/runs/{2}/', github.server_url, github.repository, github.run_id) || '' }}
+      component: ${{ matrix.component }}
+      account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "ubuntu-latest"
+      terraform_version: ${{ inputs.terraform_version }}
+      mint_grafana_token: ${{ matrix.component == 'root' }}
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+
   root-terraform:
+    if: inputs.action != 'plan'
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      post_plan_to_pr: true
       component: "root"
+      account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
+      terraform_version: ${{ inputs.terraform_version }}
+      # Root manages the centralised AMG workspace and its Grafana-internal
+      # objects (teams, data sources, permissions), so the Grafana provider needs
+      # a short-lived service account token. No-op on workspaces without AMG.
+      mint_grafana_token: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
 
   network-terraform:
     needs: root-terraform
@@ -46,10 +110,17 @@ jobs:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      post_plan_to_pr: true
       component: "network"
+      account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
+      terraform_version: ${{ inputs.terraform_version }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
 
   cluster-terraform:
     needs: network-terraform
@@ -58,22 +129,56 @@ jobs:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      post_plan_to_pr: true
+      plan_apply_tfargs: ${{ format('-var=created_by={0}/{1}/actions/runs/{2}/', github.server_url, github.repository, github.run_id) }}
       component: "cluster"
+      account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
+      terraform_version: ${{ inputs.terraform_version }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
 
-  cluster-core-terraform:
+  cluster-base-terraform:
     needs: cluster-terraform
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
-      component: "cluster-core"
+      post_plan_to_pr: true
+      component: "cluster-base"
+      account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
+      terraform_version: ${{ inputs.terraform_version }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+
+  cluster-core-terraform:
+    needs: cluster-base-terraform
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: ${{ inputs.application }}
+      environment: ${{ inputs.environment }}
+      action: ${{ inputs.action }}
+      post_plan_to_pr: true
+      component: "cluster-core"
+      account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
+      terraform_version: ${{ inputs.terraform_version }}
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
 
   cluster-components-terraform:
     needs: cluster-core-terraform
@@ -82,7 +187,14 @@ jobs:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      post_plan_to_pr: true
       component: "cluster-components"
+      account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
+      terraform_version: ${{ inputs.terraform_version }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}

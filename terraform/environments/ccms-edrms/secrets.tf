@@ -9,37 +9,19 @@ data "aws_secretsmanager_secret_version" "spring_datasource_password" {
   secret_id = aws_secretsmanager_secret.spring_datasource_password.id
 }
 
-# Slack Channel ID for Alerts
-resource "aws_secretsmanager_secret" "slack_channel_id" {
-  name        = "alerts_slack_channel_id"
-  description = "Slack Channel ID for EDRMS Alerts"
+#Secret for EDRMS
+resource "aws_secretsmanager_secret" "edrms_secrets" {
+  name        = "${local.application_name}-secrets"
+  description = "EDRMS Secret"
 }
 
-data "aws_secretsmanager_secret_version" "slack_channel_id" {
-  secret_id = aws_secretsmanager_secret.slack_channel_id.id
-}
-
-# Slack Channel ID for guardduty Alerts
-resource "aws_secretsmanager_secret" "guardduty_slack_channel_id" {
-  name        = "guardduty_slack_channel_id"
-  description = "Slack Channel ID for guardduty Alerts"
-}
-
-data "aws_secretsmanager_secret_version" "guardduty_slack_channel_id" {
-  secret_id = aws_secretsmanager_secret.guardduty_slack_channel_id.id
-}
-
-# Slack Channel Webhook Secret for EDRMS Docs Exception
-resource "aws_secretsmanager_secret" "edrms_docs_exception_secrets" {
-  name        = "${local.application_name}-docs-exception-secrets"
-  description = "EDRMS Docs Exception Secret"
-}
-
-resource "aws_secretsmanager_secret_version" "edrms_docs_exception_secrets" {
-  secret_id = aws_secretsmanager_secret.edrms_docs_exception_secrets.id
+resource "aws_secretsmanager_secret_version" "edrms_secrets" {
+  secret_id = aws_secretsmanager_secret.edrms_secrets.id
   secret_string = jsonencode({
     "slack_channel_webhook"           = ""
     "slack_channel_webhook_guardduty" = ""
+    "slack_channel_webhook_docs"      = ""
+    "slack_channel_webhook_s3"        = ""
   })
 
   lifecycle {

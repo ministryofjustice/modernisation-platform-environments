@@ -31,7 +31,7 @@ resource "aws_iam_instance_profile" "smtp4dev_ec2_ssm_profile" {
   role  = aws_iam_role.smtp4dev_ec2_ssm_role[count.index].name
 }
 
-# Build smtp4dev EC2 
+# Build smtp4dev EC2
 resource "aws_instance" "smtp4dev_mock_server" {
   count                       = local.is-production ? 0 : 1
   instance_type               = "t3.medium"
@@ -43,7 +43,7 @@ resource "aws_instance" "smtp4dev_mock_server" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.smtp4dev_ec2_ssm_profile[count.index].name
 
-  user_data_replace_on_change = true
+#  user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/ec2_user_data_smpt4dev.sh", {
     environment = "${local.environment}"
   }))

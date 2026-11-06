@@ -99,6 +99,7 @@ resource "aws_route53_record" "jitbit_amazonses_mail_from_mx_record_prod" {
 #####################
 
 resource "aws_iam_user" "jitbit_ses_smtp_user" {
+  #checkov:skip=CKV_AWS_273: "Service account required for SES SMTP authentication; IAM Identity Center is not supported for application SMTP credentials"
   name = "${local.environment}-jitbit-smtp-user"
 }
 
@@ -107,6 +108,8 @@ resource "aws_iam_access_key" "jitbit_ses_smtp_user" {
 }
 
 resource "aws_iam_user_policy" "jitbit_ses_smtp_user" {
+  #checkov:skip=CKV_AWS_355: "Future scoping required"
+  #checkov:skip=CKV_AWS_290: "Future scoping required"
   name = "${local.environment}-jitbit-ses-smtp-user-policy"
   user = aws_iam_user.jitbit_ses_smtp_user.name
 
@@ -126,8 +129,9 @@ resource "aws_iam_user_policy" "jitbit_ses_smtp_user" {
 }
 
 resource "aws_ssm_parameter" "jitbit_ses_smtp_user" {
-  name = "/${local.environment}/jitbit/ses_smtp"
-  type = "SecureString"
+  name   = "/${local.environment}/jitbit/ses_smtp"
+  type   = "SecureString"
+  key_id = data.aws_kms_key.general_shared.arn
   value = jsonencode({
     user              = aws_iam_user.jitbit_ses_smtp_user.name,
     key               = aws_iam_access_key.jitbit_ses_smtp_user.id,

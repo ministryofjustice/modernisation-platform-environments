@@ -16,7 +16,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ------ | ------ |
 | [aws_iam_role.service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.task](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.task_exec](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
@@ -34,7 +34,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ------ | ------------- | ------ | --------- | :--------: |
 | <a name="input_env_name"></a> [env\_name](#input\_env\_name) | n/a | `string` | n/a | yes |
 | <a name="input_extra_exec_role_allow_statements"></a> [extra\_exec\_role\_allow\_statements](#input\_extra\_exec\_role\_allow\_statements) | n/a | `list(string)` | `[]` | no |
 | <a name="input_extra_service_role_allow_statements"></a> [extra\_service\_role\_allow\_statements](#input\_extra\_service\_role\_allow\_statements) | n/a | `list(string)` | `[]` | no |
@@ -45,7 +45,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ------ | ------------- |
 | <a name="output_service_role"></a> [service\_role](#output\_service\_role) | n/a |
 | <a name="output_task_exec_role"></a> [task\_exec\_role](#output\_task\_exec\_role) | n/a |
 | <a name="output_task_role"></a> [task\_role](#output\_task\_role) | n/a |

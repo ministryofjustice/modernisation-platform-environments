@@ -50,5 +50,34 @@ locals {
         ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
       }
     }
+    rclone_sync = {
+      rclone-sync-error = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_rclone_sync_value"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if any metric collected via /opt/textfile_monitoring/rclone_sync is in error, See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/6319178819"
+        alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
+        ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
+      }
+      rclone-sync-metric-not-updated = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_textfile_monitoring_rclone_sync_seconds"
+        period              = "300"
+        statistic           = "Minimum"
+        threshold           = "7200"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if no metrics in /opt/textfile_monitoring/rclone_sync have been updated in the last 2 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/6319572194"
+        alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
+        ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
+      }
+    }
   }
 }

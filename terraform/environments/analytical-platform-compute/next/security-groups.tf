@@ -5,7 +5,7 @@ module "rds_security_group" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.3.0"
+  version = "5.3.1"
 
   name            = "${local.component_name}-rds"
   use_name_prefix = true

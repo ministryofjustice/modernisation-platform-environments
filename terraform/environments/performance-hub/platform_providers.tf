@@ -56,3 +56,13 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
 }
+
+# AWS provider for managing Business Unit secrets and parameters
+provider "aws" {
+  region = "eu-west-2"
+  alias  = "shared-configuration-access"
+
+  assume_role {
+    role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:role/${local.vpc_name}-shared-configuration-access"
+  }
+}

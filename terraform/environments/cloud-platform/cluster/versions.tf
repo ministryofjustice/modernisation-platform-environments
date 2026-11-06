@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      version = "~> 6.0"
+      version = "~> 6.0, != 6.57.0"
       source  = "hashicorp/aws"
     }
     dns = {
@@ -32,15 +32,14 @@ terraform {
       source  = "hashicorp/helm"
       version = ">= 3.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.0"
+    }
 
     cloudinit = {
       version = "~> 2.0"
       source  = "hashicorp/cloudinit"
-    }
-
-    kubectl = {
-      source  = "alekc/kubectl"
-      version = "~> 2.0"
     }
   }
   required_version = "~> 1.0"

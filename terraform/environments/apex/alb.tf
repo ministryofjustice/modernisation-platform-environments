@@ -14,9 +14,9 @@ locals {
   }
 
   prod_validation = {
-    "${local.application_data.accounts[local.environment].acm_cert_domain_name}" = {
+    local.application_data.accounts[local.environment].acm_cert_domain_name = {
       account   = "core-network-services"
-      zone_name = "${local.application_data.accounts[local.environment].acm_cert_domain_name}"
+      zone_name = local.application_data.accounts[local.environment].acm_cert_domain_name
     }
   }
 
@@ -43,7 +43,7 @@ module "alb" {
   account_number                   = local.environment_management.account_ids[terraform.workspace]
   environment                      = local.environment
   region                           = "eu-west-2"
-  enable_deletion_protection       = local.environment == "production" ? true : false
+  enable_deletion_protection       = true
   idle_timeout                     = 65
   force_destroy_bucket             = true
   security_group_ingress_from_port = 443

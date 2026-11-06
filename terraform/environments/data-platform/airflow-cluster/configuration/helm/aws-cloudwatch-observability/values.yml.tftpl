@@ -1,0 +1,40 @@
+---
+clusterName: ${cluster_name}
+region: ${aws_region}
+
+# Metrics-only mode: logs continue to be handled by aws-for-fluent-bit.
+containerLogs:
+  enabled: false
+
+# Disable optional hardware exporters unless explicitly needed.
+dcgmExporter:
+  enabled: false
+
+neuronMonitor:
+  enabled: false
+
+# Keep enhanced container insights metrics, but do not enable traces/application signals.
+agent:
+  defaultConfig:
+    {
+      "logs": {
+        "metrics_collected": {
+          "kubernetes": {
+            "enhanced_container_insights": true
+          }
+        }
+      }
+    }
+
+# The operator deployment uses manager-specific tolerations.
+manager:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+tolerations:
+  - operator: Exists

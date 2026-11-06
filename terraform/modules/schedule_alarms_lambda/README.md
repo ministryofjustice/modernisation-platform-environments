@@ -1,7 +1,7 @@
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ------ | --------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.8 |
 | <a name="requirement_archive"></a> [archive](#requirement\_archive) | ~> 2.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.0 |
@@ -20,7 +20,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ------ | ------ |
 | [aws_cloudwatch_event_rule.alarm_scheduler](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
 | [aws_cloudwatch_event_target.alarm_scheduler](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
 | [aws_cloudwatch_log_group.execution_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
@@ -37,7 +37,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ------ | ------------- | ------ | --------- | :--------: |
 | <a name="input_alarm_list"></a> [alarm\_list](#input\_alarm\_list) | List of specific alarms to manage (empty list means all alarms) | `list(string)` | `[]` | no |
 | <a name="input_alarm_patterns"></a> [alarm\_patterns](#input\_alarm\_patterns) | List of alarm name patterns to match (e.g., ['alarm-name-\*', '\*-other-alarm']). Uses [fnmatch](https://docs.python.org/3/library/fnmatch.html). | `list(string)` | `[]` | no |
 | <a name="input_disable_weekend"></a> [disable\_weekend](#input\_disable\_weekend) | Whether to disable alarms for the entire weekend | `bool` | `true` | no |
@@ -50,7 +50,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ------ | ------------- |
 | <a name="output_cloudwatch_event_rule_arns"></a> [cloudwatch\_event\_rule\_arns](#output\_cloudwatch\_event\_rule\_arns) | The ARNs of the CloudWatch Event Rules |
 | <a name="output_lambda_function_arn"></a> [lambda\_function\_arn](#output\_lambda\_function\_arn) | The ARN of the Lambda function |
 | <a name="output_lambda_function_name"></a> [lambda\_function\_name](#output\_lambda\_function\_name) | The name of the Lambda function |

@@ -28,10 +28,10 @@ module "environment_test" {
 
   bastion_config = local.bastion_config_test
 
-  ldap_config        = local.ldap_config_test
-  db_config          = local.db_config_test
-  create_backup_role = true
-  create_ecs_lambda  = true
+  ldap_config                  = local.ldap_config_test
+  db_config                    = local.db_config_test
+  create_account_service_roles = true
+  create_ecs_lambda            = true
 
   delius_microservice_configs = local.delius_microservices_configs_test
 
@@ -44,4 +44,9 @@ module "environment_test" {
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
 
   db_backup_config = local.db_backup_config_test
+}
+
+module "aws_health_lambda_cloudwatch_events_test" {
+  source                          = "../../modules/aws_health_lambda_cloudwatch_events"
+  aws_health_lambda_configuration = local.aws_health_lambda_configuration_test
 }

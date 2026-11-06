@@ -67,7 +67,7 @@ This will be used to select the tables to be migrated.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ------ | ------------- | ------ | --------- | :--------: |
 | <a name="input_db"></a> [db](#input\_db) | The database name | `string` | n/a | yes |
 | <a name="input_dms_mapping_rules"></a> [dms\_mapping\_rules](#input\_dms\_mapping\_rules) | The path to the mapping rules file | `string` | n/a | yes |
 | <a name="input_dms_replication_instance"></a> [dms\_replication\_instance](#input\_dms\_replication\_instance) | n/a | <pre>object({<br/>    replication_instance_id    = string<br/>    subnet_group_id            = optional(string)<br/>    subnet_group_name          = optional(string)<br/>    subnet_ids                 = optional(list(string))<br/>    allocated_storage          = number<br/>    availability_zone          = string<br/>    engine_version             = string<br/>    kms_key_arn                = optional(string)<br/>    multi_az                   = bool<br/>    replication_instance_class = string<br/>    inbound_cidr               = string<br/>  })</pre> | n/a | yes |
@@ -89,7 +89,7 @@ This will be used to select the tables to be migrated.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ------ | ------ |
 | [aws_dms_endpoint.source](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dms_endpoint) | resource |
 | [aws_dms_replication_instance.instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dms_replication_instance) | resource |
 | [aws_dms_replication_subnet_group.replication_subnet_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dms_replication_subnet_group) | resource |

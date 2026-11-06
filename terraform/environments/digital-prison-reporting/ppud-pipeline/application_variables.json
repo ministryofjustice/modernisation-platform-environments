@@ -1,0 +1,85 @@
+{
+  "accounts": {
+    "development": {
+      "days_back": "3",
+      "cron_schedule": "cron(30 07 ? * MON *)",
+      "rds_output_parquest_file_size": 50,
+      "short_name_environment": "dev",
+      "ppud_replication_environment": "dev",
+      "rds_module_sql_engine_version": "15.00.4420.2.v1",
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["dpr-structured-historical-development"],
+          "resource_shares": [
+            {
+              "glue_database": "public_protection_datamarts_dev_dbt",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "public_protection_derived_dev_dbt",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ]
+    },
+    "preproduction": {
+      "days_back": "1",
+      "cron_schedule": "cron(30 07 ? * TUE *)",
+      "rds_output_parquest_file_size": 200,
+      "short_name_environment": "preprod",
+      "ppud_replication_environment": "uat",
+      "rds_module_sql_engine_version": "16.00.4295.3.v1",
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["dpr-structured-historical-preproduction"],
+          "resource_shares": [
+            {
+              "glue_database": "public_protection_datamarts_preprod_dbt",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "public_protection_derived_preprod_dbt",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ]
+    },
+    "production": {
+      "days_back": "1",
+      "cron_schedule": "cron(30 07 * * ? *)",
+      "rds_output_parquest_file_size": 200,
+      "short_name_environment": "prod",
+      "ppud_replication_environment": "prod",
+      "rds_module_sql_engine_version": "15.00.4420.2.v1",
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["dpr-structured-historical-production"],
+          "resource_shares": [
+            {
+              "glue_database": "public_protection_datamarts",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "public_protection_derived",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

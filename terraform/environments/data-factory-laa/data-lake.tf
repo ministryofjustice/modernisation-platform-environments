@@ -1,0 +1,325 @@
+locals {
+  name      = "laa-data-factory"
+  databases = ["aws-athena-query-results", "raw", "processedraw", "staging", "intermediate", "datamarts", "derived"]
+  environments = {
+    development = {
+      lakeformation_admins = [
+        "arn:aws:iam::307869868585:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_c38cf78de39ef4d0",
+        "arn:aws:iam::307869868585:role/MemberInfrastructureAccess",
+        "arn:aws:iam::307869868585:role/github-actions-apply"
+      ]
+      lakeformation_read_only_admins = [
+        "arn:aws:iam::307869868585:role/github-actions-plan"
+      ]
+    }
+    test = {
+      lakeformation_admins = concat([
+        "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_9e1f6f5fda83364d",
+        "arn:aws:iam::766696030771:role/MemberInfrastructureAccess",
+        "arn:aws:iam::766696030771:role/github-actions-apply",
+      ], aws_iam_role.file_uploads_role[*].arn)
+      lakeformation_read_only_admins = [
+        "arn:aws:iam::766696030771:role/github-actions-plan"
+      ]
+    }
+  }
+}
+
+module "data_lake_settings" {
+  source = "git::https://github.com/ministryofjustice/terraform-aws-data-platform-lakeformation.git//modules/data-lake-settings?ref=43c73a9"
+
+  admins           = local.environments[local.environment].lakeformation_admins
+  read_only_admins = local.environments[local.environment].lakeformation_read_only_admins
+}
+
+resource "aws_glue_data_catalog_encryption_settings" "catalog_encryption" {
+  data_catalog_encryption_settings {
+    connection_password_encryption {
+      aws_kms_key_id                       = aws_kms_key.data_lake_kms_key.arn
+      return_connection_password_encrypted = true
+    }
+
+    encryption_at_rest {
+      catalog_encryption_mode = "SSE-KMS"
+      sse_aws_kms_key_id      = aws_kms_key.data_lake_kms_key.arn
+    }
+  }
+}
+
+data "aws_iam_policy_document" "data_lake_kms_key" {
+  #checkov:skip=CKV_AWS_356: Delegates access to the root account for KMS key management
+  #checkov:skip=CKV_AWS_109: Delegates access to the root account for KMS key management
+  #checkov:skip=CKV_AWS_111: Delegates access to the root account for KMS key management
+  # Enables IAM policies in this AWS account to delegate access to the key.
+  statement {
+    sid    = "EnableRootAccountPermissions"
+    effect = "Allow"
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+      ]
+    }
+
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  # Allows S3 event notifications to publish to an encrypted SQS queue.
+  statement {
+    sid    = "AllowS3EventNotifications"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "s3.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    resources = ["*"]
+  }
+
+  # Allow developers to use the key for encrypting and decrypting data in the data lake.
+  statement {
+    sid    = "AllowDevelopersToUseKey"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = local.environments[local.environment].lakeformation_admins
+    }
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+resource "aws_kms_key" "data_lake_kms_key" {
+  description             = "KMS key for encrypting data in the data lake"
+  deletion_window_in_days = 10
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.data_lake_kms_key.json
+}
+
+resource "aws_kms_alias" "data_lake_kms_alias" {
+  name          = "alias/data-lake"
+  target_key_id = aws_kms_key.data_lake_kms_key.id
+}
+
+module "data_lake_buckets" {
+  for_each = toset(local.databases)
+  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=0294b1a1303028f91707fdc67f1e4bba63d34ea6"
+
+  manage_log_bucket_policy = false
+  log_buckets              = local.access_log_destination
+  log_prefix               = "${each.key}/"
+
+  bucket_prefix       = each.key == "aws-athena-query-results" ? "aws-athena-query-results" : "${local.name}-${each.key}"
+  bucket_namespace    = "account-regional"
+  versioning_enabled  = false
+  ownership_controls  = "BucketOwnerEnforced"
+  replication_enabled = false
+  sse_algorithm       = "aws:kms"
+  custom_kms_key      = aws_kms_key.data_lake_kms_key.arn
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  # Attach policy to query results bucket to allow Athena to write query results to it
+  bucket_policy_v2 = each.key == "aws-athena-query-results" ? [
+    {
+      effect = "Allow"
+
+      actions = [
+        "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts",
+      ]
+
+      principals = {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_9e1f6f5fda83364d"
+        ]
+      }
+    }
+  ] : []
+
+  tags = local.tags
+}
+
+resource "aws_athena_workgroup" "laa" {
+  name = "laa"
+
+  configuration {
+    #checkov:skip=CKV_AWS_82: CADET needs to output to specific buckets per DB
+    enforce_workgroup_configuration    = false
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${module.data_lake_buckets["aws-athena-query-results"].bucket.id}/athena-results/"
+
+      encryption_configuration {
+        encryption_option = "SSE_KMS"
+        kms_key_arn       = aws_kms_key.data_lake_kms_key.arn
+      }
+    }
+  }
+}
+
+module "databases" {
+  for_each = toset(local.databases)
+  source   = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/data-factory-glue-database?ref=ef60504"
+
+  database_name = each.key
+
+  storage = {
+    bucket_name = module.data_lake_buckets[each.key].bucket.id
+    prefix      = each.key
+    kms_key_arn = aws_kms_key.data_lake_kms_key.arn
+  }
+}
+
+data "aws_iam_policy_document" "data_lake_access_action_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/data-engineering-datalake-access-github-actions"]
+    }
+  }
+}
+
+resource "aws_iam_role" "lakeformation_share_role" {
+  name               = "lakeformation-share-role"
+  assume_role_policy = data.aws_iam_policy_document.data_lake_access_action_assume_role.json
+}
+
+# ref: https://docs.aws.amazon.com/lake-formation/latest/dg/cross-account-prereqs.html
+resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_attachment" {
+  role       = aws_iam_role.lakeformation_share_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
+}
+
+
+data "aws_iam_policy_document" "lakeformation_share_permissions_policy" {
+  # Needed for LakeFormationAdmin to check the presense of the Lake Formation Service Role
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:GetRolePolicy",
+      "iam:GetRole"
+    ]
+    resources = [aws_iam_role.lakeformation_share_role.arn]
+  }
+
+  # Lake Formation permissions to manage cross-account access
+  statement {
+    effect = "Allow"
+    actions = [
+
+      # Permission management
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:RegisterResource",
+      "lakeformation:DeregisterResource",
+      "lakeformation:ListPermissions",
+      "lakeformation:DescribeResource",
+
+      # LF tag permissions (needed to create and grant tag-based access)
+      "lakeformation:CreateLFTag",
+      "lakeformation:CreateLFTagExpression",
+      "lakeformation:GetLFTagExpression",
+      "lakeformation:UpdateLFTag",
+      "lakeformation:UpdateLFTagExpression",
+      "lakeformation:DeleteLFTag",
+      "lakeformation:GetResourceLFTags",
+      "lakeformation:ListLFTags",
+      "lakeformation:GetLFTag"
+
+    ]
+    resources = [
+      #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+      "arn:aws:lakeformation:${local.current_account_region}:${local.current_account_id}:catalog:${local.current_account_id}"
+    ]
+  }
+
+  # RAM permissions to create resource shares
+  statement {
+    effect = "Allow"
+    actions = [
+      "ram:CreateResourceShare",
+      "ram:DeleteResourceShare"
+    ]
+    resources = [
+      "arn:aws:ram:${local.current_account_region}:${local.current_account_id}:resource-share/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:CreateDatabase",
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetPartition",
+      "glue:GetTags",
+      "glue:DeleteDatabase",
+      "glue:TagResource",
+      "glue:UpdateDatabase"
+    ]
+    resources = [
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/*/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:userDefinedFunction/*/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:GetRole",
+      "iam:TagRole",
+      "iam:ListRolePolicies",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListInstanceProfilesForRole",
+      "iam:PutRolePolicy",
+      "iam:PassRole"
+
+    ]
+    resources = [
+      "arn:aws:iam::${local.current_account_id}:role/*-location"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "lakeformation_share_permissions_policy" {
+  name   = "lakeformation-share-permissions-policy"
+  role   = aws_iam_role.lakeformation_share_role.id
+  policy = data.aws_iam_policy_document.lakeformation_share_permissions_policy.json
+}

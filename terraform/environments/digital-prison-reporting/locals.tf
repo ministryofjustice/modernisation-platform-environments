@@ -1,5 +1,5 @@
 #### This file can be used to store locals specific to the member account ####
-#### DPR Specific ####
+#### DPR Specific #####
 locals {
 
   is_dev_or_test       = local.is-development || local.is-test
@@ -49,6 +49,7 @@ locals {
 
   cloud_platform_cidr   = "172.20.0.0/16"
   enable_dpr_cloudtrail = local.application_data.accounts[local.environment].enable_cloud_trail
+  enable_bedrock        = local.application_data.accounts[local.environment].enable_bedrock
   generic_lambda        = "${local.project}-generic-lambda"
 
   lambda_log_retention_in_days = local.application_data.accounts[local.environment].lambda_log_retention_in_days
@@ -70,6 +71,7 @@ locals {
   federated_query_lambda_concurrent_executions = local.application_data.accounts[local.environment].athena_federated_query_lambda_concurrent_executions
   lambda_oracle_handler                        = "com.amazonaws.athena.connectors.oracle.OracleMuxCompositeHandler"
   athena_oracle_connector_type                 = "oracle"
+  athena_oracle_connector_jar_key              = "third-party/athena-connectors/athena-oracle-2022.47.1.jar"
 
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
@@ -107,6 +109,7 @@ locals {
   create_rds_replica             = local.application_data.accounts[local.environment].dpr_rds_db.create_replica
   dpr_rds_engine                 = local.application_data.accounts[local.environment].dpr_rds_db.engine
   dpr_rds_engine_version         = local.application_data.accounts[local.environment].dpr_rds_db.engine_version
+  dpr_rds_replica_engine_version = local.application_data.accounts[local.environment].dpr_rds_db.replica_engine_version
   dpr_rds_init_size              = local.application_data.accounts[local.environment].dpr_rds_db.init_size
   dpr_rds_max_size               = local.application_data.accounts[local.environment].dpr_rds_db.max_size
   dpr_rds_name                   = local.application_data.accounts[local.environment].dpr_rds_db.name
@@ -116,6 +119,11 @@ locals {
   dpr_rds_store_type             = local.application_data.accounts[local.environment].dpr_rds_db.store_type
   dpr_rds_parameter_group_family = local.application_data.accounts[local.environment].dpr_rds_db.parameter_group_family
   dpr_rds_parameter_group_name   = local.application_data.accounts[local.environment].dpr_rds_db.parameter_group_name
+
+
+  # Operational Data Store (ODS)
+  ods_engine_version = local.application_data.accounts[local.environment].dpr_ods_db.engine_version
+
 
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
@@ -130,6 +138,7 @@ locals {
   rds_dbuilder_init_size         = 10
   rds_dbuilder_max_size          = 50
   rds_dbuilder_parameter_group   = local.application_data.accounts[local.environment].domain_builder_rds_parameter_group
+  rds_dbuilder_engine_version    = local.application_data.accounts[local.environment].domain_builder_rds_engine_version
   rds_dbuilder_port              = 5432
   rds_dbuilder_user              = "domain_builder"
   enable_dbuilder_lambda         = local.application_data.accounts[local.environment].enable_domain_builder_lambda
@@ -213,7 +222,8 @@ locals {
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     aws_iam_policy.redshift_dataapi_cross_policy.arn,
-    aws_iam_policy.dpd_table_read_policy.arn
+    aws_iam_policy.dpd_table_read_policy.arn,
+    aws_iam_policy.dpr_event_bus_write_events_policy.arn
   ]
   lambda_scheduled_dataset_secret_arn          = module.datamart.credential_secret_arn
   lambda_scheduled_dataset_cluster_id          = module.datamart.cluster_id
@@ -242,6 +252,7 @@ locals {
   lambda_generate_dataset_cluster_id        = module.datamart.cluster_id
   lambda_generate_dataset_database_name     = module.datamart.cluster_database_name
   lambda_generate_dataset_dpd_ddb_table_arn = module.dynamo_table_dpd.dynamodb_table_arn
+  lambda_generate_dataset_s3_rep_location   = module.s3_working_bucket.bucket_id
   lambda_generate_dataset_timeout_seconds   = 900
   lambda_generate_dataset_memory_size       = 1024
 
@@ -437,16 +448,7 @@ locals {
     heartbeat_endpoint = "0.0.0.0"
   }
 
-  probation_domains_list = local.application_data.accounts[local.environment].probation_domains
-  probation_secrets_placeholder = {
-    db_name            = "dps"
-    password           = "placeholder"
-    user               = "placeholder"
-    username           = "placeholder"
-    endpoint           = "0.0.0.0"
-    port               = "5432"
-    heartbeat_endpoint = "0.0.0.0"
-  }
+  probation_domains = local.application_data.accounts[local.environment].probation_domains
 
   # Operational DataStore Secrets PlaceHolder
   operational_datastore_secrets_placeholder = {
@@ -530,6 +532,9 @@ locals {
       analytical_platform_runner_suffix = ""
     }
   }
+
+  # AI Gateway assumes into each DPR environment's Bedrock role.
+  ai_gateway_role_arn = "arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:role/ai-gateway"
 
 
   all_tags = merge(

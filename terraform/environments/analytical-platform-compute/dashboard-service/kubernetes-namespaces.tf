@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "dashboard_service" {
+resource "kubernetes_namespace_v1" "dashboard_service" {
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
   metadata {

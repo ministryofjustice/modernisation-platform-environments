@@ -5,7 +5,7 @@ resource "aws_ecs_task_definition" "ecs_connector_task_definition" {
   family             = "${local.connector_app_name}-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn      = aws_iam_role.connector_ecs_task_role.arn
-  network_mode       = "bridge"
+  network_mode       = "awsvpc"
   requires_compatibilities = [
     "EC2",
   ]
@@ -46,6 +46,10 @@ resource "aws_ecs_task_definition" "ecs_connector_task_definition" {
       logging_level_oracle_ocs_opa_laa             = local.application_data.accounts[local.environment].logging_level_oracle_ocs_opa_laa
       logging_level_uk_gov_laa_opa                 = local.application_data.accounts[local.environment].logging_level_uk_gov_laa_opa
       opa_security_password                        = "${aws_secretsmanager_secret.connector_secrets.arn}:opa_security_password::"
+      ccms_bc_url                                  = "${aws_secretsmanager_secret.connector_secrets.arn}:ccms_bc_url::"
+      ccms_bc_lscServiceName                       = "${aws_secretsmanager_secret.connector_secrets.arn}:ccms_bc_lscServiceName::"
+      ccms_bc_clientOrgId                          = "${aws_secretsmanager_secret.connector_secrets.arn}:ccms_bc_clientOrgId::"
+      ccms_bc_clientUserId                         = "${aws_secretsmanager_secret.connector_secrets.arn}:ccms_bc_clientUserId::"
     }
   )
 
@@ -58,13 +62,32 @@ resource "aws_ecs_task_definition" "ecs_connector_task_definition" {
 
 resource "aws_ecs_service" "ecs_connector_service" {
   name            = local.connector_app_name
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = aws_ecs_cluster.conn_saa.id
   task_definition = aws_ecs_task_definition.ecs_connector_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].connector_app_count
-  launch_type     = "EC2"
+
+
+
+  # Required by the AWS provider whenever capacity_provider_strategy is
+  # added/changed on an existing service (here: switching from launch_type
+  # to capacity_provider_strategy), so the change is applied via a fresh
+  # deployment rather than an in-place update.
+  force_new_deployment = true
+
+  # Use the cluster's capacity provider (with managed scaling enabled)
+  # instead of a bare EC2 launch type, so ECS can grow the ASG automatically
+  # to provide extra instance capacity for rolling deployments instead of
+  # stalling with "insufficient resources" because there is no room to place
+  # the new task revision alongside the old one.
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.capacity_provider_conn_saa.name
+    weight            = 1
+    base              = 1
+  }
 
   health_check_grace_period_seconds = 300
 
+  # Task definition revisions are deployed outside Terraform.
   lifecycle {
     ignore_changes = [
       task_definition
@@ -74,6 +97,11 @@ resource "aws_ecs_service" "ecs_connector_service" {
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
+  }
+
+  network_configuration {
+    subnets         = data.aws_subnets.shared-private.ids
+    security_groups = [aws_security_group.ecs_tasks_connector.id]
   }
 
   load_balancer {

@@ -149,3 +149,15 @@ output "domain_builder_rds_endpoint" {
   description = "Domain Builder RDS Endpoint"
   value       = module.domain_builder_backend_db.rds_host
 }
+
+## Bedrock
+output "ai_gateway_bedrock_role_arn" {
+  description = "IAM role ARN assumed by the Justice AI Gateway to invoke Bedrock"
+  value       = local.enable_bedrock ? aws_iam_role.ai_gateway_bedrock[0].arn : null
+}
+
+## Redshift IAM Role
+output "redshift_cluster_role_arn" {
+  description = "IAM role ARN attached to the Redshift cluster for S3/KMS access"
+  value       = aws_iam_role.redshift-role.arn
+}

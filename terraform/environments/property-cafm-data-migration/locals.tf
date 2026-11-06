@@ -49,4 +49,22 @@ locals {
     "development"   = "dev"
   }
   environment_shorthand = local.environment_map[local.environment]
+
+  # The property/planetfm/concept Glue databases are created via a manual
+  # process. They currently exist in development and production only; we've had
+  # no reason to create them in preproduction yet. Lake Formation grants are
+  # only applied in environments where the databases are present, so add an
+  # environment here if the databases are later created there.
+  lakeformation_databases_present = contains(["development", "production"], local.environment)
+
+  # S3 replication configuration for property-datahub-staging bucket
+  replication_configuration = lookup(local.replication_configurations, local.environment, null)
+
+  replication_configurations = {
+    production = {
+      property_datahub_staging_egress_target_bucket = "mojap-ingestion-production-property-datahub-staging-egress"
+      property_datahub_staging_egress_account_id    = local.environment_management.account_ids["analytical-platform-ingestion-production"]
+      property_datahub_staging_egress_kms_arn       = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:key/6da79242-5b40-4a37-bbdf-961950ced1f4"
+    }
+  }
 }

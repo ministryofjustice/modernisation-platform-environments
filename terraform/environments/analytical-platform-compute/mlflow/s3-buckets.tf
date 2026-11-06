@@ -1,11 +1,8 @@
 module "mlflow_bucket" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.2.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
 
   bucket = "mojap-compute-${local.environment}-mlflow"
 

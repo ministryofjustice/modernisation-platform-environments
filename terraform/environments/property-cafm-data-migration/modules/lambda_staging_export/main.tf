@@ -141,8 +141,9 @@ resource "aws_iam_role_policy" "lambda" {
 }
 
 resource "aws_cloudwatch_log_group" "this" {
+  # checkov:skip=CKV_AWS_158: Log group is encrypted at rest with the default AWS-owned key; a customer-managed KMS key is not required for these operational logs.
   name              = "/aws/lambda/${var.function_name}"
-  retention_in_days = 30
+  retention_in_days = 365
 
   tags = var.tags
 }
@@ -154,6 +155,11 @@ data "archive_file" "lambda" {
 }
 
 resource "aws_lambda_function" "this" {
+  # checkov:skip=CKV_AWS_116: DLQ not required - the function is invoked synchronously, so failures are returned to the caller rather than retried asynchronously.
+  # checkov:skip=CKV_AWS_117: VPC not required - the function only calls AWS service APIs (Athena, Glue, S3) via public service endpoints.
+  # checkov:skip=CKV_AWS_272: Code-signing not used - the deployment package is built and managed in-repo via archive_file.
+  # checkov:skip=CKV_AWS_173: Environment variables contain no secrets (database name and S3 paths only) and are already encrypted at rest with the AWS-managed key.
+  # checkov:skip=CKV_AWS_50: X-Ray tracing not required for this on-demand batch export function.
   function_name = var.function_name
   description   = var.description
   role          = aws_iam_role.lambda.arn
@@ -165,6 +171,8 @@ resource "aws_lambda_function" "this" {
 
   timeout     = 900
   memory_size = 3008
+
+  reserved_concurrent_executions = var.reserved_concurrent_executions
 
   environment {
     variables = {

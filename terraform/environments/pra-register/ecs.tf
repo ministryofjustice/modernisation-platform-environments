@@ -52,7 +52,7 @@ resource "aws_ecs_task_definition" "pra_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = aws_db_instance.pra_db.address
+          value = local.pra_db.address
         },
         {
           name  = "RDS_PORT"
@@ -60,7 +60,7 @@ resource "aws_ecs_task_definition" "pra_task_definition" {
         },
         {
           name  = "RDS_USERNAME"
-          value = aws_db_instance.pra_db.username
+          value = local.pra_db.username
         },
         {
           name  = "RDS_PASSWORD"
@@ -68,7 +68,7 @@ resource "aws_ecs_task_definition" "pra_task_definition" {
         },
         {
           name  = "DB_NAME"
-          value = aws_db_instance.pra_db.db_name
+          value = local.pra_db.db_name
         },
         {
           name  = "supportEmail"

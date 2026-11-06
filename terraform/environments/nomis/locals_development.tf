@@ -5,6 +5,12 @@ locals {
     maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
+  aws_health_lambda_configuration_development = {
+    enabled               = true
+    aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
+    rule_name             = "ForwardAllHealthEvents"
+  }
+
   baseline_presets_development = {
     options = {
       sns_topics = {
@@ -145,46 +151,36 @@ locals {
       })
 
       # remember to delete associated backup plan
-      qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
+      qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.autoscaling_group, {
+          desired_capacity = 0
+          max_size         = 0
+        })
         autoscaling_schedules = {}
-        config = merge(local.ec2_autoscaling_groups.web12.config, {
+        config = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
           ])
         })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.user_data_cloud_init.args, {
             branch = "main"
           })
         })
-        tags = merge(local.ec2_autoscaling_groups.web12.tags, {
-          nomis-environment = "qa11g"
+        tags = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.tags, {
+          nomis-environment      = "dev"
+          oracle-db-name         = "qa11g"
+          oracle-db-hostname-a   = "dev-nomis-db19c-1-a"
+          oracle-db-hostname-b   = "none"
+          weblogic-config-target = "qa11g"
         })
       })
 
-      dev-nomis-weblogic-12 = merge(local.ec2_autoscaling_groups.weblogic-12, {
-        autoscaling_schedules = {}
-        config = merge(local.ec2_autoscaling_groups.web12.config, {
-          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
-            "Ec2Qa11GWeblogicPolicy",
-            "Ec2Qa11G2WeblogicPolicy",
-            "Ec2Qa19CWeblogicPolicy",
-          ])
+      qa12c-nomis-web = merge(local.ec2_autoscaling_groups.qa12c-nomis-web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.autoscaling_group, {
+          desired_capacity = 0
+          max_size         = 0
         })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.web12.tags, {
-          nomis-environment    = "qa11g2"
-          oracle-db-name       = "qa11g2"
-          oracle-db-hostname-a = "dev-nomis-db19c-1-a"
-          oracle-db-hostname-b = "none"
-        })
-      })
-
-      qa12c-nomis-web-a = merge(local.ec2_autoscaling_groups.qa12c-nomis-web, {
         autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
@@ -195,14 +191,15 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init.args, {
-            branch = "TM-2061"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.tags, {
-          nomis-environment    = "qa11g"
-          oracle-db-name       = "qa11g"
-          oracle-db-hostname-a = "dev-nomis-db19c-1-b"
-          oracle-db-hostname-b = "none"
+          nomis-environment      = "dev"
+          oracle-db-name         = "qa19c"
+          oracle-db-hostname-a   = "dev-nomis-db19c-1-b"
+          oracle-db-hostname-b   = "none"
+          weblogic-config-target = "qa19c"
         })
       })
     }
@@ -319,6 +316,37 @@ locals {
         })
       })
 
+      nomis-db19c-1-a = merge(local.ec2_instances.db19c, {
+        config = merge(local.ec2_instances.db19c.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
+            "Ec2DevDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.ec2_instances.db19c.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
+          data  = { total_size = 500 }
+          flash = { total_size = 50 }
+        })
+        instance = merge(local.ec2_instances.db19c.instance, {
+          # disable_api_termination = true
+        })
+        user_data_cloud_init = merge(local.ec2_instances.db19c.user_data_cloud_init, {
+          args = merge(local.ec2_instances.db19c.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.db19c.tags, {
+          description         = "syscon nomis dev qa and rel Oracle 19c databases"
+          instance-scheduling = "skip-scheduling"
+          nomis-environment   = "dev"
+          oracle-sids         = ""
+        })
+      })
+
       dev-nomis-web-a = merge(local.ec2_instances.web, {
         config = merge(local.ec2_instances.web.config, {
           availability_zone = "eu-west-2a"
@@ -376,20 +404,93 @@ locals {
       })
 
       # built by code and then handed over to Syscon for remaining manual configuration
-      qa11g-nomis-web12-b = merge(local.ec2_instances.web12, {
-        config = merge(local.ec2_instances.web12.config, {
+      qa11g-nomis-web12-b = merge(local.ec2_instances.qa11g-nomis-web12, {
+        config = merge(local.ec2_instances.qa11g-nomis-web12.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
           ])
         })
-        user_data_cloud_init = merge(local.ec2_instances.web12.user_data_cloud_init, {
-          args = merge(local.ec2_instances.web12.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.ec2_instances.qa11g-nomis-web12.user_data_cloud_init, {
+          args = merge(local.ec2_instances.qa11g-nomis-web12.user_data_cloud_init.args, {
             branch = "main"
           })
         })
-        tags = merge(local.ec2_instances.web12.tags, {
-          nomis-environment = "qa11g"
+        tags = merge(local.ec2_instances.qa11g-nomis-web12.tags, {
+          instance-scheduling    = "skip-scheduling"
+          nomis-environment      = "dev"
+          oracle-db-name         = "qa11g"
+          oracle-db-hostname-a   = "dev-nomis-db19c-1-a"
+          oracle-db-hostname-b   = "none"
+          weblogic-config-target = "qa11g"
+        })
+      })
+
+      qa-nomis-web12-a = merge(local.ec2_instances.web_12, {
+        config = merge(local.ec2_instances.web_12.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.web_12.config.instance_profile_policies, [
+            "Ec2QAWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.web_12.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web_12.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.web_12.tags, {
+          instance-scheduling    = "skip-scheduling"
+          nomis-environment      = "qa"
+          oracle-db-hostname-a   = "nomis-db19c-1-a"
+          oracle-db-hostname-b   = "none"
+          oracle-db-name         = "qa19c"
+          weblogic-config-target = "qa"
+        })
+      })
+
+      rel-nomis-web12-a = merge(local.ec2_instances.web_12, {
+        config = merge(local.ec2_instances.web_12.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.web_12.config.instance_profile_policies, [
+            "Ec2RelWeblogicPolicy",
+            "Ec2Rel19CWeblogicPolicy"
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.web_12.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web_12.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.web_12.tags, {
+          instance-scheduling    = "skip-scheduling"
+          nomis-environment      = "rel"
+          oracle-db-hostname-a   = "nomis-db19c-1-a"
+          oracle-db-hostname-b   = "none"
+          oracle-db-name         = "rel19c"
+          weblogic-config-target = "rel"
+        })
+      })
+
+      dev-nomis-web12-a = merge(local.ec2_instances.web_12, {
+        config = merge(local.ec2_instances.web_12.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.web_12.config.instance_profile_policies, [
+            "Ec2DevWeblogicPolicy",
+            "Ec2Dev19CWeblogicPolicy"
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.web_12.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web_12.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.web_12.tags, {
+          instance-scheduling    = "skip-scheduling"
+          nomis-environment      = "dev"
+          oracle-db-hostname-a   = "nomis-db19c-1-a"
+          oracle-db-hostname-b   = "none"
+          oracle-db-name         = "dev19c"
+          weblogic-config-target = "dev"
         })
       })
 
@@ -438,7 +539,9 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev19c/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/rel19c/*"
             ]
           }
         ]
@@ -455,6 +558,36 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/dev/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev/weblogic-*",
+            ]
+          }
+        ])
+      }
+      Ec2QAWeblogicPolicy = {
+        description = "Permissions required for QA Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa/*",
+            ]
+          }
+        ])
+      }
+      Ec2RelWeblogicPolicy = {
+        description = "Permissions required for REL Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/rel/*",
             ]
           }
         ])
@@ -507,6 +640,22 @@ locals {
           }
         ])
       }
+      Ec2Dev19CWeblogicPolicy = {
+        description = "Permissions required for DEV19C Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/dev19c/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev19c/weblogic-*"
+            ]
+          }
+        ])
+      }
       Ec2Qa19CWeblogicPolicy = {
         description = "Permissions required for QA19C Weblogic EC2s"
         statements = concat(local.iam_policy_statements_ec2.web, [
@@ -519,6 +668,22 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa19c/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/weblogic-*"
+            ]
+          }
+        ])
+      }
+      Ec2Rel19CWeblogicPolicy = {
+        description = "Permissions required for REL19C Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/rel19c/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/rel19c/weblogic-*"
             ]
           }
         ])
@@ -681,6 +846,8 @@ locals {
     secretsmanager_secrets = {
       "/oracle/weblogic/dev"    = local.secretsmanager_secrets.web
       "/oracle/database/dev"    = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa"     = local.secretsmanager_secrets.web
+      "/oracle/weblogic/rel"    = local.secretsmanager_secrets.web
       "/oracle/weblogic/qa11g"  = local.secretsmanager_secrets.web
       "/oracle/database/qa11g"  = local.secretsmanager_secrets.db_cnom
       "/oracle/weblogic/qa11g2" = local.secretsmanager_secrets.web
@@ -689,6 +856,10 @@ locals {
       "/oracle/database/qa11r"  = local.secretsmanager_secrets.db_cnom
       "/oracle/weblogic/qa19c"  = local.secretsmanager_secrets.web
       "/oracle/database/qa19c"  = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/rel19c" = local.secretsmanager_secrets.web
+      "/oracle/database/rel19c" = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/dev19c" = local.secretsmanager_secrets.web
+      "/oracle/database/dev19c" = local.secretsmanager_secrets.db_cnom
     }
   }
 }

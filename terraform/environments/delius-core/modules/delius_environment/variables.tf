@@ -115,9 +115,9 @@ variable "env_name_to_dms_config_map" {
   type        = any
 }
 
-# Only create one per account
-variable "create_backup_role" {
-  description = "Role used to run AWS Backups i.e. AWSBackupDefaultServiceRole"
+# Only create one set of account-wide service roles per account
+variable "create_account_service_roles" {
+  description = "Create the account-wide service IAM roles shared by DMS and AWS Backup"
   type        = bool
   default     = false
 }
@@ -125,6 +125,12 @@ variable "create_backup_role" {
 # Only create one per account
 variable "create_ecs_lambda" {
   description = "Lambda that alerts probation-migrations-team Slack channel if ECS tasks are being retired"
+  type        = bool
+  default     = false
+}
+
+variable "enable_autoscaling_schedule" {
+  description = "Enable/disable the autoscaling schedule for the Weblogic capacity providers"
   type        = bool
   default     = false
 }

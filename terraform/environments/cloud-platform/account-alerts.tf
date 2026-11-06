@@ -39,11 +39,12 @@ resource "aws_sns_topic_policy" "high_priority_alerts" {
   })
 }
 
-resource "aws_sns_topic_subscription" "high_priority_alerts_pagerduty" {
-  topic_arn = aws_sns_topic.high_priority_alerts.arn
-  protocol  = "https"
-  endpoint  = "https://events.pagerduty.com/integration/${data.aws_secretsmanager_secret_version.pagerduty_integration_key.secret_string}/enqueue"
-}
+# commented temporarily until new pagerduty setup is established
+# resource "aws_sns_topic_subscription" "high_priority_alerts_pagerduty" {
+#   topic_arn = aws_sns_topic.high_priority_alerts.arn
+#   protocol  = "https"
+#   endpoint  = "https://events.pagerduty.com/integration/${data.aws_secretsmanager_secret_version.pagerduty_integration_key.secret_string}/enqueue"
+# }
 
 # ---------------------------------------------------------------------------
 # CloudWatch Log Metric Filter + Alarm — new IAM user creation

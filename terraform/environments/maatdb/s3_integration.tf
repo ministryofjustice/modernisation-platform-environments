@@ -16,7 +16,7 @@ locals {
 
 module "s3_bucket" {
   for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
-  source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
+  source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_prefix       = "${local.application_name}-${local.environment}-ftp-${each.key}"
   versioning_enabled  = false
@@ -25,6 +25,10 @@ module "s3_bucket" {
   replication_region  = local.region
   ownership_controls  = "BucketOwnerEnforced"
   custom_kms_key      = local.laa_general_kms_arn
+
+  # Enforce KMS request headers for inbound bucket only, the outbound bucket is written to by MAAT DB Oracle PL/SQL which does not currently
+  # support the required KMS headers.
+  enforce_kms_request_headers = each.key == "inbound" ? true : false
 
   providers = {
     aws.bucket-replication = aws
@@ -66,8 +70,18 @@ module "s3_bucket" {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"
   })
 
+  manage_log_bucket_policy = false
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  }
+
+  log_prefix                = "s3access/${local.application_name}-${local.environment}-ftp-${each.key}/${local.application_name}-${local.environment}-ftp-${each.key}"
+  log_partition_date_source = "EventTime"
+
   bucket_policy_v2 = [
     for stmt in [
+
       length(aws_iam_role.ftp_lambda_role) > 0 ? {
         effect  = "Allow"
         actions = ["s3:GetObject", "s3:DeleteObject"]
@@ -204,10 +218,3 @@ data "aws_iam_policy_document" "ftp_user_policy" {
     resources = [local.laa_general_kms_arn]
   }
 }
-
-
-
-
-
-
-

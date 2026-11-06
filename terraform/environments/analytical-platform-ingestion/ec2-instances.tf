@@ -4,7 +4,7 @@ module "datasync_instance" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "6.2.0"
+  version = "6.4.0"
 
   name = "${local.application_name}-${local.environment}-datasync"
   # ami                    = data.aws_ssm_parameter.datasync_ami.value

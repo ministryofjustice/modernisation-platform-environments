@@ -25,6 +25,12 @@ resource "aws_api_gateway_rest_api" "api_gateway" {
   name        = var.api_name
   description = var.api_description
 
+  endpoint_configuration {
+    types            = ["PRIVATE"]
+    vpc_endpoint_ids = [var.api_gateway_endpoint]
+    ip_address_type  = "dualstack"
+  }
+
   lifecycle {
     create_before_destroy = true
   }
@@ -71,6 +77,41 @@ resource "aws_api_gateway_method" "get_status" {
   request_parameters = {
     "method.request.path.execution_id" = true
   }
+}
+
+data "aws_iam_policy_document" "vpc_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = ["${aws_api_gateway_rest_api.api_gateway.execution_arn}/*"]
+  }
+  statement {
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["execute-api:Invoke"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:sourceVpce"
+      values = [
+        var.api_gateway_endpoint
+      ]
+    }
+    resources = ["${aws_api_gateway_rest_api.api_gateway.execution_arn}/*"]
+  }
+}
+
+resource "aws_api_gateway_rest_api_policy" "vpc_policy" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  policy      = data.aws_iam_policy_document.vpc_policy.json
 }
 
 # --------------------------------------------------------
@@ -201,6 +242,7 @@ resource "aws_api_gateway_deployment" "deployment" {
       var.enable_status_check ? aws_api_gateway_method.get_status[0].id : null,
       aws_api_gateway_integration.step_function_integration.id,
       var.enable_status_check ? aws_api_gateway_integration.status_integration[0].id : null,
+      aws_api_gateway_rest_api_policy.vpc_policy.policy,
     ])))
   }
 

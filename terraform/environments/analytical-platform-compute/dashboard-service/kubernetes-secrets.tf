@@ -1,9 +1,9 @@
-resource "kubernetes_secret" "dashboard_service_rds" {
+resource "kubernetes_secret_v1" "dashboard_service_rds" {
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
   metadata {
     name      = "dashboard-service-rds"
-    namespace = kubernetes_namespace.dashboard_service[0].metadata[0].name
+    namespace = kubernetes_namespace_v1.dashboard_service[0].metadata[0].name
   }
 
   type = "Opaque"

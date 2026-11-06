@@ -1,16 +1,116 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "deploy_workspaces": true,
+      "ad_connector_secret_name": "equip-local-domain-join-account",
+      "domain_name": "equip.local",
+      "ad_connector_size": "Small",
+      "ad_connector_username": "svc_appstream",
+      "ad_connector_description": "equip.local ad connector",
+      "dns_ips": ["10.26.24.246", "10.26.24.38"],
+      "default_ou": "OU=Amazon Workspaces,OU=MoJ_AWS,OU=Server Infrastructure,DC=equip,DC=local",
+      "security_group_vpc_id": "vpc-0e826d578be712202",
+      "bundle_id": "wsb-0tm7gqlsn",
+      "running_mode": "AUTO_STOP",
+      "auto_stop_timeout": 60,
+      "security_group_name": "eucs-appstream-test-sg",
+      "security_group_description": "eucs-appstream-test-sg",
+      "security_group_egress_rules": [
+        {
+          "from_port": 0,
+          "to_port": 0,
+          "protocol": "-1",
+          "cidr_blocks": ["0.0.0.0/0"],
+          "description": "Allow all outbound traffic"
+        }
+      ],
+      "ip_group_name": "MOJ Network",
+      "ip_group_description": "MOJ Network",
+      "ip_group_allowed_cidrs": [
+        {
+          "source": "128.77.75.64/26",
+          "description": "MOJ Network"
+        }
+      ],
+      "workspace_users": {
+        "arron-ruecroft": "arron.ruecroft",
+        "svc-appstream": "svc_appstream",
+        "dragen-letic": "dragen.letic"
+      }
     },
     "test": {
-      "example_var": "test-data"
+      "deploy_workspaces": false
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "deploy_workspaces": false
     },
     "production": {
-      "example_var": "production-data"
+      "deploy_workspaces": true,
+      "ad_connector_secret_name": "equip-local-domain-join-account",
+      "domain_name": "equip.local",
+      "ad_connector_size": "Small",
+      "ad_connector_username": "svc_workspaces",
+      "ad_connector_description": "equip.local ad connector workspaces personal",
+      "dns_ips": ["10.27.9.225", "10.27.8.147"],
+      "default_ou": "OU=Amazon Workspaces,OU=MoJ_AWS,OU=Server Infrastructure,DC=equip,DC=local",
+      "vpc_id": "vpc-0a16bb6858dd27aea",
+      "subnet_ids": ["subnet-02a1a9cf9e450698b", "subnet-0387a46d6992b6817"],
+      "bundle_id": "wsb-5kg12ypdk",
+      "running_mode": "AUTO_STOP",
+      "auto_stop_timeout": 60,
+      "security_group_name": "workspaces-equip-sg",
+      "security_group_description": "Allows workspaces personal to equip infrastructure",
+      "security_group_egress_rules": [
+        {
+          "from_port": 443,
+          "to_port": 443,
+          "protocol": "tcp",
+          "cidr_blocks": ["0.0.0.0/0"],
+          "description": "HTTPS outbound"
+        },
+        {
+          "from_port": 80,
+          "to_port": 80,
+          "protocol": "tcp",
+          "cidr_blocks": ["0.0.0.0/0"],
+          "description": "HTTP outbound"
+        },
+        {
+          "from_port": 0,
+          "to_port": 0,
+          "protocol": "-1",
+          "cidr_blocks": ["10.27.8.0/24", "10.27.9.0/24", "10.27.10.0/24"],
+          "description": "All traffic to equip.local domain controller subnets"
+        }
+      ],
+      "ip_group_name": "MOJ Network",
+      "ip_group_description": "MOJ Network",
+      "ip_group_allowed_cidrs": [
+        {
+          "source": "128.77.75.64/26",
+          "description": "MOJ Network"
+        }
+      ],
+      "workspace_users": {
+        "asha-sonani": "asha.sonani",
+        "leanne-ingleson": "LeanneInglesonNPS",
+        "megan-thomas": "Megan.Thomas",
+        "aniza-khan": "Aniza.Khan",
+        "judith-adams": "JudithAdamsNPS",
+        "oluwaseun-ajiboye": "Oluwaseun.Ajiboye",
+        "rajesh-gupta": "Rajesh.Gupta",
+        "workspaces-imagebuild": "workspaces.imagebuil",
+        "workspace-user": "workspace.user",
+        "michelle-reed": "michelle.reed",
+        "sarah-lumsdon": "sarah.lumsdon",
+        "ryan-templeman": "ryan.templeman",
+        "gbenga-familugba": "gbenga.familugba",
+        "ben-davidson": "ben.davidson",
+        "dragan-letic": "dragan.letic",
+        "pamela-miller": "pamela.miller",
+        "john-birks": "John.Birks",
+        "christopher-hughes": "Christopher.hughes"
+      }
     }
   }
 }

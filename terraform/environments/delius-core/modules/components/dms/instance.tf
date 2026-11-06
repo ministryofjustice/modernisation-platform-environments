@@ -19,9 +19,8 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
   vpc_security_group_ids = [
     aws_security_group.dms.id
   ]
-
-
 }
+
 resource "aws_dms_replication_subnet_group" "this" {
   replication_subnet_group_description = "subnet for dms replication"
   replication_subnet_group_id          = "${var.env_name}-dms-subnet-group"

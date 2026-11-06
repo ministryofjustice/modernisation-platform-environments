@@ -2,13 +2,13 @@
 # define environment specific configuration in locals_development.tf, locals_test.tf etc.
 
 locals {
-  delius_oasys_queues_environments_specific = {
-    development   = local.delius_oasys_queues_development
-    test          = local.delius_oasys_queues_test
-    preproduction = local.delius_oasys_queues_preproduction
-    production    = local.delius_oasys_queues_production
+  locals_environments_specific = {
+    development   = local.locals_development
+    test          = local.locals_test
+    preproduction = local.locals_preproduction
+    production    = local.locals_production
   }
-  delius_oasys_queues = local.delius_oasys_queues_environments_specific[local.environment]
+  locals_environment_specific = local.locals_environments_specific[local.environment]
 
   baseline_presets_environments_specific = {
     development   = local.baseline_presets_development
@@ -65,6 +65,37 @@ locals {
   baseline_all_environments = {
     options = {
       enable_resource_explorer = true
+    }
+
+    iam_policies = {
+      Ec2DeliusIntegrationPolicy = {
+        descriptions = "Permissions required for EC2s for delius integration"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "sqs:ReceiveMessage",
+              "sqs:SendMessage",
+              "sqs:DeleteMessage",
+              "sqs:GetQueueAttributes",
+              "sqs:GetQueueUrl",
+              "sqs:ChangeMessageVisibility",
+            ]
+            resources = [
+              "arn:aws:sqs:eu-west-2:*:*"
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/delius_oasys/*",
+            ]
+          },
+        ]
+      }
     }
 
     security_groups = local.security_groups

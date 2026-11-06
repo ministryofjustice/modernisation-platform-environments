@@ -1,4 +1,5 @@
 #S3 bucket to store source metadata
+# adding comment to trigger terraform
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "validation_metadata" {
   #checkov:skip=CKV_AWS_18:Logging not needed
@@ -124,7 +125,7 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
       test     = "StringLike"
       variable = "kms:ViaService"
       values = [
-        "secretsmanager.${data.aws_region.current.name}.amazonaws.com",
+        "secretsmanager.${data.aws_region.current.region}.amazonaws.com",
       ]
     }
   }

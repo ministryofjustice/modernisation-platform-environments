@@ -20,9 +20,7 @@ locals {
 }
 
 module "instance" {
-  #checkov:skip=CKV_TF_1
-  #checkov:skip=CKV_TF_2
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=f6c3bf0a96f9391cb8d6a89227b55f05f6bf60a7" # v4.3.0
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts

@@ -23,7 +23,7 @@ The upgrades involve significant breaking changes across IAM, KMS, Secrets Manag
 ## Modules Analyzed
 
 | Module | Current Version | Latest Version | Major Upgrade Available | Instances | Status |
-|--------|----------------|----------------|------------------------|-----------|--------|
+| -------- | ---------------- | ---------------- | ------------------------ | ----------- | -------- |
 | terraform-aws-modules/iam/aws | 5.58.0 | 6.4.0 | ✅ Yes (5.x → 6.x) | 24 | ✅ Complete |
 | terraform-aws-modules/kms/aws | 3.1.1 | 4.2.0 | ✅ Yes (3.x → 4.x) | 19 | ✅ Complete |
 | terraform-aws-modules/secrets-manager/aws | 1.3.1 | 2.1.0 | ✅ Yes (1.x → 2.x) | 7 | Blocked |
@@ -559,7 +559,7 @@ module "observability_platform_tenant" {
 ### Critical Constraints
 
 | Module Upgrade | Required Terraform | Required AWS | Status |
-|---------------|-------------------|--------------|---------|
+| --------------- | ------------------- | -------------- | --------- |
 | IAM v6.x | v1.5.7+ | v6.0+ | ✅ Met |
 | KMS v4.x | v1.5.7+ | v6.0+ | ✅ Met |
 | Secrets Manager v2.x | v1.11+ | v6.0+ | ❌ **Terraform upgrade needed** |

@@ -4,8 +4,8 @@ locals {
 }
 
 # Alarm for high CPU usage
-resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold" {
-  alarm_name          = "jitbit-ecs-cpu-threshold"
+resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold_blue" {
+  alarm_name          = "${local.environment}-jitbit-ecs-cpu-threshold-blue"
   alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
   namespace           = "AWS/ECS"
   metric_name         = "CPUUtilization"
@@ -20,20 +20,38 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold" {
 
   dimensions = {
     ClusterName = local.cluster_name
-    ServiceName = local.cluster_name
+    ServiceName = "${local.cluster_name}-blue"
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = local.application_name
-    }
-  )
+  tags = merge(local.tags, { Name = local.application_name })
+}
+
+# Alarm for high CPU usage
+resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold_green" {
+  alarm_name          = "${local.environment}-jitbit-ecs-cpu-threshold-green"
+  alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
+  namespace           = "AWS/ECS"
+  metric_name         = "CPUUtilization"
+  statistic           = "Average"
+  period              = "60"
+  evaluation_periods  = "5"
+  alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
+  ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
+  threshold           = "80"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+
+  dimensions = {
+    ClusterName = local.cluster_name
+    ServiceName = "${local.cluster_name}-green"
+  }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 # Alarm for high memory usage
-resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold" {
-  alarm_name          = "jitbit-ecs-memory-threshold"
+resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold_blue" {
+  alarm_name          = "${local.environment}-jitbit-ecs-memory-threshold-blue"
   alarm_description   = "Triggers alarm if ECS memory crosses a threshold"
   namespace           = "AWS/ECS"
   metric_name         = "MemoryUtilization"
@@ -48,13 +66,31 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold" {
 
   dimensions = {
     ClusterName = local.cluster_name
-    ServiceName = local.cluster_name
+    ServiceName = "${local.cluster_name}-blue"
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = local.application_name
-    }
-  )
+  tags = merge(local.tags, { Name = local.application_name })
+}
+
+# Alarm for high memory usage
+resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold_green" {
+  alarm_name          = "${local.environment}-jitbit-ecs-memory-threshold-green"
+  alarm_description   = "Triggers alarm if ECS memory crosses a threshold"
+  namespace           = "AWS/ECS"
+  metric_name         = "MemoryUtilization"
+  statistic           = "Average"
+  period              = "60"
+  evaluation_periods  = "5"
+  alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
+  ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
+  threshold           = "80"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+
+  dimensions = {
+    ClusterName = local.cluster_name
+    ServiceName = "${local.cluster_name}-green"
+  }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }

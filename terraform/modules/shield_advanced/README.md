@@ -42,7 +42,7 @@ import {
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ------ | --------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.5 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.0 |
 | <a name="requirement_external"></a> [external](#requirement\_external) | ~> 2.3 |
@@ -50,7 +50,7 @@ import {
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ------ | --------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5.0 |
 | <a name="provider_aws.modernisation-platform"></a> [aws.modernisation-platform](#provider\_aws.modernisation-platform) | ~> 5.0 |
 | <a name="provider_external"></a> [external](#provider\_external) | ~> 2.3 |
@@ -64,7 +64,7 @@ import {
 ## Resources
 
 | Name | Type |
-|------|------|
+| ------ | ------ |
 | [aws_cloudwatch_log_group.waf](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_metric_alarm.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_shield_application_layer_automatic_response.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/shield_application_layer_automatic_response) | resource |
@@ -83,7 +83,7 @@ import {
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ------ | ------------- | ------ | --------- | :--------: |
 | <a name="input_application_name"></a> [application\_name](#input\_application\_name) | Name of application being protected. | `string` | n/a | yes |
 | <a name="input_enable_logging"></a> [enable\_logging](#input\_enable\_logging) | Enable logging for the WAF ACL. | `bool` | `false` | no |
 | <a name="input_excluded_protections"></a> [excluded\_protections](#input\_excluded\_protections) | A list of strings to not associate with the AWS Shield WAF ACL. | `set(string)` | `[]` | no |

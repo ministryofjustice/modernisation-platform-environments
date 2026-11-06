@@ -2,31 +2,16 @@
 
 locals {
 
-  decoded_ftp_secret = try(
-    jsondecode(
-      length(data.aws_secretsmanager_secret_version.ftp_jobs_secret_version) > 0 ?
-      data.aws_secretsmanager_secret_version.ftp_jobs_secret_version[0].secret_string :
-      "{}"
-    ),
-    []
-  )
-
-  endpoint_details = {
-    for pair in local.decoded_ftp_secret :
-    "${pair.name}.${pair.type}" => pair.value
-    if contains(keys(pair), "name") && contains(keys(pair), "type") && contains(keys(pair), "value")
-  }
-
   ftp_job = {
     job_name       = "xerox-outbound"
     bucket_name    = try(module.s3_bucket.outbound.bucket.bucket, "")
     bucket_folder  = "export/home/ccmtdb/central_print/rep_orders/"
+    remote_path    = local.environment == "production" ? "/Production/outbound/RepDocs/" : local.environment == "preproduction" ? "/Test/Outbound/RepDocs/" : "/upload/"
     ftp_protocol   = "SFTP"
     ftp_type       = "SFTP_UPLOAD"
-    require_ssl    = "NO"
-    insecure       = "YES"
     ftp_file_types = "zip"
     file_remove    = "YES"
+    ftp_port       = local.ftp_sftp_port
     cron_rule      = local.application_data.accounts[local.environment].ftp_lambda_eventbridge_cron
   }
 
@@ -39,6 +24,22 @@ locals {
     cron_rule      = local.application_data.accounts[local.environment].zip_lambda_eventbridge_cron
   }
 
+}
+
+# Package Lambda function code directly from source — Terraform zips automatically on plan/apply.
+# This mirrors the EBS pattern (data.archive_file) so no manual zip or S3 upload is required.
+# source_code_hash ensures the Lambda is redeployed whenever the Python file changes.
+
+data "archive_file" "ftp_lambda_zip" {
+  type        = "zip"
+  source_file = "${path.module}/python_libs/ftpclient.py"
+  output_path = "${path.module}/python_libs/ftpclient_lambda.zip"
+}
+
+data "archive_file" "zip_lambda_zip" {
+  type        = "zip"
+  source_file = "${path.module}/python_libs/zip_s3_objects.py"
+  output_path = "${path.module}/python_libs/zip_s3_objects_lambda.zip"
 }
 
 # IAM  Resources
@@ -235,7 +236,7 @@ resource "aws_lambda_layer_version" "ftpclientlibs" {
   count               = local.build_ftp ? 1 : 0
   layer_name          = "ftpclientlibs"
   description         = "FtpClient Dependencies"
-  compatible_runtimes = ["python3.12"]
+  compatible_runtimes = [local.python_runtime]
   s3_bucket           = local.ftp_layer_bucket
   s3_key              = "${local.ftp_layer_folder_location}/${local.ftp_layer_source_zip}"
 }
@@ -251,8 +252,8 @@ resource "aws_security_group" "ftp_lambda" {
 
   egress {
     description = "Allow SFTP outbound"
-    from_port   = local.endpoint_details["${local.ftp_job.job_name}.remote-port"]
-    to_port     = local.endpoint_details["${local.ftp_job.job_name}.remote-port"]
+    from_port   = tonumber(local.ftp_job.ftp_port)
+    to_port     = tonumber(local.ftp_job.ftp_port)
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -295,11 +296,11 @@ resource "aws_lambda_function" "ftp" {
   runtime       = local.python_runtime
   handler       = "ftpclient.lambda_handler"
 
-  memory_size       = 512
-  timeout           = 300
-  s3_bucket         = local.ftp_layer_bucket
-  s3_key            = "${local.ftp_layer_folder_location}/${local.ftp_lambda_source_file}"
-  s3_object_version = local.ftp_lambda_source_file_version
+  memory_size = 512
+  timeout     = 300
+  filename    = data.archive_file.ftp_lambda_zip.output_path
+  # source_code_hash ensures Lambda is only redeployed when the Python source file actually changes.
+  source_code_hash = data.archive_file.ftp_lambda_zip.output_base64sha256
 
   reserved_concurrent_executions = 1
 
@@ -314,19 +315,21 @@ resource "aws_lambda_function" "ftp" {
 
   environment {
     variables = {
-      HOST         = local.endpoint_details["${local.ftp_job.job_name}.remote-host"]
-      PORT         = local.endpoint_details["${local.ftp_job.job_name}.remote-port"]
-      PROTOCOL     = local.ftp_job.ftp_protocol
-      FILETYPES    = local.ftp_job.ftp_file_types
-      TRANSFERTYPE = local.ftp_job.ftp_type
-      LOCALPATH    = local.ftp_job.bucket_folder
-      REMOTEPATH   = local.endpoint_details["${local.ftp_job.job_name}.remote-folder"]
-      REQUIRE_SSL  = local.ftp_job.require_ssl
-      INSECURE     = local.ftp_job.insecure
-      USER         = local.endpoint_details["${local.ftp_job.job_name}.username"]
-      PASSWORD     = local.endpoint_details["${local.ftp_job.job_name}.password"]
-      S3BUCKET     = local.ftp_job.bucket_name
-      FILEREMOVE   = local.ftp_job.file_remove
+      FILETYPES             = local.ftp_job.ftp_file_types
+      TRANSFERTYPE          = local.ftp_job.ftp_type
+      LOCALPATH             = local.ftp_job.bucket_folder
+      REMOTEPATH            = local.ftp_job.remote_path
+      PORT                  = local.ftp_job.ftp_port
+      S3BUCKET              = local.ftp_job.bucket_name
+      FILEREMOVE            = local.ftp_job.file_remove
+      SKIP_KEY_VERIFICATION = "YES"
+      PROTOCOL              = local.ftp_job.ftp_protocol
+      REQUIRE_SSL           = "NO"
+      INSECURE              = "YES"
+      SECRET_NAME           = aws_secretsmanager_secret.ftp_jobs_secret.name
+      JOB_NAME              = local.ftp_job.job_name
+      APPLICATION_NAME      = local.application_name
+      ENVIRONMENT           = local.environment
     }
   }
 }
@@ -344,11 +347,10 @@ resource "aws_lambda_function" "zip" {
   handler       = "zip_s3_objects.lambda_handler"
 
   # Higher memory and timeout to support large numbers of files being zipped
-  memory_size       = 4096
-  timeout           = 900
-  s3_bucket         = local.ftp_layer_bucket
-  s3_key            = "${local.ftp_layer_folder_location}/${local.zip_lambda_source_file}"
-  s3_object_version = local.zip_lambda_source_file_version
+  memory_size      = 4096
+  timeout          = 900
+  filename         = data.archive_file.zip_lambda_zip.output_path
+  source_code_hash = data.archive_file.zip_lambda_zip.output_base64sha256
 
   reserved_concurrent_executions = 1
 

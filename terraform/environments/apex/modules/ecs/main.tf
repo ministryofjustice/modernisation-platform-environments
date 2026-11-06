@@ -27,6 +27,11 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   min_size              = var.ec2_min_size
   protect_from_scale_in = true
 
+  # desired_capacity is managed live by the ECS capacity provider; don't let apply reset it
+  lifecycle {
+    ignore_changes = [desired_capacity]
+  }
+
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
     version = "$Latest"
@@ -101,7 +106,7 @@ resource "aws_security_group" "cluster_ec2" {
 
 data "aws_ssm_parameter" "ecs_optimized_ami" {
   # This gets the recommended image of amzn2-ami-ecs-hvm-2.0.<date>-x86_64-ebs
-  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
 }
 
 resource "aws_launch_template" "ec2-launch-template" {
@@ -344,6 +349,7 @@ resource "aws_iam_policy" "ecs_task_execution_policy" { #tfsec:ignore:aws-iam-no
     {
       "Effect": "Allow",
       "Action": [
+        "secretsmanager:GetSecretValue",
         "ssm:GetParameters"
       ],
       "Resource": ["${var.database_tad_password_arn}"]

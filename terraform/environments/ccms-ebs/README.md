@@ -56,11 +56,11 @@ EBS DB -     ec2-ccms-ebs-production-ebsdb
 EBS Apps -   ec2-ccms-ebs-production-ebsapps-1
              ec2-ccms-ebs-production-ebsapps-2
 
-Webgate -    ec2-ccms-ebs-production-webgate-1
+<!-- Webgate -    ec2-ccms-ebs-production-webgate-1
              ec2-ccms-ebs-production-webgate-2
 
 Accessgate - ec2-ccms-ebs-production-accessgate-1
-             ec2-ccms-ebs-production-accessgate-2
+             ec2-ccms-ebs-production-accessgate-2 -->
 
 ### **Migration RunBook:**
 

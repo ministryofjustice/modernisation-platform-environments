@@ -11,6 +11,10 @@ variable "rule_name" {
   default = "ebs-trusted-rule-ip-set"
 }
 
+variable "ssogen_rule_name" {
+  default = "ssogen-waf-ip-set"
+}
+
 data "archive_file" "waf_maintenance_zip" {
   type        = "zip"
   source_file = "${path.module}/lambda/waf_maintenance/lambda_function.py"
@@ -45,13 +49,22 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
     Statement = [
       { Effect = "Allow",
         Action = ["wafv2:GetWebACL", "wafv2:UpdateWebACL"],
-      Resource = "*" },
-      { Effect = "Allow",
-        Action = ["wafv2:GetRuleGroup"],
-      Resource = "*" },
-      { Effect = "Allow",
-        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-      Resource = "*" }
+        Resource = ["arn:aws:wafv2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:regional/webacl/ebs_internal_waf/*",
+          "arn:aws:wafv2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:regional/ipset/ebsapps_internal_waf_ip_set/*"
+        ]
+      },
+      { Effect   = "Allow",
+        Action   = ["wafv2:GetRuleGroup"],
+        Resource = ["arn:aws:wafv2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:regional/rulegroup/ebs-trusted-rule-ip-set"]
+      },
+      { Effect   = "Allow",
+        Action   = ["logs:CreateLogGroup"],
+        Resource = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
+      },
+      { Effect   = "Allow",
+        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"],
+        Resource = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/waf-maintenance-${local.environment}:*"]
+      }
     ]
   })
 }
@@ -70,6 +83,28 @@ resource "aws_lambda_function" "waf_maintenance" {
       WEB_ACL_NAME     = data.aws_wafv2_web_acl.waf_web_acl.name
       WEB_ACL_ID       = data.aws_wafv2_web_acl.waf_web_acl.id
       RULE_NAME        = var.rule_name
+      CUSTOM_BODY_NAME = "maintenance_html"
+      TIME_FROM        = "21:30" # Optional - these are the defaults
+      TIME_TO          = "07:00" # Optional - these are the defaults
+    }
+  }
+}
+
+resource "aws_lambda_function" "ssogen_waf_maintenance" {
+  count            = local.ssogen_enabled ? 1 : 0
+  function_name    = "ssogen-waf-maintenance-${local.environment}"
+  source_code_hash = data.archive_file.waf_maintenance_zip.output_base64sha256
+  role             = aws_iam_role.waf_lambda_role.arn
+  filename         = data.archive_file.waf_maintenance_zip.output_path
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.13"
+  timeout          = 30
+  environment {
+    variables = {
+      SCOPE            = var.scope
+      WEB_ACL_NAME     = aws_wafv2_web_acl.ssogen_web_acl[count.index].name
+      WEB_ACL_ID       = aws_wafv2_web_acl.ssogen_web_acl[count.index].id
+      RULE_NAME        = var.ssogen_rule_name
       CUSTOM_BODY_NAME = "maintenance_html"
       TIME_FROM        = "21:30" # Optional - these are the defaults
       TIME_TO          = "07:00" # Optional - these are the defaults
@@ -123,7 +158,12 @@ resource "aws_iam_role" "scheduler_invoke_lambda_role" {
     Statement = [{
       Effect    = "Allow",
       Principal = { Service = "scheduler.amazonaws.com" },
-      Action    = "sts:AssumeRole"
+      Condition = {
+        StringEquals = {
+          "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+        }
+      },
+      Action = "sts:AssumeRole"
     }]
   })
 

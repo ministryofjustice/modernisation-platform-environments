@@ -51,7 +51,7 @@ resource "aws_lambda_function" "lambda_function" {
   layers           = [aws_lambda_layer_version.lambda_layer.arn]
   architectures    = ["x86_64"]
   memory_size      = 128
-  timeout          = 120
+  timeout          = 900
 
   environment {
     variables = {

@@ -27,14 +27,26 @@ locals {
 
   securityhub_event_bus_name = "securityhub-central"
 
-  securityhub_source_account_ids = sort(distinct([
-    for account_name, account_id in local.environment_management.account_ids : account_id
-    if can(regex("^core-", account_name))
-  ]))
+  ccms_account_ids = [
+    for account_name, _ in lookup(
+      lookup(local.environment_configuration.tenant_configuration, "ccms", {}),
+      "aws_accounts",
+      {}
+    ) :
+    local.all_account_ids[account_name]
+    if contains(keys(local.all_account_ids), account_name)
+  ]
+
+  securityhub_source_account_ids = sort(distinct(concat(
+    [
+      for account_name, account_id in local.environment_management.account_ids : account_id
+      if can(regex("^core-", account_name))
+    ],
+    local.ccms_account_ids
+  )))
 
   securityhub_account_name_map = {
     for account_name, account_id in local.all_account_ids :
     account_id => account_name if contains(local.securityhub_source_account_ids, account_id)
   }
-
 }

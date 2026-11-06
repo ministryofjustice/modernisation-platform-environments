@@ -1,0 +1,13 @@
+---
+apiVersion: gateway.k8s.aws/v1beta1
+kind: TargetGroupConfiguration
+metadata:
+  name: app
+  namespace: {{ .Release.Namespace }}
+spec:
+  targetReference:
+    name: app
+  defaultConfiguration:
+    targetType: instance
+    healthCheckConfig:
+      healthCheckPath: /healthcheck/

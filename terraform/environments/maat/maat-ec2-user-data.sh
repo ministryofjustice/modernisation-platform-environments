@@ -1,4 +1,5 @@
 #!/bin/bash -xe
+# TODO LASB-5089 Remove
 echo ECS_CLUSTER=${app_ecs_cluster} >> /etc/ecs/ecs.config
 yum install -y aws-cfn-bootstrap awslogs
 cat >/etc/awslogs/awslogs.conf <<-EOF

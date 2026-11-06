@@ -6,7 +6,8 @@ resource "aws_lb" "pui" {
   load_balancer_type = "application"
   subnets            = data.aws_subnets.shared-private.ids
 
-  security_groups = [aws_security_group.load_balancer.id]
+  security_groups            = [aws_security_group.load_balancer.id]
+  enable_deletion_protection = true
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id

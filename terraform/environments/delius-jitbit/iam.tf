@@ -35,6 +35,8 @@ resource "aws_iam_role" "ecs_service" {
 }
 
 data "aws_iam_policy_document" "ecs_service_policy" {
+  #checkov:skip=CKV_AWS_111: "Future scoping required"
+  #checkov:skip=CKV_AWS_356: "Future scoping required"
   statement {
     effect    = "Allow"
     resources = ["*"]
@@ -96,6 +98,9 @@ resource "aws_iam_role" "ecs_exec" {
 }
 
 data "aws_iam_policy_document" "ecs_exec" {
+  #checkov:skip=CKV_AWS_108: "Future scoping required"
+  #checkov:skip=CKV_AWS_111: "Future scoping required"
+  #checkov:skip=CKV_AWS_356: "Future scoping required"
   statement {
     effect    = "Allow"
     resources = ["*"]
@@ -109,6 +114,14 @@ data "aws_iam_policy_document" "ecs_exec" {
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents"
+    ]
+  }
+  statement {
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = [
+      data.aws_kms_key.general_shared.arn
     ]
   }
 }

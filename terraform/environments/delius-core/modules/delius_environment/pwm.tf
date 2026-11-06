@@ -1,3 +1,7 @@
+locals {
+  pwm_migrated_envs = ["dev", "test", "stage", "preprod", "prod"]
+}
+
 module "pwm" {
   source = "../helpers/delius_microservice"
 
@@ -49,8 +53,7 @@ module "pwm" {
   microservice_lb                    = aws_lb.delius_core_ancillary
   microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
 
-
-  alb_listener_rule_host_header = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
+  alb_listener_rule_host_header = !contains(local.pwm_migrated_envs, var.env_name) ? "pwm.${var.env_name}.${var.account_config.dns_suffix}" : null
 
   platform_vars = var.platform_vars
 
@@ -108,10 +111,6 @@ module "pwm" {
   log_error_pattern = "ERROR"
 
   log_error_threshold_config = {
-    warning = {
-      threshold = 10
-      period    = 60
-    }
     critical = {
       threshold = 20
       period    = 180
@@ -127,7 +126,70 @@ module "pwm" {
   enable_platform_backups = var.enable_platform_backups
 }
 
+resource "aws_lb_listener_rule" "ancillary_listener_rule" {
+  count        = contains(local.pwm_migrated_envs, var.env_name) ? 1 : 0
+  listener_arn = aws_lb_listener.ancillary_https.arn
+  priority     = 10
+
+  condition {
+    host_header {
+      values = [
+        var.env_name == "prod" ? "password-reset.probation.service.justice.gov.uk" : "password-reset.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "pwm.${var.env_name}.${var.account_config.dns_suffix}"
+      ]
+    }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = module.pwm.target_group_arn
+  }
+}
+
+#############
+### Certs ###
+#############
+resource "aws_acm_certificate" "pwm_legacy" {
+  count = var.env_name != "prod" ? 1 : 0
+
+  domain_name       = "password-reset.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_listener_certificate" "pwm_legacy" {
+  count = var.env_name != "prod" ? 1 : 0
+
+  listener_arn    = aws_lb_listener.ancillary_https.arn
+  certificate_arn = aws_acm_certificate.pwm_legacy[0].arn
+}
+
+resource "aws_acm_certificate" "pwm_legacy_prod" {
+  count = var.env_name == "prod" ? 1 : 0
+
+  domain_name       = "password-reset.probation.service.justice.gov.uk"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_listener_certificate" "pwm_legacy_prod" {
+  count = var.env_name == "prod" ? 1 : 0
+
+  listener_arn    = aws_lb_listener.ancillary_https.arn
+  certificate_arn = aws_acm_certificate.pwm_legacy_prod[0].arn
+}
+
+#############
+#### SSM ####
+#############
 resource "aws_ssm_parameter" "security_key" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = "/${var.env_name}/pwm/security_key"
   type  = "SecureString"
   value = random_id.security_key.hex
@@ -142,8 +204,7 @@ resource "random_id" "security_key" {
 
 #############
 # SES
-#############"
-
+#############
 resource "aws_ses_domain_identity" "pwm" {
   domain = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
 }
@@ -193,8 +254,8 @@ resource "aws_route53_record" "pwm_amazonses_dmarc_record" {
 #####################
 # SES SMTP User
 #####################
-
 resource "aws_iam_user" "pwm_ses_smtp_user" {
+  #checkov:skip=CKV_AWS_273: "SES SMTP authentication requires IAM user credentials; no human access is granted"
   name = "${var.env_name}-pwm-smtp-user"
 }
 
@@ -203,6 +264,9 @@ resource "aws_iam_access_key" "pwm_ses_smtp_user" {
 }
 
 resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
+  #checkov:skip=CKV_AWS_355: "SES email-sending APIs intentionally use Resource "*" because this dedicated SMTP user must be able to send from any verified SES identity""
+  #checkov:skip=CKV_AWS_40: "SES SMTP credentials require an IAM user; this inline policy is intentionally attached directly to the dedicated SMTP user"
+  #checkov:skip=CKV_AWS_290: "Resource "*" is required for SES SendEmail and SendRawEmail actions, as they do not support resource-level permissions"
   name = "${var.env_name}-pwm-ses-smtp-user-policy"
   user = aws_iam_user.pwm_ses_smtp_user.name
 
@@ -222,6 +286,7 @@ resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
 }
 
 resource "aws_ssm_parameter" "pwm_ses_smtp_user" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name = "/${var.env_name}/pwm/ses_smtp"
   type = "SecureString"
   value = jsonencode({

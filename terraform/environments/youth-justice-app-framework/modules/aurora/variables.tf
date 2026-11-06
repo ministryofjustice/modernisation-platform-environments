@@ -209,3 +209,45 @@ variable "aws_account_id" {
   description = "The AWS account ID"
   type        = string
 }
+
+## RDS Proxy
+variable "proxy_secret_arn" {
+  description = "The ARN of the secrets manager secret containing the credentials the RDS Proxy uses to connect to the database"
+  type        = string
+}
+
+variable "proxy_idle_client_timeout" {
+  description = "Number of seconds a client connection to the proxy can be inactive before the proxy disconnects it"
+  type        = number
+  default     = 1800
+}
+
+variable "proxy_debug_logging" {
+  description = "Enable additional CloudWatch logging of SQL statements for the RDS Proxy"
+  type        = bool
+  default     = false
+}
+
+variable "proxy_max_connections_percent" {
+  description = "Maximum percentage of the target's max_connections that the proxy can use"
+  type        = number
+  default     = 100
+}
+
+variable "proxy_max_idle_connections_percent" {
+  description = "Maximum percentage of max_connections the proxy keeps as idle connections"
+  type        = number
+  default     = 50
+}
+
+variable "proxy_connection_borrow_timeout" {
+  description = "Maximum time in seconds the proxy waits for a connection to become available"
+  type        = number
+  default     = 120
+}
+
+variable "cluster_kms_key_id" {
+  description = "The ARN of the KMS key used to encrypt the cluster storage. Only takes effect when the cluster is created; leave null for existing clusters"
+  type        = string
+  default     = null
+}

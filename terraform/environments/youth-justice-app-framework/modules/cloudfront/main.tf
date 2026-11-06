@@ -152,7 +152,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 
 resource "aws_cloudfront_origin_request_policy" "headers_policy" {
   name    = "cloudfront-${var.cloudfront_route53_record_name}-headers-policy"
-  comment = "Policy to include all viewer headers, all query strings, and no cookies."
+  comment = "Policy to include all viewer headers, all query strings, and all cookies."
 
   headers_config {
     header_behavior = "allViewer" # This includes all headers sent by the viewer.
@@ -163,7 +163,7 @@ resource "aws_cloudfront_origin_request_policy" "headers_policy" {
   }
 
   cookies_config {
-    cookie_behavior = "none" # This does not include any cookies in the origin request.
+    cookie_behavior = "all" # This includes all cookies in the origin request.
   }
 }
 #trivy:ignore:AVD-AWS-0132 todo fix later
@@ -190,7 +190,7 @@ resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
       access_control_max_age_sec = 31536000 # 1 year in seconds
       override                   = true     # Matches "Origin override"
       preload                    = true     # Now on for pen test
-      include_subdomains         = false    # Matches unchecked includeSubDomains
+      include_subdomains         = true     # Now on for pen test
     }
     content_type_options {
       override = true

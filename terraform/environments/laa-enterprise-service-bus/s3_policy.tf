@@ -70,7 +70,7 @@ resource "aws_s3_bucket_policy" "log_bucket_policy" {
         Resource = "${aws_s3_bucket.access_logs.arn}/*"
         Condition = {
           StringEquals = {
-            "aws:SourceArn" = aws_s3_bucket.data.arn
+            "aws:SourceArn" = local.s3_access_logs_source_arns
           }
         }
       }

@@ -1,12 +1,17 @@
+import os
+
 import boto3
 
 def lambda_handler(event, context):
     dms = boto3.client('dms')
     cw = boto3.client('cloudwatch')
+    env_name = os.environ['ENV_NAME']
 
     tasks = dms.describe_replication_tasks().get('ReplicationTasks', [])
     non_running_tasks = [t['ReplicationTaskIdentifier']
-                         for t in tasks if t['Status'].lower() != 'running']
+                         for t in tasks
+                         if t['Status'].lower() != 'running'
+                         and t['ReplicationTaskIdentifier'].startswith(env_name)]
 
     if non_running_tasks:
         print("Non-running tasks:", non_running_tasks)
@@ -16,7 +21,13 @@ def lambda_handler(event, context):
             MetricData=[{
                 'MetricName': 'DMSTaskNotRunning',
                 'Value': 1,
-                'Unit': 'Count'
+                'Unit': 'Count',
+                'Dimensions': [
+                    {
+                        'Name': 'Environment',
+                        'Value': env_name
+                    }
+                ]
             }]
         )
     else:
@@ -26,6 +37,12 @@ def lambda_handler(event, context):
             MetricData=[{
                 'MetricName': 'DMSTaskNotRunning',
                 'Value': 0,
-                'Unit': 'Count'
+                'Unit': 'Count',
+                'Dimensions': [
+                    {
+                        'Name': 'Environment',
+                        'Value': env_name
+                    }
+                ]
             }]
         )

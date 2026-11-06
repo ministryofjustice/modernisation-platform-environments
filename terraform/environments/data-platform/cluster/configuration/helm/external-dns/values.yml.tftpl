@@ -1,6 +1,11 @@
 ---
 txtOwnerId: ${txt_owner_id}
 
+sources:
+  - service
+  - ingress
+  - gateway-httproute
+
 domainFilters:
 %{ for domain_filter in domain_filters ~}
   - ${domain_filter}

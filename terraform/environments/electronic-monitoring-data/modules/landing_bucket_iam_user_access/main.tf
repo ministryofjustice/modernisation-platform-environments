@@ -96,7 +96,7 @@ module "secrets_manager" {
   rotation_rules = {
     # Runs at 10:00 AM on the second Tuesday of Feb, May, Aug, Nov.
     schedule_expression = "cron(0 10 ? FEB,MAY,AUG,NOV TUE#2 *)"
-    duration = "4h"
+    duration            = "4h"
   }
 
   tags = merge(

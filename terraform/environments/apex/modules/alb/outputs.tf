@@ -49,3 +49,8 @@ output "cloudfront_alb_secret" {
   description = "The secret between ALB and CloudFront"
   sensitive   = true
 }
+
+output "s3_bucket" {
+  description = "The S3 bucket used for ALB access logs"
+  value       = var.existing_bucket_name != "" ? null : module.s3-bucket[0].bucket
+}

@@ -343,6 +343,17 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
     ]
   }
   statement {
+    sid = "S3WorkingBucketWriteAccess"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.project}-working-*/*"
+    ]
+  }
+  statement {
     actions = [
       "kms:*"
     ]
@@ -480,7 +491,7 @@ data "aws_iam_policy_document" "redshift_federated_query" {
     actions = [
       "secretsmanager:GetSecretValue"
     ]
-    resources = [for s in data.aws_secretsmanager_secret.probation : s.arn]
+    resources = [for s in module.probation_source_secret : s.secret_arn]
   }
 }
 
@@ -684,7 +695,6 @@ resource "aws_iam_policy" "redshift_dataapi_cross_policy" {
   policy      = data.aws_iam_policy_document.redshift_dataapi.json
 }
 
-
 ## Athena API Policy Document
 # Policy Document
 data "aws_iam_policy_document" "athena_api" {
@@ -695,7 +705,9 @@ data "aws_iam_policy_document" "athena_api" {
       "athena:GetQueryResults",
       "athena:GetWorkGroup",
       "athena:StartQueryExecution",
-      "athena:StopQueryExecution"
+      "athena:StopQueryExecution",
+      "athena:ListQueryExecutions",
+      "athena:BatchGetQueryExecution"
     ]
     resources = [
       "arn:aws:athena:${local.account_region}:${local.account_id}:*/*"
@@ -717,6 +729,7 @@ data "aws_iam_policy_document" "athena_api" {
     ]
     resources = [
       "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function",
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-probation-function",
       "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-*-federated-query-function",
       "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-redshift-function"
     ]
@@ -802,6 +815,8 @@ data "aws_iam_policy_document" "glue_catalog_readonly" {
     resources = [
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw_archive",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/raw_archive/*",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw_archive_probation",
+      "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/raw_archive_probation/*",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/curated",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/curated/*",
       "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/raw",

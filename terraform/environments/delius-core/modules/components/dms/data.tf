@@ -8,7 +8,6 @@ data "aws_prefix_list" "s3" {
   prefix_list_id = data.aws_ec2_managed_prefix_list.s3.id
 }
 
-
 # As of date of writing, the AWS_DMS_ENDPOINT resource does not support using Secrets Manager for
 # ASM connectivity as Oracle-specific attributes are not available.
 # A replacement resource, aws_dms_oracle_endpoint, is in development and the following should be replaced

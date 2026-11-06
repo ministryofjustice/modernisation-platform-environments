@@ -21,13 +21,17 @@ locals {
 
       sns_topics = {
         pagerduty_integrations = {
-          azure-fixngo-pagerduty          = "az-noms-dev-test-environments-alerts"
-          dso-pipelines-pagerduty         = "dso-pipelines"
-          hmpps-domain-services-pagerduty = "hmpps-domain-services-test"
-          nomis-pagerduty                 = "nomis-test"
-          nomis-data-hub-pagerduty        = "nomis-data-hub-test"
-          oasys-pagerduty                 = "oasys-test"
-          pagerduty                       = "hmpps-oem-test"
+          delius-mis-preproduction-pagerduty               = "delius_core_nonprod_alarms"
+          dso-pipelines-pagerduty                          = "dso-pipelines"
+          hmpps-domain-services-test-pagerduty             = "hmpps-domain-services-test"
+          nomis-test-pagerduty                             = "nomis-test"
+          nomis-preproduction-pagerduty                    = "nomis-preproduction"
+          nomis-combined-reporting-preproduction-pagerduty = "nomis-combined-reporting-preproduction"
+          nomis-data-hub-production-pagerduty              = "nomis-data-hub-production"
+          oasys-test-pagerduty                             = "oasys-test"
+          oasys-preproduction-pagerduty                    = "oasys-preproduction"
+          oasys-national-reporting-preproduction-pagerduty = "oasys-national-reporting-preproduction"
+          pagerduty                                        = "hmpps-oem-test"
         }
       }
     }
@@ -256,6 +260,13 @@ locals {
       "/oracle/oem"              = local.secretsmanager_secrets.oem
       "/oracle/database/EMREP"   = local.secretsmanager_secrets.oem
       "/oracle/database/TRCVCAT" = local.secretsmanager_secrets.oem
+    }
+
+    ssm_patch_baselines = {
+      OracleLinuxPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["OracleLinuxPatchGroup1Baseline"], {
+        rule1_approve_after_days = null
+        rule1_approve_until_date = "2026-09-17"
+      })
     }
   }
 }

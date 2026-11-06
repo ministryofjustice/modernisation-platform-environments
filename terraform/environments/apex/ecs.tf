@@ -33,6 +33,6 @@ module "apex-ecs" {
   ec2_instance_warmup_period = local.application_data.accounts[local.environment].ec2_instance_warmup_period
   log_group_kms_key          = aws_kms_key.cloudwatch_logs_key.arn
   environment                = local.environment
-  database_tad_password_arn  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
-
+  # Use the same secret ARN as the ECS task definition template.
+  database_tad_password_arn = local.db_secret_arn
 }

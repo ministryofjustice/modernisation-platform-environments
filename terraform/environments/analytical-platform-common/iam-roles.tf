@@ -3,7 +3,7 @@ module "ecr_access_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.4.0"
+  version = "6.6.1"
 
   enable_github_oidc = true
   use_name_prefix    = false
@@ -11,8 +11,10 @@ module "ecr_access_iam_role" {
   name = "ecr-access"
 
   oidc_wildcard_subjects = [
-    "ministryofjustice/*",
-    "moj-analytical-services/*"
+    "ministryofjustice/*:*",
+    "ministryofjustice@*/*@*:*",
+    "moj-analytical-services/*:*",
+    "moj-analytical-services@*/*@*:*"
   ]
 
   policies = {
@@ -27,7 +29,7 @@ module "snyk_analytical_platform_airflow_container_scanning_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.4.0"
+  version = "6.6.1"
 
   enable_github_oidc = true
   use_name_prefix    = false
@@ -66,7 +68,7 @@ module "trivy_analytical_platform_airflow_container_scanning_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.4.0"
+  version = "6.6.1"
 
   enable_github_oidc = true
   use_name_prefix    = false
@@ -90,7 +92,7 @@ module "analytical_platform_github_actions_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.4.0"
+  version = "6.6.1"
 
   enable_github_oidc = true
   use_name_prefix    = false
@@ -111,7 +113,7 @@ module "analytical_platform_terraform_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.4.0"
+  version = "6.6.1"
 
   create          = true
   use_name_prefix = false
@@ -153,7 +155,7 @@ module "data_engineering_datalake_access_github_actions_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.4.0"
+  version = "6.6.1"
 
   enable_github_oidc = true
   use_name_prefix    = false
@@ -174,7 +176,7 @@ module "data_engineering_datalake_access_terraform_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.4.0"
+  version = "6.6.1"
 
   create          = true
   use_name_prefix = false

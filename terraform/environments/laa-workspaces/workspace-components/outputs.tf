@@ -38,9 +38,36 @@ output "nat_gateway_public_ip" {
   value       = try(aws_eip.nat[0].public_ip, null)
 }
 
+###############################################
+# Outputs for AWS Network Firewall
+###############################################
+
+output "network_firewall_policy_arn" {
+  description = "ARN of the WorkSpaces Network Firewall policy for web filtering"
+  value       = try(aws_networkfirewall_firewall_policy.workspaces_web_allowlist[0].arn, null)
+}
+
+output "network_firewall_id" {
+  description = "ID of the WorkSpaces Network Firewall"
+  value       = try(aws_networkfirewall_firewall.workspaces_web_allowlist[0].id, null)
+}
+
+output "network_firewall_endpoint_ids" {
+  description = "Endpoint IDs for the WorkSpaces Network Firewall"
+  value = try(
+    [for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states : sync_state.attachment[0].endpoint_id],
+    []
+  )
+}
+
 ##############################################
 ### RADIUS Server Outputs
 ##############################################
+
+output "radius_alb_security_group_id" {
+  description = "Security group ID for RADIUS ALB"
+  value       = try(aws_security_group.radius_alb[0].id, null)
+}
 
 output "radius_server_security_group_id" {
   description = "Security group ID for RADIUS servers"
@@ -89,3 +116,91 @@ output "mariadb_root_password_arn" {
   value       = try(aws_secretsmanager_secret.mariadb_root_password[0].arn, null)
   sensitive   = true
 }
+
+output "ses_sender_email" {
+  description = "SES verified sender email address"
+  value       = local.environment == "development" ? "no-reply@${aws_ses_domain_identity.workspaces[0].domain}" : null
+}
+
+##############################################
+### ECS / LinOTP 3.x Outputs
+##############################################
+
+output "ecs_cluster_id" {
+  description = "ECS cluster ID"
+  value       = try(aws_ecs_cluster.workspaces[0].id, null)
+}
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name"
+  value       = try(aws_ecs_cluster.workspaces[0].name, null)
+}
+
+output "ecs_cloudwatch_log_group_name" {
+  description = "CloudWatch log group name for ECS"
+  value       = try(aws_cloudwatch_log_group.ecs_linotp3[0].name, null)
+}
+
+output "ecr_linotp3_repository_url" {
+  description = "ECR repository URL for LinOTP 3.x image"
+  value       = try(aws_ecr_repository.linotp3[0].repository_url, null)
+}
+
+output "ecr_freeradius_repository_url" {
+  description = "ECR repository URL for FreeRADIUS + LinOTP Perl module image"
+  value       = try(aws_ecr_repository.freeradius_linotp[0].repository_url, null)
+}
+
+output "radius_alb_listener_https_arn" {
+  description = "RADIUS ALB HTTPS listener ARN"
+  value       = try(aws_lb_listener.radius_https[0].arn, null)
+}
+
+output "radius_alb_zone_id" {
+  description = "RADIUS ALB zone ID for Route53 alias"
+  value       = try(aws_lb.radius_portal[0].zone_id, null)
+}
+
+output "radius_nlb_target_group_arn" {
+  description = "RADIUS NLB target group ARN for ECS"
+  value       = try(aws_lb_target_group.radius_ecs[0].arn, null)
+}
+
+output "linotp_portal_target_group_arn" {
+  description = "LinOTP portal target group ARN (ALB)"
+  value       = try(aws_lb_target_group.linotp3_portal[0].arn, null)
+}
+
+output "ecs_task_execution_role_arn" {
+  description = "ECS task execution role ARN"
+  value       = try(aws_iam_role.ecs_task_execution[0].arn, null)
+}
+
+output "ecs_linotp3_security_group_id" {
+  description = "Security group ID for ECS LinOTP tasks"
+  value       = try(aws_security_group.ecs_linotp3[0].id, null)
+}
+
+output "linotp3_db_endpoint" {
+  description = "LinOTP 3.x RDS database endpoint"
+  value       = try(aws_db_instance.linotp3[0].address, null)
+}
+
+output "linotp3_enc_key_secret_arn" {
+  description = "LinOTP 3.x encryption key secret ARN"
+  value       = try(aws_secretsmanager_secret.linotp3_enc_key[0].arn, null)
+  sensitive   = true
+}
+
+output "linotp3_db_password_secret_arn" {
+  description = "LinOTP 3.x database password secret ARN"
+  value       = try(aws_secretsmanager_secret.linotp3_db_password[0].arn, null)
+  sensitive   = true
+}
+
+output "linotp_ad_bind_password_secret_arn" {
+  description = "LinOTP AD bind password secret ARN"
+  value       = try(aws_secretsmanager_secret.linotp_ad_bind_password[0].arn, null)
+  sensitive   = true
+}
+

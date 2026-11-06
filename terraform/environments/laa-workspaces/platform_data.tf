@@ -107,25 +107,23 @@ data "aws_caller_identity" "current" {}
 # }
 
 # Route53 DNS data
-# NOTE: Route53 zones commented out - no shared DNS zones for isolated account
-
 # data "aws_route53_zone" "external" {
 #   provider = aws.core-vpc
-#
+
 #   name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
 #   private_zone = false
 # }
 
 # data "aws_route53_zone" "inner" {
 #   provider = aws.core-vpc
-#
+
 #   name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal."
 #   private_zone = true
 # }
 
 # data "aws_route53_zone" "network-services" {
 #   provider = aws.core-network-services
-#
+
 #   name         = "modernisation-platform.service.justice.gov.uk."
 #   private_zone = false
 # }

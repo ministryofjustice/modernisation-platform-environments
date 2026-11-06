@@ -36,4 +36,6 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+
+  upload_bucket_parameter_prefix = "/${local.application_name}/${local.component_name}/${local.environment}/upload-bucket"
 }

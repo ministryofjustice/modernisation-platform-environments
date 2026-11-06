@@ -4,6 +4,7 @@
 
 
 resource "aws_ssm_parameter" "hmpps_bot_priv_key" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = "/github/hmpps_bot_priv_key"
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -16,6 +17,7 @@ resource "aws_ssm_parameter" "hmpps_bot_priv_key" {
 }
 
 resource "aws_ssm_parameter" "hmpps_bot_installation_id" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = "/github/hmpps_bot_installation_id"
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -28,6 +30,7 @@ resource "aws_ssm_parameter" "hmpps_bot_installation_id" {
 }
 
 resource "aws_ssm_parameter" "hmpps_bot_app_id" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = "/github/hmpps_bot_app_id"
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -40,6 +43,7 @@ resource "aws_ssm_parameter" "hmpps_bot_app_id" {
 }
 
 resource "aws_ssm_parameter" "account_ids" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name        = "account_ids"
   description = "Selected modernisation platform AWS account IDs for use by ansible"
   type        = "SecureString"

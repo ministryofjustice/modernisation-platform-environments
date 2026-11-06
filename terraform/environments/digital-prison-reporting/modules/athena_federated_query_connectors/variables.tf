@@ -89,3 +89,9 @@ variable "athena_connector_type" {
   type        = string
   description = "The Athena connector type. Example values: oracle, postgresql "
 }
+
+variable "security_group_delete_timeout" {
+  type        = string
+  default     = "45m"
+  description = "How long to keep retrying when deleting the Lambda security group. The Lambda's network interfaces can take a while to be released after the function is deleted."
+}

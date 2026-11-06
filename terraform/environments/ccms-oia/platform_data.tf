@@ -103,6 +103,47 @@ data "aws_subnet" "public_subnets_c" {
   }
 }
 
+# VPC Endpoint subnet lookup (used to identify shared VPCE subnets)
+data "aws_subnets" "shared_vpce" {
+  provider = aws.core-vpc
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected*"
+  }
+}
+
+data "aws_subnet" "vpce_subnets_a" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}a"
+  }
+}
+
+data "aws_subnet" "vpce_subnets_b" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}b"
+  }
+}
+
+data "aws_subnet" "vpce_subnets_c" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}c"
+  }
+}
+
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}
+
 # Route53 DNS data
 data "aws_route53_zone" "external" {
   provider = aws.core-vpc

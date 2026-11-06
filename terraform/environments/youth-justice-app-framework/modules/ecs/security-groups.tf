@@ -186,6 +186,29 @@ resource "aws_security_group_rule" "ecsext_to_rds_rule" {
   description              = "PostgreSQL from ECS External"
 }
 
+# Enable ECS internal Services access to RDS Proxy
+resource "aws_security_group_rule" "ecsint_to_rds_proxy_rule" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = var.rds_proxy_security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "PostgreSQL (via RDS Proxy) from ECS Internal"
+}
+
+# Enable ECS external Services access to RDS Proxy
+resource "aws_security_group_rule" "ecsext_to_rds_proxy_rule" {
+  count                    = var.create_svc_pilot ? 1 : 0
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = var.rds_proxy_security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_external.id
+  description              = "PostgreSQL (via RDS Proxy) from ECS External"
+}
+
 # Enable ECS Services access to Redshift
 resource "aws_security_group_rule" "ecsint_to_redshift_rule" {
   type                     = "ingress"

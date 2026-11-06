@@ -55,8 +55,8 @@ data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
 
 # SNS topic for GuardDuty findings
 resource "aws_sns_topic" "guardduty_alerts" {
-  name = "${local.application_name}-guardduty-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_name}-guardduty-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -186,7 +186,7 @@ resource "aws_iam_role_policy" "lambda_guardduty_sns_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.guardduty_slack_notify.function_name}:*"
+        Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.guardduty_slack_notify.function_name}:*"
       },
       {
         Effect = "Allow"

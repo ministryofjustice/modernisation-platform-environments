@@ -21,16 +21,15 @@ locals {
 
       sns_topics = {
         pagerduty_integrations = {
-          azure-fixngo-pagerduty              = "az-noms-production-1-alerts"
-          corporate-staff-rostering-pagerduty = "corporate-staff-rostering-preproduction"
-          dso-pipelines-pagerduty             = "dso-pipelines"
-          hmpps-domain-services-pagerduty     = "hmpps-domain-services-preproduction"
-          nomis-combined-reporting-pagerduty  = "nomis-combined-reporting-preproduction"
-          nomis-pagerduty                     = "nomis-preproduction"
-          oasys-national-reporting-pagerduty  = "oasys-national-reporting-preproduction"
-          oasys-pagerduty                     = "oasys-preproduction"
-          pagerduty                           = "hmpps-oem-preproduction"
-          planetfm-pagerduty                  = "planetfm-preproduction"
+          corporate-staff-rostering-preproduction-pagerduty = "corporate-staff-rostering-preproduction"
+          corporate-staff-rostering-production-pagerduty    = "corporate-staff-rostering-production"
+          hmpps-domain-services-preproduction-pagerduty     = "hmpps-domain-services-preproduction"
+          nomis-combined-reporting-preproduction-pagerduty  = "nomis-combined-reporting-preproduction"
+          nomis-preproduction-pagerduty                     = "nomis-preproduction"
+          oasys-national-reporting-preproduction-pagerduty  = "oasys-national-reporting-preproduction"
+          oasys-preproduction-pagerduty                     = "oasys-preproduction"
+          pagerduty                                         = "hmpps-oem-preproduction"
+          planetfm-preproduction-pagerduty                  = "planetfm-preproduction"
         }
       }
     }
@@ -278,6 +277,25 @@ locals {
       })
     }
 
+    iam_policies = {
+      Ec2OracleEnterpriseManagerPolicy = merge(local.baseline_all_environments.iam_policies.Ec2OracleEnterpriseManagerPolicy, {
+        statements = concat(local.baseline_all_environments.iam_policies.Ec2OracleEnterpriseManagerPolicy.statements, [
+          {
+            sid    = "S3ReadProductionBackup"
+            effect = "Allow"
+            actions = [
+              "s3:ListBucket",
+              "s3:GetObject",
+            ]
+            resources = [
+              "arn:aws:s3:::prod-hmpps-oem-db-backup-bucket-20230815102157276300000001",
+              "arn:aws:s3:::prod-hmpps-oem-db-backup-bucket-20230815102157276300000001/*",
+            ]
+          }
+        ])
+      })
+    }
+
     oam_sinks = {
       "CloudWatchMetricOamSink" = {
         resource_types = ["AWS::CloudWatch::Metric"]
@@ -306,6 +324,13 @@ locals {
       "/oracle/oem"               = local.secretsmanager_secrets.oem
       "/oracle/database/EMREP"    = local.secretsmanager_secrets.oem
       "/oracle/database/PPRCVCAT" = local.secretsmanager_secrets.oem
+    }
+
+    ssm_patch_baselines = {
+      OracleLinuxPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["OracleLinuxPatchGroup1Baseline"], {
+        rule1_approve_after_days = null
+        rule1_approve_until_date = "2026-09-17"
+      })
     }
   }
 }

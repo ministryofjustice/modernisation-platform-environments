@@ -27,12 +27,13 @@ module "environment_dev" {
 
   bastion_config = local.bastion_config_dev
 
-  ldap_config        = local.ldap_config_dev
-  db_config          = local.db_config_dev
-  create_backup_role = true
-  create_ecs_lambda  = true
+  ldap_config                  = local.ldap_config_dev
+  db_config                    = local.db_config_dev
+  create_account_service_roles = true
+  create_ecs_lambda            = true
 
   delius_microservice_configs = local.delius_microservices_configs_dev
+  enable_autoscaling_schedule = true
 
   tags = local.tags
 
@@ -70,10 +71,10 @@ module "environment_poc" {
 
   bastion_config = local.bastion_config_poc
 
-  ldap_config        = local.ldap_config_poc
-  db_config          = local.db_config_poc
-  create_backup_role = false
-  create_ecs_lambda  = false
+  ldap_config                  = local.ldap_config_poc
+  db_config                    = local.db_config_poc
+  create_account_service_roles = false
+  create_ecs_lambda            = false
 
   delius_microservice_configs = local.delius_microservices_configs_poc
 
@@ -87,3 +88,9 @@ module "environment_poc" {
 
   db_backup_config = local.db_backup_config_poc
 }
+
+module "aws_health_lambda_cloudwatch_events_development" {
+  source                          = "../../modules/aws_health_lambda_cloudwatch_events"
+  aws_health_lambda_configuration = local.aws_health_lambda_configuration_development
+}
+

@@ -5,6 +5,12 @@ locals {
     maintenance_message = "T1 and T2 are rarely used so are started on demand. T3 is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
   }
 
+  aws_health_lambda_configuration_test = {
+    enabled               = true
+    aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
+    rule_name             = "ForwardAllHealthEvents"
+  }
+
   baseline_presets_test = {
     options = {
       sns_topics = {
@@ -268,77 +274,13 @@ locals {
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
           data  = { total_size = 1000 }
-          flash = { total_size = 50 }
+          flash = { total_size = 100 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
         })
         tags = merge(local.ec2_instances.db.tags, {
           description         = "for testing oracle19c upgrade"
-          instance-scheduling = "skip-scheduling"
-          nomis-environment   = "t1"
-          oracle-sids         = ""
-        })
-      })
-
-      t1-nomis-db19c-1-c = merge(local.ec2_instances.db19c, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_instances.db19c.config, {
-          availability_zone = "eu-west-2c"
-          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
-            "Ec2T1DatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.ec2_instances.db19c.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
-          data  = { total_size = 1000 }
-          flash = { total_size = 150 }
-        })
-        instance = merge(local.ec2_instances.db19c.instance, {
-          disable_api_termination = false
-        })
-        user_data_cloud_init = merge(local.ec2_instances.db19c.user_data_cloud_init, {
-          args = merge(local.ec2_instances.db19c.user_data_cloud_init.args, {
-            branch = "TM-1983/nomis/19c-11g-testing"
-          })
-        })
-        tags = merge(local.ec2_instances.db19c.tags, {
-          description         = "T1 NOMIS database 19c"
-          instance-scheduling = "skip-scheduling"
-          nomis-environment   = "t1"
-          oracle-sids         = ""
-        })
-      })
-
-      t1-nomis-db19c-1-b = merge(local.ec2_instances.db19c, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_instances.db19c.config, {
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
-            "Ec2T1DatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.ec2_instances.db19c.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
-          data  = { total_size = 1000 }
-          flash = { total_size = 150 }
-        })
-        instance = merge(local.ec2_instances.db19c.instance, {
-          disable_api_termination = false
-        })
-        user_data_cloud_init = merge(local.ec2_instances.db19c.user_data_cloud_init, {
-          args = merge(local.ec2_instances.db19c.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_instances.db19c.tags, {
-          description         = "T1 NOMIS database 19c"
           instance-scheduling = "skip-scheduling"
           nomis-environment   = "t1"
           oracle-sids         = ""
@@ -364,8 +306,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 700 }
-          flash = { total_size = 50 }
+          data  = { total_size = 1000 }
+          flash = { total_size = 200 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true

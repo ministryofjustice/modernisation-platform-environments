@@ -7,7 +7,7 @@ output "aws_secretsmanager_secret_support_email_account_arn" {
 
 output "aws_secretsmanager_secret_version_support_email_account_arn" {
   description = "aws_secretsmanager_secret_version support_email_account arn"
-  value       = aws_secretsmanager_secret_version.support_email_account.arn
+  value       = aws_secretsmanager_secret_version.support_email_account.secret_arn
 }
 
 output "aws_secretsmanager_secret_version_support_email_account_id" {

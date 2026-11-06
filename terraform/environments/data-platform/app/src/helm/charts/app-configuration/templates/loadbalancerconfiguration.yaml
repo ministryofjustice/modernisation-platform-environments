@@ -1,0 +1,22 @@
+---
+apiVersion: gateway.k8s.aws/v1beta1
+kind: LoadBalancerConfiguration
+metadata:
+  name: app
+  namespace: {{ .Release.Namespace }}
+spec:
+  loadBalancerName: app
+  scheme: internet-facing
+  loadBalancerAttributes:
+    - key: load_balancing.cross_zone.enabled
+      value: "true"
+    - key: access_logs.s3.enabled
+      value: "true"
+    - key: access_logs.s3.bucket
+      value: {{ .Values.albLogsBucket }}
+    - key: access_logs.s3.prefix
+      value: "app"
+  listenerConfigurations:
+    - protocolPort: HTTPS:443
+      defaultCertificate: {{ .Values.certificateArn }}
+      sslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06

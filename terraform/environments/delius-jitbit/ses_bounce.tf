@@ -1,5 +1,6 @@
 resource "aws_sns_topic" "jitbit_ses_destination_topic_bounce_email_notification" {
-  name = format("%s-ses-destination-topic-bounce-email-notification", local.application_name)
+  name              = format("%s-ses-destination-topic-bounce-email-notification", local.application_name)
+  kms_master_key_id = data.aws_kms_key.general_shared.arn
 
   tags = local.tags
 }
@@ -28,13 +29,19 @@ data "archive_file" "lambda_function_payload_bounce_email_notification" {
 }
 
 resource "aws_lambda_function" "bounce_email_notification" {
-  filename         = "${path.module}/lambda/bounce_email_notification/bounce_email_notification.zip"
-  function_name    = "bounce_email_notification"
-  architectures    = ["arm64"]
-  role             = aws_iam_role.lambda_bounce_email_notification.arn
-  runtime          = "python3.12"
-  handler          = "bounce_email_notification.handler"
-  source_code_hash = data.archive_file.lambda_function_payload_bounce_email_notification.output_base64sha256
+  #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
+  #checkov:skip=CKV_AWS_117: "VPC not required - Lambda only calls AWS APIs via service endpoints"
+  #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
+  #checkov:skip=CKV_AWS_116: "DLQ not required"
+  filename                       = "${path.module}/lambda/bounce_email_notification/bounce_email_notification.zip"
+  function_name                  = "bounce_email_notification"
+  architectures                  = ["arm64"]
+  role                           = aws_iam_role.lambda_bounce_email_notification.arn
+  runtime                        = "python3.12"
+  handler                        = "bounce_email_notification.handler"
+  source_code_hash               = data.archive_file.lambda_function_payload_bounce_email_notification.output_base64sha256
+  reserved_concurrent_executions = 10
+  kms_key_arn                    = data.aws_kms_key.general_shared.arn
 
   timeout = 6
 
@@ -67,6 +74,8 @@ resource "aws_iam_role_policy" "lambda_bounce_email_notification" {
 }
 
 data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
+  #checkov:skip=CKV_AWS_356: "SES SendEmail and SendRawEmail do not support resource-level IAM permissions and require Resource "*""
+  #checkov:skip=CKV_AWS_111: "Wildcard is required given use of email-based identities for testing."
   statement {
     actions = [
       "ses:SendRawEmail",
@@ -97,7 +106,7 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
     actions = [
       "kms:Decrypt"
     ]
-    resources = [data.aws_kms_key.general_shared.arn]
+    resources = [data.aws_kms_key.general_shared.arn, aws_kms_key.cloudwatch_logs.arn]
   }
 }
 
@@ -116,8 +125,10 @@ resource "aws_sns_topic_subscription" "lambda_bounce_email_notification" {
 }
 
 resource "aws_cloudwatch_log_group" "bounce_email_notification" {
+  #checkov:skip=CKV_AWS_338: "Logs required for 3 days"
   name              = "/aws/lambda/bounce_email_notification"
   retention_in_days = 3
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
   tags = local.tags
 }
@@ -141,6 +152,10 @@ resource "aws_dynamodb_table" "bounce_email_notification" {
   attribute {
     name = "email_ticket_id"
     type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
   }
 
   tags = local.tags

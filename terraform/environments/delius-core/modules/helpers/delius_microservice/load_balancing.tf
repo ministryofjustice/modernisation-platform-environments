@@ -14,14 +14,15 @@ resource "aws_lb_target_group" "frontend" {
   count = var.microservice_lb != null ? 1 : 0
   #checkov:skip=CKV_AWS_261 "ignore"
   # https://github.com/hashicorp/terraform-provider-aws/issues/16889
-  name                 = "${var.env_name}-${var.name}-${random_id.suffix[0].hex}"
-  port                 = random_id.suffix[0].keepers.port
-  protocol             = random_id.suffix[0].keepers.protocol
-  protocol_version     = random_id.suffix[0].keepers.protocol_version
-  vpc_id               = var.account_config.shared_vpc_id
-  target_type          = "ip"
-  deregistration_delay = 30
-  tags                 = var.tags
+  name                          = "${var.env_name}-${var.name}-${random_id.suffix[0].hex}"
+  port                          = random_id.suffix[0].keepers.port
+  protocol                      = random_id.suffix[0].keepers.protocol
+  protocol_version              = random_id.suffix[0].keepers.protocol_version
+  vpc_id                        = var.account_config.shared_vpc_id
+  target_type                   = "ip"
+  deregistration_delay          = 30
+  load_balancing_algorithm_type = var.name == "weblogic" ? "least_outstanding_requests" : null
+  tags                          = var.tags
 
   stickiness {
     enabled = var.alb_stickiness_enabled
@@ -101,6 +102,9 @@ locals {
 }
 
 resource "aws_lb" "delius_microservices" {
+  #checkov:skip=CKV_AWS_152: "Cross-zone load balancing not needed
+  #checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  #checkov:skip=CKV_AWS_150: "Deletion protection off"
   count                      = length(var.container_port_config) == 0 ? 0 : 1
   name                       = local.lb_name_final
   internal                   = true
@@ -142,12 +146,13 @@ resource "aws_vpc_security_group_egress_rule" "nlb_to_ecs_service" {
 resource "aws_lb_target_group" "service" {
   for_each = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
 
-  name        = "${var.name}-${var.env_name}-at-${each.value}"
-  target_type = "ip"
-  port        = each.value
-  protocol    = "TCP"
-  vpc_id      = var.account_info.vpc_id
-  tags        = var.tags
+  name                 = "${var.name}-${var.env_name}-at-${each.value}"
+  target_type          = "ip"
+  port                 = each.value
+  protocol             = "TCP"
+  vpc_id               = var.account_info.vpc_id
+  deregistration_delay = var.deregistration_delay
+  tags                 = var.tags
 }
 
 resource "aws_lb_listener" "services" {

@@ -1,0 +1,213 @@
+# Grafana Helm chart values
+# Chart: https://github.com/grafana-community/helm-charts/tree/main/charts/grafana
+# Pulled from oci://ghcr.io/grafana-community/helm-charts in helm-charts.tf.
+# Entra ID client credentials are injected via set_sensitive, not stored here.
+
+replicas: 1
+
+# Cloud Platform namespaces cannot create cluster-scoped RBAC; Grafana does not
+# require in-cluster API access here, so chart RBAC is disabled.
+rbac:
+  create: false
+
+# Use the pre-provisioned IRSA service account in the namespace.
+serviceAccount:
+  create: false
+  name: grafana-irsa
+
+# Enable ServiceMonitor so in-cluster Prometheus can scrape Grafana metrics.
+# Ingress still blackholes /metrics externally.
+serviceMonitor:
+  enabled: true
+
+# Cloud Platform requires external-dns weight and unique set-identifier
+# annotations for weighted blue/green Route 53 records.
+ingress:
+  enabled: true
+  ingressClassName: default
+  annotations:
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
+    external-dns.alpha.kubernetes.io/set-identifier: ${ingress_set_identifier}
+    external-dns.alpha.kubernetes.io/hostname: ${hostname}
+    # Restrict ingress to allowlisted CIDRs from environment-configuration.tf.
+    nginx.ingress.kubernetes.io/whitelist-source-range: ${join(",", ingress_allowlist)}
+  # Route /metrics to a non-existent service to block external access (503).
+  # extraPaths are rendered before the main "/" path.
+  extraPaths:
+    - path: /metrics
+      pathType: Exact
+      backend:
+        service:
+          name: blackhole
+          port:
+            number: 80
+  hosts:
+    - ${hostname}
+  # TLS certificate secret provisioned by Cloud Platform.
+  tls:
+    - secretName: monitoring-tls
+      hosts:
+        - ${hostname}
+
+persistence:
+  # Grafana state is stored in external RDS Postgres, so no PV is required.
+  enabled: false
+
+# Mount Azure Workload Identity Federation token for service authentication.
+# ref: https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview
+extraSecretMounts:
+  - name: azure-workload-identity-token
+    mountPath: /var/run/secrets/sts.windows.net
+    readOnly: true
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: azure-identity-token
+            audience: api://AzureADTokenExchange
+            expirationSeconds: 3600
+  # Mount Google Workload Identity Federation token for service authentication.
+  - name: google-workload-identity-token
+    mountPath: /var/run/secrets/sts.googleapis.com
+    readOnly: true
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: google-identity-token
+            audience: ${googleWorkloadIdentityAudience}
+            expirationSeconds: 3600
+
+extraVolumes:
+  - name: google-application-default-credentials
+    configMap:
+      name: ${googleApplicationCredentialsConfigMap}
+      items:
+        - key: credentials.json
+          path: application_default_credentials.json
+
+extraVolumeMounts:
+  - name: google-application-default-credentials
+    mountPath: /home/grafana/.config/gcloud
+    readOnly: true
+
+# RDS connection values come from the grafana-rds secret; sensitive values are
+# not stored in this file.
+envValueFrom:
+  GF_DATABASE_HOST:
+    secretKeyRef:
+      name: grafana-rds
+      key: rds_instance_endpoint
+  GF_DATABASE_NAME:
+    secretKeyRef:
+      name: grafana-rds
+      key: database_name
+  GF_DATABASE_USER:
+    secretKeyRef:
+      name: grafana-rds
+      key: database_username
+  GF_DATABASE_PASSWORD:
+    secretKeyRef:
+      name: grafana-rds
+      key: database_password
+
+grafana.ini:
+  # Use external RDS Postgres (TLS required) instead of ephemeral SQLite.
+  database:
+    type: postgres
+    ssl_mode: require
+  server:
+    root_url: https://${hostname}
+  auth:
+    # SSO-only login via Entra ID.
+    disable_login_form: true
+  auth.basic:
+    enabled: false
+  security:
+    # SSO-only: no local admin user; admin is granted via Entra app roles.
+    disable_initial_admin_creation: true
+  auth.azuread:
+    name: Microsoft Entra ID
+    enabled: true
+    allow_sign_up: true
+    auth_url: https://login.microsoftonline.com/${entra_id_tenant_id}/oauth2/v2.0/authorize
+    token_url: https://login.microsoftonline.com/${entra_id_tenant_id}/oauth2/v2.0/token
+    scopes: openid email profile
+    # Map Entra app roles (Viewer/Editor/Admin/GrafanaAdmin) to Grafana roles.
+    # Unmapped users default to Viewer; GrafanaAdmin can grant server admin.
+    role_attribute_strict: false
+    allow_assign_grafana_admin: true
+  # Azure Workload Identity Federation
+  azure:
+    workload_identity_enabled: true
+    workload_identity_tenant_id: ${azure_monitor_workload_identity_tenant_id}
+    workload_identity_client_id: ${azure_monitor_workload_identity_client_id}
+    workload_identity_token_file: /var/run/secrets/sts.windows.net/azure-identity-token
+
+  # Plugins for X-Ray and Amazon Managed Prometheus (CloudWatch is built in).
+plugins:
+  - grafana-x-ray-datasource
+  - grafana-amazonprometheus-datasource
+
+# Datasources are generated from grafana_monitored_accounts.
+# Grafana assumes data-platform-monitoring in each account via IRSA.
+# Each account gets CloudWatch + X-Ray; AMP is added when workspace ID is set.
+# UIDs use account.uid (without data-platform- prefix) to stay within 40 chars.
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: azure-monitor-ai-foundry
+        type: grafana-azure-monitor-datasource
+        access: proxy
+        uid: azure-monitor-ai-foundry
+        isDefault: false
+        jsonData:
+          azureAuthType: workloadidentity
+          subscriptionId: ${azure_monitor_workload_identity_subscription_id}
+      - name: google-cloud-monitoring-moj-gcp-ai-gateway
+        type: stackdriver
+        access: proxy
+        uid: google-cloud-monitoring
+        isDefault: false
+        jsonData:
+          authenticationType: gce
+          defaultProject: ${googleCloudProjectName}
+          universeDomain: googleapis.com
+%{ for account in monitored_accounts ~}
+      - name: ${account.name}-cloudwatch
+        type: cloudwatch
+        access: proxy
+        uid: ${account.uid}-cloudwatch
+        isDefault: false
+        jsonData:
+          defaultRegion: eu-west-2
+          assumeRoleArn: arn:aws:iam::${account.account_id}:role/data-platform-monitoring
+          # Link CloudWatch metrics/logs to the matching X-Ray datasource.
+          tracingDatasourceUid: ${account.uid}-xray
+      - name: ${account.name}-xray
+        type: grafana-x-ray-datasource
+        access: proxy
+        uid: ${account.uid}-xray
+        isDefault: false
+        jsonData:
+          defaultRegion: eu-west-2
+          assumeRoleArn: arn:aws:iam::${account.account_id}:role/data-platform-monitoring
+%{ if account.prometheus_workspace_id != "" ~}
+      - name: ${account.name}-prometheus
+        type: grafana-amazonprometheus-datasource
+        access: proxy
+        uid: ${account.uid}-prometheus
+        isDefault: false
+        url: https://aps-workspaces.eu-west-2.amazonaws.com/workspaces/${account.prometheus_workspace_id}/
+        jsonData:
+          httpMethod: POST
+          sigV4Auth: true
+          sigV4AuthType: default
+          sigV4Region: eu-west-2
+          sigV4AssumeRoleArn: arn:aws:iam::${account.account_id}:role/data-platform-monitoring
+%{ endif ~}
+%{ endfor ~}
+
+# Dashboards are managed by the Terraform Grafana provider, not this chart.
+# Panels select account-specific datasources via an Account template variable.

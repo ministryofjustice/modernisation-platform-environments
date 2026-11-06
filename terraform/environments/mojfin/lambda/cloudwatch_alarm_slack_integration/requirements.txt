@@ -1,0 +1,9 @@
+boto3==1.41.2
+botocore==1.41.2
+jmespath==1.0.1
+mypy-boto3-secretsmanager==1.41.0
+pycurl==7.45.7
+python-dateutil==2.9.0.post0
+s3transfer==0.15.0
+six==1.17.0
+urllib3==2.5.0

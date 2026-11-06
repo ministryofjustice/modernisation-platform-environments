@@ -12,7 +12,7 @@ locals {
     migration_environment_short_name       = "stage"
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/stage/ec2-user.pub")
-    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
+    homepage_path                          = "/NDelius-war/delius/JSP/homepage.xhtml"
     has_mis_environment                    = true
   }
 
@@ -84,68 +84,19 @@ locals {
   }
 
   delius_microservices_configs_stage = {
+    # Weblogic/EIS ECS config managed here: https://github.com/ministryofjustice/delius-releases
     weblogic = {
-      image_tag         = "6.2.0.3"
-      container_port    = 8080
-      container_memory  = 4096
-      container_cpu     = 2048
-      ec2_instance_type = "r7i.2xlarge"
-      task_count        = 8
-    }
-
-    weblogic_params = {
-      API_CLIENT_ID               = "delius-ui-client"
-      AWS_REGION                  = "eu-west-2"
-      BREACH_NOTICE_API_URL       = "https://breach-notice-api-stage.hmpps.service.justice.gov.uk"
-      BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-stage.hmpps.service.justice.gov.uk/breach-notice/%s"
-      COOKIE_SECURE               = "true"
-      # DELIUS_API_URL                    = "" # No longer needed
-      DMS_HOST                          = "https://hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
-      DMS_OFFICE_URI_HOST               = "https://hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
-      DMS_OFFICE_URI_PORT               = "443"
-      DMS_PORT                          = "443"
-      DMS_PROTOCOL                      = "https"
-      EIS_USER_CONTEXT                  = "cn=EISUsers,ou=Users,dc=moj,dc=com"
-      ELASTICSEARCH_URL                 = "https://probation-search-stage.hmpps.service.justice.gov.uk/delius"
-      GDPR_URL                          = "/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
-      JDBC_CONNECTION_POOL_MAX_CAPACITY = "100"
-      JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
-      JDBC_URL                          = ""
-      JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "https://ldap.stage.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
-      LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
-      LOG_LEVEL_NDELIUS                 = "DEBUG"
-      MERGE_API_URL                     = "https://delius-merge-api-stage.hmpps.service.justice.gov.uk"
-      MERGE_OAUTH_URL                   = "https://delius-user-management-stage.hmpps.service.justice.gov.uk/umt/oauth/"
-      MERGE_URL                         = "https://delius-merge-ui-stage.hmpps.service.justice.gov.uk"
-      NDELIUS_CLIENT_ID                 = "migrations_client_id"
-      OAUTH_CALLBACK_URL                = "https://ndelius.stage.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/token.jsp"
-      OAUTH_CLIENT_ID                   = "delius-ui"
-      OAUTH_DEFAULT_SCOPE               = "delius"
-      OAUTH_LOGIN_ENABLED               = "false"
-      OAUTH_LOGIN_NAME                  = ""
-      OAUTH_TOKEN_VERIFICATION_URL      = "https://token-verification-api-stage.prison.service.justice.gov.uk/token/verify"
-      OAUTH_URL                         = "https://sign-in-stage.hmpps.service.justice.gov.uk/auth"
-      OFFENDER_SEARCH_API_URL           = "https://probation-offender-search-stage.hmpps.service.justice.gov.uk"
-      PASSWORD_RESET_URL                = "https://pwm.stage.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk/public/forgottenpassword"
-      PDFCREATION_TEMPLATES             = "shortFormatPreSentenceReport|paroleParom1Report|oralReport"
-      PDFCREATION_URL                   = "https://ndelius-new-tech-pdf-generator-stage.hmpps.service.justice.gov.uk/newTech"
-      PREPARE_CASE_FOR_SENTENCE_URL     = "https://prepare-a-case-stage.apps.live-1.cloud-platform.service.justice.gov.uk"
-      PSR_SERVICE_URL                   = "https://pre-sentence-service-stage.hmpps.service.justice.gov.uk"
-      TRAINING_MODE_APP_NAME            = "National Delius - TEST USE ONLY"
-      TZ                                = "Europe/London"
-      USERMANAGEMENT_URL                = "https://delius-user-management-stage.hmpps.service.justice.gov.uk/umt/"
-      USER_CONTEXT                      = "ou=Users,dc=moj,dc=com"
-      USER_MEM_ARGS                     = "-XX:MaxRAMPercentage=90.0"
+      ec2_instance_type = "r7i.xlarge"
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
+      asg_min_size      = 1
+      asg_max_size      = 1
     }
 
     weblogic_eis = {
-      image_tag         = "6.2.0.3"
-      container_port    = 8080
-      container_memory  = 2048
-      container_cpu     = 1024
       ec2_instance_type = "r7i.large"
-      task_count        = 1
+      ami_id            = "ami-0ae744f4dd5f7bf4b"
+      asg_min_size      = 0
+      asg_max_size      = 0
     }
 
     pwm = {
@@ -177,7 +128,7 @@ locals {
   }
 
   dms_config_stage = {
-    deploy_dms                 = false
+    deploy_dms                 = true
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.4"
 
@@ -188,19 +139,17 @@ locals {
       read_database = "STGNDA"
     }
     audit_target_endpoint = {
-      write_environment = "stage" # Until production exists set dummy replication target
-      write_database    = "NONE"  # Remove this dummy attribute once production target exists
+      write_environment = "prod"
     }
-    user_source_endpoint = { # Set this map to {} once production exists
-      read_host     = "primarydb"
-      read_database = "NONE"
-    }
+    user_source_endpoint = {}
     user_target_endpoint = {
       write_database = "STGNDA"
     }
     # Auditing from the Stage environment is considered production data
     is-production = true
   }
+
+
 
   db_backup_config_stage = {
     object_lock_days             = 0

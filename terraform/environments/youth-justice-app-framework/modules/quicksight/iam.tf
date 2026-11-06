@@ -68,3 +68,26 @@ resource "aws_iam_role_policy_attachment" "kms" {
   role       = data.aws_iam_role.secrets.name
   policy_arn = aws_iam_policy.qs_kms.arn
 }
+
+resource "aws_iam_policy" "disparity_toolkit_secret_read" {
+  name        = "quicksight-disparity-toolkit-secret-read"
+  description = "Allows QuickSight to read the disparity toolkit Redshift Serverless secret."
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = var.disparity_toolkit_secret_arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "disparity_toolkit_secret_read" {
+  role       = data.aws_iam_role.secrets.name
+  policy_arn = aws_iam_policy.disparity_toolkit_secret_read.arn
+}

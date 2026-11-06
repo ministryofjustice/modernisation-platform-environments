@@ -32,32 +32,18 @@ locals {
           description = "wildcard cert for hmpps domain load balancer"
         }
       }
-
-      remote_desktop_and_planetfm_wildcard_cert_v3 = {
-        certificate_transparency_logging_preference = false # this should have been set to true
-        cloudwatch_metric_alarms                    = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name                                 = "*.preproduction.hmpps-domain.service.justice.gov.uk"
-        export                                      = true
+      remote_desktop_and_planetfm_wildcard_cert_v4 = {
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "*.preproduction.hmpps-domain.service.justice.gov.uk"
+        external_validation_records_created = false
         subject_alternate_names = [
+          "*.hmpps-domain-services.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
           "*.pp.planetfm.service.justice.gov.uk",
         ]
         tags = {
-          description = "wildcard cert for hmpps remote desktop services"
+          description = "wildcard cert for hmpps domain load balancer"
         }
       }
-
-      # TM-2057: Oct 2026, use below to replace above 2 certs
-      # remote_desktop_and_planetfm_wildcard_cert_v4 = {
-      #   cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
-      #   domain_name              = "*.preproduction.hmpps-domain.service.justice.gov.uk"
-      #   export                   = true
-      #   subject_alternate_names = [
-      #     "*.pp.planetfm.service.justice.gov.uk",
-      #   ]
-      #   tags = {
-      #     description = "wildcard cert for hmpps remote desktop services"
-      #   }
-      # }
     }
 
     cloudwatch_dashboards = {
@@ -127,11 +113,11 @@ locals {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
         })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 400 }
+        }
         instance = merge(local.ec2_instances.jumpserver.instance, {
           instance_type = "r6i.xlarge"
-          tags = {
-            patch-manager = "group2"
-          }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name              = "azure.hmpp.root"
@@ -144,12 +130,6 @@ locals {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
         })
-        instance = merge(local.ec2_instances.rdgw.instance, {
-          tags = {
-            backup-plan   = "daily-and-weekly"
-            patch-manager = "group1"
-          }
-        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description              = "Remote Desktop Gateway for azure.hmpp.root domain"
           domain-name              = "azure.hmpp.root"
@@ -161,11 +141,6 @@ locals {
       pp-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           availability_zone = "eu-west-2a"
-        })
-        instance = merge(local.ec2_instances.rds.instance, {
-          tags = {
-            patch-manager = "group2"
-          }
         })
         tags = merge(local.ec2_instances.rds.tags, {
           description              = "Remote Desktop Services for azure.hmpp.root domain"
@@ -252,19 +227,6 @@ locals {
           })
         })
       })
-    }
-
-    patch_manager = {
-      patch_schedules = {
-        group1 = "cron(50 06 ? * WED *)" # 6:50am wed to work around the overnight shutdown
-        group2 = "cron(50 06 ? * THU *)" # 6:50am thu, see patch-manager.tf for approval_days config
-      }
-      maintenance_window_duration = 2 # 4 for prod
-      maintenance_window_cutoff   = 1 # 2 for prod
-      patch_classifications = {
-        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
-      }
     }
 
     schedule_alarms_lambda = {

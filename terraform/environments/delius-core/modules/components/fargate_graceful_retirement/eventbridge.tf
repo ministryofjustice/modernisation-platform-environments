@@ -6,7 +6,8 @@ resource "aws_cloudwatch_event_rule" "ecs_restart_rule" {
   event_pattern = jsonencode({
     "detail-type" : ["AWS Health Event"],
     "detail" : {
-      "eventTypeCode" : ["AWS_ECS_TASK_PATCHING_RETIREMENT"]
+      "eventTypeCode" : ["AWS_ECS_TASK_PATCHING_RETIREMENT"],
+      "statusCode" : ["upcoming"]
     }
   })
 }
@@ -17,10 +18,11 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
   role_arn = aws_iam_role.eventbridge_execution_role.arn
 }
 
-
 # CloudWatch log group to capture events
 resource "aws_cloudwatch_log_group" "ecs_restart_events" {
-  name = "/aws/health/ecs_restart_events/${var.environment}"
+  #checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
+  name              = "/aws/health/ecs_restart_events/${var.environment}"
+  retention_in_days = 365
 }
 
 # IAM policy to allow EventBridge to write logs
@@ -31,11 +33,9 @@ data "aws_iam_policy_document" "ecs_restart_logging" {
       "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
-
     resources = [
       "${aws_cloudwatch_log_group.ecs_restart_events.arn}:*"
     ]
-
     principals {
       type = "Service"
       identifiers = [
@@ -50,7 +50,6 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_restart_logging_policy" {
   policy_document = data.aws_iam_policy_document.ecs_restart_logging.json
   policy_name     = "ecs-restart-events-log-policy-${var.environment}"
 }
-
 
 # event bridge target to push to log groups
 resource "aws_cloudwatch_event_target" "ecs_restart_logging_target" {
@@ -81,9 +80,12 @@ resource "aws_iam_policy" "eventbridge_execution_role_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = "logs:*",
-        Resource = "*"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.ecs_restart_events.arn}:*"
       },
       {
         Effect   = "Allow"

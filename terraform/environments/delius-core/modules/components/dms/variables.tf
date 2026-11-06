@@ -52,3 +52,15 @@ variable "env_name_to_dms_config_map" {
   description = "Map of delius-core environments to DMS configs"
   type        = any
 }
+
+variable "create_dms_cloudwatch_logs_role" {
+  description = "Create the account-wide DMS CloudWatch logs role"
+  type        = bool
+  default     = false
+}
+
+variable "create_dms_vpc_role" {
+  description = "Create the account-wide DMS VPC role"
+  type        = bool
+  default     = false
+}

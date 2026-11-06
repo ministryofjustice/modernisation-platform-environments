@@ -21,6 +21,57 @@ resource "aws_athena_workgroup" "default" {
   }
 }
 
+resource "aws_athena_workgroup" "downstream_reconciliation" {
+  name = format(
+    "%s-downstream-reconciliation",
+    local.env_account_id,
+  )
+
+  description = "Athena workgroup for staged MDSS, AC and EMDI position reconciliation"
+
+  state = "ENABLED"
+
+  configuration {
+    bytes_scanned_cutoff_per_query     = 1073741824000 # 1 TB
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${module.s3-athena-bucket.bucket.id}/output/downstream_reconciliation/"
+
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+
+      acl_configuration {
+        s3_acl_option = "BUCKET_OWNER_FULL_CONTROL"
+      }
+    }
+  }
+}
+
+resource "aws_athena_workgroup" "dlt_iceberg_maintenance" {
+  name        = format("%s-dlt-iceberg-maintenance", local.env_account_id)
+  description = "An Athena workgroup for DLT Iceberg maintenance"
+  state       = "ENABLED"
+
+  configuration {
+    bytes_scanned_cutoff_per_query     = 1073741824000 # 1 TB
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${module.s3-athena-bucket.bucket.id}/output/dlt_iceberg_maintenance/"
+
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+      acl_configuration {
+        s3_acl_option = "BUCKET_OWNER_FULL_CONTROL"
+      }
+    }
+  }
+}
 
 resource "aws_athena_workgroup" "ears_sars" {
   name        = format("%s-ears-sars", local.env_account_id)
@@ -44,6 +95,30 @@ resource "aws_athena_workgroup" "ears_sars" {
     }
   }
 }
+
+resource "aws_athena_workgroup" "data_validation_db" {
+  name        = format("%s-data-validation", local.env_account_id)
+  description = "An Athena workgroup for the data validation db, dumps to: ${module.s3-athena-bucket.bucket.id}"
+  state       = "ENABLED"
+
+  configuration {
+    bytes_scanned_cutoff_per_query     = 10737418240 # 10 GB
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${module.s3-athena-bucket.bucket.id}/output/data_validation/"
+
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+      acl_configuration {
+        s3_acl_option = "BUCKET_OWNER_FULL_CONTROL"
+      }
+    }
+  }
+}
+
 
 resource "aws_athena_workgroup" "cadt" {
   name        = "create-a-derived-table"
@@ -90,6 +165,46 @@ resource "aws_athena_workgroup" "cadt-historic-dev" {
       }
     }
   }
+}
+
+
+# ----------------------------------
+# Observability Platform Athena
+# ----------------------------------
+
+resource "aws_athena_workgroup" "observability_platform" {
+  name = format(
+    "%s-observability-platform",
+    local.env_account_id,
+  )
+
+  description = "Athena workgroup for Observability Platform queries"
+  state       = "ENABLED"
+
+  configuration {
+    bytes_scanned_cutoff_per_query     = 10737418240 # 10 GB
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${module.s3-observability-athena-bucket.bucket.id}/output/"
+
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+
+      acl_configuration {
+        s3_acl_option = "BUCKET_OWNER_FULL_CONTROL"
+      }
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      GrafanaDataSource = "true"
+    },
+  )
 }
 
 resource "aws_glue_catalog_database" "ears_sars_audit_db" {

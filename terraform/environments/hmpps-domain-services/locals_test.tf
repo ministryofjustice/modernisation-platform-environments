@@ -116,11 +116,6 @@ locals {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
         })
-        instance = merge(local.ec2_instances.rdgw.instance, {
-          tags = {
-            patch-manager = "group1"
-          }
-        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description              = "Remote Desktop Gateway for azure.noms.root domain"
           domain-name              = "azure.noms.root"
@@ -136,9 +131,9 @@ locals {
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
           instance_type = "r6i.large"
-          tags = {
-            patch-manager = "group2"
-          }
+        })
+        ebs_volumes = merge(local.ec2_instances.jumpserver.ebs_volumes, {
+          "/dev/sda1" = { type = "gp3", size = 150 }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name              = "azure.noms.root"
@@ -151,11 +146,6 @@ locals {
         config = merge(local.ec2_instances.rds.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
           availability_zone = "eu-west-2a"
-        })
-        instance = merge(local.ec2_instances.rds.instance, {
-          tags = {
-            patch-manager = "group2"
-          }
         })
         tags = merge(local.ec2_instances.rds.tags, {
           domain-name              = "azure.noms.root"
@@ -239,20 +229,6 @@ locals {
           })
         })
       })
-    }
-
-    patch_manager = {
-      patch_schedules = {
-        group1 = "cron(05 07 ? * WED *)" # 7:05am wed to work around the overnight shutdown
-        group2 = "cron(05 07 ? * THU *)" # 7:05am thu, see patch-manager.tf for approval_days config
-        # manual = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
-      }
-      maintenance_window_duration = 2 # 4 for prod
-      maintenance_window_cutoff   = 1 # 2 for prod
-      patch_classifications = {
-        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"]                                                             # Linux Options=Security,Bugfix,Enhancement,Recommended,Newpackage
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
-      }
     }
 
     schedule_alarms_lambda = {
