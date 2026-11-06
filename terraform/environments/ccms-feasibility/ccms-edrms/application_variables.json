@@ -8,7 +8,7 @@
       "ec2_desired_capacity": 1,
       "root_volume_size": 30,
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-edrms",
-      "container_version": "latest",
+      "container_version": "c25b791-cert-patch.1",
       "edrms_server_port": 8080,
       "container_cpu": 1024,
       "container_memory": 2048,
