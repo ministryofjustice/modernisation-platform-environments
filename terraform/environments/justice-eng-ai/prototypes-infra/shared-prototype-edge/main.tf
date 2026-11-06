@@ -402,6 +402,7 @@ output "hosting" {
     distribution_arn        = aws_cloudfront_distribution.shared.arn
     web_acl_arn             = aws_wafv2_web_acl.shared.arn
     load_balancer_arn       = aws_lb.shared.arn
+    alb_security_group_id   = aws_security_group.alb.id
     listener_arn            = aws_lb_listener.shared.arn
     origin_domain_name      = aws_route53_record.origin.fqdn
     origin_token_secret_arn = aws_secretsmanager_secret.origin_token.arn

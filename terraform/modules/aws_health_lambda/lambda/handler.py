@@ -77,6 +77,28 @@ def get_github_token(audience, github_org, identity, repo, web_identity_token):
     return github_token
 
 
+def get_ignored_findings():
+    try:
+        findings = json.loads(os.getenv("IGNORE_FINDINGS", "{}"))
+    except ValueError as error:
+        logger.error("IGNORE_FINDINGS must contain a JSON object")
+        raise ValueError("IGNORE_FINDINGS must contain a JSON object") from error
+
+    if not isinstance(findings, dict) or any(
+        not account.strip()
+        or not isinstance(description, str)
+        or not description.strip()
+        for account, description in findings.items()
+    ):
+        message = (
+            "IGNORE_FINDINGS must map non-empty account keys "
+            "to non-empty description strings"
+        )
+        logger.error(message)
+        raise ValueError(message)
+    return findings
+
+
 def build_github_issue(event):
     detail = event["detail"]
     title = f"{event['detail-type']}: {detail['eventTypeCode']} - {event['account']}"
@@ -159,6 +181,26 @@ def lambda_handler(event, context):
             message,
             event["detail"].get("eventArn"),
             event.get("account"),
+        )
+        return {
+            "statusCode": 200,
+            "body": json.dumps({"message": message}),
+        }
+
+    ignored_description = get_ignored_findings().get(str(event["account"]))
+    if ignored_description is not None and any(
+        ignored_description in description["latestDescription"]
+        for description in event["detail"]["eventDescription"]
+    ):
+        message = (
+            "AWS Health event matches an ignored finding; "
+            "not generating a ticket."
+        )
+        logger.info(
+            "%s Event ARN: %s; account: %s",
+            message,
+            event["detail"].get("eventArn"),
+            event["account"],
         )
         return {
             "statusCode": 200,
