@@ -1,0 +1,12 @@
+.terraform/
+.generated/
+deployment.generated.auto.tfvars.json
+*.tfplan
+tfplan
+x.tfplan
+tfplan.json
+tfplan.txt
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log

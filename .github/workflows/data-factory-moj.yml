@@ -21,7 +21,7 @@ on:
         description: 'Set either [deploy|destroy].'
         default: 'deploy'
         required: true
-        type: string
+        type: choice
         options:
           - deploy
           - destroy
@@ -32,8 +32,6 @@ on:
         type: string
 
 permissions:
-  pull-requests: write
-  id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
 jobs:
@@ -43,12 +41,86 @@ jobs:
     with:
       application: "${{ github.workflow }}"
 
-  terraform:
+  ingestion-routing:
     needs: strategy
-    if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      matrix: ${{ steps.route.outputs.matrix }}
+      has_terraform: ${{ steps.route.outputs.has_terraform }}
+      has_ingestion: ${{ steps.route.outputs.has_ingestion }}
+      ingestion_action: ${{ steps.route.outputs.ingestion_action }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Route development service-ingestion
+        id: route
+        shell: bash
+        env:
+          MATRIX: ${{ needs.strategy.outputs.matrix }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BASE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          force=false
+
+          if [[ "${GITHUB_EVENT_NAME}" != "workflow_dispatch" ]]; then
+            if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+              head="${PR_HEAD_SHA}"
+              base="$(git merge-base origin/main "${head}")"
+            else
+              head="${GITHUB_SHA}"
+              base="${PUSH_BASE_SHA}"
+            fi
+
+            status=0
+            git diff --quiet "${base}" "${head}" -- \
+              .github/workflows/data-factory-moj.yml \
+              terraform/environments/data-factory-moj/dms-core/onboarding/services \
+              terraform/environments/data-factory-moj/dms-core/onboarding/generations.json \
+              || status=$?
+
+            case "${status}" in
+              0) ;;
+              1) force=true ;;
+              *) exit "${status}" ;;
+            esac
+          fi
+
+          jq -er --argjson force "${force}" '
+            .include as $all
+            | [$all[] | select(
+                .component == "service-ingestion"
+                and .target == "development"
+              )] as $ingestion
+            | [$all[] | select(
+                (.component == "service-ingestion"
+                 and .target == "development") | not
+              )] as $remaining
+            | if ($ingestion | length) > 1 then
+                error("Duplicate development service-ingestion entries")
+              else
+                "matrix=\({include: $remaining} | tojson)",
+                "has_terraform=\(($remaining | length) > 0)",
+                "has_ingestion=\(($ingestion | length) > 0 or $force)",
+                "ingestion_action=\($ingestion[0].action // (if $force then "plan_apply" else "plan" end))"
+              end
+          ' <<< "${MATRIX}" >> "${GITHUB_OUTPUT}"
+
+  terraform:
+    needs: ingestion-routing
+    if: inputs.action != 'destroy' && needs.ingestion-routing.outputs.has_terraform == 'true'
+    permissions:
+      pull-requests: write
+      id-token: write
+      contents: read
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.ingestion-routing.outputs.matrix) }}
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
@@ -59,8 +131,26 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
+  service-ingestion:
+    needs: ingestion-routing
+    if: needs.ingestion-routing.outputs.has_ingestion == 'true'
+    permissions:
+      contents: read
+      id-token: write
+    uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/workflows/data-factory-moj-service-ingestion.yml@c7b03021b809f7c0b2809c2faedd14baaf9f45f8
+    with:
+      action: ${{ needs.ingestion-routing.outputs.ingestion_action }}
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      DMS_DEVELOPMENT_RUNTIME_REFERENCE: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
+
   destroy-development:
-    if: inputs.action == 'destroy'
+    if: inputs.action == 'destroy' && inputs.component != 'service-ingestion'
+    permissions:
+      pull-requests: write
+      id-token: write
+      contents: read
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
