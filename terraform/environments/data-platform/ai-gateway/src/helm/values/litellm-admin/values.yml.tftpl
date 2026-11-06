@@ -238,7 +238,7 @@ envVars: {
     LITELLM_UI_PATH: "/app/var/litellm/ui",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
-    REDIS_SSL: "True",
+    REDIS_SSL: "True",${temporaryDirectory != "" ? "\n    TMPDIR: \"${temporaryDirectory}\"," : ""}
     XDG_CACHE_HOME: "/app/cache",
     IAM_TOKEN_DB_AUTH: "True",
     DATABASE_USER: "${databaseUsername}",

@@ -37,6 +37,7 @@ resource "helm_release" "litellm_admin" {
         imageRepository    = try(local.environment_configuration.litellm_image_repository, "ghcr.io/berriai/litellm-non_root")
         imageTag           = try(local.environment_configuration.litellm_image_tag, local.environment_configuration.litellm_version)
         imagePullSecret    = try(local.environment_configuration.litellm_image_pull_secret, "")
+        temporaryDirectory = try(local.environment_configuration.litellm_tmpdir, "")
         serviceAccountName = kubernetes_service_account_v1.ai_gateway.metadata[0].name
         ingressHostname    = "admin.${local.environment_configuration.ai_gateway_hostname}"
         proxyHostname      = local.environment_configuration.ai_gateway_hostname
@@ -117,6 +118,7 @@ resource "helm_release" "litellm" {
         imageRepository    = try(local.environment_configuration.litellm_image_repository, "ghcr.io/berriai/litellm-non_root")
         imageTag           = try(local.environment_configuration.litellm_image_tag, local.environment_configuration.litellm_version)
         imagePullSecret    = try(local.environment_configuration.litellm_image_pull_secret, "")
+        temporaryDirectory = try(local.environment_configuration.litellm_tmpdir, "")
         serviceAccountName = kubernetes_service_account_v1.ai_gateway.metadata[0].name
         ingressHostname    = local.environment_configuration.ai_gateway_hostname
 
