@@ -1,9 +1,137 @@
-# Service Runbook
+# HMCTS Claude Provider
 
-<!-- This is a template that should be populated by the development team when moving to the modernisation platform, but also reviewed and kept up to date.
-To ensure that people looking at your runbook can get the information they need quickly, your runbook should be short but clear. Throughout, only use acronyms if you’re confident that someone who has just been woken up at 3am would understand them. -->
+This environment provides AWS Bedrock access for Claude AI models in the eu-west-2 (London) region.
 
-_If you have any questions surrounding this page please post in the `#team-name` channel._
+## AWS Bedrock Setup
+
+### 1. Issue a Bedrock API Key
+
+Keys are issued per person, so invocation logs attribute usage to an individual:
+
+```bash
+./issue-bedrock-key.sh linus.norton
+```
+
+This assumes the BedrockAPIKeyCreator role, creates the IAM user `BedrockAPIKey-<name>` if needed,
+attaches `HMCTSClaudeBedrockPolicy`, and issues a credential that expires after 90 days.
+
+- `--rotate` replaces an existing credential, for expiry or a suspected leak
+- `--revoke` removes a person's credentials, keeping the IAM user so past usage stays attributable
+
+The token is shown once and cannot be retrieved again.
+
+### 2. Configure Claude Code
+
+Add the environment variables from the script output to your `~/.bashrc` or `~/.zshrc`, then reload
+your shell.
+
+Model access does not need requesting per region - the account's marketplace subscriptions already
+cover eu-west-2.
+
+## Available Models
+
+### In-region, UK only (eu-west-2)
+
+An unprefixed model ID called against the eu-west-2 endpoint is served from London with no inference
+profile in front of it. Four Claude models support this in eu-west-2:
+
+- **Claude Opus 5.5**: `anthropic.claude-opus-5-5` (Claude Code Opus slot)
+- **Claude Sonnet 5**: `anthropic.claude-sonnet-5` (Claude Code Sonnet slot)
+- **Claude Sonnet 4.6**: `anthropic.claude-sonnet-4-6`
+- **Claude Opus 4.6**: `anthropic.claude-opus-4-6-v1`
+
+eu-west-2 is the only region offering in-region inference for Opus 5.5 at all.
+
+Opus 5.5, Sonnet 4.6 and Opus 4.6 are in-region in eu-west-2 and nowhere else, so an unprefixed ID
+sent to the wrong region fails rather than running abroad. Sonnet 5 is also in-region in
+ap-northeast-2 and ap-southeast-1, so `HMCTSClaudeBedrockPolicy` admits its foundation model ARN
+only under `eu-*`, and neither globally nor in any non-EU region.
+
+To check whether another model has gained in-region support:
+
+```bash
+aws bedrock list-foundation-models --region eu-west-2 --by-provider anthropic \
+  | jq -r '.modelSummaries[] | select(.inferenceTypesSupported|index("ON_DEMAND")) | .modelId'
+```
+
+A model listing only `INFERENCE_PROFILE` cannot be pinned to London. Sonnet 5.5, Haiku 5.5, Opus 5,
+Opus 4.8, Opus 4.7, Fable 5 and Fable 5.1 are all in that group.
+
+### EU inference profiles (cross-region within the EU)
+
+- **Claude Haiku 4.5**: `eu.anthropic.claude-haiku-4-5-20251001-v1:0`
+
+No Haiku has in-region support in any region, so the Claude Code Haiku slot is the one part of this
+environment that is not UK only. Called from eu-west-2 this profile routes across eu-central-1,
+eu-north-1, eu-south-1, eu-south-2, eu-west-1, eu-west-2 and eu-west-3.
+
+## Model Invocation Logging
+
+Bedrock model invocation logging is enabled in both eu-west-1 and eu-west-2. eu-west-2 is the region
+this README tells people to use and the account default, but the Bedrock policy admits inference
+profiles in any region, so traffic can still arrive at eu-west-1. Until October 2026 only eu-west-1 was
+logged, and about 39% of that month's spend could not be attributed to anyone.
+
+Logging is configured per region and Bedrock only accepts a destination in its own region, so each
+region has its own bucket, KMS key and log group:
+
+| Region | S3 bucket | CloudWatch log group |
+| --- | --- | --- |
+| eu-west-1 | `hmcts-claude-provider-bedrock-logs-<account-id>` | `/aws/bedrock/modelinvocations` |
+| eu-west-2 | `hmcts-claude-provider-bedrock-logs-<account-id>-eu-west-2` | `/aws/bedrock/modelinvocations` |
+
+Records land under `invocation-logs/` and expire after 90 days. Any region not in that table is
+still uncaptured; add it to `bedrock_log_buckets` in `bedrock_logging.tf` to start logging it.
+
+Request and response bodies are not logged: `text_data_delivery_enabled` is false, so a record
+carries only the envelope - timestamp, principal, model, region and the four token counts. That is
+everything the dashboard and per-person attribution need, and it keeps prompts and source code out
+of the buckets entirely. One side effect: with bodies off, a streaming invocation writes a second
+record under the same `requestId` with zero token counts, so a call count has to be
+`count_distinct(requestId)` rather than `count(*)`. Token sums are unaffected.
+
+### Usage dashboard
+
+The `hmcts-claude-bedrock-usage` dashboard in eu-west-1 reports calls, tokens and estimated cost by
+user and by model. A Logs Insights query cannot span regions, so the dashboard carries one column of
+widgets per region and the columns have to be added together for an account total.
+
+### Copy to Azure for PlatOps
+
+HMCTS PlatOps have no AWS access, so `bedrock_logs_sync.tf` copies the records to an Azure Blob
+container they own, `bedrock-claude-v1-token-metrics` on `spsaitokenmetrics`. A DataSync task per
+region runs hourly in Enhanced mode, which transfers between S3 and Azure Blob with no agent to
+run. Records land under `<region>/` in the container, keeping the key layout they have in S3.
+
+The `data/` folders are excluded. They hold the request and response bodies written before text
+delivery was turned off - prompts and source code, not token metrics - and they stay in the bucket
+until the 90 day lifecycle reaches them.
+
+Deleted records are preserved at the destination, so our 90 day expiry does not prune their copy.
+
+The container's SAS token is held in Secrets Manager as `bedrock-logs-azure-sas`, one secret per
+logging region, and DataSync reads it at run time through `CustomSecretConfig`. Terraform creates
+the secret with a placeholder value and then ignores the value, so the token passes through neither
+a plan nor a state file. Set it, and rotate it, with the `developer` role:
+
+```bash
+umask 077; printf '%s' "$SAS_TOKEN" > /tmp/sas
+for region in eu-west-1 eu-west-2; do
+  aws secretsmanager put-secret-value --region "$region" \
+    --secret-id bedrock-logs-azure-sas --secret-string file:///tmp/sas
+done
+shred -u /tmp/sas
+```
+
+DataSync picks up a new value on the next run, with no Terraform change. The current token expires
+on 28 October 2027 and the task starts failing at that point, so rotate before then.
+
+## Troubleshooting
+
+### Bearer Token Authentication
+
+Note: The bearer token (BSK...) format may not work with all Bedrock API endpoints. If you encounter authentication issues with Claude Code, you may need to use AWS credential-based authentication instead.
+
 
 ## Mandatory Information
 
