@@ -13,7 +13,6 @@ data "terraform_remote_state" "justice_eng_ai" {
 
 #cluster arn
 data "aws_ecs_cluster" "prototype_deployment" {
-  count        = local.prototype_deployment_enabled ? 1 : 0
   cluster_name = "${local.application_name}-prototypes-app"
 }
 
@@ -40,26 +39,22 @@ data "aws_subnets" "private" {
 
 #ECS security group
 data "aws_security_group" "prototype_deployment" {
-  count = local.prototype_deployment_enabled ? 1 : 0
-  name  = "${local.application_name}-prototypes-app"
+  name = "${local.application_name}-prototypes-app"
 }
 
 #Load Balancer
 data "aws_lb" "prototype_deployment" {
-  count = local.prototype_deployment_enabled ? 1 : 0
-  name  = "${local.application_name}-prototypes-alb"
+  name = "${local.application_name}-prototypes-alb"
 }
 
 #listener rule 
 data "aws_lb_listener" "prototype_deployment" {
-  count             = local.prototype_deployment_enabled ? 1 : 0
-  load_balancer_arn = data.aws_lb.prototype_deployment[0].arn
+  load_balancer_arn = data.aws_lb.prototype_deployment.arn
   port              = 443
 }
 
 #Route53 zone 
 data "aws_route53_zone" "prototype_deployment" {
-  count        = local.prototype_deployment_enabled ? 1 : 0
-  name         = local.is-production ? "ai-builder.modernisation-platform.service.justice.gov.uk" : "ai-builder-dev.modernisation-platform.service.justice.gov.uk"
+  name         = local.application_data.accounts[local.environment].builder_hostname
   private_zone = false
 }

@@ -17,7 +17,7 @@ locals {
       build_infra          = module.step_functions_build_infra.arn
       notify               = module.step_functions_notify.arn
     },
-    local.prototype_deployment_enabled ? { deploy_prototype = module.step_functions_deploy_prototype[0].arn } : {},
+    { deploy_prototype = module.step_functions_deploy_prototype.arn },
   )
 
   # Bedrock errors are matched in the existing ECS logs by text. Thresholds are counts
@@ -32,7 +32,7 @@ locals {
   # The control plane runs in script-runner, so its logs are in the script-runner log group.
   bedrock_log_groups = merge(
     { control-plane = aws_cloudwatch_log_group.script_runner.name },
-    local.prototype_deployment_enabled ? { web-ui = data.aws_cloudwatch_log_group.web_ui[0].name } : {},
+    { web-ui = data.aws_cloudwatch_log_group.web_ui.name },
   )
   bedrock_log_alarms = {
     for pair in setproduct(keys(local.bedrock_log_groups), keys(local.bedrock_error_types)) :
