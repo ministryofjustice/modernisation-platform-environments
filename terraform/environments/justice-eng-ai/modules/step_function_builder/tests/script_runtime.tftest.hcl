@@ -695,3 +695,46 @@ run "build_query_pagination" {
     error_message = "Pagination must preserve custom partition keys, caller result paths and subsequent steps."
   }
 }
+
+run "sns_publish_step" {
+  command = plan
+  variables {
+    steps = [
+      {
+        name        = "first"
+        type        = "script_runner"
+        script_path = "scripts/test.sh"
+        shell_type  = "bash"
+        result_path = "$.first"
+      },
+      {
+        name      = "announce"
+        type      = "sns_publish"
+        topic_arn = "arn:aws:sns:eu-west-2:123456789012:topic"
+        subject   = "Done"
+        message   = "States.Format('Build {} done', $.build_id)"
+      },
+    ]
+  }
+
+  assert {
+    condition = (
+      local.definition.States.first_finish.Next == "announce" &&
+      endswith(local.definition.States.announce.Resource, ":states:::sns:publish") &&
+      local.definition.States.announce.Parameters.TopicArn == "arn:aws:sns:eu-west-2:123456789012:topic" &&
+      local.definition.States.announce.Parameters["Message.$"] == "States.Format('Build {} done', $.build_id)" &&
+      local.definition.States.announce.Parameters.Subject == "Done" &&
+      local.definition.States.announce.ResultPath == "$.announce_result" &&
+      local.definition.States.announce.End == true
+    )
+    error_message = "sns_publish must publish natively, keep its result at the default result path and end the workflow when last."
+  }
+}
+
+run "sns_publish_requires_topic_and_message" {
+  command = plan
+  variables {
+    steps = [{ name = "announce", type = "sns_publish", topic_arn = "arn:aws:sns:eu-west-2:123456789012:topic" }]
+  }
+  expect_failures = [var.steps]
+}

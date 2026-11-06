@@ -41,6 +41,10 @@ variable "steps" {
     variable is absent) and otherwise ends successfully (optional
     stop_comment). A choice step cannot be last.
 
+    An sns_publish step has topic_arn, message (JSONPath or intrinsic giving the
+    plain-text message), optional subject (static string), and optional
+    result_path (default $.<name>_result). The execution role needs sns:Publish.
+
     Scope input_path to the specific prior result a step_function step needs
     (e.g. "$.previous_step_name") rather than "$", to avoid forwarding the
     full accumulated state and risking the 256 KB Step Functions data limit.
@@ -64,9 +68,18 @@ variable "steps" {
 
   validation {
     condition = alltrue([
-      for step in var.steps : contains(["script_runner", "step_function", "dynamodb_get_item", "dynamodb_query_latest", "dynamodb_query_build", "wait_for_approval", "choice"], try(step.type, ""))
+      for step in var.steps : contains(["script_runner", "step_function", "dynamodb_get_item", "dynamodb_query_latest", "dynamodb_query_build", "wait_for_approval", "choice", "sns_publish"], try(step.type, ""))
     ])
-    error_message = "Each step type must be script_runner, step_function, dynamodb_get_item, dynamodb_query_latest, dynamodb_query_build, wait_for_approval or choice."
+    error_message = "Each step type must be script_runner, step_function, dynamodb_get_item, dynamodb_query_latest, dynamodb_query_build, wait_for_approval, choice or sns_publish."
+  }
+
+  validation {
+    condition = alltrue([
+      for step in var.steps : try(step.type, "") == "sns_publish" ? (
+        try(step.topic_arn, "") != "" && try(step.message, "") != ""
+      ) : true
+    ])
+    error_message = "sns_publish steps require topic_arn and message."
   }
 
   validation {

@@ -31,6 +31,14 @@ locals {
       input_path         = "$.build_test_deploy_app_image.Output"
       result_path        = "$.deploy_prototype_app"
     },
+    {
+      # Runs only if build_app_infra succeeded; a failed child fails the root.
+      name               = "notify_user"
+      type               = "step_function"
+      state_machine_name = local.notify_state_machine_name
+      input_path         = "$.deploy_prototype_app.Output"
+      result_path        = "$.notify_user"
+    },
   ]
 }
 
@@ -47,5 +55,7 @@ module "step_functions_root" {
     module.step_functions_build_image,
     module.step_functions_deploy_prototype,
     module.step_functions_control_plane,
+    module.step_functions_notify,
+    aws_iam_role_policy.step_functions_common,
   ]
 }
