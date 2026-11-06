@@ -79,6 +79,9 @@ module "state_bucket" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
+  providers = {
+    aws.bucket-replication = aws
+  }
   bucket_prefix      = "${terraform.workspace}-tf-state-bucket"
   ownership_controls = "BucketOwnerEnforced"
 
