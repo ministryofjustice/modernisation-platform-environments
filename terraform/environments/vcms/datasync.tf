@@ -1,6 +1,6 @@
 # intermediate bucket for EFS migration
 module "s3_bucket_efs_migration" {
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.2.0"
   bucket_name         = "vcms-${local.environment}-efs-migration-landing"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
