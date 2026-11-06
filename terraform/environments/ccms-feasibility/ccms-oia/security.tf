@@ -275,15 +275,6 @@ resource "aws_vpc_security_group_egress_rule" "conn_saa_cluster_ec2_egress_https
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-resource "aws_vpc_security_group_egress_rule" "conn_saa_cluster_ec2_egress_ebsdb" {
-  security_group_id            = aws_security_group.conn_saa_cluster_ec2.id
-  description                  = "Allow outbound to the EBS DB Oracle listener"
-  ip_protocol                  = "tcp"
-  from_port                    = 1521
-  to_port                      = 1522
-  referenced_security_group_id = data.aws_security_group.ebsdb.id
-}
-
 # RDS Security Group
 
 resource "aws_security_group" "rds" {
@@ -294,17 +285,6 @@ resource "aws_security_group" "rds" {
   tags = merge(local.tags, {
     Name = "${local.component_name}-${local.env_label}-rds-sg"
   })
-}
-
-resource "aws_vpc_security_group_ingress_rule" "rds_from_private_subnets" {
-  for_each = toset(local.private_subnets_cidr_blocks)
-
-  security_group_id = aws_security_group.rds.id
-  description       = "MySQL from private subnets"
-  ip_protocol       = "tcp"
-  from_port         = 3306
-  to_port           = 3306
-  cidr_ipv4         = each.value
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_from_workspace" {

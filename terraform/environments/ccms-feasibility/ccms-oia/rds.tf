@@ -8,6 +8,7 @@ module "rds" {
 
   instance_class    = local.application_data.accounts[local.environment].db_instance_type
   allocated_storage = local.application_data.accounts[local.environment].db_storage_gb
+  multi_az          = local.application_data.accounts[local.environment].db_multi_az
 
   db_name  = "opahub"
   username = local.application_data.accounts[local.environment].db_user

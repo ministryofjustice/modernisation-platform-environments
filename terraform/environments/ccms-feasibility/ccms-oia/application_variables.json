@@ -27,7 +27,7 @@
       "opa_health_check_port": 9002,
       "opa_container_cpu": 2048,
       "opa_container_memory": 6144,
-      "wl_mem_args": "-Xms512m -Xmx2048m",
+      "wl_mem_args": "-Xms4096m -Xmx4096m",
       "create_database": "false",
 
       "connector_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-connector",
@@ -56,6 +56,7 @@
       "db_instance_version": "8.4.8",
       "db_instance_type": "db.t3.large",
       "db_storage_gb": 100,
+      "db_multi_az": true,
       "db_deletion_protection": true,
       "db_log_retention_days": 30,
       "alb_deletion_protection": true,
