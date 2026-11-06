@@ -46,6 +46,11 @@ module "litellm_entra_id_secret" {
     proxy_admin_id = "CHANGEME"
   })
   ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = local.environment_configuration.litellm_entra_client_secret_expiry }
+  )
 }
 
 module "microsoft_foundry_jedi_gateway_secret" {
