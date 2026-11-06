@@ -8,7 +8,7 @@ for profile in $profiles; do
   else
     echo "# $profile: downloading ec2-user secret from $profile"
     key=$(aws secretsmanager get-secret-value --secret-id "/ec2/.ssh/ec2-user" --query SecretString --output text --profile "$profile")
-    echo "# $profile: creating encrypted private key, paste in passphrase"
+    echo "# $profile: creating encrypted private key, set a passphrase of your choosing"
     openssl rsa -in <(echo "${key}") -out "$profile/ec2-user" -aes256
     chmod 0600 "$profile/ec2-user"
   fi
