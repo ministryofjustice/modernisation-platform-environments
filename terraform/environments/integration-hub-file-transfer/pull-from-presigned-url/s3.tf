@@ -3,7 +3,7 @@ data "aws_kms_key" "clean" { key_id = "alias/s3/clean" }
 module "s3_pickup" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source                                   = "terraform-aws-modules/s3-bucket/aws"
-  version                                  = "5.16.1"
+  version                                  = "5.17.0"
   bucket                                   = local.pickup_bucket_name
   allowed_kms_key_arn                      = module.kms_notifications_pipeline.key_arn
   attach_deny_incorrect_encryption_headers = true
