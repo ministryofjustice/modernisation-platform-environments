@@ -3,11 +3,12 @@ locals {
 
   environment_configurations = {
     development = {
-      litellm_version           = "1.104.0"
-      litellm_image_repository  = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag         = "1.104.1-enterprise"
-      litellm_image_pull_secret = "litellm-enterprise-pull"
-      ai_gateway_hostname       = "development.ai-gateway.justice.gov.uk"
+      litellm_version                    = "1.104.0"
+      litellm_entra_client_secret_expiry = "2027-05-05"
+      litellm_image_repository           = "docker.io/litellmenterprise/litellm"
+      litellm_image_tag                  = "1.104.1-enterprise"
+      litellm_image_pull_secret          = "litellm-enterprise-pull"
+      ai_gateway_hostname                = "development.ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
         input_bucket_name  = "alpha-airflow-aigw-example-input"
         output_bucket_name = "alpha-airflow-aigw-example-output"
@@ -60,11 +61,12 @@ locals {
       ai_gateway_egress_policy_enabled = false
     }
     test = {
-      litellm_version           = "1.104.0"
-      litellm_image_repository  = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag         = "1.104.1-enterprise"
-      litellm_image_pull_secret = "litellm-enterprise-pull"
-      ai_gateway_hostname       = "test.ai-gateway.justice.gov.uk"
+      litellm_version                    = "1.104.0"
+      litellm_entra_client_secret_expiry = "2027-04-17"
+      litellm_image_repository           = "docker.io/litellmenterprise/litellm"
+      litellm_image_tag                  = "1.104.1-enterprise"
+      litellm_image_pull_secret          = "litellm-enterprise-pull"
+      ai_gateway_hostname                = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
@@ -105,11 +107,12 @@ locals {
       ai_gateway_egress_policy_enabled = false
     }
     preproduction = {
-      litellm_version           = "1.104.0"
-      litellm_image_repository  = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag         = "1.104.1-enterprise"
-      litellm_image_pull_secret = "litellm-enterprise-pull"
-      ai_gateway_hostname       = "preproduction.ai-gateway.justice.gov.uk"
+      litellm_version                    = "1.104.0"
+      litellm_entra_client_secret_expiry = "2026-11-22"
+      litellm_image_repository           = "docker.io/litellmenterprise/litellm"
+      litellm_image_tag                  = "1.104.1-enterprise"
+      litellm_image_pull_secret          = "litellm-enterprise-pull"
+      ai_gateway_hostname                = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
@@ -146,11 +149,12 @@ locals {
       ai_gateway_egress_policy_enabled = false
     }
     production = {
-      litellm_version           = "1.104.0"
-      litellm_image_repository  = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag         = "1.104.1-enterprise"
-      litellm_image_pull_secret = "litellm-enterprise-pull"
-      ai_gateway_hostname       = "ai-gateway.justice.gov.uk"
+      litellm_version                    = "1.104.0"
+      litellm_entra_client_secret_expiry = "2026-11-22"
+      litellm_image_repository           = "docker.io/litellmenterprise/litellm"
+      litellm_image_tag                  = "1.104.1-enterprise"
+      litellm_image_pull_secret          = "litellm-enterprise-pull"
+      ai_gateway_hostname                = "ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
         input_bucket_name = "alpha-bold-pilot-rr-families"
         input_prefix      = "litellm/batch/input"
