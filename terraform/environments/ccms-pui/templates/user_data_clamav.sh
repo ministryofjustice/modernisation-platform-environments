@@ -23,6 +23,7 @@ systemctl start amazon-ssm-agent
 
 dnf install -y clamav1.4 clamav1.4-freshclam clamav1.4-data clamav1.4-filesystem clamd1.4.x86_64
 
+# Base Clamd Scan Daemon Config
 cat << EOF > /etc/clamd.d/scan.conf
 ## Minimal config
 LogFile /var/log/clamd.scan
@@ -35,7 +36,27 @@ StreamMaxLength 320M
 User clamscan
 EOF
 
+# Base Freshclam Config
+cat << EOF > /etc/freshclam.conf
+# Database Location
+DatabaseDirectory /var/lib/clamav
+
+# Logging configuration
+UpdateLogFile /var/log/freshclam.log
+LogTime yes
+LogVerbose no
+
+# Log file admin and rotation
+LogFileMaxSize 1M
+LogRotate yes
+
+# Notify clamd when database updates are downloaded
+NotifyClamd /etc/clamd.d/scan.conf
+EOF
+
+# Initial Run of freshclam to update DB
 freshclam
 
-systemctl enable clamd@scan.service
-systemctl start clamd@scan.service
+# Enable and Activate ClamAV Scan Daemon and Freshclam Services
+systemctl enable --now clamav-freshclam.service
+systemctl enable --now clamd@scan.service
