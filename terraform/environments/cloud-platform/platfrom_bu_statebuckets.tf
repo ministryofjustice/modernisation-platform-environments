@@ -11,7 +11,7 @@ locals {
     ) => {
       workspace   = account
       account_id  = local.environment_management.account_ids[account]
-      bucket_name = "${account}-tf-state-bucket"
+      bucket_name = "${account}-tf"
     }
     if endswith(account, "-live")
   }
