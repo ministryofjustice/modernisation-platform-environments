@@ -296,7 +296,19 @@ resource "aws_iam_policy" "awsconfig_sns_policy" {
           "firehose:PutRecordBatch"
         ],
         Resource = [
-          "arn:aws:firehose:eu-west-2:${var.aws_account_id}:deliverystream/awsconfig-to-datadog"
+          "arn:aws:firehose:eu-west-2:${var.aws_account_id}:deliverystream/awsconfig-to-datadog",
+          aws_kinesis_firehose_delivery_stream.to_datadog.arn
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "kms:GenerateDataKey",
+          "kms:Decrypt"
+        ],
+        Resource = [
+          aws_kms_key.awsconfig_firehose_backup.arn,
+          aws_kms_key.firehose_backup.arn
         ]
       }
     ]
