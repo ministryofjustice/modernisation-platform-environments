@@ -72,7 +72,7 @@ module "shared-prototype-edge" {
     origin_certificate_arn = aws_acm_certificate_validation.prototype_origin[0].certificate_arn
     name_prefix            = local.prototype_name_prefix
     vpc_id                 = data.aws_vpc.prototype[0].id
-    public_subnet_ids      = data.aws_subnets.public_prototypes[0].ids
+    public_subnet_ids      = data.aws_subnets.public_subnets[0].ids
     allowed_ipv4_cidrs     = toset(var.allowed_ingress_cidrs)
   }
   tags = local.tags
