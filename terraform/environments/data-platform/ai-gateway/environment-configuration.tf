@@ -103,11 +103,9 @@ locals {
       ai_gateway_egress_policy_enabled = false
     }
     preproduction = {
-      litellm_version                    = "1.104.0"
+      litellm_version                    = "1.106.5"
+      litellm_tmpdir                     = "/app/cache"
       litellm_entra_client_secret_expiry = "2026-11-22"
-      litellm_image_repository           = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag                  = "1.104.1-enterprise"
-      litellm_image_pull_secret          = "litellm-enterprise-pull"
       ai_gateway_hostname                = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
