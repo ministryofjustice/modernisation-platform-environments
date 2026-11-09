@@ -130,33 +130,6 @@ locals {
           domain-name = "azure.noms.root"
         })
       })
-
-      qa12c-nomis-web = merge(local.ec2_autoscaling_groups.qa12c-nomis-web, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 0
-        })
-        autoscaling_schedules = {}
-        config = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.config, {
-          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
-            "Ec2Qa11GWeblogicPolicy",
-            "Ec2Qa11G2WeblogicPolicy",
-            "Ec2Qa19CWeblogicPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.tags, {
-          nomis-environment      = "dev"
-          oracle-db-name         = "qa19c"
-          oracle-db-hostname-a   = "dev-nomis-db19c-1-b"
-          oracle-db-hostname-b   = "none"
-          weblogic-config-target = "qa19c"
-        })
-      })
     }
 
     ec2_instances = {
