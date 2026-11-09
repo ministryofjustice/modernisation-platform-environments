@@ -30,8 +30,6 @@ teams:
 
 models:
   amazon_bedrock:
-    # Generally available Bedrock models (including batch deployments) use the
-    # generally-available-models group; other models have individual groups.
     # Amazon
     amazon-nova-lite:
       model_id: "amazon.nova-lite-v1:0"
