@@ -1,5 +1,5 @@
 locals {
   securityhub_accounts = jsondecode(
-    data.aws_ssm_parameter.securityhub_accounts.value
+    data.aws_ssm_parameter.aws_accounts.value
   ).accounts
 }

@@ -3,7 +3,7 @@ variable "aws_account_id" {
   type        = string
 }
 
-variable "securityhub_accounts_parameter_name" {
+variable "aws_accounts_parameter_name" {
   description = "The name of the AWS SSM parameter that contains the Security Hub source account IDs"
   type        = string
 }
