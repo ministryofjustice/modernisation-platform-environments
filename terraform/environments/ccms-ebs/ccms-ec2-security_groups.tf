@@ -1,9 +1,45 @@
+
+# These security groups are managed in the ccms-file-transfer root module (separate
+# state), so they can't be referenced via aws_security_group.<name>.id here - look
+# them up by their Name tag instead.
+data "aws_security_group" "sftp_process_file_from_bucket_lambda_sg" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "tag:Name"
+    values = ["${local.application_name}-sftp-process-file-from-bucket-lambda-security-group"]
+  }
+}
+
+data "aws_security_group" "sftp_load_balancer" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "tag:Name"
+    values = ["${local.application_name}-sftp-load-balancer-sg"]
+  }
+}
+
+data "aws_security_group" "sftp_cluster_ec2" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "tag:Name"
+    values = ["${local.application_name}-sftp-cluster-ec2-security-group"]
+  }
+}
+
+data "aws_security_group" "sftp_ecs_tasks_security_group" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "tag:Name"
+    values = ["${local.application_name}-sftp-ecs-tasks-security-group"]
+  }
+}
+
 locals {
   excluded_sgs = [
-    aws_security_group.process_file_from_bucket_lambda_sg.id,
-    aws_security_group.sftp_load_balancer.id,
-    aws_security_group.cluster_ec2.id,
-    aws_security_group.ecs_tasks_sftp_security_group.id,
+    data.aws_security_group.sftp_process_file_from_bucket_lambda_sg.id,
+    data.aws_security_group.sftp_load_balancer.id,
+    data.aws_security_group.sftp_cluster_ec2.id,
+    data.aws_security_group.sftp_ecs_tasks_security_group.id,
   ]
 }
 
