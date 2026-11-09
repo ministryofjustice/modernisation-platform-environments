@@ -358,29 +358,6 @@ locals {
         })
       })
 
-      # built by code and then handed over to Syscon for remaining manual configuration
-      qa11g-nomis-web12-b = merge(local.ec2_instances.qa11g-nomis-web12, {
-        config = merge(local.ec2_instances.qa11g-nomis-web12.config, {
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
-            "Ec2Qa11GWeblogicPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_instances.qa11g-nomis-web12.user_data_cloud_init, {
-          args = merge(local.ec2_instances.qa11g-nomis-web12.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_instances.qa11g-nomis-web12.tags, {
-          instance-scheduling    = "skip-scheduling"
-          nomis-environment      = "dev"
-          oracle-db-name         = "qa11g"
-          oracle-db-hostname-a   = "dev-nomis-db19c-1-a"
-          oracle-db-hostname-b   = "none"
-          weblogic-config-target = "qa11g"
-        })
-      })
-
       qa-nomis-web12-a = merge(local.ec2_instances.web_12, {
         config = merge(local.ec2_instances.web_12.config, {
           availability_zone = "eu-west-2a"
