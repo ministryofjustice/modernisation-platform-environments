@@ -20,6 +20,7 @@ locals {
     jsondecode(data.http.environments_file.response_body).tags,
     { "is-production" = local.is-production },
     { "environment-name" = terraform.workspace },
+    { "test" = "test-tag" },
     { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
   )
 
