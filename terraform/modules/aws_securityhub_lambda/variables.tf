@@ -1,0 +1,95 @@
+variable "aws_account_id" {
+  description = "The AWS account ID where the Lambda function will be deployed"
+  type        = string
+}
+
+variable "securityhub_accounts_parameter_name" {
+  description = "The name of the AWS SSM parameter that contains the Security Hub source account IDs"
+  type        = string
+}
+
+variable "aws_region" {
+  description = "The AWS region where the Lambda and KMS resources are deployed"
+  type        = string
+  default     = "eu-west-2"
+}
+
+variable "github_org" {
+  description = "The name of the github organization"
+  type        = string
+  default     = "ministryofjustice"
+}
+
+variable "github_identity" {
+  description = "The Octo STS identity configured in the target repository with issues: write permission"
+  type        = string
+  default     = "platops_github_issue_identifier"
+}
+
+variable "github_repo" {
+  description = "The name of the GitHub repository where Security Hub finding issues are created"
+  type        = string
+}
+
+variable "finding_severity_labels" {
+  description = "Security Hub finding severity labels that trigger GitHub issues"
+  type        = list(string)
+  default     = ["CRITICAL"]
+
+  validation {
+    condition = length(var.finding_severity_labels) > 0 && alltrue([
+      for label in var.finding_severity_labels : contains(
+        ["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"],
+        label
+      )
+    ])
+    error_message = "finding_severity_labels must contain one or more valid Security Hub severity labels."
+  }
+}
+
+variable "lambda_memory_size" {
+  description = "Amount of memory available to the Lambda function"
+  type        = number
+  default     = 256
+}
+
+variable "lambda_runtime" {
+  description = "Runtime environment for the Lambda function"
+  type        = string
+  default     = "python3.13"
+}
+
+variable "lambda_timeout" {
+  description = "Timeout for the Lambda function"
+  type        = number
+  default     = 30
+}
+
+variable "project_name" {
+  description = "The prefix to use for AWS resources created by this module"
+  type        = string
+  default     = "securityhub-finding-issue-generator"
+}
+
+variable "securityhub_ignore_findings_parameter_name" {
+  description = "The name of the AWS SSM parameter that contains ignored Security Hub finding descriptions"
+  type        = string
+}
+
+variable "web_identity_audience" {
+  description = "The web identity audience for OCTO STS"
+  type        = string
+  default     = "octo-sts.dev"
+}
+
+variable "web_identity_duration_seconds" {
+  description = "The duration in seconds for the web identity token"
+  type        = number
+  default     = 600
+}
+
+variable "web_identity_signing_algorithm" {
+  description = "The signing algorithm for the web identity token"
+  type        = string
+  default     = "RS256"
+}
