@@ -49,7 +49,7 @@
       "adaptor_container_memory": 2048,
       "adaptor_desired_count": 1,
       "adaptor_spring_profile": "aws",
-      "logging_config": "classpath:logback-spring.xml",
+      "logging_config": "classpath:log4j2-aws.xml",
       "logging_level_uk_gov_justice_laa_ccms": "INFO",
 
       "db_user": "opahubdb",
