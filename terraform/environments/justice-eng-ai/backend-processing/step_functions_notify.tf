@@ -49,7 +49,7 @@ locals {
       { name = "AWS_REGION", value = local.aws_region },
       { name = "USER_EMAIL", path = "$.latest.UserName" },
       { name = "APP_ID", path = local.script_runner_app_id_path },
-      { name = "BUILD_ID", path = "$.latest.BuildID" },
+      { name = "BUILD_ID", path = "States.Format('{}', $.latest.BuildID)" },
       { name = "APP_URL", path = "$.dns.url" },
     ]
     result_path     = "$.slack_task"
