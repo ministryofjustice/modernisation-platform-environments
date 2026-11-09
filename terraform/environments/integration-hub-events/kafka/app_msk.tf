@@ -1,18 +1,31 @@
-resource "aws_msk_serverless_cluster" "cluster" {
-  count        = contains(local.deploy_to, local.environment) ? 1 : 0
-  cluster_name = local.cluster_name
-  region       = data.aws_region.current.region
+resource "aws_msk_cluster" "cluster" {
+  count                  = contains(local.deploy_to, local.environment) ? 1 : 0
+  cluster_name           = local.cluster_name
+  kafka_version          = "3.8.x"
+  number_of_broker_nodes = 1
 
-  vpc_config {
-    subnet_ids         = data.aws_subnets.shared-private.ids
-    security_group_ids = [aws_security_group.msk[0].id]
+  broker_node_group_info {
+    instance_type   = "kafka.t3.small"
+    client_subnets  = [sort(data.aws_subnets.shared-private.ids)[0]] # a single broker needs a single subnet
+    security_groups = [aws_security_group.msk[0].id]
+
+    storage_info {
+      ebs_storage_info {
+        volume_size = 1
+      }
+    }
   }
 
   client_authentication {
     sasl {
-      iam {
-        enabled = true
-      }
+      iam = true
+    }
+  }
+
+  encryption_info {
+    encryption_in_transit {
+      client_broker = "TLS"
+      in_cluster    = true
     }
   }
 
@@ -26,7 +39,7 @@ resource "aws_security_group" "msk" {
   #checkov:skip=CKV2_AWS_5:Skipping because this SG is attached via the MSK vpc_config block
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = "${local.cluster_name}-sg"
-  description = "Security group for MSK Serverless cluster"
+  description = "Security group for MSK cluster"
   vpc_id      = data.aws_vpc.shared.id
 
   lifecycle {
@@ -35,7 +48,7 @@ resource "aws_security_group" "msk" {
 
   tags = merge(local.extended_tags, {
     Name        = "${local.cluster_name}-sg",
-    description = "Security group for MSK Serverless cluster"
+    description = "Security group for MSK cluster"
   })
 
 }
