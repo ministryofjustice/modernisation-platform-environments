@@ -1,5 +1,9 @@
 resource "litellm_unified_access_group" "amazon_bedrock" {
-  for_each = try(local.ai_gateway_models_filtered.amazon_bedrock, {})
+  for_each = {
+    for model_key, model in try(local.ai_gateway_models_filtered.amazon_bedrock, {}) :
+    model_key => model
+    if !try(model.generally_available, false)
+  }
 
   access_group_name  = "bedrock-${each.key}"
   access_model_names = [litellm_model.amazon_bedrock[each.key].model_name]
@@ -100,11 +104,6 @@ resource "litellm_unified_access_group" "generally_available_models" {
       for key in sort(keys(litellm_model.amazon_bedrock)) :
       litellm_model.amazon_bedrock[key].model_name
       if try(local.ai_gateway_models_filtered.amazon_bedrock[key].generally_available, false)
-    ],
-    [
-      for key in sort(keys(litellm_model.amazon_bedrock_batch)) :
-      litellm_model.amazon_bedrock_batch[key].model_name
-      if try(local.ai_gateway_bedrock_batch_models[key].generally_available, false)
     ],
     [
       for key in sort(keys(litellm_model.google_gemini_enterprise_agent_platform)) :

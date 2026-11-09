@@ -3,49 +3,67 @@ locals {
 
   notify_builder_url = "https://${local.application_data.accounts[local.environment].builder_hostname}"
 
-  notify_steps = [
-    {
-      name        = "send_notification"
-      type        = "script_runner"
-      script_path = "scripts/notification/send_notification.py"
-      shell_type  = "python3"
-      variables = [
-        { name = "TEMPLATE_ID", value = local.application_data.accounts[local.environment].notify_template_id },
-        { name = "USER_EMAIL", path = "$.latest.UserName" },
-        { name = "CC_EMAIL", value = "ModernisationPlatform-gg@justice.gov.uk" },
-        { name = "EMAIL_SUBJECT", value = "Your application has been built and deployed" },
-        { name = "EMAIL_BODY_FILE", value = "scripts/notification/email-body.md" },
-        {
-          # Braces are escaped for States.Format; builder_url comes from Terraform.
-          # The input is the deploy_prototype child's final state, passed on by the root.
-          name = "EMAIL_VARS"
-          path = "States.Format('\\{\"endpoint_url\":\"{}\",\"app_id\":\"{}\",\"build_id\":\"{}\",\"builder_url\":\"${local.notify_builder_url}\"\\}', $.dns.url, ${local.script_runner_app_id_path}, $.latest.BuildID)"
-        },
-      ]
-      result_path     = "$.notify_task"
-      timeout_seconds = 300
-    },
-    {
-      # AWS Chatbot delivers the job completion topic to Slack.
-      name        = "send_slack_alert"
-      type        = "script_runner"
-      script_path = "scripts/notification/send_slack_alert.py"
-      shell_type  = "python3"
-      variables = [
-        { name = "TOPIC_ARN", value = aws_sns_topic.job_completion.arn },
-        { name = "AWS_REGION", value = local.aws_region },
-        { name = "USER_EMAIL", path = "$.latest.UserName" },
-        { name = "APP_ID", path = local.script_runner_app_id_path },
-        { name = "BUILD_ID", path = "$.latest.BuildID" },
-        { name = "APP_URL", path = "$.dns.url" },
-      ]
-      result_path     = "$.slack_task"
-      timeout_seconds = 300
-    }
-  ]
+  email_confirmations_enabled = local.application_data.accounts[local.environment].email_confirmations_enabled
+  slack_confirmations_enabled = local.application_data.accounts[local.environment].slack_confirmations_enabled
+
+  # Each confirmation is included only when enabled in application_variables.json.
+  notify_steps = concat(
+    local.email_confirmations_enabled ? [local.notify_email_step] : [],
+    local.slack_confirmations_enabled ? [local.notify_slack_step] : [],
+  )
+
+  # The notify state machine needs at least one step, so with both disabled it is not created
+  # and the root skips it.
+  notify_enabled = length(local.notify_steps) > 0
+
+  notify_email_step = {
+    name        = "send_notification"
+    type        = "script_runner"
+    script_path = "scripts/notification/send_notification.py"
+    shell_type  = "python3"
+    variables = [
+      { name = "TEMPLATE_ID", value = local.application_data.accounts[local.environment].notify_template_id },
+      { name = "USER_EMAIL", path = "$.latest.UserName" },
+      { name = "CC_EMAIL", value = "ModernisationPlatform-gg@justice.gov.uk" },
+      { name = "EMAIL_SUBJECT", value = "Your application has been built and deployed" },
+      { name = "EMAIL_BODY_FILE", value = "scripts/notification/email-body.md" },
+      {
+        # Braces are escaped for States.Format; builder_url comes from Terraform.
+        # The input is the deploy_prototype child's final state, passed on by the root.
+        name = "EMAIL_VARS"
+        path = "States.Format('\\{\"endpoint_url\":\"{}\",\"app_id\":\"{}\",\"build_id\":\"{}\",\"builder_url\":\"${local.notify_builder_url}\"\\}', $.dns.url, ${local.script_runner_app_id_path}, $.latest.BuildID)"
+      },
+    ]
+    result_path     = "$.notify_task"
+    timeout_seconds = 300
+  }
+
+  notify_slack_step = {
+    # AWS Chatbot delivers the job completion topic to Slack.
+    name        = "send_slack_alert"
+    type        = "script_runner"
+    script_path = "scripts/notification/send_slack_alert.py"
+    shell_type  = "python3"
+    variables = [
+      { name = "TOPIC_ARN", value = aws_sns_topic.job_completion.arn },
+      { name = "AWS_REGION", value = local.aws_region },
+      { name = "USER_EMAIL", path = "$.latest.UserName" },
+      { name = "APP_ID", path = local.script_runner_app_id_path },
+      { name = "BUILD_ID", path = "$.latest.BuildID" },
+      { name = "APP_URL", path = "$.dns.url" },
+    ]
+    result_path     = "$.slack_task"
+    timeout_seconds = 300
+  }
+}
+
+moved {
+  from = module.step_functions_notify
+  to   = module.step_functions_notify[0]
 }
 
 module "step_functions_notify" {
+  count  = local.notify_enabled ? 1 : 0
   source = "../modules/step_function_builder"
 
   step_function_retry_attempts = local.step_function_retry_attempts
