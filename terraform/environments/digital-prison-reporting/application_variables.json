@@ -212,6 +212,10 @@
         }
       ],
       "redshift_table_expiry_days": 7,
+      "reporting_app_irsa_role_names": {
+        "prisons": "cloud-platform-irsa-aab1a0074cd15a74-live",
+        "probation": "cloud-platform-irsa-a525aa481a663772-live"
+      },
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
       "enable_probation_discovery_node": true,
@@ -437,6 +441,10 @@
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
+      "reporting_app_irsa_role_names": {
+        "prisons": "cloud-platform-irsa-c67c125c17f8f34b-live",
+        "probation": "cloud-platform-irsa-c059a9b678a6347d-live"
+      },
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
       "enable_probation_discovery_node": false,
@@ -679,6 +687,10 @@
         }
       ],
       "redshift_table_expiry_days": 7,
+      "reporting_app_irsa_role_names": {
+        "prisons": "cloud-platform-irsa-a37c09a6599464a7-live",
+        "probation": "cloud-platform-irsa-5b33e8326ac304c0-live"
+      },
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": false,
       "enable_probation_discovery_node": false,
@@ -927,6 +939,10 @@
         }
       ],
       "redshift_table_expiry_days": 1,
+      "reporting_app_irsa_role_names": {
+        "prisons": "cloud-platform-irsa-3ad2418b7222e329-live",
+        "probation": "cloud-platform-irsa-b37dede5f38efbc7-live"
+      },
       "enable_s3_data_migrate_lambda": false,
       "create_postgres_load_generator_job": false,
       "enable_probation_discovery_node": false,
