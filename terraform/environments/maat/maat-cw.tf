@@ -96,7 +96,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_StatusCheckFailure" {
   threshold          = local.application_data.accounts[local.environment].maat_ASGStatusFailureAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.maat_ec2_scaling_group.name
+    AutoScalingGroupName = aws_autoscaling_group.maat_ec2_scaling_group_al2023.name
   }
   comparison_operator = "GreaterThanThreshold"
   tags = merge(
