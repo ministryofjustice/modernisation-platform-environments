@@ -74,7 +74,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsalb_443_azure_virtual_des
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = [local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr]
+  cidr_blocks       = local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
 }
 
 # EGRESS Rules

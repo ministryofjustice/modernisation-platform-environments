@@ -95,7 +95,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_wp_azure_virtual_deskt
   protocol          = "TCP"
   from_port         = 1521
   to_port           = 1522
-  cidr_blocks       = [local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr]
+  cidr_blocks       = local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
 }
 
 ### Oracle
