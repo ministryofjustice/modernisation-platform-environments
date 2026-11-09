@@ -1,6 +1,8 @@
 import hashlib
 import json
 import os
+import urllib.request
+import uuid
 from datetime import datetime
 
 import boto3
@@ -123,6 +125,19 @@ def lambda_handler(event, _context):
                 "source_event_id": source_event_id,
             },
         )
+        # TEMPORARY smoke test of integration_hub_events
+        try:
+            urllib.request.urlopen(
+                urllib.request.Request(
+                    "https://development.events-platform.service.justice.gov.uk/events/incoming_file",
+                    data=json.dumps({"random": uuid.uuid4().hex}).encode(),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                ),
+                timeout=5,
+            )
+        except Exception:
+            logger.exception("Failed to send incoming_file event")
         return {"eventId": destination_event_id}
     except Exception:
         logger.exception(
