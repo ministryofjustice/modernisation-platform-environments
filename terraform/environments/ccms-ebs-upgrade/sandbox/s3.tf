@@ -1,7 +1,7 @@
 # S3 Bucket - Artefacts
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  # v8.2.2 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/bf97d1f182936e9bfab0fb61baad2ba327ac36d3
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=bf97d1f182936e9bfab0fb61baad2ba327ac36d3"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name        = local.artefact_bucket_name
   versioning_enabled = false
@@ -128,8 +128,8 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
 
 # S3 Bucket - Logging
 module "s3-bucket-logging" {
-  # v8.2.2 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/bf97d1f182936e9bfab0fb61baad2ba327ac36d3
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=bf97d1f182936e9bfab0fb61baad2ba327ac36d3"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = false
@@ -260,8 +260,8 @@ module "s3-bucket-logging" {
 
 # S3 Bucket - R-sync
 module "s3-bucket-dbbackup" {
-  # v8.2.2 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/bf97d1f182936e9bfab0fb61baad2ba327ac36d3
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=bf97d1f182936e9bfab0fb61baad2ba327ac36d3"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
