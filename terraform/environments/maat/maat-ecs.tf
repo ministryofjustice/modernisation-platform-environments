@@ -188,7 +188,7 @@ resource "aws_launch_template" "maat_ec2_launch_template_al2023" {
 
 #### EC2 Scaling Group  -----
 
-resource "aws_autoscaling_group" "maat_ec2_scaling_group_al2023" {
+resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
   name_prefix         = "${local.application_name}-ec2-al2023-"
   # New ASG, set capacity to 0 - will be scaled manually during migration.
@@ -221,7 +221,7 @@ resource "aws_autoscaling_policy" "maat_ec2_scaling_up_policy" {
   name                   = "${local.application_name}-ec2-scaling-up"
   policy_type            = "SimpleScaling"
   adjustment_type        = "ChangeInCapacity"
-  autoscaling_group_name = aws_autoscaling_group.maat_ec2_scaling_group_al2023.name
+  autoscaling_group_name = aws_autoscaling_group.maat_ec2_scaling_group.name
   cooldown               = 60
   scaling_adjustment     = 1
 }
@@ -230,7 +230,7 @@ resource "aws_autoscaling_policy" "maat_ec2_scaling_down_policy" {
   name                   = "${local.application_name}-ec2-scaling-down"
   policy_type            = "SimpleScaling"
   adjustment_type        = "ChangeInCapacity"
-  autoscaling_group_name = aws_autoscaling_group.maat_ec2_scaling_group_al2023.name
+  autoscaling_group_name = aws_autoscaling_group.maat_ec2_scaling_group.name
   cooldown               = 60
   scaling_adjustment     = -1
 }
