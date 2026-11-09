@@ -144,7 +144,7 @@ locals {
     }
     production = {
       litellm_version                    = "1.104.0"
-      litellm_entra_client_secret_expiry = "22-11-2026"
+      litellm_entra_client_secret_expiry = "08-05-2027"
       litellm_image_repository           = "docker.io/litellmenterprise/litellm"
       litellm_image_tag                  = "1.104.1-enterprise"
       litellm_image_pull_secret          = "litellm-enterprise-pull"
