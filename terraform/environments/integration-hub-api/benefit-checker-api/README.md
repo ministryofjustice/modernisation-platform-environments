@@ -84,3 +84,16 @@ The registration apply succeeded in
 [run 42643076503](https://github.com/ministryofjustice/staff-identity-idam-entra-infra/actions/runs/42643076503).
 The development IDs come from its `pilot_api_configuration` output. These are
 public configuration identifiers; no client credential is stored here.
+
+### Authorizer migration
+
+Create the Entra JWT authorizer as a separate resource and switch the assessment
+route to it. Retain the old REQUEST authorizer during this cutover; the application
+package denies old shared credentials, and the route no longer uses it after the
+switch. Do not convert REQUEST to JWT in place: the provider sends Lambda-only
+fields such as `EnableSimpleResponses`, which API Gateway rejects for JWT.
+Remove the unused legacy authorizer after the development flow is verified.
+
+After a failed conversion attempt, generate a fresh plan from the latest branch.
+Expect a new Entra authorizer and a route update, not an in-place type conversion.
+Review any already-applied changes using the refreshed state before approving.

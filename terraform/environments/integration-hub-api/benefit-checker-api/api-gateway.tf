@@ -36,7 +36,24 @@ resource "aws_apigatewayv2_integration" "benefit_orchestrator" {
   timeout_milliseconds   = 10000
 }
 
+# Keep the existing REQUEST authorizer during cutover. Converting its type in
+# place makes the provider send Lambda-only fields that AWS rejects for JWT.
+# Remove this unused authorizer in a follow-up after the JWT route is verified.
 resource "aws_apigatewayv2_authorizer" "request" {
+  count = local.create_service ? 1 : 0
+
+  api_id                            = aws_apigatewayv2_api.benefit_checker[0].id
+  authorizer_type                   = "REQUEST"
+  name                              = "${local.application_name}-${local.component_name}-authorizer"
+  authorizer_uri                    = module.lambda_api_authorizer[0].lambda_function_invoke_arn
+  authorizer_payload_format_version = "2.0"
+  authorizer_result_ttl_in_seconds  = 0
+  enable_simple_responses           = true
+  identity_sources                  = ["$request.header.Authorization"]
+}
+
+
+resource "aws_apigatewayv2_authorizer" "entra" {
   count = local.create_service ? 1 : 0
 
   api_id           = aws_apigatewayv2_api.benefit_checker[0].id
@@ -67,7 +84,7 @@ resource "aws_apigatewayv2_route" "assessment" {
   route_key          = "POST /v1/benefit-checks/assessments"
   target             = "integrations/${aws_apigatewayv2_integration.benefit_orchestrator[0].id}"
   authorization_type = "JWT"
-  authorizer_id      = aws_apigatewayv2_authorizer.request[0].id
+  authorizer_id      = aws_apigatewayv2_authorizer.entra[0].id
 }
 
 resource "aws_apigatewayv2_route" "health" {
