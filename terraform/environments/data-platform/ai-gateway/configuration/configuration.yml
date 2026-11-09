@@ -503,8 +503,8 @@ models:
       model_id: "gemini-3.5-transcribe"
       model_family: "Google Gemini"
       model_name: "Google Gemini 3.5 Transcribe"
-      model_location: "EU"
-      location: "EU"
+      model_location: "European Union"
+      location: "eu"
       generally_available: false
       environments_available: ["development", "production"]
     gemini-3-6-flash:
