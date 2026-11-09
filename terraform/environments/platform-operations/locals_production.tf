@@ -259,6 +259,30 @@ locals {
         timezone = "Europe/London"
         workflow = "certificate_renewal.yml"
       }
+      mp-automation-db-refresh-nomis-1a = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "preprod_nomis_db_1_a"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 7 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "nomis_database_refresh.yml"
+      }
+      mp-automation-db-refresh-nomis-2a = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "preprod_nomis_db_2_a"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 10 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "nomis_database_refresh.yml"
+      }
       mp-automation-github-workflow-monitoring = {
         identity = "platops"
         inputs = {
