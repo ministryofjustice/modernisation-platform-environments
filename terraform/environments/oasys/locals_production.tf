@@ -1000,11 +1000,11 @@ locals {
       ]
     }
 
-    ssm_patch_baselines = {
-      RedHatPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["RedHatPatchGroup1Baseline"], {
-        rule1_approve_after_days = null
-        rule1_approve_until_date = "2026-11-04"
-      })
-    }
+    # ssm_patch_baselines = {
+    #   RedHatPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["RedHatPatchGroup1Baseline"], {
+    #     rule1_approve_after_days = null
+    #     rule1_approve_until_date = "2026-11-04"
+    #   })
+    # }
   }
 }
