@@ -38,24 +38,7 @@ locals {
       }
     }
 
-    backup_plans = {
-      # delete once qa11g-nomis-web12-a removed
-      qa11g-nomis-web12-a-workaround = {
-        rule = {
-          schedule          = "cron(30 23 ? * MON-FRI *)"
-          start_window      = 60
-          completion_window = 3600
-          delete_after      = 10
-        }
-        selection = {
-          selection_tags = [{
-            type  = "STRINGEQUALS"
-            key   = "server-name"
-            value = "qa11g-nomis-web12-a"
-          }]
-        }
-      }
-    }
+    backup_plans = {}
 
     cloudwatch_dashboards = {
       "CloudWatch-Default" = {
@@ -147,32 +130,6 @@ locals {
         }
         tags = merge(local.ec2_autoscaling_groups.client.tags, {
           domain-name = "azure.noms.root"
-        })
-      })
-
-      # remember to delete associated backup plan
-      qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 0
-        })
-        autoscaling_schedules = {}
-        config = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.config, {
-          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
-            "Ec2Qa11GWeblogicPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.tags, {
-          nomis-environment      = "dev"
-          oracle-db-name         = "qa11g"
-          oracle-db-hostname-a   = "dev-nomis-db19c-1-a"
-          oracle-db-hostname-b   = "none"
-          weblogic-config-target = "qa11g"
         })
       })
 
@@ -763,20 +720,6 @@ locals {
                   }
                 }]
               }
-              qa11g-nomis-web12-a-http-7777 = {
-                priority = 500
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "qa11g-nomis-web12-a-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "qa11g-nomis-web12-a.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
               maintenance = {
                 priority = 999
                 actions = [{
@@ -826,8 +769,6 @@ locals {
           { name = "qa11r-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "qa11r-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-qa11r", type = "A", lbs_map_key = "private" },
-          # weblogic 12
-          { name = "qa11g-nomis-web12-a", type = "A", lbs_map_key = "private" },
         ]
       }
     }
