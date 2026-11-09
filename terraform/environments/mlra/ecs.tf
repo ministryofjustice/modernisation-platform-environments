@@ -12,7 +12,7 @@ module "mlra-ecs" {
   container_instance_type = local.application_data.accounts[local.environment].container_instance_type
   instance_type           = local.application_data.accounts[local.environment].instance_type
   user_data                      = local.user_data
-  user_data_al2023               = local.user_data
+  user_data               = local.user_data
   key_name                       = local.application_data.accounts[local.environment].key_name
   task_definition                = local.task_definition
   ec2_desired_capacity           = local.application_data.accounts[local.environment].ec2_desired_capacity
