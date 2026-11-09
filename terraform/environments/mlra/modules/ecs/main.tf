@@ -398,11 +398,6 @@ resource "aws_ecs_service" "ecs_service" {
   desired_count   = var.app_count
 
   capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.mlra.name
-    weight            = 0
-  }
-
-  capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.mlra-al2023.name
     weight            = 1
   }
@@ -677,7 +672,6 @@ resource "aws_ecs_cluster_capacity_providers" "mlra" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
 
   capacity_providers = [
-    aws_ecs_capacity_provider.mlra.name,
     aws_ecs_capacity_provider.mlra-al2023.name
   ]
 }
