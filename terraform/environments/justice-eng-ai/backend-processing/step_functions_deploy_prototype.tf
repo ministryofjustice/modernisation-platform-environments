@@ -39,7 +39,7 @@ locals {
     ]
     dns = []
   }
-  prototype_deployment_steps = [for stage in ["table", "task_definition", "target_group", "listener_rule", "service", "dns"] : {
+  prototype_deployment_steps = [for stage in ["table", "task_definition", "target_group", "listener_rule", "service"] : {
     name        = "deploy_${stage}"
     type        = "script_runner"
     script_path = "scripts/deployment/prototype_deployment.py"
