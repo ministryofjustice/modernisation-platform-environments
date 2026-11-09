@@ -590,3 +590,4 @@ models:
       model_provider: "OpenAI"
       generally_available: false
       environments_available: ["development", "production"]
+      health_check_mode: "responses"
