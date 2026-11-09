@@ -6,7 +6,7 @@ resource "helm_release" "actions_runner_mojas_airflow" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.337.0-1"
+  version    = "2.337.0-11"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace_v1.actions_runners[0].metadata[0].name
   values = [
