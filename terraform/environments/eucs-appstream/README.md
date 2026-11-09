@@ -242,6 +242,8 @@ A single-purpose local module containing all AWS resources needed for the WorkSp
 | `bundle_id` | `string` | Custom bundle ID (empty = skip workspace provisioning) |
 | `running_mode` | `string` | `AUTO_STOP` or `ALWAYS_ON` |
 | `auto_stop_timeout` | `number` | Inactivity timeout in minutes |
+| `root_volume_size_gib` | `number` | Root volume size in GiB (default `175`, must match/exceed bundle) |
+| `user_volume_size_gib` | `number` | User volume size in GiB (default `100`, must match/exceed bundle) |
 | `ip_group_allowed_cidrs` | `list(object)` | Allowed client IP ranges |
 | `workspace_users` | `map(string)` | User key → AD username mapping |
 | `security_group_name` | `string` | Override SG name (for importing existing resources) |
