@@ -1,32 +1,33 @@
 #!/bin/bash -xe
-# TODO LASB-5089 Remove
 echo ECS_CLUSTER=${app_ecs_cluster} >> /etc/ecs/ecs.config
-yum install -y aws-cfn-bootstrap awslogs
-cat >/etc/awslogs/awslogs.conf <<-EOF
-[general]
-state_file = /var/lib/awslogs/agent-state
-
-[/var/log/secure]
-datetime_format = %b %d %H:%M:%S
-file = /var/log/secure
-buffer_duration = 5000
-log_stream_name = secure/{instance_id}
-initial_position = start_of_file
-log_group_name = ${maat_ec2_log_group}
-
-[/var/log/messages]
-datetime_format = %b %d %H:%M:%S
-file = /var/log/messages
-buffer_duration = 5000
-log_stream_name = messages/{instance_id}
-initial_position = start_of_file
-log_group_name = ${maat_ec2_log_group}
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
+# Install CloudWatch Agent
+yum install -y amazon-cloudwatch-agent
+# Write CloudWatch Agent config (provided via Terraform)
+cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<-EOF
+${cw_agent_config}
 EOF
-chmod 644 /etc/awslogs/awslogs.conf
-# Change region
-sed -i 's/^region = .*/region = eu-west-2/g' /etc/awslogs/awscli.conf
-sudo systemctl start awslogsd
-sudo systemctl enable awslogsd.service
+
+chmod 644 /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+
+# Start rsyslog
+sudo yum install -y rsyslog
+sudo systemctl enable rsyslog
+sudo systemctl start rsyslog
+
+# Start CloudWatch Agent
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config \
+  -m ec2 \
+  -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+
+sudo systemctl enable amazon-cloudwatch-agent
+sudo systemctl start amazon-cloudwatch-agent
+
+
+# Install prerequisites for Cortex agent
+sudo yum install -y selinux-policy-devel
 
 # Install XDR agent stored in S3 bucket
 XDR_AGENT_BUCKET="s3://modernisation-platform-laa-shared20250605080758955300000001/laa-platform/xdr-agent/"
@@ -36,7 +37,7 @@ else
   AGENT_PATH="pre-prod/cortex-agent.tar.gz"
 fi
 
-aws s3 cp $${XDR_AGENT_BUCKET}$${AGENT_PATH} ${xdr_tar}
+aws s3 cp "$${XDR_AGENT_BUCKET}$${AGENT_PATH}" "${xdr_tar}"
 
 if [[ -f ${xdr_tar} ]]; then
   mkdir -p ${xdr_dir}

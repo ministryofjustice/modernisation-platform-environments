@@ -151,7 +151,7 @@ resource "aws_launch_template" "maat_ec2_launch_template_al2023" {
     security_groups = [aws_security_group.maat_ecs_security_group.id]
   }
 
-  user_data = base64encode(templatefile("maat-ec2-user-data-al2023.sh", {
+  user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
     maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group,
     app_ecs_cluster    = aws_ecs_cluster.maat_ecs_cluster.name,
     environment        = local.environment,
