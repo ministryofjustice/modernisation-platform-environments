@@ -213,6 +213,7 @@ resource "aws_workspaces_workspace" "this" {
   workspace_properties {
     running_mode                              = var.running_mode
     running_mode_auto_stop_timeout_in_minutes = var.running_mode == "AUTO_STOP" ? var.auto_stop_timeout : null
+    compute_type_name                         = var.compute_type_name
     root_volume_size_gib                      = var.root_volume_size_gib
     user_volume_size_gib                      = var.user_volume_size_gib
   }
