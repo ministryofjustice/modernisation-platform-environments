@@ -38,8 +38,6 @@ locals {
       }
     }
 
-    backup_plans = {}
-
     cloudwatch_dashboards = {
       "CloudWatch-Default" = {
         periodOverride = "auto"
