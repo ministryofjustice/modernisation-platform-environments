@@ -56,8 +56,8 @@ consumer client-ID allowlist. Health remains public.
 Use a dedicated benefit-checker API registration, not the file-transfer API's
 registration or upload permission. Configure `entra.api_audience` with its API
 client ID and `entra.allowed_client_ids` with approved consumer application IDs.
-The DEVL tenant is configured; the API and consumer IDs are intentionally empty
-until registration is approved. Planning is blocked while they are missing.
+The DEVL tenant, API and consumer IDs are configured from the successful IDAM
+apply. A precondition continues to block missing or malformed identity settings.
 
 The former caller Basic/shared-token secrets and tables remain in state during
 migration, but the JWT route does not use them. The old Lambda authorizer invoke
@@ -79,3 +79,8 @@ The dedicated registrations are requested in
 After IDAM applies it, use the `pilot_api_configuration` output to populate this
 component's `entra.api_audience` and `entra.allowed_client_ids`. The client uses
 its `token_scope`. No credentials belong in application_variables.json.
+
+The registration apply succeeded in
+[run 42643076503](https://github.com/ministryofjustice/staff-identity-idam-entra-infra/actions/runs/42643076503).
+The development IDs come from its `pilot_api_configuration` output. These are
+public configuration identifiers; no client credential is stored here.
