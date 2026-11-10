@@ -37,7 +37,9 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # GitHub Runner
+        "20.58.27.30/32"      # octo-production
       ]
       rds = {
         engine_version          = "18.4"
@@ -60,7 +62,9 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # GitHub Runner
+        "20.58.27.30/32"      # octo-production
       ]
       rds = {
         engine_version          = "18.4"
