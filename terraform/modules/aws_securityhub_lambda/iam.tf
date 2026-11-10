@@ -91,7 +91,7 @@ data "aws_iam_policy_document" "securityhub_web_identity" {
 }
 
 resource "aws_iam_role" "securityhub" {
-  name               = "${var.project_name}-securityhub-lambda"
+  name               = "${var.project_name}-lambda"
   assume_role_policy = data.aws_iam_policy_document.securityhub_assume_role.json
 }
 
