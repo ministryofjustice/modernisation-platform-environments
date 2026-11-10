@@ -36,10 +36,15 @@ StreamMaxLength 320M
 User clamscan
 EOF
 
+# Create freshclam log file in advance
+touch /var/log/freshclam.log
+
 # Base Freshclam Config
 cat << EOF > /etc/freshclam.conf
 ## Minimal config
 DatabaseDirectory /var/lib/clamav
+DatabaseMirror database.clamav.net
+Checks 12
 LogFileMaxSize 1M
 LogRotate yes
 LogTime yes
