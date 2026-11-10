@@ -5,6 +5,7 @@ resource "aws_db_instance" "wardship_db" {
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   #checkov:skip=CKV_AWS_354: "Ensure RDS Performance Insights are encrypted using KMS CMKs"
+  #checkov:skip=CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled" - replaced by wardship_db_v2 and being deleted
   allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
   db_name                         = local.application_data.accounts[local.environment].db_name
   storage_type                    = local.application_data.accounts[local.environment].storage_type
@@ -16,7 +17,7 @@ resource "aws_db_instance" "wardship_db" {
   password                        = random_password.password.result
   skip_final_snapshot             = false
   final_snapshot_identifier       = "${local.application_data.accounts[local.environment].identifier}-final-snapshot"
-  deletion_protection             = true
+  deletion_protection             = false
   publicly_accessible             = false
   vpc_security_group_ids          = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
