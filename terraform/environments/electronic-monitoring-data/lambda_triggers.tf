@@ -61,7 +61,7 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
 module "process_fms_metadata_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.fms_expected_file_processor.lambda_function_name
+  lambda_function_name = module.format_fms_json_event_queue.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
