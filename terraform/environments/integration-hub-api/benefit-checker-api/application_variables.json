@@ -27,9 +27,7 @@
       "entra": {
         "tenant_id": "0bb413d7-160d-4839-868a-f3d46537f6af",
         "api_audience": "295ebc85-3771-449b-a125-1d0344e11614",
-        "allowed_client_ids": [
-          "9284ec07-518e-4641-a73e-681b639255b3"
-        ]
+        "allowed_client_ids": ["9284ec07-518e-4641-a73e-681b639255b3"]
       }
     },
     "test": {
