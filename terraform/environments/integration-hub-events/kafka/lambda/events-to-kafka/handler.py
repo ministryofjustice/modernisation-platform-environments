@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 import os
@@ -30,11 +31,31 @@ producer = KafkaProducer(
 )
 
 
+def response(status_code, message):
+    return {
+        "statusCode": status_code,
+        "headers": {"content-type": "application/json"},
+        "body": json.dumps({"message": message}),
+    }
+
+
 def lambda_handler(event, context):
-    # An exception here fails the invocation so EventBridge retries it
+    # API Gateway HTTP API (payload format 2.0) request
+    event_name = event["pathParameters"]["eventName"]
+    body = event.get("body") or "{}"
+    if event.get("isBase64Encoded"):
+        body = base64.b64decode(body).decode("utf-8")
+
+    try:
+        payload = json.loads(body)
+    except ValueError:
+        return response(400, "Request body must be valid JSON")
+
+    # An exception here returns a 500 to the caller
     producer.send(
         TOPIC,
-        key=event["id"].encode("utf-8"),
-        value=json.dumps(event).encode("utf-8"),
+        key=event["requestContext"]["requestId"].encode("utf-8"),
+        value=json.dumps({"name": event_name, "payload": payload}).encode("utf-8"),
     ).get(timeout=30)
-    logger.info("Published event %s to topic %s", event["id"], TOPIC)
+    logger.info("Published event %s to topic %s", event_name, TOPIC)
+    return response(200, "Event published")
