@@ -6,6 +6,10 @@
         "live": "container-platform-octo-live",
         "nonlive": "container-platform-octo-nonlive"
       },
+      "amp_enabled": {
+        "live": false,
+        "nonlive": true
+      },
       "grafana_enabled": {
         "live": false,
         "nonlive": false
@@ -16,6 +20,10 @@
       "amp_workspace_aliases": {
         "live": "container-platform-laa-live",
         "nonlive": "container-platform-laa-nonlive"
+      },
+      "amp_enabled": {
+        "live": false,
+        "nonlive": false
       },
       "grafana_enabled": {
         "live": false,
@@ -28,6 +36,10 @@
         "live": "container-platform-hmpps-live",
         "nonlive": "container-platform-hmpps-nonlive"
       },
+      "amp_enabled": {
+        "live": false,
+        "nonlive": false
+      },
       "grafana_enabled": {
         "live": false,
         "nonlive": false
@@ -38,6 +50,10 @@
       "amp_workspace_aliases": {
         "live": "container-platform-cd-live",
         "nonlive": "container-platform-cd-nonlive"
+      },
+      "amp_enabled": {
+        "live": false,
+        "nonlive": false
       },
       "grafana_enabled": {
         "live": false,
