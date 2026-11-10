@@ -26,7 +26,8 @@ locals {
       grafana_objects_enabled = true
     }
     cloud-platform-live = {
-      account_subdomain_name = "live.${local.base_domain}"
+      account_subdomain_name  = "live.${local.base_domain}"
+      grafana_objects_enabled = true
     }
     container-platform-octo-nonlive = {
       account_subdomain_name = "octo-nonlive.${local.base_domain}"
