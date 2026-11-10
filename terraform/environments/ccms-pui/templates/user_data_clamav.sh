@@ -36,23 +36,6 @@ StreamMaxLength 320M
 User clamscan
 EOF
 
-# Create freshclam log file in advance
-touch /var/log/freshclam.log
-
-# Base Freshclam Config
-cat << EOF > /etc/freshclam.conf
-## Minimal config
-DatabaseDirectory /var/lib/clamav
-DatabaseMirror database.clamav.net
-Checks 12
-LogFileMaxSize 1M
-LogRotate yes
-LogTime yes
-LogVerbose no
-NotifyClamd /etc/clamd.d/scan.conf
-UpdateLogFile /var/log/freshclam.log
-EOF
-
 # Enable and Activate ClamAV Scan Daemon and Freshclam Services
 systemctl enable --now clamav-freshclam.service
 systemctl enable --now clamd@scan.service
