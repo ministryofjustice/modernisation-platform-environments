@@ -479,6 +479,19 @@ resource "aws_lambda_permission" "allow_eventbridge_emdi_position" {
   source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
 }
 
+# Keep scheduled AC and EMDI merge events from building an async backlog.
+resource "aws_lambda_function_event_invoke_config" "merge_ac_position" {
+  function_name                = module.merge_ac_position[0].lambda_function_name
+  maximum_event_age_in_seconds = 300
+  maximum_retry_attempts       = 2
+}
+
+resource "aws_lambda_function_event_invoke_config" "merge_emdi_position" {
+  function_name                = module.merge_emdi_position[0].lambda_function_name
+  maximum_event_age_in_seconds = 300
+  maximum_retry_attempts       = 2
+}
+
 # --------------------------------------------------------
 # update_p1_export
 # --------------------------------------------------------
@@ -759,6 +772,107 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
     aws_lakeformation_permissions.merge_redrive_planner_database_access,
     aws_lakeformation_permissions.merge_redrive_planner_table_access,
     aws_iam_role_policy_attachment.merge_redrive_planner,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation Lake Formation permission repair
+# Reapply table grants after CADT creates AC and EMDI tables.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_lf_databases = [
+    "acquisitive_crime${local.dbt_suffix}",
+    "data_insights${local.dbt_suffix}",
+  ]
+
+  downstream_reconciliation_lf_backstop = tomap({
+    ac   = "acquisitive_crime${local.dbt_suffix}"
+    emdi = "data_insights${local.dbt_suffix}"
+  })
+}
+
+resource "aws_cloudwatch_event_rule" "downstream_reconciliation_lf_create_table" {
+  name = "downstream_reconciliation_lf_create_table"
+
+  description = (
+    "Repairs reconciliation Lake Formation grants after table creation"
+  )
+
+  event_pattern = jsonencode({
+    source      = ["aws.glue"]
+    "detail-type" = ["Glue Data Catalog Database State Change"]
+
+    detail = {
+      typeOfChange = ["CreateTable"]
+      databaseName = local.downstream_reconciliation_lf_databases
+      changedTables = [
+        "position",
+        "device_activations",
+      ]
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "downstream_reconciliation_lf_create_table" {
+  rule = (
+    aws_cloudwatch_event_rule.downstream_reconciliation_lf_create_table.name
+  )
+
+  target_id = "RepairReconciliationLakeFormationPermissions"
+  arn       = module.downstream_reconciliation_lf_permissions.arn
+  role_arn  = aws_iam_role.downstream_reconciliation_lf_events.arn
+
+  input_transformer {
+    input_paths = {
+      database = "$.detail.databaseName"
+      tables   = "$.detail.changedTables"
+    }
+
+    input_template = <<-EOT
+      {"database": <database>, "tables": <tables>}
+    EOT
+  }
+
+  depends_on = [
+    aws_lakeformation_data_lake_settings.settings,
+  ]
+}
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_lf_backstop" {
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_lf_backstop
+    : tomap({})
+  )
+
+  name = "downstream_reconciliation_lf_${each.key}_backstop"
+
+  description = (
+    "Rechecks ${upper(each.key)} reconciliation Lake Formation grants"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = "rate(5 minutes)"
+
+  target {
+    arn      = module.downstream_reconciliation_lf_permissions.arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      database = each.value
+      tables = [
+        "position",
+        "device_activations",
+      ]
+    })
+  }
+
+  depends_on = [
+    aws_lakeformation_data_lake_settings.settings,
   ]
 }
 

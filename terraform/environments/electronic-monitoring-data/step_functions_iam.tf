@@ -324,6 +324,96 @@ resource "aws_iam_policy" "downstream_reconciliation_audit" {
 }
 
 # ------------------------------------------------------------------------------
+# Downstream reconciliation Lake Formation permission repair
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "downstream_reconciliation_lf_permissions" {
+  statement {
+    sid    = "ReadReconciliationTables"
+    effect = "Allow"
+
+    actions = [
+      "glue:GetTable",
+    ]
+
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/acquisitive_crime${local.dbt_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights${local.dbt_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquisitive_crime${local.dbt_suffix}/position",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquisitive_crime${local.dbt_suffix}/device_activations",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights${local.dbt_suffix}/position",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights${local.dbt_suffix}/device_activations",
+    ]
+  }
+
+  statement {
+    sid    = "RepairReconciliationLakeFormationPermissions"
+    effect = "Allow"
+
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:ListPermissions",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "downstream_reconciliation_lf_permissions" {
+  name = (
+    "downstream_reconciliation_lf_permissions_step_function_policy"
+  )
+
+  policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_lf_permissions.json
+  )
+}
+
+data "aws_iam_policy_document" "downstream_reconciliation_lf_events_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "downstream_reconciliation_lf_events" {
+  name = "downstream_reconciliation_lf_events_role"
+
+  assume_role_policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_lf_events_assume.json
+  )
+}
+
+resource "aws_iam_role_policy" "downstream_reconciliation_lf_events" {
+  name = "downstream_reconciliation_lf_events_start_policy"
+  role = aws_iam_role.downstream_reconciliation_lf_events.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "states:StartExecution",
+        ]
+
+        Resource = [
+          module.downstream_reconciliation_lf_permissions.arn,
+        ]
+      },
+    ]
+  })
+}
+
+# ------------------------------------------------------------------------------
 # Downstream position reconciliation scheduler
 # ------------------------------------------------------------------------------
 
@@ -374,6 +464,7 @@ resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
           module.merge_into_mdss_staged_position.arn,
           module.merge_into_mdss_ac_position.arn,
           module.merge_into_emdi_position.arn,
+          module.downstream_reconciliation_lf_permissions.arn,
         ]
       },
       {
