@@ -718,6 +718,103 @@ resource "aws_lambda_permission" "allow_eventbridge_specials_remediation" {
 }
 
 # ------------------------------------------------------------------------------
+# AC morning readiness
+# Track CADT completion and evaluate readiness every five minutes each morning.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "ac_readiness_cadt_completion" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "ac_readiness_cadt_completion"
+
+  description = (
+    "Records successful or failed CADT completion for AC morning readiness"
+  )
+
+  event_pattern = jsonencode({
+    source      = ["aws.ecs"]
+    "detail-type" = ["ECS Task State Change"]
+
+    detail = {
+      clusterArn = [aws_ecs_cluster.cadt.arn]
+      lastStatus = ["STOPPED"]
+      taskDefinitionArn = [
+        {
+          prefix = (
+            "arn:aws:ecs:${data.aws_region.current.name}:${local.env_account_id}:task-definition/${aws_ecs_task_definition.create_a_derived_table.family}:"
+          )
+        },
+      ]
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "ac_readiness_cadt_completion" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  rule = aws_cloudwatch_event_rule.ac_readiness_cadt_completion[0].name
+  arn  = module.merge_redrive_planner.lambda_function_arn
+
+  input_transformer {
+    input_paths = {
+      task_arn = "$.detail.taskArn"
+    }
+
+    input_template = <<-EOT
+      {"action":"record_cadt_completion","task_arn":<task_arn>}
+    EOT
+  }
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_ac_readiness_cadt_completion" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  statement_id  = "AllowEventBridgeAcReadinessCadtCompletion"
+  action        = "lambda:InvokeFunction"
+  function_name = module.merge_redrive_planner.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.ac_readiness_cadt_completion[0].arn
+}
+
+resource "aws_scheduler_schedule" "ac_morning_readiness" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "ac_morning_readiness"
+
+  description = (
+    "Checks AC morning readiness every five minutes from 03:00 to 11:55"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(0/5 3-11 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.merge_redrive_planner.lambda_function_arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      action = "run_ac_morning_readiness"
+    })
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+  ]
+}
+
+# ------------------------------------------------------------------------------
 # Rolling downstream position reconciliation
 # Run each consumer every four hours through its existing merge orchestration.
 # ------------------------------------------------------------------------------
