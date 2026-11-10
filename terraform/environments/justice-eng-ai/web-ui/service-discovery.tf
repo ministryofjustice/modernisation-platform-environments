@@ -31,3 +31,18 @@ resource "aws_service_discovery_service" "forge" {
 
   tags = local.tags
 }
+
+# AWS's deregistration of the ECS task's Cloud Map instance (triggered when
+# aws_ecs_service.forge is updated/destroyed) isn't immediately visible to
+# the ServiceDiscovery API, so deleting the service straight after can fail
+# with "ResourceInUse: Service contains registered instances". Depending on
+# the service here and delaying this resource's own destruction pushes
+# *its* removal until after the ECS service's -- which, because Terraform
+# destroys in reverse-dependency order, is exactly the gap that needs the wait.
+resource "time_sleep" "forge_service_discovery_deregistration" {
+  count = local.forge_single_url_enabled ? 1 : 0
+
+  depends_on       = [aws_service_discovery_service.forge]
+  destroy_duration = "60s"
+}
+
