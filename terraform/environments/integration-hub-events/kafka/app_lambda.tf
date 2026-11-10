@@ -73,6 +73,9 @@ module "events_to_kafka" {
     }
   }
 
+  # The module attaches the permission to the unqualified function; $LATEST permissions are not supported
+  create_current_version_allowed_triggers = false
+
   allowed_triggers = {
     eventbridge = {
       principal  = "events.amazonaws.com"
