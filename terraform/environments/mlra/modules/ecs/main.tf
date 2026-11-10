@@ -22,7 +22,7 @@ data "aws_subnets" "shared-private" {
   }
 }
 
-resource "aws_autoscaling_group" "cluster-scaling-group-al2023" {
+resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
   name_prefix           = "${var.app_name}-ec2-al2023-"
   desired_capacity      = var.ec2_desired_capacity
@@ -656,7 +656,7 @@ resource "aws_ecs_capacity_provider" "mlra-al2023" {
   name = "${var.app_name}-${var.environment}-capacity-provider-al2023"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group-al2023.arn
+    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
     managed_termination_protection = "ENABLED"
 
     managed_scaling {
