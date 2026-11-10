@@ -12,7 +12,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 sts = boto3.client("sts", region_name=os.getenv("AWS_REGION"))
-VALID_SEVERITY_LABELS = {"INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"}
 
 
 def get_web_identity_token(audience, duration_seconds, signing_algorithm):
@@ -101,32 +100,43 @@ def get_ignored_findings():
     return findings
 
 
-def get_finding_severity_labels():
+def get_string_set(name, default, allow_empty=False):
     try:
-        labels = json.loads(os.getenv("FINDING_SEVERITY_LABELS", '["CRITICAL"]'))
+        values = json.loads(os.getenv(name, default))
     except ValueError as error:
-        logger.error("FINDING_SEVERITY_LABELS must contain a JSON array")
-        raise ValueError("FINDING_SEVERITY_LABELS must contain a JSON array") from error
+        message = f"{name} must contain a JSON array"
+        logger.error(message)
+        raise ValueError(message) from error
 
     if (
-        not isinstance(labels, list)
-        or not labels
-        or any(
-            not isinstance(label, str) or label not in VALID_SEVERITY_LABELS
-            for label in labels
-        )
+        not isinstance(values, list)
+        or (not values and not allow_empty)
+        or any(not isinstance(value, str) or not value.strip() for value in values)
     ):
-        message = (
-            "FINDING_SEVERITY_LABELS must contain one or more valid "
-            "Security Hub severity labels"
-        )
+        message = f"{name} must contain a JSON array of non-empty strings"
         logger.error(message)
         raise ValueError(message)
 
-    return set(labels)
+    return set(values)
+
+
+def get_finding_severity_labels():
+    valid_labels = get_string_set(
+        "VALID_SEVERITY_LABELS",
+        '["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"]',
+    )
+    labels = get_string_set("FINDING_SEVERITY_LABELS", '["CRITICAL"]')
+    if not labels <= valid_labels:
+        message = "FINDING_SEVERITY_LABELS must be included in VALID_SEVERITY_LABELS"
+        logger.error(message)
+        raise ValueError(message)
+    return labels
 
 
 def build_github_issue(finding):
+    resource_keys_to_exclude = get_string_set(
+        "RESOURCE_KEYS_TO_EXCLUDE", '["Tags", "Details"]', allow_empty=True
+    )
     title = finding.get("Title") or "Untitled Security Hub finding"
     severity_details = finding.get("Severity")
     severity = (
@@ -151,7 +161,17 @@ def build_github_issue(finding):
             "## Finding types\n" + "\n".join(f"- {item}" for item in finding["Types"])
         )
     if finding.get("Resources"):
-        resources = json.dumps(finding["Resources"], indent=2)
+        resources = json.dumps(
+            [
+                {
+                    key: value
+                    for key, value in resource.items()
+                    if key not in resource_keys_to_exclude
+                }
+                for resource in finding["Resources"]
+            ],
+            indent=2,
+        )
         sections.append(f"## Resources\n```json\n{resources}\n```")
     remediation = finding.get("Remediation")
     recommendation_details = (
@@ -165,7 +185,10 @@ def build_github_issue(finding):
     if recommendation:
         sections.append(f"## Remediation\n{recommendation}")
     if finding.get("Id"):
-        sections.append(f"## Finding ID\n{finding['Id']}")
+        finding_id = finding["Id"]
+        if finding_id.startswith("arn:"):
+            finding_id = finding_id.rsplit("/", 1)[-1].rsplit(":", 1)[-1]
+        sections.append(f"## Finding ID\n{finding_id}")
 
     return {
         "title": issue_title,
