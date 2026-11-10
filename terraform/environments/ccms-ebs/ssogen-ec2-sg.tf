@@ -103,6 +103,15 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
   referenced_security_group_id = aws_security_group.ec2_sg_ebsdb.id
 }
 
+resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds_tls" {
+  count                        = local.ssogen_enabled ? 1 : 0
+  security_group_id            = aws_security_group.ssogen_sg[count.index].id
+  description                  = "Allow outbound to RDS"
+  from_port                    = local.application_data.accounts[local.environment].tg_db_ssl_port
+  to_port                      = local.application_data.accounts[local.environment].tg_db_ssl_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.ec2_sg_ebsdb.id
+}
 # #########################################
 # # SSOGEN Security Group — Allow Outbound 443 from ssogen EC2 to SSM (for Session Manager)
 # #########################################
