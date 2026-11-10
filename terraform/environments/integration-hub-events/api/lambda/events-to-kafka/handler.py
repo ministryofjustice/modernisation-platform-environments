@@ -54,7 +54,7 @@ def lambda_handler(event, context):
     # An exception here returns a 500 to the caller
     producer.send(
         TOPIC,
-        key=event["requestContext"]["requestId"].encode("utf-8"),
+        key=event_name.encode("utf-8"),
         value=json.dumps({"name": event_name, "payload": payload}).encode("utf-8"),
     ).get(timeout=30)
     logger.info("Published event %s to topic %s", event_name, TOPIC)
