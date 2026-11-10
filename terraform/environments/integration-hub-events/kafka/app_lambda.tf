@@ -37,7 +37,8 @@ module "events_to_kafka" {
   handler                           = "handler.lambda_handler"
   ignore_source_code_hash           = true
   runtime                           = "python3.12"
-  timeout                           = 60
+  memory_size                       = 512
+  timeout                           = 30 # API Gateway gives up on an integration after 30 seconds
   source_path = [{
     path             = "${path.module}/../api/lambda/events-to-kafka"
     pip_requirements = true

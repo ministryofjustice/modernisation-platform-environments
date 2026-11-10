@@ -11,6 +11,7 @@ module "create_topics" {
   handler                           = "handler.lambda_handler"
   ignore_source_code_hash           = true
   runtime                           = "python3.12"
+  memory_size                       = 256
   timeout                           = 120
   source_path = [{
     path             = "${path.module}/lambda/create-topics"

@@ -4,6 +4,7 @@ import os
 from aws_msk_iam_sasl_signer import MSKAuthTokenProvider
 from kafka.admin import KafkaAdminClient, NewTopic
 from kafka.errors import TopicAlreadyExistsError
+from kafka.sasl.oauth import AbstractTokenProvider
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -12,7 +13,7 @@ REGION = os.environ["AWS_REGION"]
 BOOTSTRAP_SERVERS = os.environ["BOOTSTRAP_SERVERS"].split(",")
 
 
-class TokenProvider:
+class TokenProvider(AbstractTokenProvider):
     def token(self):
         token, _ = MSKAuthTokenProvider.generate_auth_token(REGION)
         return token
