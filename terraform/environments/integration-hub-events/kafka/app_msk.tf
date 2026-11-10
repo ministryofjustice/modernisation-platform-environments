@@ -62,3 +62,36 @@ resource "aws_vpc_security_group_ingress_rule" "private_subnets" {
   ip_protocol       = "tcp"
   cidr_ipv4         = each.value
 }
+
+# The Lambda event source mapping poller runs in the cluster subnets using this
+# security group, so it needs to reach the brokers and, for IAM auth, STS.
+resource "aws_vpc_security_group_ingress_rule" "msk_self" {
+  count                        = contains(local.deploy_to, local.environment) ? 1 : 0
+  security_group_id            = aws_security_group.msk[0].id
+  description                  = "Allow broker traffic from members of this security group"
+  from_port                    = 9098
+  to_port                      = 9098
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.msk[0].id
+}
+
+resource "aws_vpc_security_group_egress_rule" "msk_self" {
+  count                        = contains(local.deploy_to, local.environment) ? 1 : 0
+  security_group_id            = aws_security_group.msk[0].id
+  description                  = "Allow broker traffic to members of this security group"
+  from_port                    = 9098
+  to_port                      = 9098
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.msk[0].id
+}
+
+resource "aws_vpc_security_group_egress_rule" "msk_https" {
+  #checkov:skip=CKV_AWS_382:HTTPS egress is required for the Lambda poller to reach STS and the Lambda service
+  count             = contains(local.deploy_to, local.environment) ? 1 : 0
+  security_group_id = aws_security_group.msk[0].id
+  description       = "Allow HTTPS for STS and Lambda service calls"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+}
