@@ -5,6 +5,10 @@
       "amp_workspace_aliases": {
         "live": "container-platform-octo-live",
         "nonlive": "container-platform-octo-nonlive"
+      },
+      "grafana_enabled": {
+        "live": false,
+        "nonlive": false
       }
     },
     "laa": {
@@ -12,6 +16,10 @@
       "amp_workspace_aliases": {
         "live": "container-platform-laa-live",
         "nonlive": "container-platform-laa-nonlive"
+      },
+      "grafana_enabled": {
+        "live": false,
+        "nonlive": false
       }
     },
     "hmpps": {
@@ -19,6 +27,10 @@
       "amp_workspace_aliases": {
         "live": "container-platform-hmpps-live",
         "nonlive": "container-platform-hmpps-nonlive"
+      },
+      "grafana_enabled": {
+        "live": false,
+        "nonlive": false
       }
     },
     "cd": {
@@ -26,6 +38,10 @@
       "amp_workspace_aliases": {
         "live": "container-platform-cd-live",
         "nonlive": "container-platform-cd-nonlive"
+      },
+      "grafana_enabled": {
+        "live": false,
+        "nonlive": false
       }
     }
   }
