@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "cloudwatch_logs_clamav" {
 
 resource "aws_iam_role_policy" "cloudwatch_logs_clamav" {
   name   = "${local.application_name}-clamav-cloudwatch-logs"
-  role   = aws_iam_role.clamav_role.id
+  role   = aws_iam_role.clamav_role.name
   policy = data.aws_iam_policy_document.cloudwatch_logs_clamav.json
 }
 
