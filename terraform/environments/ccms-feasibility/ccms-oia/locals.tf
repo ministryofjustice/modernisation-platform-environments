@@ -5,16 +5,21 @@ locals {
     data.aws_subnet.private_subnets_c.cidr_block,
   ]
 
+  vpce_subnets_cidr_blocks = [
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ]
+
   opahub_name    = "ccms-opahub"
   connector_name = "ccms-connector"
   adaptor_name   = "ccms-adaptor"
 
   # OPAHub runs on its own cluster; Connector and Service Adaptor share the second,
-  # matching the split in the original ccms-oia stack
   opa_cluster_name      = "${local.component_name}-${local.env_label}-opa-cluster"
   conn_saa_cluster_name = "${local.component_name}-${local.env_label}-conn-saa-cluster"
 
-  # Hostnames of this and the sibling feasibility components, all in the same external zone
+  # Hostnames of feasibility components
   external_domain    = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   soa_hostname       = "ccms-soa-managed-${local.env_label}.${local.external_domain}"
   opahub_hostname    = "${local.opahub_name}-${local.env_label}.${local.external_domain}"

@@ -142,13 +142,36 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opahub_from_alb_health
   referenced_security_group_id = aws_security_group.alb_opahub.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opahub_egress_https" {
+# OPAHub tasks: AWS APIs via VPC endpoints and internal load balancers in the private subnets
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opahub_egress_vpce" {
+  for_each = toset(local.vpce_subnets_cidr_blocks)
+
   security_group_id = aws_security_group.ecs_tasks_opahub.id
-  description       = "Allow outbound HTTPS"
+  description       = "Allow egress to VPC endpoints (ECR, ECS, Logs, Secrets Manager, SSM)"
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = each.value
+}
+
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opahub_egress_s3" {
+  security_group_id = aws_security_group.ecs_tasks_opahub.id
+  description       = "Allow S3 access via the gateway endpoint"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_id    = data.aws_prefix_list.s3.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opahub_egress_private" {
+  for_each = toset(local.private_subnets_cidr_blocks)
+
+  security_group_id = aws_security_group.ecs_tasks_opahub.id
+  description       = "HTTPS to internal load balancers in the private subnets"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = each.value
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opahub_egress_rds" {
@@ -221,14 +244,36 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_adaptor_from_alb" {
   referenced_security_group_id = aws_security_group.alb_adaptor.id
 }
 
-# OPAHub assess services via the OPAHub ALB
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_https" {
+# Adaptor tasks: AWS APIs via VPC endpoints and the OPAHub ALB in the private subnets
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_vpce" {
+  for_each = toset(local.vpce_subnets_cidr_blocks)
+
   security_group_id = aws_security_group.ecs_tasks_adaptor.id
-  description       = "Allow outbound HTTPS"
+  description       = "Allow egress to VPC endpoints (ECR, ECS, Logs, Secrets Manager, SSM)"
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = each.value
+}
+
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_s3" {
+  security_group_id = aws_security_group.ecs_tasks_adaptor.id
+  description       = "Allow S3 access via the gateway endpoint"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_id    = data.aws_prefix_list.s3.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_private" {
+  for_each = toset(local.private_subnets_cidr_blocks)
+
+  security_group_id = aws_security_group.ecs_tasks_adaptor.id
+  description       = "HTTPS to the OPAHub ALB in the private subnets"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = each.value
 }
 
 # OPA Cluster EC2 Security Group (the underlying hosts)
@@ -243,14 +288,25 @@ resource "aws_security_group" "opa_cluster_ec2" {
   })
 }
 
-# ECS agent, ECR, SSM, CloudWatch Logs, Secrets Manager and dnf repos over HTTPS
-resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_https" {
+# ECS agent, ECR, SSM and CloudWatch via VPC endpoints; ECR layers and dnf repos via S3
+resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_vpce" {
+  for_each = toset(local.vpce_subnets_cidr_blocks)
+
   security_group_id = aws_security_group.opa_cluster_ec2.id
-  description       = "Allow outbound HTTPS"
+  description       = "Allow egress to VPC endpoints (ECR, ECS, Logs, Secrets Manager, SSM)"
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = each.value
+}
+
+resource "aws_vpc_security_group_egress_rule" "opa_cluster_ec2_egress_s3" {
+  security_group_id = aws_security_group.opa_cluster_ec2.id
+  description       = "Allow S3 access via the gateway endpoint"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_id    = data.aws_prefix_list.s3.id
 }
 
 # Connector / Service Adaptor Cluster EC2 Security Group (the underlying hosts)
@@ -265,14 +321,25 @@ resource "aws_security_group" "conn_saa_cluster_ec2" {
   })
 }
 
-# ECS agent, ECR, SSM, CloudWatch Logs, Secrets Manager and dnf repos over HTTPS
-resource "aws_vpc_security_group_egress_rule" "conn_saa_cluster_ec2_egress_https" {
+# ECS agent, ECR, SSM and CloudWatch via VPC endpoints; ECR layers and dnf repos via S3
+resource "aws_vpc_security_group_egress_rule" "conn_saa_cluster_ec2_egress_vpce" {
+  for_each = toset(local.vpce_subnets_cidr_blocks)
+
   security_group_id = aws_security_group.conn_saa_cluster_ec2.id
-  description       = "Allow outbound HTTPS"
+  description       = "Allow egress to VPC endpoints (ECR, ECS, Logs, Secrets Manager, SSM)"
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = each.value
+}
+
+resource "aws_vpc_security_group_egress_rule" "conn_saa_cluster_ec2_egress_s3" {
+  security_group_id = aws_security_group.conn_saa_cluster_ec2.id
+  description       = "Allow S3 access via the gateway endpoint"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_id    = data.aws_prefix_list.s3.id
 }
 
 # RDS Security Group
@@ -303,13 +370,6 @@ resource "aws_vpc_security_group_ingress_rule" "rds_from_ecs_tasks_opahub" {
   from_port                    = 3306
   to_port                      = 3306
   referenced_security_group_id = aws_security_group.ecs_tasks_opahub.id
-}
-
-resource "aws_vpc_security_group_egress_rule" "rds_egress_all" {
-  security_group_id = aws_security_group.rds.id
-  description       = "Allow all outbound traffic"
-  ip_protocol       = "-1"
-  cidr_ipv4         = "0.0.0.0/0"
 }
 
 # EBS DB SG, managed in the ccms-feasibility/ccms-ebs stack
