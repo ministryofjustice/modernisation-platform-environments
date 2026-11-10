@@ -43,14 +43,11 @@ def lambda_handler(event, context):
     # API Gateway HTTP API (payload format 2.0) request
     event_name = event["pathParameters"]["eventName"]
     body = event.get("body") or "{}"
-    logger.info(
-        "Received request for event %s with body %s",
-        event_name,
-        body,
-    )
+
     if event.get("isBase64Encoded"):
         body = base64.b64decode(body).decode("utf-8")
 
+    logger.info("Received request for event %s with body %s", event_name, body)
     try:
         payload = json.loads(body)
     except ValueError:
