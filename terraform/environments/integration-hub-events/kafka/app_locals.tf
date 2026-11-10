@@ -18,8 +18,4 @@ locals {
       replication_factor = 1
     }
   }
-
-  # Development alerts channel used by the file transfer service (#integration-hub-alerts in Justice Digital)
-  slack_channel_id = "C0CAB9Q6S2U"
-  slack_team_id    = "T02DYEB3A"
 }
