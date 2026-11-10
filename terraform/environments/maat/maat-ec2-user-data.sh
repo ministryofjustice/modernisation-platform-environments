@@ -1,5 +1,6 @@
 #!/bin/bash -xe
-echo ECS_CLUSTER=${app_ecs_cluster} >> /etc/ecs/ecs.config
+# shellcheck disable=SC2034,SC2154
+echo "ECS_CLUSTER=${app_ecs_cluster}" >> /etc/ecs/ecs.config
 dnf update -y ca-certificates --releasever 2023.12.20261026
 update-ca-trust
 # Install CloudWatch Agent
@@ -39,23 +40,22 @@ fi
 
 aws s3 cp "$${XDR_AGENT_BUCKET}$${AGENT_PATH}" "${xdr_tar}"
 
-if [[ -f ${xdr_tar} ]]; then
-  mkdir -p ${xdr_dir}
-  tar -xzf ${xdr_tar} -C ${xdr_dir}
+if [[ -f "${xdr_tar}" ]]; then
+  mkdir -p "${xdr_dir}"
+  tar -xzf "${xdr_tar}" -C "${xdr_dir}"
 
-  if [[ -f ${xdr_dir}/cortex.conf ]]; then
+  if [[ -f "${xdr_dir}/cortex.conf" ]]; then
     sudo mkdir -p /etc/panw
-    sudo cp ${xdr_dir}/cortex.conf /etc/panw/
+    sudo cp "${xdr_dir}/cortex.conf" /etc/panw/
   else
     echo "Missing cortex.conf in extracted archive" >&2
     exit 1
   fi
 
-  sudo yum install -y ${xdr_dir}/*.rpm
+  sudo yum install -y "${xdr_dir}"/*.rpm
   sudo /opt/traps/bin/cytool endpoint_tags add "${xdr_tags}"
 
 else
   echo "XDR agent download failed" >&2
   exit 1
 fi
-
