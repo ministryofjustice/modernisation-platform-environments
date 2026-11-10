@@ -244,7 +244,7 @@ resource "aws_security_group_rule" "ingress_traffic_az_workspace_ebsapps_443" {
 ### The following egress rule is added for Azure Virtual Desktop to connect to EBS Apps instances on HTTPS port 443. 
 resource "aws_security_group_rule" "ingress_traffic_az_workspace_ebsapps_1521_1522" {
   count             = local.environment == "development" ? 1 : 0
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  security_group_id = aws_security_group.avd_sg_ebsapps_internal_alb.id
   type              = "ingress"
   description       = "Oracle DB connection from Azure Virtual Desktop to EBS Apps"
   protocol          = "TCP"
