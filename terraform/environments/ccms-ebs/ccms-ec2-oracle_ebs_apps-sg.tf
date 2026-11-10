@@ -229,6 +229,30 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps_oem_https_7803" {
   cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
 }
 
+### The following egress rule is added for Azure Virtual Desktop to connect to EBS Apps instances on HTTPS port 443. 
+resource "aws_security_group_rule" "ingress_traffic_az_workspace_ebsapps_443" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "ingress"
+  description       = "HTTPS connection from EBS apps to EBS LB - Azure Virtual Desktop"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
+}
+
+### The following egress rule is added for Azure Virtual Desktop to connect to EBS Apps instances on HTTPS port 443. 
+resource "aws_security_group_rule" "ingress_traffic_az_workspace_ebsapps_1521_1522" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "ingress"
+  description       = "Oracle DB connection from Azure Virtual Desktop to EBS Apps"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_blocks       = local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
+}
+
 # EGRESS Rules
 
 ### HTTP
@@ -255,17 +279,6 @@ resource "aws_security_group_rule" "egress_traffic_ebsapps_443" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### The following egress rule is added for Azure Virtual Desktop to connect to EBS Apps instances on HTTPS port 443. 
-resource "aws_security_group_rule" "ingress_traffic_az_workspace_ebsapps_443" {
-  count             = local.environment == "development" ? 1 : 0
-  security_group_id = aws_security_group.ec2_sg_ebsapps.id
-  type              = "ingress"
-  description       = "HTTPS connection from EBS apps to EBS LB - Azure Virtual Desktop"
-  protocol          = "TCP"
-  from_port         = 443
-  to_port           = 443
-  cidr_blocks       = local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
-}
 
 ### FTP
 
