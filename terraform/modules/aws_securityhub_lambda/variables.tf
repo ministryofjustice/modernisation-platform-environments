@@ -31,6 +31,35 @@ variable "github_repo" {
   type        = string
 }
 
+variable "valid_severity_labels" {
+  description = "Accepted Security Hub severity labels used to validate the selected finding severities"
+  type        = list(string)
+  default     = ["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"]
+
+  validation {
+    condition = length(var.valid_severity_labels) > 0 && alltrue([
+      for label in var.valid_severity_labels : contains(
+        ["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"],
+        label
+      )
+    ])
+    error_message = "valid_severity_labels must contain one or more valid Security Hub severity labels."
+  }
+}
+
+variable "resource_keys_to_exclude" {
+  description = "Top-level resource keys excluded from GitHub issue summaries"
+  type        = list(string)
+  default     = ["Tags", "Details"]
+
+  validation {
+    condition = alltrue([
+      for key in var.resource_keys_to_exclude : try(length(trimspace(key)) > 0, false)
+    ])
+    error_message = "resource_keys_to_exclude must contain only non-empty resource keys."
+  }
+}
+
 variable "finding_severity_labels" {
   description = "Security Hub finding severity labels that trigger GitHub issues"
   type        = list(string)
@@ -39,7 +68,7 @@ variable "finding_severity_labels" {
   validation {
     condition = length(var.finding_severity_labels) > 0 && alltrue([
       for label in var.finding_severity_labels : contains(
-        ["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"],
+        var.valid_severity_labels,
         label
       )
     ])
