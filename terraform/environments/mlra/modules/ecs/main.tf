@@ -331,8 +331,6 @@ resource "aws_launch_template" "ec2-launch-template-al2023" {
     }
   }
 
-  user_data = var.user_data_al2023
-
   tag_specifications {
     resource_type = "instance"
     tags = merge(tomap({
