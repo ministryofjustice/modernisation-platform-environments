@@ -88,6 +88,8 @@ locals {
   # Only create Grafana objects in phase 2, where BUs are defined.
   grafana_bus = local.manage_grafana_objects ? lookup(local.bus_by_workspace, terraform.workspace, {}) : {}
 
+  bu_permission = terraform.workspace == "cloud-platform-nonlive" ? "Edit" : "View"
+
   # Map of IdC group display name -> group ID, resolved via the read-only
   # Identity Center provider. Uses the plural aws_identitystore_groups data
   # source (ListGroups API); the singular data source's GetGroupId /
@@ -211,7 +213,7 @@ resource "grafana_folder_permission" "bu" {
 
   permissions {
     team_id    = grafana_team.bu[each.key].id
-    permission = "View"
+    permission = local.bu_permission
   }
 }
 
