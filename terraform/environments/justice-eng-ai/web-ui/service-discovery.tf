@@ -27,7 +27,10 @@ resource "aws_service_discovery_service" "forge" {
     routing_policy = "MULTIVALUE"
   }
 
-  health_check_custom_config {}
+  # health_check_custom_config is force-new: the deployed service was created
+  # without it, so adding it here would replace the service, re-triggering
+  # the ECS deregistration race below on every apply. Left unset to match
+  # deployed state.
 
   tags = local.tags
 }
