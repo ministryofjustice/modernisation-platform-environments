@@ -3,6 +3,10 @@ locals {
 
   notify_builder_url = "https://${local.application_data.accounts[local.environment].builder_hostname}"
 
+  # Mirrors the URL built by scripts/deployment/prototype_deployment.py: the hostname uses the
+  # first two dash-separated segments of the app ID, followed by the app's entry path.
+  notify_app_url_path = "States.Format('https://{}-{}.${local.prototype_deployment.domain_name}{}', States.ArrayGetItem(States.StringSplit(${local.script_runner_app_id_path}, '-'), 0), States.ArrayGetItem(States.StringSplit(${local.script_runner_app_id_path}, '-'), 1), $.image_build_task.index_html_path)"
+
   email_confirmations_enabled = local.application_data.accounts[local.environment].email_confirmations_enabled
   slack_confirmations_enabled = local.application_data.accounts[local.environment].slack_confirmations_enabled
 
@@ -24,6 +28,10 @@ locals {
     variables = [
       { name = "TEMPLATE_ID", value = local.application_data.accounts[local.environment].notify_template_id },
       { name = "USER_EMAIL", path = "$.latest.UserName" },
+      { name = "APP_ID", path = local.script_runner_app_id_path },
+      { name = "BUILD_ID", path = "States.Format('{}', $.latest.BuildID)" },
+      { name = "AWS_REGION", value = local.aws_region },
+      { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
       { name = "CC_EMAIL", value = "ModernisationPlatform-gg@justice.gov.uk" },
       { name = "EMAIL_SUBJECT", value = "Your application has been built and deployed" },
       { name = "EMAIL_BODY_FILE", value = "scripts/notification/email-body.md" },
@@ -31,7 +39,7 @@ locals {
         # Braces are escaped for States.Format; builder_url comes from Terraform.
         # The input is the deploy_prototype child's final state, passed on by the root.
         name = "EMAIL_VARS"
-        path = "States.Format('\\{\"endpoint_url\":\"{}\",\"app_id\":\"{}\",\"build_id\":\"{}\",\"builder_url\":\"${local.notify_builder_url}\"\\}', $.dns.url, ${local.script_runner_app_id_path}, $.latest.BuildID)"
+        path = "States.Format('\\{\"endpoint_url\":\"{}\",\"app_id\":\"{}\",\"build_id\":\"{}\",\"builder_url\":\"${local.notify_builder_url}\"\\}', ${local.notify_app_url_path}, ${local.script_runner_app_id_path}, $.latest.BuildID)"
       },
     ]
     result_path     = "$.notify_task"
@@ -47,10 +55,11 @@ locals {
     variables = [
       { name = "TOPIC_ARN", value = aws_sns_topic.job_completion.arn },
       { name = "AWS_REGION", value = local.aws_region },
+      { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
       { name = "USER_EMAIL", path = "$.latest.UserName" },
       { name = "APP_ID", path = local.script_runner_app_id_path },
       { name = "BUILD_ID", path = "States.Format('{}', $.latest.BuildID)" },
-      { name = "APP_URL", path = "$.dns.url" },
+      { name = "APP_URL", path = local.notify_app_url_path },
     ]
     result_path     = "$.slack_task"
     timeout_seconds = 300
