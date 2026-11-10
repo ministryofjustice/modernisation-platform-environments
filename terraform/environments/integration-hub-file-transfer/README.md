@@ -87,4 +87,4 @@ For push and pull request events, the workflow only includes `root` in its plan/
 
 When you change Lambda code, also update the date below so the workflow runs and deploys the new code:
 
-Lambda last changed: 2026-10-14
+Lambda last changed: 2026-11-09
