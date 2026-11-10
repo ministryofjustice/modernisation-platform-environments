@@ -24,8 +24,38 @@ resource "aws_iam_role" "clamav_role" {
   )
 }
 
-# Attach SSM Policy to ClamAV Role
+# IAM Policy for ClamAV Logs to Cloudwatch
+data "aws_iam_policy_document" "cloudwatch_logs_clamav" {
+  statement {
+    sid = "EnableCloudWatchLogs"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "${aws_cloudwatch_log_group.log_group_clamav_clamd.arn}*",
+      "${aws_cloudwatch_log_group.log_group_clamav_freshclam.arn}:*",
+    ]
+  }
+  statement {
+    sid = "DescribeCloudWatchLogStreams"
+    actions = [
+      "logs:DescribeLogStreams"
+    ]
+    resources = [
+      aws_cloudwatch_log_group.log_group_clamav_clamd.arn,
+      aws_cloudwatch_log_group.log_group_clamav_freshclam.arn,
+    ]
+  }
+}
 
+resource "aws_iam_role_policy" "cloudwatch_logs_clamav" {
+  name   = "${local.application_name}-clamav-cloudwatch-logs"
+  role   = aws_iam_role.clamav_role.id
+  policy = data.aws_iam_policy_document.cloudwatch_logs_clamav.json
+}
+
+# Attach SSM Policy to ClamAV Role
 resource "aws_iam_role_policy_attachment" "ssm_policy_clamav" {
   role       = aws_iam_role.clamav_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
