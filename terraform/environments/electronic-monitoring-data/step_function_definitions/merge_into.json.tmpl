@@ -188,6 +188,11 @@
         },
         {
           "Variable": "$.status",
+          "StringEquals": "dependency_unavailable",
+          "Next": "PlanningComplete"
+        },
+        {
+          "Variable": "$.status",
           "StringEquals": "recovery_complete",
           "Next": "RollingComplete"
         },
@@ -243,6 +248,11 @@
           "Variable": "$.status",
           "StringEquals": "iteration_clean",
           "Next": "CheckEmptyRollingPlan"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "dependency_unavailable",
+          "Next": "PlanningComplete"
         }
       ],
       "Default": "UnexpectedPlanningResult"
@@ -1207,7 +1217,9 @@
                 ],
                 "IntervalSeconds": 15,
                 "BackoffRate": 2,
-                "MaxAttempts": 6
+                "MaxAttempts": 12,
+                "MaxDelaySeconds": 300,
+                "JitterStrategy": "FULL"
               },
               {
                 "ErrorEquals": [
@@ -1457,6 +1469,11 @@
           "Variable": "$.status",
           "StringEquals": "completed",
           "Next": "RollingComplete"
+        },
+        {
+          "Variable": "$.status",
+          "StringEquals": "dependency_unavailable",
+          "Next": "PlanningComplete"
         },
         {
           "Variable": "$.status",

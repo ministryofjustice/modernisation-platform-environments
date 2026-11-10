@@ -1,0 +1,356 @@
+{
+  "Comment": "Restore reconciliation Lake Formation permissions after derived table changes.",
+  "StartAt": "ProcessTables",
+  "States": {
+    "ProcessTables": {
+      "Type": "Map",
+      "ItemsPath": "$.tables",
+      "MaxConcurrency": 1,
+      "ItemSelector": {
+        "database.$": "$.database",
+        "table.$": "$$.Map.Item.Value"
+      },
+      "Iterator": {
+        "StartAt": "ValidateTarget",
+        "States": {
+          "ValidateTarget": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "And": [
+                  {
+                    "Variable": "$.database",
+                    "StringEquals": "${ac_database}"
+                  },
+                  {
+                    "Or": [
+                      {
+                        "Variable": "$.table",
+                        "StringEquals": "position"
+                      },
+                      {
+                        "Variable": "$.table",
+                        "StringEquals": "device_activations"
+                      }
+                    ]
+                  }
+                ],
+                "Next": "GetTable"
+              },
+              {
+                "And": [
+                  {
+                    "Variable": "$.database",
+                    "StringEquals": "${emdi_database}"
+                  },
+                  {
+                    "Or": [
+                      {
+                        "Variable": "$.table",
+                        "StringEquals": "position"
+                      },
+                      {
+                        "Variable": "$.table",
+                        "StringEquals": "device_activations"
+                      }
+                    ]
+                  }
+                ],
+                "Next": "GetTable"
+              }
+            ],
+            "Default": "IgnoredTarget"
+          },
+          "GetTable": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::aws-sdk:glue:getTable",
+            "Parameters": {
+              "DatabaseName.$": "$.database",
+              "Name.$": "$.table"
+            },
+            "ResultPath": null,
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Glue.InternalServiceException",
+                  "Glue.OperationTimeoutException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 5,
+                "MaxDelaySeconds": 30,
+                "JitterStrategy": "FULL"
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "Glue.EntityNotFoundException"
+                ],
+                "ResultPath": "$.error",
+                "Next": "TableUnavailable"
+              }
+            ],
+            "Next": "ListPermissions"
+          },
+          "ListPermissions": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::aws-sdk:lakeformation:listPermissions",
+            "Parameters": {
+              "CatalogId": "${catalog_id}",
+              "Principal": {
+                "DataLakePrincipalIdentifier": "${planner_role_arn}"
+              },
+              "Resource": {
+                "Table": {
+                  "CatalogId": "${catalog_id}",
+                  "DatabaseName.$": "$.database",
+                  "Name.$": "$.table"
+                }
+              }
+            },
+            "ResultPath": "$.permission_result",
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "LakeFormation.EntityNotFoundException",
+                  "LakeFormation.InternalServiceException",
+                  "LakeFormation.OperationTimeoutException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 5,
+                "MaxDelaySeconds": 30,
+                "JitterStrategy": "FULL"
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "LakeFormation.EntityNotFoundException"
+                ],
+                "ResultPath": "$.error",
+                "Next": "TableUnavailable"
+              }
+            ],
+            "Next": "CheckPermissionRecord"
+          },
+          "CheckPermissionRecord": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.permission_result.PrincipalResourcePermissions[0].Permissions",
+                "IsPresent": true,
+                "Next": "CalculatePermissionFlags"
+              }
+            ],
+            "Default": "GrantBoth"
+          },
+          "CalculatePermissionFlags": {
+            "Type": "Pass",
+            "Parameters": {
+              "has_select.$": "States.ArrayContains($.permission_result.PrincipalResourcePermissions[0].Permissions, 'SELECT')",
+              "has_describe.$": "States.ArrayContains($.permission_result.PrincipalResourcePermissions[0].Permissions, 'DESCRIBE')"
+            },
+            "ResultPath": "$.permission_flags",
+            "Next": "SelectGrant"
+          },
+          "SelectGrant": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "And": [
+                  {
+                    "Variable": "$.permission_flags.has_select",
+                    "BooleanEquals": true
+                  },
+                  {
+                    "Variable": "$.permission_flags.has_describe",
+                    "BooleanEquals": true
+                  }
+                ],
+                "Next": "PermissionsCurrent"
+              },
+              {
+                "Variable": "$.permission_flags.has_select",
+                "BooleanEquals": true,
+                "Next": "GrantDescribe"
+              },
+              {
+                "Variable": "$.permission_flags.has_describe",
+                "BooleanEquals": true,
+                "Next": "GrantSelect"
+              }
+            ],
+            "Default": "GrantBoth"
+          },
+          "GrantSelect": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::aws-sdk:lakeformation:grantPermissions",
+            "Parameters": {
+              "CatalogId": "${catalog_id}",
+              "Principal": {
+                "DataLakePrincipalIdentifier": "${planner_role_arn}"
+              },
+              "Resource": {
+                "Table": {
+                  "CatalogId": "${catalog_id}",
+                  "DatabaseName.$": "$.database",
+                  "Name.$": "$.table"
+                }
+              },
+              "Permissions": [
+                "SELECT"
+              ]
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "LakeFormation.ConcurrentModificationException",
+                  "LakeFormation.EntityNotFoundException",
+                  "LakeFormation.InternalServiceException",
+                  "LakeFormation.OperationTimeoutException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 6,
+                "MaxDelaySeconds": 30,
+                "JitterStrategy": "FULL"
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "LakeFormation.EntityNotFoundException"
+                ],
+                "ResultPath": "$.error",
+                "Next": "TableUnavailable"
+              }
+            ],
+            "Next": "PermissionsRestored"
+          },
+          "GrantDescribe": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::aws-sdk:lakeformation:grantPermissions",
+            "Parameters": {
+              "CatalogId": "${catalog_id}",
+              "Principal": {
+                "DataLakePrincipalIdentifier": "${planner_role_arn}"
+              },
+              "Resource": {
+                "Table": {
+                  "CatalogId": "${catalog_id}",
+                  "DatabaseName.$": "$.database",
+                  "Name.$": "$.table"
+                }
+              },
+              "Permissions": [
+                "DESCRIBE"
+              ]
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "LakeFormation.ConcurrentModificationException",
+                  "LakeFormation.EntityNotFoundException",
+                  "LakeFormation.InternalServiceException",
+                  "LakeFormation.OperationTimeoutException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 6,
+                "MaxDelaySeconds": 30,
+                "JitterStrategy": "FULL"
+              }
+            ],
+            "Next": "PermissionsRestored",
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "LakeFormation.EntityNotFoundException"
+                ],
+                "ResultPath": "$.error",
+                "Next": "TableUnavailable"
+              }
+            ]
+          },
+          "GrantBoth": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::aws-sdk:lakeformation:grantPermissions",
+            "Parameters": {
+              "CatalogId": "${catalog_id}",
+              "Principal": {
+                "DataLakePrincipalIdentifier": "${planner_role_arn}"
+              },
+              "Resource": {
+                "Table": {
+                  "CatalogId": "${catalog_id}",
+                  "DatabaseName.$": "$.database",
+                  "Name.$": "$.table"
+                }
+              },
+              "Permissions": [
+                "SELECT",
+                "DESCRIBE"
+              ]
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "LakeFormation.ConcurrentModificationException",
+                  "LakeFormation.EntityNotFoundException",
+                  "LakeFormation.InternalServiceException",
+                  "LakeFormation.OperationTimeoutException"
+                ],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 6,
+                "MaxDelaySeconds": 30,
+                "JitterStrategy": "FULL"
+              }
+            ],
+            "Next": "PermissionsRestored",
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "LakeFormation.EntityNotFoundException"
+                ],
+                "ResultPath": "$.error",
+                "Next": "TableUnavailable"
+              }
+            ]
+          },
+          "PermissionsCurrent": {
+            "Type": "Pass",
+            "Result": {
+              "status": "permissions_current"
+            },
+            "End": true
+          },
+          "PermissionsRestored": {
+            "Type": "Pass",
+            "Result": {
+              "status": "permissions_restored"
+            },
+            "End": true
+          },
+          "TableUnavailable": {
+            "Type": "Pass",
+            "Result": {
+              "status": "table_unavailable"
+            },
+            "End": true
+          },
+          "IgnoredTarget": {
+            "Type": "Pass",
+            "Result": {
+              "status": "ignored_target"
+            },
+            "End": true
+          }
+        }
+      },
+      "End": true
+    }
+  }
+}
