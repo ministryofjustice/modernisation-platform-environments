@@ -9,6 +9,20 @@ resource "aws_security_group" "sg_ebsapps_internal_alb" {
   )
 }
 
+# This Security Group is created for Azure Virtual Desktop (AVD) users as above SG has full quota
+resource "aws_security_group" "avd_sg_ebsapps_internal_alb" {
+  name        = "avd_ebs_apps_internal_alb"
+  description = "Inbound traffic control for EBSAPPS Internal loadbalancer"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(local.tags,
+    { Name = lower(format("sg-avd-ebsapps-loadbalancer-internal")) }
+  )
+}
+
+
+
+
 # INGRESS Rules
 
 ### HTTPS
@@ -68,7 +82,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsalb_internal_443_mp_v1_wo
 # The following rule is added to allow Azure Virtual Desktop (AVD) to access EBS Apps HTTPS.
 resource "aws_security_group_rule" "ingress_traffic_ebsalb_443_azure_virtual_destop_workspace" {
   count             = local.environment == "development" ? 1 : 0
-  security_group_id = aws_security_group.sg_ebsapps_internal_alb.id
+  security_group_id = aws_security_group.avd_sg_ebsapps_internal_alb.id
   type              = "ingress"
   description       = "HTTPS from Azure Virtual Desktop (AVD) users to use EBS Apps in 443 - DEV only"
   protocol          = "TCP"
@@ -76,6 +90,19 @@ resource "aws_security_group_rule" "ingress_traffic_ebsalb_443_azure_virtual_des
   to_port           = 443
   cidr_blocks       = local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
 }
+
+# The following rule is added to allow Azure Virtual Desktop (AVD) to access EBS DB.
+resource "aws_security_group_rule" "ingress_traffic_ebsalb_1521_azure_virtual_destop_workspace" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.avd_sg_ebsapps_internal_alb.id
+  type              = "ingress"
+  description       = "TCP from Azure Virtual Desktop (AVD) users to use EBS DB in 1521 - DEV only"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_blocks       = local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
+}
+
 
 # EGRESS Rules
 
