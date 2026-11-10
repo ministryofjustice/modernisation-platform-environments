@@ -6,6 +6,7 @@ The data factory allows for:
 
 - receiving data in an encrypted S3 landing bucket from an external aws account
 - limiting the external account to its allocated S3 prefix
+- optionally allowing Airflow workflows to read and write landing-bucket objects using temporary credentials
 - allowing the user to catalogue the data with AWS Glue
 - scanning new S3 objects for malware with GuardDuty Malware Protection
 - moving selected scan results to a quarantine bucket
@@ -13,10 +14,41 @@ The data factory allows for:
 - encrypting data and supporting services with customer-managed KMS keys
 - recording AWS management activity with CloudTrail
 
+## Airflow Access
+
+[airflow.tf](airflow.tf) always creates an empty, KMS-encrypted authentication secret. The `enable_airflow_iam_role` toggle defaults to `false` and controls the secret-value lookup, Analytical Platform Compute OIDC provider and Airflow data-ingestion role.
+
+### Setup
+
+Use two applies, with a manual secret update between them:
+
+1. Leave `enable_airflow_iam_role = false` in [airflow.tf](airflow.tf), then plan and apply. This creates the KMS-encrypted secret `external/analytical_platform/airflow_authentication` without a value, skipping the value lookup, OIDC provider and role.
+2. From the cluster's OpenID Connect provider URL, take only the value after `/id/`, not the cluster ARN or full URL. Populate the secret in the target AWS account in `eu-west-2` with:
+
+    ```json
+    {"oidc_cluster_identifier":"<value-after-/id/>"}
+    ```
+3. Set `enable_airflow_iam_role = true`, then plan and apply again to create the OIDC provider and role. Keep it enabled afterwards; setting it back to `false` plans to destroy the role and OIDC provider, but retains the secret and its value.
+
+### Trust And Permissions
+
+The role trusts the Kubernetes service account `data-factory-corporate-data-ingestion` in the `mwaa` namespace. Preproduction appends `-pp` to the service-account name. 
+
+The module names the role `airflow-<dev|test|prod>-data-ingestion`, with `-pp` appended for preproduction. Workloads receive temporary credentials through `sts:AssumeRoleWithWebIdentity`, not static access keys.
+
+The role grants:
+
+- `s3:ListBucket` on the Sherlock landing bucket to list keys across all prefixes.
+- `s3:GetObject` and `s3:PutObject` across all prefixes in the Sherlock landing bucket, unlike the prefix-restricted external role.
+- `kms:Decrypt` and `kms:GenerateDataKey` on the Sherlock landing key, only through S3 in the deployment region.
+
+It does not grant object deletion, access to older object versions, Glue access or quarantine-bucket access.
+
 ## Architecture
 
 ![Sherlock people account architecture](architecture.excalidraw.svg)
 
+The Airflow secret is always created; its OIDC provider and role are only created when `enable_airflow_iam_role = true`. Dashed connections show configuration and encryption relationships rather than object transfers.
 
 ## Process
 
@@ -157,5 +189,7 @@ The configuration is in [modules/logging-bucket-cloudtrail/main.tf](modules/logg
 | [data_factory_guardduty_eventbridge](modules/guardduty-eventbridge/README.md) | Quarantine and alert EventBridge rules, Lambda target, and SNS topic |
 | [data_factory_guardduty_lambda](modules/guardduty-lambda/README.md) | Quarantine Lambda and SQS dead-letter queue |
 | `guardduty_chatbot` | Optional Amazon Q Developer Slack channel configuration using Secrets Manager IDs |
+| `data_platform_airflow_iam_role` | Optional Airflow role with OIDC trust, landing-object access and scoped KMS permissions |
+| Airflow resources in [airflow.tf](airflow.tf) | Always-created authentication secret encrypted with `corporate_general_kms_key`; optional IAM OIDC provider |
 
 

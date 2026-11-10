@@ -48,7 +48,8 @@ resource "aws_iam_role_policy" "quarantine_lambda" {
         Action = [
           "s3:GetObject",
           "s3:DeleteObject",
-          "s3:GetObjectTagging"
+          "s3:GetObjectTagging",
+          "s3:PutObjectTagging"
         ]
 
         Resource = [

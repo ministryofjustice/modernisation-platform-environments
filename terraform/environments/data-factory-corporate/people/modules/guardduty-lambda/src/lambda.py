@@ -17,6 +17,8 @@ QUARANTINE_KMS_KEY_ARN = os.environ["QUARANTINE_KMS_KEY_ARN"]
 QUARANTINE_STATUSES = set(
     json.loads(os.environ["QUARANTINE_STATUSES"])
 )
+CLASSIFICATION_TAG_KEY = "classification"
+CLASSIFICATION_TAG_VALUE = "official-sensitive"
 
 
 def quarantine_object(bucket_name, object_key):
@@ -29,6 +31,26 @@ def quarantine_object(bucket_name, object_key):
         SSEKMSKeyId=QUARANTINE_KMS_KEY_ARN,
     )
     s3_client.delete_object(Bucket=bucket_name, Key=object_key)
+
+def tag_object(bucket_name, object_key):
+    """Add the classification tag without removing existing object tags."""
+    response = s3_client.get_object_tagging(Bucket=bucket_name, Key=object_key)
+    tags = {
+        tag["Key"]: tag["Value"]
+        for tag in response.get("TagSet", [])
+    }
+    tags[CLASSIFICATION_TAG_KEY] = CLASSIFICATION_TAG_VALUE
+
+    s3_client.put_object_tagging(
+        Bucket=bucket_name,
+        Key=object_key,
+        Tagging={
+            "TagSet": [
+                {"Key": key, "Value": value}
+                for key, value in tags.items()
+            ]
+        },
+    )
 
 def lambda_handler(event, context):
     logger.info("Received event: " + json.dumps(event, indent=2))
@@ -49,6 +71,8 @@ def lambda_handler(event, context):
         f"Object Key: {object_key}, "
         f"Scan Result Status: {scan_result_status}"
     )
+
+    tag_object(bucket_name, object_key)
 
     if scan_result_status in QUARANTINE_STATUSES:
         logger.info(

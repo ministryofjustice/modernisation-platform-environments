@@ -299,8 +299,11 @@ module "data_factory_guardduty_eventbridge" {
 
   bucket_names = [module.sherlock_landing_bucket_mp.bucket.bucket]
 
-  alert_scan_result_statuses      = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
-  quarantine_scan_result_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
+  # Publish matching scan results to SNS; include clean scans for notifications.
+  alert_scan_result_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
+  # Invoke the Lambda for matching results; it tags each object and quarantines
+  # only statuses listed in the Lambda module's quarantine_statuses below.
+  scan_result_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
 
   target_lambda_name = module.data_factory_guardduty_lambda.name
 
@@ -360,6 +363,7 @@ module "data_factory_guardduty_lambda" {
     Infrastructure = "sherlock-guardduty-malware-scan"
   }
 
+  # Of the results delivered to the Lambda, move only these statuses to quarantine.
   quarantine_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
 
   eventbridge_rule_arn = module.data_factory_guardduty_eventbridge.rule_arn

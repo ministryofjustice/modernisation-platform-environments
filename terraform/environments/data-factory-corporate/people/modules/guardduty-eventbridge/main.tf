@@ -1,12 +1,12 @@
 
 # GuardDuty creates its own internal EventBridge rule to start scans.
 
-# This file creates an Eventbridge rule to trigger the quarantine Lambda when 
-# GuardDuty Malware Protection reports an unsafe or failed S3 object scan.
+# This file creates an EventBridge rule to trigger the Lambda when GuardDuty
+# Malware Protection reports an S3 object scan result.
 
 # - listen for GuardDuty scan result events
-# - match unsafe or failed scan outcomes
-# - invoke the quarantine Lambda
+# - match scan outcomes
+# - invoke the Lambda to tag the object and quarantine unsafe or failed scans
 #
 # GuardDuty publishes scan results to the default EventBridge bus with:
 #
@@ -18,7 +18,7 @@
 # Match configured GuardDuty scan outcomes for objects in the protected buckets.
 resource "aws_cloudwatch_event_rule" "guardduty_quarantine" {
   name        = var.name
-  description = "Invoke quarantine Lambda when GuardDuty reports an unsafe or failed S3 object scan."
+  description = "Tag objects and quarantine unsafe or failed GuardDuty scan results."
 
   event_pattern = jsonencode({
     source = [
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_event_rule" "guardduty_quarantine" {
       }
 
       scanResultDetails = {
-        scanResultStatus = var.quarantine_scan_result_statuses
+        scanResultStatus = var.scan_result_statuses
       }
     }
   })

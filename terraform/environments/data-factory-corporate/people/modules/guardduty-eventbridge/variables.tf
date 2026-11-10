@@ -20,10 +20,10 @@ variable "target_lambda_arn" {
   type        = string
 }
 
-variable "quarantine_scan_result_statuses" {
-  description = "List of scan result statuses that invoke the quarantine Lambda."
+variable "scan_result_statuses" {
+  description = "List of scan result statuses that invoke the Lambda."
   type        = list(string)
-  default     = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
+  default     = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
 }
 
 variable "alert_scan_result_statuses" {
