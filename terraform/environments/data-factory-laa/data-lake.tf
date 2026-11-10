@@ -22,6 +22,14 @@ locals {
         "arn:aws:iam::766696030771:role/github-actions-plan"
       ]
     }
+    preproduction = {
+      lakeformation_admins = [
+        "arn:aws:iam::080426581928:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_d2bdd78878a090a5"
+      ],
+      lakeformation_read_only_admins = [
+        "arn:aws:iam::080426581928:role/github-actions-plan"
+      ]
+    }
   }
 }
 
