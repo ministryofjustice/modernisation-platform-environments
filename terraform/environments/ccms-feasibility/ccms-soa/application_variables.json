@@ -13,7 +13,7 @@
       "admin_container_memory": 15360,
       "admin_wl_mem_args": "-Xms8192m -Xmx12288m",
       "admin_run_rcu_bootstrap": true,
-      "admin_app_count": 0,
+      "admin_app_count": 1,
       "admin_pui_user": "pui_user",
       "admin_caab_user": "caab_soa_gateway_api",
       "admin_apply_user": "apply_user",
@@ -29,9 +29,9 @@
       "managed_container_cpu": 4096,
       "managed_container_memory": 15360,
       "managed_wl_mem_args": "-Xms8192m -Xmx12288m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80 -XX:+AlwaysPreTouch",
-      "managed_app_count": 0,
+      "managed_app_count": 1,
 
-      "root_volume_size": 30,
+      "root_volume_size": 60,
 
       "soa_db_user": "soapdb",
       "soa_db_role": "system",
