@@ -1391,6 +1391,18 @@ data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
   }
 
   statement {
+    sid    = "ReadGitHubAppSecret"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+    resources = [
+      module.live_feed_github_app.secret_arn,
+    ]
+  }
+
+  statement {
     sid    = "AllowSendAlarmDebounceConfirmations"
     effect = "Allow"
     actions = [
