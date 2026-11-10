@@ -39,7 +39,7 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
     filter_prefix = "allied/mdss"
   }
   queue {
-    queue_arn     = module.process_fms_metadata_sqs.sqs_queue.arn
+    queue_arn     = module.fms_raw_file_formatter_sqs.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".JSON"
     filter_prefix = "serco/fms"
@@ -58,10 +58,10 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
   }
 }
 
-module "process_fms_metadata_sqs" {
+module "fms_raw_file_formatter_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.format_fms_json_event_queue.lambda_function_name
+  lambda_function_name = module.fms_raw_file_formatter.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
