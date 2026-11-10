@@ -25,7 +25,7 @@ variable "bedrock_model_id" {
 variable "bedrock_max_tokens" {
   type        = string
   description = "The maximum output tokens allocated for Amazon Bedrock generation payloads to prevent JSON truncation."
-  default     = "32768"
+  default     = "131,072"
 }
 
 variable "enable_oidc_auth" {
