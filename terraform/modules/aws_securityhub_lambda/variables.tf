@@ -23,7 +23,7 @@ variable "github_org" {
 variable "github_identity" {
   description = "The Octo STS identity configured in the target repository with issues: write permission"
   type        = string
-  default     = "platops_github_issue_identifier"
+  default     = "platops_securityhub_github_issue_identifier"
 }
 
 variable "github_repo" {

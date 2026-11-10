@@ -2,7 +2,7 @@ resource "aws_lambda_function" "securityhub_finding_issue" {
   #checkov:skip=CKV_AWS_272:code signing not required
   #checkov:skip=CKV_AWS_117:lambda only calls public HTTPS endpoints
   #checkov:skip=CKV_AWS_50:X-Ray tracing is not required
-  function_name = "${var.project_name}-securityhub-finding-issue"
+  function_name = "${var.project_name}-lambda"
   handler       = "handler.lambda_handler"
   memory_size   = var.lambda_memory_size
   role          = aws_iam_role.securityhub.arn
