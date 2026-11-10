@@ -2,11 +2,11 @@ resource "aws_msk_cluster" "cluster" {
   count                  = contains(local.deploy_to, local.environment) ? 1 : 0
   cluster_name           = local.cluster_name
   kafka_version          = "3.8.x"
-  number_of_broker_nodes = 1
+  number_of_broker_nodes = 2
 
   broker_node_group_info {
     instance_type   = "kafka.t3.small"
-    client_subnets  = [sort(data.aws_subnets.shared-private.ids)[0]] # a single broker needs a single subnet
+    client_subnets  = slice(sort(data.aws_subnets.shared-private.ids), 0, 2) # MSK needs 2 or 3 subnets, and one broker per subnet here
     security_groups = [aws_security_group.msk[0].id]
 
     storage_info {
