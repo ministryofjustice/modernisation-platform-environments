@@ -43,6 +43,14 @@ def lambda_handler(event, context):
     # API Gateway HTTP API (payload format 2.0) request
     event_name = event["pathParameters"]["eventName"]
     body = event.get("body") or "{}"
+    # The body is deliberately not logged, only its size
+    logger.info(
+        "Received request %s for event %s from %s (%d byte body)",
+        event["requestContext"]["requestId"],
+        event_name,
+        event["requestContext"]["http"].get("sourceIp"),
+        len(body),
+    )
     if event.get("isBase64Encoded"):
         body = base64.b64decode(body).decode("utf-8")
 
@@ -57,5 +65,10 @@ def lambda_handler(event, context):
         key=event_name.encode("utf-8"),
         value=json.dumps({"name": event_name, "payload": payload}).encode("utf-8"),
     ).get(timeout=30)
-    logger.info("Published event %s to topic %s", event_name, TOPIC)
+    logger.info(
+        "Published event %s to topic %s for request %s",
+        event_name,
+        TOPIC,
+        event["requestContext"]["requestId"],
+    )
     return response(200, "Event published")
