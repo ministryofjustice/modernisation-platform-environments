@@ -484,14 +484,19 @@ module "live_feed_daily_handover" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-
   environment_variables = {
     SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
     ENVIRONMENT    = local.environment_shorthand
     NAMESPACE      = "EMDS/MDSS"
     LOOKBACK_HOURS = "24"
+
+    GITHUB_SECRET_ARN = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER      = "moj-analytical-services"
+    GITHUB_REPOSITORY = "dmet-em"
+
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
 
     LOAD_MDSS_QUEUE_NAME = module.load_mdss_event_queue.sqs_queue.name
     LOAD_FMS_QUEUE_NAME  = module.load_fms_event_queue.sqs_queue.name
@@ -1171,7 +1176,6 @@ locals {
     PLV2QS6 = "lucy-astley-jones"
     PREPU2L = "mrixson-moj"
     PY6LVCP = "gwionap"
-    PO9DYMA = "georgewk92"
   }
 }
 
