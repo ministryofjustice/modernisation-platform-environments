@@ -87,6 +87,8 @@ variable "replication_details" {
     fms_ho_kms_id        = optional(string)
     fms_specials_bucket  = optional(string)
     fms_specials_kms_id  = optional(string)
+    gems_general_bucket  = optional(string)
+    gems_general_kms_id  = optional(string)
     mdss_general_bucket  = optional(string)
     mdss_general_kms_id  = optional(string)
     mdss_specials_bucket = optional(string)
