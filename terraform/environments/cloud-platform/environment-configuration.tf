@@ -22,7 +22,8 @@ locals {
       account_subdomain_name = "preproduction.${local.base_domain}"
     }
     cloud-platform-nonlive = {
-      account_subdomain_name = "nonlive.${local.base_domain}"
+      account_subdomain_name  = "nonlive.${local.base_domain}"
+      grafana_objects_enabled = true
     }
     cloud-platform-live = {
       account_subdomain_name = "live.${local.base_domain}"
