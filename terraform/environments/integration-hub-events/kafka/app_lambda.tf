@@ -39,7 +39,7 @@ module "events_to_kafka" {
   runtime                           = "python3.12"
   timeout                           = 60
   source_path = [{
-    path             = "${path.module}/lambda/events-to-kafka"
+    path             = "${path.module}/../api/lambda/events-to-kafka"
     pip_requirements = true
     patterns = [
       "!(.*/)?__pycache__(/.*)?$",
