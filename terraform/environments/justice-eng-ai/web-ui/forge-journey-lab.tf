@@ -676,6 +676,9 @@ resource "aws_ecs_service" "forge" {
   depends_on = [
     aws_lb_listener_rule.forge,
     aws_efs_mount_target.plans,
+    # Ensures the Cloud Map service isn't destroyed/replaced until after this
+    # ECS service has been updated/destroyed -- see service-discovery.tf.
+    time_sleep.forge_service_discovery_deregistration,
   ]
 
   # CI/CD publishes new task-definition revisions out-of-band and points
