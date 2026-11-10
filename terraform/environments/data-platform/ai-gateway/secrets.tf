@@ -59,9 +59,6 @@ module "microsoft_foundry_jedi_gateway_secret" {
   name = "${local.component_name}/microsoft-foundry/jedi-gateway"
 
   secret_string = jsonencode({
-    # Legacy API key mechanism
-    api_key = "CHANGEME"
-    # New OIDC mechanism
     endpoint  = "CHANGEME"
     client_id = "CHANGEME"
     tenant_id = "CHANGEME"

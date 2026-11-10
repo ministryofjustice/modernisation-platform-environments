@@ -5,7 +5,7 @@ Terraform for the AI Application Builder backend: the Step Functions workflows, 
 ## Workflows
 
 | File | State machine | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `step_functions_root.tf` | root | Looks up the build, then runs the control plane, image build, prototype deployment and notification |
 | `step_functions_control_plane.tf` | control-plane | Reviews the request (Bedrock) and waits for approval if needed |
 | `step_functions_build_image.tf` | build-app-image | Builds the prototype image (`build-prototype-image.py`) |
@@ -32,7 +32,7 @@ Terraform for the AI Application Builder backend: the Step Functions workflows, 
 Both use `modernisation-platform-terraform-aws-chatbot` v3.0.0, pinned to its commit SHA in `slack_notifications.tf`. The Slack client must be set up manually in each account first. Nothing is created while a channel ID is empty.
 
 | Variable | Receives |
-|---|---|
+| --- | --- |
 | `slack_channel_id` | Job-completion messages (`<app>-job-completion` topic) |
 | `alerts_slack_channel_id` | Alarms and runtime errors (`<app>-alerts` topic) |
 
@@ -48,7 +48,7 @@ All alarms publish to the encrypted `<app>-alerts` topic and are named `<app>-<e
 - **Bedrock (logs):** metric filters on the control-plane (script-runner) and web-ui ECS logs for `throttled`, `timeout`, `token-limit` and `failed` errors, each with its own alarm. The filters match exception names and message text, so adjust them if the application's log wording changes.
 - **Bedrock (service):** alarms on the `AWS/Bedrock` throttle, client-error and server-error metrics for the configured model.
 
-`monitoring_runtime.tf` (dev and prod, where the web UI and prototype stack are deployed):
+`monitoring_runtime.tf` (all environments, so the web UI and prototype stack must be applied first):
 
 - **Load balancers:** 5xx, target 5xx, target connection errors, rejected connections and unhealthy hosts for the web-ui and prototype ALBs. The unhealthy-host alarm uses Metrics Insights across every target group, so it covers prototypes created at runtime.
 - **Web UI service:** no running tasks, CPU and memory above 85%, and ERROR-level log lines.

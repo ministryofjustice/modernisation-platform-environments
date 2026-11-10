@@ -38,6 +38,12 @@ locals {
 
     environment = local.script_runner_environment_variables
 
+    # Used by scripts/notification/send_notification.py.
+    secrets = [{
+      name      = "API_KEY"
+      valueFrom = aws_secretsmanager_secret.gov_uk_notify_api_key.arn
+    }]
+
     logConfiguration = {
       logDriver = "awslogs"
       options = {
@@ -458,6 +464,25 @@ data "aws_iam_policy_document" "script_runner_ecs_task_build_flow" {
     effect    = "Allow"
     actions   = ["iam:PassRole"]
     resources = [aws_iam_role.prototype_app_task.arn]
+  }
+
+  # The dns stage upserts the prototype CNAME and waits for the change to propagate.
+  statement {
+    sid    = "ManagePrototypeDnsRecords"
+    effect = "Allow"
+    actions = [
+      "route53:GetHostedZone",
+      "route53:ListResourceRecordSets",
+      "route53:ChangeResourceRecordSets",
+    ]
+    resources = [data.aws_route53_zone.prototype_deployment.arn]
+  }
+
+  statement {
+    sid       = "ReadPrototypeDnsChange"
+    effect    = "Allow"
+    actions   = ["route53:GetChange"]
+    resources = ["arn:${data.aws_partition.current.partition}:route53:::change/*"]
   }
 
   # The profile routes to the foundation model in any of its geography's regions.

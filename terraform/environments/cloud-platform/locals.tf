@@ -17,6 +17,7 @@ locals {
   amg_host_workspaces = [
     "cloud-platform-live",
     "cloud-platform-development",
+    "cloud-platform-nonlive"
   ]
   enable_amg         = contains(local.amg_host_workspaces, terraform.workspace)
   amg_workspace_name = "${terraform.workspace}-observability"

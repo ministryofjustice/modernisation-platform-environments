@@ -1,16 +1,15 @@
 # Runtime alarms for the web UI and the per-prototype infrastructure. All
-# alerts go to the alerts topic defined in monitoring.tf. These resources exist
-# only where the web UI and prototype stack are deployed (prototype_deployment_enabled).
+# alerts go to the alerts topic defined in monitoring.tf.
 
 locals {
   web_ui_name        = "${local.application_name}-ui"
   prototypes_cluster = "${local.application_name}-prototypes-app"
 
   # The load balancer dimension is the ARN suffix (app/<name>/<id>).
-  runtime_albs = local.prototype_deployment_enabled ? {
-    web-ui     = data.aws_lb.web_ui[0].arn_suffix
-    prototypes = data.aws_lb.prototype_deployment[0].arn_suffix
-  } : {}
+  runtime_albs = {
+    web-ui     = data.aws_lb.web_ui.arn_suffix
+    prototypes = data.aws_lb.prototype_deployment.arn_suffix
+  }
 
   alb_metric_alarms = {
     elb-5xx = {
@@ -41,10 +40,10 @@ locals {
   }
 
   # Service events (including failed deployments) and stopped tasks, delivered to Slack.
-  ecs_event_clusters = local.prototype_deployment_enabled ? {
+  ecs_event_clusters = {
     web-ui     = local.web_ui_name
     prototypes = local.prototypes_cluster
-  } : {}
+  }
 
   ecs_event_kinds = {
     service-error = {
@@ -84,13 +83,11 @@ locals {
 
 # Created by the web-ui and prototypes-infra roots, so those must be applied first.
 data "aws_cloudwatch_log_group" "web_ui" {
-  count = local.prototype_deployment_enabled ? 1 : 0
-  name  = "/ecs/${local.web_ui_name}"
+  name = "/ecs/${local.web_ui_name}"
 }
 
 data "aws_lb" "web_ui" {
-  count = local.prototype_deployment_enabled ? 1 : 0
-  name  = local.web_ui_name
+  name = local.web_ui_name
 }
 
 # ---------- Load balancers (web UI and the shared prototype ALB) ----------
@@ -141,7 +138,6 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
 # ---------- Web UI service ----------
 
 resource "aws_cloudwatch_metric_alarm" "web_ui_running_tasks" {
-  count = local.prototype_deployment_enabled ? 1 : 0
 
   alarm_name          = "${local.application_name}-${local.environment}-web-ui-no-running-tasks"
   alarm_description   = "The web UI ECS service has no running tasks."
@@ -160,7 +156,7 @@ resource "aws_cloudwatch_metric_alarm" "web_ui_running_tasks" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "web_ui_utilisation" {
-  for_each = local.prototype_deployment_enabled ? { cpu = "CPUUtilization", memory = "MemoryUtilization" } : {}
+  for_each = { cpu = "CPUUtilization", memory = "MemoryUtilization" }
 
   alarm_name          = "${local.application_name}-${local.environment}-web-ui-high-${each.key}"
   alarm_description   = "The web UI service ${each.key} utilisation is above 85%."
@@ -181,10 +177,9 @@ resource "aws_cloudwatch_metric_alarm" "web_ui_utilisation" {
 # The UI logs JSON (MPAPB_LOG_FORMAT=json). Bedrock failures also match this filter;
 # monitoring.tf has separate Bedrock alarms that say what kind of failure it was.
 resource "aws_cloudwatch_log_metric_filter" "web_ui_errors" {
-  count = local.prototype_deployment_enabled ? 1 : 0
 
   name           = "${local.application_name}-web-ui-errors"
-  log_group_name = data.aws_cloudwatch_log_group.web_ui[0].name
+  log_group_name = data.aws_cloudwatch_log_group.web_ui.name
   pattern        = "{ $.level = \"ERROR\" }"
 
   metric_transformation {
@@ -195,10 +190,9 @@ resource "aws_cloudwatch_log_metric_filter" "web_ui_errors" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "web_ui_errors" {
-  count = local.prototype_deployment_enabled ? 1 : 0
 
   alarm_name          = "${local.application_name}-${local.environment}-web-ui-errors"
-  alarm_description   = "The web UI logged errors. Search the ${data.aws_cloudwatch_log_group.web_ui[0].name} log group for level ERROR."
+  alarm_description   = "The web UI logged errors. Search the ${data.aws_cloudwatch_log_group.web_ui.name} log group for level ERROR."
   namespace           = "${local.metric_namespace}/WebUi"
   metric_name         = "WebUiErrors"
   statistic           = "Sum"

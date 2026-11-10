@@ -1,29 +1,3 @@
-# data "template_file" "launch-template-main" {
-#   template = file("${path.module}/templates/user-data-main.sh")
-#   vars = {
-#     cluster_name       = "${local.first_cluster_name}"
-#     efs_id             = "test"
-#     deploy_environment = local.environment
-#   }
-# }
-
-data "template_file" "launch-template-main-updated" {
-  template = file("${path.module}/templates/user-data-mainone.sh")
-  vars = {
-    cluster_name       = "${local.first_cluster_name}"
-    deploy_environment = local.environment
-  }
-}
-# efs_id             = aws_efs_file_system.oia-storage.id
-
-data "template_file" "launch-template-additional" {
-  template = file("${path.module}/templates/user-data-additional.sh")
-  vars = {
-    cluster_name       = "${local.second_cluster_name}"
-    deploy_environment = local.environment
-  }
-}
-
 resource "aws_launch_template" "ec2_launch_template_main" {
   name_prefix   = local.first_cluster_name
   image_id      = local.application_data.accounts[local.environment].ami_image_id
@@ -53,7 +27,10 @@ resource "aws_launch_template" "ec2_launch_template_main" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template-main-updated.rendered)
+  user_data = base64encode(templatefile("${path.module}/templates/user-data-mainone.sh", {
+    cluster_name       = local.first_cluster_name
+    deploy_environment = local.environment
+  }))
 
   tag_specifications {
     resource_type = "instance"
@@ -130,7 +107,10 @@ resource "aws_launch_template" "ec2_launch_template_additional" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template-additional.rendered)
+  user_data = base64encode(templatefile("${path.module}/templates/user-data-additional.sh", {
+    cluster_name       = local.second_cluster_name
+    deploy_environment = local.environment
+  }))
 
   tag_specifications {
     resource_type = "instance"
