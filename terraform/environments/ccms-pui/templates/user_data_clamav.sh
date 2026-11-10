@@ -38,24 +38,15 @@ EOF
 
 # Base Freshclam Config
 cat << EOF > /etc/freshclam.conf
-# Database Location
+## Minimal config
 DatabaseDirectory /var/lib/clamav
-
-# Logging configuration
-UpdateLogFile /var/log/freshclam.log
-LogTime yes
-LogVerbose no
-
-# Log file admin and rotation
 LogFileMaxSize 1M
 LogRotate yes
-
-# Notify clamd when database updates are downloaded
+LogTime yes
+LogVerbose no
 NotifyClamd /etc/clamd.d/scan.conf
+UpdateLogFile /var/log/freshclam.log
 EOF
-
-# Initial Run of freshclam to update DB
-freshclam
 
 # Enable and Activate ClamAV Scan Daemon and Freshclam Services
 systemctl enable --now clamav-freshclam.service
