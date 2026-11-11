@@ -57,7 +57,7 @@ resource "aws_lambda_function" "purge_lambda" {
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
 
-  layers = [data.aws_ssm_parameter.powertools.value]
+  layers = [data.aws_ssm_parameter.lambda_layer_python_powertools.value]
 
   environment {
     variables = {
