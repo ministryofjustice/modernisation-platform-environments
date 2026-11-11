@@ -34,7 +34,6 @@ data "aws_iam_policy_document" "cloudwatch_logs_clamav" {
     ]
     resources = [
       "${aws_cloudwatch_log_group.log_group_clamav_clamd.arn}*",
-      "${aws_cloudwatch_log_group.log_group_clamav_freshclam.arn}:*",
     ]
   }
   statement {
@@ -44,7 +43,6 @@ data "aws_iam_policy_document" "cloudwatch_logs_clamav" {
     ]
     resources = [
       aws_cloudwatch_log_group.log_group_clamav_clamd.arn,
-      aws_cloudwatch_log_group.log_group_clamav_freshclam.arn,
     ]
   }
 }
