@@ -36,6 +36,20 @@ StreamMaxLength 320M
 User clamscan
 EOF
 
+# Cloudwatch Log Config for Clamd Scan Daemon
+cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'EOF'
+${clamav_cloudwatch_config}
+EOF
+
+/opt/aws/amazon-cloudwatch-agent/etc/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config \
+  -m ec2 \
+  -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json \
+  -s
+
+# Enable Cloudwatch Agent Service
+systemctl enable --now amazon-cloudwatch-agent
+
 # Enable and Activate ClamAV Scan Daemon and Freshclam Services
 systemctl enable --now clamav-freshclam.service
 systemctl enable --now clamd@scan.service
