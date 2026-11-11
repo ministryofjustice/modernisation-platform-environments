@@ -18,7 +18,6 @@ resource "aws_lambda_layer_version" "lambda_layer_oracle_python" {
   s3_object_version   = data.aws_s3_object.lambda_layer_zip.version_id
   compatible_runtimes = ["python3.10"]
 }
-
 # python314-oracleinstantclient21-layer.zip
 
 data "aws_s3_object" "lambda_layer_zip_p314_oic21" {
@@ -33,4 +32,9 @@ resource "aws_lambda_layer_version" "lambda_layer_p314_oic21" {
   s3_key              = data.aws_s3_object.lambda_layer_zip_p314_oic21.key
   s3_object_version   = data.aws_s3_object.lambda_layer_zip_p314_oic21.version_id
   compatible_runtimes = ["python3.14"]
+}
+
+# AWS Powertools
+data "aws_ssm_parameter" "lambda_layer_python_powertools" {
+  name = "/aws/service/powertools/python/x86_64/python3.14/latest"
 }

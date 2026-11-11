@@ -42,7 +42,7 @@ resource "aws_lambda_function" "cloudwatch_log_alert" {
   description       = "Lambda function to send CloudWatch log alerts to Slack."
   function_name     = "cloudwatch_log_alert"
   handler           = "lambda_function.lambda_handler"
-  runtime           = "python3.10"
+  runtime           = "python3.14"
   role              = aws_iam_role.cloudwatch_log_alert_role.arn
   s3_bucket         = data.aws_s3_object.cloudwatch_log_alert_zip.bucket
   s3_key            = data.aws_s3_object.cloudwatch_log_alert_zip.key
