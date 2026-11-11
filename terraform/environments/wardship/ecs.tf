@@ -52,7 +52,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = local.wardship_db.address
+          value = aws_db_instance.wardship_db_v2.address
         },
         {
           name  = "RDS_PORT"
@@ -60,15 +60,15 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
         },
         {
           name  = "RDS_USERNAME"
-          value = local.wardship_db.username
+          value = aws_db_instance.wardship_db_v2.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = local.wardship_db.password
+          value = aws_db_instance.wardship_db_v2.password
         },
         {
           name  = "DB_NAME"
-          value = local.wardship_db.db_name
+          value = aws_db_instance.wardship_db_v2.db_name
         },
         {
           name  = "supportEmail"
