@@ -148,7 +148,7 @@ resource "aws_lambda_function" "cwa_sns_lambda" {
   memory_size       = 128
   runtime           = "python3.14"
 
-  layers = [data.aws_ssm_parameter.powertools.value]
+  layers = [data.aws_ssm_parameter.lambda_layer_python_powertools.value]
 
   vpc_config {
     security_group_ids = [aws_security_group.cwa_extract_new.id]
