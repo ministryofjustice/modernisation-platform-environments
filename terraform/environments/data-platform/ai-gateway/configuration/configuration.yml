@@ -118,6 +118,9 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      legacy_state_begins: 2026-10-08
+      extended_access_begins: 2027-01-08
+      end_of_life: 2027-04-08
     claude-sonnet-4-6:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_family: "Anthropic Claude"
@@ -170,6 +173,8 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      legacy_state_begins: 2026-09-30
+      end_of_life: 2027-03-30
     google-gemma-3-12-it:
       model_id: "google.gemma-3-12b-it"
       model_family: "Google Gemma"
@@ -177,6 +182,8 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      legacy_state_begins: 2026-09-30
+      end_of_life: 2027-03-30
     google-gemma-3-27b-it:
       model_id: "google.gemma-3-27b-it"
       model_family: "Google Gemma"
@@ -184,6 +191,8 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      legacy_state_begins: 2026-09-30
+      end_of_life: 2027-03-30
     # Meta
     meta-llama3-8b-instruct:
       model_id: "meta.llama3-8b-instruct-v1:0"
@@ -192,6 +201,8 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      legacy_state_begins: 2026-09-30
+      end_of_life: 2027-03-30
     meta-llama3-70b-instruct:
       model_id: "meta.llama3-70b-instruct-v1:0"
       model_family: "Meta Llama"
@@ -199,6 +210,8 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      legacy_state_begins: 2026-09-30
+      end_of_life: 2027-03-30
     # Mistral
     mistral-7b-instruct:
       model_id: "mistral.mistral-7b-instruct-v0:2"
@@ -207,6 +220,8 @@ models:
       model_location: "United Kingdom"
       region: eu-west-2
       generally_available: true
+      legacy_state_begins: 2026-09-30
+      end_of_life: 2027-03-30
     # OpenAI
     openai-gpt-oss-20b:
       model_id: "openai.gpt-oss-20b-1:0"
@@ -311,6 +326,9 @@ models:
       aws_role_name: ai-gateway
       generally_available: false
       environments_available: ["production"]
+      legacy_state_begins: 2026-10-08
+      extended_access_begins: 2027-01-08
+      end_of_life: 2027-04-08
     dpr-development-claude-sonnet-4-6:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
@@ -355,6 +373,9 @@ models:
       aws_role_name: ai-gateway
       generally_available: false
       environments_available: ["production"]
+      legacy_state_begins: 2026-10-08
+      extended_access_begins: 2027-01-08
+      end_of_life: 2027-04-08
     dpr-test-claude-sonnet-4-6:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_provider: "Amazon Bedrock (Digital Prison Reporting Test)"
@@ -399,6 +420,9 @@ models:
       aws_role_name: ai-gateway
       generally_available: false
       environments_available: ["production"]
+      legacy_state_begins: 2026-10-08
+      extended_access_begins: 2027-01-08
+      end_of_life: 2027-04-08
     dpr-preproduction-claude-sonnet-4-6:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_provider: "Amazon Bedrock (Digital Prison Reporting Preproduction)"
@@ -443,6 +467,9 @@ models:
       aws_role_name: ai-gateway
       generally_available: false
       environments_available: ["production"]
+      legacy_state_begins: 2026-10-08
+      extended_access_begins: 2027-01-08
+      end_of_life: 2027-04-08
     dpr-production-claude-sonnet-4-6:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"

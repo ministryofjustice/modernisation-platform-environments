@@ -11,12 +11,15 @@ resource "litellm_model" "amazon_bedrock" {
 
   additional_litellm_params = merge(
     {
-      ai_model_provider            = try(each.value.model_provider, "Amazon Bedrock")
-      ai_model_family              = each.value.model_family
-      ai_model_name                = each.value.model_name
-      ai_model_location            = each.value.model_location
-      ai_model_generally_available = each.value.generally_available
-      additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_location\",\"ai_model_generally_available\",\"ai_aws_account_name\"]"
+      ai_model_provider               = try(each.value.model_provider, "Amazon Bedrock")
+      ai_model_family                 = each.value.model_family
+      ai_model_name                   = each.value.model_name
+      ai_model_location               = each.value.model_location
+      ai_model_generally_available    = each.value.generally_available
+      ai_model_legacy_state_begins    = try(each.value.legacy_state_begins, null)
+      ai_model_extended_access_begins = try(each.value.extended_access_begins, null)
+      ai_model_end_of_life            = try(each.value.end_of_life, null)
+      additional_drop_params          = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_location\",\"ai_model_generally_available\",\"ai_aws_account_name\",\"ai_model_generally_available\",\"ai_model_legacy_state_begins\",\"ai_model_extended_access_begins\",\"ai_model_end_of_life\"]"
     },
     try(each.value.aws_account_name, null) == null ? {} : {
       ai_aws_account_name = each.value.aws_account_name
