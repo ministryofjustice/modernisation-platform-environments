@@ -542,6 +542,8 @@ resource "aws_ecs_task_definition" "forge" {
       environment = concat(
         [
           { name = "AWS_REGION", value = data.aws_region.current.region },
+          # Allow larger prototype generations to finish before Forge aborts the model request.
+          { name = "BEDROCK_TIMEOUT_MS", value = "300000" },
           { name = "CHROMIUM_SANDBOX_ENABLED", value = "false" },
           { name = "DATA_DIR", value = "/data" },
           { name = "DESIGN_REVIEW_ENABLED", value = "true" },
@@ -674,6 +676,9 @@ resource "aws_ecs_service" "forge" {
   depends_on = [
     aws_lb_listener_rule.forge,
     aws_efs_mount_target.plans,
+    # Ensures the Cloud Map service isn't destroyed/replaced until after this
+    # ECS service has been updated/destroyed -- see service-discovery.tf.
+    time_sleep.forge_service_discovery_deregistration,
   ]
 
   # CI/CD publishes new task-definition revisions out-of-band and points

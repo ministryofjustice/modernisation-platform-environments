@@ -5,9 +5,7 @@
         "tenant_id": "0bb413d7-160d-4839-868a-f3d46537f6af",
         "api_audience": "e42002c9-c785-4d89-ba44-a280596f6fbd",
         "application_clients": {
-          "0ded1120-7c5c-46ab-b0bb-1811a107f191": [
-            "products-poc"
-          ]
+          "0ded1120-7c5c-46ab-b0bb-1811a107f191": ["products-poc"]
         }
       },
       "api_configuration": {
@@ -15,8 +13,8 @@
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900,
         "multipart_upload": {
-          "single_put_limit_bytes": 5368709120,
-          "multipart_default_part_size_bytes": 67108864,
+          "single_put_limit_bytes": 1073741824,
+          "multipart_default_part_size_bytes": 104857600,
           "multipart_max_parts": 10000,
           "multipart_initial_presign_parts": 10
         }
@@ -24,9 +22,7 @@
       "auth_configuration": {
         "roles": {
           "products-poc-upload": {
-            "allowed_client_ids": [
-              "products-poc"
-            ]
+            "allowed_client_ids": ["products-poc"]
           }
         },
         "users": {
@@ -62,8 +58,8 @@
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900,
         "multipart_upload": {
-          "single_put_limit_bytes": 5368709120,
-          "multipart_default_part_size_bytes": 67108864,
+          "single_put_limit_bytes": 1073741824,
+          "multipart_default_part_size_bytes": 104857600,
           "multipart_max_parts": 10000,
           "multipart_initial_presign_parts": 10
         }
@@ -81,8 +77,8 @@
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900,
         "multipart_upload": {
-          "single_put_limit_bytes": 5368709120,
-          "multipart_default_part_size_bytes": 67108864,
+          "single_put_limit_bytes": 1073741824,
+          "multipart_default_part_size_bytes": 104857600,
           "multipart_max_parts": 10000,
           "multipart_initial_presign_parts": 10
         }
@@ -100,8 +96,8 @@
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900,
         "multipart_upload": {
-          "single_put_limit_bytes": 5368709120,
-          "multipart_default_part_size_bytes": 67108864,
+          "single_put_limit_bytes": 1073741824,
+          "multipart_default_part_size_bytes": 104857600,
           "multipart_max_parts": 10000,
           "multipart_initial_presign_parts": 10
         }

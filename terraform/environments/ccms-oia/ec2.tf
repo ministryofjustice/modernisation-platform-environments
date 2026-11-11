@@ -1,19 +1,3 @@
-data "template_file" "launch-template-opa" {
-  template = file("${path.module}/templates/user-data-opa.sh")
-  vars = {
-    cluster_name       = "${local.first_cluster_name}"
-    deploy_environment = local.environment
-  }
-}
-
-data "template_file" "launch-template-conn-saa" {
-  template = file("${path.module}/templates/user-data-conn-saa.sh")
-  vars = {
-    cluster_name       = "${local.second_cluster_name}"
-    deploy_environment = local.environment
-  }
-}
-
 resource "aws_launch_template" "ec2_launch_template_opa" {
   name_prefix   = local.first_cluster_name
   image_id      = local.application_data.accounts[local.environment].ami_image_id
@@ -43,7 +27,10 @@ resource "aws_launch_template" "ec2_launch_template_opa" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template-opa.rendered)
+  user_data = base64encode(templatefile("${path.module}/templates/user-data-opa.sh", {
+    cluster_name       = local.first_cluster_name
+    deploy_environment = local.environment
+  }))
 
   tag_specifications {
     resource_type = "instance"
@@ -121,7 +108,10 @@ resource "aws_launch_template" "ec2_launch_template_conn_saa" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template-conn-saa.rendered)
+  user_data = base64encode(templatefile("${path.module}/templates/user-data-conn-saa.sh", {
+    cluster_name       = local.second_cluster_name
+    deploy_environment = local.environment
+  }))
 
   tag_specifications {
     resource_type = "instance"
@@ -167,5 +157,10 @@ resource "aws_autoscaling_group" "conn_saa_cluster_scaling_group" {
     key                 = "AmazonECSManaged"
     value               = ""
     propagate_at_launch = true
+  }
+
+  # Desired capacity is managed by the ECS capacity provider (managed scaling).
+  lifecycle {
+    ignore_changes = [desired_capacity]
   }
 }

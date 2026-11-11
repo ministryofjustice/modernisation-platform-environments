@@ -1,7 +1,7 @@
 module "s3_test_harness" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.16.1"
+  version = "5.17.0"
 
   create_bucket = local.create_test_harness
   bucket        = local.destination_bucket_name

@@ -2,6 +2,7 @@
   "accounts": {
     "development": {
       "deploy_workspaces": true,
+      "nexthink_external_id": "",
       "ad_connector_secret_name": "equip-local-domain-join-account",
       "domain_name": "equip.local",
       "ad_connector_size": "Small",
@@ -46,6 +47,7 @@
     },
     "production": {
       "deploy_workspaces": true,
+      "nexthink_external_id": "",
       "ad_connector_secret_name": "equip-local-domain-join-account",
       "domain_name": "equip.local",
       "ad_connector_size": "Small",
@@ -109,7 +111,9 @@
         "dragan-letic": "dragan.letic",
         "pamela-miller": "pamela.miller",
         "john-birks": "John.Birks",
-        "christopher-hughes": "Christopher.hughes"
+        "debadrita-modak": "debadrita.modak",
+        "christopher-hughes": "Christopher.hughes",
+        "Ayomide-Olafare": "Ayomide.Olafare"
       }
     }
   }

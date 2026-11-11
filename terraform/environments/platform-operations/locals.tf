@@ -48,5 +48,10 @@ locals {
     development = local.enable_aws_health_lambda_development
     production  = local.enable_aws_health_lambda_production
   }
-  enable_aws_health_lambda = local.enable_aws_health_lambda_environments_specific[local.environment]
+  enable_aws_securityhub_lambda_environments_specific = {
+    development = local.enable_aws_securityhub_lambda_development
+    production  = local.enable_aws_securityhub_lambda_production
+  }
+  enable_aws_health_lambda      = local.enable_aws_health_lambda_environments_specific[local.environment]
+  enable_aws_securityhub_lambda = local.enable_aws_securityhub_lambda_environments_specific[local.environment]
 }

@@ -173,7 +173,7 @@ resource "aws_instance" "s609693lo6vw105" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id]
-  subnet_id = data.aws_subnet.private_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -430,7 +430,7 @@ resource "aws_instance" "s609693lo6vw115" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]
-  subnet_id = data.aws_subnet.private_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -542,7 +542,7 @@ resource "aws_instance" "s618358rgvw024" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.conditional["Database-and-Document-Service-Security-Group"].id]
-  subnet_id = data.aws_subnet.data_subnets_a.id
+  subnet_id              = data.aws_subnet.data_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -573,7 +573,7 @@ resource "aws_instance" "s618358rgsw025" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.all["WAM-Data-Access-Server-Security-Group"].id]
-  subnet_id = data.aws_subnet.private_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -598,7 +598,7 @@ resource "aws_instance" "s618358rgvw026" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]
-  subnet_id = data.aws_subnet.data_subnets_b.id
+  subnet_id              = data.aws_subnet.data_subnets_b.id
 
   metadata_options {
     http_tokens   = "required"
@@ -626,7 +626,7 @@ resource "aws_instance" "s618358rgvw028" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]
-  subnet_id = data.aws_subnet.data_subnets_b.id
+  subnet_id              = data.aws_subnet.data_subnets_b.id
 
   metadata_options {
     http_tokens   = "required"
@@ -701,7 +701,7 @@ resource "aws_instance" "S618358RGVW202" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.conditional["WAM-Bridge-Server-Security-Group"].id]
-  subnet_id = data.aws_subnet.private_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"

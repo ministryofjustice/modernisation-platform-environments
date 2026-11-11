@@ -4,6 +4,14 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 6.28.0, < 7.0.0, != 6.57.0"
     }
+    dns = {
+      source  = "hashicorp/dns"
+      version = "~> 3.0"
+    }
+    external = {
+      source  = "hashicorp/external"
+      version = "~> 2.0"
+    }
     http = {
       source  = "hashicorp/http"
       version = "~> 3.0"

@@ -31,8 +31,8 @@ locals {
     basic_auth_username = try(local.application_configuration.api_configuration.docs.basic_auth_username, "api-docs")
   }
   multipart_configuration = {
-    single_put_limit_bytes            = try(local.application_configuration.api_configuration.multipart_upload.single_put_limit_bytes, 5368709120)
-    multipart_default_part_size_bytes = try(local.application_configuration.api_configuration.multipart_upload.multipart_default_part_size_bytes, 67108864)
+    single_put_limit_bytes            = try(local.application_configuration.api_configuration.multipart_upload.single_put_limit_bytes, 1073741824)
+    multipart_default_part_size_bytes = try(local.application_configuration.api_configuration.multipart_upload.multipart_default_part_size_bytes, 104857600)
     multipart_max_parts               = try(local.application_configuration.api_configuration.multipart_upload.multipart_max_parts, 10000)
     multipart_initial_presign_parts   = try(local.application_configuration.api_configuration.multipart_upload.multipart_initial_presign_parts, 10)
   }

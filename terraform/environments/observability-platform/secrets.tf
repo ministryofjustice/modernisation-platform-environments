@@ -69,3 +69,20 @@ resource "aws_secretsmanager_secret" "grafana_cloud_password" {
 
   name = "grafana/grafana-cloud-password"
 }
+
+#tfsec:ignore:avd-aws-0098 CMK not required currently
+resource "aws_secretsmanager_secret" "grafana_cloud_access_policy_token" {
+  #checkov:skip=CKV_AWS_149:CMK not required currently
+  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
+
+  name = "grafana-cloud/terraform-access-policy-token"
+}
+
+#tfsec:ignore:avd-aws-0098 CMK not required currently
+resource "aws_secretsmanager_secret" "grafana_cloud_pdc_token" {
+  #checkov:skip=CKV_AWS_149:CMK not required currently
+  #checkov:skip=CKV2_AWS_57:Token is issued by Grafana Cloud and rotated via Terraform
+  count = local.grafana_cloud_pdc.enabled ? 1 : 0
+
+  name = "grafana-cloud/pdc-agent-token"
+}
