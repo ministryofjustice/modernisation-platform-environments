@@ -1,7 +1,7 @@
 # 1. Create a custom parameter group
 resource "aws_db_parameter_group" "dacp_analyse" {
   name        = "custom-postgres-parameters"
-  family      = "postgres14" # match your RDS engine version
+  family      = "postgres16" # match your RDS engine version
   description = "Custom parameter group for slow query logging"
 
   parameter {
@@ -53,7 +53,7 @@ resource "aws_db_instance" "dacp_db_v2" {
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
   apply_immediately               = local.is-production ? false : true
   copy_tags_to_snapshot           = true
-  parameter_group_name            = local.is-production ? "default.postgres14" : aws_db_parameter_group.dacp_analyse.name
+  parameter_group_name            = local.is-production ? "default.postgres16" : aws_db_parameter_group.dacp_analyse.name
   maintenance_window              = local.is-production ? "sun:04:00-sun:04:30" : "wed:19:20-wed:19:50"
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 }
