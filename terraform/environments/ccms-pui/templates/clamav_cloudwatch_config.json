@@ -5,7 +5,7 @@
                 "collect_list": [
                     {
                         "file_path": "/var/log/clamd.scan",
-                        "log_group_name": "/aws/ec2/clamav/clamd",
+                        "log_group_name": "${clamav_log_group_name}",
                         "log_stream_name": "{instance_id}"
                     }       
                 ]       

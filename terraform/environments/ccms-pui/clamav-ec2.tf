@@ -20,9 +20,18 @@ resource "aws_instance" "ec2_clamav" {
   }
 
   user_data_replace_on_change = false
-  user_data = base64encode(templatefile("./templates/user_data_clamav.sh", {
-    hostname = "clamav"
-  }))
+  user_data = base64encode(
+    templatefile(
+      "./templates/user_data_clamav.sh", {
+        hostname = "clamav",
+        clamav_cloudwatch_config = templatefile(
+          "${path.module}/templates/clamav_cloudwatch_config.json",
+          {
+            clamav_log_group_name = aws_cloudwatch_log_group.log_group_clamav_clamd.name
+        })
+      }
+    )
+  )
 
   metadata_options {
     http_endpoint = "enabled"
