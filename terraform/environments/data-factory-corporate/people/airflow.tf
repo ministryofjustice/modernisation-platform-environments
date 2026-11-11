@@ -1,7 +1,7 @@
 locals {
   # Apply with false, populate the secret, then set true and apply again.
   # Switching back to false removes the role and provider, but keeps the secret.
-  enable_airflow_iam_role = false
+  enable_airflow_iam_role = true
 }
 
 # Create an empty secret; populate its JSON value manually before enabling.
