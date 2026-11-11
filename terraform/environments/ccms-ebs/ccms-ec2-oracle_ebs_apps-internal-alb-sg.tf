@@ -9,16 +9,16 @@ resource "aws_security_group" "sg_ebsapps_internal_alb" {
   )
 }
 
-# # This Security Group is created for Azure Virtual Desktop (AVD) users as above SG has full quota
-# resource "aws_security_group" "avd_sg_ebsapps_internal_alb" {
-#   name        = "avd_ebs_apps_internal_alb"
-#   description = "Inbound traffic control for EBSAPPS Internal loadbalancer"
-#   vpc_id      = data.aws_vpc.shared.id
+# This Security Group is created for Azure Virtual Desktop (AVD) users as above SG has full quota
+resource "aws_security_group" "avd_sg_ebsapps_internal_alb" {
+  name        = "avd_ebs_apps_internal_alb"
+  description = "Inbound traffic control for EBSAPPS Internal loadbalancer"
+  vpc_id      = data.aws_vpc.shared.id
 
-#   tags = merge(local.tags,
-#     { Name = lower(format("sg-avd-ebsapps-loadbalancer-internal")) }
-#   )
-# }
+  tags = merge(local.tags,
+    { Name = lower(format("sg-avd-ebsapps-loadbalancer-internal")) }
+  )
+}
 
 
 
