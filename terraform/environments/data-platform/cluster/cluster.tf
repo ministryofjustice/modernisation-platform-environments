@@ -11,7 +11,16 @@ module "eks" {
   vpc_id                   = data.aws_vpc.main.id
   control_plane_subnet_ids = data.aws_subnets.private.ids
   subnet_ids               = data.aws_subnets.private.ids
-
+  security_group_additional_rules = {
+    vpc = {
+      description = "Allow traffic from the VPC"
+      from_port   = 0
+      to_port     = 65535
+      protocol    = "tcp"
+      type        = "ingress"
+      cidr_blocks = [data.aws_vpc.main.cidr_block]
+    }
+  }
   deletion_protection = true
 
   create_node_security_group = false
@@ -144,6 +153,18 @@ module "eks" {
           }
         }
       }
+    }
+    # MWAA access to MWAA role in MWAA namespace
+    dp-mwaa = {
+      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/mwaa-execution"
+      username          = "dp-mwaa"
+      kubernetes_groups = ["mwaa"]
+    }
+    # Analytical Platform Common access to MWAA ServiceAccount management role in MWAA namespace
+    gha-mojap-common = {
+      principal_arn     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/analytical-platform-github-actions"
+      username          = "github-actions-moj-ap-airflow"
+      kubernetes_groups = ["mwaa-serviceaccount-management", "mwaa-external-secrets"]
     }
   }
 }
