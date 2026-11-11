@@ -79,6 +79,20 @@ module "data_platform_airflow_iam_role" {
               "kms:ViaService" = "s3.${data.aws_region.current.region}.amazonaws.com"
             }
           }
+        },
+        {
+          Effect = "Allow"
+          Action = [
+            "glue:GetDatabase",
+            "glue:GetTable",
+            "glue:CreateTable",
+            "glue:UpdateTable"
+          ]
+          Resource = [
+            local.glue_catalog_arn,
+            module.sherlock_glue_database.glue_database_arn,
+            "${replace(module.sherlock_glue_database.glue_database_arn, ":database/", ":table/")}/*"
+          ]
         }
       ]
     })
