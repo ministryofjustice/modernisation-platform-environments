@@ -146,11 +146,9 @@ resource "aws_lambda_function" "cwa_sns_lambda" {
   s3_object_version = data.aws_s3_object.cwa_sns_zip.version_id
   timeout           = 300
   memory_size       = 128
-  runtime           = "python3.10"
+  runtime           = "python3.14"
 
-  layers = [
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
-  ]
+  layers = [data.aws_ssm_parameter.powertools.value]
 
   vpc_config {
     security_group_ids = [aws_security_group.cwa_extract_new.id]
