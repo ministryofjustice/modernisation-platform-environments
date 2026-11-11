@@ -171,3 +171,9 @@ variable "metadata_generator_allowed_triggers" {
   default     = {}
   description = "Which services can invoke metadata generator lambda (see https://github.com/terraform-aws-modules/terraform-aws-lambda?tab=readme-ov-file#lambda-permissions-for-allowed-triggers)"
 }
+
+variable "slack_webhook_secret_id" {
+  type        = string
+  default     = null
+  description = "Secrets Manager ID holding the Slack workflow webhook URL for DMS alerts. Alerts are not sent to Slack when null."
+}
