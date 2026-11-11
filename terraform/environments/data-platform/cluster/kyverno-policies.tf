@@ -69,3 +69,68 @@ resource "kubernetes_manifest" "kyverno_privileged_policy" {
   }
   depends_on = [helm_release.kyverno]
 }
+
+# Kyverno's default-deny NetworkPolicy (generate-default-network-policy) blocks
+# all egress except DNS. Allow HTTPS out of the MWAA namespace so pods can reach
+# AWS APIs (STS, S3, Glue, Athena, Secrets Manager). IMDS stays blocked.
+resource "kubernetes_manifest" "kyverno_allow_egress_https" {
+  manifest = {
+    apiVersion = "kyverno.io/v1"
+    kind       = "ClusterPolicy"
+    metadata = {
+      name = "generate-allow-egress-https"
+      annotations = {
+        "policies.kyverno.io/title"       = "Generate Allow Egress HTTPS NetworkPolicy"
+        "policies.kyverno.io/description" = "default-deny blocks all egress except DNS. Allow HTTPS out so pods can reach AWS APIs."
+      }
+    }
+    spec = {
+      generateExisting = true
+      rules = [
+        {
+          name = "allow-egress-https"
+          match = {
+            any = [
+              {
+                resources = {
+                  kinds = ["Namespace"]
+                  names = ["mwaa"]
+                }
+              }
+            ]
+          }
+          generate = {
+            synchronize = true
+            apiVersion  = "networking.k8s.io/v1"
+            kind        = "NetworkPolicy"
+            name        = "allow-egress-https"
+            namespace   = "{{request.object.metadata.name}}"
+            data = {
+              spec = {
+                podSelector = {}
+                policyTypes = ["Egress"]
+                egress = [
+                  {
+                    to = [
+                      {
+                        ipBlock = {
+                          cidr   = "0.0.0.0/0"
+                          except = ["169.254.169.254/32"]
+                        }
+                      }
+                    ]
+                    ports = [
+                      { protocol = "TCP", port = 443 }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+
+  depends_on = [helm_release.kyverno]
+}
