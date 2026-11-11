@@ -49,7 +49,6 @@ resource "aws_security_group_rule" "cwa_extract_egress_https_s3" {
 ### Lambda Resources For Step Function
 ######################################
 resource "aws_lambda_function" "cwa_extract_lambda" {
-
   description       = "Connect to CWA DB and invoke cwa extract procedure."
   function_name     = "cwa_extract_lambda"
   role              = aws_iam_role.cwa_extract_lambda_role.arn
@@ -59,10 +58,10 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
   s3_object_version = data.aws_s3_object.cwa_extract_zip.version_id
   timeout           = 900
   memory_size       = 128
-  runtime           = "python3.10"
+  runtime           = "python3.14"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn
+    aws_lambda_layer_version.lambda_layer_p314_oic21.arn
   ]
 
   vpc_config {
@@ -74,8 +73,8 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
     variables = {
       PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_1"
-      ORACLE_HOME       = "/opt/instantclient_12_1"
+      LD_LIBRARY_PATH   = "/opt/instantclient_21_23"
+      ORACLE_HOME       = "/opt/instantclient_21_23"
       SERVICE_NAME      = "cwa-extract-service"
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment
@@ -93,7 +92,6 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
 }
 
 resource "aws_lambda_function" "cwa_file_transfer_lambda" {
-
   description       = "Connect to CWA DB, retrieve multiple json files of each extract and merge into single JSON file, uploads them to S3"
   function_name     = "cwa_file_transfer_lambda"
   role              = aws_iam_role.cwa_extract_lambda_role.arn
@@ -103,10 +101,10 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
   s3_object_version = data.aws_s3_object.cwa_file_transfer_zip.version_id
   timeout           = 900
   memory_size       = 128
-  runtime           = "python3.10"
+  runtime           = "python3.14"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn
+    aws_lambda_layer_version.lambda_layer_p314_oic21.arn
   ]
 
   vpc_config {
@@ -119,8 +117,8 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
       TABLE_NAME_SECRET = aws_secretsmanager_secret.cwa_table_name_secret.name
       TARGET_BUCKET     = aws_s3_bucket.data.bucket
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_1"
-      ORACLE_HOME       = "/opt/instantclient_12_1"
+      LD_LIBRARY_PATH   = "/opt/instantclient_21_23"
+      ORACLE_HOME       = "/opt/instantclient_21_23"
       SERVICE_NAME      = "cwa-file-transfer-service"
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment

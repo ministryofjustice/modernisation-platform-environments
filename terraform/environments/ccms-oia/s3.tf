@@ -116,7 +116,9 @@ module "s3-bucket-logging" {
         "Principal" : "*",
         "Action" : "s3:*",
         "Resource" : [
-        "${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ],
         "Condition" : {
           "Bool" : {
             "aws:SecureTransport" : "false"
@@ -129,8 +131,11 @@ module "s3-bucket-logging" {
         Principal = {
           AWS = "*"
         },
-        Action   = "s3:*",
-        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        Action = "s3:*",
+        Resource = [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ],
         Condition = {
           Bool = {
             "aws:SecureTransport" = "false"

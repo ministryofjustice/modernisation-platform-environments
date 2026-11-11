@@ -14,8 +14,10 @@ locals {
   prototype_deployment_variables = [
     { name = "IMAGE_URI", path = "States.Format('{}:{}-{}', '${aws_ecr_repository.user_applications.repository_url}', $.package_identity.AppID, $.package_identity.BuildID)" },
     { name = "REQUEST_ID", path = "$.package_identity.AppID" },
+    { name = "BUILD_ID", path = "States.Format('{}', $.package_identity.BuildID)" },
     { name = "BASE_PATH", path = "$.image_build_task.index_html_path" },
     { name = "AWS_REGION", value = data.aws_region.current.region },
+    { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
     { name = "TASK_EXECUTION_ROLE_ARN", value = aws_iam_role.script_runner_ecs_execution.arn },
     { name = "TASK_ROLE_ARN", value = aws_iam_role.prototype_app_task.arn },
     { name = "ECS_CLUSTER_ARN", value = local.prototype_deployment.cluster_arn },

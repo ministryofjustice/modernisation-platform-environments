@@ -66,10 +66,6 @@
         "value": "${aws_endpoint}"
       },
       {
-        "name": "spring_datasource_url",
-        "value": "jdbc:mysql://${spring_datasource_url}/opahub"
-      },
-      {
         "name": "LOGGING_LEVEL_ROOT",
         "value": "${logging_level_root}"
       },
@@ -118,6 +114,10 @@
       {
         "name": "ccms_pui_connector_assess_service_password",
         "valueFrom": "${client_opa12assess_security_user_password}"
+      },
+      {
+        "name": "spring_datasource_url",
+        "valueFrom": "${spring_datasource_url}"
       },
       {
         "name": "spring_datasource_username",
