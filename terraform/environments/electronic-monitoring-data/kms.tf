@@ -36,7 +36,6 @@ module "kms_metadata_key" {
             module.s3-fms-general-landing-bucket.bucket_arn,
             module.s3-fms-ho-landing-bucket.bucket_arn,
             module.s3-fms-specials-landing-bucket.bucket_arn,
-            module.s3-gems-general-landing-bucket.bucket_arn,
             module.s3-mdss-general-landing-bucket.bucket_arn,
             module.s3-mdss-ho-landing-bucket.bucket_arn,
             module.s3-mdss-specials-landing-bucket.bucket_arn,
