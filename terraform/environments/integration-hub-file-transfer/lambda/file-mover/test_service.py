@@ -77,59 +77,6 @@ class FileMoverServiceTest(unittest.TestCase):
         self.assertEqual(completed_fields["processing_version_id"], "destination-version")
         self.assertEqual(completed_fields["staged_event_id"], "completion-event-id")
 
-    def test_route_sends_a_tag_mismatch_to_investigation(self):
-        route_event = {
-            **self.event,
-            "detail-type": "FileScanResultRecorded.v1",
-            "detail": {
-                "metadata": {"correlationId": "correlation-id"},
-                "data": {
-                    **self.event["detail"]["data"],
-                    "object": {
-                        **self.event["detail"]["data"]["object"],
-                        "bucket": "processing",
-                    },
-                    "scanResultStatus": "NO_THREATS_FOUND",
-                    "scanResultStatusMatchesTag": False,
-                },
-            },
-        }
-        item = {
-            **self.base_item,
-            "operation": "ROUTE",
-            "source_bucket": "processing",
-            "scan_result_status": "NO_THREATS_FOUND",
-            "scan_result_status_matches_tag": False,
-        }
-        self.store.claim.return_value = SimpleNamespace(state="CLAIMED", item=item)
-        snapshot = SimpleNamespace(
-            tags=[
-                {
-                    "Key": "GuardDutyMalwareScanStatus",
-                    "Value": "NO_THREATS_FOUND",
-                }
-            ]
-        )
-        self.copy_engine.inspect_source.return_value = snapshot
-        self.copy_engine.copy.side_effect = lambda item, *_args: {
-            **item,
-            "status": "COPIED",
-            "destination_bucket": "investigation",
-            "destination_version_id": "investigation-version",
-            "copy_token": "copy-token",
-        }
-        service = self._route_service()
-
-        result = service.handle(route_event, self.context)
-
-        self.assertEqual(result["status"], "COMPLETED")
-        published = json.loads(
-            self.eventbridge.put_events.call_args.kwargs["Entries"][0]["Detail"]
-        )
-        self.assertEqual(published["data"]["route"], "investigation")
-        self.assertFalse(published["data"]["scanResultStatusMatchesTag"])
-        self.copy_engine.delete_source.assert_called_once()
-
     def test_enabled_stage_receipt_is_created_after_source_deletion(self):
         item = {
             **self.base_item,

@@ -136,6 +136,9 @@ resource "aws_grafana_workspace" "this" {
   # upgrade to Grafana v12 (otherwise UpdateWorkspaceConfiguration returns
   # "Grafana alerting must be enabled before upgrading to v12").
   configuration = jsonencode({
+    plugins = {
+      pluginAdminEnabled = false
+    }
     unifiedAlerting = {
       enabled = true
     }

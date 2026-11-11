@@ -1,0 +1,31 @@
+configuration_version: 1
+
+service: sandbox-oracle
+parent_domain: probation
+
+source:
+  engine: oracle
+  database_name: DMSTEST
+  secret_ref: sandbox-oracle-source
+
+task_groups:
+  integration:
+    mode: full-load-and-cdc
+
+    tables:
+      - schema_name: DMS_USER
+        table_name: DMS_INTEGRATION_TEST
+
+        contract:
+          strategy: generate_if_missing
+          namespace: uk.gov.justice.contracts
+
+        processing_profile: standard
+        history_profile: standard
+        publication_profile: sandbox
+
+destination_profile: sandbox-oracle
+concurrency_profile: sandbox-small
+
+schedule:
+  enabled: false

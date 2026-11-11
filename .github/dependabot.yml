@@ -251,18 +251,6 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
-      - "terraform/environments/cdpt-chaps"
-    schedule:
-      interval: "daily"
-    groups:
-      cdpt-chaps:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
       - "terraform/environments/cdpt-ifs"
     schedule:
       interval: "daily"
@@ -323,38 +311,6 @@ updates:
       interval: "daily"
     groups:
       cloud-platform:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
-      - "terraform/environments/cloud-platform-live"
-      - "terraform/environments/cloud-platform-live/cluster"
-      - "terraform/environments/cloud-platform-live/cluster-components"
-      - "terraform/environments/cloud-platform-live/cluster-core"
-      - "terraform/environments/cloud-platform-live/network"
-    schedule:
-      interval: "daily"
-    groups:
-      cloud-platform-live:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
-      - "terraform/environments/cloud-platform-non-live"
-      - "terraform/environments/cloud-platform-non-live/cluster"
-      - "terraform/environments/cloud-platform-non-live/cluster-components"
-      - "terraform/environments/cloud-platform-non-live/cluster-core"
-      - "terraform/environments/cloud-platform-non-live/network"
-    schedule:
-      interval: "daily"
-    groups:
-      cloud-platform-non-live:
         patterns:
           - "*"
     open-pull-requests-limit: 50
@@ -489,6 +445,7 @@ updates:
       - "terraform/environments/data-factory-laa/modules/airflow-data-ingestion-role"
       - "terraform/environments/data-factory-laa/modules/airflow-oidc"
       - "terraform/environments/data-factory-laa/modules/cadet-role"
+      - "terraform/environments/data-factory-laa/modules/file-ingestion"
     schedule:
       interval: "daily"
     groups:
@@ -506,6 +463,9 @@ updates:
       - "terraform/environments/data-factory-moj/dms-core/modules/dms-test-harness"
       - "terraform/environments/data-factory-moj/dms-core/modules/oracle-test-harness"
       - "terraform/environments/data-factory-moj/genesys-data-ingestion"
+      - "terraform/environments/data-factory-moj/ingestion-artifacts"
+      - "terraform/environments/data-factory-moj/ingestion-registry"
+      - "terraform/environments/data-factory-moj/service-ingestion"
       - "terraform/environments/data-factory-moj/streaming-poc"
       - "terraform/environments/data-factory-moj/streaming-poc-devops"
       - "terraform/environments/data-factory-moj/streaming-poc-maf"
@@ -682,7 +642,9 @@ updates:
     directories:
       - "terraform/environments/developer-experience"
       - "terraform/environments/developer-experience/auth0-event-stream"
+      - "terraform/environments/developer-experience/dns"
       - "terraform/environments/developer-experience/github-audit-log-stream"
+      - "terraform/environments/developer-experience/github-backup"
       - "terraform/environments/developer-experience/github-management"
     schedule:
       interval: "daily"
@@ -767,7 +729,6 @@ updates:
       - "terraform/environments/electronic-monitoring-data/modules/ap_airflow_iam_role"
       - "terraform/environments/electronic-monitoring-data/modules/ap_airflow_load_data_iam_role"
       - "terraform/environments/electronic-monitoring-data/modules/api_step_function"
-      - "terraform/environments/electronic-monitoring-data/modules/dms"
       - "terraform/environments/electronic-monitoring-data/modules/export_bucket_presigned_url"
       - "terraform/environments/electronic-monitoring-data/modules/export_bucket_push"
       - "terraform/environments/electronic-monitoring-data/modules/glue_table_optimiser"
@@ -912,6 +873,7 @@ updates:
       - "terraform/environments/integration-hub/downstream-mock-api"
       - "terraform/environments/integration-hub/downstream-mock-api/modules/service"
       - "terraform/environments/integration-hub/events-platform"
+      - "terraform/environments/integration-hub/iac"
       - "terraform/environments/integration-hub/managed-file-transfer"
     schedule:
       interval: "daily"
@@ -927,8 +889,6 @@ updates:
       - "terraform/environments/integration-hub-api"
       - "terraform/environments/integration-hub-api/benefit-checker-api"
       - "terraform/environments/integration-hub-api/file-transfer-api"
-      - "terraform/environments/integration-hub-api/modules/file-transfer-api"
-      - "terraform/environments/integration-hub-api/modules/integration-hub-file-transfer-api"
     schedule:
       interval: "daily"
     groups:
@@ -941,6 +901,10 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/integration-hub-events"
+      - "terraform/environments/integration-hub-events/api"
+      - "terraform/environments/integration-hub-events/api-client-lib"
+      - "terraform/environments/integration-hub-events/event-subscriber-admin-ui"
+      - "terraform/environments/integration-hub-events/kafka"
     schedule:
       interval: "daily"
     groups:
@@ -957,6 +921,7 @@ updates:
       - "terraform/environments/integration-hub-file-transfer/pull-from-presigned-url"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup"
+      - "terraform/environments/integration-hub-file-transfer/push-to-sftp"
       - "terraform/environments/integration-hub-file-transfer/test-harness"
     schedule:
       interval: "daily"
@@ -973,6 +938,7 @@ updates:
       - "terraform/environments/justice-eng-ai/backend-processing"
       - "terraform/environments/justice-eng-ai/modules/step_function_builder"
       - "terraform/environments/justice-eng-ai/prototypes-infra"
+      - "terraform/environments/justice-eng-ai/prototypes-infra/shared-prototype-edge"
       - "terraform/environments/justice-eng-ai/web-ui"
     schedule:
       interval: "daily"
@@ -1556,6 +1522,8 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/modules/acm_certificate"
+      - "terraform/modules/aws_health_lambda"
+      - "terraform/modules/aws_health_lambda_cloudwatch_events"
       - "terraform/modules/baseline"
       - "terraform/modules/baseline_presets"
       - "terraform/modules/cloudwatch_dashboard"

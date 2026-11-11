@@ -4,6 +4,17 @@ locals {
   shred_unstructured_docker_image_uri = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/${local.emds_gdpr_ecr_name}:${local.shred_unstructured_image_name}-${local.environment_shorthand}"
 }
 
+variable "sqlserver_https_ports" {
+  description = "List of ports required for Glue outbound connections"
+  type        = list(number)
+  default     = [1433, 443]
+}
+
+data "aws_ip_ranges" "london_s3" {
+  regions  = ["eu-west-2"]
+  services = ["s3"]
+}
+
 # ==============================================================================
 # 1. IAM: Batch Service Role (Allows AWS Batch to manage EC2 instances)
 # ==============================================================================

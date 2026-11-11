@@ -21,6 +21,7 @@ locals {
     preprod = true
   }
 }
+
 module "fargate_graceful_retirement" {
   count                   = contains(keys(local.fargate_restart_schedules), var.env_name) ? 1 : 0
   source                  = "../components/fargate_graceful_retirement"

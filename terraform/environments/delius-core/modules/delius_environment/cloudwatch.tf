@@ -48,7 +48,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_4xx_warning" {
   statistic           = "Sum"
   metric_name         = "HTTPCode_ELB_4XX_Count"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 50
+  threshold           = 200
   treat_missing_data  = "notBreaching"
   evaluation_periods  = 2
   period              = 60
@@ -69,7 +69,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_5xx_warning" {
   statistic           = "Sum"
   metric_name         = "HTTPCode_ELB_5XX_Count"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 1
+  threshold           = 10
   treat_missing_data  = "notBreaching"
   evaluation_periods  = 2
   period              = 60
@@ -102,4 +102,52 @@ resource "aws_cloudwatch_metric_alarm" "alb_rejected_connections_warning" {
   }
 
   tags = merge(var.tags, { "Name" = local.alb_name })
+}
+
+resource "aws_cloudwatch_alarm_mute_rule" "weeknight_mute" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+  name  = "weeknight-alarm-mute"
+
+  mute_targets {
+    alarm_names = compact(concat(
+      module.weblogic.alarm_names,
+      module.weblogic_eis.alarm_names,
+      try(module.weblogic_testdata_api.alarm_names, []),
+      module.pwm.alarm_names,
+      module.ldap_ecs.alarm_names,
+      try(module.oracle_db_shared.alarm_names, [])
+    ))
+  }
+
+  rule {
+    schedule {
+      expression = "cron(0 19 * * MON-FRI)"
+      duration   = "PT11H"
+      timezone   = "Europe/London"
+    }
+  }
+}
+
+resource "aws_cloudwatch_alarm_mute_rule" "weekend_mute" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+  name  = "weekend-alarm-mute"
+
+  mute_targets {
+    alarm_names = compact(concat(
+      module.weblogic.alarm_names,
+      module.weblogic_eis.alarm_names,
+      try(module.weblogic_testdata_api.alarm_names, []),
+      module.pwm.alarm_names,
+      module.ldap_ecs.alarm_names,
+      try(module.oracle_db_shared.alarm_names, [])
+    ))
+  }
+
+  rule {
+    schedule {
+      expression = "cron(0 0 * * SAT)"
+      duration   = "PT54H"
+      timezone   = "Europe/London"
+    }
+  }
 }

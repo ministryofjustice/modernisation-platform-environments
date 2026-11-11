@@ -1,5 +1,7 @@
 locals {
-  lambda_name         = "${var.service_name}-nightly-restart"
+  service_name        = "${var.env_name}-${var.app_name}"
+  alarm_prefix        = "${var.app_name}-${var.env_name}"
+  lambda_name         = "${local.service_name}-nightly-restart"
   schedule_expression = "cron(15 02 * * ? *)" # 02:15 every day
 }
 
@@ -20,23 +22,21 @@ data "aws_iam_policy_document" "lambda_exec_policy" {
     actions   = ["ecs:UpdateService"]
     resources = [var.service_arn]
   }
-}
-
-resource "aws_cloudwatch_event_rule" "rule" {
-  name                = "${local.lambda_name}-rule"
-  schedule_expression = local.schedule_expression
-}
-
-resource "aws_cloudwatch_event_target" "target" {
-  rule = aws_cloudwatch_event_rule.rule.name
-  arn  = aws_lambda_function.nightly_restart_lambda.arn
-}
-
-resource "aws_lambda_permission" "allow_cloudwatch" {
-  action        = "lambda:InvokeFunction"
-  principal     = "events.amazonaws.com"
-  function_name = aws_lambda_function.nightly_restart_lambda.function_name
-  source_arn    = aws_cloudwatch_event_rule.rule.arn
+  statement {
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:DisableAlarmActions",
+      "cloudwatch:EnableAlarmActions",
+      "cloudwatch:ListTagsForResource"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ecs:DescribeServices"]
+    resources = [var.service_arn]
+  }
 }
 
 resource "aws_iam_role" "lambda_role" {
@@ -73,17 +73,19 @@ resource "aws_lambda_function" "nightly_restart_lambda" {
   #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
 
   function_name    = local.lambda_name
-  description      = "Lambda function to restart the ${var.service_name} ECS service nightly"
+  description      = "Lambda function to restart the ${local.service_name} ECS service nightly"
   role             = aws_iam_role.lambda_role.arn
   runtime          = "python3.14"
   handler          = "lambda.handler"
   filename         = data.archive_file.nightly_restart_lambda_zip.output_path
   source_code_hash = filebase64sha256(data.archive_file.nightly_restart_lambda_zip.output_path)
+  timeout          = 30
   tags             = { Name = local.lambda_name }
   environment {
     variables = {
-      CLUSTER       = var.cluster_name
-      SERVICE       = var.service_name
+      CLUSTER_NAME  = var.cluster_name
+      SERVICE_NAME  = local.service_name
+      ALARM_PREFIX  = local.alarm_prefix
       DESIRED_COUNT = var.task_count
     }
   }

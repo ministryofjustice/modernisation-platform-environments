@@ -141,6 +141,10 @@ module "external_secrets_iam_role" {
 
   attach_external_secrets_policy = true
   external_secrets_kms_key_arns  = [module.common_secrets_manager_kms.key_arn]
+  external_secrets_secrets_manager_arns = [
+    for secret_name in local.environment_configuration.external_secrets_secrets_manager_names :
+    "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${secret_name}-*"
+  ]
 
   oidc_providers = {
     main = {

@@ -4,6 +4,14 @@ locals {
       /* Route53 */
       route53_zone = "test.data-platform.service.justice.gov.uk"
 
+      /* Airflow UI access (ALB ingress) - name => CIDR */
+      airflow_allowed_ingress_cidrs = {
+        "prisma_corporate" = "128.77.75.64/26"
+        "office_102PF"     = "213.121.161.112/28"
+        "office_10SC"      = "51.149.2.0/24"
+      }
+
+
       /* MWAA */
       airflow_version                 = "3.3.1"
       airflow_environment_class       = "mw1.large"
@@ -13,6 +21,19 @@ locals {
       airflow_schedulers              = 2
       airflow_celery_worker_autoscale = "7,1"
       airflow_dagbag_import_timeout   = 60
+
+      # >>> TEMPORARY (Airflow 3 durability test): START
+      /* Airflow workflow access to the MWAA bucket
+         Prefix => workflow IAM role names. The roles are created by
+         ministryofjustice/analytical-platform-airflow in analytical-platform-data-production,
+         and must exist before this is applied (S3 and KMS reject unknown principals). */
+      mwaa_bucket_workflow_access = {
+        "durability-test" = [
+          "airflow-dp-test-data-platform-example-durability-producer",
+          "airflow-dp-test-data-platform-example-durability-consumer",
+        ]
+      }
+      # <<< TEMPORARY (Airflow 3 durability test): END
     }
   }
 }

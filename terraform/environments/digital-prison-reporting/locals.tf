@@ -71,6 +71,7 @@ locals {
   federated_query_lambda_concurrent_executions = local.application_data.accounts[local.environment].athena_federated_query_lambda_concurrent_executions
   lambda_oracle_handler                        = "com.amazonaws.athena.connectors.oracle.OracleMuxCompositeHandler"
   athena_oracle_connector_type                 = "oracle"
+  athena_oracle_connector_jar_key              = "third-party/athena-connectors/athena-oracle-2022.47.1.jar"
 
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"

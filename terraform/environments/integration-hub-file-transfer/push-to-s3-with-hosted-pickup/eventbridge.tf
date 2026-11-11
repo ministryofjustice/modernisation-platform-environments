@@ -1,7 +1,11 @@
+data "aws_cloudwatch_event_bus" "file_transfer" {
+  name = local.parent_event_bus_name
+}
+
 module "eventbridge_hosted_pickup" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/eventbridge/aws"
-  version = "4.3.2"
+  version = "4.3.3"
 
   bus_name                   = data.aws_cloudwatch_event_bus.file_transfer.name
   create_bus                 = false

@@ -36,6 +36,9 @@ resource "aws_apigatewayv2_integration" "benefit_orchestrator" {
   timeout_milliseconds   = 10000
 }
 
+# Keep the existing REQUEST authorizer during cutover. Converting its type in
+# place makes the provider send Lambda-only fields that AWS rejects for JWT.
+# Remove this unused authorizer in a follow-up after the JWT route is verified.
 resource "aws_apigatewayv2_authorizer" "request" {
   count = local.create_service ? 1 : 0
 
@@ -49,14 +52,39 @@ resource "aws_apigatewayv2_authorizer" "request" {
   identity_sources                  = ["$request.header.Authorization"]
 }
 
+
+resource "aws_apigatewayv2_authorizer" "entra" {
+  count = local.create_service ? 1 : 0
+
+  api_id           = aws_apigatewayv2_api.benefit_checker[0].id
+  authorizer_type  = "JWT"
+  name             = "${local.application_name}-${local.component_name}-entra"
+  identity_sources = ["$request.header.Authorization"]
+  jwt_configuration {
+    audience = [local.entra_api_audience]
+    issuer   = "https://login.microsoftonline.com/${local.entra_tenant_id}/v2.0"
+  }
+  lifecycle {
+    precondition {
+      condition = (
+        can(regex("^[0-9a-fA-F-]{36}$", local.entra_tenant_id)) &&
+        can(regex("^[0-9a-fA-F-]{36}$", local.entra_api_audience)) &&
+        length(local.entra_allowed_client_ids) > 0 &&
+        alltrue([for id in local.entra_allowed_client_ids : can(regex("^[0-9a-fA-F-]{36}$", id))])
+      )
+      error_message = "Configure the dedicated pilot Entra tenant, API client ID and approved consumer client IDs before applying."
+    }
+  }
+}
+
 resource "aws_apigatewayv2_route" "assessment" {
   count = local.create_service ? 1 : 0
 
   api_id             = aws_apigatewayv2_api.benefit_checker[0].id
   route_key          = "POST /v1/benefit-checks/assessments"
   target             = "integrations/${aws_apigatewayv2_integration.benefit_orchestrator[0].id}"
-  authorization_type = "CUSTOM"
-  authorizer_id      = aws_apigatewayv2_authorizer.request[0].id
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.entra[0].id
 }
 
 resource "aws_apigatewayv2_route" "health" {
@@ -102,14 +130,4 @@ resource "aws_lambda_permission" "api_gateway_orchestrator" {
   function_name = module.lambda_benefit_orchestrator[0].lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.benefit_checker[0].execution_arn}/*/*"
-}
-
-resource "aws_lambda_permission" "api_gateway_authorizer" {
-  count = local.create_service ? 1 : 0
-
-  statement_id  = "AllowExecutionFromApiGatewayAuthorizer"
-  action        = "lambda:InvokeFunction"
-  function_name = module.lambda_api_authorizer[0].lambda_function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.benefit_checker[0].execution_arn}/authorizers/${aws_apigatewayv2_authorizer.request[0].id}"
 }

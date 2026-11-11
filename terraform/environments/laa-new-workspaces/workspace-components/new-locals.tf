@@ -7,6 +7,16 @@ locals {
     "18.169.147.172/32", # Global Protect 2nd Gateway
   ]
 
+  # Prisma VPN - RADIUS portal access
+  prisma_vpn_cidrs = [
+    "128.77.75.64/26",
+  ]
+
+  radius_portal_vpn_cidrs = concat(
+    local.global_protect_alpha_vpn_cidrs,
+    local.prisma_vpn_cidrs
+  )
+
   firewall_endpoints = {
     for s in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status[0].sync_states :
     s.availability_zone => s.attachment[0].endpoint_id

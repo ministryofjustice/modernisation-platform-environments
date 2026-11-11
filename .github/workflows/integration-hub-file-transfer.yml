@@ -34,6 +34,11 @@ name: integration-hub-file-transfer
 permissions:
   contents: read  # This is required for actions/checkout
 
+# Hold the shared environment through both deployment and verification.
+concurrency:
+  group: integration-hub-file-transfer-deploy-and-test
+  cancel-in-progress: false
+
 jobs:
   strategy:
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
@@ -41,10 +46,39 @@ jobs:
     with:
       application: "${{ github.workflow }}"
 
+  test-candidate:
+    name: Identify a test deployment
+    needs: strategy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    outputs:
+      run-tests: ${{ steps.candidate.outputs.run-tests }}
+    steps:
+      - name: Check for a test plan/apply target
+        id: candidate
+        shell: bash
+        env:
+          TARGET_MATRIX: ${{ needs.strategy.outputs.matrix }}
+        run: |
+          set -euo pipefail
+          run_tests=$(jq -er '
+            if (.include | type) != "array" then
+              error("Expected a Terraform component matrix")
+            else
+              any(.include[]; .target == "test" and .action == "plan_apply") | tostring
+            end
+          ' <<< "$TARGET_MATRIX")
+          echo "run-tests=$run_tests" >> "$GITHUB_OUTPUT"
+          if [[ "$run_tests" == "false" ]]; then
+            echo "::notice::No test plan/apply target; live file-transfer tests are not applicable."
+          fi
+
   terraform:
     needs: strategy
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     permissions:
+      pull-requests: write
       id-token: write
       contents: read
     strategy:
@@ -60,6 +94,26 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
+  integration-tests:
+    name: File-transfer integration tests
+    needs: [test-candidate, terraform]
+    if: >-
+      needs.terraform.result == 'success' &&
+      needs.test-candidate.outputs.run-tests == 'true' &&
+      (github.event_name != 'pull_request' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
+    permissions:
+      pull-requests: write
+      contents: read
+      id-token: write
+    uses: ministryofjustice/integration-hub/.github/workflows/file-transfer-tests.yml@91500ccee6a7042526b80736d6837057d0704533
+    with:
+      infrastructure-sha: ${{ github.sha }}
+      harness-ref: 91500ccee6a7042526b80736d6837057d0704533
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
   notify-failure:
     needs: [strategy, terraform]
     if: >-
@@ -70,6 +124,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
+      pull-requests: write
       id-token: write
     steps:
       - name: Configure AWS credentials for PagerDuty key retrieval
@@ -121,6 +176,8 @@ jobs:
               routing_key: env.PAGERDUTY_ROUTING_KEY,
               event_action: "trigger",
               dedup_key: ($repository + ":" + $workflow + ":" + $run),
+              client: "GitHub Actions",
+              client_url: $url,
               payload: {
                 summary: ($workflow + " Terraform run failed on main"),
                 source: $repository,
@@ -145,6 +202,7 @@ jobs:
   destroy-development:
     if: inputs.action == 'destroy'
     permissions:
+      pull-requests: write
       id-token: write
       contents: read
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml

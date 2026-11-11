@@ -11,36 +11,36 @@ resource "aws_security_group" "opahub_load_balancer" {
 }
 
 # # Temp only for DEV
-resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7001_all" {
+resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7002_all" {
   count             = local.is-development ? 1 : 0
   security_group_id = aws_security_group.opahub_load_balancer.id
   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
   ip_protocol       = "tcp"
-  from_port         = 7001
-  to_port           = 7001
-  description       = "7001 from AWS Workspaces"
+  from_port         = 7002
+  to_port           = 7002
+  description       = "7002 from AWS Workspaces"
 }
 
 # # Temp only for test
-resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7001_all_test" {
+resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7002_all_test" {
   count             = local.is-test ? 1 : 0
   security_group_id = aws_security_group.opahub_load_balancer.id
   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
   ip_protocol       = "tcp"
-  from_port         = 7001
-  to_port           = 7001
-  description       = "7001 from AWS Workspaces"
+  from_port         = 7002
+  to_port           = 7002
+  description       = "7002 from AWS Workspaces"
 }
 
-# # Temp only for DEV
-resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7001_preproduction_all" {
+# # Temp only for Preprod
+resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7002_preproduction_all" {
   count             = local.is-preproduction ? 1 : 0
   security_group_id = aws_security_group.opahub_load_balancer.id
   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
   ip_protocol       = "tcp"
-  from_port         = 7001
-  to_port           = 7001
-  description       = "7001 from AWS Workspaces"
+  from_port         = 7002
+  to_port           = 7002
+  description       = "7002 from AWS Workspaces"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443_private_subnets" {
@@ -60,7 +60,7 @@ resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443_private_subnets"
 resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443_production_cidr" {
   count             = local.is-production ? 1 : 0
   security_group_id = aws_security_group.opahub_load_balancer.id
-  description       = "HTTPS from production CIDR"
+  description       = "HTTPS from production Secure Browser CIDR"
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
@@ -76,15 +76,23 @@ resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443_workspace" {
   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
 }
 
-resource "aws_vpc_security_group_egress_rule" "alb_egress_oia_ec2" {
+resource "aws_vpc_security_group_egress_rule" "alb_egress_opa_ecs" {
+  security_group_id            = aws_security_group.opahub_load_balancer.id
+  description                  = "Allow ALB egress to OIA ECS task ports"
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].opa_server_port
+  to_port                      = local.application_data.accounts[local.environment].opa_ssl_port
+  referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "alb_egress_opa_ecs_health_check" {
   security_group_id            = aws_security_group.opahub_load_balancer.id
   description                  = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
   ip_protocol                  = "tcp"
-  from_port                    = 32768
-  to_port                      = 61000
-  referenced_security_group_id = aws_security_group.cluster_ec2.id
+  from_port                    = local.application_data.accounts[local.environment].opa_health_check_port
+  to_port                      = local.application_data.accounts[local.environment].opa_health_check_port
+  referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
 }
-
 
 # Container Security Group
 
@@ -104,6 +112,24 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress" {
   ip_protocol                  = "tcp"
   from_port                    = local.application_data.accounts[local.environment].opa_server_port
   to_port                      = local.application_data.accounts[local.environment].opa_server_port
+  description                  = "Allow ALB to reach ECS app port"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_ssl" {
+  security_group_id            = aws_security_group.ecs_tasks_opa.id
+  referenced_security_group_id = aws_security_group.opahub_load_balancer.id
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].opa_ssl_port
+  to_port                      = local.application_data.accounts[local.environment].opa_ssl_port
+  description                  = "Allow ALB to reach ECS app port"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_health_check" {
+  security_group_id            = aws_security_group.ecs_tasks_opa.id
+  referenced_security_group_id = aws_security_group.opahub_load_balancer.id
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].opa_health_check_port
+  to_port                      = local.application_data.accounts[local.environment].opa_health_check_port
   description                  = "Allow ALB to reach ECS app port"
 }
 
@@ -195,14 +221,14 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_1522" {
   cidr_ipv4         = each.value
 }
 
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_2049_efs" {
-  security_group_id            = aws_security_group.ecs_tasks_opa.id
-  description                  = "Allow egress to EFS security group on port 2049"
-  ip_protocol                  = "tcp"
-  from_port                    = 2049
-  to_port                      = 2049
-  referenced_security_group_id = aws_security_group.oia-efs-security-group.id
-}
+# resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_2049_efs" {
+#   security_group_id            = aws_security_group.ecs_tasks_opa.id
+#   description                  = "Allow egress to EFS security group on port 2049"
+#   ip_protocol                  = "tcp"
+#   from_port                    = 2049
+#   to_port                      = 2049
+#   referenced_security_group_id = aws_security_group.oia-efs-security-group.id
+# }
 
 
 # RDS Security Group
@@ -227,14 +253,14 @@ resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_workspaces" {
   description       = "Allow MySQL access from Workspaces"
 }
 
-# Ingress from ECS Cluster EC2s
+# Ingress from ECS Cluster
 resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ec2" {
   security_group_id            = aws_security_group.opahub_db.id
-  referenced_security_group_id = aws_security_group.cluster_ec2.id
+  referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
   ip_protocol                  = "tcp"
   from_port                    = 3306
   to_port                      = 3306
-  description                  = "Allow MySQL access from ECS Cluster EC2s"
+  description                  = "Allow MySQL access from ECS Cluster"
 }
 
 # # Allow all outbound

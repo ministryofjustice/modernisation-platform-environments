@@ -160,6 +160,12 @@ module "eks" {
       username          = "dp-mwaa"
       kubernetes_groups = ["mwaa"]
     }
+    # Analytical Platform Common access to MWAA ServiceAccount management role in MWAA namespace
+    gha-mojap-common = {
+      principal_arn     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/analytical-platform-github-actions"
+      username          = "github-actions-moj-ap-airflow"
+      kubernetes_groups = ["mwaa-serviceaccount-management", "mwaa-external-secrets"]
+    }
   }
 }
 

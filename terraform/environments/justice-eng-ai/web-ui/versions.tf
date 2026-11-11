@@ -16,6 +16,10 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
+    time = {
+      version = "~> 0.14"
+      source  = "hashicorp/time"
+    }
   }
   required_version = "~> 1.0"
 }

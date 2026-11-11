@@ -38,11 +38,6 @@ resource "aws_efs_access_point" "this" {
   )
 }
 
-moved {
-  from = aws_efs_access_point.ldap
-  to   = aws_efs_access_point.this
-}
-
 # Security Group
 resource "aws_security_group" "default" {
   name        = "${var.env_name}-${var.name}-efs"

@@ -99,14 +99,6 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
                 "mft-correlation-id": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1"
             },
         }
-        self.s3_client.get_object_tagging.return_value = {
-            "TagSet": [
-                {
-                    "Key": "GuardDutyMalwareScanStatus",
-                    "Value": "NO_THREATS_FOUND",
-                }
-            ]
-        }
         self.dynamodb_client.get_item.return_value = {
             "Item": {
                 "status": {"S": "COMPLETED"},
@@ -174,7 +166,6 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
             detail["metadata"]["causationId"], "6dce6b40-6e43-49f0-a2cf-1da1d43bce22"
         )
         self.assertEqual(detail["data"]["scanResultStatus"], "NO_THREATS_FOUND")
-        self.assertTrue(detail["data"]["scanResultStatusMatchesTag"])
         self.assertEqual(detail["data"]["object"]["sizeBytes"], 4096)
         self.assertEqual(entry["Time"], datetime(2026, 7, 10, 14, 2, tzinfo=timezone.utc))
         self.assertEqual(result, {"eventId": "scan-result-event-id"})
@@ -242,26 +233,6 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
             json.loads(entry["Detail"])["data"]["statusReasons"],
             ["PASSWORD_PROTECTED"],
         )
-
-    def test_reports_tag_mismatch_without_changing_scan_result_status(self):
-        for tag_set in [
-            [],
-            [
-                {
-                    "Key": "GuardDutyMalwareScanStatus",
-                    "Value": "THREATS_FOUND",
-                }
-            ],
-        ]:
-            with self.subTest(tag_set=tag_set):
-                self.s3_client.get_object_tagging.return_value = {"TagSet": tag_set}
-                self.adapter.lambda_handler(self.event, None)
-
-                entry = self.events_client.put_events.call_args.kwargs["Entries"][0]
-                data = json.loads(entry["Detail"])["data"]
-                self.assertEqual(data["scanResultStatus"], "NO_THREATS_FOUND")
-                self.assertFalse(data["scanResultStatusMatchesTag"])
-                IDEMPOTENCY_CACHE.clear()
 
     def test_rejects_processing_object_without_correlation_metadata(self):
         self.s3_client.head_object.return_value["Metadata"] = {}

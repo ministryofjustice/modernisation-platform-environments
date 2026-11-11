@@ -304,6 +304,18 @@ locals {
       description  = "Trigger Lambda at 06:00 every Monday"
       timezone     = "Europe/London"
     }
+    start_malware_scanner2 = {
+      environments = ["production"]
+      schedule     = "cron(30 19 ? * 3#4 *)"
+      description  = "Trigger Lambda at 19:30 every 4th Tuesday of the month"
+      timezone     = "Europe/London"
+    }
+    stop_malware_scanner2 = {
+      environments = ["production"]
+      schedule     = "cron(0 22 ? * 3#4 *)"
+      description  = "Trigger Lambda at 22:00 every 4th Tuesday of the month"
+      timezone     = "Europe/London"
+    }
     disk_info_report = {
       environments = ["production"]
       schedule     = "cron(0 7 ? * MON *)"
@@ -517,6 +529,8 @@ locals {
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     start_malware_scanner          = local.is-production ? aws_lambda_function.lambda_functions["start_malware_scanner_production"].arn : null
     stop_malware_scanner           = local.is-production ? aws_lambda_function.lambda_functions["stop_malware_scanner_production"].arn : null
+    start_malware_scanner2         = local.is-production ? aws_lambda_function.lambda_functions["start_malware_scanner_production"].arn : null
+    stop_malware_scanner2          = local.is-production ? aws_lambda_function.lambda_functions["stop_malware_scanner_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null
     disk_info_report               = local.is-production ? aws_lambda_function.lambda_functions["disk_info_report_production"].arn : null

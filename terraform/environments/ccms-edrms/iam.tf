@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
+      values   = [data.aws_caller_identity.current.account_id]
     }
   }
 }
@@ -333,7 +333,7 @@ data "aws_iam_policy_document" "rds_publish_to_sns" {
       test     = "ArnLike"
       variable = "aws:SourceArn"
       values = [
-        "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:${aws_db_instance.tds_db.identifier}"
+        "arn:aws:rds:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:db:${aws_db_instance.tds_db.identifier}"
       ]
     }
   }

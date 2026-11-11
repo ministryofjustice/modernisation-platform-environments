@@ -1,7 +1,32 @@
 locals {
 
+  # these should align with the patch-manager-run-patch crons below so the same
+  # set of patches are applied to both patchgroup1 and patchgroup2
+  patch_baselines_approve_after_days = {
+    development = {
+      patchgroup1 = 7 # Tue
+      patchgroup2 = 9 # Thu
+    }
+    test = {
+      patchgroup1 = 7 # Tue
+      patchgroup2 = 9 # Thu
+    }
+    preproduction = {
+      patchgroup1 = 13 # Mon (patches will have spent 1 week in dev/test)
+      patchgroup2 = 16 # Thu
+    }
+    production = {
+      patchgroup1 = 21 # Tue (patches will have spent 2 weeks in dev/test and 1 week in preprod)
+      patchgroup2 = 22 # Wed
+    }
+  }
+
+  # ssm agent / config management updates are at different times to patching
   ssm_schedule_expressions = {
     development = {
+      install-windows-definition-updates          = "cron(00 7 ? * * *)"
+      patch-manager-run-patch-baseline-group1     = "cron(30 7 ? * TUE *)"
+      patch-manager-run-patch-baseline-group2     = "cron(30 7 ? * THU *)"
       update-ssm-agent-patchgroup1                = "cron(30 7 ? * MON *)"
       update-ssm-agent-patchgroup2                = "cron(30 7 ? * WED *)"
       update-configuration-management-daily       = "cron(00 8 ? * * *)"
@@ -9,6 +34,9 @@ locals {
       update-configuration-management-patchgroup2 = "cron(00 8 ? * WED *)"
     }
     test = {
+      install-windows-definition-updates          = "cron(00 7 ? * * *)"
+      patch-manager-run-patch-baseline-group1     = "cron(30 7 ? * TUE *)"
+      patch-manager-run-patch-baseline-group2     = "cron(30 7 ? * THU *)"
       update-ssm-agent-patchgroup1                = "cron(30 7 ? * MON *)"
       update-ssm-agent-patchgroup2                = "cron(30 7 ? * WED *)"
       update-configuration-management-daily       = "cron(00 8 ? * * *)"
@@ -16,6 +44,9 @@ locals {
       update-configuration-management-patchgroup2 = "cron(00 8 ? * WED *)"
     }
     preproduction = {
+      install-windows-definition-updates          = "cron(00 7 ? * * *)"
+      patch-manager-run-patch-baseline-group1     = "cron(30 7 ? * MON *)"
+      patch-manager-run-patch-baseline-group2     = "cron(30 7 ? * THU *)"
       update-ssm-agent-patchgroup1                = "cron(00 12 ? * TUE *)"
       update-ssm-agent-patchgroup2                = "cron(00 12 ? * WED *)"
       update-configuration-management-daily       = "cron(30 12 ? * * *)"
@@ -23,6 +54,9 @@ locals {
       update-configuration-management-patchgroup2 = "cron(30 12 ? * WED *)"
     }
     production = {
+      install-windows-definition-updates          = "cron(00 20 ? * * *)"
+      patch-manager-run-patch-baseline-group1     = "cron(30 22 ? * TUE *)"
+      patch-manager-run-patch-baseline-group2     = "cron(30 22 ? * WED *)"
       update-ssm-agent-patchgroup1                = "cron(00 18 ? * WED *)"
       update-ssm-agent-patchgroup2                = "cron(00 18 ? * THU *)"
       update-configuration-management-daily       = "cron(30 18 ? * * *)"
@@ -154,6 +188,63 @@ locals {
   ])
   ssm_documents = { for item in local.ssm_documents_list : item.key => item.value }
 
+  ssm_maintenance_window_run_commands = {
+    "patch-manager-run-patch-baseline-group1" = {
+      cutoff            = 1 # hour
+      command_arn       = "AWS-RunPatchBaseline"
+      description       = "Automated patching via AWS-RunPatchBaseline for instances with tag:patch-manager=group1"
+      duration          = 3 # hours
+      max_concurrency   = 1
+      max_errors        = 1
+      schedule          = local.ssm_schedule_expressions[var.environment.environment].patch-manager-run-patch-baseline-group1
+      schedule_timezone = "Europe/London"
+      run_command_parameters = {
+        Operation    = ["Install"]
+        RebootOption = ["RebootIfNeeded"]
+      }
+      targets_by_tag = {
+        "Patch Group"        = ["patchgroup1"]
+        "run-patch-baseline" = ["weekly"]
+      }
+    }
+    "patch-manager-run-patch-baseline-group2" = {
+      cutoff            = 1 # hour
+      command_arn       = "AWS-RunPatchBaseline"
+      description       = "Automated patching via AWS-RunPatchBaseline for instances with tag:patch-manager=group2"
+      duration          = 3 # hours
+      max_concurrency   = 1
+      max_errors        = 1
+      schedule          = local.ssm_schedule_expressions[var.environment.environment].patch-manager-run-patch-baseline-group2
+      schedule_timezone = "Europe/London"
+      run_command_parameters = {
+        Operation    = ["Install"]
+        RebootOption = ["RebootIfNeeded"]
+      }
+      targets_by_tag = {
+        "Patch Group"        = ["patchgroup2"]
+        "run-patch-baseline" = ["weekly"]
+      }
+    }
+    "install-windows-definition-updates" = {
+      cutoff            = 1 # hour
+      command_arn       = "AWS-InstallWindowsUpdates"
+      description       = "Automated Microsoft definition updates (antivirus etc) via AWS-InstallWindowsUpdates for instances with tag:os-type=Windows"
+      duration          = 2 # hours
+      max_concurrency   = 1
+      max_errors        = 1
+      schedule          = local.ssm_schedule_expressions[var.environment.environment].install-windows-definition-updates
+      schedule_timezone = "Europe/London"
+      run_command_parameters = {
+        Action      = ["Install"]
+        AllowReboot = ["False"]
+        Categories  = ["DefinitionUpdates"]
+      }
+      targets_by_tag = {
+        "os-type" = ["Windows"]
+      }
+    }
+  }
+
   ssm_parameters_filter = flatten([
     length(local.account_names_for_account_ids_ssm_parameter) != 0 ? ["account"] : [],
     var.options.enable_ec2_cloud_watch_agent && fileexists(local.cloud_watch_windows_filename) ? ["cloud-watch-config"] : [],
@@ -208,5 +299,83 @@ locals {
     }
 
   }
-}
 
+  ssm_patch_baselines = {
+    OracleLinuxPatchGroup1Baseline = {
+      description              = "Apply security and bugfixes to Oracle Linux instances"
+      operating_system         = "ORACLE_LINUX"
+      patch_group              = "patchgroup1"
+      rejected_patches         = ["*.i686"]
+      rule1_approve_after_days = local.patch_baselines_approve_after_days[var.environment.environment].patchgroup1
+      rule1_compliance_level   = "CRITICAL"
+      rule1_patch_filters = {
+        CLASSIFICATION = ["Security", "Bugfix"]
+        PRODUCT        = ["*"]
+        SEVERITY       = ["*"]
+      }
+    }
+    OracleLinuxPatchGroup2Baseline = {
+      description              = "Apply security and bugfixes to Oracle Linux instances"
+      operating_system         = "ORACLE_LINUX"
+      patch_group              = "patchgroup2"
+      rejected_patches         = ["*.i686"]
+      rule1_approve_after_days = local.patch_baselines_approve_after_days[var.environment.environment].patchgroup2
+      rule1_compliance_level   = "CRITICAL"
+      rule1_patch_filters = {
+        CLASSIFICATION = ["Security", "Bugfix"]
+        PRODUCT        = ["*"]
+        SEVERITY       = ["*"]
+      }
+    }
+    RedHatPatchGroup1Baseline = {
+      description              = "Apply security and bugfixes to Redhat Enterprise Linux instances"
+      operating_system         = "REDHAT_ENTERPRISE_LINUX"
+      patch_group              = "patchgroup1"
+      rejected_patches         = ["*.i686"]
+      rule1_approve_after_days = local.patch_baselines_approve_after_days[var.environment.environment].patchgroup1
+      rule1_compliance_level   = "CRITICAL"
+      rule1_patch_filters = {
+        CLASSIFICATION = ["Security", "Bugfix"] # Enhancement,Recommended,Newpackage
+        PRODUCT        = ["*"]
+        SEVERITY       = ["*"]
+      }
+    }
+    RedHatPatchGroup2Baseline = {
+      description              = "Apply security and bugfixes to Redhat Enterprise Linux instances"
+      operating_system         = "REDHAT_ENTERPRISE_LINUX"
+      patch_group              = "patchgroup2"
+      rejected_patches         = ["*.i686"]
+      rule1_approve_after_days = local.patch_baselines_approve_after_days[var.environment.environment].patchgroup2
+      rule1_compliance_level   = "CRITICAL"
+      rule1_patch_filters = {
+        CLASSIFICATION = ["Security", "Bugfix"] # Enhancement,Recommended,Newpackage
+        PRODUCT        = ["*"]
+        SEVERITY       = ["*"]
+      }
+    }
+    WindowsPatchGroup1Baseline = {
+      description              = "Apply security, bugfixes and service packs to Windows instances"
+      operating_system         = "WINDOWS"
+      patch_group              = "patchgroup1"
+      rule1_approve_after_days = local.patch_baselines_approve_after_days[var.environment.environment].patchgroup1
+      rule1_compliance_level   = "CRITICAL"
+      rule1_patch_filters = {
+        CLASSIFICATION = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # DefinitionUpdates,Drivers,FeaturePacks,Tools,Upgrades
+        MSRC_SEVERITY  = ["*"]
+        PRODUCT        = ["*"]
+      }
+    }
+    WindowsPatchGroup2Baseline = {
+      description              = "Apply security, bugfixes and service packs to Windows instances"
+      operating_system         = "WINDOWS"
+      patch_group              = "patchgroup2"
+      rule1_approve_after_days = local.patch_baselines_approve_after_days[var.environment.environment].patchgroup2
+      rule1_compliance_level   = "CRITICAL"
+      rule1_patch_filters = {
+        CLASSIFICATION = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # DefinitionUpdates,Drivers,FeaturePacks,Tools,Upgrades
+        MSRC_SEVERITY  = ["*"]
+        PRODUCT        = ["*"]
+      }
+    }
+  }
+}

@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "s3_sftp_kms_policy" {
     condition {
       test     = "StringEquals"
       variable = "kms:ViaService"
-      values   = ["secretsmanager.${data.aws_region.current.name}.amazonaws.com"]
+      values   = ["secretsmanager.${data.aws_region.current.region}.amazonaws.com"]
     }
   }
   statement {

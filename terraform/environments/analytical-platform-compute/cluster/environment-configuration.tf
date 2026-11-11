@@ -7,6 +7,13 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
+      eks_public_access_cidrs = [
+        "128.77.75.64/26", # Prisma Corporate
+        "20.58.27.30/32",  # GitHub Runner (octo-production)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+      ]
       eks_cluster_version = "1.36"
       eks_node_version    = "1.64.0-ad9d4847"
       eks_cluster_addon_versions = {
@@ -41,6 +48,12 @@ locals {
 
       /* Kube Prometheus Stack */
       prometheus_operator_crd_version = "v0.93.0"
+
+      /* External Secrets */
+      external_secrets_secrets_manager_names = [
+        "dashboard-service/app-secrets",
+        "next/azure",
+      ]
 
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
@@ -53,6 +66,13 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
+      eks_public_access_cidrs = [
+        "128.77.75.64/26", # Prisma Corporate
+        "20.58.27.30/32",  # GitHub Runner (octo-production)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+      ]
       eks_cluster_version = "1.36"
       eks_node_version    = "1.64.0-ad9d4847"
       eks_cluster_addon_versions = {
@@ -87,6 +107,9 @@ locals {
 
       /* Kube Prometheus Stack */
       prometheus_operator_crd_version = "v0.93.0"
+
+      /* External Secrets */
+      external_secrets_secrets_manager_names = []
 
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
@@ -133,6 +156,14 @@ locals {
 
       /* Kube Prometheus Stack */
       prometheus_operator_crd_version = "v0.93.0"
+
+      /* External Secrets */
+      external_secrets_secrets_manager_names = [
+        "actions-runners/token/apc-self-hosted-runners",
+        "actions-runners/token/moj-apc-self-hosted-runners",
+        "actions-runners/app/apc-self-hosted-runners",
+        "dashboard-service/app-secrets",
+      ]
 
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-prod-execution-role"

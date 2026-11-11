@@ -109,7 +109,7 @@ locals {
     external_fqdn       = "reporting.probation.service.justice.gov.uk"
     external_admin_fqdn = "admin.reporting.probation.service.justice.gov.uk"
 
-    instance_count = 1
+    instance_count = 4
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
     ansible_branch = "main"
@@ -449,7 +449,7 @@ locals {
   }
 
   db_backup_config_production = {
-    object_lock_days             = 1
+    object_lock_days             = 54
     expire_current_after_days    = 200
     expire_noncurrent_after_days = 10
     transition = [

@@ -1,5 +1,5 @@
 resource "aws_transfer_server" "this" {
-  certificate                 = aws_acm_certificate.ftps.arn
+  certificate                 = module.acm_ftps.acm_certificate_arn
   domain                      = "S3"
   endpoint_type               = "VPC"
   function                    = module.lambda_custom_idp.lambda_function_arn
@@ -30,7 +30,7 @@ resource "aws_transfer_server" "this" {
     }
   )
 
-  depends_on = [aws_acm_certificate_validation.ftps]
+  depends_on = [module.acm_ftps]
 
   # Recreating the server generates a new host key, breaking every partner's
   # known_hosts entry.

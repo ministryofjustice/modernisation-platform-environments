@@ -61,6 +61,51 @@ module "data_platform_access_iam_role" {
   }
 }
 
+module "openai_management_iam_role" {
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=7279fc444aed7e36c60438b46972e1611e48984c" # v6.2.3
+
+  path            = "/github-actions/"
+  name            = "openai-management"
+  use_name_prefix = false
+
+  enable_github_oidc = true
+
+  oidc_wildcard_subjects = ["ministryofjustice/openai-management:*"]
+
+  create_inline_policy = true
+  inline_policy_permissions = {
+    KMSAccess = {
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = [module.kms_key_dp_prod[0].key_arn]
+    }
+    S3BucketAccess = {
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:ListBucketVersions"
+      ]
+      resources = [module.s3_bucket_dp_prod[0].s3_bucket_arn]
+    }
+    S3ObjectAccess = {
+      effect = "Allow"
+      actions = [
+        "s3:DeleteObject",
+        "s3:GetObject",
+        "s3:PutObject"
+      ]
+      resources = ["${module.s3_bucket_dp_prod[0].s3_bucket_arn}/openai-management/*"]
+    }
+  }
+}
+
 module "octo_access_iam_role" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 

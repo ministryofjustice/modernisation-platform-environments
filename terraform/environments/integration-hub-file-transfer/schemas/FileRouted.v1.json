@@ -42,28 +42,19 @@
             "destinationObject",
             "route",
             "scanResultStatus",
-            "scanResultStatusMatchesTag",
             "sourceDeleted"
           ],
           "oneOf": [
             {
               "properties": {
                 "route": { "enum": ["clean"] },
-                "scanResultStatus": { "enum": ["NO_THREATS_FOUND"] },
-                "scanResultStatusMatchesTag": { "enum": [true] }
+                "scanResultStatus": { "enum": ["NO_THREATS_FOUND"] }
               }
             },
             {
               "properties": {
                 "route": { "enum": ["quarantine"] },
-                "scanResultStatus": { "enum": ["THREATS_FOUND"] },
-                "scanResultStatusMatchesTag": { "enum": [true] }
-              }
-            },
-            {
-              "properties": {
-                "route": { "enum": ["investigation"] },
-                "scanResultStatusMatchesTag": { "enum": [false] }
+                "scanResultStatus": { "enum": ["THREATS_FOUND"] }
               }
             },
             {
@@ -71,8 +62,7 @@
                 "route": { "enum": ["investigation"] },
                 "scanResultStatus": {
                   "enum": ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
-                },
-                "scanResultStatusMatchesTag": { "enum": [true] }
+                }
               }
             }
           ],
@@ -97,10 +87,6 @@
                 "ACCESS_DENIED",
                 "FAILED"
               ]
-            },
-            "scanResultStatusMatchesTag": {
-              "type": "boolean",
-              "description": "Whether scanResultStatus matched the exact object's GuardDutyMalwareScanStatus tag. A mismatch routes the object to investigation."
             },
             "sourceDeleted": { "type": "boolean", "enum": [true] }
           }
@@ -163,7 +149,6 @@
           },
           "route": "clean",
           "scanResultStatus": "NO_THREATS_FOUND",
-          "scanResultStatusMatchesTag": true,
           "sourceDeleted": true
         }
       }

@@ -1,15 +1,8 @@
 exports.handler = (event, context, callback) => {
     try {
-        console.log('=== PROD FUNCTION START ===');
-        console.log('Event type:', typeof event);
-        console.log('Event keys:', Object.keys(event));
-
         const request = event.Records[0].cf.request;
         const host = request.headers.host[0].value || '';
         const uri = request.uri || '/';
-
-        console.log('Host:', host);
-        console.log('URI:', uri);
 
         var redirectMap = {
             'ahmlr.gov.uk': {
@@ -289,33 +282,30 @@ exports.handler = (event, context, callback) => {
         // Find matching config, checking aliases
         var redirectConfig = null;
         for (var domain in redirectMap) {
-            console.log('Checking domain:', domain);
             if (host === domain || (redirectMap[domain].aliases && redirectMap[domain].aliases.includes(host))) {
                 redirectConfig = redirectMap[domain];
-                console.log('Matched domain:', domain);
                 break;
             }
         }
 
         if (!redirectConfig) {
-            console.log('No redirect config found for host:', host);
+            console.log('No redirect config found:', host + uri);
             callback(null, request);
             return;
         }
 
         for (const pathConfig of redirectConfig.pathRedirects) {
             for (const path of pathConfig.paths) {
-                console.log('Checking path:', path);
                 const isMatch = pathConfig.exactMatch
                     ? uri.toLowerCase() === path.toLowerCase()
                     : (path.startsWith('.*\\.') ? new RegExp(path, 'i').test(uri) : uri.toLowerCase().startsWith(path.toLowerCase()));
                 if (isMatch) {
-                    console.log('Path match found');
                     const redirectUrl = pathConfig.exactMatch
                         ? pathConfig.target
                         : pathConfig.target.includes('$request_uri')
                             ? pathConfig.target.replace('$request_uri', uri)
                             : pathConfig.target + uri;
+                    console.log('Path redirect:', host + uri, '->', redirectUrl);
                     callback(null, {
                         status: '301',
                         statusDescription: 'Moved Permanently',
@@ -331,7 +321,7 @@ exports.handler = (event, context, callback) => {
         const defaultRedirectUrl = redirectConfig.defaultRedirect.endsWith('$request_uri')
             ? redirectConfig.defaultRedirect.replace('$request_uri', uri)
             : redirectConfig.defaultRedirect;
-        console.log('Using default redirect:', defaultRedirectUrl);
+        console.log('Default redirect:', host + uri, '->', defaultRedirectUrl);
         callback(null, {
             status: '301',
             statusDescription: 'Moved Permanently',

@@ -38,7 +38,8 @@ module "weblogic" {
 
   db_ingress_security_groups = []
 
-  microservice_lb = aws_lb.delius_core_frontend
+  microservice_lb                    = aws_lb.delius_core_frontend
+  microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
@@ -64,7 +65,14 @@ module "weblogic" {
     }
   ]
 
-  log_error_pattern      = "FATAL"
+  log_error_pattern = "FATAL"
+  log_error_threshold_config = {
+    critical = {
+      threshold = 50
+      period    = 300
+    }
+  }
+
   sns_topic_arn          = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix = aws_lb.delius_core_frontend.arn_suffix
 
@@ -95,6 +103,11 @@ resource "aws_launch_template" "weblogic" {
     http_endpoint               = "enabled"
     http_tokens                 = "required"
     http_put_response_hop_limit = 2
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = var.tags
   }
 }
 
@@ -229,10 +242,6 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   }
 }
 
-locals {
-  weblogic_cutover_envs = ["dev", "test", "stage", "preprod", "prod"]
-}
-
 # Cert for Legacy URL: https://dsdmoj.atlassian.net/browse/TM-2173
 # 1. Create ACM cert (apply this config)
 # 2. Manually validate cert by adding validation records to legacy zone
@@ -240,7 +249,7 @@ locals {
 # 4. Uncomment aws_lb_listener_certificate and apply this config
 # 5. Create CNAME record in legacy that points ndelius.probation.service.justice.gov.uk -> ndelius.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk
 resource "aws_acm_certificate" "legacy" {
-  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
+  count = var.env_name != "prod" ? 1 : 0
 
   domain_name       = "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
   validation_method = "DNS"
@@ -257,14 +266,14 @@ resource "aws_acm_certificate" "legacy" {
 }
 
 resource "aws_lb_listener_certificate" "legacy" {
-  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
+  count = var.env_name != "prod" ? 1 : 0
 
   listener_arn    = aws_lb_listener.listener_https.arn
   certificate_arn = aws_acm_certificate.legacy[0].arn
 }
 
 resource "aws_acm_certificate" "legacy_prod" {
-  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
+  count = var.env_name == "prod" ? 1 : 0
 
   domain_name       = "ndelius.probation.service.justice.gov.uk"
   validation_method = "DNS"
@@ -280,7 +289,7 @@ resource "aws_acm_certificate" "legacy_prod" {
 }
 
 resource "aws_lb_listener_certificate" "legacy_prod" {
-  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
+  count = var.env_name == "prod" ? 1 : 0
 
   listener_arn    = aws_lb_listener.listener_https.arn
   certificate_arn = aws_acm_certificate.legacy_prod[0].arn
@@ -291,11 +300,12 @@ locals {
 }
 
 module "ecs_nightly_restart_weblogic" {
+  count  = var.enable_autoscaling_schedule ? 0 : 1
   source = "../components/ecs_nightly_restart"
 
   env_name     = var.env_name
+  app_name     = "weblogic"
   cluster_name = module.ecs.ecs_cluster_arn
-  service_name = "${var.env_name}-weblogic"
   service_arn  = local.weblogic_service_arn
   task_count   = data.aws_ssm_parameter.weblogic_task_count.value
 }

@@ -171,10 +171,24 @@ output "ssm_documents" {
   value       = aws_ssm_document.this
 }
 
+output "ssm_maintenance_window_run_commands" {
+  description = "map of aws_ssm_maintenance_window,window_target and window_task resources corresponding to var.ssm_maintenance_window_run_commands"
+  value = {
+    window        = aws_ssm_maintenance_window.run_command
+    window_target = aws_ssm_maintenance_window_target.run_command
+    window_task   = aws_ssm_maintenance_window_task.run_command
+  }
+}
+
 output "ssm_parameters" {
   description = "map of security groups corresponding to var.ssm_parameters"
   value = merge(
     aws_ssm_parameter.fixed,
     aws_ssm_parameter.placeholder
   )
+}
+
+output "ssm_patch_baselines" {
+  description = "map of aws_ssm_patch_baseline resources corresponding to var.ssm_patch_baselines"
+  value       = aws_ssm_patch_baseline.this
 }

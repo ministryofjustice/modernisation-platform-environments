@@ -16,7 +16,7 @@ resource "aws_lb" "admin" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-admin", "${local.component_name}")) }
+    { Name = lower(format("lb-%s-admin", local.component_name)) }
   )
 
   depends_on = [module.s3-bucket-logging]
@@ -83,7 +83,7 @@ resource "aws_lb" "managed" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-managed", "${local.component_name}")) }
+    { Name = lower(format("lb-%s-managed", local.component_name)) }
   )
 
   depends_on = [module.s3-bucket-logging]

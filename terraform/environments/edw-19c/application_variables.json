@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "engine": "oracle-ee",
-      "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-07.mrp-2026-07.r1",
       "instance_class": "db.m6i.2xlarge",
       "license_model": "bring-your-own-license",
       "allocated_storage": 3000,
@@ -35,7 +35,7 @@
     "test": {},
     "preproduction": {
       "engine": "oracle-ee",
-      "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-07.mrp-2026-07.r1",
       "instance_class": "db.m6i.2xlarge",
       "license_model": "bring-your-own-license",
       "allocated_storage": 3000,

@@ -34,9 +34,6 @@ class OperationStore:
         }
         if operation_event.scan_result_status is not None:
             item["scan_result_status"] = operation_event.scan_result_status
-            item["scan_result_status_matches_tag"] = (
-                operation_event.scan_result_status_matches_tag
-            )
         if operation_event.received_at:
             # S3 landing time, used to measure end-to-end latency at dispatch.
             item["received_at"] = operation_event.received_at
@@ -179,9 +176,6 @@ class OperationStore:
         }
         if operation_event.scan_result_status is not None:
             expected["scan_result_status"] = operation_event.scan_result_status
-            expected["scan_result_status_matches_tag"] = (
-                operation_event.scan_result_status_matches_tag
-            )
         conflicts = [name for name, value in expected.items() if item.get(name) != value]
         if conflicts:
             raise RuntimeError(

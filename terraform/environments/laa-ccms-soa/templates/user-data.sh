@@ -8,6 +8,10 @@ echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
 echo 'ECS_VOLUME_PLUGIN_CAPABILITIES=["efsAuth"]' >> /etc/ecs/ecs.config
 echo 'ECS_INSTANCE_ATTRIBUTES={"server": "${server}","latest": "true"}' >> /etc/ecs/ecs.config
 
+#--Update CA certificates
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
+
 #--Configure EFS
 yum install -y amazon-efs-utils
 mkdir $EFS_MOUNT_POINT
@@ -52,8 +56,8 @@ chmod 777 $INBOUND_S3_MOUNT_POINT
 chmod 777 $OUTBOUND_S3_MOUNT_POINT
 chown -R 1000:1000 $INBOUND_S3_MOUNT_POINT
 chown -R 1000:1000 $OUTBOUND_S3_MOUNT_POINT
-mount-s3 ${inbound_bucket} $INBOUND_S3_MOUNT_POINT --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
-mount-s3 ${outbound_bucket} $OUTBOUND_S3_MOUNT_POINT --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
+mount-s3 ${inbound_bucket} $INBOUND_S3_MOUNT_POINT --allow-delete --allow-overwrite --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
+mount-s3 ${outbound_bucket} $OUTBOUND_S3_MOUNT_POINT --allow-delete --allow-overwrite --allow-other --uid 1000 --gid 1000 --dir-mode 0777 --file-mode 0777
 
 #--Create essential subdirs in S3 Bucket
 mkdir -p \

@@ -12,6 +12,9 @@ module "lambda_benefit_orchestrator" {
   source_path                  = "${local.bootstrap_code_root}/benefit-orchestrator"
   trigger_on_package_timestamp = false
   environment_variables = {
+    ENTRA_TENANT_ID                 = local.entra_tenant_id
+    ENTRA_API_AUDIENCE              = local.entra_api_audience
+    ENTRA_ALLOWED_CLIENT_IDS        = jsonencode(local.entra_allowed_client_ids)
     DOWNSTREAM_BENEFIT_CHECKER_URL  = local.downstream_benefit_checker_url
     DOWNSTREAM_BASIC_AUTH_SECRET_ID = module.downstream_basic_auth_secret[0].secret_name
     DOWNSTREAM_TIMEOUT_SECONDS      = "5"

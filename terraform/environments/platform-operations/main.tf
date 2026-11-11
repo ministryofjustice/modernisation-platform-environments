@@ -66,3 +66,74 @@ module "github_workflow_scheduler" {
   project_name               = local.github_actions_project_name
   github_workflows           = local.github_actions_lambda_environment_specific.github_workflows
 }
+
+resource "aws_ssm_parameter" "aws_health_lambda_accounts" {
+  count       = local.enable_aws_health_lambda ? 1 : 0
+  name        = "health_lambda_accounts"
+  description = "AWS Health Lambda accounts"
+  type        = "SecureString"
+  value       = "TO_BE_UPDATED"
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "aws_health_lambda_ignore_findings" {
+  count       = local.enable_aws_health_lambda ? 1 : 0
+  name        = "health_lambda_ignore_findings"
+  description = "AWS Health Lambda ignore findings"
+  type        = "SecureString"
+  value       = "TO_BE_UPDATED"
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+module "aws_health_lambda" {
+  count                          = local.enable_aws_health_lambda ? 1 : 0
+  source                         = "../../modules/aws_health_lambda"
+  aws_account_id                 = data.aws_caller_identity.current.id
+  aws_accounts_parameter_name    = aws_ssm_parameter.aws_health_lambda_accounts[count.index].name
+  github_repo                    = "platform-operations"
+  ignore_findings_parameter_name = aws_ssm_parameter.aws_health_lambda_ignore_findings[count.index].name
+}
+
+resource "aws_ssm_parameter" "aws_securityhub_lambda" {
+  for_each = local.enable_aws_securityhub_lambda ? {
+    accounts = {
+      name        = "securityhub_lambda_accounts"
+      description = "AWS SecurityHub Lambda accounts"
+    }
+    ignore_findings = {
+      name        = "securityhub_lambda_ignore_findings"
+      description = "AWS SecurityHub Lambda ignore findings"
+    }
+  } : {}
+
+  name        = each.value.name
+  description = each.value.description
+  type        = "SecureString"
+  value       = "TO_BE_UPDATED"
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+module "aws_securityhub_lambda" {
+  count                                      = local.enable_aws_securityhub_lambda ? 1 : 0
+  source                                     = "../../modules/aws_securityhub_lambda"
+  aws_account_id                             = data.aws_caller_identity.current.id
+  aws_accounts_parameter_name                = aws_ssm_parameter.aws_securityhub_lambda["accounts"].name
+  github_repo                                = "platform-operations"
+  securityhub_ignore_findings_parameter_name = aws_ssm_parameter.aws_securityhub_lambda["ignore_findings"].name
+  depends_on                                 = [aws_ssm_parameter.aws_securityhub_lambda]
+}

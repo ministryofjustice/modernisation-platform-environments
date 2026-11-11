@@ -110,3 +110,35 @@ resource "kubernetes_role_v1" "mwaa_serviceaccount_management" {
     ]
   }
 }
+
+resource "kubernetes_role_v1" "mwaa_external_secrets" {
+  metadata {
+    name      = "mwaa-external-secrets"
+    namespace = kubernetes_namespace_v1.mwaa.metadata[0].name
+
+  }
+  rule {
+    api_groups = [""]
+    resources  = ["secrets"]
+    verbs = [
+      "create",
+      "delete",
+      "get",
+      "list",
+      "patch",
+      "update"
+    ]
+  }
+  rule {
+    api_groups = ["external-secrets.io"]
+    resources  = ["externalsecrets"]
+    verbs = [
+      "create",
+      "delete",
+      "get",
+      "list",
+      "patch",
+      "update"
+    ]
+  }
+}

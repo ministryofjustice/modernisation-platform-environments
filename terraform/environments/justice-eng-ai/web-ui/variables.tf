@@ -19,7 +19,13 @@ variable "bedrock_model_id" {
     Kept in sync with app/policy/schema.py MODEL_DEFAULT and every other
     reference in this repo.
   EOT
-  default     = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+  default     = "eu.anthropic.claude-sonnet-5-5"
+}
+
+variable "bedrock_max_tokens" {
+  type        = string
+  description = "The maximum output tokens allocated for Amazon Bedrock generation payloads to prevent JSON truncation."
+  default     = "128000"
 }
 
 variable "enable_oidc_auth" {
@@ -45,7 +51,13 @@ variable "enable_in_app_oidc" {
   description = <<-EOT
     Whether the UI container performs its own Entra OIDC handshake
     instead of relying on the ALB ``authenticate-oidc`` listener action.
-    When true:
+
+    NOTE: this is now only the FALLBACK. An account's
+    ``builder_auth_mode`` in application_variables.json ("in-app" or
+    "alb") takes precedence; this variable applies only to accounts
+    without that key (true -> "in-app", false -> "alb"). See oidc.tf.
+
+    When in-app is selected:
 
       * the ALB listener drops ``authenticate-oidc`` and forwards plainly
         to the container (the app owns login / session / logout);
@@ -74,7 +86,7 @@ variable "entra_admin_group_id" {
     tfvar rather than in Secrets Manager. Leave empty to disable
     admin-role wiring.
   EOT
-  default     = ""
+  default     = "d0c842bc-1581-47b6-af5c-409db76fbbf2"
   validation {
     condition     = var.entra_admin_group_id == "" || can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", var.entra_admin_group_id))
     error_message = "entra_admin_group_id must be empty or a GUID."
@@ -88,10 +100,14 @@ variable "entra_reviewer_group_id" {
     reviewer dashboard when in-app OIDC is enabled. Presence in the
     id_token ``groups`` claim -> ``roles.is_reviewer_via_group`` returns
     true. See ``entra_admin_group_id`` for why this isn't a secret. Leave
-    empty to fall back on ``MPAPB_REVIEWER_USER_IDS`` /
-    ``MPAPB_REVIEWER_GITHUB_TEAM`` for reviewer authorisation.
+    empty to fall back on ``MPAPB_REVIEWER_USER_IDS`` for break-glass
+    reviewer authorisation.
+
+    Defaults to the SAME GUID as ``entra_admin_group_id`` -- intentional
+    for the MVP, not a copy-paste placeholder: admins are the only group
+    with reviewer-page access for now.
   EOT
-  default     = ""
+  default     = "d0c842bc-1581-47b6-af5c-409db76fbbf2"
   validation {
     condition     = var.entra_reviewer_group_id == "" || can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", var.entra_reviewer_group_id))
     error_message = "entra_reviewer_group_id must be empty or a GUID."
@@ -106,14 +122,14 @@ variable "builder_hostname" {
 
 variable "container_image_tag" {
   type        = string
-  description = "Container image tag to run from ECR. CI/CD pushes new task-definition revisions directly and this attribute is ignore_changes'd thereafter (see aws_ecs_service.app), so this default only matters for the service's initial creation."
-  default     = "ui-build-ce979fe"
+  description = "SHA-tagged UI build deployed with the Terraform task-definition settings across all environments. Update this shared release tag in a reviewed PR after verifying the application build."
+  default     = "ui-build-latest"
 }
 
 variable "forge_container_image_tag" {
   type        = string
-  description = "Image tag to run for the Forge Journey Lab container, pulled from the same shared-services ECR repository as the UI image (a forge-build-<sha> tag, not the UI's ui-build-<sha> tag). Same ignore_changes caveat as container_image_tag applies once CI/CD takes over."
-  default     = "forge-build-ce979fe"
+  description = "Image tag to run for the Forge Journey Lab container, pulled from the same shared-services ECR repository as the UI image. Forge continues to ignore service task_definition changes and uses CI/CD for image deployment, separately from the Terraform-managed UI configuration."
+  default     = "forge-build-latest"
 }
 
 variable "app_container_port" {
@@ -176,32 +192,13 @@ variable "github_intake_workflow_file" {
   default     = "intake.yml"
 }
 
-variable "reviewer_github_team" {
-  type        = string
-  description = <<EOT
-GitHub org/team slug (e.g. "ministryofjustice/modernisation-platform")
-whose members are allowed to see the ``/review`` reviewer dashboard.
-
-The task will use the GitHub App to fetch team members via
-``GET /orgs/{org}/teams/{team_slug}/members``. This requires the App to
-have ``Organization -> Members: Read-only`` permission granted AND for
-an org owner to have accepted the permission bump (see the GitHub App
-settings page). Without that permission the API returns 404, we log a
-warning, and the reviewer dashboard silently denies all users.
-
-Leave empty to disable team-based review access entirely (only the
-env-var allow-list below can then grant access).
-EOT
-  default     = "ministryofjustice/modernisation-platform"
-}
-
 variable "reviewer_user_ids" {
   type        = string
   description = <<EOT
 Comma-separated 12-hex ``user_id`` values (the value
-``ui/app/auth.resolve_user`` returns) that get reviewer access without
-needing to verify a GitHub username. Break-glass mechanism -- prefer
-adding people to ``reviewer_github_team`` above.
+``ui/app/auth.resolve_user`` returns) that get reviewer access without an
+Entra reviewer or administrator group claim. This is a break-glass mechanism;
+prefer granting access through the relevant Entra group.
 
 Users can find their own id via ``/whoami`` while signed in.
 EOT

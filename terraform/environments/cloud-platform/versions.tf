@@ -12,6 +12,10 @@ terraform {
       source  = "grafana/grafana"
       version = "~> 4.46"
     }
+    opensearch = {
+      source  = "opensearch-project/opensearch"
+      version = "~> 2.6"
+    }
   }
   required_version = "~> 1.0"
 }

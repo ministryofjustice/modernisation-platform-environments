@@ -26,33 +26,9 @@ class CompletionEventSchemaTest(unittest.TestCase):
 
     def test_route_completion_events_match_all_schema_branches(self):
         cases = [
-            ("clean", "NO_THREATS_FOUND", True),
-            ("quarantine", "THREATS_FOUND", True),
-            ("investigation", "FAILED", True),
-            ("investigation", "NO_THREATS_FOUND", False),
-            ("investigation", "THREATS_FOUND", False),
-        ]
-        service = self._service("ROUTE")
-        for route, status, matches_tag in cases:
-            with self.subTest(route=route, status=status, matches_tag=matches_tag):
-                item = self._item(
-                    operation="ROUTE",
-                    source_bucket="processing",
-                    destination_bucket=route,
-                    destination_version_id=f"{route}-version",
-                    route=route,
-                    scan_result_status=status,
-                    scan_result_status_matches_tag=matches_tag,
-                )
-
-                detail, detail_type, _ = service._completion_event(item)
-
-                self._validate(detail_type, detail)
-
-    def test_route_completion_rejects_a_tag_mismatch_outside_investigation(self):
-        cases = [
             ("clean", "NO_THREATS_FOUND"),
             ("quarantine", "THREATS_FOUND"),
+            ("investigation", "FAILED"),
         ]
         service = self._service("ROUTE")
         for route, status in cases:
@@ -64,12 +40,11 @@ class CompletionEventSchemaTest(unittest.TestCase):
                     destination_version_id=f"{route}-version",
                     route=route,
                     scan_result_status=status,
-                    scan_result_status_matches_tag=False,
                 )
+
                 detail, detail_type, _ = service._completion_event(item)
 
-                with self.assertRaises(ValidationError):
-                    self._validate(detail_type, detail)
+                self._validate(detail_type, detail)
 
     def _validate(self, detail_type, detail):
         schema = json.loads((SCHEMA_DIRECTORY / f"{detail_type}.json").read_text())

@@ -68,24 +68,6 @@ def _attribute(item, name, attribute_type="S"):
     return _required(value, f"workflow record {name}")
 
 
-def _scan_result_status_matches_tag(scan):
-    response = s3.get_object_tagging(
-        Bucket=scan["bucket"],
-        Key=scan["key"],
-        VersionId=scan["versionId"],
-        ExpectedBucketOwner=os.environ["AWS_ACCOUNT_ID"],
-    )
-    tag_status = next(
-        (
-            tag["Value"]
-            for tag in response.get("TagSet", [])
-            if tag["Key"] == "GuardDutyMalwareScanStatus"
-        ),
-        None,
-    )
-    return tag_status == scan["scanResultStatus"]
-
-
 def _workflow_record(scan):
     response = s3.head_object(
         Bucket=scan["bucket"],
@@ -126,12 +108,11 @@ def _workflow_record(scan):
     }
 
 
-def _build_detail(scan, workflow, scan_result_status_matches_tag, recorded_at):
+def _build_detail(scan, workflow, recorded_at):
     data = {
         "fileId": workflow["fileId"],
         "object": workflow["object"],
         "scanResultStatus": scan["scanResultStatus"],
-        "scanResultStatusMatchesTag": scan_result_status_matches_tag,
         "recordedAt": recorded_at.isoformat().replace("+00:00", "Z"),
     }
     if scan["statusReasons"]:
@@ -159,7 +140,6 @@ def _build_detail(scan, workflow, scan_result_status_matches_tag, recorded_at):
 def lambda_handler(event, _context):
     scan = _scan(event)
     workflow = _workflow_record(scan)
-    scan_result_status_matches_tag = _scan_result_status_matches_tag(scan)
     recorded_at = _event_time(event)
     response = eventbridge.put_events(
         Entries=[
@@ -167,12 +147,7 @@ def lambda_handler(event, _context):
                 "Source": "uk.gov.justice.service.managed-file-transfer",
                 "DetailType": "FileScanResultRecorded.v1",
                 "Detail": json.dumps(
-                    _build_detail(
-                        scan,
-                        workflow,
-                        scan_result_status_matches_tag,
-                        recorded_at,
-                    ),
+                    _build_detail(scan, workflow, recorded_at),
                     separators=(",", ":"),
                 ),
                 "EventBusName": os.environ["EVENT_BUS_ARN"],
@@ -187,7 +162,6 @@ def lambda_handler(event, _context):
         raise RuntimeError(
             f"Failed to publish FileScanResultRecorded.v1 event: {response['Entries']}"
         )
-
     destination_event_id = response["Entries"][0]["EventId"]
     logger.info(
         "Published FileScanResultRecorded.v1 event",

@@ -19,29 +19,6 @@ resource "aws_iam_policy" "trigger_unzip_lambda" {
 }
 
 # ------------------------------------------
-# DMS Validation
-# ------------------------------------------
-
-data "aws_iam_policy_document" "dms_validation_step_function_policy_document" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-  statement {
-    effect  = "Allow"
-    actions = ["lambda:InvokeFunction"]
-    resources = [
-      module.dms_retrieve_metadata[0].lambda_function_arn,
-    module.dms_validation[0].lambda_function_arn]
-  }
-}
-
-resource "aws_iam_policy" "dms_validation_step_function_policy" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-
-  name   = "dms_validation_step_function_role"
-  policy = data.aws_iam_policy_document.dms_validation_step_function_policy_document[0].json
-}
-
-
-# ------------------------------------------
 # Data Cut Back
 # ------------------------------------------
 
@@ -327,62 +304,23 @@ resource "aws_iam_policy" "dlt_iceberg_maintenance_invoke" {
 }
 
 # ------------------------------------------------------------------------------
-# Downstream position reconciliation Step Function
+# Downstream reconciliation audit Step Function
 # ------------------------------------------------------------------------------
 
-data "aws_iam_policy_document" "downstream_reconciliation_sfn_assume" {
+data "aws_iam_policy_document" "downstream_reconciliation_audit" {
   statement {
     effect  = "Allow"
-    actions = ["sts:AssumeRole"]
+    actions = ["lambda:InvokeFunction"]
 
-    principals {
-      type        = "Service"
-      identifiers = ["states.amazonaws.com"]
-    }
+    resources = [
+      module.merge_redrive_planner.lambda_function_arn,
+    ]
   }
 }
 
-resource "aws_iam_role" "downstream_reconciliation_state_machine" {
-  name = "downstream_reconciliation_state_machine_role"
-
-  assume_role_policy = (
-    data.aws_iam_policy_document.downstream_reconciliation_sfn_assume.json
-  )
-}
-
-resource "aws_iam_role_policy" "downstream_reconciliation_state_machine" {
-  name = "downstream_reconciliation_state_machine_invoke_policy"
-  role = aws_iam_role.downstream_reconciliation_state_machine.id
-
-  policy = jsonencode(
-    {
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Sid    = "AllowInvokeReconciliationPlanner"
-          Effect = "Allow"
-          Action = [
-            "lambda:InvokeFunction"
-          ]
-          Resource = [
-            module.merge_redrive_planner.lambda_function_arn
-          ]
-        },
-        {
-          Sid    = "AllowInvokeReconciliationMergeLambdas"
-          Effect = "Allow"
-          Action = [
-            "lambda:InvokeFunction"
-          ]
-          Resource = [
-            module.merge_mdss_staged_position[0].lambda_function_arn,
-            module.merge_ac_position[0].lambda_function_arn,
-            module.merge_emdi_position[0].lambda_function_arn
-          ]
-        }
-      ]
-    }
-  )
+resource "aws_iam_policy" "downstream_reconciliation_audit" {
+  name   = "downstream_reconciliation_audit_step_function_policy"
+  policy = data.aws_iam_policy_document.downstream_reconciliation_audit.json
 }
 
 # ------------------------------------------------------------------------------
@@ -433,9 +371,25 @@ resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
         ]
 
         Resource = [
-          aws_sfn_state_machine.downstream_reconciliation.arn,
+          module.merge_into_mdss_staged_position.arn,
+          module.merge_into_mdss_ac_position.arn,
+          module.merge_into_emdi_position.arn,
+        ]
+      },
+      {
+        Effect = "Allow"
+
+        Action = [
+          "lambda:InvokeFunction",
+        ]
+
+        Resource = [
+          module.merge_redrive_planner.lambda_function_arn,
         ]
       },
     ]
   })
 }
+
+
+

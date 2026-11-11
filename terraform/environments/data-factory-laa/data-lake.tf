@@ -13,13 +13,21 @@ locals {
       ]
     }
     test = {
-      lakeformation_admins = [
-        "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_f6defe724ee76f07",
+      lakeformation_admins = concat([
+        "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_9e1f6f5fda83364d",
         "arn:aws:iam::766696030771:role/MemberInfrastructureAccess",
-        "arn:aws:iam::766696030771:role/github-actions-apply"
-      ]
+        "arn:aws:iam::766696030771:role/github-actions-apply",
+      ], aws_iam_role.file_uploads_role[*].arn)
       lakeformation_read_only_admins = [
         "arn:aws:iam::766696030771:role/github-actions-plan"
+      ]
+    }
+    preproduction = {
+      lakeformation_admins = [
+        "arn:aws:iam::080426581928:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_d2bdd78878a090a5"
+      ],
+      lakeformation_read_only_admins = [
+        "arn:aws:iam::080426581928:role/github-actions-plan"
       ]
     }
   }
@@ -30,6 +38,20 @@ module "data_lake_settings" {
 
   admins           = local.environments[local.environment].lakeformation_admins
   read_only_admins = local.environments[local.environment].lakeformation_read_only_admins
+}
+
+resource "aws_glue_data_catalog_encryption_settings" "catalog_encryption" {
+  data_catalog_encryption_settings {
+    connection_password_encryption {
+      aws_kms_key_id                       = aws_kms_key.data_lake_kms_key.arn
+      return_connection_password_encrypted = true
+    }
+
+    encryption_at_rest {
+      catalog_encryption_mode = "SSE-KMS"
+      sse_aws_kms_key_id      = aws_kms_key.data_lake_kms_key.arn
+    }
+  }
 }
 
 data "aws_iam_policy_document" "data_lake_kms_key" {
@@ -71,6 +93,50 @@ data "aws_iam_policy_document" "data_lake_kms_key" {
 
     resources = ["*"]
   }
+
+  # Allow developers to use the key for encrypting and decrypting data in the data lake.
+  statement {
+    sid    = "AllowDevelopersToUseKey"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = local.environments[local.environment].lakeformation_admins
+    }
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+    ]
+
+    resources = ["*"]
+  }
+
+  # ALlow key to be used by CloudWatch for logs
+  statement {
+    sid    = "AllowCloudwatchLogs"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "logs.${local.current_account_region}.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*",
+    ]
+
+    resources = ["*"]
+  }
 }
 
 resource "aws_kms_key" "data_lake_kms_key" {
@@ -87,7 +153,11 @@ resource "aws_kms_alias" "data_lake_kms_alias" {
 
 module "data_lake_buckets" {
   for_each = toset(local.databases)
-  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4f72896323ec7f06e293f1f75732549b3248f841"
+  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=0294b1a1303028f91707fdc67f1e4bba63d34ea6"
+
+  manage_log_bucket_policy = false
+  log_buckets              = local.access_log_destination
+  log_prefix               = "${each.key}/"
 
   bucket_prefix       = each.key == "aws-athena-query-results" ? "aws-athena-query-results" : "${local.name}-${each.key}"
   bucket_namespace    = "account-regional"
@@ -101,7 +171,49 @@ module "data_lake_buckets" {
     aws.bucket-replication = aws
   }
 
+  # Attach policy to query results bucket to allow Athena to write query results to it
+  bucket_policy_v2 = each.key == "aws-athena-query-results" ? [
+    {
+      effect = "Allow"
+
+      actions = [
+        "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts",
+      ]
+
+      principals = {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_9e1f6f5fda83364d"
+        ]
+      }
+    }
+  ] : []
+
   tags = local.tags
+}
+
+resource "aws_athena_workgroup" "laa" {
+  name = "laa"
+
+  configuration {
+    #checkov:skip=CKV_AWS_82: CADET needs to output to specific buckets per DB
+    enforce_workgroup_configuration    = false
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${module.data_lake_buckets["aws-athena-query-results"].bucket.id}/athena-results/"
+
+      encryption_configuration {
+        encryption_option = "SSE_KMS"
+        kms_key_arn       = aws_kms_key.data_lake_kms_key.arn
+      }
+    }
+  }
 }
 
 module "databases" {

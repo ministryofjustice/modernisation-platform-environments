@@ -29,7 +29,7 @@ locals {
   volume_prefix           = local.environment == "production" ? "/CCMS/EBSPROD" : "/CCMS/EBS"
 
   sftp_enabled       = contains(["development", "test", "preproduction", "production"], local.environment)
-  ssogen_enabled     = contains(["development", "test"], local.environment)
+  ssogen_enabled     = contains(["development", "test", "preproduction"], local.environment)
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 
   lambda_source_hashes_cloudwatch_slack_integration_v2 = [
@@ -82,7 +82,6 @@ locals {
   prod_sans = [
     format("ccmsebs.%s", local.prod_domain),
     format("ccms-ebs-db-nlb.%s", local.prod_domain),
-    format("ccmsebs-sso.%s", local.prod_domain),
   ]
 
   subject_alternative_names = local.is-production ? local.prod_sans : local.nonprod_sans

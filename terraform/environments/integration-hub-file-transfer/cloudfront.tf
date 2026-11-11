@@ -3,7 +3,7 @@ module "cloudfront_web_app" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = "6.7.1"
 
-  aliases               = [aws_acm_certificate.web_app.domain_name]
+  aliases               = [local.acm_domains.web_app]
   comment               = "Integration Hub File Transfer web app"
   enabled               = true
   http_version          = "http2"
@@ -41,7 +41,7 @@ module "cloudfront_web_app" {
   }
 
   viewer_certificate = {
-    acm_certificate_arn      = aws_acm_certificate_validation.web_app.certificate_arn
+    acm_certificate_arn      = module.acm_web_app.acm_certificate_arn
     minimum_protocol_version = "TLSv1.2_2025"
     ssl_support_method       = "sni-only"
   }

@@ -32,7 +32,7 @@ resource "aws_security_group_rule" "alb_egress_ec2" {
 }
 
 data "aws_prefix_list" "s3" {
-  name = "com.amazonaws.${data.aws_region.current.name}.s3"
+  name = "com.amazonaws.${data.aws_region.current.region}.s3"
 }
 
 ### Container Security Group
