@@ -47,7 +47,7 @@
     },
     "production": {
       "deploy_workspaces": true,
-      "nexthink_external_id": "",
+      "nexthink_external_id": "b1e9614c-c038-4de8-be35-1f0354802d52",
       "ad_connector_secret_name": "equip-local-domain-join-account",
       "domain_name": "equip.local",
       "ad_connector_size": "Small",
