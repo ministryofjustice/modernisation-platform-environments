@@ -1,15 +1,15 @@
 {
-    "logs": {
-        "logs_collected": {
-            "files": {
-                "collect_list": [
-                    {
-                        "file_path": "/var/log/clamd.scan",
-                        "log_group_name": "${clamav_log_group_name}",
-                        "log_stream_name": "{instance_id}"
-                    }       
-                ]       
-            }       
-        }       
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/clamd.scan",
+            "log_group_name": "${clamav_log_group_name}",
+            "log_stream_name": "{instance_id}"
+          }
+        ]
+      }
     }
+  }
 }
