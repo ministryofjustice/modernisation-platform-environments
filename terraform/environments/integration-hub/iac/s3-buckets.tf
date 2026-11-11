@@ -16,21 +16,9 @@ data "aws_iam_policy_document" "pagerduty_state_bucket" {
     }
 
     condition {
-      test     = "StringNotLike"
+      test     = "ArnNotLike"
       variable = "aws:PrincipalArn"
-      values = [
-        "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*",
-        "arn:aws:iam::*:role/MemberInfrastructureAccess",
-        "arn:aws:iam::*:role/github-actions-plan",
-        "arn:aws:iam::*:role/github-actions-apply",
-        "arn:aws:iam::${local.account_id}:role/github-actions/${local.pagerduty_role_name}"
-      ]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:PrincipalAccount"
-      values   = [local.account_id]
+      values   = local.pagerduty_state_allowed_principal_arns
     }
   }
 
@@ -74,7 +62,8 @@ module "pagerduty_state_bucket" {
 
   server_side_encryption_configuration = {
     rule = {
-      bucket_key_enabled = true
+      bucket_key_enabled       = true
+      blocked_encryption_types = ["SSE-C"]
       apply_server_side_encryption_by_default = {
         kms_master_key_id = module.pagerduty_state_kms[0].key_arn
         sse_algorithm     = "aws:kms"

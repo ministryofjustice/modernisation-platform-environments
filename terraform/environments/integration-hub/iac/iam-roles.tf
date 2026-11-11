@@ -109,8 +109,33 @@ data "aws_iam_policy_document" "pagerduty_permissions" {
   statement {
     sid       = "ReadPagerDutyApiToken"
     effect    = "Allow"
-    actions   = ["secretsmanager:GetSecretValue"]
+    actions   = ["secretsmanager:DescribeSecret", "secretsmanager:GetSecretValue"]
     resources = [module.pagerduty_api_key_secret[0].secret_arn]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["true"]
+    }
+  }
+
+  statement {
+    sid       = "DecryptPagerDutyApiToken"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [module.pagerduty_api_key_kms[0].key_arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["secretsmanager.eu-west-2.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:EncryptionContext:SecretARN"
+      values   = [module.pagerduty_api_key_secret[0].secret_arn]
+    }
   }
 }
 
