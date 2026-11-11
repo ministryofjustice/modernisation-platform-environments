@@ -165,6 +165,34 @@ resource "aws_lakeformation_permissions" "merge_redrive_planner_table_access" {
 }
 
 # ------------------------------------------------------------------------
+# Lake Formation for Observability Platform
+# Limit Grafana Athena access to operational monitoring data only.
+# ------------------------------------------------------------------------
+
+resource "aws_lakeformation_permissions" "observability_platform_database" {
+  principal   = data.aws_iam_role.observability_platform.arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = aws_glue_catalog_database.ops_monitoring.name
+  }
+
+  depends_on = [module.observability_platform_tenant]
+}
+
+resource "aws_lakeformation_permissions" "observability_platform_tables" {
+  principal   = data.aws_iam_role.observability_platform.arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = aws_glue_catalog_database.ops_monitoring.name
+    wildcard      = true
+  }
+
+  depends_on = [module.observability_platform_tenant]
+}
+
+# ------------------------------------------------------------------------
 # Lake Formation - admin permissions
 # https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/adding-admin-data-lake-formation-permissions.html
 # ------------------------------------------------------------------------
