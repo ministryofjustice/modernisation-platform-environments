@@ -874,97 +874,65 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
 
 # ------------------------------------------------------------------------------
 # Downstream reconciliation Lake Formation permission repair
-# Reapply table grants after CADT creates AC and EMDI tables.
+# Temporarily reapply grants on a schedule until CADT runs through ECS.
 # ------------------------------------------------------------------------------
 
 locals {
-  downstream_reconciliation_lf_databases = [
-    "acquisitive_crime${local.dbt_suffix}",
-    "data_insights${local.dbt_suffix}",
-  ]
-
-  downstream_reconciliation_lf_backstop = tomap({
-    ac   = "acquisitive_crime${local.dbt_suffix}"
-    emdi = "data_insights${local.dbt_suffix}"
-  })
-}
-
-resource "aws_cloudwatch_event_rule" "downstream_reconciliation_lf_create_table" {
-  name = "downstream_reconciliation_lf_create_table"
-
-  description = (
-    "Repairs reconciliation Lake Formation grants after table creation"
-  )
-
-  event_pattern = jsonencode({
-    source      = ["aws.glue"]
-    "detail-type" = ["Glue Data Catalog Database State Change"]
-
-    detail = {
-      typeOfChange = ["CreateTable"]
-      databaseName = local.downstream_reconciliation_lf_databases
-      changedTables = [
+  downstream_reconciliation_lf_grants = [
+    {
+      database             = "acquisitive_crime${local.dbt_suffix}"
+      principal_arn        = aws_iam_role.merge_redrive_planner.arn
+      database_permissions = ["DESCRIBE"]
+      tables = [
         "position",
         "device_activations",
       ]
-    }
-  })
-}
-
-resource "aws_cloudwatch_event_target" "downstream_reconciliation_lf_create_table" {
-  rule = (
-    aws_cloudwatch_event_rule.downstream_reconciliation_lf_create_table.name
-  )
-
-  target_id = "RepairReconciliationLakeFormationPermissions"
-  arn       = module.downstream_reconciliation_lf_permissions.arn
-  role_arn  = aws_iam_role.downstream_reconciliation_lf_events.arn
-
-  input_transformer {
-    input_paths = {
-      database = "$.detail.databaseName"
-      tables   = "$.detail.changedTables"
-    }
-
-    input_template = <<-EOT
-      {"database": <database>, "tables": <tables>}
-    EOT
-  }
-
-  depends_on = [
-    aws_lakeformation_data_lake_settings.settings,
+      table_permissions = [
+        "SELECT",
+        "DESCRIBE",
+      ]
+    },
+    {
+      database             = "data_insights${local.dbt_suffix}"
+      principal_arn        = aws_iam_role.merge_redrive_planner.arn
+      database_permissions = ["DESCRIBE"]
+      tables = [
+        "position",
+        "device_activations",
+      ]
+      table_permissions = [
+        "SELECT",
+        "DESCRIBE",
+      ]
+    },
   ]
 }
 
-resource "aws_scheduler_schedule" "downstream_reconciliation_lf_backstop" {
-  for_each = (
-    local.is-preproduction || local.is-production
-    ? local.downstream_reconciliation_lf_backstop
-    : tomap({})
+resource "aws_scheduler_schedule" "downstream_reconciliation_lf_permissions" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
   )
 
-  name = "downstream_reconciliation_lf_${each.key}_backstop"
+  name = "downstream_reconciliation_lf_permissions"
 
   description = (
-    "Rechecks ${upper(each.key)} reconciliation Lake Formation grants"
+    "Temporarily reapplies reconciliation Lake Formation permissions each morning"
   )
 
   flexible_time_window {
     mode = "OFF"
   }
 
-  schedule_expression = "rate(5 minutes)"
+  schedule_expression          = "cron(0/15 6-7 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
 
   target {
-    arn      = module.downstream_reconciliation_lf_permissions.arn
+    arn      = module.lake_formation_permission_granter.lambda_function_arn
     role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
 
     input = jsonencode({
-      database = each.value
-      tables = [
-        "position",
-        "device_activations",
-      ]
+      fail_on_missing = false
+      grants          = local.downstream_reconciliation_lf_grants
     })
   }
 

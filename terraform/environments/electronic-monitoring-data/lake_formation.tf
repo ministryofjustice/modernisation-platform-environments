@@ -26,7 +26,7 @@ resource "aws_lakeformation_data_lake_settings" "settings" {
       aws_iam_role.clean_after_dlt_load.arn,
       aws_iam_role.glue_db_count_metrics.arn,
       aws_iam_role.staging_db_janitor.arn,
-      module.downstream_reconciliation_lf_permissions.role_arn,
+      aws_iam_role.lake_formation_permission_granter.arn,
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
     ]

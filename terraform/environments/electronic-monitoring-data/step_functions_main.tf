@@ -186,30 +186,6 @@ module "downstream_reconciliation_audit" {
   })
 }
 
-# ------------------------------------------
-# Downstream reconciliation Lake Formation permissions
-# ------------------------------------------
-
-module "downstream_reconciliation_lf_permissions" {
-  source = "./modules/step_function"
-  name   = "downstream_reconciliation_lf_permissions"
-  type   = "STANDARD"
-
-  iam_policies = tomap({
-    downstream_reconciliation_lf_permissions = (
-      aws_iam_policy.downstream_reconciliation_lf_permissions
-    )
-  })
-
-  variable_dictionary = tomap({
-    catalog_id       = local.env_account_id
-    planner_role_arn = aws_iam_role.merge_redrive_planner.arn
-    ac_database      = "acquisitive_crime${local.dbt_suffix}"
-    emdi_database    = "data_insights${local.dbt_suffix}"
-  })
-}
-
-
 # ------------------------------------------------------------------------------
 # Staging DB janitor Step Function
 # ------------------------------------------------------------------------------
@@ -451,6 +427,13 @@ module "trigger_cadt_step_function" {
       "trigger_cadt" = module.trigger_cadt.lambda_function_name,
       "environment"  = local.environment,
       "poll_cadt"    = module.poll_cadt.lambda_function_name,
+      "grant_lf_permissions" = (
+        module.lake_formation_permission_granter.lambda_function_name
+      ),
+      "lf_permission_grants" = jsonencode({
+        fail_on_missing = true
+        grants          = local.downstream_reconciliation_lf_grants
+      })
     }
   )
   type = "STANDARD"
