@@ -48,6 +48,18 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_22" {
   local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod]
 }
 
+# THe following SSH rule is created for AVZ (Azure Virtual Desktop) usrs to access EBS DB - Testing Purpose only
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_22_avd" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "SSH from Azure Virtual Desktop (AVD) workspace for POC - DEV only"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
+}
+
 ### Oracle LDAP
 
 resource "aws_security_group_rule" "ingress_traffic_ebsdb_1389" {
