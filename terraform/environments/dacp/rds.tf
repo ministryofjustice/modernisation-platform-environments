@@ -1,6 +1,6 @@
 # 1. Create a custom parameter group
 resource "aws_db_parameter_group" "dacp_analyse" {
-  name        = "custom-postgres-parameters"
+  name_prefix = "custom-postgres16-parameters-"
   family      = "postgres16" # match your RDS engine version
   description = "Custom parameter group for slow query logging"
 
@@ -17,6 +17,11 @@ resource "aws_db_parameter_group" "dacp_analyse" {
   parameter {
     name  = "log_destination"
     value = "stderr"
+  }
+
+  # A family change forces replacement; the old group can't be deleted while the instance still uses it.
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -48,7 +53,7 @@ resource "aws_db_instance" "dacp_db_v2" {
   publicly_accessible             = false
   vpc_security_group_ids          = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup_data.name
-  allow_major_version_upgrade     = false
+  allow_major_version_upgrade     = true
   auto_minor_version_upgrade      = true
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
   apply_immediately               = local.is-production ? false : true
