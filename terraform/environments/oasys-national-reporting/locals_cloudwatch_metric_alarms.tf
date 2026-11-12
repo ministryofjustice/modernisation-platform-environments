@@ -11,6 +11,8 @@ locals {
         comparison_operator = "LessThanThreshold"
         threshold           = 2 # CloudWatch agent runs 2 processes
         treat_missing_data  = "breaching"
+        alarm_actions       = ["pagerduty"]
+        ok_actions          = ["pagerduty"]
         dimensions = {
           exe        = "amazon-cloudwatch-agent"
           pid_finder = "native"
@@ -26,6 +28,8 @@ locals {
         comparison_operator = "LessThanThreshold"
         threshold           = 2 # SSM agent runs 2 processes
         treat_missing_data  = "breaching"
+        alarm_actions       = ["pagerduty"]
+        ok_actions          = ["pagerduty"]
         dimensions = {
           exe        = "ssm-agent"
           pid_finder = "native"
@@ -43,6 +47,8 @@ locals {
         comparison_operator = "LessThanThreshold"
         threshold           = 1
         treat_missing_data  = "breaching"
+        alarm_actions       = ["pagerduty"]
+        ok_actions          = ["pagerduty"]
         dimensions = {
           exe        = "CMS"
           pid_finder = "native"
@@ -58,6 +64,8 @@ locals {
         comparison_operator = "LessThanThreshold"
         threshold           = 1
         treat_missing_data  = "breaching"
+        alarm_actions       = ["pagerduty"]
+        ok_actions          = ["pagerduty"]
         dimensions = {
           exe        = "AL_JobService"
           pid_finder = "native"
@@ -75,6 +83,8 @@ locals {
         comparison_operator = "LessThanThreshold"
         threshold           = 1
         treat_missing_data  = "breaching"
+        alarm_actions       = ["pagerduty"]
+        ok_actions          = ["pagerduty"]
         dimensions = {
           exe        = "AL_JobService"
           pid_finder = "native"
