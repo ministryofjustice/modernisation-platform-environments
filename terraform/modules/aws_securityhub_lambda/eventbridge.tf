@@ -32,12 +32,11 @@ resource "aws_lambda_permission" "securityhub_findings" {
   source_account = var.aws_account_id
 }
 
-# To re-enable once rolled out as part of POC
-# resource "aws_lambda_permission" "allow_external_securityhub_accounts_eventbridge" {
-#   for_each = nonsensitive(toset(keys(local.securityhub_accounts)))
-#
-#   statement_id  = "AllowSecurityHubEvents${each.key}"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.securityhub_finding_issue.function_name
-#   principal     = "arn:aws:iam::${local.securityhub_accounts[each.key]}:role/EventBridgeInvokeSecurityHubLambda"
-# }
+resource "aws_lambda_permission" "allow_external_securityhub_accounts_eventbridge" {
+  for_each = nonsensitive(toset(keys(local.securityhub_accounts)))
+
+  statement_id  = "AllowSecurityHubEvents${each.key}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.securityhub_finding_issue.function_name
+  principal     = "arn:aws:iam::${local.securityhub_accounts[each.key]}:role/EventBridgeInvokeAWSSecurityHubLambda"
+}
