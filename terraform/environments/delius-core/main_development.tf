@@ -90,8 +90,8 @@ module "environment_poc" {
 }
 
 module "aws_lambda_event_forwarding_development" {
-  source                                = "../../modules/aws_lambda_event_forwarding"
-  aws_health_lambda_configuration       = local.aws_health_lambda_configuration_development
-  aws_securityhub_lambda_configuration  = local.aws_securityhub_lambda_configuration_development
+  source                               = "../../modules/aws_lambda_event_forwarding"
+  aws_health_lambda_configuration      = local.aws_health_lambda_configuration_development
+  aws_securityhub_lambda_configuration = local.aws_securityhub_lambda_configuration_development
 }
 
