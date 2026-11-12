@@ -263,8 +263,8 @@ data "aws_iam_policy_document" "data_engineering_datalake_access_github_actions"
       "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/lakeformation-share-role",
       "arn:aws:iam::${local.environment_management.account_ids["data-factory-laa-development"]}:role/lakeformation-share-role",
       "arn:aws:iam::${local.environment_management.account_ids["data-factory-laa-test"]}:role/lakeformation-share-role",
-      "arn:aws:iam::${local.environment_management.account_ids["data-factory-laa-preproduction"]}:role/lakeformation-share-role",
-      "arn:aws:iam::${local.environment_management.account_ids["data-factory-laa-production"]}:role/lakeformation-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["data-factory-corporate-development"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["data-factory-corporate-test"]}:role/analytical-platform-data-production-share-role",
     ]
   }
 }
