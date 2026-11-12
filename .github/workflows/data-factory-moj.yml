@@ -7,6 +7,7 @@ on:
     paths:
       - 'terraform/environments/data-factory-moj/**'
       - '.github/workflows/data-factory-moj.yml'
+      - '.github/workflows/reusable_service_ingestion.yml'
 
   pull_request:
     branches:
@@ -14,6 +15,7 @@ on:
     paths:
       - 'terraform/environments/data-factory-moj/**'
       - '.github/workflows/data-factory-moj.yml'
+      - '.github/workflows/reusable_service_ingestion.yml'
 
   workflow_dispatch:
     inputs:
@@ -80,6 +82,7 @@ jobs:
             status=0
             git diff --quiet "${base}" "${head}" -- \
               .github/workflows/data-factory-moj.yml \
+              .github/workflows/reusable_service_ingestion.yml \
               terraform/environments/data-factory-moj/dms-core/onboarding/services \
               terraform/environments/data-factory-moj/dms-core/onboarding/generations.json \
               || status=$?
@@ -137,7 +140,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/workflows/data-factory-moj-service-ingestion.yml@c7b03021b809f7c0b2809c2faedd14baaf9f45f8
+    uses: ./.github/workflows/reusable_service_ingestion.yml
     with:
       action: ${{ needs.ingestion-routing.outputs.ingestion_action }}
     secrets:
