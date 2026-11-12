@@ -45,3 +45,10 @@ AWS Health event forwarding is configured through
 `aws_health_lambda_configuration`. Set `enabled = true` and provide
 `aws_health_lambda_arn` and `rule_name` to enable forwarding.
 It is disabled by default.
+
+AWS SecurityHub event forwarding is configured through
+`aws_securityhub_lambda_configuration`. Set `enabled = true` and provide
+`aws_securityhub_lambda_arn` and `rule_name` to enable forwarding.
+It is disabled by default. When enabled, imported findings are forwarded only
+when their severity matches `finding_severity_labels`, which defaults to
+`["CRITICAL"]`. Configure the destination Lambda to accept the same labels.
