@@ -12,6 +12,18 @@ module "eks" {
   control_plane_subnet_ids = data.aws_subnets.private.ids
   subnet_ids               = data.aws_subnets.private.ids
 
+  # Allow in-VPC clients (MWAA) to reach the private EKS API endpoint
+  security_group_additional_rules = {
+    vpc = {
+      description = "Allow HTTPS to the EKS API from the VPC"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      type        = "ingress"
+      cidr_blocks = [data.aws_vpc.main.cidr_block]
+    }
+  }
+
   deletion_protection = true
 
   create_node_security_group = false
@@ -100,52 +112,70 @@ module "eks" {
     }
   }
 
-  access_entries = {
-    MemberInfrastructureAccess = {
-      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
-      policy_associations = {
-        eks-admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
+  access_entries = merge(
+    {
+      MemberInfrastructureAccess = {
+        principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
+        policy_associations = {
+          eks-admin = {
+            policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+            access_scope = {
+              type = "cluster"
+            }
           }
         }
       }
-    }
-    GitHubActionsPlan = {
-      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan"
-      policy_associations = {
-        eks-admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
+      GitHubActionsPlan = {
+        principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan"
+        policy_associations = {
+          eks-admin = {
+            policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+            access_scope = {
+              type = "cluster"
+            }
           }
         }
       }
-    }
-    GitHubActionsApply = {
-      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply"
-      policy_associations = {
-        eks-admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
+      GitHubActionsApply = {
+        principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply"
+        policy_associations = {
+          eks-admin = {
+            policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+            access_scope = {
+              type = "cluster"
+            }
           }
         }
       }
-    }
-    PlatformEngineerAdmin = {
-      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
-      policy_associations = {
-        eks-admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
+      PlatformEngineerAdmin = {
+        principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
+        policy_associations = {
+          eks-admin = {
+            policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+            access_scope = {
+              type = "cluster"
+            }
           }
         }
       }
+    },
+    # Airflow 3 (MWAA, data-platform/airflow)
+    # Kubernetes RBAC for these groups is managed in data-platform/airflow.
+    {
+      # MWAA execution role -> mwaa namespace
+      dp-mwaa = {
+        principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/mwaa-execution"
+        username          = "dp-mwaa"
+        kubernetes_groups = ["mwaa"]
+      }
+      # Analytical Platform Common GitHub Actions -> MWAA ServiceAccount / ExternalSecret management
+      gha-mojap-common = {
+        principal_arn     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/analytical-platform-github-actions"
+        username          = "github-actions-moj-ap-airflow"
+        kubernetes_groups = ["mwaa-serviceaccount-management", "mwaa-external-secrets"]
+      }
     }
-  }
+  )
 }
 
 module "eks_managed_node_group_system" {
