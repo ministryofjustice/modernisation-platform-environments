@@ -104,6 +104,74 @@ resource "aws_eks_pod_identity_association" "adot_amp" {
 }
 
 #------------------------------------------------------------------------------
+# Cross-account query role — assumed by the central AMG workspace role in the
+# hub account (cloud-platform-<tier>) to query this BU's AMP workspace. Scoped to
+# this cluster's workspace only; created only on enabled BU clusters. The name
+# must match local.bu_amp_query_role_name in the root component.
+#------------------------------------------------------------------------------
+
+resource "aws_iam_role" "amg_amp_query" {
+  count = local.bu_amp_enabled ? 1 : 0
+
+  name = "amg-amp-query"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-${local.workspace_environment}"]}:role/cloud-platform-${local.workspace_environment}-amg"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = merge(local.tags, {
+    component = "observability"
+  })
+}
+
+resource "aws_iam_role_policy" "amg_amp_query" {
+  count = local.bu_amp_enabled ? 1 : 0
+
+  name = "amp-query"
+  role = aws_iam_role.amg_amp_query[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "aps:QueryMetrics",
+          "aps:GetSeries",
+          "aps:GetLabels",
+          "aps:GetMetricMetadata"
+        ]
+        Resource = aws_prometheus_workspace.this[0].arn
+      }
+    ]
+  })
+}
+
+#------------------------------------------------------------------------------
+# Publish the workspace ID for the hub Grafana (root component), which cannot
+# see this account's AMP workspaces. Stored in core-shared-services-production
+# under the business-unit prefix permitted by the shared-configuration-access role.
+#------------------------------------------------------------------------------
+
+resource "aws_ssm_parameter" "amp_workspace_id" {
+  count    = local.bu_amp_enabled ? 1 : 0
+  provider = aws.shared-configuration-access
+
+  name  = "/${local.vpc_name}/cloud-platform/amp/${local.amp_workspace_alias}/workspace-id"
+  type  = "String"
+  value = aws_prometheus_workspace.this[0].id
+}
+
+#------------------------------------------------------------------------------
 # Outputs
 #------------------------------------------------------------------------------
 

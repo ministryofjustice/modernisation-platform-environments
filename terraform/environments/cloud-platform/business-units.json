@@ -12,7 +12,7 @@
       },
       "grafana_enabled": {
         "live": false,
-        "nonlive": true
+        "nonlive": false
       }
     },
     "laa": {
