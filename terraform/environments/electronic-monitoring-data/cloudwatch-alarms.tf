@@ -396,6 +396,38 @@ resource "aws_cloudwatch_metric_alarm" "live_feed_incident_events_dlq" {
 }
 
 # ------------------------------------------------------------------------------
+# Alarm notification confirmation DLQ
+# Notify directly if delayed alarm confirmation cannot recover.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "cloudwatch_alarm_debounce_dlq" {
+  alarm_name = "cloudwatch_alarm_debounce_dlq_has_messages"
+
+  alarm_description = (
+    "Triggered when CloudWatch alarm confirmations reach the DLQ"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+  actions_enabled     = true
+
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+  period      = 60
+  statistic   = "Maximum"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
 # Downstream specials remediation guard
 # ------------------------------------------------------------------------------
 
@@ -506,6 +538,45 @@ resource "aws_cloudwatch_metric_alarm" "specials_guard_lambda_errors" {
 
   dimensions = {
     FunctionName = module.live_feed_specials_remediator.lambda_function_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation Lake Formation permission repair
+# Alert only when automatic permission repair fails.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_lf_permission_repair_failed" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  alarm_name = "downstream_reconciliation_lf_permission_repair_failed"
+
+  alarm_description = (
+    "Triggered when automatic Lake Formation permission repair fails"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  # Use EventBridge -> cloudwatch_alarm_threader -> incident automation.
+  # Disable direct alarm actions to avoid duplicate Slack messages.
+  actions_enabled = false
+
+  metric_name = "PermissionRepairFailed"
+  namespace   = "EM/LakeFormationPermissions"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
   }
 
   alarm_actions = [

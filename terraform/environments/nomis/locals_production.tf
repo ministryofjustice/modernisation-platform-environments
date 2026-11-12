@@ -10,6 +10,10 @@ locals {
     enabled = false
   }
 
+  aws_securityhub_lambda_configuration_production = {
+    enabled = false
+  }
+
   baseline_presets_production = {
     options = {
       db_backup_object_lock_days          = 14

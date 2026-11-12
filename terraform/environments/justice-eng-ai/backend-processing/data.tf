@@ -10,3 +10,51 @@ data "terraform_remote_state" "justice_eng_ai" {
     workspace_key_prefix = "environments/members/justice-eng-ai"
   }
 }
+
+#cluster arn
+data "aws_ecs_cluster" "prototype_deployment" {
+  cluster_name = "${local.application_name}-prototypes-app"
+}
+
+#vpc id
+data "aws_vpc" "vpc" {
+  filter {
+    name   = "tag:Name"
+    values = ["${terraform.workspace}"]
+  }
+}
+
+#private subnet ids
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.vpc.id]
+  }
+
+  filter {
+    name   = "tag:Name"
+    values = ["*-private-eu-west-2*"]
+  }
+}
+
+#ECS security group
+data "aws_security_group" "prototype_deployment" {
+  name = "${local.application_name}-prototypes-app"
+}
+
+#Load Balancer
+data "aws_lb" "prototype_deployment" {
+  name = "${local.application_name}-prototypes-alb"
+}
+
+#listener rule 
+data "aws_lb_listener" "prototype_deployment" {
+  load_balancer_arn = data.aws_lb.prototype_deployment.arn
+  port              = 443
+}
+
+#Route53 zone 
+data "aws_route53_zone" "prototype_deployment" {
+  name         = local.application_data.accounts[local.environment].builder_hostname
+  private_zone = false
+}

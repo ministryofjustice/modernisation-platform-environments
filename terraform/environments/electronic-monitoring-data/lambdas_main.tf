@@ -484,14 +484,19 @@ module "live_feed_daily_handover" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-
   environment_variables = {
     SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
     ENVIRONMENT    = local.environment_shorthand
     NAMESPACE      = "EMDS/MDSS"
     LOOKBACK_HOURS = "24"
+
+    GITHUB_SECRET_ARN = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER      = "moj-analytical-services"
+    GITHUB_REPOSITORY = "dmet-em"
+
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
 
     LOAD_MDSS_QUEUE_NAME = module.load_mdss_event_queue.sqs_queue.name
     LOAD_FMS_QUEUE_NAME  = module.load_fms_event_queue.sqs_queue.name
@@ -520,6 +525,26 @@ module "live_feed_daily_handover" {
     RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
     RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
 
+    GITHUB_SECRET_ARN = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER      = "moj-analytical-services"
+    GITHUB_REPOSITORY = "dmet-em"
+
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
+
+    MDSS_DASHBOARD_NAME = (
+      "mdss-ops-${local.environment_shorthand}"
+    )
+
+    FMS_DASHBOARD_NAME = (
+      "fms-ops-${local.environment_shorthand}"
+    )
+
+    LANDING_DASHBOARD_NAME = (
+      "landing-ops-${local.environment_shorthand}"
+    )
+
     DOWNSTREAM_RECONCILIATION_DASHBOARD_NAME = (
       "downstream-reconciliation-ops-${local.environment_shorthand}"
     )
@@ -528,6 +553,7 @@ module "live_feed_daily_handover" {
     CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
     ROTA_GUIDE_URL             = "https://jubilant-adventure-g65j3om.pages.github.io/hmpps/electronic_monitoring/data_engineering_guides/rota_duties/"
     EARS_SARS_TALLY_URL        = "https://justiceuk.sharepoint.com/:x:/r/sites/EMExpansionProgrammeteam/_layouts/15/doc2.aspx?sourcedoc=%7B25644699-3837-4A02-9C09-020EF0ECA744%7D&file=Monthly%20Tally%20of%20EARs%20and%20SARs.xlsx&action=default&mobileredirect=true"
+    OPEN_PRS_URL               = "https://github.com/ministryofjustice/electronic-monitoring-data/pulls"
   }
 }
 
@@ -639,6 +665,12 @@ module "cloudwatch_alarm_threader" {
     INCLUDE_REASON        = "true"
     ENABLE_CUSTOM_ACTIONS = "false"
     INCIDENT_QUEUE_URL    = aws_sqs_queue.live_feed_incident_events.id
+
+    DEBOUNCE_QUEUE_URL = aws_sqs_queue.cloudwatch_alarm_debounce.id
+    DEBOUNCE_SECONDS   = tostring(local.alarm_debounce_seconds)
+    DEBOUNCE_BYPASS_ALARM_NAMES = jsonencode(
+      local.alarm_debounce_bypass_names
+    )
 
     RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
     RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
@@ -1104,10 +1136,10 @@ module "trigger_cadt" {
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   environment_variables = {
-    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
-    TASK_DEFINITION_ARN = aws_ecs_task_definition.create_a_derived_table.arn
-    SUBNET_IDS          = jsonencode(data.aws_subnets.shared-private.ids)
-    SECURITY_GROUPS     = jsonencode([aws_security_group.gdpr_batch_sg[0].id])
+    CLUSTER_NAME           = aws_ecs_cluster.cadt.name
+    TASK_DEFINITION_FAMILY = "create-a-derived-table"
+    SUBNET_IDS             = jsonencode(data.aws_subnets.shared-private.ids)
+    SECURITY_GROUPS        = jsonencode([aws_security_group.gdpr_batch_sg[0].id])
   }
 }
 
@@ -1144,7 +1176,6 @@ locals {
     PLV2QS6 = "lucy-astley-jones"
     PREPU2L = "mrixson-moj"
     PY6LVCP = "gwionap"
-    PO9DYMA = "georgewk92"
   }
 }
 
@@ -1205,8 +1236,9 @@ module "live_feed_incident_manager" {
     GITHUB_PROJECT_DONE_OPTION     = "✅ Done"
     GITHUB_PROJECT_PRIORITY_OPTION = "🚨 Urgent"
 
-    PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
-    PAGERDUTY_TIME_ZONE   = "Europe/London"
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
     PAGERDUTY_TO_GITHUB = jsonencode(
       local.live_feed_pagerduty_to_github
     )
@@ -1281,8 +1313,9 @@ module "rota_personal_digest" {
     GITHUB_OWNER      = "moj-analytical-services"
     GITHUB_REPOSITORY = "dmet-em"
 
-    PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
-    PAGERDUTY_TIME_ZONE   = "Europe/London"
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
     PAGERDUTY_TO_GITHUB = jsonencode(
       local.live_feed_pagerduty_to_github
     )
@@ -1368,6 +1401,41 @@ module "live_feed_specials_remediator" {
     POWERTOOLS_LOG_LEVEL  = "INFO"
     REMEDIATION_BUCKET    = module.s3-logging-bucket.bucket.id
     REMEDIATION_PREFIX    = local.specials_remediation_prefix
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Lake Formation permission granter
+# Apply reusable database and table grants through AWS managed service APIs.
+# ------------------------------------------------------------------------------
+
+module "lake_formation_permission_granter" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "lake_formation_permission_granter"
+  role_name                      = aws_iam_role.lake_formation_permission_granter.name
+  role_arn                       = aws_iam_role.lake_formation_permission_granter.arn
+  handler                        = "lake_formation_permission_granter.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    CATALOG_ID              = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME        = local.environment_shorthand
+    POWERTOOLS_LOG_LEVEL    = "INFO"
+    POWERTOOLS_SERVICE_NAME = "lake-formation-permission-granter"
   }
 }
 

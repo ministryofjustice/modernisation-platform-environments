@@ -137,10 +137,10 @@ wrong audience/issuer, expired/invalid signature, delegated user, missing applic
 unmapped application, and cross-client access on all multipart operations. Unit tests in
 the application cover handler authorisation, not AWS cryptographic token validation.
 
-Production acceptance additionally needs payload/encryption/connectivity evidence,
-zero-critical-error smoke results and Buyer SecOps/Infra sign-off. This authentication
-change alone does not complete D07. Existing alarm actions are not wired; agree the
-operational alert destinations before production activation.
+Before production release, verify file integrity, encryption and connectivity,
+run the smoke tests, and agree the results with the security and infrastructure
+leads. Development alarms use the existing platform topic; test message delivery
+and configure production destinations before release.
 
 
 ## IDAM registrations and automated development testing
@@ -169,3 +169,14 @@ complete the coordinated API cutover, then run **Test Entra development authenti
 from `main`. It checks basic authentication failures and uploads a harmless file.
 It does not replace the broader token, multipart, scan and download acceptance tests.
 No changes to platform-managed workflows are needed for these tests.
+
+See [operations](OPERATIONS.md) for notification checks, cleanup verification, capacity testing and rollout/rollback steps.
+
+Files below 1 GiB (1,073,741,824 bytes) use a single S3 PUT. Files at or above
+1 GiB use multipart upload with a default part size of 100 MiB (104,857,600 bytes).
+The API can increase the part size for very large files to stay within the part
+count limit; clients must always use the returned `partSizeBytes`.
+
+Deploy the matching API change before applying this configuration: multipart now
+starts at the threshold, including a file of exactly 1 GiB. A 1 GiB file uses ten
+100 MiB parts and a final 24 MiB part.

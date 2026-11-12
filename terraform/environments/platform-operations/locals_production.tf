@@ -14,7 +14,9 @@ locals {
     }
   }
 
-  enable_aws_health_lambda_production = true
+  enable_aws_health_lambda_production         = true
+  enable_aws_securityhub_lambda_production    = true
+  enable_github_workflow_scheduler_production = true
 
   github_actions_lambda_production = {
     enable_outbound_federation = true
@@ -259,6 +261,66 @@ locals {
         timezone = "Europe/London"
         workflow = "certificate_renewal.yml"
       }
+      mp-automation-db-refresh-nomis-1a = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "preprod_nomis_db_1_a"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 7 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "nomis_database_refresh.yml"
+      }
+      mp-automation-db-refresh-nomis-2a = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "preprod_nomis_db_2_a"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 10 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "nomis_database_refresh.yml"
+      }
+      mp-automation-db-refresh-oasys-ppoasys = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "pp_oasys_db_a_PPOASYS"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 7 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "oasys_database_refresh.yml"
+      }
+      mp-automation-db-refresh-oasys-ppoasrep = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "pp_onr_db_a_PPOASREP"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 8 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "oasys_database_refresh.yml"
+      }
+      mp-automation-db-refresh-oasys-ppmistrn = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "pp_onr_db_a_PPMISTRN"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 9 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "oasys_database_refresh.yml"
+      }
       mp-automation-github-workflow-monitoring = {
         identity = "platops"
         inputs = {
@@ -270,6 +332,74 @@ locals {
         schedule = "cron(0/30 * * * ? *)"
         timezone = "Europe/London"
         workflow = "github_workflow_monitoring.yml"
+      }
+      mp-automation-ndh-offloc-cloudplatform-am = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy_cloudplatform"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 0,3 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cloudplatfom_copy.yml"
+      }
+      mp-automation-ndh-offloc-cloudplatform-pm = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy_cloudplatform"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 0,23 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cloudplatfom_copy.yml"
+      }
+      mp-automation-ndh-offloc-copy = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(45 23 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cdecopy.yml"
+      }
+      mp-automation-ndh-offloc-copy-backup = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "ndh_offloc_copy"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(20 2 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "ndh_offloc_cdecopy.yml"
+      }
+      mp-automation-planetfm-gfsl-data-extract-am = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(10,30 5 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "planetfm_gfsl_data_extract.yml"
+      }
+      mp-automation-planetfm-gfsl-data-extract-pm = {
+        identity = "platops"
+        inputs   = {}
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 12,13 * * ? *)"
+        timezone = "Europe/London"
+        workflow = "planetfm_gfsl_data_extract.yml"
       }
       mp-automation-security-hub-alerting = {
         identity = "platops"
@@ -295,6 +425,129 @@ locals {
         timezone = "Europe/London"
         workflow = "ssm_command_monitoring.yml"
       }
+      mp-automation-start-jump-server = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "jump_server_start"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(45 6 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "jump_server_start.yml"
+      }
+      mp-automation-stop-jump-server = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "jump_server_stop"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(5 22 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "jump_server_stop.yml"
+      }
+      # NCR Stop job is currently disabled, therefore commenting out NCR Start and Stop jobs
+      # mp-automation-start-ncr = {
+      #   identity = "platops"
+      #   inputs = {
+      #     scheduled_run = "ncr_environment_start"
+      #   }
+      #
+      #   ref      = "main"
+      #   repo     = "dso-modernisation-platform-automation"
+      #   schedule = "cron(45 6 ? * MON-FRI *)"
+      #   timezone = "Europe/London"
+      #   workflow = "ncr_environment_start.yml"
+      # }
+      # mp-automation-stop-ncr = {
+      #   identity = "platops"
+      #   inputs = {
+      #     scheduled_run = "ncr_environment_stop"
+      #   }
+      #
+      #   ref      = "main"
+      #   repo     = "dso-modernisation-platform-automation"
+      #   schedule = "cron(5 19 ? * MON-FRI *)"
+      #   timezone = "Europe/London"
+      #   workflow = "ncr_environment_stop.yml"
+      # }
+      # NDMIS Stop job is currently disabled, therefore commenting out NCR Start and Stop jobs
+      # mp-automation-start-ndmis = {
+      #   identity = "platops"
+      #   inputs = {
+      #     scheduled_run = "ndmis_environment_start"
+      #   }
+      #
+      #   ref      = "main"
+      #   repo     = "dso-modernisation-platform-automation"
+      #   schedule = "cron(45 6 ? * MON-FRI *)"
+      #   timezone = "Europe/London"
+      #   workflow = "ndmis_environment_start.yml"
+      # }
+      # mp-automation-stop-ndmis = {
+      #   identity = "platops"
+      #   inputs = {
+      #     scheduled_run = "ndmis_environment_stop"
+      #   }
+      #
+      #   ref      = "main"
+      #   repo     = "dso-modernisation-platform-automation"
+      #   schedule = "cron(5 19 ? * MON-FRI *)"
+      #   timezone = "Europe/London"
+      #   workflow = "ndmis_environment_stop.yml"
+      # }
+      mp-automation-start-nomis = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "nomis_environment_start"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(30 6 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "nomis_environment_start.yml"
+      }
+      mp-automation-stop-nomis = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "nomis_environment_stop"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(5 19 ? * MON-FRI *)"
+        timezone = "Europe/London"
+        workflow = "nomis_environment_stop.yml"
+      }
+      # ONR Stop job is currently disabled, therefore commenting out NCR Start and Stop jobs
+      # mp-automation-start-onr = {
+      #   identity = "platops"
+      #   inputs = {
+      #     scheduled_run = "onr_environment_start"
+      #   }
+      #
+      #   ref      = "main"
+      #   repo     = "dso-modernisation-platform-automation"
+      #   schedule = "cron(45 6 ? * MON-FRI *)"
+      #   timezone = "Europe/London"
+      #   workflow = "onr_environment_start.yml"
+      # }
+      # mp-automation-stop-onr = {
+      #   identity = "platops"
+      #   inputs = {
+      #     scheduled_run = "onr_environment_stop"
+      #   }
+      #
+      #   ref      = "main"
+      #   repo     = "dso-modernisation-platform-automation"
+      #   schedule = "cron(5 19 ? * MON-FRI *)"
+      #   timezone = "Europe/London"
+      #   workflow = "onr_environment_stop.yml"
+      # }
     }
   }
 }

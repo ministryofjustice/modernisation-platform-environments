@@ -5,21 +5,36 @@
       "alb_group_authorization_enabled": true,
       "hosted_zone_name": "ai-builder-dev.modernisation-platform.service.justice.gov.uk",
       "builder_hostname": "ai-builder-dev.modernisation-platform.service.justice.gov.uk",
-      "forge_hostname": "forge.ai-builder-dev.modernisation-platform.service.justice.gov.uk"
+      "forge_hostname": "forge.ai-builder-dev.modernisation-platform.service.justice.gov.uk",
+      "forge_single_url_enabled": true,
+      "forge_base_path": "/forge-app",
+      "forge_upstream_port": 3000,
+      "forge_public_endpoint_enabled": false,
+      "forge_embedded_entra_enabled": false
     },
     "test": {
       "builder_auth_mode": "alb",
       "alb_group_authorization_enabled": true,
       "hosted_zone_name": "ai-builder-test.modernisation-platform.service.justice.gov.uk",
       "builder_hostname": "ai-builder-test.modernisation-platform.service.justice.gov.uk",
-      "forge_hostname": "forge.ai-builder-test.modernisation-platform.service.justice.gov.uk"
+      "forge_hostname": "forge.ai-builder-test.modernisation-platform.service.justice.gov.uk",
+      "forge_single_url_enabled": true,
+      "forge_base_path": "/forge-app",
+      "forge_upstream_port": 3000,
+      "forge_public_endpoint_enabled": false,
+      "forge_embedded_entra_enabled": false
     },
     "production": {
       "builder_auth_mode": "alb",
       "alb_group_authorization_enabled": true,
       "hosted_zone_name": "ai-builder.modernisation-platform.service.justice.gov.uk",
       "builder_hostname": "ai-builder.modernisation-platform.service.justice.gov.uk",
-      "forge_hostname": "forge.ai-builder.modernisation-platform.service.justice.gov.uk"
+      "forge_hostname": "forge.ai-builder.modernisation-platform.service.justice.gov.uk",
+      "forge_single_url_enabled": true,
+      "forge_base_path": "/forge-app",
+      "forge_upstream_port": 3000,
+      "forge_public_endpoint_enabled": false,
+      "forge_embedded_entra_enabled": false
     }
   }
 }

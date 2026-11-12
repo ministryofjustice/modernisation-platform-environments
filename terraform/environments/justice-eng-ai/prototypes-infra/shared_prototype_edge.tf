@@ -1,6 +1,8 @@
 locals {
-  prototype_edge_enabled = local.is-production || local.is-development
-  prototype_domain_name  = local.is-production ? "ai-builder.modernisation-platform.service.justice.gov.uk" : "ai-builder-dev.modernisation-platform.service.justice.gov.uk"
+  # Per-environment domain from application_variables.json; the shared edge exists
+  # only in environments that define one.
+  prototype_domain_name  = try(local.application_data.accounts[local.environment].prototype_domain_name, null)
+  prototype_edge_enabled = local.prototype_domain_name != null
   prototype_name_prefix  = "justice-eng-ai-prototypes"
 
   # Reuse the stable validation CNAME already managed by web-ui.
@@ -70,13 +72,13 @@ module "shared-prototype-edge" {
     origin_certificate_arn = aws_acm_certificate_validation.prototype_origin[0].certificate_arn
     name_prefix            = local.prototype_name_prefix
     vpc_id                 = data.aws_vpc.prototype[0].id
-    public_subnet_ids      = data.aws_subnets.public_prototypes[0].ids
+    public_subnet_ids      = data.aws_subnets.public_subnets[0].ids
     allowed_ipv4_cidrs     = toset(var.allowed_ingress_cidrs)
   }
   tags = local.tags
 }
 
 output "shared_prototype_edge" {
-  description = "Shared CloudFront, WAF and public ALB details for prototype routing; populated in development and production."
+  description = "Shared CloudFront, WAF and public ALB details for prototype routing; populated in environments that set prototype_domain_name in application_variables.json."
   value       = local.prototype_edge_enabled ? module.shared-prototype-edge[0].hosting : null
 }

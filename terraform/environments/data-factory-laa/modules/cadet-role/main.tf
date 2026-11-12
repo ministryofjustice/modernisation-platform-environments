@@ -45,6 +45,7 @@ data "aws_iam_policy_document" "cadet_policy" {
       "glue:UpdatePartition",
       "glue:GetPartition",
       "glue:GetPartitions",
+      "glue:GetDataCatalogEncryptionSettings",
     ]
     resources = ["*"]
   }

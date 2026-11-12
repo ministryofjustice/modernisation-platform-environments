@@ -1,18 +1,30 @@
 locals {
+  analytical_platform_data_production_account_id = nonsensitive(local.environment_management.account_ids["analytical-platform-data-production"])
+
   environment_configurations = {
     development = {
-      litellm_version           = "1.104.0"
-      litellm_image_repository  = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag         = "1.104.1-enterprise"
-      litellm_image_pull_secret = "litellm-enterprise-pull"
-      ai_gateway_hostname       = "development.ai-gateway.justice.gov.uk"
+      litellm_version                    = "1.106.5"
+      litellm_entra_client_secret_expiry = "05-05-2027"
+      ai_gateway_hostname                = "development.ai-gateway.justice.gov.uk"
+      ai_gateway_batch_storage = {
+        input_bucket_name  = "alpha-airflow-aigw-example-input"
+        output_bucket_name = "alpha-airflow-aigw-example-output"
+        output_kms_key_arn = "arn:aws:kms:eu-west-1:${local.analytical_platform_data_production_account_id}:key/48120119-33ea-4c0b-bf47-bbc236388eaa"
+        bucket_owner       = local.analytical_platform_data_production_account_id
+        region             = "eu-west-1"
+      }
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # Development Compute
+        "18.133.132.50/32",
+        "18.132.51.177/32",
+        "13.42.93.133/32",
+        "13.42.179.104/32"
       ]
       ai_gateway_admin_ingress_allowlist = [
         # VPN
@@ -46,11 +58,9 @@ locals {
       ai_gateway_egress_policy_enabled = true
     }
     test = {
-      litellm_version           = "1.104.0"
-      litellm_image_repository  = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag         = "1.104.1-enterprise"
-      litellm_image_pull_secret = "litellm-enterprise-pull"
-      ai_gateway_hostname       = "test.ai-gateway.justice.gov.uk"
+      litellm_version                    = "1.106.5"
+      litellm_entra_client_secret_expiry = "17-04-2027"
+      ai_gateway_hostname                = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
@@ -91,11 +101,9 @@ locals {
       ai_gateway_egress_policy_enabled = true
     }
     preproduction = {
-      litellm_version           = "1.104.0"
-      litellm_image_repository  = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag         = "1.104.1-enterprise"
-      litellm_image_pull_secret = "litellm-enterprise-pull"
-      ai_gateway_hostname       = "preproduction.ai-gateway.justice.gov.uk"
+      litellm_version                    = "1.106.5"
+      litellm_entra_client_secret_expiry = "08-05-2027"
+      ai_gateway_hostname                = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
@@ -132,11 +140,19 @@ locals {
       ai_gateway_egress_policy_enabled = false
     }
     production = {
-      litellm_version           = "1.101.0"
-      litellm_image_repository  = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag         = "1.101.5-enterprise"
-      litellm_image_pull_secret = "litellm-enterprise-pull"
-      ai_gateway_hostname       = "ai-gateway.justice.gov.uk"
+      litellm_version                    = "1.106.5"
+      litellm_entra_client_secret_expiry = "08-05-2027"
+      ai_gateway_hostname                = "ai-gateway.justice.gov.uk"
+      ai_gateway_batch_storage = {
+        input_bucket_name = "alpha-bold-pilot-rr-families"
+        input_prefix      = "litellm/batch/input"
+        output_prefix     = "litellm/batch/output"
+        # Optional: output_bucket_name defaults to input_bucket_name when no output value is specified.
+        #output_bucket_name = ""
+        output_kms_key_arn = "arn:aws:kms:eu-west-1:${local.analytical_platform_data_production_account_id}:key/7da10bee-bf36-4e9a-904f-8e270f80e0d2"
+        bucket_owner       = local.analytical_platform_data_production_account_id
+        region             = "eu-west-1"
+      }
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate

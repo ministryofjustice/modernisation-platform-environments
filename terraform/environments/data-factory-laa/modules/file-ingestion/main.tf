@@ -93,15 +93,16 @@ module "process_uploads_lambda" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22" # v8.8.1
 
 
-  function_name      = "process-file-upload"
-  description        = "Lambda function to process file uploads"
-  handler            = "process_uploads.lambda_handler"
-  runtime            = "python3.14"
-  architectures      = ["arm64"]
-  timeout            = 30
-  memory_size        = 4096
-  policy_json        = data.aws_iam_policy_document.process_uploads_lambda_policy.json
-  attach_policy_json = true
+  function_name              = "process-file-upload"
+  description                = "Lambda function to process file uploads"
+  handler                    = "process_uploads.lambda_handler"
+  runtime                    = "python3.14"
+  architectures              = ["arm64"]
+  timeout                    = 30
+  memory_size                = 4096
+  policy_json                = data.aws_iam_policy_document.process_uploads_lambda_policy.json
+  attach_policy_json         = true
+  cloudwatch_logs_kms_key_id = var.kms_key_arn
 
   source_path = "${path.module}/process_uploads.py"
 

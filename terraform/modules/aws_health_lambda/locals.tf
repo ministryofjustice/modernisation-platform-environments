@@ -1,5 +1,5 @@
 locals {
   aws_accounts = jsondecode(
-    data.aws_secretsmanager_secret_version.aws_accounts.secret_string
+    data.aws_ssm_parameter.aws_accounts.value
   ).accounts
 }

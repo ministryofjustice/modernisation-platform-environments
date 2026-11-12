@@ -11,6 +11,10 @@ locals {
     rule_name             = "ForwardAllHealthEvents"
   }
 
+  aws_securityhub_lambda_configuration_test = {
+    enabled = false
+  }
+
   baseline_presets_test = {
     options = {
       sns_topics = {

@@ -459,5 +459,16 @@ locals {
       "/sap/bip/lsast"            = local.secretsmanager_secrets.bip
       "/sap/bip/pp"               = local.secretsmanager_secrets.bip
     }
+
+    ssm_patch_baselines = {
+      OracleLinuxPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["OracleLinuxPatchGroup1Baseline"], {
+        rule1_approve_after_days = null
+        rule1_approve_until_date = "2026-11-04"
+      })
+      RedHatPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["RedHatPatchGroup1Baseline"], {
+        rule1_approve_after_days = null
+        rule1_approve_until_date = "2026-11-04"
+      })
+    }
   }
 }

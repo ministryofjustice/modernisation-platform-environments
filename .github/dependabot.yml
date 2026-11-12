@@ -185,6 +185,7 @@ updates:
       - "terraform/environments/ccms-feasibility"
       - "terraform/environments/ccms-feasibility/ccms-ebs"
       - "terraform/environments/ccms-feasibility/ccms-edrms"
+      - "terraform/environments/ccms-feasibility/ccms-file-transfer"
       - "terraform/environments/ccms-feasibility/ccms-oia"
       - "terraform/environments/ccms-feasibility/ccms-pui"
       - "terraform/environments/ccms-feasibility/ccms-soa"
@@ -244,18 +245,6 @@ updates:
       interval: "daily"
     groups:
       ccms-upg:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
-      - "terraform/environments/cdpt-chaps"
-    schedule:
-      interval: "daily"
-    groups:
-      cdpt-chaps:
         patterns:
           - "*"
     open-pull-requests-limit: 50
@@ -475,6 +464,9 @@ updates:
       - "terraform/environments/data-factory-moj/dms-core/modules/dms-test-harness"
       - "terraform/environments/data-factory-moj/dms-core/modules/oracle-test-harness"
       - "terraform/environments/data-factory-moj/genesys-data-ingestion"
+      - "terraform/environments/data-factory-moj/ingestion-artifacts"
+      - "terraform/environments/data-factory-moj/ingestion-registry"
+      - "terraform/environments/data-factory-moj/service-ingestion"
       - "terraform/environments/data-factory-moj/streaming-poc"
       - "terraform/environments/data-factory-moj/streaming-poc-devops"
       - "terraform/environments/data-factory-moj/streaming-poc-maf"
@@ -651,6 +643,7 @@ updates:
     directories:
       - "terraform/environments/developer-experience"
       - "terraform/environments/developer-experience/auth0-event-stream"
+      - "terraform/environments/developer-experience/dns"
       - "terraform/environments/developer-experience/github-audit-log-stream"
       - "terraform/environments/developer-experience/github-backup"
       - "terraform/environments/developer-experience/github-management"
@@ -737,7 +730,6 @@ updates:
       - "terraform/environments/electronic-monitoring-data/modules/ap_airflow_iam_role"
       - "terraform/environments/electronic-monitoring-data/modules/ap_airflow_load_data_iam_role"
       - "terraform/environments/electronic-monitoring-data/modules/api_step_function"
-      - "terraform/environments/electronic-monitoring-data/modules/dms"
       - "terraform/environments/electronic-monitoring-data/modules/export_bucket_presigned_url"
       - "terraform/environments/electronic-monitoring-data/modules/export_bucket_push"
       - "terraform/environments/electronic-monitoring-data/modules/glue_table_optimiser"
@@ -882,6 +874,7 @@ updates:
       - "terraform/environments/integration-hub/downstream-mock-api"
       - "terraform/environments/integration-hub/downstream-mock-api/modules/service"
       - "terraform/environments/integration-hub/events-platform"
+      - "terraform/environments/integration-hub/iac"
       - "terraform/environments/integration-hub/managed-file-transfer"
     schedule:
       interval: "daily"
@@ -909,6 +902,10 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/integration-hub-events"
+      - "terraform/environments/integration-hub-events/api"
+      - "terraform/environments/integration-hub-events/api-client-lib"
+      - "terraform/environments/integration-hub-events/event-subscriber-admin-ui"
+      - "terraform/environments/integration-hub-events/kafka"
     schedule:
       interval: "daily"
     groups:
@@ -1528,6 +1525,7 @@ updates:
       - "terraform/modules/acm_certificate"
       - "terraform/modules/aws_health_lambda"
       - "terraform/modules/aws_health_lambda_cloudwatch_events"
+      - "terraform/modules/aws_securityhub_lambda"
       - "terraform/modules/baseline"
       - "terraform/modules/baseline_presets"
       - "terraform/modules/cloudwatch_dashboard"

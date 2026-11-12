@@ -22,6 +22,16 @@ locals {
         "arn:aws:iam::766696030771:role/github-actions-plan"
       ]
     }
+    preproduction = {
+      lakeformation_admins = [
+        "arn:aws:iam::080426581928:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_d2bdd78878a090a5",
+        "arn:aws:iam::080426581928:role/MemberInfrastructureAccess",
+        "arn:aws:iam::080426581928:role/github-actions-apply",
+      ]
+      lakeformation_read_only_admins = [
+        "arn:aws:iam::080426581928:role/github-actions-plan"
+      ]
+    }
   }
 }
 
@@ -30,6 +40,20 @@ module "data_lake_settings" {
 
   admins           = local.environments[local.environment].lakeformation_admins
   read_only_admins = local.environments[local.environment].lakeformation_read_only_admins
+}
+
+resource "aws_glue_data_catalog_encryption_settings" "catalog_encryption" {
+  data_catalog_encryption_settings {
+    connection_password_encryption {
+      aws_kms_key_id                       = aws_kms_key.data_lake_kms_key.arn
+      return_connection_password_encrypted = true
+    }
+
+    encryption_at_rest {
+      catalog_encryption_mode = "SSE-KMS"
+      sse_aws_kms_key_id      = aws_kms_key.data_lake_kms_key.arn
+    }
+  }
 }
 
 data "aws_iam_policy_document" "data_lake_kms_key" {
@@ -88,6 +112,29 @@ data "aws_iam_policy_document" "data_lake_kms_key" {
       "kms:ReEncrypt*",
       "kms:GenerateDataKey*",
       "kms:DescribeKey",
+    ]
+
+    resources = ["*"]
+  }
+
+  # ALlow key to be used by CloudWatch for logs
+  statement {
+    sid    = "AllowCloudwatchLogs"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "logs.${local.current_account_region}.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*",
     ]
 
     resources = ["*"]

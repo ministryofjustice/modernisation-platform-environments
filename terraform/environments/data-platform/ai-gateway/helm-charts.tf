@@ -36,7 +36,6 @@ resource "helm_release" "litellm_admin" {
         # imageTag           = local.environment_configuration.litellm_version
         imageRepository    = try(local.environment_configuration.litellm_image_repository, "ghcr.io/berriai/litellm-non_root")
         imageTag           = try(local.environment_configuration.litellm_image_tag, local.environment_configuration.litellm_version)
-        imagePullSecret    = try(local.environment_configuration.litellm_image_pull_secret, "")
         serviceAccountName = kubernetes_service_account_v1.ai_gateway.metadata[0].name
         ingressHostname    = "admin.${local.environment_configuration.ai_gateway_hostname}"
         proxyHostname      = local.environment_configuration.ai_gateway_hostname
@@ -57,6 +56,11 @@ resource "helm_release" "litellm_admin" {
         # Google
         googleWorkloadIdentityAudience        = local.google_workload_identity_audience
         googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
+
+        # OpenAI
+        openai_identity_provider_id    = local.openai_identity_provider_id
+        openai_service_account_id      = local.openai_service_account_id
+        openaiWorkloadIdentityAudience = local.openai_workload_identity_audience
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
@@ -86,7 +90,6 @@ resource "helm_release" "litellm_admin" {
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_config_map_v1.google_application_credentials,
     kubernetes_manifest.external_secret_litellm_license,
-    kubernetes_manifest.external_secret_litellm_registry,
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
@@ -111,7 +114,6 @@ resource "helm_release" "litellm" {
         # imageTag           = local.environment_configuration.litellm_version
         imageRepository    = try(local.environment_configuration.litellm_image_repository, "ghcr.io/berriai/litellm-non_root")
         imageTag           = try(local.environment_configuration.litellm_image_tag, local.environment_configuration.litellm_version)
-        imagePullSecret    = try(local.environment_configuration.litellm_image_pull_secret, "")
         serviceAccountName = kubernetes_service_account_v1.ai_gateway.metadata[0].name
         ingressHostname    = local.environment_configuration.ai_gateway_hostname
 
@@ -141,10 +143,19 @@ resource "helm_release" "litellm" {
         googleWorkloadIdentityAudience        = local.google_workload_identity_audience
         googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
 
+        # OpenAI
+        openai_identity_provider_id    = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["identity_provider_id"]
+        openai_service_account_id      = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["service_account_id"]
+        openaiWorkloadIdentityAudience = local.openai_workload_identity_audience
+
         # Autoscaling
         minReplicas                    = local.environment_configuration.ai_gateway_autoscaling.min_replicas
         maxReplicas                    = local.environment_configuration.ai_gateway_autoscaling.max_replicas
         targetCPUUtilizationPercentage = local.environment_configuration.ai_gateway_autoscaling.target_cpu_utilization_percentage
+
+        # Prompt Logs
+        promptLogsBucket = module.prompt_logs.s3_bucket_id
+        promptLogsRegion = data.aws_region.current.region
 
         # LiteLLM models are stored in the database; no model list is templated here.
         # Admin
@@ -168,7 +179,6 @@ resource "helm_release" "litellm" {
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_config_map_v1.google_application_credentials,
     kubernetes_manifest.external_secret_litellm_license,
-    kubernetes_manifest.external_secret_litellm_registry,
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,

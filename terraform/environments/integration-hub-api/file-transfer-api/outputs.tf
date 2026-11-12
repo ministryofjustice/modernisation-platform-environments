@@ -81,3 +81,14 @@ output "system_auth_secret_names" {
   description = "Bearer token secret names keyed by system principal"
   value       = { for principal, secret in module.api_system_bearer_token_secret : principal => secret.secret_name }
 }
+output "operations_verification" {
+  description = "Account and resources used by the operations runbook"
+  value = {
+    account_id          = local.account_id
+    region              = local.region
+    api_id              = module.api_gateway.api_id
+    session_table       = module.dynamodb_multipart_uploads.dynamodb_table_id
+    high_priority_topic = local.alarm_topic_arns.high_priority
+    low_priority_topic  = local.alarm_topic_arns.low_priority
+  }
+}

@@ -26,6 +26,7 @@ resource "aws_lakeformation_data_lake_settings" "settings" {
       aws_iam_role.clean_after_dlt_load.arn,
       aws_iam_role.glue_db_count_metrics.arn,
       aws_iam_role.staging_db_janitor.arn,
+      aws_iam_role.lake_formation_permission_granter.arn,
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
     ]
@@ -162,6 +163,34 @@ resource "aws_lakeformation_permissions" "merge_redrive_planner_table_access" {
     database_name = each.value.database
     name          = each.value.table
   }
+}
+
+# ------------------------------------------------------------------------
+# Lake Formation for Observability Platform
+# Limit Grafana Athena access to operational monitoring data only.
+# ------------------------------------------------------------------------
+
+resource "aws_lakeformation_permissions" "observability_platform_database" {
+  principal   = data.aws_iam_role.observability_platform.arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = aws_glue_catalog_database.ops_monitoring.name
+  }
+
+  depends_on = [module.observability_platform_tenant]
+}
+
+resource "aws_lakeformation_permissions" "observability_platform_tables" {
+  principal   = data.aws_iam_role.observability_platform.arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = aws_glue_catalog_database.ops_monitoring.name
+    wildcard      = true
+  }
+
+  depends_on = [module.observability_platform_tenant]
 }
 
 # ------------------------------------------------------------------------

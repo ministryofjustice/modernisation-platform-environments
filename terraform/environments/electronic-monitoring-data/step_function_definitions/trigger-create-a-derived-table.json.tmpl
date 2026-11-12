@@ -56,6 +56,29 @@
           "JitterStrategy": "FULL"
         }
       ],
+      "Next": "GrantLakeFormationPermissions"
+    },
+    "GrantLakeFormationPermissions": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Arguments": {
+        "Payload": ${lf_permission_grants},
+        "FunctionName": "${grant_lf_permissions}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
       "End": true
     }
   },

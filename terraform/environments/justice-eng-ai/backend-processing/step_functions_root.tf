@@ -1,7 +1,7 @@
 locals {
   root_state_machine_name = "${local.application_name}-root"
 
-  root_process_steps = [
+  root_core_steps = [
     {
       name              = "build_event"
       type              = "dynamodb_query_build"
@@ -25,13 +25,24 @@ locals {
       result_path        = "$.build_test_deploy_app_image"
     },
     {
-      name               = "build_app_infra"
+      name               = "prototype_deployment"
       type               = "step_function"
-      state_machine_name = local.build_infra_state_machine_name
+      state_machine_name = local.prototype_deployment_state_machine_name
       input_path         = "$.build_test_deploy_app_image.Output"
-      result_path        = "$.build_app_infra"
+      result_path        = "$.deploy_prototype_app"
     },
   ]
+  root_process_steps = concat(local.root_core_steps, local.notify_enabled ? [local.root_notify_step] : [])
+
+  root_notify_step = {
+    # Runs only if build_app_infra succeeded; a failed child fails the root.
+    # Skipped when both confirmations are disabled.
+    name               = "notify_user"
+    type               = "step_function"
+    state_machine_name = local.notify_state_machine_name
+    input_path         = "$.deploy_prototype_app.Output"
+    result_path        = "$.notify_user"
+  }
 }
 
 module "step_functions_root" {
@@ -45,7 +56,9 @@ module "step_functions_root" {
   depends_on = [
     aws_iam_role_policy.step_functions_common,
     module.step_functions_build_image,
-    module.step_functions_build_infra,
+    module.step_functions_deploy_prototype,
     module.step_functions_control_plane,
+    module.step_functions_notify,
+    aws_iam_role_policy.step_functions_common,
   ]
 }
