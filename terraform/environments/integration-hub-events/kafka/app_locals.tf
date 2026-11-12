@@ -1,7 +1,7 @@
 locals {
   name         = "integration-hub-events"
   cluster_name = "${local.name}-msk"
-  deploy_to    = ["development"]
+  deploy_to    = []
 
   extended_tags = merge(local.tags, {
     component = local.cluster_name
