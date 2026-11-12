@@ -1,68 +1,97 @@
 # Integration Hub PagerDuty infrastructure
 
-This component creates AWS resources for PagerDuty Terraform in
-`ministryofjustice/integration-hub/terraform/pagerduty`. It never calls PagerDuty.
-Only the `integration-hub-production` workspace creates them: its plan adds
-12 resources; development, test and preproduction plan no changes. This
-component's state is separate, in `modernisation-platform-terraform-state`.
+This Terraform configuration creates the AWS resources needed by the
+PagerDuty Terraform configuration in
+`ministryofjustice/integration-hub/terraform/pagerduty`. It does not connect
+to PagerDuty itself.
 
-## Resources and access
+The resources are created only in the `integration-hub-production` workspace.
+The production plan adds 12 resources; plans for development, test and
+preproduction make no changes. This configuration has its own state in
+`modernisation-platform-terraform-state`.
 
-The versioned `integration-hub-production-pagerduty-tfstate` bucket blocks
-public access and SSE-C, and requires TLS. Its policy denies everyone except
-the account's SSO `platform-engineer-admin`, `MemberInfrastructureAccess`,
-`github-actions-plan`, `github-actions-apply` and
-`/github-actions/integration-hub-pagerduty` roles.
+## What this creates
 
-The `pagerduty/api-key` secret starts empty, with no version. Its tag is
-`credential-expiration=none`. The bucket and secret each have a KMS key.
-Both have rotation on and default key policies off; the listed roles can use
-them only through S3 for the bucket or Secrets Manager for the secret. For
-the secret key, the permitted roles are the SSO admin,
-`MemberInfrastructureAccess` and PagerDuty roles.
+### Terraform state bucket
 
-The PagerDuty role uses the IAM `iam-role` module, version `6.8.2`. It trusts
-the account's GitHub OIDC provider only with audience `sts.amazonaws.com` and
-subject `repo:ministryofjustice/integration-hub:environment:pagerduty-production`.
-It can list, read and write `pagerduty/terraform.tfstate` and its `.tflock`
-file, use the state key through S3, and read the secret over TLS and decrypt
-it through Secrets Manager. It cannot delete state or write the secret.
+The `integration-hub-production-pagerduty-tfstate` bucket stores PagerDuty's
+Terraform state. Versioning is enabled, public access and SSE-C are blocked,
+and connections must use TLS.
 
-## Before you deploy
+The bucket policy denies access to everyone except these roles:
+
+- The account's SSO `platform-engineer-admin` role
+- `MemberInfrastructureAccess`
+- `github-actions-plan`
+- `github-actions-apply`
+- `/github-actions/integration-hub-pagerduty`
+
+### API key secret
+
+The `pagerduty/api-key` secret is created without a value or a secret
+version. It has the tag `credential-expiration=none`. An authorised person
+must add the PagerDuty API token after the first apply.
+
+### Encryption keys
+
+The bucket and secret each have a KMS key. Both keys have rotation enabled
+and default key policies disabled. The permitted roles can use the bucket key
+only through S3 and the secret key only through Secrets Manager. For the
+secret key, those roles are the SSO admin, `MemberInfrastructureAccess` and
+PagerDuty roles.
+
+### GitHub Actions role
+
+The PagerDuty role uses version `6.8.2` of the IAM `iam-role` module. It
+trusts the account's GitHub OIDC provider only when the audience is
+`sts.amazonaws.com` and the subject is
+`repo:ministryofjustice/integration-hub:environment:pagerduty-production`.
+
+The role can:
+
+- List, read and write `pagerduty/terraform.tfstate` and its `.tflock` file.
+- Use the state key through S3.
+- Read the API key secret over TLS and decrypt it through Secrets Manager.
+
+It cannot delete state or write the secret.
+
+## Before deploying
 
 You need Terraform 1.11 or later, but below 2.0, the Modernisation Platform
-generated files and the `environment_management` secret. The production account
-is defined in `environments/integration-hub.json` in
-`ministryofjustice/modernisation-platform`; the workflow supplies the workspace.
+generated files and the `environment_management` secret. The production
+account is defined in `environments/integration-hub.json` in
+`ministryofjustice/modernisation-platform`. The workflow supplies the
+workspace.
 
-Do not edit `platform_*.tf`, `platform_base_variables.tf` or
-`networking.auto.tfvars.json`; they are generated. PagerDuty values are in
-`locals-pagerduty.tf`. Before changing anything, run `terraform fmt`,
-`terraform init -backend=false` and `terraform validate`. Run plans and applies
-only through GitHub Actions.
+PagerDuty settings are in `locals-pagerduty.tf`. Do not edit `platform_*.tf`,
+`platform_base_variables.tf` or `networking.auto.tfvars.json`; they are
+generated files.
 
-## Deploy
+Before making changes, run `terraform fmt`, `terraform init -backend=false`
+and `terraform validate`. Run plans and applies only through GitHub Actions.
 
-1. Merge the PR. The integration-hub workflow plans and, with the usual
-   approval, applies production.
-2. After the first apply, someone with access adds the PagerDuty API token to
-   the secret in Secrets Manager. Never put it in code or Terraform; this
-   component does not read or store it.
-3. In `integration-hub`, create the `pagerduty-production` GitHub environment:
-   limit deployments to `main`, require reviewers and turn off admin bypass.
+## Deployment
+
+1. Merge the pull request. The integration-hub workflow plans the change and,
+   with the usual approval, applies it to production.
+2. After the first apply, an authorised person adds the PagerDuty API token to
+   the secret in Secrets Manager. Do not put the token in code or Terraform;
+   this configuration does not read or store it.
+3. In `integration-hub`, create the `pagerduty-production` GitHub environment.
+   Limit deployments to `main`, require reviewers and turn off admin bypass.
    Add the role ARN and state KMS key ARN as environment secrets.
-4. Run the PagerDuty Terraform workflow there, plan-only for now. Neither the
-   environment nor the workflow exists yet.
+4. Run the PagerDuty Terraform workflow in that repository, plan-only for now.
+   The environment and workflow do not yet exist.
 
-Pass backend settings to `terraform init` with `-backend-config` and do not
-commit them. Include `kms_key_id`: `encrypt=true` alone uses SSE-S3, not the
-KMS key.
+Pass backend settings to `terraform init` using `-backend-config`; do not
+commit them. Include `kms_key_id`, because `encrypt=true` alone uses SSE-S3
+rather than the KMS key.
 
 ## Known gaps
 
-- Generated `platform_secrets.tf` reads `environment_management` as an ordinary
-  data source, so its value is in this component's state. It is not the
-  PagerDuty token.
+- The generated `platform_secrets.tf` reads `environment_management` as an
+  ordinary data source, so its value is stored in this configuration's state.
+  This is not the PagerDuty token.
 - The state bucket has no S3 access logging or lifecycle rule. The team still
-  needs to agree state retention.
-- Secret rotation is off; PagerDuty token rotation is manual.
+  needs to agree how long to retain state.
+- Secret rotation is disabled. PagerDuty token rotation is manual.
