@@ -47,6 +47,19 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdbnlb_1521_azure_virtual_
   cidr_blocks       = local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
 }
 
+# The following rule is added to allow Azure Virtual Desktop (AVD) to access EBS DB NLB.
+resource "aws_security_group_rule" "ingress_traffic_ebsdbnlb_22_azure_virtual_workspace" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.sg_ebsdb_nlb.id
+  type              = "ingress"
+  description       = "SSH from Azure Virtual Desktop (AVD) users to use EBS DB NLB in 22 - DEV only"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
+}
+
+
 
 # EGRESS Rules
 
