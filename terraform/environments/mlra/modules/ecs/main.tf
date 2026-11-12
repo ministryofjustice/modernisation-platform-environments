@@ -22,66 +22,6 @@ data "aws_subnets" "shared-private" {
   }
 }
 
-# TODO LASB-5089 Remove
-resource "aws_autoscaling_group" "cluster-scaling-group" {
-  vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
-  name                  = "${var.app_name}-cluster-scaling-group"
-  desired_capacity      = 0
-  max_size              = var.ec2_max_size
-  min_size              = 0
-  protect_from_scale_in = true
-  metrics_granularity   = "1Minute"
-  enabled_metrics = [
-    "GroupMinSize",
-    "GroupMaxSize",
-    "GroupDesiredCapacity",
-    "GroupInServiceInstances",
-    "GroupPendingInstances",
-    "GroupStandbyInstances",
-    "GroupTerminatingInstances",
-    "GroupTotalInstances",
-    "GroupInServiceCapacity",
-    "GroupPendingCapacity",
-    "GroupStandbyCapacity",
-    "GroupTerminatingCapacity",
-    "GroupTotalCapacity",
-    "WarmPoolDesiredCapacity",
-    "WarmPoolWarmedCapacity",
-    "WarmPoolPendingCapacity",
-    "WarmPoolTerminatingCapacity",
-    "WarmPoolTotalCapacity",
-    "GroupAndWarmPoolDesiredCapacity",
-    "GroupAndWarmPoolTotalCapacity"
-  ]
-
-  launch_template {
-    id      = aws_launch_template.ec2-launch-template.id
-    version = "$Latest"
-  }
-
-  tag {
-    key                 = "Name"
-    value               = "${var.app_name}-cluster-scaling-group"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "AmazonECSManaged"
-    value               = true
-    propagate_at_launch = true
-  }
-
-  dynamic "tag" {
-    for_each = var.tags_common
-
-    content {
-      key                 = tag.key
-      value               = tag.value
-      propagate_at_launch = true
-    }
-  }
-}
-
 resource "aws_autoscaling_group" "cluster-scaling-group-al2023" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
   name_prefix           = "${var.app_name}-ec2-al2023-"
@@ -200,11 +140,6 @@ resource "aws_security_group_rule" "mlra_to_maatdb_sg_rule_outbound" {
   source_security_group_id = var.maatdb_rds_sec_group_id
 }
 
-# TODO LASB-5089 Remove
-data "aws_ssm_parameter" "ecs_optimized_ami_al2" {
-  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
-}
-
 # always use the recommended ECS optimized linux 2023 base image; used to obtain its AMI ID
 data "aws_ssm_parameter" "ecs_optimized_ami_al2023" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
@@ -213,7 +148,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami_al2023" {
 # TODO LASB-5089 update to reference AL2023 ID after migration
 # if the AMI is used elsewhere it can be obtained here
 output "ami_id" {
-  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2.value)["image_id"]
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   sensitive = true
 }
 
@@ -226,69 +161,6 @@ output "ami_id_al2023" {
 # EC2 launch template - settings to use for new EC2s added to the group
 # Note - when updating this you will need to manually terminate the EC2s
 # so that the autoscaling group creates new ones using the new launch template
-
-# TODO LASB-5089 Remove
-#tfsec:ignore:AVD-AWS-0130:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-resource "aws_launch_template" "ec2-launch-template" {
-  #checkov:skip=CKV_AWS_79:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  #checkov:skip=CKV_AWS_341:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  name_prefix            = "${var.app_name}-ec2-launch-template"
-  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2.value)["image_id"]
-  instance_type          = var.instance_type
-  key_name               = var.key_name
-  ebs_optimized          = true
-  update_default_version = true
-
-  monitoring {
-    enabled = true
-  }
-
-  metadata_options {
-    http_endpoint               = "enabled"
-    http_tokens                 = "optional"
-    http_put_response_hop_limit = "2"
-  }
-
-  iam_instance_profile {
-    name = aws_iam_instance_profile.ec2_instance_profile.name
-  }
-
-  network_interfaces {
-    associate_public_ip_address = false
-    security_groups             = [aws_security_group.cluster_ec2.id]
-  }
-
-  block_device_mappings {
-    device_name = "/dev/xvda"
-    ebs {
-      delete_on_termination = true
-      encrypted             = true
-      volume_size           = 30
-      volume_type           = "gp2"
-      iops                  = 0
-    }
-  }
-
-  user_data = var.user_data
-
-  tag_specifications {
-    resource_type = "instance"
-    tags = merge(tomap({
-      "Name" = "${var.app_name}-ecs-cluster"
-    }), var.tags_common)
-  }
-
-  tag_specifications {
-    resource_type = "volume"
-    tags = merge(tomap({
-      "Name" = "${var.app_name}-ecs-cluster"
-    }), var.tags_common)
-  }
-
-  tags = merge(tomap({
-    "Name" = "${var.app_name}-ecs-cluster-template"
-  }), var.tags_common)
-}
 
 #tfsec:ignore:AVD-AWS-0130:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_launch_template" "ec2-launch-template-al2023" {
@@ -531,11 +403,6 @@ resource "aws_ecs_service" "ecs_service" {
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = data.aws_ecs_task_definition.task_definition.id
   desired_count   = var.app_count
-
-  capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.mlra.name
-    weight            = 0
-  }
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.mlra-al2023.name
@@ -792,23 +659,6 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
   }
 }
 
-# TODO LASB-5089 Remove
-resource "aws_ecs_capacity_provider" "mlra" {
-  name = "${var.app_name}-${var.environment}-capacity-provider"
-
-  auto_scaling_group_provider {
-    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
-    managed_termination_protection = "ENABLED"
-
-    managed_scaling {
-      # maximum_scaling_step_size = 1000
-      # minimum_scaling_step_size = 1
-      status          = "ENABLED"
-      target_capacity = var.ecs_target_capacity
-    }
-  }
-}
-
 resource "aws_ecs_capacity_provider" "mlra-al2023" {
   name = "${var.app_name}-${var.environment}-capacity-provider-al2023"
 
@@ -829,8 +679,6 @@ resource "aws_ecs_cluster_capacity_providers" "mlra" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
 
   capacity_providers = [
-    aws_ecs_capacity_provider.mlra.name,
     aws_ecs_capacity_provider.mlra-al2023.name
   ]
 }
-
