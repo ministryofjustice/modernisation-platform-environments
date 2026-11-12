@@ -74,6 +74,7 @@ resource "litellm_model" "google_gemini_enterprise_agent_platform" {
   model_name          = startswith(each.key, "gemini-") ? each.key : "gemini-${each.key}"
   base_model          = each.value.model_id
   tier                = "paid"
+  mode                = try(each.value.mode, null)
 
   # vertex_credentials is deliberately omitted; the pod's GOOGLE_APPLICATION_CREDENTIALS (WIF) is used instead
   # "eu" is a multi-region identifier, not a regional location, so it's routed via api_base rather than vertex_location
