@@ -513,6 +513,7 @@ models:
       model_name: "Google Gemini 3.5 Transcribe Live"
       model_location: "European Union"
       location: "eu"
+      mode: "realtime"
       generally_available: false
       environments_available: ["development"]
     gemini-3-6-flash:
