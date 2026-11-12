@@ -49,3 +49,19 @@ variable "aws_securityhub_lambda_configuration" {
     error_message = "When aws_securityhub_lambda_configuration.enabled is true, aws_securityhub_lambda_arn and rule_name must both be provided and non-empty."
   }
 }
+
+variable "finding_severity_labels" {
+  description = "Security Hub finding severity labels to forward to the Lambda function"
+  type        = list(string)
+  default     = ["CRITICAL"]
+
+  validation {
+    condition = try(length(var.finding_severity_labels) > 0 && alltrue([
+      for label in var.finding_severity_labels : contains(
+        ["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"],
+        label
+      )
+    ]), false)
+    error_message = "finding_severity_labels must contain one or more valid Security Hub severity labels."
+  }
+}
