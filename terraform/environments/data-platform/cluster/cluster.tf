@@ -13,15 +13,18 @@ module "eks" {
   subnet_ids               = data.aws_subnets.private.ids
 
   # Allow in-VPC clients (MWAA) to reach the private EKS API endpoint
+  # Only created where enable_mwaa_access is true (see environment-configuration.tf)
   security_group_additional_rules = {
-    vpc = {
-      description = "Allow HTTPS to the EKS API from the VPC"
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      type        = "ingress"
-      cidr_blocks = [data.aws_vpc.main.cidr_block]
-    }
+    for k, v in {
+      vpc = {
+        description = "Allow HTTPS to the EKS API from the VPC"
+        from_port   = 443
+        to_port     = 443
+        protocol    = "tcp"
+        type        = "ingress"
+        cidr_blocks = [data.aws_vpc.main.cidr_block]
+      }
+    } : k => v if local.environment_configuration.enable_mwaa_access
   }
 
   deletion_protection = true
@@ -161,19 +164,22 @@ module "eks" {
     },
     # Airflow 3 (MWAA, data-platform/airflow)
     # Kubernetes RBAC for these groups is managed in data-platform/airflow.
+    # Only created where enable_mwaa_access is true (see environment-configuration.tf)
     {
-      # MWAA execution role -> mwaa namespace
-      dp-mwaa = {
-        principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/mwaa-execution"
-        username          = "dp-mwaa"
-        kubernetes_groups = ["mwaa"]
-      }
-      # Analytical Platform Common GitHub Actions -> MWAA ServiceAccount / ExternalSecret management
-      gha-mojap-common = {
-        principal_arn     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/analytical-platform-github-actions"
-        username          = "github-actions-moj-ap-airflow"
-        kubernetes_groups = ["mwaa-serviceaccount-management", "mwaa-external-secrets"]
-      }
+      for k, v in {
+        # MWAA execution role -> mwaa namespace
+        dp-mwaa = {
+          principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/mwaa-execution"
+          username          = "dp-mwaa"
+          kubernetes_groups = ["mwaa"]
+        }
+        # Analytical Platform Common GitHub Actions -> MWAA ServiceAccount / ExternalSecret management
+        gha-mojap-common = {
+          principal_arn     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/analytical-platform-github-actions"
+          username          = "github-actions-moj-ap-airflow"
+          kubernetes_groups = ["mwaa-serviceaccount-management", "mwaa-external-secrets"]
+        }
+      } : k => v if local.environment_configuration.enable_mwaa_access
     }
   )
 }
