@@ -131,7 +131,7 @@ data "aws_ssm_parameter" "bu_amp_workspace_id" {
   for_each = local.grafana_bus
   provider = aws.shared-configuration-access
 
-  name = "/octo/cloud-platform/amp/${each.value.amp_workspace_alias}/workspace-id"
+  name = "/${lower(local.vpc_name)}/cloud-platform/amp/${each.value.amp_workspace_alias}/workspace-id"
 }
 
 #------------------------------------------------------------------------------
