@@ -42,6 +42,17 @@ resource "aws_vpc_security_group_ingress_rule" "database_from_windows" {
   to_port                      = local.account_config.db_port
 }
 
+resource "aws_vpc_security_group_ingress_rule" "database_from_api" {
+  count = local.create_rds ? 1 : 0
+
+  description                  = "Allow SQL Server access from London Unpaid Work API servers"
+  security_group_id            = aws_security_group.database[0].id
+  referenced_security_group_id = module.baseline.security_groups["london-unpaid-work-api"].id
+  ip_protocol                  = "tcp"
+  from_port                    = local.account_config.db_port
+  to_port                      = local.account_config.db_port
+}
+
 resource "aws_db_instance" "database" {
   count = local.create_rds ? 1 : 0
 
