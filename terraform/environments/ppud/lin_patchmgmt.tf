@@ -23,10 +23,6 @@ resource "aws_ssm_patch_baseline" "linux_os_baseline" {
     enable_non_security = false
 
     patch_filter {
-      key    = "PRODUCT"
-      values = ["AmazonLinux2023"]
-    }
-    patch_filter {
       key    = "CLASSIFICATION"
       values = ["Security", "Bugfix"]
     }
