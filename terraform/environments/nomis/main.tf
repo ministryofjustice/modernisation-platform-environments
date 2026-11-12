@@ -32,7 +32,8 @@ module "baseline_presets" {
     local.baseline_presets_all_environments.options,
     local.baseline_presets_environment_specific.options,
     {
-      aws_health_lambda_configuration = local.aws_health_lambda_configuration_environment_specific
+      aws_health_lambda_configuration      = local.aws_health_lambda_configuration_environment_specific
+      aws_securityhub_lambda_configuration = local.aws_securityhub_lambda_configuration_environment_specific
     }
   )
 }
@@ -65,7 +66,8 @@ module "baseline" {
     }
   }
 
-  aws_health_lambda_configuration = local.aws_health_lambda_configuration_environment_specific
+  aws_health_lambda_configuration      = local.aws_health_lambda_configuration_environment_specific
+  aws_securityhub_lambda_configuration = local.aws_securityhub_lambda_configuration_environment_specific
 
   bastion_linux = merge(
     lookup(local.baseline_all_environments, "bastion_linux", {}),
