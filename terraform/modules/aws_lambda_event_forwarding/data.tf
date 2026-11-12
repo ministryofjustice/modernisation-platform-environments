@@ -21,3 +21,15 @@ data "aws_iam_policy_document" "invoke_aws_health_lambda" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "invoke_aws_securityhub_lambda" {
+  count = local.enable_aws_securityhub_lambda ? 1 : 0
+
+  statement {
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [
+      var.aws_securityhub_lambda_configuration.aws_securityhub_lambda_arn
+    ]
+  }
+}
