@@ -23,3 +23,29 @@ variable "aws_health_lambda_configuration" {
     error_message = "When aws_health_lambda_configuration.enabled is true, aws_health_lambda_arn and rule_name must both be provided and non-empty."
   }
 }
+
+variable "aws_securityhub_lambda_configuration" {
+  description = "Configuration for AWS Security Hub event forwarding to the AWS Security Hub Lambda"
+
+  type = object({
+    enabled                    = bool
+    aws_securityhub_lambda_arn = optional(string)
+    rule_name                  = optional(string)
+  })
+
+  default = {
+    enabled = false
+  }
+
+  validation {
+    condition = (
+      !var.aws_securityhub_lambda_configuration.enabled ||
+      (
+        try(trimspace(var.aws_securityhub_lambda_configuration.aws_securityhub_lambda_arn), "") != "" &&
+        try(trimspace(var.aws_securityhub_lambda_configuration.rule_name), "") != ""
+      )
+    )
+
+    error_message = "When aws_securityhub_lambda_configuration.enabled is true, aws_securityhub_lambda_arn and rule_name must both be provided and non-empty."
+  }
+}
