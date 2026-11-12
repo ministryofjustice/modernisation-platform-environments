@@ -1758,7 +1758,7 @@ module "s3-gems-general-landing-bucket" {
   subnet_ids               = data.aws_subnets.shared-public.ids
   cross_account            = false
   cross_account_id         = null
-  replication_details      = null #local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
   metadata_bucket          = module.s3-metadata-bucket.bucket.arn
 
   providers = {
