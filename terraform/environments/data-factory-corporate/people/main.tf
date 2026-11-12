@@ -220,6 +220,7 @@ resource "aws_lakeformation_data_lake_settings" "your_lake_settings_name" {
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
+      aws_iam_role.analytical_platform_data_share.arn,
     ],
     [
       for role_name in data.aws_iam_roles.modernisation_platform_sandbox_role.names :
