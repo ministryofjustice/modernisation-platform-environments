@@ -134,6 +134,7 @@ module "s3-bucket" {
   replication_enabled = false
   versioning_enabled  = true
   force_destroy       = var.force_destroy_bucket
+  sse_algorithm       = "AES256"
   lifecycle_rule = [
     {
       id      = "main"

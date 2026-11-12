@@ -18,6 +18,7 @@ module "s3-bucket" {
     # Platform team to add a new provider for the additional Region.
     aws.bucket-replication = aws
   }
+  sse_algorithm = "AES256"
 
   lifecycle_rule = [
     {
