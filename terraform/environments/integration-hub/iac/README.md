@@ -45,7 +45,7 @@ PagerDuty roles.
 The PagerDuty role uses version `6.8.2` of the IAM `iam-role` module. It
 trusts the account's GitHub OIDC provider only when the audience is
 `sts.amazonaws.com` and the subject is
-`repo:ministryofjustice/integration-hub:environment:pagerduty-production`.
+`repo:ministryofjustice/integration-hub:ref:refs/heads/main`.
 
 The role can:
 
@@ -77,11 +77,13 @@ and `terraform validate`. Run plans and applies only through GitHub Actions.
 2. After the first apply, an authorised person adds the PagerDuty API token to
    the secret in Secrets Manager. Do not put the token in code or Terraform;
    this configuration does not read or store it.
-3. In `integration-hub`, create the `pagerduty-production` GitHub environment.
-   Limit deployments to `main`, require reviewers and turn off admin bypass.
-   Add the role ARN and state KMS key ARN as environment secrets.
+3. In `integration-hub`, add the role ARN and state KMS key ARN as repository
+   secrets. The job that assumes the role must run on `main` and must not use
+   a GitHub environment, because GitHub sends a different subject for those.
+   Anyone who can run a workflow on `main` can assume the role, so keep `main`
+   protected.
 4. Run the PagerDuty Terraform workflow in that repository, plan-only for now.
-   The environment and workflow do not yet exist.
+   The workflow does not yet exist.
 
 Pass backend settings to `terraform init` using `-backend-config`; do not
 commit them. Include `kms_key_id`, because `encrypt=true` alone uses SSE-S3

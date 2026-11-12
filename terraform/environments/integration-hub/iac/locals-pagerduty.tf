@@ -5,7 +5,7 @@ locals {
   pagerduty_state_key         = "pagerduty/terraform.tfstate"
   pagerduty_secret_name       = "pagerduty/api-key"
   pagerduty_role_name         = "integration-hub-pagerduty"
-  pagerduty_oidc_subject      = "repo:ministryofjustice/integration-hub:environment:pagerduty-production"
+  pagerduty_oidc_subject      = "repo:ministryofjustice/integration-hub:ref:refs/heads/main"
 
   pagerduty_state_allowed_principal_arns = [
     "arn:aws:iam::${local.account_id}:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*",
