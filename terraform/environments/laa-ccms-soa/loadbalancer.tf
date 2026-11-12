@@ -129,6 +129,19 @@ resource "aws_lb_target_group" "managed_https" {
   }
 }
 
+resource "aws_lb_listener" "managed80" {
+  load_balancer_arn = aws_lb.managed.id
+  port              = 80
+
+  default_action {
+    target_group_arn = aws_lb_target_group.managed_https.id
+    type             = "forward"
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "aws_lb_listener" "managed443" {
   load_balancer_arn = aws_lb.managed.id
   port              = 443
