@@ -145,7 +145,6 @@ data "aws_ssm_parameter" "ecs_optimized_ami_al2023" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
 }
 
-# TODO LASB-5089 update to reference AL2023 ID after migration
 # if the AMI is used elsewhere it can be obtained here
 output "ami_id" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
