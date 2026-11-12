@@ -873,6 +873,7 @@ updates:
       - "terraform/environments/integration-hub/downstream-mock-api"
       - "terraform/environments/integration-hub/downstream-mock-api/modules/service"
       - "terraform/environments/integration-hub/events-platform"
+      - "terraform/environments/integration-hub/iac"
       - "terraform/environments/integration-hub/managed-file-transfer"
     schedule:
       interval: "daily"

@@ -22,6 +22,14 @@ locals {
         "arn:aws:iam::766696030771:role/github-actions-plan"
       ]
     }
+    preproduction = {
+      lakeformation_admins = [
+        "arn:aws:iam::080426581928:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_d2bdd78878a090a5"
+      ],
+      lakeformation_read_only_admins = [
+        "arn:aws:iam::080426581928:role/github-actions-plan"
+      ]
+    }
   }
 }
 
@@ -102,6 +110,29 @@ data "aws_iam_policy_document" "data_lake_kms_key" {
       "kms:ReEncrypt*",
       "kms:GenerateDataKey*",
       "kms:DescribeKey",
+    ]
+
+    resources = ["*"]
+  }
+
+  # ALlow key to be used by CloudWatch for logs
+  statement {
+    sid    = "AllowCloudwatchLogs"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "logs.${local.current_account_region}.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*",
     ]
 
     resources = ["*"]

@@ -187,7 +187,7 @@ resource "aws_athena_workgroup" "observability_platform" {
     publish_cloudwatch_metrics_enabled = true
 
     result_configuration {
-      output_location = "s3://${module.s3-observability-athena-bucket.bucket.id}/output/"
+      output_location = "s3://${module.s3-athena-bucket.bucket.id}/output/observability_platform/"
 
       encryption_configuration {
         encryption_option = "SSE_S3"
@@ -205,6 +205,10 @@ resource "aws_athena_workgroup" "observability_platform" {
       GrafanaDataSource = "true"
     },
   )
+}
+
+resource "aws_glue_catalog_database" "ops_monitoring" {
+  name = "ops_monitoring${local.dbt_suffix}"
 }
 
 resource "aws_glue_catalog_database" "ears_sars_audit_db" {
