@@ -129,8 +129,8 @@ locals {
           module.baseline_presets.cloudwatch_metric_alarms.ec2,
           module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
           module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
-          local.cloudwatch_metric_alarms.windows,
-          local.cloudwatch_metric_alarms.bods_primary,
+          # local.cloudwatch_metric_alarms.windows,
+          # local.cloudwatch_metric_alarms.bods_primary,
         )
       })
 
@@ -158,14 +158,13 @@ locals {
           oasys-national-reporting-environment = "pp"
           domain-name                          = "azure.hmpp.root"
         })
-        cloudwatch_metric_alarms = {} # swap with block below once configured
-        # cloudwatch_metric_alarms = merge(
-        #   module.baseline_presets.cloudwatch_metric_alarms.ec2,
-        #   module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
-        #   module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
-        #   local.cloudwatch_metric_alarms.windows,
-        #   local.cloudwatch_metric_alarms.bods_secondary,
-        # )
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms.ec2,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+          #  local.cloudwatch_metric_alarms.windows,
+          #  local.cloudwatch_metric_alarms.bods_secondary,
+        )
       })
 
       pp-onr-cms-1 = merge(local.ec2_instances.bip_cms, {
