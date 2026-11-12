@@ -1756,7 +1756,7 @@ module "s3-gems-general-landing-bucket" {
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
-  cross_account            = local.is-development || local.is-preproduction
+  cross_account            = false
   cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
   replication_details      = null #local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
   metadata_bucket          = module.s3-metadata-bucket.bucket.arn
