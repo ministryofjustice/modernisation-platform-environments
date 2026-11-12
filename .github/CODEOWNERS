@@ -141,7 +141,7 @@ prisons-de @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/tribunals @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
-/terraform/environments/vcms @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/hmpps-vcms-write-team @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/vcms @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform-audit @ministryofjustice/vcms-non-production @ministryofjustice/vcms-production @ministryofjustice/modernisation-platform
 /terraform/environments/wardship @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/xhibit-portal @ministryofjustice/cjse-xhibit-portal-discovery @ministryofjustice/modernisation-platform-audit @ministryofjustice/octo-cyber @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
 /terraform/environments/youth-justice-app-framework @ministryofjustice/azure-aws-sso-yjb-statistics-and-analytics @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
