@@ -328,7 +328,10 @@ locals {
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [
+              "pd-onr-bods-http28080",
+              "pd-onr-web-http-7777",
+            ]
             rules = {
               pd-onr-bods-http28080 = {
                 priority = 100
