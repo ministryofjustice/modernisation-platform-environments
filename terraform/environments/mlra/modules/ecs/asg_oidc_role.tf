@@ -1,5 +1,15 @@
 # GitHub OIDC role used by laa-mlra-application "Manage MLRA ASG" workflow to scale the MLRA EC2 ASG.
 # The OIDC provider is created by MP bootstrapping, we only need to create the role.
+
+data "aws_region" "current" {}
+
+data "aws_caller_identity" "current" {}
+
+locals {
+  application_name = var.app_name
+  tags             = var.tags_common
+}
+
 module "github_actions_asg_oidc_role" {
   source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
   github_repositories = ["ministryofjustice/laa-mlra-application"]
@@ -11,7 +21,7 @@ module "github_actions_asg_oidc_role" {
 
 data "aws_iam_policy_document" "github_actions_asg_oidc_policy" {
   statement {
-    sid       = "UpdateMaatAsg"
+    sid       = "UpdateMlraAsg"
     effect    = "Allow"
     actions   = ["autoscaling:UpdateAutoScalingGroup"]
     resources = ["arn:aws:autoscaling:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:autoScalingGroup:*:autoScalingGroupName/${local.application_name}-ec2-*"]
