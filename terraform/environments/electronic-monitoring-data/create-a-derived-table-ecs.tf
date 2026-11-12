@@ -147,7 +147,8 @@ data "aws_iam_policy_document" "cadt_api_trigger" {
     effect  = "Allow"
     actions = ["apigateway:POST"]
     resources = [
-      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_request_id}/methods/POST"
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_request_id}/methods/POST",
+      "${aws_api_gateway_rest_api.ops_api.arn}/resources/${module.ops_trigger_cadt_api.resource_request_id}/methods/POST",
     ]
   }
   statement {
@@ -157,7 +158,8 @@ data "aws_iam_policy_document" "cadt_api_trigger" {
       "apigateway:POST"
     ]
     resources = [
-      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_status_id}/methods/GET"
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_status_id}/methods/GET",
+      "${aws_api_gateway_rest_api.ops_api.arn}/resources/${module.ops_trigger_cadt_api.resource_status_id}/methods/GET",
     ]
   }
   statement {
@@ -167,7 +169,8 @@ data "aws_iam_policy_document" "cadt_api_trigger" {
       "apigateway:POST"
     ]
     resources = [
-      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_execution_id_id}/methods/GET"
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_execution_id_id}/methods/GET",
+      "${aws_api_gateway_rest_api.ops_api.arn}/resources/${module.ops_trigger_cadt_api.resource_execution_id_id}/methods/GET",
     ]
   }
 }

@@ -285,10 +285,14 @@ module "emd_test_tags_role" {
 data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
   count = local.is-preproduction || local.is-production ? 1 : 0
   statement {
-    sid       = "AllowAccessToTriggerUpdateP1API"
-    effect    = "Allow"
-    actions   = ["execute-api:Invoke"]
-    resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
+    sid     = "AllowAccessToTriggerUpdateP1API"
+    effect  = "Allow"
+    actions = ["execute-api:Invoke"]
+    resources = [
+      "${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/ops/POST/add",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/ops/POST/remove",
+    ]
   }
   statement {
     sid       = "ListAccountAliasForEnvironmentClass"
@@ -504,10 +508,14 @@ data "aws_iam_policy_document" "em_data_api_permissions" {
 data "aws_iam_policy_document" "em_dashboard_ear_sar_permissions" {
   count = local.is-preproduction || local.is-production ? 1 : 0
   statement {
-    sid       = "AllowAccessToTriggerEARSARAPI"
-    effect    = "Allow"
-    actions   = ["execute-api:Invoke"]
-    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.ears_sars_api[0].api_gateway_id}/*"]
+    sid     = "AllowAccessToTriggerEARSARAPI"
+    effect  = "Allow"
+    actions = ["execute-api:Invoke"]
+    resources = [
+      "arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.ears_sars_api[0].api_gateway_id}/*",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/ops/POST/ears-sars",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/ops/GET/ears-sars/status/*",
+    ]
   }
   statement {
     sid       = "ListAccountAliasForEnvironmentClass"
@@ -913,9 +921,12 @@ data "aws_iam_policy_document" "cmt_permissions" {
     resources = local.cmt_glue_arns
   }
   statement {
-    effect    = "Allow"
-    actions   = ["execute-api:Invoke"]
-    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.get_zipped_file_api_api.api_gateway_id}/*"]
+    effect  = "Allow"
+    actions = ["execute-api:Invoke"]
+    resources = [
+      "arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.get_zipped_file_api_api.api_gateway_id}/*",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/ops/POST/get-zipped-file",
+    ]
   }
 }
 
