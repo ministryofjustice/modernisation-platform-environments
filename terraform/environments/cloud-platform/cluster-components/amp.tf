@@ -166,7 +166,7 @@ resource "aws_ssm_parameter" "amp_workspace_id" {
   count    = local.bu_amp_enabled ? 1 : 0
   provider = aws.shared-configuration-access
 
-  name  = "/${local.vpc_name}/cloud-platform/amp/${local.amp_workspace_alias}/workspace-id"
+  name  = "/octo/cloud-platform/amp/${local.amp_workspace_alias}/workspace-id"
   type  = "String"
   value = aws_prometheus_workspace.this[0].id
 }
