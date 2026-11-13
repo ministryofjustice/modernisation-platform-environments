@@ -20,7 +20,7 @@ module "github_actions_secret_check_iam_policy" {
   count = local.is-test ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.1"
+  version = "6.8.2"
 
   name_prefix = "github-actions-secret-check"
   description = "IAM policy for checking AWS Secrets Manager expiry tags"
@@ -36,7 +36,7 @@ module "github_actions_secret_check_iam_role" {
   count = local.is-test ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
+  version = "6.8.2"
 
   name            = "github-actions-secret-check"
   use_name_prefix = false
