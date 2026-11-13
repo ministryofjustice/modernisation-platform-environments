@@ -132,31 +132,36 @@ data "aws_iam_policy_document" "rds_artifacts" {
   count = local.create_rds ? 1 : 0
 
   statement {
-    sid    = "ListArtifactsBucket"
-    effect = "Allow"
+    sid       = "GetSharedArtifactsBucketLocation"
+    effect    = "Allow"
+    actions   = ["s3:GetBucketLocation"]
+    resources = ["arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001"]
+  }
 
-    actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket",
-    ]
+  statement {
+    sid       = "ListSharedDatabaseArtifacts"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = ["arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001"]
 
-    resources = [
-      module.baseline.s3_buckets["artifacts-bucket"].bucket.arn,
-    ]
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values = [
+        "hmpps/london-unpaid-work/database",
+        "hmpps/london-unpaid-work/database/*",
+      ]
+    }
   }
 
   statement {
     sid    = "ReadDatabaseBackups"
     effect = "Allow"
-
     actions = [
       "s3:GetObject",
       "s3:GetObjectVersion",
     ]
-
-    resources = [
-      "${module.baseline.s3_buckets["artifacts-bucket"].bucket.arn}/*",
-    ]
+    resources = ["arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001/hmpps/london-unpaid-work/database/*"]
   }
 }
 
