@@ -24,6 +24,19 @@ data "aws_subnets" "public_prototypes" {
   }
 }
 
+data "aws_subnets" "public_subnets" {
+  count = local.prototype_edge_enabled ? 1 : 0
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.prototype[0].id]
+  }
+
+  tags = {
+    Name = "${local.application_name}-${local.environment}-public-eu-west-2*"
+  }
+}
+
 # Each environment's web-ui root owns its ai-builder hosted zone in the same account.
 data "aws_route53_zone" "ai_builder" {
   count = local.prototype_edge_enabled ? 1 : 0

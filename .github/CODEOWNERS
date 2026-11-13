@@ -24,6 +24,7 @@
 /terraform/environments/ccms-feasibility/ccms-oia @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-soa @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-edrms @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-feasibility/ccms-file-transfer @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-oia @ministryofjustice/laa-ccms-developers @ministryofjustice/laa-ccms-security-testing-kpmg @ministryofjustice/laa-dba @ministryofjustice/laa-oia-developers @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/octo-cyber @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-oia/ccms-oia-sandbox @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-pui-internal @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
@@ -80,7 +81,7 @@ prisons-de @ministryofjustice/modernisation-platform
 /terraform/environments/digital-prison-reporting/cross-account-roles @ministryofjustice/probation-de
 prisons-de @ministryofjustice/modernisation-platform
 /terraform/environments/edw-19c @ministryofjustice/edw-mp-access @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
-/terraform/environments/electronic-monitoring-data @ministryofjustice/azure-aws-sso-electronic-monitoring-data @ministryofjustice/azure-aws-sso-electronic-monitoring-data-athena-read-only @ministryofjustice/hmpps-electronic-monitoring-data-store @ministryofjustice/hmpps-electronic-monitoring-data-store-read-only @ministryofjustice/hmpps-electronic-monitoring-devs @ministryofjustice/hmpps-electronic-monitoring-reconciliation-approvers @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/electronic-monitoring-data @ministryofjustice/azure-aws-sso-electronic-monitoring-data @ministryofjustice/azure-aws-sso-electronic-monitoring-data-athena-read-only @ministryofjustice/hmpps-electronic-monitoring-data-hub-live @ministryofjustice/hmpps-electronic-monitoring-data-store @ministryofjustice/hmpps-electronic-monitoring-devs @ministryofjustice/hmpps-electronic-monitoring-reconciliation-approvers @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/eucs-appstream @ministryofjustice/eucs-mojo-vds-engineers @ministryofjustice/eucs-mojo-vds-engineers-elevated @ministryofjustice/modernisation-platform-audit @ministryofjustice/mojo-vds-team @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/green-ops @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber @ministryofjustice/modernisation-platform
@@ -141,7 +142,7 @@ prisons-de @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/tribunals @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
-/terraform/environments/vcms @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/hmpps-vcms-write-team @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/vcms @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform-audit @ministryofjustice/vcms-non-production @ministryofjustice/vcms-production @ministryofjustice/modernisation-platform
 /terraform/environments/wardship @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/xhibit-portal @ministryofjustice/cjse-xhibit-portal-discovery @ministryofjustice/modernisation-platform-audit @ministryofjustice/octo-cyber @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
 /terraform/environments/youth-justice-app-framework @ministryofjustice/azure-aws-sso-yjb-statistics-and-analytics @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform

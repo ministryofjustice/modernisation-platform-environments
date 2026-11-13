@@ -141,24 +141,6 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_dev_bucket_policy" {
       identifiers = ["arn:aws:iam::279191903737:root"]
     }
   }
-  statement {
-    sid    = "RAGLambdaAccess"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket",
-      "s3:GetBucketLocation"
-    ]
-    resources = [
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.rag_lambda_role.arn]
-    }
-  }
 }
 
 data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
@@ -256,24 +238,6 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
       values   = [data.aws_caller_identity.current.account_id]
-    }
-  }
-  statement {
-    sid    = "RAGLambdaAccess"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket",
-      "s3:GetBucketLocation"
-    ]
-    resources = [
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.rag_lambda_role.arn]
     }
   }
 }

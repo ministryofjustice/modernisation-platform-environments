@@ -44,10 +44,10 @@ module "athena_workgroup_analytics_generic" {
 # A workgroup for each reporting app deployment, so each has its own query history and results location.
 module "athena_workgroup_reporting_app" {
   source   = "./modules/athena_workgroups"
-  for_each = toset(["prisons", "probation"])
+  for_each = local.reporting_app_athena_output_paths
 
   name            = format("%s-reporting-%s-athena-workgroup", local.project, each.key)
-  output_location = format("s3://%s/athena-output/reporting-%s", module.s3_working_bucket.bucket_id, each.key)
+  output_location = format("s3://%s/%s", module.s3_working_bucket.bucket_id, each.value)
   description     = format("The workgroup for the %s MI reporting app", each.key)
 
   tags = merge(

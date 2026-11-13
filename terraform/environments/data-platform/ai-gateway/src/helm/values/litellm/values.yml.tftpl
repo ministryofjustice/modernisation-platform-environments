@@ -3,11 +3,6 @@ image:
   repository: ${imageRepository}
   tag: ${imageTag}
 
-%{ if imagePullSecret != "" ~}
-imagePullSecrets:
-  - name: ${imagePullSecret}
-
-%{ endif ~}
 nameOverride: "litellm"
 
 service:
@@ -197,6 +192,7 @@ envVars: {
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
+    TMPDIR: "/app/cache",
     XDG_CACHE_HOME: "/app/cache",
     IAM_TOKEN_DB_AUTH: "True",
     DATABASE_USER: "${databaseUsername}",

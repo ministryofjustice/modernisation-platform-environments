@@ -15,7 +15,7 @@ locals {
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
     core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-live-data-additional"]
-    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub.lostprivatekey")
     lb_additional_allowed_public_cidrs     = module.ip_addresses.mp_cidrs.live_eu_west_nat
     migration_environment_full_name        = "del-prod"
     migration_environment_abbreviated_name = "del"
@@ -109,7 +109,7 @@ locals {
     external_fqdn       = "reporting.probation.service.justice.gov.uk"
     external_admin_fqdn = "admin.reporting.probation.service.justice.gov.uk"
 
-    instance_count = 1
+    instance_count = 4
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
     ansible_branch = "main"

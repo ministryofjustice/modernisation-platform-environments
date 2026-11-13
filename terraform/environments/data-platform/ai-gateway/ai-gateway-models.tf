@@ -133,6 +133,8 @@ resource "litellm_model" "openai" {
   tier                = "paid"
   model_api_base      = "https://api.openai.com/v1"
 
+  mode = try(each.value.health_check_mode, null)
+
   additional_litellm_params = {
     ai_model_provider            = "OpenAI"
     ai_model_family              = each.value.model_family

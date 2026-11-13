@@ -8,9 +8,7 @@ data "template_file" "launch-template1" {
     DISKSARRAY            = local.disksmount_joined
     EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
     efs_id                = aws_efs_file_system.storage[count.index].id
-    ADMIN_LOG_PATH        = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs"
-    OHS_LOG_PATH          = "/u01/product/runtime/Domain/mserver/instances/OHS_inst1/diagnostics/logs/OHS/ohs1"
-    MSERVER_LOG_PATH      = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG1/logs"
+    seq                   = 1
   }
 }
 
@@ -24,9 +22,7 @@ data "template_file" "launch-template2" {
     DISKSARRAY            = local.disksmount_joined
     EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
     efs_id                = aws_efs_file_system.storage[count.index].id
-    ADMIN_LOG_PATH        = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs"
-    OHS_LOG_PATH          = "/u01/product/runtime/Domain/mserver/instances/OHS_inst2/diagnostics/logs/OHS/ohs2"
-    MSERVER_LOG_PATH      = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG2/logs"
+    seq                   = 2
   }
 }
 
