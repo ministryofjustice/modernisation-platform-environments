@@ -146,7 +146,7 @@ def build_github_issue(finding):
         else "UNKNOWN"
     )
     account_id = finding.get("AwsAccountId", "unknown account")
-    issue_title = f"[{severity}] {title} - {account_id}"
+    issue_title = f"[{severity}] AWS SecurityHub Finding: {title} - {account_id}"
 
     sections = [
         f"## Severity\n{severity}",

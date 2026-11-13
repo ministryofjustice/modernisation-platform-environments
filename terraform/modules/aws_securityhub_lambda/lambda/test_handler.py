@@ -126,7 +126,7 @@ class HandlerTests(unittest.TestCase):
     def test_issue_contains_securityhub_finding_details(self):
         issue = handler.build_github_issue(self.finding)
         self.assertEqual(
-            issue["title"], "[CRITICAL] Public access is enabled - test-account"
+            issue["title"], "[CRITICAL] AWS SecurityHub Finding: Public access is enabled - test-account"
         )
         self.assertEqual(issue["labels"], ["support", "aws_securityhub_finding"])
         for value in (
@@ -285,8 +285,8 @@ class HandlerTests(unittest.TestCase):
         self.assertEqual(
             [call.kwargs["issue"]["title"] for call in create_issue.call_args_list],
             [
-                "[CRITICAL] Public access is enabled - test-account",
-                "[HIGH] High severity finding - test-account",
+                "[CRITICAL] AWS SecurityHub Finding: Public access is enabled - test-account",
+                "[HIGH] AWS SecurityHub Finding: High severity finding - test-account",
             ],
         )
 
@@ -580,7 +580,7 @@ class HandlerTests(unittest.TestCase):
     def test_minimal_issue_uses_defaults_and_omits_optional_sections(self):
         issue = handler.build_github_issue({})
         self.assertEqual(
-            issue["title"], "[UNKNOWN] Untitled Security Hub finding - unknown account"
+            issue["title"], "[UNKNOWN] AWS SecurityHub Finding: Untitled Security Hub finding - unknown account"
         )
         self.assertEqual(
             issue["body"], "## Severity\nUNKNOWN\n\n## Account\nunknown account"
@@ -831,7 +831,9 @@ class HandlerTests(unittest.TestCase):
                 handler.lambda_handler(self.event, None)
                 create.assert_called_once()
                 self.assertTrue(
-                    create.call_args.kwargs["issue"]["title"].startswith(f"[{severity}]")
+                    create.call_args.kwargs["issue"]["title"].startswith(
+                        f"[{severity}] AWS SecurityHub Finding: "
+                    )
                 )
 
 
