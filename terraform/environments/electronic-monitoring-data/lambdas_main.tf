@@ -1739,7 +1739,6 @@ module "trigger_cadt_daily_run" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    API_GATEWAY_POST_ID = module.trigger_cadt_api.resource_request_id
-    API_GATEWAY_ARN     = module.trigger_cadt_api.api_gateway_arn
+    TRIGGER_CADT_URL = "https://${module.trigger_cadt_api.api_gateway_id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${module.trigger_cadt_api.resource_request_id}"
   }
 }
