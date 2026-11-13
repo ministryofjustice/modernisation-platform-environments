@@ -210,10 +210,9 @@ data "aws_ssm_parameter" "ecs_optimized_ami_al2023" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
 }
 
-# TODO LASB-5089 update to reference AL2023 ID after migration
 # if the AMI is used elsewhere it can be obtained here
 output "ami_id" {
-  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2.value)["image_id"]
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   sensitive = true
 }
 
@@ -533,11 +532,6 @@ resource "aws_ecs_service" "ecs_service" {
   desired_count   = var.app_count
 
   capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.mlra.name
-    weight            = 0
-  }
-
-  capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.mlra-al2023.name
     weight            = 1
   }
@@ -829,8 +823,6 @@ resource "aws_ecs_cluster_capacity_providers" "mlra" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
 
   capacity_providers = [
-    aws_ecs_capacity_provider.mlra.name,
     aws_ecs_capacity_provider.mlra-al2023.name
   ]
 }
-
