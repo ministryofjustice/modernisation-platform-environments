@@ -591,3 +591,12 @@ models:
       generally_available: false
       environments_available: ["development", "production"]
       health_check_mode: "responses"
+    gpt-5-6-cyber:
+      model_id: "gpt-5.6-cyber"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.6 Cyber"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
