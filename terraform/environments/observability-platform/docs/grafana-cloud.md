@@ -117,3 +117,15 @@ endpoint pair per VPC serves both stacks. The
 
 Grafana Cloud management API calls, browser access and alert notifications
 still go over public HTTPS.
+
+## CloudWatch (Grafana Assume Role)
+
+`grafana-cloud-cloudwatch.tf` creates the `grafana-cloud-cloudwatch` IAM role
+with `CloudWatchReadOnlyAccess`. Grafana Cloud's AWS account (`008923505280`)
+can assume it only with this environment's stack ID as the external ID.
+
+CloudWatch is an AWS API, not a service in the VPC, so CloudWatch data sources
+don't use PDC. In the data source, set **Authentication Provider** to
+**Grafana Assume Role**, **Assume Role ARN** to the
+`grafana_cloud_cloudwatch_role_arn` output, and **Default Region** to
+`eu-west-2`. Leave **Private data source connect** unset.
