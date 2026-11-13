@@ -1,6 +1,8 @@
+# Amazon Managed Grafana (AMG) tenant configuration only.
+# Grafana Cloud tenant configuration lives in grafana-cloud-tenant-environment-configurations.tf
 locals {
-  environment_configuration = local.environment_configurations[local.environment]
-  environment_configurations = {
+  environment_configuration_amg = local.environment_configurations_amg[local.environment]
+  environment_configurations_amg = {
     development = {
       tenant_configuration = {
         "modernisation-platform" = {

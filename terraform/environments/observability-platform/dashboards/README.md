@@ -19,5 +19,5 @@ dashboards/
 
 **Team-specific dashboards**:
 - Place JSON files in team subfolders: `dashboards/{team-name}/your-dashboard.json`
-- Team name must match a tenant name from `environment-configurations.tf`
+- Team name must match a tenant name from `amg-tenant-environment-configurations.tf`
 - These are automatically placed in the team's Grafana folder with appropriate permissions
