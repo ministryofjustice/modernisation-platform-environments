@@ -41,6 +41,8 @@ class HandlerTests(unittest.TestCase):
         self.addCleanup(environment.stop)
         self.finding = {
             "Id": "finding-id",
+            "CreatedAt": "2026-11-13T09:00:00Z",
+            "UpdatedAt": "2026-11-13T09:00:00Z",
             "Title": "Public access is enabled",
             "Description": "A resource allows public access.",
             "AwsAccountId": "test-account",
@@ -56,6 +58,70 @@ class HandlerTests(unittest.TestCase):
             "detail-type": "Security Hub Findings - Imported",
             "detail": {"findings": [copy.deepcopy(self.finding)]},
         }
+
+    def test_grace_period_boundaries_and_timezones(self):
+        for updated, expected in (
+            ("2026-11-13T09:00:00Z", True),
+            ("2026-11-13T09:10:00Z", True),
+            ("2026-11-13T09:10:00.001Z", False),
+            ("2026-11-13T08:59:59Z", False),
+            ("2026-11-13T10:10:00+01:00", True),
+        ):
+            with self.subTest(updated=updated):
+                self.finding["UpdatedAt"] = updated
+                self.assertEqual(
+                    handler.finding_is_within_grace_period(self.finding, 10), expected
+                )
+
+    def test_grace_period_configuration(self):
+        self.assertEqual(handler.get_finding_grace_period(), 10)
+        for value in ("0", "30"):
+            with patch.dict(os.environ, {"FINDING_GRACE_PERIOD": value}):
+                self.assertEqual(handler.get_finding_grace_period(), int(value))
+        for value in ("-1", "1.5", "invalid", ""):
+            with self.subTest(value=value):
+                with patch.dict(os.environ, {"FINDING_GRACE_PERIOD": value}):
+                    with self.assertLogs(handler.logger, level="ERROR"):
+                        with self.assertRaises(ValueError):
+                            handler.get_finding_grace_period()
+
+    def test_invalid_finding_timestamps_fail_explicitly(self):
+        for field in ("CreatedAt", "UpdatedAt"):
+            for value in (None, "", "invalid", "2026-11-13T09:00:00", 1):
+                with self.subTest(field=field, value=value):
+                    finding = {**self.finding, field: value}
+                    with self.assertLogs(handler.logger, level="ERROR"):
+                        with self.assertRaisesRegex(ValueError, field):
+                            handler.finding_is_within_grace_period(finding, 10)
+
+    @patch.object(handler, "create_github_issue")
+    @patch.object(handler, "get_web_identity_token")
+    def test_old_finding_update_skips_authentication_and_issue_creation(self, web, create):
+        self.event["detail"]["findings"][0]["UpdatedAt"] = "2026-11-13T09:10:01Z"
+        with self.assertLogs(handler.logger, level="INFO") as logs:
+            result = handler.lambda_handler(self.event, None)
+        self.assertEqual(result["statusCode"], 200)
+        self.assertIn("grace period", "\n".join(logs.output))
+        web.assert_not_called()
+        create.assert_not_called()
+
+    @patch.object(handler, "create_github_issue", return_value={"number": 1, "html_url": "https://example/issues/1"})
+    @patch.object(handler, "get_github_token", return_value="github-token")
+    @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
+    def test_configured_grace_period_filters_each_finding(self, web, token, create):
+        os.environ["FINDING_GRACE_PERIOD"] = "30"
+        self.event["detail"]["findings"] = [
+            {**self.finding, "Id": "within-window", "UpdatedAt": "2026-11-13T09:30:00Z"},
+            {**self.finding, "Id": "outside-window", "UpdatedAt": "2026-11-13T09:30:01Z"},
+        ]
+        original = copy.deepcopy(self.event)
+
+        result = handler.lambda_handler(self.event, None)
+
+        self.assertEqual(result["statusCode"], 200)
+        create.assert_called_once()
+        self.assertIn("within-window", create.call_args.kwargs["issue"]["body"])
+        self.assertEqual(self.event, original)
 
     def test_issue_contains_securityhub_finding_details(self):
         issue = handler.build_github_issue(self.finding)

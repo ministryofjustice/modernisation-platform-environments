@@ -2,6 +2,7 @@ import boto3
 import json
 import logging
 import os
+from datetime import datetime, timedelta
 from urllib.parse import quote
 
 import requests
@@ -228,6 +229,49 @@ def create_github_issue(github_org, github_token, repo, issue):
     return response.json()
 
 
+def get_finding_grace_period():
+    value = os.getenv("FINDING_GRACE_PERIOD", "10")
+    try:
+        minutes = int(value)
+    except ValueError as error:
+        logger.error("FINDING_GRACE_PERIOD must be a non-negative whole number of minutes")
+        raise ValueError(
+            "FINDING_GRACE_PERIOD must be a non-negative whole number of minutes"
+        ) from error
+    if minutes < 0:
+        logger.error("FINDING_GRACE_PERIOD must be non-negative")
+        raise ValueError("FINDING_GRACE_PERIOD must be non-negative")
+    return minutes
+
+
+def finding_is_within_grace_period(finding, minutes):
+    timestamps = {}
+    for field in ("CreatedAt", "UpdatedAt"):
+        value = finding.get(field)
+        try:
+            if not isinstance(value, str):
+                raise ValueError("Timestamp must be a string")
+            timestamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            if timestamp.utcoffset() is None:
+                raise ValueError("Timestamp must include a timezone")
+        except ValueError as error:
+            logger.error(
+                "Security Hub finding %s has missing or invalid %s",
+                finding.get("Id", "unknown"), field,
+            )
+            raise ValueError(f"Finding {field} must be a timezone-aware timestamp") from error
+        timestamps[field] = timestamp
+
+    elapsed = timestamps["UpdatedAt"] - timestamps["CreatedAt"]
+    if elapsed < timedelta(0) or elapsed.total_seconds() > minutes * 60:
+        logger.info(
+            "Skipping Security Hub finding %s: UpdatedAt is outside the %s-minute grace period after CreatedAt",
+            finding.get("Id", "unknown"), minutes,
+        )
+        return False
+    return True
+
+
 def lambda_handler(event, context):
     if not isinstance(event, dict):
         raise ValueError("Event must be an object")
@@ -240,6 +284,7 @@ def lambda_handler(event, context):
         raise ValueError("Event detail must contain a findings array")
 
     expected_severities = get_finding_severity_labels()
+    grace_period = get_finding_grace_period()
     matching_findings = []
     for finding in findings:
         if not isinstance(finding, dict):
@@ -257,10 +302,11 @@ def lambda_handler(event, context):
                 sorted(expected_severities),
             )
             continue
-        matching_findings.append(finding)
+        if finding_is_within_grace_period(finding, grace_period):
+            matching_findings.append(finding)
 
     if not matching_findings:
-        message = "No Security Hub findings matched the configured severity labels."
+        message = "No Security Hub findings matched the configured severity labels and grace period."
         logger.info(message)
         return {"statusCode": 200, "body": json.dumps({"message": message})}
 
