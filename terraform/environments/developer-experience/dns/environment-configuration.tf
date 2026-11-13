@@ -30,7 +30,6 @@ locals {
               type = "NS"
               name = "sts.github"
               ttl  = 86400
-              # Replace these placeholders with the four authoritative nameservers before applying.
               records = [
                 "ns-1368.awsdns-43.org.",
                 "ns-1996.awsdns-57.co.uk.",
