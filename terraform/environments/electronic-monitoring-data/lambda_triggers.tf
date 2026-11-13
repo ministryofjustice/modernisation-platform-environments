@@ -1132,5 +1132,5 @@ resource "aws_lambda_permission" "allow_cadt_trigger_eventbridge" {
   action        = "lambda:InvokeFunction"
   function_name = module.trigger_cadt_daily_run[0].lambda_function_arn
   principal     = "events.amazonaws.com"
-  source_arn    = module.daily_cadt_eventbridge.eventbridge_rule_arns.orders
+  source_arn    = module.daily_cadt_eventbridge.eventbridge_rule_arns.crons
 }
