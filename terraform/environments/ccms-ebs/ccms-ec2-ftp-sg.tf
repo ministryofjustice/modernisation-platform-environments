@@ -41,6 +41,48 @@ data "aws_secretsmanager_secret_version" "secrets" {
   secret_id = "${each.value}-${local.environment}"
 }
 
+# Reference Lambda security group by name tag
+data "aws_security_group" "lambda_security_group" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "tag:Name"
+    values = ["${local.application_name}-${local.environment}-lambda-sg"]
+  }
+}
+
+# VPC endpoint subnets for outbound connectivity
+data "aws_subnet" "vpce_subnets_a" {
+  vpc_id            = data.aws_vpc.shared.id
+  availability_zone = data.aws_availability_zones.available.names[0]
+  filter {
+    name   = "tag:Name"
+    values = ["${local.vpc_name}-vpce-*"]
+  }
+}
+
+data "aws_subnet" "vpce_subnets_b" {
+  vpc_id            = data.aws_vpc.shared.id
+  availability_zone = data.aws_availability_zones.available.names[1]
+  filter {
+    name   = "tag:Name"
+    values = ["${local.vpc_name}-vpce-*"]
+  }
+}
+
+data "aws_subnet" "vpce_subnets_c" {
+  vpc_id            = data.aws_vpc.shared.id
+  availability_zone = data.aws_availability_zones.available.names[2]
+  filter {
+    name   = "tag:Name"
+    values = ["${local.vpc_name}-vpce-*"]
+  }
+}
+
+# S3 gateway endpoint prefix list
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}
+
 # Security Group for FTP Server
 
 resource "aws_security_group" "ec2_sg_ftp" {
@@ -93,28 +135,69 @@ resource "aws_security_group" "ec2_sg_ftp" {
 #   local.application_data.accounts[local.environment].lz_aws_subnet_env]
 # }
 
-resource "aws_security_group_rule" "ingress_private_traffic_lambda" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "ingress"
-  description       = "allow all tcp traffic from lambda"
-  protocol          = "TCP"
-  from_port         = 0
-  to_port           = 65535
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_443" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from lambda security group on port 443"
+  ip_protocol                  = "tcp"
+  from_port                    = 443
+  to_port                      = 443
+  referenced_security_group_id = data.aws_security_group.lambda_security_group.id
 }
 
-resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "ingress"
-  description       = "allow all tcp traffic from ebsdb"
-  protocol          = "TCP"
-  from_port         = 0
-  to_port           = 65535
-  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_ebsdb_22" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from EBS DB security group on port 22"
+  ip_protocol                  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = aws_security_group.ec2_sg_ebsdb.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_ftp_1521_1522" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from FTP security group on ports 1521-1522"
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1522
+  referenced_security_group_id = aws_security_group.ec2_sg_ftp.id
 }
 
 
 # EGRESS Rules
+
+resource "aws_vpc_security_group_egress_rule" "egress_ftp_ebsdb_1521_1522" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow egress to EBS DB security group on ports 1521-1522"
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1522
+  referenced_security_group_id = aws_security_group.ec2_sg_ebsdb.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "egress_ftp_vpce" {
+  for_each = toset([
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ])
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  description       = "Allow egress to VPC endpoints (S3 / Secrets Manager)"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = each.value
+}
+
+resource "aws_vpc_security_group_egress_rule" "egress_ftp_s3" {
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_id    = data.aws_prefix_list.s3.id
+}
 
 ### FTP
 
