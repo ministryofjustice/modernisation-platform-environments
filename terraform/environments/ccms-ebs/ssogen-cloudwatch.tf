@@ -46,7 +46,7 @@ resource "aws_ssm_parameter" "ssogen_2_cw_agent_config" {
     ADMIN_LOG_PATH_1   = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs/*.log"
     ADMIN_LOG_PATH_2   = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs/*.out"
     OHS_LOG_PATH       = "/u01/product/runtime/Domain/mserver/instances/OHS_inst2/diagnostics/logs/OHS/ohs2/*?log"
-    MSERVER_LOG_PATH_1 = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG2/logs/WLS_EAG*"
+    MSERVER_LOG_PATH_1 = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG2/logs/WLS_EAG**"
     MSERVER_LOG_PATH_2 = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG2/logs/access.log"
   })
 
