@@ -9,7 +9,8 @@ resource "aws_wafv2_ip_set" "ssogen_console_waf_ip_set" {
 
   addresses = compact([
     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-    local.application_data.accounts[local.environment].mp_v1_workspaces_cidr
+    local.application_data.accounts[local.environment].mp_v1_workspaces_cidr,
+    local.application_data.accounts[local.environment].mp_azure_virtual_desktop_cidr
   ])
 
   tags = merge(
