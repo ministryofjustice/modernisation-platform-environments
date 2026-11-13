@@ -23,14 +23,18 @@ resource "litellm_unified_access_group" "amazon_bedrock_batch" {
 
   access_group_name  = "bedrock-batch-${each.key}"
   access_model_names = [litellm_model.amazon_bedrock_batch[each.key].model_name]
+  assigned_key_ids   = []
   assigned_team_ids = [
     for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id
     if contains(try(team.unified_access_groups, []), "bedrock-batch-${each.key}")
   ]
 
-  # Teams can be assigned to access groups out-of-band via the LiteLLM UI/API; don't revoke those.
+  # Preserve team and key assignments made out-of-band through the LiteLLM UI/API.
   lifecycle {
-    ignore_changes = [assigned_team_ids]
+    ignore_changes = [
+      assigned_team_ids,
+      assigned_key_ids
+    ]
   }
 }
 
