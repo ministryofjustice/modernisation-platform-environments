@@ -42,6 +42,14 @@ data "aws_security_group" "lambda_security_group" {
   }
 }
 
+data "aws_security_group" "ec2_sg_ftp" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "tag:Name"
+    values = [lower(format("sg-%s-%s-FTP", local.application_name, local.environment))]
+  }
+}
+
 locals {
   excluded_sgs = [
     data.aws_security_group.sftp_process_file_from_bucket_lambda_sg.id,
@@ -49,6 +57,7 @@ locals {
     data.aws_security_group.sftp_cluster_ec2.id,
     data.aws_security_group.sftp_ecs_tasks_security_group.id,
     data.aws_security_group.lambda_security_group.id,
+    data.aws_security_group.ec2_sg_ftp.id,
   ]
 }
 
