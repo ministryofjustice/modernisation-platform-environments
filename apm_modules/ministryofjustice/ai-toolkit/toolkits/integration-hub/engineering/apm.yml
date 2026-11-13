@@ -1,0 +1,25 @@
+---
+name: integration-hub-engineering
+version: 1.2.0
+description: Engineering Toolkit for the Ministry of Justice Integration Hub team
+author: dms1981
+targets:
+  - copilot
+dependencies:
+  apm:
+    - aws/agent-toolkit-for-aws/plugins/aws-core#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/serverless-skills/debugging-lambda-timeouts#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/database-skills/amazon-dynamodb#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/networking-and-content-delivery-skills/cloudfront#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/networking-and-content-delivery-skills/creating-production-vpc-multi-az#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/networking-and-content-delivery-skills/route53#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/networking-and-content-delivery-skills/routing-traffic-with-route53-and-cloudfront#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/networking-and-content-delivery-skills/shieldadvanced#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/networking-and-content-delivery-skills/waf#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/operations-skills/setting-up-cloudwatch-alarm-notifications#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/operations-skills/troubleshooting-application-failures#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/security-and-identity-skills/creating-secrets-using-best-practices#8e5b627c5d210e7a5546f54d40bde547bb55930f
+    - aws/agent-toolkit-for-aws/skills/specialized-skills/storage-skills/securing-s3-buckets#8e5b627c5d210e7a5546f54d40bde547bb55930f
+  mcp: []
+includes: auto
+scripts: {}
