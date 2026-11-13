@@ -4402,3 +4402,69 @@ resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
     wildcard      = true
   }
 }
+
+# ------------------------------------------------------------
+# trigger_cadt_daily_run
+# ------------------------------------------------------------
+
+module "trigger_cadt_daily_run_iam_role" {
+ source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+
+  name = "trigger_cadt_daily_run"
+
+  trust_policy_permissions = {
+    TrustRoleAndServiceToAssume = {
+      actions = [
+        "sts:AssumeRole",
+      ]
+      principals = [{
+        type = "Service"
+        identifiers = [
+          "lambda.amazonaws.com",
+        ]
+      }]
+    }
+  }
+
+  policies = {
+    trigger_api_gateway = aws_iam_policy.trigger_cadt_daily_run_iam_policy.arn
+  }
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "trigger_cadt_daily_run_iam_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["apigateway:POST"]
+    resources = [
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_request_id}/methods/POST"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "apigateway:GET",
+      "apigateway:POST"
+    ]
+    resources = [
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_status_id}/methods/GET"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "apigateway:GET",
+      "apigateway:POST"
+    ]
+    resources = [
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_execution_id_id}/methods/GET"
+    ]
+  }
+}
+
+
+resource "aws_iam_policy" "trigger_cadt_daily_run_iam_policy" {
+  name   = "trigger_cadt_daily_run_iam_policy"
+  policy = data.aws_iam_policy_document.cadt_policy_document.json
+}
