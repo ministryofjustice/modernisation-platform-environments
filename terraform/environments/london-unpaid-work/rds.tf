@@ -42,6 +42,17 @@ resource "aws_vpc_security_group_ingress_rule" "database_from_windows" {
   to_port                      = local.account_config.db_port
 }
 
+resource "aws_vpc_security_group_ingress_rule" "database_from_api" {
+  count = local.create_rds ? 1 : 0
+
+  description                  = "Allow SQL Server access from London Unpaid Work API servers"
+  security_group_id            = aws_security_group.database[0].id
+  referenced_security_group_id = module.baseline.security_groups["london-unpaid-work-api"].id
+  ip_protocol                  = "tcp"
+  from_port                    = local.account_config.db_port
+  to_port                      = local.account_config.db_port
+}
+
 resource "aws_db_instance" "database" {
   count = local.create_rds ? 1 : 0
 
@@ -121,33 +132,49 @@ data "aws_iam_policy_document" "rds_artifacts" {
   count = local.create_rds ? 1 : 0
 
   statement {
-    sid    = "ListArtifactsBucket"
-    effect = "Allow"
+    sid       = "GetSharedArtifactsBucketLocation"
+    effect    = "Allow"
+    actions   = ["s3:GetBucketLocation"]
+    resources = ["arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001"]
+  }
 
-    actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket",
-    ]
+  statement {
+    sid       = "ListSharedDatabaseArtifacts"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = ["arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001"]
 
-    resources = [
-      module.baseline.s3_buckets["artifacts-bucket"].bucket.arn,
-    ]
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values = [
+        "hmpps/london-unpaid-work/database",
+        "hmpps/london-unpaid-work/database/*",
+      ]
+    }
   }
 
   statement {
     sid    = "ReadDatabaseBackups"
     effect = "Allow"
-
     actions = [
       "s3:GetObject",
       "s3:GetObjectVersion",
     ]
+    resources = ["arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001/hmpps/london-unpaid-work/database/*"]
+  }
 
-    resources = [
-      "${module.baseline.s3_buckets["artifacts-bucket"].bucket.arn}/*",
+  statement {
+    sid    = "DecryptDatabaseBackups"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
     ]
+    resources = [data.aws_kms_key.general_shared.arn]
   }
 }
+
 
 resource "aws_iam_role_policy" "rds_artifacts" {
   count = local.create_rds ? 1 : 0
