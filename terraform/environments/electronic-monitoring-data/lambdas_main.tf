@@ -1728,8 +1728,8 @@ module "trigger_cadt_daily_run" {
   is_image                       = true
   function_name                  = "trigger_cadt_daily_run"
   image_name                     = "trigger_cadt_daily_run"
-  role_name                      = aws_iam_role.trigger_cadt_daily_run[0].name
-  role_arn                       = aws_iam_role.trigger_cadt_daily_run[0].arn
+  role_name                      = module.trigger_cadt_daily_run_iam_role.name
+  role_arn                       = module.trigger_cadt_daily_run_iam_role.arn
   memory_size                    = 1024
   timeout                        = 60
   reserved_concurrent_executions = 2
