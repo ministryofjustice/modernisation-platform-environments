@@ -124,7 +124,7 @@ resource "aws_security_group_rule" "ecs_tasks_sftp_security_group_egress_s3" {
 resource "aws_security_group_rule" "ecs_tasks_sftp_security_group_egress_https" {
   security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
   type              = "egress"
-  description       = "Allow outbound HTTPS traffic to anywhere"
+  description       = "Allow outbound HTTPS traffic to anywhere for intra oAuth"
   protocol          = "tcp"
   from_port         = 443
   to_port           = 443
