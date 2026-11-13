@@ -1723,7 +1723,6 @@ module "register_athena" {
 }
 
 module "trigger_cadt_daily_run" {
-  count                          = local.is-production || local.is-preproduction ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "trigger_cadt_daily_run"
