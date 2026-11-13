@@ -1101,3 +1101,36 @@ resource "aws_cloudwatch_event_target" "dlt_iceberg_maintenance" {
 
   depends_on = [aws_iam_role_policy.dlt_iceberg_maintenance_start]
 }
+
+# daily trigger for cadt
+
+module "daily_cadt_eventbridge" {
+  source = "terraform-aws-modules/eventbridge/aws"
+
+  create_bus = false
+
+  rules = {
+    crons = {
+      description         = "Every morning at 5am"
+      schedule_expression = "cron(0 5 * * * *)"
+    }
+  }
+
+  targets = {
+    crons = [
+      {
+        name  = "trigger-cadt-lambda"
+        arn   = module.trigger_cadt_daily_run.lambda_function_arn
+        input = jsonencode({ "job" : "cron-by-rate" })
+      }
+    ]
+  }
+}
+
+resource "aws_lambda_permission" "allow_cadt_trigger_eventbridge" {
+  statement_id  = "AllowcadtExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = module.trigger_cadt_daily_run.lambda_fuction_name
+  principal     = "events.amazonaws.com"
+  source_arn    = module.daily_cadt_eventbridge.eventbridge_rule_arns.orders
+}
