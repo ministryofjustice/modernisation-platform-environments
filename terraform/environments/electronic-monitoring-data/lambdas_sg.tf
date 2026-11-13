@@ -82,7 +82,7 @@ resource "aws_security_group_rule" "lambda_egress_dynamodb" {
   security_group_id = aws_security_group.lambda_generic.id
 }
 
-resource "aws_security_group_rule" "lambda_egress_dynamodb" {
+resource "aws_security_group_rule" "lambda_egress_apigateway" {
   type              = "egress"
   description       = "allow dynamodb"
   from_port         = 443
