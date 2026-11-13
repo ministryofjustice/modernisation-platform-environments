@@ -1,12 +1,12 @@
 resource "aws_secretsmanager_secret" "data_claims_database" {
   # checkov:skip=CKV2_AWS_57: Skipping because automatic rotation not needed.
-  count      = local.is-test ? 1 : 0
+  count      = local.is-test || local.is-preproduction ? 1 : 0
   name       = "data-claims-secret"
   kms_key_id = aws_kms_key.data_lake_kms_key.arn
 }
 
 module "data_claims_mapping_bucket" {
-  count                    = local.is-test ? 1 : 0
+  count                    = local.is-test || local.is-preproduction ? 1 : 0
   source                   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=0294b1a1303028f91707fdc67f1e4bba63d34ea6"
   manage_log_bucket_policy = false
   log_buckets              = local.access_log_destination
@@ -29,7 +29,7 @@ module "data_claims_mapping_bucket" {
 
 # Upload the table mapping file to S3
 resource "aws_s3_object" "data_claims_mapping_file" {
-  count        = local.is-test ? 1 : 0
+  count        = local.is-test || local.is-preproduction ? 1 : 0
   bucket       = module.data_claims_mapping_bucket[0].bucket.id
   key          = "table_mappings.json"
   source       = "${path.module}/table_mappings/data_claims_mappings.json"
@@ -101,7 +101,7 @@ resource "aws_iam_role_policy" "glue_access_dms" {
 
 
 module "data_claims_dms" {
-  count                    = local.is-test ? 1 : 0
+  count                    = local.is-test || local.is-preproduction ? 1 : 0
   source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=5af822545b8c47096e979c5c07e2fc1bc2579eb1"
   vpc_id                   = data.aws_vpc.shared.id
   environment              = local.environment
