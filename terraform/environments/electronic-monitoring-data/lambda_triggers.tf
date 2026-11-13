@@ -734,7 +734,7 @@ resource "aws_cloudwatch_event_rule" "ac_readiness_cadt_completion" {
   )
 
   event_pattern = jsonencode({
-    source      = ["aws.ecs"]
+    source        = ["aws.ecs"]
     "detail-type" = ["ECS Task State Change"]
 
     detail = {
