@@ -88,26 +88,26 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure_Clamav" {
 }
 
 # ClamAV Process Failure Alarm
-# resource "aws_cloudwatch_metric_alarm" "Process_Failure_Clamd" {
-#   alarm_name          = "${local.application_name}-${local.environment}-clamd-process-failure"
-#   alarm_description   = "The PUI clamav-ec2 instance has failed to run the clamd process, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
-#   comparison_operator = "LessThanThreshold"
-#   datapoints_to_alarm = 2
-#   metric_name         = "procstat_lookup_pid_count"
-#   statistic           = "Minimum"
-#   namespace           = "Custom/ClamAV"
-#   period              = "60"
-#   evaluation_periods  = "5"
-#   threshold           = "1"
-#   treat_missing_data  = "Breaching"
-#   dimensions = {
-#     InstanceId = aws_instance.ec2_clamav.id
-#     exe        = "clamd"
-#   }
-#   alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
-#   ok_actions    = [aws_sns_topic.cloudwatch_alerts.arn]
-#   tags = local.tags
-# }
+resource "aws_cloudwatch_metric_alarm" "Process_Failure_Clamd" {
+  alarm_name          = "${local.application_name}-${local.environment}-clamd-process-failure"
+  alarm_description   = "The PUI clamav-ec2 instance has failed to run the clamd process, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  comparison_operator = "LessThanThreshold"
+  datapoints_to_alarm = 2
+  metric_name         = "procstat_lookup_pid_count"
+  statistic           = "Minimum"
+  namespace           = "Custom/ClamAV"
+  period              = "60"
+  evaluation_periods  = "2"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  dimensions = {
+    InstanceId = aws_instance.ec2_clamav.id
+    exe        = "clamd"
+  }
+  alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions    = [aws_sns_topic.cloudwatch_alerts.arn]
+  tags = local.tags
+}
 
 # Underlying waf Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "waf_high_blocked_requests" {
