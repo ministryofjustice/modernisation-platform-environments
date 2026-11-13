@@ -78,4 +78,4 @@ Modernisation Platform
 ### **Grafana Cloud:**
 
 Grafana Cloud deployment and credential prerequisites are documented in
-[Grafana Cloud](docs/grafana-cloud.md).
+[Grafana Cloud](docs/grafana-cloud/overview.md).
