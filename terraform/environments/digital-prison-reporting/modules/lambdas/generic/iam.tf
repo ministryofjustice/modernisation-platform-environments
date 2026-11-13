@@ -28,13 +28,22 @@ data "aws_iam_policy_document" "lambda_execution" {
   #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   statement {
     resources = [
+      "arn:aws:logs:eu-west-2:*:log-group:*"
+    ]
+
+    actions = [
+      "logs:CreateLogGroup",
+    ]
+  }
+
+  statement {
+    resources = [
       "arn:aws:logs:eu-west-2:*:*"
     ]
 
     actions = [
       "logs:PutLogEvents",
       "logs:CreateLogStream",
-      "logs:CreateLogGroup",
     ]
   }
 
