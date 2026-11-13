@@ -22,6 +22,7 @@ data "aws_subnets" "shared-private" {
   }
 }
 
+# TODO LASB-5089 Remove
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
   name                  = "${var.app_name}-cluster-scaling-group"
@@ -199,6 +200,7 @@ resource "aws_security_group_rule" "mlra_to_maatdb_sg_rule_outbound" {
   source_security_group_id = var.maatdb_rds_sec_group_id
 }
 
+# TODO LASB-5089 Remove
 data "aws_ssm_parameter" "ecs_optimized_ami_al2" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 }
@@ -224,6 +226,7 @@ output "ami_id_al2023" {
 # Note - when updating this you will need to manually terminate the EC2s
 # so that the autoscaling group creates new ones using the new launch template
 
+# TODO LASB-5089 Remove
 #tfsec:ignore:AVD-AWS-0130:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_launch_template" "ec2-launch-template" {
   #checkov:skip=CKV_AWS_79:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
@@ -783,6 +786,7 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
   }
 }
 
+# TODO LASB-5089 Remove
 resource "aws_ecs_capacity_provider" "mlra" {
   name = "${var.app_name}-${var.environment}-capacity-provider"
 
