@@ -163,7 +163,18 @@ data "aws_iam_policy_document" "rds_artifacts" {
     ]
     resources = ["arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001/hmpps/london-unpaid-work/database/*"]
   }
+
+  statement {
+    sid    = "DecryptDatabaseBackups"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+    ]
+    resources = [data.aws_kms_key.general_shared.arn]
+  }
 }
+
 
 resource "aws_iam_role_policy" "rds_artifacts" {
   count = local.create_rds ? 1 : 0
