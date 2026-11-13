@@ -1,5 +1,5 @@
 #!/bin/bash -xe
-# shellcheck disable=SC2154
+# shellcheck disable=SC2154,SC2034
 # TODO LASB-5089 Remove
 echo "ECS_CLUSTER=${app_name}" >> /etc/ecs/ecs.config
 echo ECS_IMAGE_PULL_BEHAVIOR=always >> /etc/ecs/ecs.config
@@ -60,7 +60,7 @@ else
   AGENT_PATH="pre-prod/cortex-agent.tar.gz"
 fi
 
-aws s3 cp "${XDR_AGENT_BUCKET}${AGENT_PATH}" "${xdr_tar}"
+aws s3 cp "$${XDR_AGENT_BUCKET}$${AGENT_PATH}" "${xdr_tar}"
 
 if [[ -f ${xdr_tar} ]]; then
   mkdir -p "${xdr_dir}"
