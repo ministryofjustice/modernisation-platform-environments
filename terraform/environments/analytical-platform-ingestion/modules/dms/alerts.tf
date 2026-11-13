@@ -28,7 +28,7 @@ module "sns_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.2"
 
   aliases               = ["dms/${var.db}/sns-alerts"]
   description           = "Encrypts the ${var.db} DMS alerts SNS topic"
