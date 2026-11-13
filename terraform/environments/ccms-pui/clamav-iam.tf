@@ -45,8 +45,19 @@ data "aws_iam_policy_document" "cloudwatch_logs_clamav" {
       aws_cloudwatch_log_group.log_group_clamav_clamd.arn,
     ]
   }
+  statement {
+    sid = "AllowPutMetrics"
+    actions = [
+      "cloudwatch:PutMetricData"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "cloudwatch:namespace"
+      values   = ["Custom/ClamAV"]
+    }
+  }
 }
-
 resource "aws_iam_role_policy" "cloudwatch_logs_clamav" {
   name   = "${local.application_name}-clamav-cloudwatch-logs"
   role   = aws_iam_role.clamav_role.name
