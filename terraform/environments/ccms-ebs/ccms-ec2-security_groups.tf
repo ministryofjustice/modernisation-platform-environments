@@ -34,12 +34,21 @@ data "aws_security_group" "sftp_ecs_tasks_security_group" {
   }
 }
 
+data "aws_security_group" "lambda_security_group" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "tag:Name"
+    values = ["${local.application_name}-${local.environment}-lambda-sg"]
+  }
+}
+
 locals {
   excluded_sgs = [
     data.aws_security_group.sftp_process_file_from_bucket_lambda_sg.id,
     data.aws_security_group.sftp_load_balancer.id,
     data.aws_security_group.sftp_cluster_ec2.id,
     data.aws_security_group.sftp_ecs_tasks_security_group.id,
+    data.aws_security_group.lambda_security_group.id,
   ]
 }
 

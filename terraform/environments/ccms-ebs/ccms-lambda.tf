@@ -23,20 +23,42 @@ resource "aws_security_group" "lambda_security_group" {
 
 # hashicorp recommened Ingress rule of lambda_security_group
 resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
-  security_group_id = aws_security_group.lambda_security_group.id
-  description       = "Allow FTP lambda inbound traffic"
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
-  from_port         = 1521
-  ip_protocol       = "tcp"
-  to_port           = 1522
+  security_group_id            = aws_security_group.lambda_security_group.id
+  description                  = "Allow FTP lambda inbound traffic from EBS DB EC2"
+  referenced_security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  from_port                    = 443
+  ip_protocol                  = "tcp"
+  to_port                      = 443
 }
 
 # hashicorp recommened egress rule of lambda_security_group
 resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
   security_group_id = aws_security_group.lambda_security_group.id
-  description       = "Allow FTP lambdaall outbound traffic"
+  description       = "Allow FTP lambda outbound traffic on port 443"
   cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
+# Lambda egress to FTP EC2 on port 443
+resource "aws_vpc_security_group_egress_rule" "lambda_egress_to_ftp" {
+  security_group_id            = aws_security_group.lambda_security_group.id
+  description                  = "Allow lambda outbound traffic to FTP EC2 on port 443"
+  referenced_security_group_id = aws_security_group.ec2_sg_ftp.id
+  from_port                    = 443
+  ip_protocol                  = "tcp"
+  to_port                      = 443
+}
+
+# Lambda egress to EBS DB EC2 on ports 1521-1522
+resource "aws_vpc_security_group_egress_rule" "lambda_egress_to_ebsdb" {
+  security_group_id            = aws_security_group.lambda_security_group.id
+  description                  = "Allow lambda outbound traffic to EBS DB EC2 on ports 1521-1522"
+  referenced_security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  from_port                    = 1521
+  ip_protocol                  = "tcp"
+  to_port                      = 1522
 }
 
 # Lambda Function
