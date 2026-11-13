@@ -177,6 +177,10 @@
       {
         "name": "APP_ATS_BASE_URL",
         "value": "${maat_ats_base_url}"
+      },
+      {
+        "name": "JACOCO_ENABLED",
+        "value": "${jacoco_enabled}"
       }
     ],
     "logConfiguration": {
