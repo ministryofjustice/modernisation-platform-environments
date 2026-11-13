@@ -7,7 +7,7 @@
         "nonlive": "container-platform-octo-nonlive"
       },
       "amp_enabled": {
-        "live": false,
+        "live": true,
         "nonlive": true
       },
       "grafana_enabled": {
