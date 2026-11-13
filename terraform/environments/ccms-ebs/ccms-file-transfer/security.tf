@@ -11,12 +11,12 @@ resource "aws_security_group" "sftp_load_balancer" {
 
 resource "aws_vpc_security_group_ingress_rule" "sftp_lb_ingress_443" {
   security_group_id = aws_security_group.sftp_load_balancer.id
-  #this needs to be tightened further
-  cidr_ipv4   = "0.0.0.0/0"
-  description = "HTTPS from Anywhere - WAF in front of ALB"
+
+  description = "HTTPS from AWS Workspaces"
   ip_protocol = "tcp"
   from_port   = 443
   to_port     = 443
+  cidr_ipv4   = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
 }
 
 resource "aws_vpc_security_group_ingress_rule" "sftp_lb_ingress_from_lambda_443" {
@@ -29,13 +29,14 @@ resource "aws_vpc_security_group_ingress_rule" "sftp_lb_ingress_from_lambda_443"
   referenced_security_group_id = aws_security_group.process_file_from_bucket_lambda_sg.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "sftp_lb_egress_api" {
-  security_group_id = aws_security_group.sftp_load_balancer.id
-
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "tcp"
-  from_port   = 0
-  to_port     = 65535
+resource "aws_security_group_rule" "sftp_lb_egress_api" {
+  security_group_id        = aws_security_group.sftp_load_balancer.id
+  type                     = "egress"
+  description              = "Allow ALB egress to ECS tasks"
+  protocol                 = "tcp"
+  from_port                = 8443
+  to_port                  = 8443
+  source_security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
 }
 
 # Container Security Group
@@ -82,13 +83,52 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_sftp_security_group_ec
 #   }
 # }
 
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_sftp_security_group_egress_rule" {
+resource "aws_security_group_rule" "ecs_tasks_sftp_security_group_egress_rule" {
   security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
+  type              = "egress"
+  description       = "Allow Oracle DB access"
+  protocol          = "tcp"
+  from_port         = 1521
+  to_port           = 1522
+  cidr_blocks = [
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
+  ]
+}
 
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "tcp"
-  from_port   = 0
-  to_port     = 65535
+resource "aws_security_group_rule" "ecs_tasks_sftp_security_group_egress_vpce" {
+  security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
+  type              = "egress"
+  description       = "Allow egress to VPC endpoints (S3 / Secrets Manager)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_sftp_security_group_egress_s3" {
+  security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
+  type              = "egress"
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_sftp_security_group_egress_https" {
+  security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
+  type              = "egress"
+  description       = "Allow outbound HTTPS traffic to anywhere for intra oAuth"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 # Lambda Security Group
@@ -147,11 +187,49 @@ resource "aws_security_group" "cluster_ec2" {
   )
 }
 
-resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_all" {
+resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_rule" {
+  for_each = toset([
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
+  ])
   security_group_id = aws_security_group.cluster_ec2.id
-
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "tcp"
-  from_port   = 0
-  to_port     = 65535
+  description       = "Allow Oracle DB access"
+  ip_protocol       = "tcp"
+  from_port         = 1521
+  to_port           = 1522
+  cidr_ipv4         = each.value
 }
+
+resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_vpce" {
+  for_each = toset([
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ])
+  security_group_id = aws_security_group.cluster_ec2.id
+  description       = "Allow egress to VPC endpoints (S3 / Secrets Manager)"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = each.value
+}
+
+resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_s3" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_id    = data.aws_prefix_list.s3.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_ecs" {
+  security_group_id            = aws_security_group.cluster_ec2.id
+  description                  = "Allow EC2 egress to ECS tasks"
+  ip_protocol                  = "tcp"
+  from_port                    = 8443
+  to_port                      = 8443
+  referenced_security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
+}
+
