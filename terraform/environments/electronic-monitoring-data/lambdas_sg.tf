@@ -27,6 +27,11 @@ data "aws_prefix_list" "dynamodb" {
   name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
 }
 
+data "aws_prefix_list" "apigateway" {
+  name = "com.amazonaws.${data.aws_region.current.name}.execute-api"
+}
+
+
 resource "aws_security_group_rule" "lambda_ingress_generic" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
   type              = "ingress"
@@ -77,6 +82,15 @@ resource "aws_security_group_rule" "lambda_egress_dynamodb" {
   security_group_id = aws_security_group.lambda_generic.id
 }
 
+resource "aws_security_group_rule" "lambda_egress_apigateway" {
+  type              = "egress"
+  description       = "allow dynamodb"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_prefix_list.apigateway.id]
+  security_group_id = aws_security_group.lambda_generic.id
+}
 
 resource "aws_security_group" "lambda_cp_sg" {
   name_prefix = "${local.bucket_prefix}-cloud-platform-lambda-sg"

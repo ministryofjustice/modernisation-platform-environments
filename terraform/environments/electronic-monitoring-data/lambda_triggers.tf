@@ -1120,7 +1120,7 @@ module "daily_cadt_eventbridge" {
     crons = [
       {
         name  = "trigger-cadt-lambda"
-        arn   = module.trigger_cadt_daily_run[0].lambda_function_arn
+        arn   = module.trigger_cadt_daily_run.lambda_function_arn
         input = jsonencode({ "job" : "cron-by-rate" })
       }
     ]
@@ -1130,7 +1130,7 @@ module "daily_cadt_eventbridge" {
 resource "aws_lambda_permission" "allow_cadt_trigger_eventbridge" {
   statement_id  = "AllowcadtExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
-  function_name = module.trigger_cadt_daily_run[0].lambda_function_arn
+  function_name = module.trigger_cadt_daily_run.lambda_function_arn
   principal     = "events.amazonaws.com"
   source_arn    = module.daily_cadt_eventbridge.eventbridge_rule_arns.crons
 }
