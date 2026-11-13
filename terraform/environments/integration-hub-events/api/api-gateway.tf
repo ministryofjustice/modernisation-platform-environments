@@ -1,7 +1,7 @@
 module "api_access_log_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
-  version = "5.7.2"
+  version = "6.0.0"
 
   name              = "/aws/apigateway/${local.resource_name_prefix}"
   kms_key_id        = module.kms_cloudwatch_logs.key_arn
@@ -12,7 +12,7 @@ module "api_access_log_group" {
 module "api_gateway" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/apigateway-v2/aws"
-  version = "6.1.0"
+  version = "6.1.1"
 
   name          = local.resource_name_prefix
   protocol_type = "HTTP"
