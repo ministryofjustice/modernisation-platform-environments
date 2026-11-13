@@ -1,0 +1,109 @@
+#!/bin/bash
+set -euo pipefail
+
+# sshd stays stopped until the pinned host key has been installed from Secrets Manager.
+systemctl disable --now sshd.service || true
+
+useradd --system --home-dir /srv/sftp/${username} --shell /sbin/nologin ${username}
+# A locked account ('!') is refused by sshd even for public-key logins.
+usermod -p '*' ${username}
+
+install -d -o root -g root -m 755 /srv/sftp/${username}
+install -d -o ${username} -g ${username} -m 755 /srv/sftp/${username}/incoming
+install -d -o root -g root -m 755 /etc/ssh/authorized_keys
+
+cat > /etc/ssh/sshd_config.d/00-hub-test.conf <<'EOF'
+HostKey /etc/ssh/hub_host_ed25519_key
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PubkeyAuthentication yes
+AuthenticationMethods publickey
+AuthorizedKeysFile /etc/ssh/authorized_keys/%u
+AllowUsers ${username}
+Match User ${username}
+  ChrootDirectory /srv/sftp/${username}
+  ForceCommand internal-sftp
+  AllowTcpForwarding no
+  X11Forwarding no
+EOF
+
+cat > /usr/local/bin/hub-sftp-refresh-credentials <<'EOF'
+#!/bin/bash
+set -uo pipefail
+
+REGION="${region}"
+
+# Installs a secret only if it is present and passes validation. Values are never printed.
+install_secret() {
+  local secret_id="$1" destination="$2" mode="$3" validator="$4" value tmp
+  value=$(aws secretsmanager get-secret-value --region "$REGION" --secret-id "$secret_id" \
+    --query SecretString --output text 2>/dev/null) || return 1
+  [ -n "$value" ] && [ "$value" != "None" ] || return 1
+
+  tmp=$(mktemp -p /etc/ssh)
+  printf '%s\n' "$value" | tr -d '\r' > "$tmp"
+  chmod "$mode" "$tmp"
+  if ! $validator "$tmp" >/dev/null 2>&1; then
+    rm -f "$tmp"
+    echo "secret $secret_id is not a valid key"
+    return 1
+  fi
+  if cmp -s "$tmp" "$destination" 2>/dev/null; then
+    rm -f "$tmp"
+    return 0
+  fi
+  mv "$tmp" "$destination"
+  return 2
+}
+
+validate_private_key() { ssh-keygen -y -f "$1"; }
+validate_public_key() { ssh-keygen -l -f "$1"; }
+
+install_secret "${host_key_secret_name}" /etc/ssh/hub_host_ed25519_key 600 validate_private_key
+host_key_status=$?
+install_secret "${client_public_key_secret_arn}" /etc/ssh/authorized_keys/${username} 644 validate_public_key || true
+
+if [ "$host_key_status" -eq 1 ]; then
+  echo "host key not available yet"
+  exit 1
+fi
+
+if [ "$host_key_status" -eq 2 ] || ! systemctl is-active --quiet sshd.service; then
+  sshd -t && systemctl enable sshd.service && systemctl restart sshd.service
+fi
+EOF
+
+cat > /usr/local/bin/hub-sftp-agent <<'EOF'
+#!/bin/bash
+set -uo pipefail
+
+while true; do
+  /usr/local/bin/hub-sftp-refresh-credentials || true
+  if systemctl is-active --quiet sshd.service; then
+    # Temporary upload files are excluded: only completed renames reach the read-back bucket.
+    aws s3 sync /srv/sftp/${username}/incoming "s3://${bucket_name}/${readback_prefix}" \
+      --region "${region}" --exclude ".mft-*" --exclude "*/.mft-*" --only-show-errors || echo "read-back sync failed"
+  fi
+  sleep 5
+done
+EOF
+
+chmod 755 /usr/local/bin/hub-sftp-refresh-credentials /usr/local/bin/hub-sftp-agent
+
+cat > /etc/systemd/system/hub-sftp-agent.service <<'EOF'
+[Unit]
+Description=Integration Hub test SFTP credentials and read-back sync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/hub-sftp-agent
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now hub-sftp-agent.service

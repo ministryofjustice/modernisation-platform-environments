@@ -1,136 +1,236 @@
 # File-transfer test harness
 
-This component provides test-only infrastructure for an Integration Hub repository smoke test using direct S3 uploads. The test checks that a file can pass through the existing scanning and delivery pipeline and arrive unchanged at an isolated destination.
+This component provides test-only infrastructure for Integration Hub live tests
+in `eu-west-2`. It supplies a GitHub OIDC role, an isolated push-to-S3 destination
+with a dedicated KMS key, and a private SFTP server with an S3 read-back bucket.
+Together with service-owned pickup storage, these support push-to-S3, hosted
+pickup, push-to-SFTP and presigned-pickup tests through the existing file-transfer
+pipeline.
 
-The component provisions a GitHub OIDC IAM role, a private destination bucket and a dedicated KMS encryption key using Terraform registry modules. Resources are created only in the test environment. The parent file-transfer and `push-to-s3` components own routing and delivery.
-
-Smoke-test scripts and GitHub Actions workflow configuration are outside this component's scope.
+The live-test scripts and GitHub Actions workflows belong to the
+`ministryofjustice/integration-hub` repository under `tests/file-transfer/`.
+This component defines their AWS access and simulated recipients, not the tests
+themselves. Its resources are created only in the test environment.
 
 ## Architecture
 
-The harness uses the existing file-transfer pipeline rather than deploying a separate delivery pipeline:
+1. A GitHub Actions job assumes the harness role and uploads a non-sensitive
+	fixture to a route-specific prefix in the incoming bucket.
+2. The parent file-transfer pipeline processes the uploaded object version.
+	Only a positive clean malware scan permits clean-file dispatch.
+3. Shared dispatch configuration selects the action or notification for that
+	source prefix. The corresponding service component delivers or retains the
+	clean file using its own execution role.
+4. For SFTP, an agent on the recipient server copies completed uploads into the
+  read-back bucket. Other routes are observed in their destination or pickup bucket.
+5. The test uses the harness role to inspect the result within its permitted
+  prefix, comparing contents or checking access restrictions as appropriate.
 
-1. The harness role uploads a non-sensitive fixture beneath `test-harness/push-to-s3/` in the test incoming bucket.
-2. The parent file-transfer pipeline scans the file and routes the clean object through the shared dispatch configuration.
-3. The `push-to-s3` component assumes its delivery role and copies the clean object to the harness-owned destination beneath `push-to-s3/`.
-4. The harness role downloads the delivered object and compares it with the original fixture.
-
-The harness role does not deliver files itself. A successful test requires the
-parent pipeline and `push-to-s3` configuration to be deployed and authorised.
-
-## Configuration contract
-
-The route belongs in the shared
-[`file-dispatch-configuration` module](../modules/file-dispatch-configuration/locals-test.tf), under the test environment's `test-harness` identity and `/push-to-s3/` source prefix. Its action is `push-to-s3`, with these destination settings:
-
-| Setting | Value |
+| Component | Responsibility |
 | --- | --- |
-| `bucket_id` | `integration-hub-file-transfer-test-test-harness` |
-| `bucket_region` | `eu-west-2` |
-| `destination_prefix` | `push-to-s3/` |
-| `kms_key_arn` | The key ARN resolved from `alias/s3/integration-hub-file-transfer-test-test-harness` |
+| `test-harness` | GitHub test role, simulated customer destination bucket and its encryption key, test SFTP server and its read-back bucket |
+| Parent file-transfer service | Incoming and clean storage, malware-processing pipeline and dispatch secrets |
+| `push-to-s3` | Copies clean files to the harness-owned destination |
+| `push-to-s3-with-hosted-pickup` | Provisions hosted recipient storage and copies clean files into it |
+| `push-to-sftp` | Uploads clean files to the harness-owned test SFTP server |
+| `pull-from-presigned-url` | Retains recipient files in shared pickup storage and manages pickup grants and notifications |
 
-This component exposes `destination_bucket_name` and `destination_kms_key_arn`.
-Use the deployed outputs to verify the shared route, especially after replacing
-the destination key. The shared module looks up the destination key alias only
-in the test environment. The alias must exist before planning the parent or `push-to-s3` component, and the deployment role must be able to read it. If the alias points to a replacement key, a new plan reads that key's ARN; an existing dispatch secret still needs updating through the process below.
+The GitHub harness role has no destination-write permissions. Service components
+perform delivery; a separate instance role lets the SFTP server publish read-back
+copies. There is no separate scanning pipeline or test bypass of clean-file dispatch.
 
-New dispatch entries receive their initial non-sensitive action value when the
-parent state creates their secret. For an existing entry, update the secret
-value through the approved Secrets Manager process to match any changed action.
-See the [push-to-s3 configuration contract](../push-to-s3/README.md#configuration-contract).
+## Routes and destinations
 
-## Names and isolation
+All fixtures enter `integration-hub-file-transfer-test-incoming`. The
+[shared test dispatch configuration](../modules/file-dispatch-configuration/locals-test.tf)
+defines four routes under the `test-harness` identity.
 
-Resources are created only in the test environment. The smoke test uses:
+| Route | Incoming prefix | Observed bucket | Observed prefix |
+| --- | --- | --- | --- |
+| Push to S3 | `test-harness/push-to-s3/` | `integration-hub-file-transfer-test-test-harness` | `push-to-s3/` |
+| Hosted pickup | `test-harness/hosted-pickup/` | `integration-hub-test-test-harness-pickup` | `pickup/` |
+| Push to SFTP | `test-harness/push-to-sftp/` | `integration-hub-file-transfer-test-test-harness-sftp` (read-back copy) | `push-to-sftp/` |
+| Presigned pickup | `test-harness/pull-from-presigned-url/` | `integration-hub-file-transfer-pickup-test-<account-id>` | `test-harness-presigned/` |
 
-| Resource | Name or prefix |
-| --- | --- |
-| Incoming bucket | `integration-hub-file-transfer-test-incoming` |
-| Upload prefix | `test-harness/push-to-s3/` |
-| Destination bucket | `integration-hub-file-transfer-test-test-harness` |
-| Delivery prefix | `push-to-s3/` |
+Push-to-S3, hosted pickup and push-to-SFTP use their respective delivery actions,
+with no notifications configured. The SFTP writer delivers to `incoming/` inside
+the server's chroot; the table shows the S3 copy used for assertions, not the SFTP
+destination. The presigned route has `action = null` and a Slack notification for
+recipient `test-harness-presigned`; its notification component retains the clean
+copy for pickup.
 
-GitHub OIDC trust is restricted to jobs using the `smoke-test` environment in
+The presigned recipient is configured for the `azure-aws-sso-integration-hub`
+Identity Center group and `#integration-hub-test-alerts` in the Justice Digital
+Slack workspace. Web-app membership is managed by the parent configuration;
+pickup grants are managed by the presigned component. Slack channel membership
+does not itself grant file access.
+
+### SFTP delivery and read-back
+
+The recipient is an OpenSSH `internal-sftp` server on a `t3.micro` instance with
+an encrypted 8 GiB root volume. It uses host address 100 in the shared private
+subnet with the first sorted subnet ID. The harness and shared dispatch module
+derive this address independently from matching subnet lookups, so those lookups
+must remain aligned. Dispatch pins the server's public host key and restricts
+the destination network to that address's `/32`.
+
+The writer uploads temporary files and renames them into their completed paths
+under `incoming/`. A server agent runs `aws s3 sync` to the read-back prefix,
+excluding `.mft-*` files at the root and in nested directories, with a
+five-second pause between iterations. GitHub Actions observes this S3 copy
+without requiring direct access to the private SFTP endpoint. The agent copies
+files; it does not delete the server originals.
+
+## Access boundaries
+
+GitHub OIDC trust accepts jobs using the `smoke-test` environment in
 `ministryofjustice/integration-hub` or
 `ministryofjustice/modernisation-platform-environments`, with audience
-`sts.amazonaws.com`. The
-workflow job must declare `environment: smoke-test` and grant `id-token: write`.
-Jobs without this environment do not match the trust policy, including jobs on
-`main`.
+`sts.amazonaws.com`. Jobs require `environment: smoke-test` and
+`id-token: write`. Branch restrictions and required reviewers belong to the
+GitHub environment protection rules, not the IAM trust policy.
 
-Before using this role, create and protect the `smoke-test` GitHub environment
-with deployment branch restrictions and required reviewers. Allow `main` and
-the authorised feature branches needed to test changes before merging. The IAM
-trust policy does not restrict branches itself; access is controlled by the
-GitHub environment's protection rules.
+| Scope | Harness permissions |
+| --- | --- |
+| Incoming storage | Upload and encrypt fixtures beneath the four test prefixes |
+| Clean storage | List object versions beneath those prefixes, without reading file contents |
+| Dispatch configuration | Describe the four route secrets, without reading their values |
+| Delivery functions | Invoke the push-to-S3, hosted-pickup and push-to-SFTP writers |
+| Push-to-S3 destination | List, read and decrypt objects beneath `push-to-s3/` |
+| Hosted destination | List, read and decrypt objects beneath `pickup/`; read lifecycle configuration |
+| SFTP read-back copy | List and read objects beneath `push-to-sftp/` |
+| Presigned destination | List objects beneath `test-harness-presigned/`, without object-read or decryption permissions |
+| S3 Access Grants | List grant metadata on the account's regional default instance |
 
-The harness role can upload only beneath its incoming prefix, list and read only
-its destination prefix, and use the relevant KMS keys only through S3 with the
-configured encryption contexts. It has no destination-write, delete or
-administrative permissions. Delivery uses a separate role managed by `push-to-s3`.
+KMS permissions are restricted to use through S3 with the configured encryption
+contexts. Hosted storage uses S3 Bucket Keys and therefore a bucket-level
+encryption context; S3 object permissions still restrict reads to `pickup/`.
+The harness policy grants no object deletion, destination writes or
+administrative access. Direct writer invocations remain subject to the
+writers' request and source/destination validation.
 
-## Retention and costs
+The SFTP server accepts port 22 only from the push-to-SFTP writer's security
+group. The `ihubtest` account requires public-key authentication and is confined
+to an SFTP-only chroot, with shell access and forwarding disabled. The harness
+does not configure an SSH shell or SSM administration path. Outbound security
+group rules allow HTTPS to shared protected endpoint subnets and regional S3.
 
-The destination blocks public access, enforces TLS and bucket-owner-enforced
-ownership, and uses versioning and SSE-KMS with its dedicated key. Incorrect
-encryption headers or a different KMS key are rejected. S3 Bucket Keys are disabled.
+The server's instance role can read its host-private-key secret and the writer's
+client-public-key secret, decrypt them through Secrets Manager, and list/write
+the read-back prefix. It cannot retrieve the writer's private key. Terraform
+creates the host-key secret container without a value; operators supply key
+material outside Terraform. The agent refreshes keys and starts `sshd` once a
+valid host private key is installed; successful login also needs the client
+public key and a host key matching the writer's configured pin.
 
-Lifecycle rules expire current and noncurrent objects after one day, abort
-incomplete multipart uploads after one day, and remove expired delete markers.
-Cleanup is asynchronous; it is not a guarantee that objects disappear exactly
-24 hours after upload. The harness role cannot delete test objects manually.
+## Verification scope
 
-Costs include the dedicated KMS key, S3 requests and stored versions, and use of
-the existing scanning and delivery pipeline. Use small, non-sensitive fixtures.
+| Route | Supported assertions |
+| --- | --- |
+| Push to S3 | Locate the delivered fixture and compare its contents with the original |
+| Hosted pickup | Compare delivered contents and inspect configured retention rules |
+| Push to SFTP | Locate the server-produced S3 copy and compare its contents with the original |
+| Presigned pickup | Locate the retained fixture, inspect grant metadata and check that a direct read with harness credentials is denied |
 
-## Smoke-test procedure
+SFTP verification covers delivery through the server's read-back agent. A missing
+S3 copy may indicate either an SFTP delivery failure or a read-back failure; this
+observation alone does not distinguish them or prove every SFTP protocol behaviour.
 
-Run only against `integration-hub-file-transfer-test` after deploying the
-components and configuring GitHub environment access.
+For presigned pickup, establish that the specific run's fixture exists before
+checking a denied read. The policy deliberately supplies no presigned object-read
+permission; it does not contain an explicit deny. This check does not establish
+successful Slack delivery or an authorised recipient download.
 
-1. Upload a small, non-sensitive fixture to `integration-hub-file-transfer-test-incoming` at `test-harness/push-to-s3/<unique-run-token>/payload.txt`.
-2. Wait for `push-to-s3` delivery to the harness-owned destination at `push-to-s3/<unique-run-token>/payload.txt`.
-3. Download the delivered object and compare its contents with the fixture. Fail on timeout or content mismatch.
+Use a unique run token for each fixture and bounded waits for asynchronous
+delivery. Assertions must use the harness role, not an operator's broader
+credentials. Never copy a fixture into a destination to satisfy a test.
 
-Use a fresh run token for every execution to avoid matching stale files.
+All four routes start with direct S3 staging. They do not exercise customer-facing
+SFTP, FTPS, HTTP API or browser ingestion; the SFTP route tests outbound delivery.
+Negative scan outcomes, retries, idempotency and completion events require
+dedicated assertions. Deploying this infrastructure does not verify them.
 
-Run the upload and download using the harness role to verify its permissions as
-well as delivery. A manual test using an operator's credentials verifies the
-pipeline path but does not establish that GitHub OIDC or harness access works.
+## Storage and retention
 
-If delivery does not arrive within the test's timeout, inspect the parent
-pipeline and `push-to-s3` CloudWatch logs and dead-letter queues. Do not manually copy the fixture into the destination to make the test pass. Follow the
-[push-to-s3 dead-letter guidance](../push-to-s3/README.md#dead-letter-operations) before retrying failed deliveries.
+Both harness-owned S3 buckets block public access, enforce TLS and bucket-owner
+ownership, and enable versioning. Their lifecycle rules expire current and
+noncurrent versions after one day, abort incomplete multipart uploads after one
+day and remove expired delete markers.
 
-## Coverage limits
+| Storage | Encryption and retention |
+| --- | --- |
+| Push-to-S3 destination | Dedicated SSE-KMS key; incorrect encryption headers and alternative keys rejected; S3 Bucket Keys disabled; one-day lifecycle |
+| SFTP read-back bucket | S3-managed encryption (`AES256`); one-day lifecycle |
+| SFTP server files | Encrypted root volume; no automatic file expiry configured |
+| Hosted pickup | Component-owned encryption and one-day retention configured by the test route |
+| Presigned pickup | Shared storage governed by the [presigned component's retention policy](../pull-from-presigned-url/README.md) |
 
-The smoke-test procedure covers direct-S3 staging, scanning, clean routing,
-dispatch and delivery.
+S3 lifecycle cleanup is asynchronous, not an exact 24-hour deletion guarantee.
+It does not clean the SFTP server's disk. Server originals can accumulate and
+may be copied again after their read-back objects expire, so the read-back
+lifecycle is not an end-to-end retention limit.
 
-It does not test customer authentication, SFTP, FTPS, HTTP API or browser uploads; negative scan outcomes; retry or idempotency guarantees; or completion-event assertions. Notifications remain a later step.
+Use small, non-sensitive fixtures and account for server disk capacity. Costs
+include the running EC2 instance and EBS volume, Secrets Manager, the dedicated
+KMS key, S3 storage and repeated read-back requests, plus the existing scanning
+and delivery services.
 
-## Deployment order
+## Deployment dependencies
 
-1. Confirm the parent test file-transfer infrastructure exists, including the incoming and clean buckets and their KMS keys.
-2. Deploy this test-harness component and confirm its destination bucket and KMS key outputs. Destination creation must not depend on the delivery role.
-3. Confirm the destination key alias exists and that the shared test dispatch route resolves the expected key ARN, then deploy the parent file-transfer state to create or update the dispatch secret.
-4. For an existing dispatch entry, ensure its secret value matches the configured action through the approved Secrets Manager process.
-5. Deploy the `push-to-s3` state and confirm its delivery role has the required destination bucket and KMS access.
-6. Run the smoke test using the harness role and confirm the delivered contents match the fixture.
+The harness depends on the parent incoming and clean buckets, the incoming
+encryption key, the hosted key at
+`alias/s3/integration-hub-test-test-harness-pickup`, the shared secrets key at
+`alias/secrets/integration-hub-file-transfer-test`, the push-to-SFTP credentials
+key at `alias/integration-hub-file-transfer-push-to-sftp-credentials`, and the
+push-to-SFTP writer's security group. The SFTP server also needs the shared
+private networking and connectivity to Secrets Manager and S3. The shared test
+dispatch module in turn looks up the harness destination key at
+`alias/s3/integration-hub-file-transfer-test-test-harness`.
 
-Review Terraform plans before applying and confirm the parent and `push-to-s3`
-deployments before running the test. Do not run smoke tests while changing role
-permissions or routing. A successful plan does not establish successful delivery.
+For the existing test installation, keep the shared routes present on `main`
+and aligned across deploying branches. Deploy parent dispatch configuration
+and the delivery/pickup components before applying the updated harness role.
+A fresh installation requires staged bootstrapping of these key dependencies;
+the complete configuration cannot be applied harness-first unchanged.
 
-## Local validation
+New dispatch secrets receive their initial configuration from Terraform.
+Existing secret values must be maintained through the approved Secrets Manager
+process; changing shared configuration alone does not update those values,
+including SFTP server addresses and host-key pins.
+The harness outputs `destination_bucket_name` and `destination_kms_key_arn`
+identify the push-to-S3 destination. See the
+[push-to-S3 configuration contract](../push-to-s3/README.md#configuration-contract).
 
-Run the formatting check from the repository root without contacting AWS:
+Before running live tests, confirm GitHub environment protection, deployed
+recipient-group access, and the test account's Amazon Q Developer in chat
+applications connection to the configured Slack workspace and channel. Review
+plans through the deployment process and do not run tests while changing
+routing or permissions.
+
+### SFTP credentials and test configuration
+
+After deploying the push-to-SFTP component and harness:
+
+1. Populate `integration-hub-file-transfer/test-harness/sftp-host-private-key`
+  with the private host key matching `host_public_keys` in the dispatch entry.
+  Obtain it through the approved team process, or generate a new pair and update
+  both the public pin in shared configuration and the deployed dispatch secret.
+2. Populate the route's client `private-key` and `public-key` secrets using the
+  approved operator tooling in the [push-to-SFTP README](../push-to-sftp/README.md).
+  The writer's private-key secret uses JSON containing `private_key`; the server
+  consumes the corresponding public key. Do not commit private keys or pass
+  them through Terraform.
+3. Allow the server agent to install the keys and confirm the endpoint is ready.
+  Set `FILE_TRANSFER_SFTP_DESTINATION_BUCKET` to
+  `integration-hub-file-transfer-test-test-harness-sftp` for the live tests.
+
+### Validation
+
+Formatting can be checked from the repository root:
 
 ```shell
 terraform fmt -check -recursive terraform/environments/integration-hub-file-transfer/test-harness
 ```
 
-Formatting and Terraform validation do not verify deployed permissions, GitHub
-OIDC access or file delivery. Review plans and applies separately through the
-deployment process, then use the smoke test for runtime verification.
+Formatting and Terraform validation do not verify deployed permissions, OIDC
+access or file delivery. Runtime results must come from the live tests.
