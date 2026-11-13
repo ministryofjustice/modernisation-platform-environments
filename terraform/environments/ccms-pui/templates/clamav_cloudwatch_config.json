@@ -21,9 +21,7 @@
       "procstat": [
         {
           "exe": "clamd",
-          "measurement": [
-            "pid_count"
-          ],
+          "measurement": ["pid_count"],
           "metrics_collection_interval": 60
         }
       ]
