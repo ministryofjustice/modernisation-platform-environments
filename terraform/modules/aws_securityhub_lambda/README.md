@@ -9,7 +9,7 @@ Findings from configured source accounts are accepted through EventBridge, and
 ignored finding descriptions can be configured through SSM.
 
 The Lambda accepts findings only when `UpdatedAt` is between `CreatedAt` and
-`finding_grace_period` minutes afterwards (inclusive). Set it on the `aws_securityhub_lambda` 
+`finding_grace_period` minutes afterwards (inclusive). Set it on the `aws_securityhub_lambda`
 module to change the window. Missing or invalid timestamps fail explicitly.
 
 ## Running Tests
