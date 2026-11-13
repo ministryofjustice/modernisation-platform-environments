@@ -2,19 +2,63 @@
   "business_units": {
     "octo": {
       "parent_group": "office-of-the-cto",
-      "amp_workspace_alias": "container-platform-octo"
+      "amp_workspace_aliases": {
+        "live": "container-platform-octo-live",
+        "nonlive": "container-platform-octo-nonlive"
+      },
+      "amp_enabled": {
+        "live": false,
+        "nonlive": true
+      },
+      "grafana_enabled": {
+        "live": false,
+        "nonlive": true
+      }
     },
     "laa": {
       "parent_group": "laa",
-      "amp_workspace_alias": "container-platform-laa"
+      "amp_workspace_aliases": {
+        "live": "container-platform-laa-live",
+        "nonlive": "container-platform-laa-nonlive"
+      },
+      "amp_enabled": {
+        "live": false,
+        "nonlive": false
+      },
+      "grafana_enabled": {
+        "live": false,
+        "nonlive": false
+      }
     },
     "hmpps": {
       "parent_group": "hmpps-developers",
-      "amp_workspace_alias": "container-platform-hmpps"
+      "amp_workspace_aliases": {
+        "live": "container-platform-hmpps-live",
+        "nonlive": "container-platform-hmpps-nonlive"
+      },
+      "amp_enabled": {
+        "live": false,
+        "nonlive": false
+      },
+      "grafana_enabled": {
+        "live": false,
+        "nonlive": false
+      }
     },
     "cd": {
       "parent_group": "central-digital",
-      "amp_workspace_alias": "container-platform-cd"
+      "amp_workspace_aliases": {
+        "live": "container-platform-cd-live",
+        "nonlive": "container-platform-cd-nonlive"
+      },
+      "amp_enabled": {
+        "live": false,
+        "nonlive": false
+      },
+      "grafana_enabled": {
+        "live": false,
+        "nonlive": false
+      }
     }
   }
 }

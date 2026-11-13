@@ -3622,6 +3622,55 @@ resource "aws_lakeformation_permissions" "specials_remediation_table_access" {
 }
 
 # ------------------------------------------------------------------------------
+# Lake Formation permission granter IAM
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "lake_formation_permission_granter" {
+  statement {
+    sid    = "ReadGlueCatalogResources"
+    effect = "Allow"
+
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+    ]
+
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
+    ]
+  }
+
+  statement {
+    sid    = "ManageLakeFormationPermissions"
+    effect = "Allow"
+
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:ListPermissions",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "lake_formation_permission_granter" {
+  name               = "lake_formation_permission_granter_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "lake_formation_permission_granter" {
+  name   = "lake_formation_permission_granter_lambda_policy"
+  policy = data.aws_iam_policy_document.lake_formation_permission_granter.json
+}
+
+resource "aws_iam_role_policy_attachment" "lake_formation_permission_granter" {
+  role       = aws_iam_role.lake_formation_permission_granter.name
+  policy_arn = aws_iam_policy.lake_formation_permission_granter.arn
+}
+
+# ------------------------------------------------------------------------------
 # Downstream position reconciliation IAM
 # ------------------------------------------------------------------------------
 
@@ -3856,6 +3905,7 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
     effect = "Allow"
 
     actions = [
+      "ecs:DescribeTasks",
       "ecs:ListTasks",
     ]
 

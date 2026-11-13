@@ -11,6 +11,12 @@ locals {
     rule_name             = "ForwardAllHealthEvents"
   }
 
+  aws_securityhub_lambda_configuration_development = {
+    enabled                    = true
+    aws_securityhub_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:securityhub-finding-issue-generator-lambda"
+    rule_name                  = "ForwardAllSecurityHubFindings"
+  }
+
   baseline_presets_development = {
     options = {
       sns_topics = {
