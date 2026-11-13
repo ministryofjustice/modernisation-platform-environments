@@ -8,6 +8,7 @@ module "pagerduty_api_key_secret" {
   description             = "PagerDuty API token for Integration Hub Terraform"
   kms_key_id              = module.pagerduty_api_key_kms[0].key_arn
   create_secret_version   = false
+  ignore_secret_changes   = true
   enable_rotation         = false
   recovery_window_in_days = 30
 
