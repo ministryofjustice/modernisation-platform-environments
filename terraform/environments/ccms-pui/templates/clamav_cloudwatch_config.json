@@ -11,5 +11,20 @@
         ]
       }
     }
+  },
+  "metrics": {
+    "append_dimensions": {
+      "InstanceId": "$${aws:InstanceId}"
+    },
+    "namespace": "Custom/ClamAV",
+    "metrics_collected": {
+      "procstat": [
+        {
+          "exe": "clamd",
+          "measurement": ["pid_count"],
+          "metrics_collection_interval": 60
+        }
+      ]
+    }
   }
 }
