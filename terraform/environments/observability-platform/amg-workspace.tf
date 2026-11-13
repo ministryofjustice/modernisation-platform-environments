@@ -10,7 +10,7 @@ module "managed_grafana" {
   name = local.application_name
 
   license_type    = "ENTERPRISE"
-  grafana_version = local.environment_configuration.grafana_version
+  grafana_version = local.environment_configuration_amg.grafana_version
 
   account_access_type       = "CURRENT_ACCOUNT"
   authentication_providers  = ["AWS_SSO"]
@@ -34,7 +34,7 @@ module "managed_grafana" {
       "group_ids" = [for group in data.aws_identitystore_group.observability_platform_admins : group.id]
     }
     "EDITOR" = {
-      "group_ids" = [for team in data.aws_identitystore_group.all_identity_centre_teams : team.id]
+      "group_ids" = [for team in data.aws_identitystore_group.amg_identity_centre_teams : team.id]
     }
   }
 
@@ -49,18 +49,18 @@ resource "aws_grafana_workspace_service_account" "automation" {
 
 /* Slack Contact Points */
 module "contact_point_slack" {
-  for_each = toset(local.all_slack_channels)
+  for_each = toset(local.amg_slack_channels)
 
-  source = "./modules/grafana/contact-point/slack"
+  source = "./modules/amazon-managed-grafana/contact-point/slack"
 
   channel = each.value
 }
 
 /* PagerDuty Contact Points */
 module "contact_point_pagerduty" {
-  for_each = toset(local.all_pagerduty_services)
+  for_each = toset(local.amg_pagerduty_services)
 
-  source = "./modules/grafana/contact-point/pagerduty"
+  source = "./modules/amazon-managed-grafana/contact-point/pagerduty"
 
   service = each.value
 }
@@ -74,7 +74,7 @@ resource "grafana_notification_policy" "root" {
   repeat_interval = "4h"
 
   dynamic "policy" {
-    for_each = toset(local.all_slack_channels)
+    for_each = toset(local.amg_slack_channels)
     content {
       matcher {
         label = "slack-channel"
@@ -86,7 +86,7 @@ resource "grafana_notification_policy" "root" {
   }
 
   dynamic "policy" {
-    for_each = toset(local.all_pagerduty_services)
+    for_each = toset(local.amg_pagerduty_services)
     content {
       matcher {
         label = "pagerduty-integration"

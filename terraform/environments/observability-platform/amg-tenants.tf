@@ -1,5 +1,5 @@
 module "tenant_configuration" {
-  for_each = local.environment_configuration.tenant_configuration
+  for_each = local.environment_configuration_amg.tenant_configuration
 
   source = "./modules/observability-platform/tenant-configuration"
 
