@@ -51,4 +51,6 @@ AWS SecurityHub event forwarding is configured through
 `aws_securityhub_lambda_arn` and `rule_name` to enable forwarding.
 It is disabled by default. When enabled, imported findings are forwarded only
 when their severity matches `finding_severity_labels`, which defaults to
-`["CRITICAL"]`. Configure the destination Lambda to accept the same labels.
+`["CRITICAL"]`. Configure the destination Lambda to accept the same labels; 
+the `aws_securityhub_lambda` module applies its
+timestamp-based grace period before creating issues.
