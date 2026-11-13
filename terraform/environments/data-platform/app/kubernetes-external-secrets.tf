@@ -94,6 +94,13 @@ resource "kubernetes_manifest" "app_secrets_secret" {
           }
           "secretKey" = "notify-budget-alert-template-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         },
+        {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "notify_budget_limit_hit_template_id"
+          }
+          "secretKey" = "notify-budget-limit-hit-template-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        },
       ], local.environment_configuration.app_e2e_auth_enabled ? [
         {
           "remoteRef" = {
