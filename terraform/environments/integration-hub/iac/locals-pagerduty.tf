@@ -16,6 +16,7 @@ locals {
 
   pagerduty_api_key_kms_principal_arns = [
     "arn:aws:iam::${local.account_id}:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*",
+    "arn:aws:iam::${local.account_id}:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_AdministratorAccess_*",
     "arn:aws:iam::${local.account_id}:role/MemberInfrastructureAccess",
     "arn:aws:iam::${local.account_id}:role/github-actions/${local.pagerduty_role_name}"
   ]
