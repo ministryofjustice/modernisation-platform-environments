@@ -124,6 +124,563 @@ resource "aws_iam_role_policy" "cloudwatch" {
 }
 
 # --------------------------------------------------------------------------------
+# Ops API
+# --------------------------------------------------------------------------------
+
+resource "aws_api_gateway_rest_api" "ops_api" {
+  name        = "ops_api"
+  description = "Operational API for Electronic Monitoring Data."
+
+  endpoint_configuration {
+    types            = ["PRIVATE"]
+    vpc_endpoint_ids = [data.aws_vpc_endpoint.api_gateway.id]
+    ip_address_type  = "dualstack"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+locals {
+  ops_cadt_roles = concat(
+    tolist(data.aws_iam_roles.mod_plat_roles.arns),
+    [module.cadt_api_trigger.iam_role_arn],
+  )
+  ops_ears_sars_roles = concat(
+    tolist(data.aws_iam_roles.mod_plat_roles.arns),
+    local.is-preproduction || local.is-production ? [module.emd_ears_sars_cp_role[0].iam_role_arn] : [],
+  )
+  ops_update_p1_roles = local.is-preproduction || local.is-production ? [
+    module.emd_update_p1_cp_role[0].iam_role_arn,
+  ] : tolist(data.aws_iam_roles.mod_plat_roles.arns)
+}
+
+data "aws_iam_policy_document" "ops_api_vpc" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = ["${aws_api_gateway_rest_api.ops_api.execution_arn}/*"]
+  }
+
+  statement {
+    sid    = "DenyRequestsOutsideVpcEndpoint"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = ["execute-api:Invoke"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:sourceVpce"
+      values = [
+        data.aws_vpc_endpoint.api_gateway.id
+      ]
+    }
+    resources = ["${aws_api_gateway_rest_api.ops_api.execution_arn}/*"]
+  }
+
+  statement {
+    sid    = "DenyGetZippedFileForOtherRoles"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = ["execute-api:Invoke"]
+    resources = [
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/POST/get-zipped-file",
+    ]
+
+    condition {
+      test     = "ArnNotLike"
+      variable = "aws:PrincipalArn"
+      values   = [module.cmt_front_end_assumable_role.iam_role_arn]
+    }
+  }
+
+  statement {
+    sid    = "DenyEarsSarsForOtherRoles"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = ["execute-api:Invoke"]
+    resources = [
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/POST/ears-sars",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/GET/ears-sars/status/*",
+    ]
+
+    condition {
+      test     = "ArnNotLike"
+      variable = "aws:PrincipalArn"
+      values   = local.ops_ears_sars_roles
+    }
+  }
+
+  statement {
+    sid    = "DenyCadtForOtherRoles"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = ["execute-api:Invoke"]
+    resources = [
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/POST/cadt",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/GET/cadt/status/*",
+    ]
+
+    condition {
+      test     = "ArnNotLike"
+      variable = "aws:PrincipalArn"
+      values   = local.ops_cadt_roles
+    }
+  }
+
+  statement {
+    sid    = "DenyUpdateP1ForOtherRoles"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = ["execute-api:Invoke"]
+    resources = [
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/POST/add",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/POST/remove",
+    ]
+
+    condition {
+      test     = "ArnNotLike"
+      variable = "aws:PrincipalArn"
+      values   = local.ops_update_p1_roles
+    }
+  }
+}
+
+resource "aws_api_gateway_rest_api_policy" "ops_api_vpc" {
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  policy      = data.aws_iam_policy_document.ops_api_vpc.json
+}
+
+module "ops_get_zipped_file_api" {
+  source = "./modules/api_step_function_route"
+
+  route_name        = "ops_get_zipped_file"
+  rest_api_id       = aws_api_gateway_rest_api.ops_api.id
+  parent_resource_id = aws_api_gateway_rest_api.ops_api.root_resource_id
+  api_path           = "get-zipped-file"
+  step_function      = module.get_zipped_file_api
+  sfn_type           = "express"
+  schema = {
+    type = "object"
+    properties = {
+      file_name     = { type = "string" }
+      zip_file_name = { type = "string" }
+    }
+    required = ["file_name", "zip_file_name"]
+  }
+}
+
+module "ops_ears_sars_api" {
+  count  = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  source = "./modules/api_step_function_route"
+
+  route_name         = "ops_ears_sars"
+  rest_api_id        = aws_api_gateway_rest_api.ops_api.id
+  parent_resource_id = aws_api_gateway_rest_api.ops_api.root_resource_id
+  api_path           = "ears-sars"
+  step_function      = module.ears_sars_step_function[0]
+  sfn_type           = "standard"
+  enable_status_check = true
+  schema = {
+    type = "object"
+    properties = {
+      legacy_subject_id      = { type = ["string", "integer"] }
+      legacy_order_id        = { type = ["string", "integer"] }
+      priority               = { type = "string" }
+      monitoring_requirement = { type = "string" }
+      request_types = {
+        type  = "array"
+        items = { type = "string" }
+      }
+      information_requested_from = { type = "string" }
+      information_requested_to   = { type = "string" }
+    }
+    required = [
+      "legacy_subject_id",
+      "legacy_order_id",
+      "priority",
+      "monitoring_requirement",
+      "request_types",
+      "information_requested_from",
+      "information_requested_to"
+    ]
+  }
+}
+
+module "ops_trigger_cadt_api" {
+  source = "./modules/api_step_function_route"
+
+  route_name          = "ops_trigger_cadt"
+  rest_api_id         = aws_api_gateway_rest_api.ops_api.id
+  parent_resource_id  = aws_api_gateway_rest_api.ops_api.root_resource_id
+  api_path            = "cadt"
+  step_function       = module.trigger_cadt_step_function
+  sfn_type            = "standard"
+  enable_status_check = true
+  schema = {
+    type = "object"
+    properties = {
+      full_refresh = { type = "boolean" }
+      all_models   = { type = "boolean" }
+    }
+    required = [
+      "full_refresh",
+      "all_models",
+    ]
+  }
+}
+
+# --------------------------------------------------------
+# Update P1 export routes
+# --------------------------------------------------------
+
+resource "aws_api_gateway_resource" "ops_update_p1_export_add" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  parent_id   = aws_api_gateway_rest_api.ops_api.root_resource_id
+  path_part   = "add"
+}
+
+resource "aws_api_gateway_resource" "ops_update_p1_export_remove" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  parent_id   = aws_api_gateway_rest_api.ops_api.root_resource_id
+  path_part   = "remove"
+}
+
+resource "aws_api_gateway_method" "ops_update_p1_export_add_post" {
+  count                = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id          = aws_api_gateway_rest_api.ops_api.id
+  resource_id          = aws_api_gateway_resource.ops_update_p1_export_add[0].id
+  http_method          = "POST"
+  authorization        = "AWS_IAM"
+  request_validator_id = aws_api_gateway_request_validator.ops_update_p1_export[0].id
+  request_models = {
+    "application/json" = aws_api_gateway_model.ops_update_p1_export[0].name
+  }
+}
+
+resource "aws_api_gateway_method" "ops_update_p1_export_remove_post" {
+  count                = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id          = aws_api_gateway_rest_api.ops_api.id
+  resource_id          = aws_api_gateway_resource.ops_update_p1_export_remove[0].id
+  http_method          = "POST"
+  authorization        = "AWS_IAM"
+  request_validator_id = aws_api_gateway_request_validator.ops_update_p1_export[0].id
+  request_models = {
+    "application/json" = aws_api_gateway_model.ops_update_p1_export[0].name
+  }
+}
+
+resource "aws_api_gateway_request_validator" "ops_update_p1_export" {
+  count                       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id                 = aws_api_gateway_rest_api.ops_api.id
+  name                        = "OpsUpdateP1ExportRequestValidator"
+  validate_request_body       = true
+  validate_request_parameters = true
+}
+
+resource "aws_api_gateway_model" "ops_update_p1_export" {
+  count        = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id  = aws_api_gateway_rest_api.ops_api.id
+  name         = "OpsUpdateP1ExportModel"
+  content_type = "application/json"
+  schema = jsonencode(
+    {
+      type = "object"
+      properties = {
+        case_numbers = {
+          type  = "array"
+          items = { type = "integer" }
+        }
+        run_historic = { type = "boolean" }
+      }
+      required = ["case_numbers", "run_historic"]
+    }
+  )
+}
+
+resource "aws_api_gateway_integration" "ops_update_p1_export_add_lambda_post" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  resource_id = aws_api_gateway_resource.ops_update_p1_export_add[0].id
+  http_method = aws_api_gateway_method.ops_update_p1_export_add_post[0].http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.update_p1_export[0].lambda_function_invoke_arn
+}
+
+resource "aws_api_gateway_integration" "ops_update_p1_export_remove_lambda_post" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  resource_id = aws_api_gateway_resource.ops_update_p1_export_remove[0].id
+  http_method = aws_api_gateway_method.ops_update_p1_export_remove_post[0].http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.update_p1_export[0].lambda_function_invoke_arn
+}
+
+resource "aws_api_gateway_method_response" "ops_update_p1_export_add_200" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  resource_id = aws_api_gateway_resource.ops_update_p1_export_add[0].id
+  http_method = aws_api_gateway_method.ops_update_p1_export_add_post[0].http_method
+  status_code = "200"
+}
+
+resource "aws_api_gateway_method_response" "ops_update_p1_export_add_404" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  resource_id = aws_api_gateway_resource.ops_update_p1_export_add[0].id
+  http_method = aws_api_gateway_method.ops_update_p1_export_add_post[0].http_method
+  status_code = "404"
+}
+
+resource "aws_api_gateway_method_response" "ops_update_p1_export_remove_200" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  resource_id = aws_api_gateway_resource.ops_update_p1_export_remove[0].id
+  http_method = aws_api_gateway_method.ops_update_p1_export_remove_post[0].http_method
+  status_code = "200"
+}
+
+resource "aws_api_gateway_method_response" "ops_update_p1_export_remove_404" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  resource_id = aws_api_gateway_resource.ops_update_p1_export_remove[0].id
+  http_method = aws_api_gateway_method.ops_update_p1_export_remove_post[0].http_method
+  status_code = "404"
+}
+
+# -------------------------------------------------------
+# Deployment and stage
+# -------------------------------------------------------
+
+resource "aws_api_gateway_deployment" "ops_api" {
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+
+  triggers = {
+    redeployment = sha1(jsonencode(compact([
+      aws_api_gateway_rest_api_policy.ops_api_vpc.policy,
+      module.ops_get_zipped_file_api.resource_request_id,
+      module.ops_get_zipped_file_api.method_id,
+      module.ops_get_zipped_file_api.integration_id,
+      try(module.ops_ears_sars_api[0].resource_request_id, null),
+      try(module.ops_ears_sars_api[0].resource_status_id, null),
+      try(module.ops_ears_sars_api[0].resource_execution_id_id, null),
+      try(module.ops_ears_sars_api[0].method_id, null),
+      try(module.ops_ears_sars_api[0].status_method_id, null),
+      try(module.ops_ears_sars_api[0].integration_id, null),
+      try(module.ops_ears_sars_api[0].status_integration_id, null),
+      module.ops_trigger_cadt_api.resource_request_id,
+      module.ops_trigger_cadt_api.resource_status_id,
+      module.ops_trigger_cadt_api.resource_execution_id_id,
+      module.ops_trigger_cadt_api.method_id,
+      module.ops_trigger_cadt_api.status_method_id,
+      module.ops_trigger_cadt_api.integration_id,
+      module.ops_trigger_cadt_api.status_integration_id,
+      try(aws_api_gateway_integration.ops_update_p1_export_add_lambda_post[0].id, null),
+      try(aws_api_gateway_integration.ops_update_p1_export_remove_lambda_post[0].id, null),
+    ])))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "ops_api" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
+  name              = "/aws/apigateway/ops_api-ops"
+  retention_in_days = 400
+}
+
+resource "aws_api_gateway_stage" "ops_api" {
+  #checkov:skip=CKV_AWS_120: "Ensure API Gateway caching is enabled, operational POST requests must not be cached"
+  #checkov:skip=CKV2_AWS_29: "API gateway is protected by WAF below"
+  #checkov:skip=CKV2_AWS_77: "Log4j protection implemented via AWSManagedRulesKnownBadInputsRuleSet"
+  deployment_id = aws_api_gateway_deployment.ops_api.id
+  rest_api_id   = aws_api_gateway_rest_api.ops_api.id
+  stage_name    = "ops"
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.ops_api.arn
+    format = jsonencode({
+      requestId      = "$context.requestId"
+      ip             = "$context.identity.sourceIp"
+      caller         = "$context.identity.caller"
+      user           = "$context.identity.user"
+      requestTime    = "$context.requestTime"
+      httpMethod     = "$context.httpMethod"
+      resourcePath   = "$context.resourcePath"
+      status         = "$context.status"
+      responseLength = "$context.responseLength"
+    })
+  }
+
+  xray_tracing_enabled = true
+
+  depends_on = [
+    aws_api_gateway_account.global_usage,
+  ]
+}
+
+resource "aws_api_gateway_method_settings" "ops_api" {
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  stage_name  = aws_api_gateway_stage.ops_api.stage_name
+  method_path = "*/*"
+
+  settings {
+    metrics_enabled        = true
+    logging_level          = "INFO"
+    throttling_burst_limit = 200
+    throttling_rate_limit  = 2000
+    caching_enabled        = false
+  }
+}
+
+resource "aws_api_gateway_method_settings" "ops_ears_sars" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  stage_name  = aws_api_gateway_stage.ops_api.stage_name
+  method_path = "ears-sars/POST"
+
+  settings {
+    throttling_burst_limit = 20
+    throttling_rate_limit  = 200
+  }
+}
+
+resource "aws_api_gateway_method_settings" "ops_cadt" {
+  rest_api_id = aws_api_gateway_rest_api.ops_api.id
+  stage_name  = aws_api_gateway_stage.ops_api.stage_name
+  method_path = "cadt/POST"
+
+  settings {
+    throttling_burst_limit = 20
+    throttling_rate_limit  = 200
+  }
+}
+
+# -------------------------------------------------------
+# WAF
+# -------------------------------------------------------
+
+resource "aws_wafv2_web_acl" "ops_api" {
+  name        = "ops_api-waf"
+  description = "WAF for the Electronic Monitoring Data Ops API"
+  scope       = "REGIONAL"
+
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "Log4j-Block"
+    priority = 1
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ops_api-log4j-block"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "Common-Rules"
+    priority = 2
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ops_api-common-rules"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "ops_api-waf"
+    sampled_requests_enabled   = false
+  }
+}
+
+resource "aws_wafv2_web_acl_association" "ops_api" {
+  resource_arn = aws_api_gateway_stage.ops_api.arn
+  web_acl_arn  = aws_wafv2_web_acl.ops_api.arn
+}
+
+# tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "ops_api_waf" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
+  name              = "aws-waf-logs-ops_api"
+  retention_in_days = 400
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "ops_api" {
+  resource_arn = aws_wafv2_web_acl.ops_api.arn
+
+  log_destination_configs = [
+    aws_cloudwatch_log_group.ops_api_waf.arn
+  ]
+}
+
+# --------------------------------------------------------------------------------
 # update_p1_export
 # --------------------------------------------------------------------------------
 
