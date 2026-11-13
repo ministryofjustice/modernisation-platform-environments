@@ -38,7 +38,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@5ec14e836f3de882a84f1c0b919645846a9d4f8e
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -58,7 +58,7 @@ jobs:
       fingerprint: ${{ steps.prepare.outputs.fingerprint }}
     steps:
       - name: Checkout environments repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ github.repository }}
           ref: ${{ github.sha }}
@@ -84,7 +84,7 @@ jobs:
           esac
 
       - name: Decrypt deployment settings
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -105,14 +105,14 @@ jobs:
           printf 'ACCOUNT_NUMBER=%s\n' "${account}" >> "${GITHUB_ENV}"
 
       - name: Configure plan credentials
-        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-plan
           role-session-name: githubactionsplanrolesession
           aws-region: eu-west-2
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: "1.15.8"
           terraform_wrapper: false
@@ -126,7 +126,7 @@ jobs:
 
       - name: Prepare ingestion deployment
         id: prepare
-        uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/actions/prepare-service-ingestion@4413054b2a4e3a9121f21c7b9172a5cc0742e0b6
+        uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/actions/prepare-service-ingestion@4413054b2a4e3a9121f21c7b9172a5cc0742e0b6 # Pinned commit (no matching release tag)
         with:
           repository-token: ${{ github.token }}
           runtime-reference: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
@@ -159,7 +159,7 @@ jobs:
 
       - name: Check required platform review
         if: github.event_name == 'pull_request' && steps.evaluate.outputs.resources_found == 'true'
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ env.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
           script: |
@@ -209,14 +209,14 @@ jobs:
         working-directory: terraform/environments/data-factory-moj/service-ingestion
     steps:
       - name: Checkout environments repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ github.repository }}
           ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Decrypt deployment settings
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -237,14 +237,14 @@ jobs:
           printf 'ACCOUNT_NUMBER=%s\n' "${account}" >> "${GITHUB_ENV}"
 
       - name: Configure apply credentials
-        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-apply
           role-session-name: githubactionsrolesession
           aws-region: eu-west-2
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: "1.15.8"
           terraform_wrapper: false
@@ -268,7 +268,7 @@ jobs:
           }
 
       - name: Prepare matching ingestion deployment
-        uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/actions/prepare-service-ingestion@4413054b2a4e3a9121f21c7b9172a5cc0742e0b6
+        uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/actions/prepare-service-ingestion@4413054b2a4e3a9121f21c7b9172a5cc0742e0b6 # Pinned commit (no matching release tag)
         with:
           repository-token: ${{ github.token }}
           runtime-reference: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
@@ -302,7 +302,7 @@ jobs:
             | bash "${GITHUB_WORKSPACE}/scripts/redact-output.sh"
 
       - name: Configure publication credentials
-        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess
           role-chaining: true
