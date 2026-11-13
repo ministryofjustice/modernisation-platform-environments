@@ -103,6 +103,7 @@ resource "aws_cloudwatch_metric_alarm" "Process_Failure_Clamd" {
   dimensions = {
     InstanceId = aws_instance.ec2_clamav.id
     exe        = "clamd"
+    pid_finder = "native"
   }
   alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions    = [aws_sns_topic.cloudwatch_alerts.arn]
