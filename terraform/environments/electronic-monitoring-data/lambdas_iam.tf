@@ -1446,7 +1446,7 @@ data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
     resources = [
       "${module.s3-logging-bucket.bucket.arn}/downstream-reconciliation/${local.environment_shorthand}/*/status/*.json",
     ]
-    }
+  }
 
   statement {
     sid    = "ReadLiveFeedGitHubAppSecret"

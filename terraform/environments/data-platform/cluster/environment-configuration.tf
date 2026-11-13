@@ -1,6 +1,9 @@
 locals {
   environment_configurations = {
     development = {
+      # Airflow 3 (MWAA) access to the EKS cluster - currently test only
+      enable_mwaa_access = false
+
       eks_public_access_cidrs = [
         "128.77.75.64/26", # Prisma Corporate
         "20.58.27.30/32",  # GitHub Runner (octo-production)
@@ -10,6 +13,9 @@ locals {
       ]
     }
     test = {
+      # Airflow 3 (MWAA) access to the EKS cluster - currently test only
+      enable_mwaa_access = true
+
       eks_public_access_cidrs = [
         "128.77.75.64/26", # Prisma Corporate
         "20.58.27.30/32",  # GitHub Runner (octo-production)
@@ -19,6 +25,9 @@ locals {
       ]
     }
     preproduction = {
+      # Airflow 3 (MWAA) access to the EKS cluster - currently test only
+      enable_mwaa_access = false
+
       eks_public_access_cidrs = [
         "128.77.75.64/26", # Prisma Corporate
         "20.58.27.30/32",  # GitHub Runner (octo-production)
@@ -28,6 +37,9 @@ locals {
       ]
     }
     production = {
+      # Airflow 3 (MWAA) access to the EKS cluster - currently test only
+      enable_mwaa_access = false
+
       eks_public_access_cidrs = [
         "128.77.75.64/26", # Prisma Corporate
         "20.58.27.30/32",  # GitHub Runner (octo-production)

@@ -76,6 +76,17 @@ variable "finding_severity_labels" {
   }
 }
 
+variable "finding_grace_period" {
+  description = "Maximum minutes between a finding's CreatedAt and UpdatedAt for issue creation; this is a best-effort filter, not deduplication"
+  type        = number
+  default     = 10
+
+  validation {
+    condition     = try(var.finding_grace_period >= 0 && floor(var.finding_grace_period) == var.finding_grace_period, false)
+    error_message = "finding_grace_period must be a non-negative whole number of minutes."
+  }
+}
+
 variable "lambda_memory_size" {
   description = "Amount of memory available to the Lambda function"
   type        = number

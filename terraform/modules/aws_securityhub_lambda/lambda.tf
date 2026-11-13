@@ -29,6 +29,7 @@ resource "aws_lambda_function" "securityhub_finding_issue" {
       GITHUB_REPO                    = var.github_repo
       IGNORE_FINDINGS                = data.aws_ssm_parameter.securityhub_ignore_findings.value
       FINDING_SEVERITY_LABELS        = jsonencode(var.finding_severity_labels)
+      FINDING_GRACE_PERIOD           = tostring(var.finding_grace_period)
       VALID_SEVERITY_LABELS          = jsonencode(var.valid_severity_labels)
       RESOURCE_KEYS_TO_EXCLUDE       = jsonencode(var.resource_keys_to_exclude)
       WEB_IDENTITY_AUDIENCE          = var.web_identity_audience
