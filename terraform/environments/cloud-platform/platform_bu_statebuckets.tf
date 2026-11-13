@@ -8,7 +8,7 @@ locals {
     trimsuffix(
       replace(account, "container-platform-", ""),
       "-live"
-    ) => {
+      ) => {
       workspace  = account
       account_id = local.environment_management.account_ids[account]
     }

@@ -25,5 +25,5 @@ output "ecs_task_execution_policy" {
 
 output "ec2_autoscaling_group" {
   description = "Autoscaling group information"
-  value       = aws_autoscaling_group.cluster-scaling-group
+  value       = aws_autoscaling_group.cluster-scaling-group-al2023
 }

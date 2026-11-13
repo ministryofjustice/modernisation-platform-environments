@@ -3622,6 +3622,55 @@ resource "aws_lakeformation_permissions" "specials_remediation_table_access" {
 }
 
 # ------------------------------------------------------------------------------
+# Lake Formation permission granter IAM
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "lake_formation_permission_granter" {
+  statement {
+    sid    = "ReadGlueCatalogResources"
+    effect = "Allow"
+
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+    ]
+
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
+    ]
+  }
+
+  statement {
+    sid    = "ManageLakeFormationPermissions"
+    effect = "Allow"
+
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:ListPermissions",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "lake_formation_permission_granter" {
+  name               = "lake_formation_permission_granter_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "lake_formation_permission_granter" {
+  name   = "lake_formation_permission_granter_lambda_policy"
+  policy = data.aws_iam_policy_document.lake_formation_permission_granter.json
+}
+
+resource "aws_iam_role_policy_attachment" "lake_formation_permission_granter" {
+  role       = aws_iam_role.lake_formation_permission_granter.name
+  policy_arn = aws_iam_policy.lake_formation_permission_granter.arn
+}
+
+# ------------------------------------------------------------------------------
 # Downstream position reconciliation IAM
 # ------------------------------------------------------------------------------
 
@@ -3856,6 +3905,7 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
     effect = "Allow"
 
     actions = [
+      "ecs:DescribeTasks",
       "ecs:ListTasks",
     ]
 
@@ -4401,4 +4451,70 @@ resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
     database_name = each.value.name
     wildcard      = true
   }
+}
+
+# ------------------------------------------------------------
+# trigger_cadt_daily_run
+# ------------------------------------------------------------
+
+module "trigger_cadt_daily_run_iam_role" {
+ source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+
+  name = "trigger_cadt_daily_run"
+
+  trust_policy_permissions = {
+    TrustRoleAndServiceToAssume = {
+      actions = [
+        "sts:AssumeRole",
+      ]
+      principals = [{
+        type = "Service"
+        identifiers = [
+          "lambda.amazonaws.com",
+        ]
+      }]
+    }
+  }
+
+  policies = {
+    trigger_api_gateway = aws_iam_policy.trigger_cadt_daily_run_iam_policy.arn
+  }
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "trigger_cadt_daily_run_iam_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["apigateway:POST"]
+    resources = [
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_request_id}/methods/POST"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "apigateway:GET",
+      "apigateway:POST"
+    ]
+    resources = [
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_status_id}/methods/GET"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "apigateway:GET",
+      "apigateway:POST"
+    ]
+    resources = [
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_execution_id_id}/methods/GET"
+    ]
+  }
+}
+
+
+resource "aws_iam_policy" "trigger_cadt_daily_run_iam_policy" {
+  name   = "trigger_cadt_daily_run_iam_policy"
+  policy = data.aws_iam_policy_document.cadt_policy_document.json
 }

@@ -10,6 +10,7 @@ locals {
     var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessRole"] : [],
     var.options.enable_vmimport ? ["vmimport"] : [],
     var.options.aws_health_lambda_configuration.enabled ? ["EventBridgeInvokeAWSHealthLambda"] : [],
+    var.options.aws_securityhub_lambda_configuration.enabled ? ["EventBridgeInvokeAWSSecurityHubLambda"] : [],
   ]))
 
   iam_roles = {
@@ -23,6 +24,18 @@ locals {
         }
       }]
       policy_attachments = ["InvokeAWSHealthLambda"]
+    }
+
+    EventBridgeInvokeAWSSecurityHubLambda = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
+        principals = {
+          type        = "Service"
+          identifiers = ["events.amazonaws.com"]
+        }
+      }]
+      policy_attachments = ["InvokeAWSSecurityHubLambda"]
     }
 
     # prereq: ImageBuilderLaunchTemplatePolicy and BusinessUnitKmsCmkPolicy 
