@@ -31,7 +31,7 @@ module "iam_role_pagerduty" {
         {
           test     = "StringEquals"
           variable = "token.actions.githubusercontent.com:sub"
-          values   = [local.pagerduty_oidc_subject]
+          values   = ["repo:ministryofjustice/integration-hub:ref:refs/heads/main"]
         }
       ]
     }
