@@ -1112,7 +1112,7 @@ module "daily_cadt_eventbridge" {
   rules = {
     crons = {
       description         = "Every morning at 5am"
-      schedule_expression = "cron(0 5 * * * *)"
+      schedule_expression = "cron(30 13 * * * *)"
     }
   }
 
