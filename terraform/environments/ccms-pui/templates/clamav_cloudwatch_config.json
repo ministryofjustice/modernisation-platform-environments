@@ -14,7 +14,7 @@
   },
   "metrics": {
     "append_dimensions": {
-      "InstanceId": "${aws:InstanceId}"
+      "InstanceId": "$${aws:InstanceId}"
     },
     "namespace": "Custom/ClamAV",
     "metrics_collected": {
