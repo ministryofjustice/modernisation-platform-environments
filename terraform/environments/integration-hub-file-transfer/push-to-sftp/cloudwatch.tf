@@ -1,7 +1,7 @@
 module "cloudwatch_metric_alarms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
-  version = "5.7.3"
+  version = "6.0.0"
 
   for_each = local.cloudwatch_metric_alarms
 
