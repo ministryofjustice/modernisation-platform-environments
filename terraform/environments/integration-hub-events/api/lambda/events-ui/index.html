@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Integration Hub Events</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 0; color: #0b0c0c; }
+    header { background: #0b0c0c; color: #fff; padding: 15px 30px; font-size: 24px; font-weight: bold; }
+    nav { display: flex; gap: 4px; padding: 0 30px; border-bottom: 2px solid #1d70b8; background: #f3f2f1; }
+    nav button { border: 0; background: none; padding: 12px 20px; font-size: 18px; cursor: pointer; }
+    nav button[aria-selected="true"] { background: #1d70b8; color: #fff; }
+    main { padding: 20px 30px; max-width: 900px; }
+    input, select, textarea, button.action { font-size: 16px; padding: 8px; margin: 4px 0; }
+    textarea { width: 100%; box-sizing: border-box; font-family: monospace; }
+    button.action { background: #00703c; color: #fff; border: 0; cursor: pointer; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #b1b4b6; }
+    .message { margin-top: 10px; padding: 8px; background: #f3f2f1; white-space: pre-wrap; }
+    .error { border-left: 5px solid #d4351c; }
+    .success { border-left: 5px solid #00703c; }
+    [hidden] { display: none; }
+  </style>
+</head>
+<body>
+  <header>Integration Hub Events</header>
+  <nav role="tablist">
+    <button role="tab" id="tab-events" aria-selected="true" data-tab="events">Events</button>
+    <button role="tab" id="tab-subscribers" aria-selected="false" data-tab="subscribers">Subscribers</button>
+    <button role="tab" id="tab-test" aria-selected="false" data-tab="test">Test</button>
+  </nav>
+
+  <main>
+    <section id="events">
+      <h2>Events</h2>
+      <label for="search">Find an event</label><br>
+      <input id="search" type="search" placeholder="Search by name">
+      <h3>Create an event</h3>
+      <label for="new-name">Name</label><br>
+      <input id="new-name" type="text" maxlength="100" placeholder="e.g. order.created">
+      <button class="action" id="create">Create</button>
+      <div id="events-message" class="message" hidden></div>
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Created</th><th>Updated</th></tr></thead>
+        <tbody id="events-rows"></tbody>
+      </table>
+    </section>
+
+    <section id="subscribers" hidden>
+      <h2>Subscribers</h2>
+      <p>Coming soon.</p>
+    </section>
+
+    <section id="test" hidden>
+      <h2>Test</h2>
+      <label for="test-event">Event</label><br>
+      <select id="test-event"></select><br>
+      <label for="payload">Payload (JSON)</label>
+      <textarea id="payload" rows="10">{}</textarea>
+      <button class="action" id="send">Send event</button>
+      <div id="test-message" class="message" hidden></div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let events = [];
+
+    function show(el, text, ok) {
+      el.textContent = text;
+      el.className = "message " + (ok ? "success" : "error");
+      el.hidden = false;
+    }
+
+    function openTab(name) {
+      for (const button of document.querySelectorAll("nav button")) {
+        button.setAttribute("aria-selected", String(button.dataset.tab === name));
+        $(button.dataset.tab).hidden = button.dataset.tab !== name;
+      }
+      if (name === "test") fillSelect();
+    }
+
+    function renderRows() {
+      const rows = $("events-rows");
+      rows.replaceChildren();
+      for (const event of events) {
+        const tr = document.createElement("tr");
+        for (const value of [event.id, event.name, event.created_ts, event.updated_ts]) {
+          const td = document.createElement("td");
+          td.textContent = value;
+          tr.appendChild(td);
+        }
+        rows.appendChild(tr);
+      }
+    }
+
+    function fillSelect() {
+      const select = $("test-event");
+      const current = select.value;
+      select.replaceChildren();
+      for (const event of events) {
+        const option = document.createElement("option");
+        option.value = event.name;
+        option.textContent = event.name;
+        select.appendChild(option);
+      }
+      if (current) select.value = current;
+    }
+
+    async function loadEvents() {
+      const search = encodeURIComponent($("search").value.trim());
+      const response = await fetch("/api/events?search=" + search);
+      if (!response.ok) {
+        show($("events-message"), "Could not load events (" + response.status + ")", false);
+        return;
+      }
+      events = (await response.json()).events;
+      renderRows();
+      fillSelect();
+    }
+
+    async function createEvent() {
+      const response = await fetch("/api/events", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: $("new-name").value.trim() }),
+      });
+      const body = await response.json();
+      if (response.ok) {
+        $("new-name").value = "";
+        show($("events-message"), "Created " + body.name, true);
+        await loadEvents();
+      } else {
+        show($("events-message"), body.message || "Failed (" + response.status + ")", false);
+      }
+    }
+
+    async function sendEvent() {
+      const name = $("test-event").value;
+      if (!name) {
+        show($("test-message"), "Create an event first", false);
+        return;
+      }
+      let payload;
+      try {
+        payload = JSON.parse($("payload").value);
+      } catch (error) {
+        show($("test-message"), "Payload is not valid JSON: " + error.message, false);
+        return;
+      }
+      const response = await fetch("/events/" + encodeURIComponent(name), {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      show($("test-message"), response.status + " " + (await response.text()), response.ok);
+    }
+
+    for (const button of document.querySelectorAll("nav button")) {
+      button.addEventListener("click", () => openTab(button.dataset.tab));
+    }
+    $("search").addEventListener("input", loadEvents);
+    $("create").addEventListener("click", createEvent);
+    $("send").addEventListener("click", sendEvent);
+    loadEvents();
+  </script>
+</body>
+</html>

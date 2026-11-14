@@ -9,4 +9,9 @@ locals {
 
   # The zone is the domain itself, e.g. development.events-platform.service.justice.gov.uk
   api_domain = local.is-production ? "events-platform.service.justice.gov.uk" : "${local.environment}.events-platform.service.justice.gov.uk"
+
+  # The events-to-kafka Lambda is created by the kafka root, which must be applied first
+  publish_to_kafka            = local.is-development
+  events_to_kafka_lambda_name = "${local.application_name}-events-to-kafka"
+  events_to_kafka_lambda_arn  = "arn:aws:lambda:${local.region}:${local.account_id}:function:${local.events_to_kafka_lambda_name}"
 }
