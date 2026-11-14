@@ -112,7 +112,7 @@ module "ecs_service" {
 
   subnet_ids                = var.ecs_subnet_ids
   create_security_group     = false
-  security_group_ids        = each.value.internal_only ? [aws_security_group.common_ecs_service_internal.id] : [aws_security_group.common_ecs_service_external.id]
+  security_group_ids        = concat(each.value.internal_only ? [aws_security_group.common_ecs_service_internal.id] : [aws_security_group.common_ecs_service_external.id], each.value.additional_security_group_ids)
   tasks_iam_role_arn        = aws_iam_role.ecs_task_role.arn
   create_tasks_iam_role     = false
   create_task_exec_iam_role = false
