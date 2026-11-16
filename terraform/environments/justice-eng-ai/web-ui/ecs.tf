@@ -31,8 +31,8 @@ resource "aws_ecs_task_definition" "app" {
   family                   = "${local.application_name}-ui"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = var.task_cpu
-  memory                   = var.task_memory
+  cpu                      = local.builder_task_cpu
+  memory                   = local.builder_task_memory
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
   tags                     = local.tags

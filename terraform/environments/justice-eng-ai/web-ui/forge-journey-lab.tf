@@ -42,9 +42,17 @@ locals {
   forge_hostname           = local.application_data.accounts[local.environment].forge_hostname
   forge_ecr_repository_url = local.ui_ecr_repository_url
   forge_container_port     = local.forge_upstream_port
-  forge_task_cpu           = 1024
-  forge_task_memory        = 2048
-  forge_desired_count      = 1
+  # Tunable per environment in application_variables.json. The cpu/memory pair
+  # must be a valid Fargate combination; the 2 vCPU / 8 GiB default leaves
+  # headroom for concurrent Chromium design checks and the in-memory build
+  # registry.
+  forge_task_cpu      = try(local.application_data.accounts[local.environment].forge_task_cpu, 2048)
+  forge_task_memory   = try(local.application_data.accounts[local.environment].forge_task_memory, 8192)
+  forge_desired_count = 1
+
+  forge_max_builds_in_memory          = try(local.application_data.accounts[local.environment].forge_max_builds_in_memory, 200)
+  forge_design_check_concurrency      = try(local.application_data.accounts[local.environment].forge_design_check_concurrency, 3)
+  forge_design_check_queue_timeout_ms = try(local.application_data.accounts[local.environment].forge_design_check_queue_timeout_ms, 120000)
 }
 
 resource "random_password" "forge_session_secret" {
@@ -546,6 +554,8 @@ resource "aws_ecs_task_definition" "forge" {
           { name = "BEDROCK_TIMEOUT_MS", value = "300000" },
           { name = "CHROMIUM_SANDBOX_ENABLED", value = "false" },
           { name = "DATA_DIR", value = "/data" },
+          { name = "DESIGN_CHECK_CONCURRENCY", value = tostring(local.forge_design_check_concurrency) },
+          { name = "DESIGN_CHECK_QUEUE_TIMEOUT_MS", value = tostring(local.forge_design_check_queue_timeout_ms) },
           { name = "DESIGN_REVIEW_ENABLED", value = "true" },
           { name = "DESIGN_REVIEW_MAX_CORRECTIONS", value = "3" },
           # Builder forwards its own verified identity in single-url mode
@@ -554,6 +564,10 @@ resource "aws_ecs_task_definition" "forge" {
           # deliberately never set here -- incompatible with FORGE_BASE_PATH.
           { name = "ENTRA_AUTH_ENABLED", value = local.forge_embedded_entra_enabled ? "true" : "false" },
           { name = "FORGE_BASE_PATH", value = local.forge_base_path },
+          { name = "FORGE_MAX_BUILDS_IN_MEMORY", value = tostring(local.forge_max_builds_in_memory) },
+          # Cap the V8 heap below the task limit (8192 MiB) so Chromium and
+          # native memory still fit and Node fails with a clear error, not an OOM kill.
+          { name = "NODE_OPTIONS", value = "--max-old-space-size=6144" },
           { name = "FORGE_PACKAGE_S3_BUCKET", value = local.forge_package_s3_bucket },
           { name = "FORGE_PACKAGE_KEY_VERSION", value = "2" },
           { name = "FORGE_PACKAGE_S3_PREFIX", value = var.forge_package_s3_prefix },
