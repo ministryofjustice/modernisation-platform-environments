@@ -102,6 +102,7 @@ locals {
         os-type              = "Linux"
         os-major-version     = 8
         os-version           = "RHEL 8.5"
+        "Patch Group"        = "patchgroup1"
         server-type          = "onr-db"
         update-ssm-agent     = "patchgroup1"
       }
@@ -120,7 +121,8 @@ locals {
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+          "Ec2DeliusIntegrationPolicy",
         ]
         secretsmanager_secrets_prefix = "ec2/"
         subnet_name                   = "data"
@@ -164,6 +166,7 @@ locals {
         os-type              = "Linux"
         os-major-version     = 8
         os-version           = "RHEL 8.5"
+        "Patch Group"        = "patchgroup1"
         server-type          = "oasys-db"
         update-ssm-agent     = "patchgroup1"
       }

@@ -4,7 +4,7 @@ module "cur_v2_hourly" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.0.0"
+  version = "5.14.0"
 
   bucket = "coat-${local.environment}-cur-v2-hourly"
 
@@ -27,16 +27,6 @@ module "cur_v2_hourly" {
   versioning = {
     status = "Enabled"
   }
-
-  lifecycle_rule = [
-    {
-      id      = "DeleteOldVersions"
-      enabled = true
-      noncurrent_version_expiration = {
-        days = 1
-      }
-    }
-  ]
 }
 
 data "aws_iam_policy_document" "coat_cur_v2_hourly_dev_bucket_policy" {
@@ -151,24 +141,6 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_dev_bucket_policy" {
       identifiers = ["arn:aws:iam::279191903737:root"]
     }
   }
-  statement {
-    sid    = "RAGLambdaAccess"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket",
-      "s3:GetBucketLocation"
-    ]
-    resources = [
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.rag_lambda_role.arn]
-    }
-  }
 }
 
 data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
@@ -268,24 +240,6 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
       values   = [data.aws_caller_identity.current.account_id]
     }
   }
-  statement {
-    sid    = "RAGLambdaAccess"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket",
-      "s3:GetBucketLocation"
-    ]
-    resources = [
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.rag_lambda_role.arn]
-    }
-  }
 }
 
 # FOCUS Reports
@@ -346,7 +300,7 @@ module "focus_reports" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.0.0"
+  version = "5.14.0"
 
   bucket           = "coat-${local.environment}-focus-reports"
   object_ownership = "BucketOwnerEnforced"
@@ -368,16 +322,6 @@ module "focus_reports" {
   versioning = {
     status = "Enabled"
   }
-
-  lifecycle_rule = [
-    {
-      id      = "DeleteOldVersions"
-      enabled = true
-      noncurrent_version_expiration = {
-        days = 1
-      }
-    }
-  ]
 }
 
 # COAT Reports 
@@ -419,7 +363,7 @@ module "coat_reports" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.0.0"
+  version = "5.14.0"
 
   bucket           = "coat-reports-${local.environment}"
   object_ownership = "BucketOwnerEnforced"
@@ -440,16 +384,6 @@ module "coat_reports" {
   versioning = {
     status = "Enabled"
   }
-
-  lifecycle_rule = [
-    {
-      id      = "DeleteOldVersions"
-      enabled = true
-      noncurrent_version_expiration = {
-        days = 1
-      }
-    }
-  ]
 }
 
 resource "aws_s3_object" "ebs_waste_reports" {
@@ -470,6 +404,103 @@ resource "aws_s3_object" "pod_waste_reports" {
   acl    = "private"
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "cur_v2_hourly" {
+  bucket = module.cur_v2_hourly.s3_bucket_id
+
+  rule {
+    id     = "DeleteOldVersions"
+    status = "Enabled"
+
+    filter {}
+
+    noncurrent_version_expiration {
+      noncurrent_days = 1
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "focus_reports" {
+  bucket = module.focus_reports.s3_bucket_id
+
+  rule {
+    id     = "DeleteOldVersions"
+    status = "Enabled"
+
+    filter {}
+
+    noncurrent_version_expiration {
+      noncurrent_days = 1
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "coat_reports" {
+  bucket = module.coat_reports.s3_bucket_id
+
+  rule {
+    id     = "DeleteOldVersions"
+    status = "Enabled"
+
+    filter {}
+
+    noncurrent_version_expiration {
+      noncurrent_days = 1
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "cur_v2_hourly_enriched" {
+  count  = local.is-development ? 0 : 1
+  bucket = module.cur_v2_hourly_enriched[0].s3_bucket_id
+
+  rule {
+    id     = "DeleteOldVersions"
+    status = "Enabled"
+
+    filter {}
+
+    noncurrent_version_expiration {
+      noncurrent_days = 1
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+moved {
+  from = module.cur_v2_hourly.aws_s3_bucket_lifecycle_configuration.this[0]
+  to   = aws_s3_bucket_lifecycle_configuration.cur_v2_hourly
+}
+
+moved {
+  from = module.focus_reports.aws_s3_bucket_lifecycle_configuration.this[0]
+  to   = aws_s3_bucket_lifecycle_configuration.focus_reports
+}
+
+moved {
+  from = module.coat_reports.aws_s3_bucket_lifecycle_configuration.this[0]
+  to   = aws_s3_bucket_lifecycle_configuration.coat_reports
+}
+
+moved {
+  from = module.cur_v2_hourly_enriched[0].aws_s3_bucket_lifecycle_configuration.this[0]
+  to   = aws_s3_bucket_lifecycle_configuration.cur_v2_hourly_enriched[0]
+}
+
 moved {
   from = module.cur_v2_hourly_enriched
   to   = module.cur_v2_hourly_enriched[0]
@@ -482,7 +513,7 @@ module "cur_v2_hourly_enriched" {
   count = local.is-development ? 0 : 1
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.0.0"
+  version = "5.14.0"
 
   bucket = "coat-${local.environment}-cur-v2-hourly-enriched"
 
@@ -507,16 +538,6 @@ module "cur_v2_hourly_enriched" {
   versioning = {
     status = "Enabled"
   }
-
-  lifecycle_rule = [
-    {
-      id      = "DeleteOldVersions"
-      enabled = true
-      noncurrent_version_expiration = {
-        days = 1
-      }
-    }
-  ]
 
   replication_configuration = {
     role = module.cur_v2_hourly_enriched_replication_role[0].iam_role_arn

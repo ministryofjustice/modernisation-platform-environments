@@ -114,6 +114,15 @@ locals {
             protocol    = -1
             self        = true
           }
+          ssh = {
+            description = "Allow SSH ingress"
+            from_port   = 22
+            to_port     = 22
+            protocol    = "tcp"
+            security_groups = [
+              "data-db",
+            ]
+          }
           http7001 = {
             description = "Allow http7001 ingress"
             from_port   = 7001

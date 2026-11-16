@@ -16,6 +16,11 @@
       <artifactId>aws-lambda-java-core</artifactId>
       <version>1.2.3</version>
     </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>secretsmanager</artifactId>
+      <version>2.25.0</version>
+    </dependency>
   </dependencies>
 
   <build>

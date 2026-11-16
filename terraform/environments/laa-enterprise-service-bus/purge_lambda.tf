@@ -50,16 +50,14 @@ resource "aws_lambda_function" "purge_lambda" {
   s3_object_version = data.aws_s3_object.purge_lambda_zip.version_id
   timeout           = 100
   memory_size       = 128
-  runtime           = "python3.10"
+  runtime           = "python3.14"
 
   vpc_config {
     security_group_ids = [aws_security_group.purge_lambda_sg.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
 
-  layers = [
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
-  ]
+  layers = [data.aws_ssm_parameter.lambda_layer_python_powertools.value]
 
   environment {
     variables = {

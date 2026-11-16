@@ -12,6 +12,51 @@ resource "aws_route53_record" "alb_frontend" {
   }
 }
 
+resource "aws_route53_record" "alb_frontend_eis" {
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = "interface.${var.env_name}.${var.account_config.dns_suffix}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.delius_core_frontend.dns_name
+    zone_id                = aws_lb.delius_core_frontend.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "alb_frontend_data" {
+  count = var.env_name == "test" ? 1 : 0
+
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = "testdata-api.${var.env_name}.${var.account_config.dns_suffix}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.delius_core_frontend.dns_name
+    zone_id                = aws_lb.delius_core_frontend.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "alb_ancillary" {
+  count    = contains(local.pwm_migrated_envs, var.env_name) ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.delius_core_ancillary.dns_name
+    zone_id                = aws_lb.delius_core_ancillary.zone_id
+    evaluate_target_health = true
+  }
+}
+
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 

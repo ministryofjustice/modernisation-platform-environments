@@ -40,6 +40,15 @@ resource "aws_secretsmanager_secret_version" "auto_admit_version" {
   }
 }
 
+# Reads the live secret value (including the internalServiceToken key added manually
+data "aws_secretsmanager_secret_version" "auto_admit_secret" {
+  secret_id = aws_secretsmanager_secret.auto_admit_secret.id
+}
+
+locals {
+  internal_service_token = jsondecode(data.aws_secretsmanager_secret_version.auto_admit_secret.secret_string).internalServiceToken
+}
+
 
 resource "aws_secretsmanager_secret" "LDAP_administration_secret" {
   #checkov:skip=CKV2_AWS_57:todo add rotation if needed
@@ -126,6 +135,22 @@ resource "aws_secretsmanager_secret_version" "google_api" {
   }
 }
 
+resource "aws_secretsmanager_secret" "proxy_account" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "${local.project_name}_proxy_account"
+  description = "Used by rds proxy to login to rds cluster"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "proxy_account" {
+  secret_id     = aws_secretsmanager_secret.proxy_account.id
+  secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
 resource "aws_secretsmanager_secret" "ordnance_survey_api" {
   #checkov:skip=CKV2_AWS_57:doesn't need rotation
   name        = "${local.project_name}_ordnance_survey_api"
@@ -157,6 +182,42 @@ resource "aws_secretsmanager_secret_version" "jwt_secret" {
   lifecycle {
     ignore_changes = [secret_string]
   }
+}
+
+resource "aws_secretsmanager_secret" "disparity_toolkit" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "${local.project_name}/disparity-toolkit/redshift-serverless"
+  description = "details for quicksight"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "disparity_toolkit" {
+  secret_id     = aws_secretsmanager_secret.disparity_toolkit.id
+  secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret_policy" "disparity_toolkit" {
+  secret_arn          = aws_secretsmanager_secret.disparity_toolkit.arn
+  block_public_policy = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowQuickSightAdminAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/quicksight-admin-access"
+        }
+        Action   = "secretsmanager:GetSecretValue"
+        Resource = aws_secretsmanager_secret.disparity_toolkit.arn
+      }
+    ]
+  })
 }
 
 resource "aws_secretsmanager_secret" "Root_CA_secret" {
