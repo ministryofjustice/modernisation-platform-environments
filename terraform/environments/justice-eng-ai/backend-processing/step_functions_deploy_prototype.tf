@@ -1,33 +1,25 @@
 locals {
-  prototype_deployment_enabled = local.is-development || local.is-production
-  prototype_deployment = local.prototype_deployment_enabled ? {
-    cluster_arn            = data.aws_ecs_cluster.prototype_deployment[0].arn
+  prototype_deployment = {
+    cluster_arn            = data.aws_ecs_cluster.prototype_deployment.arn
     vpc_id                 = data.aws_vpc.vpc.id
     private_subnet_ids     = data.aws_subnets.private.ids
-    ecs_security_group_id  = data.aws_security_group.prototype_deployment[0].id
-    load_balancer_arn      = data.aws_lb.prototype_deployment[0].arn
-    listener_arn           = data.aws_lb_listener.prototype_deployment[0].arn
-    hosted_zone_id         = data.aws_route53_zone.prototype_deployment[0].zone_id
-    domain_name            = local.is-production ? "ai-builder.modernisation-platform.service.justice.gov.uk" : "ai-builder-dev.modernisation-platform.service.justice.gov.uk"
-    load_balancer_dns_name = data.aws_lb.prototype_deployment[0].dns_name
-    } : {
-    cluster_arn            = ""
-    vpc_id                 = ""
-    private_subnet_ids     = []
-    ecs_security_group_id  = ""
-    load_balancer_arn      = ""
-    listener_arn           = ""
-    hosted_zone_id         = ""
-    domain_name            = ""
-    load_balancer_dns_name = ""
+    ecs_security_group_id  = data.aws_security_group.prototype_deployment.id
+    load_balancer_arn      = data.aws_lb.prototype_deployment.arn
+    listener_arn           = data.aws_lb_listener.prototype_deployment.arn
+    hosted_zone_id         = data.aws_route53_zone.prototype_deployment.zone_id
+    domain_name            = local.application_data.accounts[local.environment].builder_hostname
+    load_balancer_dns_name = data.aws_lb.prototype_deployment.dns_name
   }
   prototype_deployment_state_machine_name = "${local.application_name}-deploy-prototype"
   prototype_deployment_variables = [
     { name = "IMAGE_URI", path = "States.Format('{}:{}-{}', '${aws_ecr_repository.user_applications.repository_url}', $.package_identity.AppID, $.package_identity.BuildID)" },
     { name = "REQUEST_ID", path = "$.package_identity.AppID" },
+    { name = "BUILD_ID", path = "States.Format('{}', $.package_identity.BuildID)" },
     { name = "BASE_PATH", path = "$.image_build_task.index_html_path" },
     { name = "AWS_REGION", value = data.aws_region.current.region },
+    { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
     { name = "TASK_EXECUTION_ROLE_ARN", value = aws_iam_role.script_runner_ecs_execution.arn },
+    { name = "TASK_ROLE_ARN", value = aws_iam_role.prototype_app_task.arn },
     { name = "ECS_CLUSTER_ARN", value = local.prototype_deployment.cluster_arn },
     { name = "VPC_ID", value = local.prototype_deployment.vpc_id },
     { name = "PRIVATE_SUBNET_IDS", value = jsonencode(local.prototype_deployment.private_subnet_ids) },
@@ -39,6 +31,7 @@ locals {
     { name = "CNAME_TARGET", value = local.prototype_deployment.load_balancer_dns_name },
   ]
   prototype_deployment_stage_inputs = {
+    table           = []
     task_definition = []
     target_group    = []
     listener_rule   = [{ name = "TARGET_GROUP_ARN", path = "$.target_group.target_group_arn" }]
@@ -48,7 +41,7 @@ locals {
     ]
     dns = []
   }
-  prototype_deployment_steps = [for stage in ["task_definition", "target_group", "listener_rule", "service", "dns"] : {
+  prototype_deployment_steps = [for stage in ["table", "task_definition", "target_group", "listener_rule", "service"] : {
     name        = "deploy_${stage}"
     type        = "script_runner"
     script_path = "scripts/deployment/prototype_deployment.py"
@@ -71,7 +64,6 @@ locals {
 }
 
 module "step_functions_deploy_prototype" {
-  count  = local.prototype_deployment_enabled ? 1 : 0
   source = "../modules/step_function_builder"
 
   step_function_retry_attempts = local.step_function_retry_attempts

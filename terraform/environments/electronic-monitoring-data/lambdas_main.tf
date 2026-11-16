@@ -484,14 +484,19 @@ module "live_feed_daily_handover" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-
   environment_variables = {
     SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
     ENVIRONMENT    = local.environment_shorthand
     NAMESPACE      = "EMDS/MDSS"
     LOOKBACK_HOURS = "24"
+
+    GITHUB_SECRET_ARN = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER      = "moj-analytical-services"
+    GITHUB_REPOSITORY = "dmet-em"
+
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
 
     LOAD_MDSS_QUEUE_NAME = module.load_mdss_event_queue.sqs_queue.name
     LOAD_FMS_QUEUE_NAME  = module.load_fms_event_queue.sqs_queue.name
@@ -1171,7 +1176,6 @@ locals {
     PLV2QS6 = "lucy-astley-jones"
     PREPU2L = "mrixson-moj"
     PY6LVCP = "gwionap"
-    PO9DYMA = "georgewk92"
   }
 }
 
@@ -1397,6 +1401,41 @@ module "live_feed_specials_remediator" {
     POWERTOOLS_LOG_LEVEL  = "INFO"
     REMEDIATION_BUCKET    = module.s3-logging-bucket.bucket.id
     REMEDIATION_PREFIX    = local.specials_remediation_prefix
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Lake Formation permission granter
+# Apply reusable database and table grants through AWS managed service APIs.
+# ------------------------------------------------------------------------------
+
+module "lake_formation_permission_granter" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "lake_formation_permission_granter"
+  role_name                      = aws_iam_role.lake_formation_permission_granter.name
+  role_arn                       = aws_iam_role.lake_formation_permission_granter.arn
+  handler                        = "lake_formation_permission_granter.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    CATALOG_ID              = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME        = local.environment_shorthand
+    POWERTOOLS_LOG_LEVEL    = "INFO"
+    POWERTOOLS_SERVICE_NAME = "lake-formation-permission-granter"
   }
 }
 
@@ -1681,4 +1720,25 @@ module "register_athena" {
     aws_lakeformation_permissions.api_int_db_level_perms,
     aws_lakeformation_permissions.api_int_table_level_perms,
   ]
+}
+
+module "trigger_cadt_daily_run" {
+  count                          = local.is-production || local.is-preproduction ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "trigger_cadt_daily_run"
+  image_name                     = "trigger_cadt_daily_run"
+  role_name                      = module.trigger_cadt_daily_run_iam_role.name
+  role_arn                       = module.trigger_cadt_daily_run_iam_role.arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    TRIGGER_CADT_URL = "https://${module.trigger_cadt_api.api_gateway_id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${module.trigger_cadt_api.resource_request_id}"
+  }
 }

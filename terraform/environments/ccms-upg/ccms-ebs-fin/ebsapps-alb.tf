@@ -15,7 +15,8 @@ module "alb" {
   }
 
   health_check = {
-    path = "/"
+    path    = "/"
+    matcher = "200,400"
   }
 
   enable_deletion_protection = false

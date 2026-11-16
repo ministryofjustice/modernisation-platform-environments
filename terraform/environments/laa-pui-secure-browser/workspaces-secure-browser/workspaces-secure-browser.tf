@@ -289,7 +289,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
         "value" = false
       }
       "PrintingEnabled" = {
-        "value" = false
+        "value" = true
       }
       "SafeBrowsingProtectionLevel" = {
         "value" = 1

@@ -12,6 +12,7 @@ locals {
   build_query_steps   = [for step in var.steps : step if step.type == "dynamodb_query_build"]
   approval_steps      = [for step in var.steps : step if step.type == "wait_for_approval"]
   choice_steps        = [for step in var.steps : step if step.type == "choice"]
+  sns_steps           = [for step in var.steps : step if step.type == "sns_publish"]
   child_cleanup_steps = [for step in local.step_function_steps : step if try(step.ec2_cleanup, null) != null]
   step_entrypoints = {
     for step in var.steps : step.name => step.type == "script_runner" ? "${step.name}_prepare_host" : step.type == "wait_for_approval" ? "${step.name}_next_key" : step.type == "dynamodb_query_build" ? "${step.name}_extract" : try(step.ec2_cleanup, null) != null ? "${step.name}_prepare_child" : step.name
@@ -391,10 +392,30 @@ locals {
     }
   }]...)
 
+  # Native SNS publish (no Lambda). message is a JSONPath or intrinsic giving the
+  # plain-text message; subject is a static string. The publish result is kept at
+  # result_path so the workflow state is preserved.
+  sns_states = {
+    for step in local.sns_steps : step.name => merge(
+      {
+        Type     = "Task"
+        Resource = "arn:${data.aws_partition.current.partition}:states:::sns:publish"
+        Parameters = merge(
+          { TopicArn = step.topic_arn, "Message.$" = step.message },
+          try(step.subject, null) == null ? {} : { Subject = step.subject },
+        )
+        ResultPath = try(step.result_path, "$.${step.name}_result")
+      },
+      local.transitions[step.name],
+      try(step.timeout_seconds, null) == null ? {} : { TimeoutSeconds = step.timeout_seconds },
+      length(try(step.retry, [])) == 0 ? {} : { Retry = step.retry }
+    )
+  }
+
   definition = {
     Comment = "Runs an ordered process using ECS script runner tasks and nested Step Functions."
     StartAt = local.step_entrypoints[var.steps[0].name]
-    States  = merge(local.task_states, local.step_function_states, local.dynamodb_states, local.query_states, local.paginated_query_states, local.build_query_states, local.approval_states, local.choice_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states, local.child_cleanup_states)
+    States  = merge(local.task_states, local.step_function_states, local.dynamodb_states, local.query_states, local.paginated_query_states, local.build_query_states, local.approval_states, local.choice_states, local.sns_states, local.disposable_lifecycle_states, local.script_runtime_states, local.fargate_lifecycle_states, local.child_cleanup_states)
   }
 
 }

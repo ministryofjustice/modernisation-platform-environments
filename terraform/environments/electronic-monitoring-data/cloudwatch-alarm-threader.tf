@@ -16,7 +16,7 @@ locals {
 
   alarm_thread_state_prefix = "alarm-threading/current"
 
-  alarm_debounce_seconds      = 120
+  alarm_debounce_seconds = 120
   alarm_debounce_bypass_names = concat(
     [
       aws_cloudwatch_metric_alarm.glue_database_count_high.alarm_name,

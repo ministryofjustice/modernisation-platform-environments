@@ -19,6 +19,10 @@ variable "options" {
       enabled               = optional(bool, false)
       aws_health_lambda_arn = optional(string)
     }), {})
+    aws_securityhub_lambda_configuration = optional(object({
+      enabled                    = optional(bool, false)
+      aws_securityhub_lambda_arn = optional(string)
+    }), {})
     cloudwatch_dashboard_default_widget_groups    = optional(list(string))          # create Cloudwatch-Default dashboard; list of map keys to filter local.cloudwatch_dashboard_widget_groups
     cloudwatch_log_groups_retention_in_days       = optional(number)                # number of days to retain cloudwatch log groups, retention is environment specific, so will be determined in locals.
     cloudwatch_metric_alarms_default_actions      = optional(list(string))          # default alarm_action to apply to cloudwatch metrics returned by this module
@@ -75,5 +79,14 @@ variable "options" {
     )
 
     error_message = "When AWS Health event forwarding is enabled, aws_health_lambda_arn must be provided and non-empty."
+  }
+
+  validation {
+    condition = (
+      !var.options.aws_securityhub_lambda_configuration.enabled ||
+      try(trimspace(var.options.aws_securityhub_lambda_configuration.aws_securityhub_lambda_arn), "") != ""
+    )
+
+    error_message = "When AWS Security Hub event forwarding is enabled, aws_securityhub_lambda_arn must be provided and non-empty."
   }
 }

@@ -15,6 +15,7 @@ locals {
     var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessPolicy"] : [],
     length(var.options.ssm_maintenance_window_run_commands) != 0 ? ["SSMPatchManagerTaskPolicy"] : [],
     var.options.aws_health_lambda_configuration.enabled ? ["InvokeAWSHealthLambda"] : [],
+    var.options.aws_securityhub_lambda_configuration.enabled ? ["InvokeAWSSecurityHubLambda"] : [],
     "EC2Default",
     "EC2Db",
   ]))
@@ -53,6 +54,17 @@ locals {
           effect    = "Allow"
           actions   = ["lambda:InvokeFunction"]
           resources = [var.options.aws_health_lambda_configuration.aws_health_lambda_arn]
+        }
+      ]
+    }
+
+    InvokeAWSSecurityHubLambda = {
+      description = "Allows EventBridge to invoke the AWS Security Hub Lambda function"
+      statements = [
+        {
+          effect    = "Allow"
+          actions   = ["lambda:InvokeFunction"]
+          resources = [var.options.aws_securityhub_lambda_configuration.aws_securityhub_lambda_arn]
         }
       ]
     }

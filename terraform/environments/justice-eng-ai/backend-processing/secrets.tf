@@ -60,3 +60,10 @@ resource "aws_iam_role_policy" "script_runner_gov_uk_notify_api_key" {
   role   = aws_iam_role.script_runner_ecs_task.name
   policy = data.aws_iam_policy_document.script_runner_gov_uk_notify_api_key.json
 }
+
+# The ECS agent injects the secret as API_KEY at task start, using the execution role
+resource "aws_iam_role_policy" "script_runner_execution_gov_uk_notify_api_key" {
+  name   = "${local.application_name}-script-runner-execution-gov-uk-notify-api-key"
+  role   = aws_iam_role.script_runner_ecs_execution.name
+  policy = data.aws_iam_policy_document.script_runner_gov_uk_notify_api_key.json
+}

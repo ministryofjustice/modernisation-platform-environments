@@ -51,6 +51,8 @@ Modernisation Platform
 
 <!-- List, briefly, problems (or types of problem) that will automatically alert your team when they occur. -->
 
+CloudWatch alarms for script-runner failures, Bedrock errors, failed Step Functions executions and web UI or prototype runtime problems post to the Slack alerts channel (`alerts_slack_channel_id` in `application_variables.json`). See [backend-processing/README.md](backend-processing/README.md).
+
 ### **Impact of an outage:**
 
 <!-- A short description of the risks if your service is down for an extended period of time. -->

@@ -57,6 +57,24 @@ variable "auto_stop_timeout" {
   default = 60
 }
 
+variable "compute_type_name" {
+  type        = string
+  description = "Compute type for workspaces. Must match the bundle; the provider otherwise defaults to VALUE."
+  default     = "POWER"
+}
+
+variable "root_volume_size_gib" {
+  type        = number
+  description = "Root volume size in GiB. Must be at least the bundle's root volume size."
+  default     = 175
+}
+
+variable "user_volume_size_gib" {
+  type        = number
+  description = "User volume size in GiB. Must be at least the bundle's user volume size."
+  default     = 100
+}
+
 variable "ip_group_allowed_cidrs" {
   type = list(object({
     source      = string
