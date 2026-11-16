@@ -80,7 +80,7 @@ resource "aws_vpc_security_group_egress_rule" "alb_egress_opa_ecs" {
   security_group_id            = aws_security_group.opahub_load_balancer.id
   description                  = "Allow ALB egress to OIA ECS task ports"
   ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].opa_server_port
+  from_port                    = local.application_data.accounts[local.environment].opa_ssl_port
   to_port                      = local.application_data.accounts[local.environment].opa_ssl_port
   referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
 }
@@ -106,14 +106,14 @@ resource "aws_security_group" "ecs_tasks_opa" {
   )
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress" {
-  security_group_id            = aws_security_group.ecs_tasks_opa.id
-  referenced_security_group_id = aws_security_group.opahub_load_balancer.id
-  ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].opa_server_port
-  to_port                      = local.application_data.accounts[local.environment].opa_server_port
-  description                  = "Allow ALB to reach ECS app port"
-}
+# resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress" {
+#   security_group_id            = aws_security_group.ecs_tasks_opa.id
+#   referenced_security_group_id = aws_security_group.opahub_load_balancer.id
+#   ip_protocol                  = "tcp"
+#   from_port                    = local.application_data.accounts[local.environment].opa_server_port
+#   to_port                      = local.application_data.accounts[local.environment].opa_server_port
+#   description                  = "Allow ALB to reach ECS app port"
+# }
 
 resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_ssl" {
   security_group_id            = aws_security_group.ecs_tasks_opa.id
