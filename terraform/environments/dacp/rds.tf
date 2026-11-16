@@ -1,30 +1,3 @@
-# 1. Create a custom parameter group
-resource "aws_db_parameter_group" "dacp_analyse" {
-  name_prefix = "custom-postgres16-parameters-"
-  family      = "postgres16" # match your RDS engine version
-  description = "Custom parameter group for slow query logging"
-
-  parameter {
-    name  = "log_min_duration_statement"
-    value = "0" # log queries longer than 5 seconds
-  }
-
-  parameter {
-    name  = "log_statement"
-    value = "none"
-  }
-
-  parameter {
-    name  = "log_destination"
-    value = "stderr"
-  }
-
-  # A family change forces replacement; the old group can't be deleted while the instance still uses it.
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_db_subnet_group" "dbsubnetgroup_data" {
   name       = "dbsubnetgroup-data"
   subnet_ids = data.aws_subnets.shared-data.ids
@@ -36,7 +9,6 @@ resource "aws_db_instance" "dacp_db_v2" {
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   #checkov:skip=CKV_AWS_354: "Ensure RDS Performance Insights are encrypted using KMS CMKs"
-  #checkov:skip=CKV2_AWS_69: "Ensure AWS RDS database instance configured with encryption in transit" - app does not yet support SSL & aws_db_parameter_group.dacp_analyse is for development only
   allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
   db_name                         = local.application_data.accounts[local.environment].db_name
   storage_type                    = local.application_data.accounts[local.environment].storage_type
@@ -53,12 +25,12 @@ resource "aws_db_instance" "dacp_db_v2" {
   publicly_accessible             = false
   vpc_security_group_ids          = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup_data.name
-  allow_major_version_upgrade     = true
+  allow_major_version_upgrade     = false
   auto_minor_version_upgrade      = true
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
   apply_immediately               = local.is-production ? false : true
   copy_tags_to_snapshot           = true
-  parameter_group_name            = local.is-production ? "default.postgres16" : aws_db_parameter_group.dacp_analyse.name
+  parameter_group_name            = "default.${local.db_parameter_group_family}"
   maintenance_window              = local.is-production ? "sun:04:00-sun:04:30" : "wed:19:20-wed:19:50"
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 }
