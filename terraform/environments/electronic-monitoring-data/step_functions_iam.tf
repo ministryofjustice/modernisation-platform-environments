@@ -273,7 +273,8 @@ data "aws_iam_policy_document" "trigger_cadt_step_function_policy_document" {
     actions = ["lambda:InvokeFunction"]
     resources = [
       module.trigger_cadt.lambda_function_arn,
-      module.poll_cadt.lambda_function_arn
+      module.poll_cadt.lambda_function_arn,
+      module.lake_formation_permission_granter.lambda_function_arn,
     ]
   }
 }
@@ -385,11 +386,9 @@ resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
 
         Resource = [
           module.merge_redrive_planner.lambda_function_arn,
+          module.lake_formation_permission_granter.lambda_function_arn,
         ]
       },
     ]
   })
 }
-
-
-

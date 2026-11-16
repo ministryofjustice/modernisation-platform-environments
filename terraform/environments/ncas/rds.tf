@@ -24,7 +24,7 @@ resource "aws_db_instance" "ncas_db_v2" {
   publicly_accessible             = false
   vpc_security_group_ids          = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup_data.name
-  allow_major_version_upgrade     = false
+  allow_major_version_upgrade     = true
   auto_minor_version_upgrade      = true
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
   apply_immediately               = local.is-production ? false : true

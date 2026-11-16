@@ -19,12 +19,12 @@ resource "aws_ssm_parameter" "ssogen_1_cw_agent_config" {
   description = "SSOGEN cloud watch agent config"
   name        = "ssogen-1-cloud-watch-config"
   type        = "String"
-  value       = templatefile("./templates/cw_agent_config_ssogen.json", {
-    ADMIN_LOG_PATH_1        = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs/*.log"
-    ADMIN_LOG_PATH_2        = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs/*.out"
-    OHS_LOG_PATH          = "/u01/product/runtime/Domain/mserver/instances/OHS_inst1/diagnostics/logs/OHS/ohs1/*?log"
-    MSERVER_LOG_PATH_1      = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG1/logs/WLS_EAG*"
-    MSERVER_LOG_PATH_2      = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG1/logs/access.log"
+  value = templatefile("./templates/cw_agent_config_ssogen.json", {
+    ADMIN_LOG_PATH_1   = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs/*.log"
+    ADMIN_LOG_PATH_2   = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs/*.out"
+    OHS_LOG_PATH       = "/u01/product/runtime/Domain/mserver/instances/OHS_inst1/diagnostics/logs/OHS/ohs1/*?log"
+    MSERVER_LOG_PATH_1 = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG1/logs/WLS_EAG*"
+    MSERVER_LOG_PATH_2 = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG1/logs/access.log"
   })
 
   tags = merge(local.tags,
@@ -42,12 +42,12 @@ resource "aws_ssm_parameter" "ssogen_2_cw_agent_config" {
   description = "SSOGEN cloud watch agent config"
   name        = "ssogen-2-cloud-watch-config"
   type        = "String"
-  value       = templatefile("./templates/cw_agent_config_ssogen.json", {
-    ADMIN_LOG_PATH_1        = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs/*.log"
-    ADMIN_LOG_PATH_2        = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs/*.out"
-    OHS_LOG_PATH          = "/u01/product/runtime/Domain/mserver/instances/OHS_inst2/diagnostics/logs/OHS/ohs2/*?log"
-    MSERVER_LOG_PATH_1      = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG2/logs/WLS_EAG*"
-    MSERVER_LOG_PATH_2      = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG2/logs/access.log"
+  value = templatefile("./templates/cw_agent_config_ssogen.json", {
+    ADMIN_LOG_PATH_1   = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs/*.log"
+    ADMIN_LOG_PATH_2   = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs/*.out"
+    OHS_LOG_PATH       = "/u01/product/runtime/Domain/mserver/instances/OHS_inst2/diagnostics/logs/OHS/ohs2/*?log"
+    MSERVER_LOG_PATH_1 = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG2/logs/WLS_EAG*"
+    MSERVER_LOG_PATH_2 = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG2/logs/access.log"
   })
 
   tags = merge(local.tags,

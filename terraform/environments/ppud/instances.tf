@@ -1029,166 +1029,9 @@ resource "aws_instance" "s618358rgvw205" {
   }
 }
 
-# Internal Mail Relay
-
-resource "aws_instance" "s266316rgsl200" {
-  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
-  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0f43890c2b4907c29"
-  instance_type          = "m5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_b.id
-  key_name               = aws_key_pair.cjms_instance[0].key_name
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name           = "s266316rgsl200"
-    is-production  = true
-    patch_group    = "prod_lin_patch"
-    docker_service = "true"
-    archive_volume = "true"
-  }
-}
-
-# External non-CJSM Mail Relay
-
-resource "aws_instance" "s265903rgsl400-non-cjsm" {
-  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
-  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0f43890c2b4907c29"
-  instance_type          = "m5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
-  subnet_id              = data.aws_subnet.public_subnets_b.id
-  key_name               = aws_key_pair.cjms_instance[0].key_name
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name           = "s265903rgsl400-non-cjsm"
-    is-production  = true
-    patch_group    = "prod_lin_patch"
-    docker_service = "true"
-  }
-}
-
-# External CJSM Mail Relay
-
-resource "aws_instance" "s265903rgsl401-cjsm" {
-  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
-  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0f43890c2b4907c29"
-  instance_type          = "m5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
-  subnet_id              = data.aws_subnet.public_subnets_c.id
-  key_name               = aws_key_pair.cjms_instance[0].key_name
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name           = "s265903rgsl401-cjsm"
-    is-production  = true
-    patch_group    = "prod_lin_patch"
-    docker_service = "true"
-    port25_check   = "true"
-  }
-}
-
-# Docker Build Server
-
-resource "aws_instance" "docker-build-server" {
-  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
-  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-050d499cfdd1ff7d4"
-  instance_type          = "m5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.conditional["Docker-Build-Server-Security-Group"].id]
-  # vpc_security_group_ids = [aws_security_group.docker-build-server[0].id]
-  subnet_id = data.aws_subnet.private_subnets_c.id
-  key_name  = aws_key_pair.cjms_instance[0].key_name
-  root_block_device {
-    delete_on_termination = true
-    volume_size           = "40"
-    volume_type           = "gp2"
-  }
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name          = "docker-build-server"
-    is-production = true
-    patch_group   = "prod_lin_patch"
-  }
-}
-
-resource "aws_key_pair" "cjms_instance" {
-  count      = local.is-production == true ? 1 : 0
-  key_name   = "linuxcjms"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDH6T6qfPg3nUtc+A0KiWra+Alg5MyBu31FYTDvaYUY9r8ySG1+Aiz+FlV6bGQGHFaKia2GNKc/OEQ9fIs0mDDRQRoc5jtli4wwP9VtLPd7c+VdywoVvPaqAgW8KzpqTdcH8RUC1w0+12UmVlPp/RQg1b8vSVOqI0aXOVm9Faitd+YDERtJGbxdgMjaCpoJcRMjmX3omFJFU1egjOePzagOp6RZOonvGOARYat2v0yB01m7PIMwxcmP6bClx/ME9EZ6uTWYI9+wEyBwWdRYM8MV+DRe3BcepPUI/uQVJ/CDtS1f3snSKE9GKJFnUAhBp263ezZyBlidDL4L3mPzpSHV ctl\\ac97864@GBR-5CG9525GMX"
-}
-
-/*
-
-# Soft Decommissioning these EIPs
-
-# resource block for eip
-resource "aws_eip" "s265903rgsl400-non-cjsm" {
-  count  = local.is-production == true ? 1 : 0
-  domain = "vpc"
-  tags = {
-    Name = "s265903rgsl400-non-cjsm"
-  }
-}
-
-resource "aws_eip" "s265903rgsl401-cjsm" {
-  count  = local.is-production == true ? 1 : 0
-  domain = "vpc"
-  tags = {
-    Name = "s265903rgsl401-cjsm"
-  }
-}
-
-
-#Associate EIP for SMTP Relay EC2 Instance
-resource "aws_eip_association" "s265903rgsl400-eip-association-non-cjsm" {
-  count         = local.is-production == true ? 1 : 0
-  instance_id   = aws_instance.s265903rgsl400-non-cjsm[0].id
-  allocation_id = aws_eip.s265903rgsl400-non-cjsm[0].id
-}
-
-resource "aws_eip_association" "s265903rgsl401-eip-association-cjsm" {
-  count         = local.is-production == true ? 1 : 0
-  instance_id   = aws_instance.s265903rgsl401-cjsm[0].id
-  allocation_id = aws_eip.s265903rgsl401-cjsm[0].id
-}
-
-*/
 
 #########################################################################################################################
-# New Amazon Linux 2023 Instances (to replace Amazon Linux 2 EOL instances)
+# New Amazon Linux 2023 Instances
 #########################################################################################################################
 
 # Internal Mail Relay
@@ -1307,6 +1150,13 @@ resource "aws_instance" "docker-build-instance" {
   }
 }
 
+# Key Pair for Linux Instances
+
+resource "aws_key_pair" "cjms_instance" {
+  count      = local.is-production == true ? 1 : 0
+  key_name   = "linuxcjms"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDH6T6qfPg3nUtc+A0KiWra+Alg5MyBu31FYTDvaYUY9r8ySG1+Aiz+FlV6bGQGHFaKia2GNKc/OEQ9fIs0mDDRQRoc5jtli4wwP9VtLPd7c+VdywoVvPaqAgW8KzpqTdcH8RUC1w0+12UmVlPp/RQg1b8vSVOqI0aXOVm9Faitd+YDERtJGbxdgMjaCpoJcRMjmX3omFJFU1egjOePzagOp6RZOonvGOARYat2v0yB01m7PIMwxcmP6bClx/ME9EZ6uTWYI9+wEyBwWdRYM8MV+DRe3BcepPUI/uQVJ/CDtS1f3snSKE9GKJFnUAhBp263ezZyBlidDL4L3mPzpSHV ctl\\ac97864@GBR-5CG9525GMX"
+}
 
 # Elastic IP Addresses for External Mail Relays
 
@@ -1325,7 +1175,6 @@ resource "aws_eip" "cjsm-mail-relay-eip" {
     Name = "cjsm-mail-relay-eip"
   }
 }
-
 
 # Associate EIP for Mail Relay EC2 Instances
 

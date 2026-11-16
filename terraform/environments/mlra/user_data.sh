@@ -1,6 +1,7 @@
 #!/bin/bash -xe
+# shellcheck disable=SC2154,SC2034
 # TODO LASB-5089 Remove
-echo ECS_CLUSTER=${app_name} >> /etc/ecs/ecs.config
+echo "ECS_CLUSTER=${app_name}" >> /etc/ecs/ecs.config
 echo ECS_IMAGE_PULL_BEHAVIOR=always >> /etc/ecs/ecs.config
 yum install -y awslogs
 cat >/etc/awslogs/awslogs.conf <<-EOF
@@ -59,21 +60,21 @@ else
   AGENT_PATH="pre-prod/cortex-agent.tar.gz"
 fi
 
-aws s3 cp "$${XDR_AGENT_BUCKET}$${AGENT_PATH}" ${xdr_tar}
+aws s3 cp "$${XDR_AGENT_BUCKET}$${AGENT_PATH}" "${xdr_tar}"
 
 if [[ -f ${xdr_tar} ]]; then
-  mkdir -p ${xdr_dir}
-  tar -xzf ${xdr_tar} -C ${xdr_dir}
+  mkdir -p "${xdr_dir}"
+  tar -xzf "${xdr_tar}" -C "${xdr_dir}"
 
   if [[ -f ${xdr_dir}/cortex.conf ]]; then
     sudo mkdir -p /etc/panw
-    sudo cp ${xdr_dir}/cortex.conf /etc/panw/
+    sudo cp "${xdr_dir}"/cortex.conf /etc/panw/
   else
     echo "Missing cortex.conf in extracted archive" >&2
     exit 1
   fi
 
-  sudo yum install -y ${xdr_dir}/*.rpm
+  sudo yum install -y "${xdr_dir}"/*.rpm
   sudo /opt/traps/bin/cytool endpoint_tags add "${xdr_tags}"
 
 else

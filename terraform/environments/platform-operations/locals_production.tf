@@ -261,6 +261,66 @@ locals {
         timezone = "Europe/London"
         workflow = "certificate_renewal.yml"
       }
+      mp-automation-db-refresh-nomis-1a = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "preprod_nomis_db_1_a"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 7 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "nomis_database_refresh.yml"
+      }
+      mp-automation-db-refresh-nomis-2a = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "preprod_nomis_db_2_a"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 10 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "nomis_database_refresh.yml"
+      }
+      mp-automation-db-refresh-oasys-ppoasys = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "pp_oasys_db_a_PPOASYS"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 7 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "oasys_database_refresh.yml"
+      }
+      mp-automation-db-refresh-oasys-ppoasrep = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "pp_onr_db_a_PPOASREP"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 8 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "oasys_database_refresh.yml"
+      }
+      mp-automation-db-refresh-oasys-ppmistrn = {
+        identity = "platops"
+        inputs = {
+          scheduled_run = "pp_onr_db_a_PPMISTRN"
+        }
+
+        ref      = "main"
+        repo     = "dso-modernisation-platform-automation"
+        schedule = "cron(0 9 ? * SUN *)"
+        timezone = "Europe/London"
+        workflow = "oasys_database_refresh.yml"
+      }
       mp-automation-github-workflow-monitoring = {
         identity = "platops"
         inputs = {

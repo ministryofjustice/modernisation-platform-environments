@@ -186,7 +186,6 @@ module "downstream_reconciliation_audit" {
   })
 }
 
-
 # ------------------------------------------------------------------------------
 # Staging DB janitor Step Function
 # ------------------------------------------------------------------------------
@@ -428,6 +427,13 @@ module "trigger_cadt_step_function" {
       "trigger_cadt" = module.trigger_cadt.lambda_function_name,
       "environment"  = local.environment,
       "poll_cadt"    = module.poll_cadt.lambda_function_name,
+      "grant_lf_permissions" = (
+        module.lake_formation_permission_granter.lambda_function_name
+      ),
+      "lf_permission_grants" = jsonencode({
+        fail_on_missing = true
+        grants          = local.downstream_reconciliation_lf_grants
+      })
     }
   )
   type = "STANDARD"
