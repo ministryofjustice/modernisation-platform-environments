@@ -173,7 +173,7 @@ data "aws_iam_policy_document" "s3_topic_policy" {
     }
 
     actions   = ["SNS:Publish"]
-    resources = ["arn:aws:sns:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:s3-event-notification-topic"]
+    resources = ["arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:s3-event-notification-topic"]
 
     condition {
       test     = "ArnLike"
@@ -197,7 +197,7 @@ data "aws_iam_policy_document" "s3_topic_policy" {
       identifiers = ["events.amazonaws.com"]
     }
     actions   = ["SNS:Publish"]
-    resources = ["arn:aws:sns:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:s3-event-notification-topic"]
+    resources = ["arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:s3-event-notification-topic"]
   }
 }
 
@@ -207,13 +207,6 @@ data "aws_route53_zone" "application-zone" {
 
   name         = "ccms-ebs.service.justice.gov.uk."
   private_zone = false
-}
-
-## GANDI CERT
-data "aws_acm_certificate" "gandi_cert" {
-  count    = local.is-production ? 1 : 0
-  domain   = local.application_data.accounts[local.environment].lz_domain_name
-  statuses = ["ISSUED"]
 }
 
 ## PROD DNS

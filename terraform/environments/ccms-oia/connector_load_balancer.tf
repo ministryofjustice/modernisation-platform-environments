@@ -9,7 +9,8 @@ resource "aws_lb" "connector" {
 
   subnets = data.aws_subnets.shared-private.ids
 
-  security_groups = [aws_security_group.connector_load_balancer.id]
+  security_groups            = [aws_security_group.connector_load_balancer.id]
+  enable_deletion_protection = true
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
     prefix  = "${local.connector_app_name}-internal-lb"
@@ -29,7 +30,7 @@ resource "aws_lb_target_group" "connector_target_group" {
   port                 = local.application_data.accounts[local.environment].connector_server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
+  target_type          = "ip"
   deregistration_delay = 30
 
   health_check {

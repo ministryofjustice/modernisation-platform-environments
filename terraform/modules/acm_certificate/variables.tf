@@ -26,6 +26,7 @@ variable "subject_alternate_names" {
   default     = []
 }
 
+# tflint-ignore: terraform_typed_variables
 variable "route53_zones" {
   description = "Provide a map of existing route53_zones that can be used for validation, e.g. from environment module route53_zones output.  Key is zone name and value must include zone_id and provider"
   default     = {}

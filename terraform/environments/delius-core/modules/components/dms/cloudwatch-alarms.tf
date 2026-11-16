@@ -1,6 +1,6 @@
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "dms_alerts_topic" {
-  name              = "delius-dms-alerts-topic"
+  name              = "${var.env_name}-delius-dms-alerts-topic"
   kms_master_key_id = var.account_config.kms_keys.general_shared
 
   http_success_feedback_role_arn    = aws_iam_role.sns_logging_role.arn
@@ -9,7 +9,7 @@ resource "aws_sns_topic" "dms_alerts_topic" {
 }
 
 resource "aws_iam_role" "sns_logging_role" {
-  name = "sns-logging-role"
+  name = "${var.env_name}-dms-sns-logging-role"
 
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
@@ -91,14 +91,14 @@ locals {
 
 resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   for_each            = local.aws_dms_replication_tasks
-  alarm_name          = "dms-cdc-latency-source-${each.value.replication_task_id}"
+  alarm_name          = "${var.env_name}-dms-cdc-latency-source-${each.value.replication_task_id}"
   alarm_description   = "High CDC source latency for dms replication task for ${each.value.replication_task_id}"
   namespace           = "AWS/DMS"
   statistic           = "Average"
   metric_name         = "CDCLatencySource"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 15
-  evaluation_periods  = 3
+  threshold           = 120
+  evaluation_periods  = 6
   period              = 120
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.dms_alerts_topic.arn]
@@ -113,14 +113,14 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
 
 resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   for_each            = local.aws_dms_replication_tasks
-  alarm_name          = "dms-cdc-latency-target-${each.value.replication_task_id}"
+  alarm_name          = "${var.env_name}-dms-cdc-latency-target-${each.value.replication_task_id}"
   alarm_description   = "High CDC target latency for dms replication task for ${each.value.replication_task_id}"
   namespace           = "AWS/DMS"
   statistic           = "Average"
   metric_name         = "CDCLatencyTarget"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 15
-  evaluation_periods  = 3
+  threshold           = 120
+  evaluation_periods  = 6
   period              = 120
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.dms_alerts_topic.arn]
@@ -156,11 +156,10 @@ locals {
 # Non-Prod alerts channel: #delius-aws-oracle-dev-alerts
 # Prod alerts channel:     #delius-aws-oracle-prod-alerts
 module "pagerduty_core_alerts" {
-  #checkov:skip=CKV_TF_1
   depends_on = [
     aws_sns_topic.dms_alerts_topic
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=d88bd90d490268896670a898edfaba24bba2f8ab" # v3.0.0
   sns_topics                = [aws_sns_topic.dms_alerts_topic.name]
   pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
 }
@@ -186,7 +185,7 @@ module "disable_out_of_hours_alarms" {
   count  = local.disable_latency_alarms.start_time == null ? 0 : 1
   source = "../../../../../modules/schedule_alarms_lambda"
 
-  lambda_function_name = "toggle-dms-cdc-latency-alarms"
+  lambda_function_name = "${var.env_name}-toggle-dms-cdc-latency-alarms"
 
   start_time      = local.disable_latency_alarms.start_time
   end_time        = local.disable_latency_alarms.end_time
@@ -200,7 +199,7 @@ module "disable_out_of_hours_alarms" {
 # IAM Role for Lambda
 resource "aws_iam_role" "lambda_exec" {
   #checkov:skip=CKV_AWS_60 "ignore"
-  name = "dms-checker-lambda-role"
+  name = "${var.env_name}-dms-checker-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -217,9 +216,8 @@ resource "aws_iam_role" "lambda_exec" {
 # IAM Policy for Lambda (permissions to describe DMS tasks and write to the clodwatch logs)
 resource "aws_iam_role_policy" "lambda_policy" {
   #checkov:skip=CKV_AWS_290 "ignore"
-  #checkov:skip=CKV_AWS_50 "ignore"
   #checkov:skip=CKV_AWS_355 "ignore"
-  name = "dms-checker-policy"
+  name = "${var.env_name}-dms-checker-policy"
   role = aws_iam_role.lambda_exec.id
 
   policy = jsonencode({
@@ -263,24 +261,26 @@ data "archive_file" "lambda_dms_replication_stopped_zip" {
 
 # Lambda Function to check DMS replication is not running (source in Zip archive)
 resource "aws_lambda_function" "dms_checker" {
-  #checkov:skip=CKV_AWS_117 "ignore"
-  #checkov:skip=CKV_AWS_116 "ignore"
-  #checkov:skip=CKV_AWS_115 "ignore"
-  #checkov:skip=CKV_AWS_173 "ignore"
-  #checkov:skip=CKV_AWS_50 "ignore"
-  #checkov:skip=CKV_AWS_272 "ignore"
-  function_name = "dms-task-health-checker"
+  #checkov:skip=CKV_AWS_117: "VPC not required - Lambda only calls AWS APIs via service endpoints"
+  #checkov:skip=CKV_AWS_116: "DLQ not required"
+  #checkov:skip=CKV_AWS_173: "Env Vars are not sensitive"
+  #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
+  #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
+  function_name = "${var.env_name}-dms-task-health-checker"
   role          = aws_iam_role.lambda_exec.arn
   handler       = "detect_stopped_replication.lambda_handler"
   runtime       = "python3.11"
   timeout       = 30
   filename      = "${path.module}/lambda/detect_stopped_replication.zip"
 
+  reserved_concurrent_executions = 10
+
   # Automatically triggers redeploy when code changes
   source_code_hash = data.archive_file.lambda_dms_replication_stopped_zip.output_base64sha256
 
   environment {
     variables = {
+      ENV_NAME      = var.env_name
       SNS_TOPIC_ARN = aws_sns_topic.dms_alerts_topic.arn
     }
   }
@@ -288,7 +288,7 @@ resource "aws_lambda_function" "dms_checker" {
 
 # EventBridge Rule to Trigger Lambda Every 15 Minutes (We hardcode this for now for simplicity - can change it if it needs to be configurable)
 resource "aws_cloudwatch_event_rule" "check_dms_every_15_min" {
-  name                = "check-dms-every-15-minutes"
+  name                = "${var.env_name}-check-dms-every-15-minutes"
   schedule_expression = "rate(15 minutes)"
 }
 
@@ -315,14 +315,23 @@ resource "aws_lambda_permission" "allow_eventbridge" {
 resource "aws_cloudwatch_metric_alarm" "dms_alarm" {
   alarm_name          = "dms-cdc-task-not-running-in-${var.env_name}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = 1
-  metric_name         = "DMSTaskNotRunning"
-  namespace           = "Custom/DMS"
-  period              = 300
-  statistic           = "Maximum"
-  threshold           = 1
 
-  alarm_description = "Triggered when any DMS replication task is not running"
+  # Allow a task to not be running for up to 40 minutes (8*300 seconds)
+  # to allow for weekly password rotation.  Any replication lag will
+  # catch up once it has resumed.
+  evaluation_periods  = 8
+  datapoints_to_alarm = 8
+
+  metric_name = "DMSTaskNotRunning"
+  namespace   = "Custom/DMS"
+  period      = 300
+  statistic   = "Maximum"
+  threshold   = 1
+  dimensions = {
+    Environment = var.env_name
+  }
+
+  alarm_description = "Triggered when any ${var.env_name} DMS replication task is not running"
   actions_enabled   = true
   alarm_actions     = [aws_sns_topic.dms_alerts_topic.arn]
   ok_actions        = [aws_sns_topic.dms_alerts_topic.arn]

@@ -45,6 +45,35 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
   }
 }
 
+#  Deny any request that does not use TLS/HTTPS
+data "aws_iam_policy_document" "deployment_report_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    actions = [
+      "s3:*"
+    ]
+    resources = [
+      aws_s3_bucket.deployment_report.arn,
+      "${aws_s3_bucket.deployment_report.arn}/*"
+    ]
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "deployment_report_secure_transport" {
+  bucket = aws_s3_bucket.deployment_report.id
+  policy = data.aws_iam_policy_document.deployment_report_secure_transport.json
+}
+
 ######################################################
 # ECR Resources
 ######################################################

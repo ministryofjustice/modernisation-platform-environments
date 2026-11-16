@@ -13,14 +13,68 @@ resource "aws_security_group" "load_balancer_internal" {
 }
 
 # EGRESS
-resource "aws_vpc_security_group_egress_rule" "lb_int_egress_all_0_0_cidr" {
-  security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Allow all outbound traffic"
-  ip_protocol       = "-1"
-  cidr_ipv4         = "0.0.0.0/0"
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_3872_app" {
+  security_group_id            = aws_security_group.load_balancer_internal.id
+  description                  = "Allow all outbound traffic"
+  ip_protocol                  = "tcp"
+  from_port                    = 3872
+  to_port                      = 3872
+  referenced_security_group_id = aws_security_group.oem_app_security_group.id
 
   tags = {
-    Name = "Allow all outbound traffic"
+    Name = "Allow access to app on 3872"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_8000_app" {
+  security_group_id            = aws_security_group.load_balancer_internal.id
+  description                  = "Allow all outbound traffic"
+  ip_protocol                  = "tcp"
+  from_port                    = 8000
+  to_port                      = 8000
+  referenced_security_group_id = aws_security_group.oem_app_security_group.id
+
+  tags = {
+    Name = "Allow access to app on 8000"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_7803_app" {
+  security_group_id            = aws_security_group.load_balancer_internal.id
+  description                  = "Allow all outbound traffic"
+  ip_protocol                  = "tcp"
+  from_port                    = 7803
+  to_port                      = 7803
+  referenced_security_group_id = aws_security_group.oem_app_security_group.id
+
+  tags = {
+    Name = "Allow access to app on 7803"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_4903_app" {
+  security_group_id            = aws_security_group.load_balancer_internal.id
+  description                  = "Allow all outbound traffic"
+  ip_protocol                  = "tcp"
+  from_port                    = 4903
+  to_port                      = 4903
+  referenced_security_group_id = aws_security_group.oem_app_security_group.id
+
+  tags = {
+    Name = "Allow access to app on 4903"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_7102_app" {
+  security_group_id            = aws_security_group.load_balancer_internal.id
+  description                  = "Allow all outbound traffic"
+  ip_protocol                  = "tcp"
+  from_port                    = 7102
+  to_port                      = 7102
+  referenced_security_group_id = aws_security_group.oem_app_security_group.id
+
+  tags = {
+    Name = "Allow access to app on 7102"
   }
 }
 
@@ -105,14 +159,14 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_3872_3872_cid
 
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_3872_3872_cidr_any" {
   security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Oracle EM Console HTTP from internet (public access)"
+  description       = "Oracle EM Console HTTP from all LZ workspaces"
   ip_protocol       = "tcp"
   from_port         = 3872
   to_port           = 3872
   cidr_ipv4         = local.cidr_lz_workspaces_all
 
   tags = {
-    Name = "Oracle EM Console HTTP from anywhere"
+    Name = "Oracle EM Console HTTP from all LZ workspaces"
   }
 }
 
@@ -157,14 +211,14 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_4903_4903_cid
 
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_4903_4903_cidr_any" {
   security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Oracle EM Console HTTPS from internet (public access)"
+  description       = "Oracle EM Console HTTPS from all LZ workspaces"
   ip_protocol       = "tcp"
   from_port         = 4903
   to_port           = 4903
   cidr_ipv4         = local.cidr_lz_workspaces_all
 
   tags = {
-    Name = "Oracle EM Console HTTPS from anywhere"
+    Name = "Oracle EM Console HTTPS from all LZ workspaces"
   }
 }
 
@@ -248,13 +302,13 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_7803_7803_cid
 
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_7803_7803_cidr_any" {
   security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Oracle EM additional port from internet (public access)"
+  description       = "Oracle EM additional port from all LZ workspaces"
   ip_protocol       = "tcp"
   from_port         = 7803
   to_port           = 7803
   cidr_ipv4         = local.cidr_lz_workspaces_all
 
   tags = {
-    Name = "Oracle EM port 7803 from anywhere"
+    Name = "Oracle EM port 7803 from all LZ workspaces"
   }
 }

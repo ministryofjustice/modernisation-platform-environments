@@ -119,6 +119,17 @@ resource "aws_iam_policy" "cw_logging_policy" {
           "Resource" : [
             "arn:aws:logs:*:*:*"
           ]
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "kms:GenerateDataKey*",
+            "kms:Decrypt",
+            "kms:DescribeKey"
+          ],
+          "Resource" : [
+            aws_kms_key.cloudwatch_logs.arn
+          ]
         }
       ]
     }
@@ -282,20 +293,23 @@ resource "aws_iam_role_policy_attachment" "ec2_operations_policy_att" {
 #tfsec:ignore:aws-iam-no-user-attached-policies
 resource "aws_iam_user" "email" {
   #checkov:skip=CKV_AWS_273: "Skipping as tfsec check is also set to ignore"
-  name = format("%s-%s-email_user", local.application_name, local.environment)
+  count = local.is-production ? 1 : 0
+  name  = format("%s-%s-email_user", local.application_name, local.environment)
   tags = merge(local.tags,
     { Name = format("%s-%s-email_user", local.application_name, local.environment) }
   )
 }
 
 resource "aws_iam_access_key" "email" {
-  user = aws_iam_user.email.name
+  count = local.is-production ? 1 : 0
+  user  = aws_iam_user.email[0].name
 }
 
 #tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_user_policy" "email_policy" {
+  count  = local.is-production ? 1 : 0
   name   = "AmazonSesSendingAccess"
-  user   = aws_iam_user.email.name
+  user   = aws_iam_user.email[0].name
   policy = data.aws_iam_policy_document.email.json
 }
 
@@ -366,28 +380,57 @@ resource "aws_iam_role" "lambda_execution_role" {
   )
 }
 
-# Attach S3 Policy to Lambda Role
-resource "aws_iam_role_policy_attachment" "s3_policy_lambda" {
-  role       = aws_iam_role.lambda_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-}
+# Lambda execution role policy 
+resource "aws_iam_role_policy" "lambda-execution-role-policy" {
+  name = "${local.application_name}-${local.environment}-lambda-execution-role-policy"
+  role = aws_iam_role.lambda_execution_role.id
 
-# Attach ENI Management Policy to Lambda Role
-resource "aws_iam_role_policy_attachment" "eni_management_policy_lambda" {
-  role       = aws_iam_role.lambda_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectTagging",
+          "s3:ListBucket",
+          "s3:PutObject",
+          "s3:PutObjectTagging",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          aws_s3_bucket.lambda_payment_load.arn,
+          "${aws_s3_bucket.lambda_payment_load.arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.application_name}-${local.environment}-payment-load:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup"
+        ]
+        Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"
+      },
+      {
+        "Effect"   = "Allow",
+        "Action"   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+        "Resource" = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:db-${local.environment}-credentials*"]
+      }
+    ]
+  })
 }
 
 # Attach VPC Access Policy to Lambda Role
 resource "aws_iam_role_policy_attachment" "vpc_access_policy_lambda" {
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-# Attach Secrets Manager Policy to Lambda Role
-resource "aws_iam_role_policy_attachment" "secrets_manager_policy_lambda" {
-  role       = aws_iam_role.lambda_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
 
 # Hub-20 S3 Permissions Policy (Dev, Test, Production)
