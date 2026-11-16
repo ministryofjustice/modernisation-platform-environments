@@ -55,19 +55,11 @@ resource "aws_secretsmanager_secret" "non_modernisation_platform_account_ids" {
 }
 
 #tfsec:ignore:avd-aws-0098 CMK not required currently
-resource "aws_secretsmanager_secret" "grafana_cloud_user" {
+resource "aws_secretsmanager_secret" "grafana_cloud_admin_user_details" {
   #checkov:skip=CKV_AWS_149:CMK not required currently
   #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
 
-  name = "grafana/grafana-cloud-user"
-}
-
-#tfsec:ignore:avd-aws-0098 CMK not required currently
-resource "aws_secretsmanager_secret" "grafana_cloud_password" {
-  #checkov:skip=CKV_AWS_149:CMK not required currently
-  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
-
-  name = "grafana/grafana-cloud-password"
+  name = "grafana-cloud/admin-user-details"
 }
 
 #tfsec:ignore:avd-aws-0098 CMK not required currently

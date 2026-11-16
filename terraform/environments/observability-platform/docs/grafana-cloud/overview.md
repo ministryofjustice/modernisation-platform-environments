@@ -29,9 +29,10 @@ Terraform creates the empty secret `grafana-cloud/terraform-access-policy-token`
 (`secrets.tf`) in each account and reads it in `data.tf`. Populate its value
 manually, as with the other Grafana secrets: the raw token as the secret
 string, not a JSON object. Use separate tokens for development and production,
-set an expiry, and rotate before expiry. The existing
-`grafana/grafana-cloud-user` and `grafana/grafana-cloud-password` secrets are
-unrelated and are not reused.
+set an expiry, and rotate before expiry. The
+`grafana-cloud/admin-user-details` secret holds the admin username and
+password as a JSON object (`{"username": "...", "password": "..."}`). It is
+unrelated and is not read by Terraform.
 
 Secret values read by Terraform are stored in state and may be present in
 saved plans: restrict access to both and to the state backend.
