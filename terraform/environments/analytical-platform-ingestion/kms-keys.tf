@@ -153,7 +153,7 @@ module "transferred_sns_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   aliases               = ["sns/transferred"]
   description           = "Key for transferred notifications"
@@ -179,7 +179,7 @@ module "supplier_data_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   aliases               = ["secretsmanager/supplier-data"]
   description           = "Key for SFTP supplier data"
@@ -205,7 +205,7 @@ module "ec2_ebs_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   aliases               = ["ec2/ebs"]
   description           = "EC2 EBS KMS Key"
@@ -231,7 +231,7 @@ module "s3_datasync_opg_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   aliases               = ["s3/datasync-opg"]
   description           = "DataSync OPG S3 KMS Key"
@@ -269,7 +269,7 @@ module "secretsmanager_common_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   aliases               = ["secretsmanager/common"]
   description           = "Common secretsmanager KMS Key"
@@ -283,7 +283,7 @@ module "s3_laa_data_analysis_kms" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   aliases               = ["s3/laa-data-analysis"]
   description           = "LAA Data Analysis S3 KMS Key"
@@ -298,7 +298,7 @@ module "shared_services_client_team_gov_29148_egress_kms" {
   count = local.is-production ? 1 : 0
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   aliases               = ["s3/ssct-gov-29148-egress"]
   description           = "Shared Services Client Team GOV-29148 Egress"
@@ -316,6 +316,44 @@ module "shared_services_client_team_gov_29148_egress_kms" {
         {
           type        = "AWS"
           identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-ssct-gov-29148-egress"]
+        }
+      ]
+    }
+  ]
+  deletion_window_in_days = 7
+}
+
+module "property_datahub_staging_egress_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  count = local.is-production ? 1 : 0
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.2.0"
+
+  aliases               = ["s3/property-datahub-staging-egress"]
+  description           = "Property Datahub Staging Egress"
+  enable_default_policy = true
+  key_statements = [
+    {
+      sid = "AllowPropertyCafmReplication"
+      actions = [
+        "kms:Encrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:root"]
+        }
+      ]
+      conditions = [
+        {
+          test     = "ArnLike"
+          variable = "aws:PrincipalArn"
+          values   = ["arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/property-datahub-staging-replication"]
         }
       ]
     }

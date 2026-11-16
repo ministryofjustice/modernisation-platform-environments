@@ -18,11 +18,19 @@ resource "aws_wafv2_web_acl" "dacp_web_acl" {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
+
         rule_action_override {
           action_to_use {
             allow {}
           }
           name = "SizeRestrictions_Cookie_HEADER"
+        }
+
+        rule_action_override {
+          name = "SizeRestrictions_BODY"
+          action_to_use {
+            count {}
+          }
         }
       }
     }
@@ -53,6 +61,52 @@ resource "aws_wafv2_web_acl" "dacp_web_acl" {
         name        = "AWSManagedRulesKnownBadInputsRuleSet"
         vendor_name = "AWS"
       }
+    }
+  }
+
+  rule {
+    name     = "AWSManagedRulesAntiDDoSRuleSet"
+    priority = 9999999 # managed by AWS Shield Advanced automatic DDoS mitigation; match what Shield sets
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesAntiDDoSRuleSet"
+        vendor_name = "AWS"
+
+        managed_rule_group_configs {
+          aws_managed_rules_anti_ddos_rule_set {
+            sensitivity_to_block = "LOW"
+
+            client_side_action_config {
+              challenge {
+                usage_of_action = "DISABLED"
+                sensitivity     = "HIGH"
+
+                exempt_uri_regular_expression {
+                  regex_string = "\\/api\\/|\\.(acc|avi|css|gif|ico|jpe?g|js|json|mp[34]|ogg|otf|pdf|png|tiff?|ttf|webm|webp|woff2?|xml)$"
+                }
+              }
+            }
+          }
+        }
+
+        rule_action_override {
+          name = "DDoSRequests"
+          action_to_use {
+            count {}
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWSManagedRulesAntiDDoSRuleSet"
+      sampled_requests_enabled   = false
     }
   }
 

@@ -1,0 +1,179 @@
+#------------------------------------------------------------------------------
+# AWS Distro for OpenTelemetry (ADOT) — EKS Add-on
+#
+# Deploys the ADOT operator on the cluster. The operator manages
+# OpenTelemetryCollector CRDs which define the actual scrape/export pipeline.
+#
+# Prerequisites:
+#   - cert-manager must be installed (deployed in cluster-core)
+#   - Pod Identity association created in amp.tf
+#
+# The ADOT add-on installs the operator only. The collector configuration
+# (what to scrape, where to export) is defined via an OpenTelemetryCollector
+# custom resource below.
+#------------------------------------------------------------------------------
+
+resource "aws_eks_addon" "adot" {
+  count = local.enable_amp_adot ? 1 : 0
+
+  cluster_name                = local.cluster_name
+  addon_name                  = "adot"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+
+  tags = merge(local.tags, {
+    component = "observability-poc"
+    option    = "A-amp-adot"
+  })
+}
+
+#------------------------------------------------------------------------------
+# OpenTelemetryCollector CR — configures ADOT to scrape Prometheus metrics
+# and remote-write to AMP.
+#
+# Deployed as a DaemonSet to collect node-level and pod metrics from every node.
+# Uses the service account bound to the AMP remote-write IAM role via Pod Identity.
+#------------------------------------------------------------------------------
+
+# The opentelemetry-operator-system namespace is created and owned by the ADOT
+# EKS add-on itself, so Terraform must not manage it (doing so races the add-on
+# and fails with "namespace already exists"). The namespace is on the Gatekeeper
+# PSA-label exclusion list, so it does not need an explicit enforce label.
+
+resource "kubernetes_service_account_v1" "adot_collector" {
+  count = local.enable_amp_adot ? 1 : 0
+
+  metadata {
+    name      = "adot-collector"
+    namespace = "opentelemetry-operator-system"
+  }
+
+  depends_on = [aws_eks_addon.adot]
+}
+
+#------------------------------------------------------------------------------
+# RBAC for the collector's Prometheus service discovery.
+#
+# The Prometheus receiver's kubernetes_sd_configs (roles node/pod/endpoints)
+# list and watch cluster-scoped resources to discover scrape targets, and the
+# cadvisor job scrapes each node via the API server proxy (nodes/proxy). The
+# collector ServiceAccount has none of this by default, so without this
+# ClusterRole discovery returns zero targets: nothing is scraped, nothing is
+# remote-written, and the AMP workspace stays empty. Pod Identity (amp.tf)
+# only covers AWS auth to AMP; it does not grant Kubernetes API access.
+#------------------------------------------------------------------------------
+
+resource "kubernetes_cluster_role_v1" "adot_collector" {
+  count = local.enable_amp_adot ? 1 : 0
+
+  metadata {
+    name = "adot-collector-prometheus-discovery"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["nodes", "nodes/metrics", "nodes/proxy", "services", "endpoints", "pods"]
+    verbs      = ["get", "list", "watch"]
+  }
+
+  rule {
+    non_resource_urls = ["/metrics", "/metrics/cadvisor", "/metrics/resource"]
+    verbs             = ["get"]
+  }
+
+  depends_on = [aws_eks_addon.adot]
+}
+
+resource "kubernetes_cluster_role_binding_v1" "adot_collector" {
+  count = local.enable_amp_adot ? 1 : 0
+
+  metadata {
+    name = "adot-collector-prometheus-discovery"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "adot-collector-prometheus-discovery"
+  }
+
+  # Ensure the ClusterRole exists before the binding references it.
+  depends_on = [kubernetes_cluster_role_v1.adot_collector]
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.adot_collector[0].metadata[0].name
+    namespace = kubernetes_service_account_v1.adot_collector[0].metadata[0].namespace
+  }
+}
+
+resource "kubectl_manifest" "adot_collector" {
+  count = local.enable_amp_adot ? 1 : 0
+
+  yaml_body = yamlencode({
+    apiVersion = "opentelemetry.io/v1beta1"
+    kind       = "OpenTelemetryCollector"
+    metadata = {
+      name      = "adot-amp"
+      namespace = "opentelemetry-operator-system"
+    }
+    spec = {
+      mode           = "daemonset"
+      serviceAccount = "adot-collector"
+      # v1beta1 OpenTelemetryCollector expects spec.config as a structured
+      # object, not an embedded YAML string, so this map is emitted directly.
+      config = {
+        receivers = {
+          prometheus = {
+            config = {
+              global = {
+                scrape_interval = "60s"
+                scrape_timeout  = "15s"
+              }
+              # Scrape jobs are defined as named locals in adot-scrape-config.tf
+              # and composed into this list there.
+              scrape_configs = local.adot_scrape_configs
+            }
+          }
+        }
+        processors = {
+          batch = {
+            timeout         = "60s"
+            send_batch_size = 1000
+          }
+        }
+        exporters = {
+          prometheusremotewrite = {
+            endpoint = "${aws_prometheus_workspace.this[0].prometheus_endpoint}api/v1/remote_write"
+            auth = {
+              authenticator = "sigv4auth"
+            }
+          }
+        }
+        extensions = {
+          sigv4auth = {
+            region  = data.aws_region.current.region
+            service = "aps"
+          }
+        }
+        service = {
+          extensions = ["sigv4auth"]
+          pipelines = {
+            metrics = {
+              receivers  = ["prometheus"]
+              processors = ["batch"]
+              exporters  = ["prometheusremotewrite"]
+            }
+          }
+        }
+      }
+    }
+  })
+
+  depends_on = [
+    aws_eks_addon.adot,
+    kubernetes_service_account_v1.adot_collector,
+    kubernetes_cluster_role_binding_v1.adot_collector,
+    aws_eks_pod_identity_association.adot_amp
+  ]
+}

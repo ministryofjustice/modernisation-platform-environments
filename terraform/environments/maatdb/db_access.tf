@@ -8,7 +8,7 @@ locals {
 }
 
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=aa44d28a832a5071f7bde436646d4639b0444737" #v4.4.2
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=d53a3a63e05a75149046d139bb14f24f56dd7375" # v6.1.0
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -24,12 +24,13 @@ module "bastion_linux" {
   log_glacier_days     = 60  # days before moving to Glacier
   log_expiry_days      = 180 # days before log expiration
   # bastion
-  allow_ssh_commands = false
-  app_name           = var.networking[0].application
-  business_unit      = local.vpc_name
-  subnet_set         = local.subnet_set
-  environment        = local.environment
-  region             = "eu-west-2"
+  allow_ssh_commands      = false
+  app_name                = var.networking[0].application
+  business_unit           = local.vpc_name
+  subnet_set              = local.subnet_set
+  environment             = local.environment
+  region                  = "eu-west-2"
+  extra_user_data_content = "dnf update -y ca-certificates --releasever 2023.12.20261026 && update-ca-trust"
   # Autoscaling
   autoscaling_cron = local.crontab
 
