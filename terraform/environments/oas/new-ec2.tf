@@ -35,6 +35,17 @@ resource "aws_secretsmanager_secret_version" "ec2_ssh_private_key_version" {
     private_key = tls_private_key.ec2_ssh_key[0].private_key_openssh
     public_key  = tls_private_key.ec2_ssh_key[0].public_key_openssh
   })
+
+  # The Terraform-generated key only seeds the secret at first boot - the
+  # oas-rotate-ssh-key Lambda (new_lambda_rotate_ssh_key.tf) owns rotation
+  # from then on via secretsmanager:PutSecretValue. Without this, the next
+  # terraform apply would see the rotated value as drift and silently
+  # overwrite it back to this Terraform-generated key.
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
 
 ######################################
@@ -76,7 +87,7 @@ resource "aws_instance" "oas_app_instance_new" {
   key_name                    = aws_key_pair.ec2_key_pair[0].key_name
   monitoring                  = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   user_data                   = base64encode(local.userdata_new)
 
   network_interface {

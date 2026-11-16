@@ -11,7 +11,7 @@ locals {
         "ec2_autoscaling_group_linux",
         "ec2_instance_linux",
         "ec2_instance_oracle_db_with_backup",
-        "ec2_instance_textfile_monitoring",
+        "ec2_instance_textfile_monitoring_with_connectivity_test",
         "ec2_windows",
         "ssm_command",
       ]
@@ -20,16 +20,15 @@ locals {
 
       sns_topics = {
         pagerduty_integrations = {
-          azure-fixngo-pagerduty              = "az-noms-production-1-alerts"
-          corporate-staff-rostering-pagerduty = "corporate-staff-rostering-production"
-          dso-pipelines-pagerduty             = "dso-pipelines"
-          hmpps-domain-services-pagerduty     = "hmpps-domain-services-production"
-          nomis-combined-reporting-pagerduty  = "nomis-combined-reporting-production"
-          nomis-pagerduty                     = "nomis-production"
-          oasys-national-reporting-pagerduty  = "oasys-national-reporting-production"
-          oasys-pagerduty                     = "oasys-production"
-          pagerduty                           = "hmpps-oem-production"
-          planetfm-pagerduty                  = "planetfm-production"
+          azure-fixngo-production-pagerduty              = "az-noms-production-1-alerts"
+          corporate-staff-rostering-production-pagerduty = "corporate-staff-rostering-production"
+          hmpps-domain-services-production-pagerduty     = "hmpps-domain-services-production"
+          nomis-combined-reporting-production-pagerduty  = "nomis-combined-reporting-production"
+          nomis-production-pagerduty                     = "nomis-production"
+          oasys-national-reporting-production-pagerduty  = "oasys-national-reporting-production"
+          oasys-production-pagerduty                     = "oasys-production"
+          pagerduty                                      = "hmpps-oem-production"
+          planetfm-production-pagerduty                  = "planetfm-production"
         }
       }
     }
@@ -259,7 +258,8 @@ locals {
       prod-oem-a = merge(local.ec2_instances.oem, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.oem.cloudwatch_metric_alarms,
-          local.cloudwatch_metric_alarms_endpoint_monitoring
+          local.cloudwatch_metric_alarms_endpoint_monitoring,
+          local.cloudwatch_metric_alarms_smtp_connectivity_test
         )
         config = merge(local.ec2_instances.oem.config, {
           availability_zone = "eu-west-2a"
@@ -303,10 +303,57 @@ locals {
       }
     }
 
+    # Allow Pre-Production RMAN Catalog to import Production RMAN Catalog for refreshes
+    s3_buckets = contains(keys(module.baseline_presets.s3_buckets), "prod-hmpps-oem-db-backup-bucket-") ? {
+      "prod-hmpps-oem-db-backup-bucket-" = merge(
+        module.baseline_presets.s3_buckets["prod-hmpps-oem-db-backup-bucket-"],
+        {
+          bucket_policy_v2 = [
+            {
+              sid    = "S3ReadProdPreprod"
+              effect = "Allow"
+              actions = [
+                "s3:Get*",
+                "s3:ListBucket",
+              ]
+              principals = {
+                type = "AWS"
+                identifiers = [
+                  "arn:aws:iam::128485831926:root",
+                  "arn:aws:iam::411333525523:root"
+                ]
+              }
+            },
+            {
+              sid    = "AllowEC2DatabaseRolePreprodOEM"
+              effect = "Allow"
+              actions = [
+                "s3:Get*",
+                "s3:ListBucket",
+              ]
+              principals = {
+                type = "AWS"
+                identifiers = [
+                  "arn:aws:iam::128485831926:role/ec2-database-role-preprod-oem-a"
+                ]
+              }
+            }
+          ]
+        }
+      )
+    } : {}
+
     secretsmanager_secrets = {
       "/oracle/oem"              = local.secretsmanager_secrets.oem
       "/oracle/database/EMREP"   = local.secretsmanager_secrets.oem
       "/oracle/database/PRCVCAT" = local.secretsmanager_secrets.oem
+    }
+
+    ssm_patch_baselines = {
+      OracleLinuxPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["OracleLinuxPatchGroup1Baseline"], {
+        rule1_approve_after_days = null
+        rule1_approve_until_date = "2026-09-17"
+      })
     }
   }
 }

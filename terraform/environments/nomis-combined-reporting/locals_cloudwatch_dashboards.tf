@@ -134,5 +134,20 @@ locals {
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
       ]
     }
+
+    rclone = {
+      header_markdown = "## EC2 RCLONE"
+      width           = 8
+      height          = 8
+      search_filter = {
+        ec2_tag = [
+          { tag_name = "server-type", tag_value = "ncr-bip-cms" },
+        ]
+      }
+      widgets = [
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_rclone_sync.rclone-sync-error,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_rclone_sync.rclone-sync-metric-not-updated,
+      ]
+    }
   }
 }

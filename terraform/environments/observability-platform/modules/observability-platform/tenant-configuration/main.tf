@@ -3,7 +3,7 @@ module "xray_source" {
     for name, account in var.aws_accounts : name => account if account.xray_enabled
   }
 
-  source = "../../grafana/xray-source"
+  source = "../../amazon-managed-grafana/xray-source"
 
   name       = each.key
   account_id = var.all_account_ids[each.key]
@@ -14,7 +14,7 @@ module "cloudwatch_source" {
     for name, account in var.aws_accounts : name => account if account.cloudwatch_enabled
   }
 
-  source = "../../grafana/cloudwatch-source"
+  source = "../../amazon-managed-grafana/cloudwatch-source"
 
   name                         = each.key
   account_id                   = var.all_account_ids[each.key]
@@ -29,7 +29,7 @@ module "amazon_prometheus_query_source" {
     for name, account in var.aws_accounts : name => account if account.amazon_prometheus_query_enabled
   }
 
-  source = "../../grafana/amazon-prometheus-query-source"
+  source = "../../amazon-managed-grafana/amazon-prometheus-query-source"
 
   name                               = each.key
   account_id                         = var.all_account_ids[each.key]
@@ -55,7 +55,7 @@ module "athena_source" {
     for config in local.flattened_athena_configs : config.key => config
   }
 
-  source = "../../grafana/athena-source"
+  source = "../../amazon-managed-grafana/athena-source"
 
   name             = each.key
   account_id       = each.value.account_id
@@ -75,7 +75,7 @@ module "prometheus_push" {
 }
 
 module "team" {
-  source = "../../grafana/team"
+  source = "../../amazon-managed-grafana/team"
 
   providers = {
     aws = aws.sso

@@ -19,3 +19,15 @@ output "aws_kms_alias_oracle_ec2_alias_target_key_arn" {
   description = "aws_kms_alias oracle_ec2_alias target_key_arn"
   value       = aws_kms_alias.oracle_ec2_alias.target_key_arn
 }
+
+#
+
+output "aws_kms_key_cloudwatch_logs_arn" {
+  description = "aws_kms_key cloudwatch_logs arn"
+  value       = aws_kms_key.cloudwatch_logs.arn
+}
+
+output "aws_kms_key_cloudwatch_logs_key_id" {
+  description = "aws_kms_key cloudwatch_logs key_id"
+  value       = aws_kms_key.cloudwatch_logs.key_id
+}

@@ -52,7 +52,11 @@ module "multiphase_query_lambda_trigger" {
       "source" : ["aws.athena"],
       "detail-type" : ["Athena Query State Change"],
       "detail" : {
-        "workgroupName" : ["dpr-generic-athena-workgroup"]
+        "workgroupName" : [
+          "dpr-generic-athena-workgroup",
+          "dpr-reporting-prisons-athena-workgroup",
+          "dpr-reporting-probation-athena-workgroup"
+        ]
       }
     }
   )

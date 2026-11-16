@@ -12,12 +12,29 @@ locals {
 
   alb_security_group_id = module.alb.security_group.id
 
+  # TODO LASB-5089 Remove
   user_data = base64encode(templatefile("user_data.sh", {
     app_name    = local.application_name,
     environment = local.environment,
     xdr_dir     = "/tmp/cortex-agent",
     xdr_tar     = "/tmp/cortex-agent.tar.gz",
     xdr_tags    = local.xdr_tags
+  }))
+
+  # TODO LASB-5089 (Optional) rename to user_data
+  user_data_al2023 = base64encode(templatefile("user_data_al2023.sh", {
+    app_name    = local.application_name,
+    environment = local.environment,
+    xdr_dir     = "/tmp/cortex-agent",
+    xdr_tar     = "/tmp/cortex-agent.tar.gz",
+    xdr_tags    = local.xdr_tags
+
+    cw_agent_config = templatefile(
+      "${path.module}/cloudwatch-agent.json",
+      {
+        app_name = local.application_name
+      }
+    )
   }))
 
   maatdb_password_secret_name    = "APP_MAATDB_DBPASSWORD_MLA1"

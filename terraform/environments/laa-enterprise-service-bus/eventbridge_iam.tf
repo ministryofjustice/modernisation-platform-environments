@@ -27,7 +27,7 @@ resource "aws_iam_policy" "scheduler_invoke_sfn" {
     Statement = [{
       Effect   = "Allow",
       Action   = "states:StartExecution",
-      Resource = "${aws_sfn_state_machine.sfn_state_machine.arn}"
+      Resource = aws_sfn_state_machine.sfn_state_machine.arn
     }]
   })
 }

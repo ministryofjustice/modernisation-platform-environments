@@ -1,3 +1,4 @@
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
 module "mlflow_iam_role" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
@@ -16,7 +17,7 @@ module "mlflow_iam_role" {
   oidc_providers = {
     main = {
       provider_arn               = data.aws_iam_openid_connect_provider.eks.arn
-      namespace_service_accounts = ["${kubernetes_namespace.mlflow[0].metadata[0].name}:mlflow"]
+      namespace_service_accounts = ["${kubernetes_namespace_v1.mlflow[0].metadata[0].name}:mlflow"]
     }
   }
 

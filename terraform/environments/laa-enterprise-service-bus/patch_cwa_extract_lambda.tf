@@ -93,10 +93,10 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
   s3_object_version = data.aws_s3_object.cwa_extract_zip.version_id
   timeout           = 900
   memory_size       = 128
-  runtime           = "python3.10"
+  runtime           = "python3.14"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
+    aws_lambda_layer_version.lambda_layer_p314_oic21.arn,
   ]
 
   vpc_config {
@@ -108,15 +108,15 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
     variables = {
       PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
       DB_SECRET_NAME    = aws_secretsmanager_secret.patch_cwa_db_secret[0].name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_1"
-      ORACLE_HOME       = "/opt/instantclient_12_1"
+      LD_LIBRARY_PATH   = "/opt/instantclient_21_23"
+      ORACLE_HOME       = "/opt/instantclient_21_23"
       SERVICE_NAME      = "cwa-extract-service"
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = "patch"
       LOG_LEVEL         = "DEBUG"
       TNS_ADMIN         = "/tmp/wallet_dir"
       WALLET_BUCKET     = data.aws_s3_bucket.lambda_files.bucket
-      WALLET_OBJ        = "wallet_files/CWA/wallet_dir.zip"
+      WALLET_OBJ        = "wallet_files/CWA/${local.application_data.accounts[local.environment].wallet_file_cwa}"
     }
   }
 
@@ -137,10 +137,10 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
   s3_object_version = data.aws_s3_object.cwa_file_transfer_zip.version_id
   timeout           = 900
   memory_size       = 128
-  runtime           = "python3.10"
+  runtime           = "python3.14"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn
+    aws_lambda_layer_version.lambda_layer_p314_oic21.arn
   ]
 
   vpc_config {
@@ -153,15 +153,15 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
       TABLE_NAME_SECRET = aws_secretsmanager_secret.cwa_table_name_secret.name
       TARGET_BUCKET     = aws_s3_bucket.patch_data[0].bucket
       DB_SECRET_NAME    = aws_secretsmanager_secret.patch_cwa_db_secret[0].name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_1"
-      ORACLE_HOME       = "/opt/instantclient_12_1"
+      LD_LIBRARY_PATH   = "/opt/instantclient_21_23"
+      ORACLE_HOME       = "/opt/instantclient_21_23"
       SERVICE_NAME      = "cwa-file-transfer-service"
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = "patch"
       LOG_LEVEL         = "DEBUG"
       TNS_ADMIN         = "/tmp/wallet_dir"
       WALLET_BUCKET     = data.aws_s3_bucket.lambda_files.bucket
-      WALLET_OBJ        = "wallet_files/CWA/wallet_dir.zip"
+      WALLET_OBJ        = "wallet_files/CWA/${local.application_data.accounts[local.environment].wallet_file_cwa}"
     }
   }
 
@@ -182,11 +182,9 @@ resource "aws_lambda_function" "patch_cwa_sns_lambda" {
   s3_object_version = data.aws_s3_object.cwa_sns_zip.version_id
   timeout           = 300
   memory_size       = 128
-  runtime           = "python3.10"
+  runtime           = "python3.14"
 
-  layers = [
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
-  ]
+  layers = [data.aws_ssm_parameter.lambda_layer_python_powertools.value]
 
   vpc_config {
     security_group_ids = [aws_security_group.patch_cwa_extract_sg[0].id]

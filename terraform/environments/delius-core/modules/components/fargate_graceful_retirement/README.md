@@ -55,7 +55,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ------ | ------ |
 | [aws_cloudwatch_event_rule.ecs_restart_rule](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
 | [aws_cloudwatch_event_target.step_function_target](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
 | [aws_iam_policy.lambda_ecs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
@@ -76,7 +76,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ------ | ------------- | ------ | --------- | :--------: |
 | <a name="input_debug_logging"></a> [debug\_logging](#input\_debug\_logging) | Enable debug logging | `bool` | `false` | no |
 | <a name="input_restart_day_of_the_week"></a> [restart\_day\_of\_the\_week](#input\_restart\_day\_of\_the\_week) | The day of the week to restart the ECS task | `string` | `"WEDNESDAY"` | no |
 | <a name="input_restart_time"></a> [restart\_time](#input\_restart\_time) | The time at which to restart the ECS task | `string` | `"22:00"` | no |
