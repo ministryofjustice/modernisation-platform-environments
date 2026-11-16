@@ -83,6 +83,8 @@ module "cross_account_details" {
     fms_ho_kms_id        = ""
     fms_specials_bucket  = ""
     fms_specials_kms_id  = ""
+    gems_general_bucket  = ""
+    gems_general_kms_id  = ""
     mdss_general_bucket  = ""
     mdss_general_kms_id  = ""
     mdss_specials_bucket = ""
