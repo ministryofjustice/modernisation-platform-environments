@@ -647,6 +647,7 @@ updates:
       - "terraform/environments/developer-experience/github-audit-log-stream"
       - "terraform/environments/developer-experience/github-backup"
       - "terraform/environments/developer-experience/github-management"
+      - "terraform/environments/developer-experience/github-sts"
     schedule:
       interval: "daily"
     groups:
