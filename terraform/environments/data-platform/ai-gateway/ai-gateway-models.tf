@@ -74,11 +74,12 @@ resource "litellm_model" "google_gemini_enterprise_agent_platform" {
   model_name          = startswith(each.key, "gemini-") ? each.key : "gemini-${each.key}"
   base_model          = each.value.model_id
   tier                = "paid"
+  mode                = try(each.value.mode, null)
 
   # vertex_credentials is deliberately omitted; the pod's GOOGLE_APPLICATION_CREDENTIALS (WIF) is used instead
-  # "eu" is a multi-region identifier, not a regional location, so it's routed via api_base rather than vertex_location
+  # Realtime also needs the EU location in the Vertex WebSocket setup model path.
   vertex_project  = local.google_cloud_project_name
-  vertex_location = each.value.location == "eu" ? null : each.value.location
+  vertex_location = each.value.location == "eu" && try(each.value.mode, null) != "realtime" ? null : each.value.location
   model_api_base  = each.value.location == "eu" ? "https://aiplatform.eu.rep.googleapis.com" : null
 
   additional_litellm_params = {
