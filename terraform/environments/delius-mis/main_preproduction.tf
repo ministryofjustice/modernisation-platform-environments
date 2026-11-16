@@ -28,17 +28,17 @@ module "environment_stage" {
 
   boe_efs_config = local.boe_efs_config_stage
 
-  bcs_config     = local.bcs_config_stage
-  bps_config     = local.bps_config_stage
-  bws_config     = local.bws_config_stage
-  bws_sso_config = local.bws_sso_config_stage
-  dis_config     = local.dis_config_stage
-  dfi_config     = local.dfi_config_stage
+  bcs_config = local.bcs_config_stage
+  bps_config = local.bps_config_stage
+  bws_config = local.bws_config_stage
+  dis_config = local.dis_config_stage
+  dfi_config = local.dfi_config_stage
 
   dsd_db_config = local.dsd_db_config_stage
   boe_db_config = local.boe_db_config_stage
   mis_db_config = local.mis_db_config_stage
 
+  acm_certificate          = local.acm_certificate_stage
   fsx_config               = local.fsx_config_stage
   dfi_report_bucket_config = local.dfi_report_bucket_config_stage
   lb_config                = local.lb_config_stage
@@ -46,7 +46,7 @@ module "environment_stage" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  create_backup_role = false # since already created in stage
+  create_backup_role = false # since already created in stage
 
   tags = local.tags
 
@@ -92,6 +92,7 @@ module "environment_preproduction" {
   boe_db_config = local.boe_db_config_preprod
   mis_db_config = local.mis_db_config_preprod
 
+  acm_certificate          = local.acm_certificate_preprod
   fsx_config               = local.fsx_config_preprod
   dfi_report_bucket_config = local.dfi_report_bucket_config_preprod
   lb_config                = local.lb_config_preprod

@@ -74,3 +74,10 @@ module "keda_namespace" {
   name     = "keda"
   workload = "system"
 }
+
+module "metrics_server_namespace" {
+  source = "./modules/kubernetes/namespace"
+
+  name     = "metrics-server"
+  workload = "system"
+}

@@ -3,7 +3,7 @@ data "aws_region" "current" {}
 # DMS Source Endpoint
 resource "aws_dms_endpoint" "source" {
   #checkov:skip=CKV_AWS_296: Use AWS managed KMS key
-  endpoint_id   = "${var.db}-source-${data.aws_region.current.name}-${var.environment}"
+  endpoint_id   = "${var.db}-source-${data.aws_region.current.region}-${var.environment}"
   endpoint_type = "source"
   engine_name   = var.dms_source.engine_name
 
@@ -13,7 +13,7 @@ resource "aws_dms_endpoint" "source" {
   extra_connection_attributes     = var.dms_source.extra_connection_attributes
 
   tags = merge(
-    { Name = "${var.db}-source-${data.aws_region.current.name}-${var.environment}" },
+    { Name = "${var.db}-source-${data.aws_region.current.region}-${var.environment}" },
     var.tags
   )
 }
@@ -21,7 +21,7 @@ resource "aws_dms_endpoint" "source" {
 # DMS S3 Target Endpoint
 resource "aws_dms_s3_endpoint" "s3_target" {
   # checkov:skip=CKV_AWS_298: Use AWS managed KMS key
-  endpoint_id                      = "${var.db}-target-${data.aws_region.current.name}-${var.environment}"
+  endpoint_id                      = "${var.db}-target-${data.aws_region.current.region}-${var.environment}"
   endpoint_type                    = "target"
   bucket_name                      = aws_s3_bucket.landing.bucket
   bucket_folder                    = var.dms_target_prefix
@@ -40,7 +40,7 @@ resource "aws_dms_s3_endpoint" "s3_target" {
   timestamp_column_name            = var.s3_target_config.timestamp_column_name
 
   tags = merge(
-    { Name = "${var.db}-target-${data.aws_region.current.name}-${var.environment}" },
+    { Name = "${var.db}-target-${data.aws_region.current.region}-${var.environment}" },
     var.tags
   )
 }

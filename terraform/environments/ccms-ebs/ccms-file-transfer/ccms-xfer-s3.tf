@@ -3,7 +3,8 @@
 # ---------------------------------------------
 
 module "s3-bucket-sftp-bc" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
   bucket_name        = local.sftp_bc_bucket_name
   versioning_enabled = true
   bucket_policy = [jsonencode({
@@ -67,10 +68,20 @@ module "s3-bucket-sftp-bc" {
     ]
   })]
 
-  log_bucket     = local.logging_bucket_name
-  log_prefix     = "s3access/${local.sftp_bc_bucket_name}"
-  custom_kms_key = aws_kms_key.s3_sftp_bc_kms_key.arn
-  sse_algorithm  = "aws:kms"
+  log_buckets = {
+    log_bucket_name = local.logging_bucket_name
+    log_bucket_arn  = "arn:aws:s3:::${local.logging_bucket_name}"
+  }
+  manage_log_bucket_policy = false
+
+  log_prefix                = "s3-access-logs/"
+  log_partition_date_source = "EventTime"
+
+  # unencrypted uploads are required in the bc bucket current state (as of 23/10/26)
+  # set enforce_kms_request_headers = false to ensure this remains
+  enforce_kms_request_headers = false
+  custom_kms_key              = aws_kms_key.s3_sftp_kms_key.arn
+  sse_algorithm               = "aws:kms"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -86,21 +97,21 @@ module "s3-bucket-sftp-bc" {
 
   lifecycle_rule = [
     {
-      id      = "delete-archive-folder-file-after-7-days"
+      id      = "delete-files-after-42-days"
       enabled = "Enabled"
-      prefix  = "archive/"
+      prefix  = ""
 
       expiration = {
-        days = 7
+        days = 42
       }
     },
     {
-      id      = "delete-noncurrent-versions-after-7-days"
+      id      = "delete-noncurrent-versions-asap"
       enabled = "Enabled"
       prefix  = ""
 
       noncurrent_version_expiration = {
-        days = 7
+        days = 1
       }
     }
   ]
@@ -110,21 +121,20 @@ module "s3-bucket-sftp-bc" {
   )
 }
 
-resource "aws_s3_bucket_notification" "sftp_bc_bucket_notification" {
+resource "aws_s3_bucket_notification" "sftp_bucket_notification" {
   bucket      = module.s3-bucket-sftp-bc.bucket.id
   eventbridge = true
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.process_file_from_bucket_lambda_function.arn
-    events              = ["s3:ObjectCreated:Put"]
-    filter_prefix       = "inbound/"
-    filter_suffix       = ".csv"
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "ccms-transfer-bc-${local.environment}/inbound/"
   }
 
   depends_on = [module.s3-bucket-sftp-bc]
 }
 
-resource "aws_cloudwatch_event_rule" "sftp_bc_bucket_event_rule" {
+resource "aws_cloudwatch_event_rule" "sftp_bucket_event_rule" {
   name        = "sftp-bc-bucket-event-rule"
   description = "Event rule to trigger on S3 Object Created events for the sftp-bc bucket"
   event_pattern = jsonencode({
@@ -139,13 +149,13 @@ resource "aws_cloudwatch_event_rule" "sftp_bc_bucket_event_rule" {
   tags = merge(local.tags, { name = "sftp-bc-bucket-event-rule" })
 }
 
-resource "aws_cloudwatch_event_target" "sftp_bc_bucket_event_target" {
-  rule      = aws_cloudwatch_event_rule.sftp_bc_bucket_event_rule.name
+resource "aws_cloudwatch_event_target" "sftp_bucket_event_target" {
+  rule      = aws_cloudwatch_event_rule.sftp_bucket_event_rule.name
   target_id = "s3-event-target"
   arn       = data.aws_sns_topic.s3_topic.arn
 }
 
-resource "aws_s3_object" "sftp_bc_folder" {
+resource "aws_s3_object" "sftp_folder" {
   bucket = module.s3-bucket-sftp-bc.bucket.id
   for_each = {
     for name in local.sftp_bc_folder_name :

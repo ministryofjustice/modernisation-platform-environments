@@ -1,5 +1,16 @@
 # Service Runbook
 
+## Architecture diagrams
+
+[General Infrastructure](infra_docs_and_diagramms/aws-icons/01-general-infrastructure.md)
+(AWS icons) · [Data Flow](infra_docs_and_diagramms/aws-icons/02-data-flow.md) (Mermaid) —
+derived from the Terraform in this directory.
+
+oas shares a VPC with `edw-19c` and has a declared-but-inactive direct link to it — see
+the combined view:
+[Combined General Infrastructure](infra_docs_and_diagramms/aws-icons/00-combined-general-infrastructure.md) ·
+[Combined Data Flow](infra_docs_and_diagramms/aws-icons/00-combined-data-flow.md)
+
 <!-- This is a template that should be populated by the development team when moving to the modernisation platform, but also reviewed and kept up to date.
 To ensure that people looking at your runbook can get the information they need quickly, your runbook should be short but clear. Throughout, only use acronyms if you’re confident that someone who has just been woken up at 3am would understand them. -->
 

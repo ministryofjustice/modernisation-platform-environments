@@ -141,7 +141,7 @@ locals {
   tariffdb_volume_layout = [
     {
       device_name = "xvde"
-      size        = 100
+      size        = local.environment == "production" ? 200 : 100
     },
     {
       device_name = "xvdf"
@@ -149,7 +149,7 @@ locals {
     },
     {
       device_name = "xvdg"
-      size        = 100
+      size        = local.environment == "production" ? 200 : 100
     },
     {
       device_name = "xvdh"
@@ -203,8 +203,21 @@ locals {
     }
   ]
 
-  mw_ami_target_id = local.environment == "development" ? "i-07e8ab8df178e58aa" : local.environment == "production" ? "i-06a75f5adc84dab2e" : ""
-  mw_date_time     = "2025-12-05T03:10:00"
+  # Maintenance Window configuration
+
+  # Single source of truth for where MW resources should exist.
+  ssm_mw_environments = toset(["development"])
+  ssm_mw_enabled      = contains(local.ssm_mw_environments, local.environment)
+  mw_config_by_environment = {
+    development = {
+      ami_target_id = "i-0caf7efc67d0b2bb3"
+      date_time     = "2026-11-06T18:00:00"
+    }
+  }
+  ssm_mw_no_reboot = "false"
+
+  # Safe defaults for environments where MW is not enabled.
+  mw_ami_target_id = try(local.mw_config_by_environment[local.environment].ami_target_id, "")
+  mw_date_time     = try(local.mw_config_by_environment[local.environment].date_time, "")
 
 }
-#

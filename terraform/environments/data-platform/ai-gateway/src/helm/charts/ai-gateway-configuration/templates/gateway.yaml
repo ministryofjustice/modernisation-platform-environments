@@ -1,0 +1,30 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: ai-gateway
+  namespace: {{ .Release.Namespace }}
+spec:
+  gatewayClassName: aws-alb
+  infrastructure:
+    parametersRef:
+      group: gateway.k8s.aws
+      kind: LoadBalancerConfiguration
+      name: ai-gateway
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: {{ .Values.hostname }}
+    - name: http-admin
+      protocol: HTTP
+      port: 80
+      hostname: {{ .Values.adminHostname }}
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.hostname }}
+    - name: https-admin
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.adminHostname }}

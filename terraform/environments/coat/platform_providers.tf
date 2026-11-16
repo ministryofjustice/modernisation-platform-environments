@@ -8,8 +8,11 @@ provider "aws" {
 # AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
 provider "aws" {
   region = "eu-west-2"
-  assume_role {
-    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? null : can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  dynamic "assume_role" {
+    for_each = can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? [1] : []
+    content {
+      role_arn = can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+    }
   }
   default_tags { tags = local.tags }
 }
@@ -48,8 +51,11 @@ provider "aws" {
 provider "aws" {
   alias  = "us-east-1"
   region = "us-east-1"
-  assume_role {
-    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? null : can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccessUSEast"
+  dynamic "assume_role" {
+    for_each = can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? [1] : []
+    content {
+      role_arn = can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccessUSEast"
+    }
   }
   default_tags { tags = local.tags }
 }
@@ -62,4 +68,14 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
   default_tags { tags = local.tags }
+}
+
+# AWS provider for managing Business Unit secrets and parameters
+provider "aws" {
+  region = "eu-west-2"
+  alias  = "shared-configuration-access"
+
+  assume_role {
+    role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:role/${local.vpc_name}-shared-configuration-access"
+  }
 }
