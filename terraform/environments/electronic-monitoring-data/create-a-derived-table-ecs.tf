@@ -70,11 +70,11 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
           value = local.environment_shorthand
         },
         {
-          name = "ARTEFACT_TARGET"
+          name  = "ARTEFACT_TARGET"
           value = local.environment_shorthand
         },
         {
-          name = "RUN_IN_DF"
+          name  = "RUN_IN_DF"
           value = "True"
         }
       ]
@@ -82,11 +82,11 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
   ])
   task_role_arn      = aws_iam_role.dataapi_cross_role.arn
   execution_role_arn = module.ecs_execution_role.arn
-   lifecycle {
-      ignore_changes = [
-         container_definitions
-      ]  
-   }
+  lifecycle {
+    ignore_changes = [
+      container_definitions
+    ]
+  }
 }
 
 module "ecs_execution_role" {

@@ -15,8 +15,8 @@ locals {
       control_plane_resume = module.step_functions_control_plane.resume_arn
       build_image          = module.step_functions_build_image.arn
       build_infra          = module.step_functions_build_infra.arn
-      notify               = module.step_functions_notify.arn
     },
+    { for m in module.step_functions_notify : "notify" => m.arn },
     { deploy_prototype = module.step_functions_deploy_prototype.arn },
   )
 

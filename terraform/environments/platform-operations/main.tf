@@ -60,6 +60,7 @@ module "baseline" {
 }
 
 module "github_workflow_scheduler" {
+  count                      = local.enable_github_workflow_scheduler ? 1 : 0
   source                     = "../../modules/github_lambda"
   aws_account_id             = data.aws_caller_identity.current.id
   enable_outbound_federation = local.github_actions_lambda_environment_specific.enable_outbound_federation
@@ -102,4 +103,38 @@ module "aws_health_lambda" {
   aws_accounts_parameter_name    = aws_ssm_parameter.aws_health_lambda_accounts[count.index].name
   github_repo                    = "platform-operations"
   ignore_findings_parameter_name = aws_ssm_parameter.aws_health_lambda_ignore_findings[count.index].name
+}
+
+resource "aws_ssm_parameter" "aws_securityhub_lambda" {
+  for_each = local.enable_aws_securityhub_lambda ? {
+    accounts = {
+      name        = "securityhub_lambda_accounts"
+      description = "AWS SecurityHub Lambda accounts"
+    }
+    ignore_findings = {
+      name        = "securityhub_lambda_ignore_findings"
+      description = "AWS SecurityHub Lambda ignore findings"
+    }
+  } : {}
+
+  name        = each.value.name
+  description = each.value.description
+  type        = "SecureString"
+  value       = "TO_BE_UPDATED"
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+module "aws_securityhub_lambda" {
+  count                                      = local.enable_aws_securityhub_lambda ? 1 : 0
+  source                                     = "../../modules/aws_securityhub_lambda"
+  aws_account_id                             = data.aws_caller_identity.current.id
+  aws_accounts_parameter_name                = aws_ssm_parameter.aws_securityhub_lambda["accounts"].name
+  github_repo                                = "platform-operations"
+  securityhub_ignore_findings_parameter_name = aws_ssm_parameter.aws_securityhub_lambda["ignore_findings"].name
+  depends_on                                 = [aws_ssm_parameter.aws_securityhub_lambda]
 }

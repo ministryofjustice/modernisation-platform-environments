@@ -5,7 +5,7 @@ Terraform for the AI Application Builder backend: the Step Functions workflows, 
 ## Workflows
 
 | File | State machine | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `step_functions_root.tf` | root | Looks up the build, then runs the control plane, image build, prototype deployment and notification |
 | `step_functions_control_plane.tf` | control-plane | Reviews the request (Bedrock) and waits for approval if needed |
 | `step_functions_build_image.tf` | build-app-image | Builds the prototype image (`build-prototype-image.py`) |
@@ -32,7 +32,7 @@ Terraform for the AI Application Builder backend: the Step Functions workflows, 
 Both use `modernisation-platform-terraform-aws-chatbot` v3.0.0, pinned to its commit SHA in `slack_notifications.tf`. The Slack client must be set up manually in each account first. Nothing is created while a channel ID is empty.
 
 | Variable | Receives |
-|---|---|
+| --- | --- |
 | `slack_channel_id` | Job-completion messages (`<app>-job-completion` topic) |
 | `alerts_slack_channel_id` | Alarms and runtime errors (`<app>-alerts` topic) |
 

@@ -70,3 +70,13 @@ resource "aws_secretsmanager_secret" "sharepoint_driveids" {
 
   tags = local.tags
 }
+
+# original private key appears to be lost
+resource "aws_secretsmanager_secret" "ec2_user_app_private_key" {
+  name = "${var.app_name}-${var.env_name}-app-ec2-user-ssh-private-key"
+
+  description = "Additional private key for ec2-user added to application servers via ansible. The original AWS keypair has been lost"
+  kms_key_id  = var.account_config.kms_keys["general_shared"]
+
+  tags = local.tags
+}

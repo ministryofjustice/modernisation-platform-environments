@@ -1,7 +1,7 @@
 locals {
   root_state_machine_name = "${local.application_name}-root"
 
-  root_process_steps = [
+  root_core_steps = [
     {
       name              = "build_event"
       type              = "dynamodb_query_build"
@@ -31,15 +31,18 @@ locals {
       input_path         = "$.build_test_deploy_app_image.Output"
       result_path        = "$.deploy_prototype_app"
     },
-    {
-      # Runs only if build_app_infra succeeded; a failed child fails the root.
-      name               = "notify_user"
-      type               = "step_function"
-      state_machine_name = local.notify_state_machine_name
-      input_path         = "$.deploy_prototype_app.Output"
-      result_path        = "$.notify_user"
-    },
   ]
+  root_process_steps = concat(local.root_core_steps, local.notify_enabled ? [local.root_notify_step] : [])
+
+  root_notify_step = {
+    # Runs only if build_app_infra succeeded; a failed child fails the root.
+    # Skipped when both confirmations are disabled.
+    name               = "notify_user"
+    type               = "step_function"
+    state_machine_name = local.notify_state_machine_name
+    input_path         = "$.deploy_prototype_app.Output"
+    result_path        = "$.notify_user"
+  }
 }
 
 module "step_functions_root" {

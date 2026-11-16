@@ -4,8 +4,7 @@ locals {
   environment_configurations = {
     development = {
       litellm_version                    = "1.106.5"
-      litellm_tmpdir                     = "/app/cache"
-      litellm_entra_client_secret_expiry = "2027-05-05"
+      litellm_entra_client_secret_expiry = "05-05-2027"
       ai_gateway_hostname                = "development.ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
         input_bucket_name  = "alpha-airflow-aigw-example-input"
@@ -56,12 +55,11 @@ locals {
       }
       elasticache_node_type = "cache.t4g.medium"
 
-      ai_gateway_egress_policy_enabled = false
+      ai_gateway_egress_policy_enabled = true
     }
     test = {
       litellm_version                    = "1.106.5"
-      litellm_tmpdir                     = "/app/cache"
-      litellm_entra_client_secret_expiry = "2027-04-17"
+      litellm_entra_client_secret_expiry = "17-04-2027"
       ai_gateway_hostname                = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -100,12 +98,11 @@ locals {
       }
       elasticache_node_type = "cache.t4g.medium"
 
-      ai_gateway_egress_policy_enabled = false
+      ai_gateway_egress_policy_enabled = true
     }
     preproduction = {
       litellm_version                    = "1.106.5"
-      litellm_tmpdir                     = "/app/cache"
-      litellm_entra_client_secret_expiry = "2026-11-22"
+      litellm_entra_client_secret_expiry = "08-05-2027"
       ai_gateway_hostname                = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -140,14 +137,11 @@ locals {
       aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type                     = "cache.t4g.medium"
 
-      ai_gateway_egress_policy_enabled = false
+      ai_gateway_egress_policy_enabled = true
     }
     production = {
-      litellm_version                    = "1.104.0"
-      litellm_entra_client_secret_expiry = "2026-11-22"
-      litellm_image_repository           = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag                  = "1.104.1-enterprise"
-      litellm_image_pull_secret          = "litellm-enterprise-pull"
+      litellm_version                    = "1.106.5"
+      litellm_entra_client_secret_expiry = "08-05-2027"
       ai_gateway_hostname                = "ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
         input_bucket_name = "alpha-bold-pilot-rr-families"

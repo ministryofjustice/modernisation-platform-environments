@@ -33,18 +33,16 @@ module "airflow_kube_config_object" {
   tags = local.tags
 }
 
-module "airflow_plugins_object" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+removed {
+  from = module.airflow_plugins_object
 
-  source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
-  version = "5.13.0"
+  lifecycle {
+    destroy = false
+  }
+}
 
+data "aws_s3_object" "airflow_plugins" {
   bucket        = module.mwaa_bucket.s3_bucket_id
   key           = "plugins.zip"
-  file_source   = "plugins.zip"
-  source_hash   = data.archive_file.airflow_plugins.output_md5
-  force_destroy = true
-
-  tags = local.tags
+  download_body = false
 }

@@ -306,22 +306,22 @@ resource "helm_release" "fluent_bit" {
             Retry_Limit         False
             storage.total_limit_size 2G
       EOT
-        # [OUTPUT]
-        #     Name                     opensearch
-        #     Match                    kube.*
-        #     Host                     ${local.opensearch_endpoint}
-        #     Port                     443
-        #     TLS                      On
-        #     TLS.Verify               On
-        #     AWS_Auth                 On
-        #     AWS_Region               eu-west-2
-        #     Logstash_Format          On
-        #     Logstash_Prefix          ${terraform.workspace}
-        #     Replace_Dots             On
-        #     Suppress_Type_Name       On
-        #     Generate_ID              On
-        #     Retry_Limit              False
-        #     storage.total_limit_size 2G
+      # [OUTPUT]
+      #     Name                     opensearch
+      #     Match                    kube.*
+      #     Host                     ${local.opensearch_endpoint}
+      #     Port                     443
+      #     TLS                      On
+      #     TLS.Verify               On
+      #     AWS_Auth                 On
+      #     AWS_Region               eu-west-2
+      #     Logstash_Format          On
+      #     Logstash_Prefix          ${terraform.workspace}
+      #     Replace_Dots             On
+      #     Suppress_Type_Name       On
+      #     Generate_ID              On
+      #     Retry_Limit              False
+      #     storage.total_limit_size 2G
       # EOT
     }
   })]

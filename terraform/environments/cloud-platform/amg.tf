@@ -81,6 +81,29 @@ resource "aws_iam_role_policy" "amg_amp_read" {
   })
 }
 
+# Cross-account AMP query: assume each enabled BU's amg-amp-query role, which
+# trusts this workspace role and is scoped to that BU's AMP workspace.
+resource "aws_iam_role_policy" "amg_bu_amp_assume" {
+  count = local.manage_grafana_objects ? 1 : 0
+
+  name = "bu-amp-assume"
+  role = aws_iam_role.amg[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Resource = [
+          for bu in values(local.grafana_bus) :
+          "arn:aws:iam::${local.environment_management.account_ids[bu.amp_workspace_alias]}:role/${local.bu_amp_query_role_name}"
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy" "amg_cloudwatch_read" {
   # checkov:skip=CKV_AWS_355:AMG must query CloudWatch metrics/logs across BU accounts, and List/Describe actions here are not resource-scopable. Per-BU resource scoping via dedicated data-source assume-roles is tracked in cloud-platform#8509 (BU metric isolation).
   count = local.enable_amg ? 1 : 0

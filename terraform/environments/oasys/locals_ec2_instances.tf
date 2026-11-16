@@ -102,6 +102,7 @@ locals {
         os-type              = "Linux"
         os-major-version     = 8
         os-version           = "RHEL 8.5"
+        "Patch Group"        = "patchgroup1"
         server-type          = "onr-db"
         update-ssm-agent     = "patchgroup1"
       }
@@ -165,6 +166,7 @@ locals {
         os-type              = "Linux"
         os-major-version     = 8
         os-version           = "RHEL 8.5"
+        "Patch Group"        = "patchgroup1"
         server-type          = "oasys-db"
         update-ssm-agent     = "patchgroup1"
       }

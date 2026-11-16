@@ -38,6 +38,12 @@ locals {
 
     environment = local.script_runner_environment_variables
 
+    # Used by scripts/notification/send_notification.py.
+    secrets = [{
+      name      = "API_KEY"
+      valueFrom = aws_secretsmanager_secret.gov_uk_notify_api_key.arn
+    }]
+
     logConfiguration = {
       logDriver = "awslogs"
       options = {

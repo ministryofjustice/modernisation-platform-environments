@@ -19,8 +19,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "connector_docs" {
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm     = "aws:kms"
-      kms_master_key_id = data.aws_kms_key.general_shared.arn
+      sse_algorithm = "AES256"
     }
   }
 }

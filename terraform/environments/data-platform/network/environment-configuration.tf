@@ -1,10 +1,10 @@
 locals {
   environment_configurations = {
-    development   = {
+    development = {
       /* Route53 */
       route53_zone = "development.data-platform.service.justice.gov.uk"
     }
-    test          = {
+    test = {
       /* Route53 */
       route53_zone = "test.data-platform.service.justice.gov.uk"
     }
@@ -12,7 +12,7 @@ locals {
       /* Route53 */
       route53_zone = "preproduction.data-platform.service.justice.gov.uk"
     }
-    production    = {
+    production = {
       /* Route53 */
       route53_zone = "data-platform.service.justice.gov.uk"
     }

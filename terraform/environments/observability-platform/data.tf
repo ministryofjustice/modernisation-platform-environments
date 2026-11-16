@@ -19,8 +19,8 @@ data "aws_identitystore_group" "observability_platform_admins" {
   }
 }
 
-data "aws_identitystore_group" "all_identity_centre_teams" {
-  for_each = { for team in local.all_identity_centre_teams : team => team }
+data "aws_identitystore_group" "amg_identity_centre_teams" {
+  for_each = { for team in local.amg_identity_centre_teams : team => team }
 
   provider = aws.sso-readonly
 

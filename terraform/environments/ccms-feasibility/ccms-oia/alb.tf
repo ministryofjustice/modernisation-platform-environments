@@ -4,19 +4,29 @@ data "aws_s3_bucket" "lb_access_logs" {
 }
 
 module "alb_opahub" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/d1af4ad
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=d1af4ad"
 
   name               = "${local.opahub_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
   security_group_ids = [aws_security_group.alb_opahub.id]
   vpc_id             = data.aws_vpc.shared.id
   certificate_arn    = data.aws_acm_certificate.wildcard.arn
-  target_port        = local.application_data.accounts[local.environment].opa_server_port
+
+  # WebLogic terminates TLS on the SSL port; health checked over the administration port
+  target_type       = "ip"
+  target_protocol   = "HTTPS"
+  target_port       = local.application_data.accounts[local.environment].opa_ssl_port
+  target_group_name = "${local.opahub_name}-${local.env_label}-ssl-tg"
 
   health_check = {
-    path                = "/opa/opa-hub/manager"
+    path                = "/weblogic/ready"
+    port                = local.application_data.accounts[local.environment].opa_health_check_port
     unhealthy_threshold = 5
+  }
+
+  stickiness = {
+    enabled = true
   }
 
   enable_deletion_protection = local.application_data.accounts[local.environment].alb_deletion_protection
@@ -34,23 +44,9 @@ module "alb_opahub" {
   tags = local.tags
 }
 
-# Direct WebLogic access from AWS Workspaces, as on the original ccms-oia non-prod ALBs
-resource "aws_lb_listener" "opahub_7001" {
-  load_balancer_arn = module.alb_opahub.alb_arn
-  port              = 7001
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = module.alb_opahub.target_group_arn
-  }
-
-  tags = local.tags
-}
-
 module "alb_connector" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/d1af4ad
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=d1af4ad"
 
   name               = "${local.connector_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -58,6 +54,8 @@ module "alb_connector" {
   vpc_id             = data.aws_vpc.shared.id
   certificate_arn    = data.aws_acm_certificate.wildcard.arn
   target_port        = local.application_data.accounts[local.environment].connector_server_port
+  target_type        = "ip"
+  target_group_name  = "${local.connector_name}-${local.env_label}-ip-tg"
 
   health_check = {
     path                = "/service-tds/actuator/health"
@@ -80,8 +78,8 @@ module "alb_connector" {
 }
 
 module "alb_adaptor" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=10d2292"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/d1af4ad
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=d1af4ad"
 
   name               = "${local.adaptor_name}-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
@@ -89,6 +87,8 @@ module "alb_adaptor" {
   vpc_id             = data.aws_vpc.shared.id
   certificate_arn    = data.aws_acm_certificate.wildcard.arn
   target_port        = local.application_data.accounts[local.environment].adaptor_server_port
+  target_type        = "ip"
+  target_group_name  = "${local.adaptor_name}-${local.env_label}-ip-tg"
 
   health_check = {
     path                = "/actuator/health"

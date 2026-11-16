@@ -68,7 +68,6 @@ models:
       model_name: "Anthropic Claude Haiku 5.5"
       model_location: "United Kingdom"
       region: eu-west-2
-      environments_available: ["development", "test"]
       generally_available: true
     claude-opus-4-5:
       model_id: "eu.anthropic.claude-opus-4-5-20251101-v1:0"
@@ -504,8 +503,8 @@ models:
       model_id: "gemini-3.5-transcribe"
       model_family: "Google Gemini"
       model_name: "Google Gemini 3.5 Transcribe"
-      model_location: "EU"
-      location: "EU"
+      model_location: "European Union"
+      location: "eu"
       generally_available: false
       environments_available: ["development", "production"]
     gemini-3-6-flash:
@@ -583,11 +582,12 @@ models:
       generally_available: false
       environments_available: ["development", "test", "preproduction", "production"]
   openai:
-    gpt-5-5-cyber-preview:
-      model_id: "gpt-5.5-cyber-preview"
+    gpt-5-6-cyber:
+      model_id: "gpt-5.6-cyber"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.5 Cyber Preview"
+      model_name: "OpenAI GPT 5.6 Cyber"
       model_location: "Global"
       model_provider: "OpenAI"
       generally_available: false
       environments_available: ["development", "production"]
+      health_check_mode: "responses"

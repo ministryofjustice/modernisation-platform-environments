@@ -41,14 +41,21 @@ locals {
   # same file, never see them.
   business_units = jsondecode(file("${path.module}/business-units.json")).business_units
 
-  # Real-BU Grafana map for cloud-platform-live, derived from the shared file.
-  # idc_group_names stays a LIST (a BU has many delivery teams); here it holds
-  # the BU's single parent group. Gated OFF on live by grafana_objects_enabled
-  # (see environment-configuration.tf) until per-BU AMP workspaces exist (#8517).
+  # Real-BU Grafana maps per tier, derived from the shared file. Each AMG
+  # workspace carries only its own tier's AMP workspaces (cloud-platform#8560),
+  # so there is one data source per BU per workspace. idc_group_names stays a
+  # LIST (a BU has many delivery teams); here it holds the BU's single parent
+  # group.
+  #
+  # A BU is only included for a tier once its grafana_enabled.<tier> flag in
+  # business-units.json is true, i.e. its AMP workspace exists (#8517). Missing
+  # flags default to false, so a new BU cannot break the plan for existing BUs.
   grafana_bus_real = {
-    for k, bu in local.business_units : k => {
-      amp_workspace_alias = bu.amp_workspace_alias
-      idc_group_names     = [bu.parent_group]
+    for tier in ["live", "nonlive"] : tier => {
+      for k, bu in local.business_units : k => {
+        amp_workspace_alias = bu.amp_workspace_aliases[tier]
+        idc_group_names     = [bu.parent_group]
+      } if try(bu.grafana_enabled[tier], false)
     }
   }
 
@@ -61,26 +68,28 @@ locals {
   # Left empty on commit so no stale alias can fail a plan.
   grafana_simulated_bus_dev = {}
 
-  # Per-workspace BU map. Live carries the real BUs (but is gated OFF, see
-  # above); development carries only the dev simulated BUs.
+  # Per-workspace BU map. Live and non-live each carry the real BUs for their
+  # own tier only (gated OFF until #8517, see above); development carries only
+  # the dev simulated BUs.
   bus_by_workspace = {
-    "cloud-platform-live"        = local.grafana_bus_real
+    "cloud-platform-live"        = local.grafana_bus_real["live"]
+    "cloud-platform-nonlive"     = local.grafana_bus_real["nonlive"]
     "cloud-platform-development" = local.grafana_simulated_bus_dev
   }
 
-  # Phase-2 gate. The Grafana provider authenticates with a token minted from
-  # the iac-grafana-objects service account (amg.tf). On the first apply of a
-  # fresh AMG host workspace that service account does not exist yet, so the
-  # mint no-ops and the provider is unauthenticated — creating any grafana_*
-  # resource in that same apply is the bootstrap cycle. We therefore only manage
-  # Grafana objects once AMG exists AND the operator has opted this workspace
-  # into phase 2 (local.grafana_objects_enabled, set per workspace in
-  # environment-configuration.tf), by which point the service account exists and
-  # the token can be minted.
-  manage_grafana_objects = local.enable_amg && local.grafana_objects_enabled
+  # The Grafana provider authenticates with a token minted from the
+  # iac-grafana-objects service account (amg.tf). On the first apply of a fresh
+  # AMG host workspace that service account does not exist yet, so the provider
+  # is unauthenticated and creating any grafana_* resource in that same apply
+  # fails. Objects are only planned once a BU is enabled, so enable the first BU
+  # in a later apply than the one that creates the workspace and service account.
+  grafana_bus            = local.enable_amg ? lookup(local.bus_by_workspace, terraform.workspace, {}) : {}
+  manage_grafana_objects = length(local.grafana_bus) > 0
 
-  # Only create Grafana objects in phase 2, where BUs are defined.
-  grafana_bus = local.manage_grafana_objects ? lookup(local.bus_by_workspace, terraform.workspace, {}) : {}
+  # Name of the per-BU query role created in each BU account by cluster-components.
+  bu_amp_query_role_name = "amg-amp-query"
+
+  bu_permission = terraform.workspace == "cloud-platform-nonlive" ? "Edit" : "View"
 
   # Map of IdC group display name -> group ID, resolved via the read-only
   # Identity Center provider. Uses the plural aws_identitystore_groups data
@@ -109,19 +118,20 @@ data "aws_identitystore_groups" "all" {
 }
 
 #------------------------------------------------------------------------------
-# Per-BU AMP workspace lookup (by alias) to obtain the query endpoint
+# Per-BU AMP workspace ID
+#
+# The AMP workspace lives in the BU's own account, which the hub cannot list, so
+# the ID is read from an SSM parameter published by the BU's cluster-components
+# in core-shared-services-production (via the shared-configuration-access role).
+# cluster-components must therefore be applied on the BU's workspace before its
+# grafana_enabled flag is set.
 #------------------------------------------------------------------------------
 
-data "aws_prometheus_workspaces" "bu" {
+data "aws_ssm_parameter" "bu_amp_workspace_id" {
   for_each = local.grafana_bus
+  provider = aws.shared-configuration-access
 
-  alias_prefix = each.value.amp_workspace_alias
-}
-
-data "aws_prometheus_workspace" "bu" {
-  for_each = local.grafana_bus
-
-  workspace_id = one(data.aws_prometheus_workspaces.bu[each.key].workspace_ids)
+  name = "/${lower(local.vpc_name)}/cloud-platform/amp/${each.value.amp_workspace_alias}/workspace-id"
 }
 
 #------------------------------------------------------------------------------
@@ -152,8 +162,9 @@ resource "grafana_team_external_group" "bu" {
 # Per-BU AMP data source
 #
 # AMG v12+ uses the dedicated Amazon Managed Service for Prometheus plugin;
-# SigV4 is built in and signed with the AMG workspace's own IAM role, so no
-# credentials are configured here.
+# SigV4 is built in. The AMP workspace lives in the BU's own account, so the AMG
+# workspace role assumes that account's amg-amp-query role (created by
+# cluster-components) to query it.
 #------------------------------------------------------------------------------
 
 resource "grafana_data_source" "bu_amp" {
@@ -161,13 +172,15 @@ resource "grafana_data_source" "bu_amp" {
 
   type = "grafana-amazonprometheus-datasource"
   name = "amp-${each.key}"
-  url  = data.aws_prometheus_workspace.bu[each.key].prometheus_endpoint
+  url  = "https://aps-workspaces.${data.aws_region.current.region}.amazonaws.com/workspaces/${data.aws_ssm_parameter.bu_amp_workspace_id[each.key].value}"
 
   json_data_encoded = jsonencode({
     httpMethod    = "POST"
     sigV4Auth     = true
     sigV4AuthType = "ec2_iam_role"
     sigV4Region   = data.aws_region.current.region
+
+    sigV4AssumeRoleArn = "arn:aws:iam::${local.environment_management.account_ids[each.value.amp_workspace_alias]}:role/${local.bu_amp_query_role_name}"
   })
 }
 
@@ -205,7 +218,7 @@ resource "grafana_folder_permission" "bu" {
 
   permissions {
     team_id    = grafana_team.bu[each.key].id
-    permission = "View"
+    permission = local.bu_permission
   }
 }
 

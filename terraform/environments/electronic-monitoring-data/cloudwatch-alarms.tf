@@ -546,6 +546,45 @@ resource "aws_cloudwatch_metric_alarm" "specials_guard_lambda_errors" {
 }
 
 # ------------------------------------------------------------------------------
+# Downstream reconciliation Lake Formation permission repair
+# Alert only when automatic permission repair fails.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_lf_permission_repair_failed" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  alarm_name = "downstream_reconciliation_lf_permission_repair_failed"
+
+  alarm_description = (
+    "Triggered when automatic Lake Formation permission repair fails"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  # Use EventBridge -> cloudwatch_alarm_threader -> incident automation.
+  # Disable direct alarm actions to avoid duplicate Slack messages.
+  actions_enabled = false
+
+  metric_name = "PermissionRepairFailed"
+  namespace   = "EM/LakeFormationPermissions"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
 # Downstream reconciliation workflow failures
 # Surface planner, replay, verification and dependency failures in Slack.
 # ------------------------------------------------------------------------------

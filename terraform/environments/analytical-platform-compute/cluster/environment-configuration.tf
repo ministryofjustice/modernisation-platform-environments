@@ -7,6 +7,13 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
+      eks_public_access_cidrs = [
+        "128.77.75.64/26", # Prisma Corporate
+        "20.58.27.30/32",  # GitHub Runner (octo-production)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+      ]
       eks_cluster_version = "1.36"
       eks_node_version    = "1.64.0-ad9d4847"
       eks_cluster_addon_versions = {
@@ -59,6 +66,13 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
+      eks_public_access_cidrs = [
+        "128.77.75.64/26", # Prisma Corporate
+        "20.58.27.30/32",  # GitHub Runner (octo-production)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+      ]
       eks_cluster_version = "1.36"
       eks_node_version    = "1.64.0-ad9d4847"
       eks_cluster_addon_versions = {
