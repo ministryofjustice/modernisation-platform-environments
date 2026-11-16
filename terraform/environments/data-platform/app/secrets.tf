@@ -4,18 +4,25 @@ module "app_secrets" {
   name       = "${local.component_name}/secrets"
   kms_key_id = data.aws_kms_key.secrets_manager_common.arn
 
-  secret_string = jsonencode({
-    azure_authority                           = "CHANGEME"
-    azure_client_id                           = "CHANGEME"
-    azure_client_secret                       = "CHANGEME"
-    field_encryption_key                      = "CHANGEME"
-    notify_api_key                            = "CHANGEME"
-    notify_project_member_added_template_id   = "CHANGEME"
-    notify_project_member_removed_template_id = "CHANGEME"
-    notify_budget_alert_template_id           = "CHANGEME"
-    secret_key                                = random_password.app_secrets.result
-    sentry_dsn                                = "CHANGEME"
-  })
+  secret_string = jsonencode(merge(
+    {
+      azure_authority                           = "CHANGEME"
+      azure_client_id                           = "CHANGEME"
+      azure_client_secret                       = "CHANGEME"
+      field_encryption_key                      = "CHANGEME"
+      notify_api_key                            = "CHANGEME"
+      notify_project_member_added_template_id   = "CHANGEME"
+      notify_project_member_removed_template_id = "CHANGEME"
+      notify_budget_alert_template_id           = "CHANGEME"
+      notify_budget_limit_hit_template_id       = "CHANGEME"
+      secret_key                                = random_password.app_secrets.result
+      sentry_dsn                                = "CHANGEME"
+    },
+    local.environment_configuration.app_e2e_auth_enabled ? {
+      e2e_auth_token = "CHANGEME"
+      e2e_user_email = "CHANGEME"
+    } : {}
+  ))
   ignore_secret_changes = true
 }
 
