@@ -36,8 +36,10 @@ resource "grafana_sso_settings" "github" {
     client_id             = data.aws_secretsmanager_secret_version.grafana_cloud_github_oauth_client_id.secret_string
     client_secret         = data.aws_secretsmanager_secret_version.grafana_cloud_github_oauth_client_secret.secret_string
     allowed_organizations = "ministryofjustice"
-    auto_login            = false
-    allow_sign_up         = true
+    # read:org is needed to see org and team membership for the login gate and role mapping
+    scopes        = "user:email,read:org"
+    auto_login    = false
+    allow_sign_up = true
     # GitHub teams are exposed to the mapping as groups in the form @org/team-slug
     role_attribute_path        = "contains(groups[*], '@ministryofjustice/${local.gc_platform_github_team}') && 'Admin' || 'Viewer'"
     role_attribute_strict      = false
