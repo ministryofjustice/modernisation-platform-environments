@@ -872,7 +872,6 @@ updates:
       - "terraform/environments/integration-hub/api-hosting-platform"
       - "terraform/environments/integration-hub/api-platform"
       - "terraform/environments/integration-hub/downstream-mock-api"
-      - "terraform/environments/integration-hub/downstream-mock-api/modules/service"
       - "terraform/environments/integration-hub/events-platform"
       - "terraform/environments/integration-hub/iac"
       - "terraform/environments/integration-hub/managed-file-transfer"
@@ -1524,7 +1523,7 @@ updates:
     directories:
       - "terraform/modules/acm_certificate"
       - "terraform/modules/aws_health_lambda"
-      - "terraform/modules/aws_health_lambda_cloudwatch_events"
+      - "terraform/modules/aws_lambda_event_forwarding"
       - "terraform/modules/aws_securityhub_lambda"
       - "terraform/modules/baseline"
       - "terraform/modules/baseline_presets"
