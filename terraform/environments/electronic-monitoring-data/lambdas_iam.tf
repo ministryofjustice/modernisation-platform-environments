@@ -4458,7 +4458,7 @@ resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
 # ------------------------------------------------------------
 
 module "trigger_cadt_daily_run_iam_role" {
- source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
 
   name = "trigger_cadt_daily_run"
 
