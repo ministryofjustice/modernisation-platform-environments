@@ -133,7 +133,7 @@ resource "aws_security_group_rule" "alb_managed_mp_v1_workspaces_ingress_443" {
 }
 
 # MP Workspaces (V1) - HTTP Access
-resource "aws_security_group_rule" "alb_managed_mp_v1_workspaces_ingress_443" {
+resource "aws_security_group_rule" "alb_managed_mp_v1_workspaces_ingress_80" {
   count             = local.alb_80_enabled ? 1 : 0
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
