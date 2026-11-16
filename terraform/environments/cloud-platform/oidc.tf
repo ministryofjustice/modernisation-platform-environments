@@ -275,7 +275,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       format("arn:aws:iam::%s:role/modify-dns-records", local.environment_management.account_ids["core-network-services-production"]),
       format("arn:aws:iam::%s:role/read-log-records", local.environment_management.account_ids["core-network-services-production"]),
       format("arn:aws:iam::%s:role/modernisation-account-limited-read-member-access", local.environment_management.modernisation_platform_account_id),
-      format("arn:aws:iam::%s:role/ModernisationPlatformSSOReadOnly", local.environment_management.aws_organizations_root_account_id)
+      format("arn:aws:iam::%s:role/ModernisationPlatformSSOReadOnly", local.environment_management.aws_organizations_root_account_id),
+      format("arn:aws:iam::%s:role/platforms-shared-configuration-access", local.environment_management.account_ids["core-shared-services-production"])
     ]
     condition {
       test     = "StringEquals"

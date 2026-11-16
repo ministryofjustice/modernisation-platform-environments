@@ -142,6 +142,7 @@ resource "helm_release" "litellm" {
         # Google
         googleWorkloadIdentityAudience        = local.google_workload_identity_audience
         googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
+        geminiLiveDeferSetup                  = try(local.environment_configuration.litellm_gemini_live_defer_setup, false)
 
         # OpenAI
         openai_identity_provider_id    = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["identity_provider_id"]
