@@ -56,3 +56,15 @@ data "aws_secretsmanager_secret_version" "grafana_cloud_github_oauth_client_id" 
 data "aws_secretsmanager_secret_version" "grafana_cloud_github_oauth_client_secret" {
   secret_id = aws_secretsmanager_secret.grafana_cloud_github_oauth_client_secret.id
 }
+
+data "aws_secretsmanager_secret_version" "grafana_cloud_terraform_github_app_id" {
+  secret_id = aws_secretsmanager_secret.grafana_cloud_terraform_github_app_id.id
+}
+
+data "aws_secretsmanager_secret_version" "grafana_cloud_terraform_github_app_installation_id" {
+  secret_id = aws_secretsmanager_secret.grafana_cloud_terraform_github_app_installation_id.id
+}
+
+data "aws_secretsmanager_secret_version" "grafana_cloud_terraform_github_app_private_key" {
+  secret_id = aws_secretsmanager_secret.grafana_cloud_terraform_github_app_private_key.id
+}
