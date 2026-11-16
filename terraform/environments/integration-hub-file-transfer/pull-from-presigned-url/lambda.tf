@@ -25,7 +25,7 @@ module "lambda_notifier" {
   function_name = local.pattern_name
   role_name     = local.pattern_name
   description   = "Notify recipients in Slack with an authenticated file-transfer portal link"
-  runtime       = "python3.12"
+  runtime       = "python3.13"
   architectures = ["arm64"]
   handler       = "handler.lambda_handler"
   source_path   = [{ path = "${path.module}/lambda/notifier", patterns = ["!tests/.*", "!.*__pycache__/.*"] }]

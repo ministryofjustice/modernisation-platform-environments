@@ -24,7 +24,7 @@ module "lambda_file_mover" {
   ignore_source_code_hash           = true
   memory_size                       = 512
   role_name                         = local.lambda_role_name
-  runtime                           = "python3.12"
+  runtime                           = "python3.13"
   source_path                       = local.lambda_source_path
   hash_extra                        = "file-mover-${sha256(jsonencode(local.lambda_docker_additional_options))}"
   timeout                           = 900
@@ -157,7 +157,7 @@ module "lambda_dlq_reporter" {
   ignore_source_code_hash           = true
   memory_size                       = 256
   role_name                         = "${local.pattern_name}-dlq"
-  runtime                           = "python3.12"
+  runtime                           = "python3.13"
   source_path                       = local.lambda_source_path
   hash_extra                        = "dlq-reporter-${sha256(jsonencode(local.lambda_docker_additional_options))}"
   timeout                           = 60
