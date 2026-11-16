@@ -48,3 +48,13 @@ data "aws_secretsmanager_secret_version" "github_app_private_key" {
 data "aws_secretsmanager_secret_version" "grafana_cloud_access_policy_token" {
   secret_id = "grafana-cloud/terraform-access-policy-token"
 }
+
+data "aws_secretsmanager_secret_version" "grafana_cloud_github_oauth_client_id" {
+  secret_id  = aws_secretsmanager_secret.grafana_cloud_github_oauth_client_id.id
+  depends_on = [aws_secretsmanager_secret_version.grafana_cloud_github_oauth_client_id]
+}
+
+data "aws_secretsmanager_secret_version" "grafana_cloud_github_oauth_client_secret" {
+  secret_id  = aws_secretsmanager_secret.grafana_cloud_github_oauth_client_secret.id
+  depends_on = [aws_secretsmanager_secret_version.grafana_cloud_github_oauth_client_secret]
+}

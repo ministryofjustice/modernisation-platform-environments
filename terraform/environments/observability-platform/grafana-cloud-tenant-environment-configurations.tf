@@ -9,6 +9,7 @@ locals {
     development = {
       tenant_configuration = {
         "observability-platform" = {
+          github_team = "observability-platform"
           aws_accounts = {
             "observability-platform-development" = {
               pdc_enabled = true
