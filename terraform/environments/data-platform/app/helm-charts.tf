@@ -3,7 +3,7 @@ resource "helm_release" "app" {
   /* https://github.com/ministryofjustice/data-platform-app */
   name       = "app"
   repository = "oci://ghcr.io/ministryofjustice/data-platform-charts"
-  version    = "0.12.3"
+  version    = "0.13.0"
   chart      = "app"
   namespace  = module.app_namespace.name
   values = [
@@ -11,6 +11,7 @@ resource "helm_release" "app" {
       "${path.module}/src/helm/values/app/values.yml.tftpl",
       {
         app_env                      = local.environment,
+        app_e2e_auth_enabled         = local.environment_configuration.app_e2e_auth_enabled,
         app_django_settings_module   = "data_platform_app.settings.${local.environment == "production" ? "production" : "development"}",
         app_hostname                 = local.environment_configuration.app_hostname,
         app_google_analytics_id      = local.environment_configuration.app_google_analytics_id,
