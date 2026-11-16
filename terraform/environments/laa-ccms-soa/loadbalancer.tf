@@ -105,7 +105,7 @@ resource "aws_lb" "managed" {
 
 resource "aws_lb" "http_redirect_managed_alb" {
   count = local.alb_80_enabled ? 1 : 0
-  name               = "${local.application_data.accounts[local.environment].app_name}-managed-api-http-redirect-lb"
+  name               = "${local.application_data.accounts[local.environment].app_name}-managed-api-http-lb"
   internal           = true
   load_balancer_type = "application"
   subnets                    = data.aws_subnets.shared-private.ids
