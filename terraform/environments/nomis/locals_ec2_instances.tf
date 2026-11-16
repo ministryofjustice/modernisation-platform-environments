@@ -254,7 +254,7 @@ locals {
       }
     }
 
-    web12 = {
+    web_12 = {
       config = {
         ami_name                  = "base_ol_8_5_2023-06-08T09-45-10.579Z"
         iam_resource_names_prefix = "ec2-instance"
@@ -262,7 +262,10 @@ locals {
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+          "Ec2Qa11GWeblogicPolicy",
+          "Ec2Qa11G2WeblogicPolicy",
+          "Ec2Qa19CWeblogicPolicy"
         ]
         subnet_name = "private"
       }
@@ -279,6 +282,10 @@ locals {
           backup-plan = "daily-and-weekly"
         }
       }
+      route53_records = {
+        create_internal_record = true
+        create_external_record = true
+      }
       user_data_cloud_init = {
         args = {
           branch       = "main"
@@ -293,7 +300,7 @@ locals {
       tags = {
         backup           = "false"
         component        = "web"
-        description      = "For testing nomis weblogic 12 image"
+        description      = "NOMIS Weblogic 12 Web Server"
         os-type          = "Linux"
         server-type      = "nomis-web12"
         update-ssm-agent = "patchgroup1"

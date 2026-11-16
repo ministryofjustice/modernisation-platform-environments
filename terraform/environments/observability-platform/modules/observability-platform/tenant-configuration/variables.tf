@@ -13,6 +13,7 @@ variable "identity_centre_team" {
 variable "aws_accounts" {
   type = map(object({
     cloudwatch_enabled                 = optional(bool)
+    cloudwatch_shared_with_teams       = optional(list(string), [])
     cloudwatch_custom_namespaces       = optional(string)
     prometheus_push_enabled            = optional(bool)
     amazon_prometheus_query_enabled    = optional(bool)
