@@ -14,10 +14,9 @@ locals {
       control_plane        = module.step_functions_control_plane.arn
       control_plane_resume = module.step_functions_control_plane.resume_arn
       build_image          = module.step_functions_build_image.arn
-      build_infra          = module.step_functions_build_infra.arn
+      deploy_prototype     = module.step_functions_deploy_prototype.arn
     },
     { for m in module.step_functions_notify : "notify" => m.arn },
-    { deploy_prototype = module.step_functions_deploy_prototype.arn },
   )
 
   # Bedrock errors are matched in the existing ECS logs by text. Thresholds are counts
