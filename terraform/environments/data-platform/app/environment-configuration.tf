@@ -7,6 +7,7 @@ locals {
       app_hostname                 = "development.data-platform.service.justice.gov.uk"
       app_google_analytics_id      = "G-2SDQPC682J"
       app_feature_ai_gateway_costs = "true"
+      app_e2e_auth_enabled         = "false"
       app_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
@@ -29,13 +30,16 @@ locals {
       app_hostname                 = "test.data-platform.service.justice.gov.uk"
       app_google_analytics_id      = "G-L4KMR1DY8G"
       app_feature_ai_gateway_costs = "true"
+      app_e2e_auth_enabled         = "true"
       app_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # GitHub Runner
+        "20.58.27.30/32"      # octo-production
       ]
       rds = {
         engine_version          = "18.4"
@@ -51,13 +55,16 @@ locals {
       app_hostname                 = "preproduction.data-platform.service.justice.gov.uk"
       app_google_analytics_id      = "G-LQW8L51Z8E"
       app_feature_ai_gateway_costs = "true"
+      app_e2e_auth_enabled         = "true"
       app_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # GitHub Runner
+        "20.58.27.30/32"      # octo-production
       ]
       rds = {
         engine_version          = "18.4"
@@ -73,6 +80,7 @@ locals {
       app_hostname                 = "data-platform.service.justice.gov.uk"
       app_google_analytics_id      = "G-KWQSR1Q3VN"
       app_feature_ai_gateway_costs = "true"
+      app_e2e_auth_enabled         = "false"
       app_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate

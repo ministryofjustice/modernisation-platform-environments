@@ -97,6 +97,25 @@ app:
         secretKeyRef:
           name: app-secrets
           key: notify-budget-alert-template-id
+    - name: NOTIFY_BUDGET_LIMIT_HIT_TEMPLATE_ID
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: notify-budget-limit-hit-template-id
+    - name: E2E_AUTH_ENABLED
+      value: "${app_e2e_auth_enabled}"
+%{ if app_e2e_auth_enabled }
+    - name: E2E_AUTH_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: e2e-auth-token
+    - name: E2E_USER_EMAIL
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: e2e-user-email
+%{ endif }
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool
