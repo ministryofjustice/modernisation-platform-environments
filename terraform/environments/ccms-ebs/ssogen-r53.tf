@@ -2,9 +2,9 @@
 # SSOGEN Internal Load Balancer DNS Records
 #########################################
 
-# Non-prod SSOGEN ALB record
+# Non-prod SSOGEN OHS ALB record
 resource "aws_route53_record" "ssogen_internal_alb" {
-  count    = local.is-development ? 1 : 0
+  count    = local.ssogen_enabled ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -16,4 +16,84 @@ resource "aws_route53_record" "ssogen_internal_alb" {
     zone_id                = aws_lb.ssogen_alb[count.index].zone_id
     evaluate_target_health = true
   }
+}
+
+# Non-prod SSOGEN ADMIN ALB record
+resource "aws_route53_record" "ssogen_internal_alb_admin" {
+  count    = local.ssogen_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "ccmsebs-sso-admin"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.ssogen_alb_console[count.index].dns_name
+    zone_id                = aws_lb.ssogen_alb_console[count.index].zone_id
+    evaluate_target_health = true
+  }
+}
+
+data "aws_instance" "ssogen_primary_details" {
+  count = local.ssogen_enabled ? 1 : 0
+
+  filter {
+    name   = "tag:aws:autoscaling:groupName"
+    values = [aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name]
+  }
+  filter {
+    name   = "tag:Name"
+    values = [lower(format("ec2-ccms-%s-%s-as1", local.application_name_ssogen, local.environment))]
+  }
+  filter {
+    name   = "instance-state-name"
+    values = ["running"]
+  }
+}
+
+data "aws_instance" "ssogen_secondary_details" {
+  count = local.ssogen_enabled ? 1 : 0
+
+  filter {
+    name   = "tag:aws:autoscaling:groupName"
+    values = [aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name]
+  }
+  filter {
+    name   = "tag:Name"
+    values = [lower(format("ec2-ccms-%s-%s-as2", local.application_name_ssogen, local.environment))]
+  }
+  filter {
+    name   = "instance-state-name"
+    values = ["running"]
+  }
+}
+
+resource "aws_route53_record" "ssogen_primary" {
+  count    = local.ssogen_enabled ? 1 : 0
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "ccms-${local.application_name_ssogen}-as1.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
+  ttl      = 300
+  records  = [data.aws_instance.ssogen_primary_details[count.index].private_ip]
+}
+
+resource "aws_route53_record" "ssogen_secondary" {
+  count    = local.ssogen_enabled ? 1 : 0
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "ccms-${local.application_name_ssogen}-as2.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
+  ttl      = 300
+  records  = [data.aws_instance.ssogen_secondary_details[count.index].private_ip]
+}
+
+resource "aws_route53_record" "ssogen_admin_primary" {
+  count    = local.ssogen_enabled ? 1 : 0
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "ccms-${local.application_name_ssogen}-admin.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
+  ttl      = 300
+  records  = [data.aws_instance.ssogen_primary_details[count.index].private_ip]
 }
