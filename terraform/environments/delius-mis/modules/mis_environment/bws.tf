@@ -11,6 +11,7 @@ resource "aws_security_group" "bws_ec2" {
 
 resource "aws_vpc_security_group_ingress_rule" "bws_ec2" {
   for_each = {
+    all-from-self     = { referenced_security_group_id = aws_security_group.bws_ec2.id }
     http7777-from-alb = { referenced_security_group_id = aws_security_group.mis_alb.id, ip_protocol = "tcp", port = 7777 }
     http7777-from-vpc = { cidr_ipv4 = var.account_config.shared_vpc_cidr, ip_protocol = "tcp", from_port = 6400, to_port = 6500 } # hmpps jumpservers
     all-from-dfi      = { referenced_security_group_id = aws_security_group.dfi_ec2.id }                                          # client tools temporarily installed on DFI
@@ -30,6 +31,7 @@ resource "aws_vpc_security_group_ingress_rule" "bws_ec2" {
 
 resource "aws_vpc_security_group_egress_rule" "bws_ec2" {
   for_each = {
+    all-to-self     = { referenced_security_group_id = aws_security_group.bws_ec2.id }
     all-to-bcs      = { referenced_security_group_id = aws_security_group.bcs_ec2.id }
     all-to-bps      = { referenced_security_group_id = aws_security_group.bps_ec2.id }
     http-to-all     = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }

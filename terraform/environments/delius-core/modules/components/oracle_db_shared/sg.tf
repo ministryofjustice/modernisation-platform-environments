@@ -220,3 +220,23 @@ resource "aws_vpc_security_group_ingress_rule" "ap_db_oracle" {
     { Name = "ap-oracle-in-${each.key}" }
   )
 }
+
+resource "aws_vpc_security_group_egress_rule" "delius_db_legacy_nextcloud_nfs" {
+  for_each = toset(var.environment_config.migration_environment_private_cidr)
+
+  ip_protocol       = "tcp"
+  from_port         = 2049
+  to_port           = 2049
+  cidr_ipv4         = each.key
+  description       = "Allow NFS mount of legacy nextcloud EFS ${each.key}"
+  security_group_id = aws_security_group.db_ec2.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "delius_db_reporting_nfs" {
+  ip_protocol       = "tcp"
+  from_port         = 2049
+  to_port           = 2049
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
+  description       = "Allow NFS mount of reporting EFS"
+  security_group_id = aws_security_group.db_ec2.id
+}
