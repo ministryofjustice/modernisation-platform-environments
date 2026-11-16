@@ -21,7 +21,7 @@ module "lambda_file_mover" {
   ignore_source_code_hash           = true
   memory_size                       = 512
   role_name                         = local.lambda_role_name
-  runtime                           = "python3.13"
+  runtime                           = "python3.14"
   source_path = [{
     path             = "${path.module}/lambda/push-to-s3-writer"
     pip_requirements = true
@@ -152,7 +152,7 @@ module "lambda_dlq_reporter" {
   ignore_source_code_hash           = true
   memory_size                       = 256
   role_name                         = "${local.application_name}-${local.component_name}-dlq"
-  runtime                           = "python3.13"
+  runtime                           = "python3.14"
   source_path = [{
     path             = "${path.module}/lambda/push-to-s3-writer"
     pip_requirements = true

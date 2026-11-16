@@ -17,7 +17,7 @@ module "lambda_file_received_adapter" {
   maximum_retry_attempts            = 2
   memory_size                       = 128
   reserved_concurrent_executions    = 10
-  runtime                           = "python3.13"
+  runtime                           = "python3.14"
   source_path                       = "lambda/file-received-adapter"
   timeout                           = 30
   tracing_mode                      = "Active"
@@ -84,7 +84,7 @@ module "lambda_file_scan_result_recorded_adapter" {
   maximum_retry_attempts            = 2
   memory_size                       = 128
   reserved_concurrent_executions    = 10
-  runtime                           = "python3.13"
+  runtime                           = "python3.14"
   source_path                       = "lambda/file-scan-result-recorded-adapter"
   timeout                           = 30
   tracing_mode                      = "Active"
@@ -163,7 +163,7 @@ module "lambda_stage" {
   maximum_retry_attempts            = 2
   memory_size                       = 1024
   reserved_concurrent_executions    = 10
-  runtime                           = "python3.13"
+  runtime                           = "python3.14"
   source_path                       = "lambda/file-mover"
   timeout                           = 900
   tracing_mode                      = "Active"
@@ -288,7 +288,7 @@ module "lambda_route" {
   maximum_retry_attempts            = 2
   memory_size                       = 1024
   reserved_concurrent_executions    = 10
-  runtime                           = "python3.13"
+  runtime                           = "python3.14"
   source_path                       = "lambda/file-mover"
   timeout                           = 900
   tracing_mode                      = "Active"
@@ -412,7 +412,7 @@ module "lambda_file_action_execution_requested_adapter" {
   maximum_retry_attempts            = 2
   memory_size                       = 128
   reserved_concurrent_executions    = 10
-  runtime                           = "python3.13"
+  runtime                           = "python3.14"
   source_path                       = "lambda/file-action-execution-requested-adapter"
   timeout                           = 30
   tracing_mode                      = "Active"
