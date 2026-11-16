@@ -515,7 +515,7 @@ models:
       location: "eu"
       mode: "realtime"
       generally_available: false
-      environments_available: ["development"]
+      environments_available: ["development", "production"]
     gemini-3-6-flash:
       model_id: "gemini-3.6-flash"
       model_family: "Google Gemini"
