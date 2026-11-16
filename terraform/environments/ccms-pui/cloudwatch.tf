@@ -107,7 +107,7 @@ resource "aws_cloudwatch_metric_alarm" "Process_Failure_Clamd" {
   }
   alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions    = [aws_sns_topic.cloudwatch_alerts.arn]
-  tags = local.tags
+  tags          = local.tags
 }
 
 # Underlying waf Instance Status Check Failure
