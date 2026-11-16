@@ -323,14 +323,21 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
     actions = [
       "logs:AssociateKmsKey",
       "logs:CreateLogGroup",
-      "logs:CreateLogStream",
       "logs:DescribeLogStreams",
-      "logs:GetLogEvents",
-      "logs:PutLogEvents",
       "logs:PutRetentionPolicy"
     ]
     resources = [
       "arn:aws:logs:*:*:log-group:/aws/redshift/*"
+    ]
+  }
+  statement {
+    actions = [
+      "logs:CreateLogStream",
+      "logs:GetLogEvents",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "arn:aws:logs:*:*:log-group:/aws/redshift/*:*"
     ]
   }
   statement {
@@ -1111,12 +1118,21 @@ data "aws_iam_policy_document" "step_function_execution_policy_document" {
       "logs:UpdateLogDelivery",
       "logs:DeleteLogDelivery",
       "logs:ListLogDeliveries",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
       "logs:PutResourcePolicy",
       "logs:DescribeResourcePolicies",
       "logs:DescribeLogGroups",
       "logs:PutDestination"
+    ]
+  }
+
+  statement {
+    resources = [
+      "arn:aws:logs:${local.account_region}:${local.account_id}:log-group:/aws/vendedlogs/states/*:*"
+    ]
+
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
     ]
   }
 

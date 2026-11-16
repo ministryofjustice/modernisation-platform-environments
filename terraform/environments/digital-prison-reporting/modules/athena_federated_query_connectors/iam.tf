@@ -34,7 +34,15 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
       },
       {
         "Action" : [
-          "logs:CreateLogGroup",
+          "logs:CreateLogGroup"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:logs:${var.region}:${var.account_id}:log-group:*"
+        ]
+      },
+      {
+        "Action" : [
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
