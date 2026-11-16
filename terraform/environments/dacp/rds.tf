@@ -9,7 +9,6 @@ resource "aws_db_instance" "dacp_db_v2" {
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   #checkov:skip=CKV_AWS_354: "Ensure RDS Performance Insights are encrypted using KMS CMKs"
-  #checkov:skip=CKV2_AWS_69: "Ensure AWS RDS database instance configured with encryption in transit" - app does not yet support SSL
   allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
   db_name                         = local.application_data.accounts[local.environment].db_name
   storage_type                    = local.application_data.accounts[local.environment].storage_type
