@@ -43,7 +43,7 @@
       "forge_max_builds_in_memory": 200,
       "forge_design_check_concurrency": 3,
       "forge_design_check_queue_timeout_ms": 120000,
-      "usage_report_enabled": true,
+      "usage_report_enabled": false,
       "usage_report_interval_minutes": 15
     },
     "preproduction": {
@@ -89,7 +89,7 @@
       "forge_max_builds_in_memory": 200,
       "forge_design_check_concurrency": 3,
       "forge_design_check_queue_timeout_ms": 120000,
-      "usage_report_enabled": false,
+      "usage_report_enabled": true,
       "usage_report_interval_minutes": 15
     }
   }
