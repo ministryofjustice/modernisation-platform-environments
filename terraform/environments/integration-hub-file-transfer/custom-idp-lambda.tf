@@ -12,8 +12,6 @@ module "lambda_custom_idp_layer" {
   compatible_runtimes = ["python3.14"]
   source_path         = "lambda/custom-idp/layer"
 
-  trigger_on_package_timestamp = false
-
   tags = local.tags
 }
 
