@@ -14,12 +14,12 @@ provider "grafana" {
   auth  = grafana_cloud_stack_service_account_token.terraform.key
 }
 
-# Read-only GitHub App (Organization > Members: read) used to resolve GitHub team slugs to IDs
+# Observability Platform GitHub App (also used by the GitHub data source); needs Organization > Members: read to resolve GitHub team slugs to IDs
 provider "github" {
   owner = "ministryofjustice"
   app_auth {
-    id              = data.aws_secretsmanager_secret_version.grafana_cloud_terraform_github_app_id.secret_string
-    installation_id = data.aws_secretsmanager_secret_version.grafana_cloud_terraform_github_app_installation_id.secret_string
-    pem_file        = data.aws_secretsmanager_secret_version.grafana_cloud_terraform_github_app_private_key.secret_string
+    id              = data.aws_secretsmanager_secret_version.github_app_id.secret_string
+    installation_id = data.aws_secretsmanager_secret_version.github_app_installation_id.secret_string
+    pem_file        = data.aws_secretsmanager_secret_version.github_app_private_key.secret_string
   }
 }

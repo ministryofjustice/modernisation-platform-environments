@@ -93,27 +93,3 @@ resource "aws_secretsmanager_secret" "grafana_cloud_github_oauth_client_secret" 
 
   name = "grafana-cloud/github-oauth/client-secret"
 }
-
-#tfsec:ignore:avd-aws-0098 CMK not required currently
-resource "aws_secretsmanager_secret" "grafana_cloud_terraform_github_app_id" {
-  #checkov:skip=CKV_AWS_149:CMK not required currently
-  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
-
-  name = "grafana-cloud/terraform-github-app/id"
-}
-
-#tfsec:ignore:avd-aws-0098 CMK not required currently
-resource "aws_secretsmanager_secret" "grafana_cloud_terraform_github_app_installation_id" {
-  #checkov:skip=CKV_AWS_149:CMK not required currently
-  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
-
-  name = "grafana-cloud/terraform-github-app/installation-id"
-}
-
-#tfsec:ignore:avd-aws-0098 CMK not required currently
-resource "aws_secretsmanager_secret" "grafana_cloud_terraform_github_app_private_key" {
-  #checkov:skip=CKV_AWS_149:CMK not required currently
-  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
-
-  name = "grafana-cloud/terraform-github-app/private-key"
-}
