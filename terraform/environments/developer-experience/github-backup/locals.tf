@@ -1,0 +1,10 @@
+locals {
+  global_config = yamldecode(file("${path.module}/../configuration/global.yml"))
+
+  is_production = local.is-production
+
+  github_backup_bucket_name = "${local.global_config.s3_bucket_prefix}-${local.environment}-github-backup"
+
+  github_backup_organisation = "ministryofjustice"
+  github_backup_schedule     = "cron(0 2 * * ? *)"
+}

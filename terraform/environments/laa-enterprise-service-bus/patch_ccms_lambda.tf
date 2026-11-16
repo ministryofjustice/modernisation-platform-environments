@@ -53,10 +53,10 @@ resource "aws_lambda_function" "patch_ccms_provider_load" {
   s3_object_version = data.aws_s3_object.provider_load_zip.version_id
   timeout           = 100
   memory_size       = 128
-  runtime           = "python3.10"
+  runtime           = "python3.14"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn
+    aws_lambda_layer_version.lambda_layer_p314_oic21.arn
   ]
 
   vpc_config {
@@ -69,8 +69,8 @@ resource "aws_lambda_function" "patch_ccms_provider_load" {
     variables = {
       DB_SECRET_NAME         = aws_secretsmanager_secret.patch_ccms_db_mp_credentials[0].name
       PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.patch_ccms_procedures_config[0].name
-      LD_LIBRARY_PATH        = "/opt/instantclient_12_1"
-      ORACLE_HOME            = "/opt/instantclient_12_1"
+      LD_LIBRARY_PATH        = "/opt/instantclient_21_23"
+      ORACLE_HOME            = "/opt/instantclient_21_23"
       SERVICE_NAME           = "patch-ccms-load-service"
       NAMESPACE              = "HUB20-CCMS-NS"
       ENVIRONMENT            = local.environment

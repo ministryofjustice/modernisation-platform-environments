@@ -3,15 +3,78 @@
 # S3 Bucket - Logging
 # ---------------------------------------------
 module "s3-bucket-logging" {
-  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
-  bucket_policy      = [data.aws_iam_policy_document.logging_s3_policy.json]
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.s3-bucket-logging.bucket.arn,
+          "${module.s3-bucket-logging.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        Sid    = "AllowELBLogDeliveryPutObject"
+        Effect = "Allow"
+        Principal = {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "s3:x-amz-acl"      = "bucket-owner-full-control"
+          }
+        }
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        "Sid" = "RestrictToTLSRequestsOnly",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.s3-bucket-logging.bucket.arn,
+          "${module.s3-bucket-logging.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          },
+          "NumericLessThan" : {
+            "aws:TLSVersion" : "1.2"
+          }
+        },
+        "Principal" : "*"
+      }
+    ]
+  })]
 
-  log_bucket    = local.logging_bucket_name
-  log_prefix    = "s3access/${local.logging_bucket_name}"
   sse_algorithm = "AES256"
 
   # Refer to the below section "Replication" before enabling replication
@@ -37,35 +100,26 @@ module "s3-bucket-logging" {
         autoclean = "true"
       }
 
-      transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
-          storage_class = "GLACIER"
-        }
-      ]
-
       expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
       }
-
-      noncurrent_version_transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
-          storage_class = "GLACIER"
-        }
-      ]
 
       noncurrent_version_expiration = {
         days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
       }
 
       abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+    },
+    {
+      id      = "s3-access-log-expire-after-90"
+      enabled = "Enabled"
+      prefix  = "s3-access-logs/"
+      expiration = {
+        days = 90
+      }
+      noncurrent_version_expiration = {
+        days = 90
+      }
     }
   ]
 
@@ -85,61 +139,64 @@ resource "aws_s3_bucket_notification" "logging_bucket_notification" {
   }
 }
 
-data "aws_iam_policy_document" "logging_s3_policy" {
-  statement {
-    sid    = "AllowELBLogDeliveryPutObject"
-    effect = "Allow"
-    principals {
-      type = "Service"
-      identifiers = [
-        "logdelivery.elasticloadbalancing.amazonaws.com"
-      ]
-    }
-    actions   = ["s3:PutObject"]
-    resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "s3:x-amz-acl"
-      values   = ["bucket-owner-full-control"]
-    }
-
-  }
-
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["logging.s3.amazonaws.com"]
-    }
-    actions   = ["s3:PutObject"]
-    resources = ["arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
-    }
-  }
-}
-
 # ---------------------------------------------
 # S3 Bucket - R-sync
 # ---------------------------------------------
 module "s3-bucket-dbbackup" {
-  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/494aa4438cec612e45387109caa832aff4cac1ce
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=494aa4438cec612e45387109caa832aff4cac1ce" # v9.0.1
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = true
-  bucket_policy      = [data.aws_iam_policy_document.dbbackup_s3_policy.json]
-
-  log_bucket = local.logging_bucket_name
-  log_prefix = "s3access/${local.rsync_bucket_name}"
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.s3-bucket-dbbackup.bucket.arn,
+          "${module.s3-bucket-dbbackup.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root",
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer"
+          ]
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-dbbackup.bucket.arn}/*"
+      },
+      {
+        "Sid" = "RestrictToTLSRequestsOnly",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.s3-bucket-dbbackup.bucket.arn,
+          "${module.s3-bucket-dbbackup.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          },
+          "NumericLessThan" : {
+            "aws:TLSVersion" : "1.2"
+          }
+        },
+        "Principal" : "*"
+      }
+    ]
+  })]
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -191,22 +248,6 @@ resource "aws_s3_bucket_notification" "dbbackup_bucket_notification" {
   }
 }
 
-data "aws_iam_policy_document" "dbbackup_s3_policy" {
-  statement {
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root",
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer"
-      ]
-    }
-    actions = [
-      "s3:PutObject"
-    ]
-    resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
-  }
-}
-
 #For shared bucket lifecycle rule is not needed as it host lambda application source code
 resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
@@ -244,6 +285,44 @@ resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
   }
 }
 
+data "aws_iam_policy_document" "shared_bucket_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.ccms_ebs_shared.arn,
+      "${aws_s3_bucket.ccms_ebs_shared.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "shared_bucket_secure_transport" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.id
+  policy = data.aws_iam_policy_document.shared_bucket_secure_transport.json
+}
+
+resource "aws_s3_bucket_logging" "shared_bucket_secure_transport" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.id
+
+  target_bucket = module.s3-bucket-logging.bucket.id
+  target_prefix = "s3-access-logs/"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
 # S3 Bucket for Payment Load
 resource "aws_s3_bucket" "lambda_payment_load" {
   bucket = "${local.application_name}-${local.environment}-payment-load"
@@ -271,38 +350,109 @@ resource "aws_s3_bucket_versioning" "lambda_payment_load" {
   }
 }
 
-# Lifecycle configuration: expire current objects and noncurrent versions after 30 days
+resource "aws_s3_bucket_logging" "lambda_payment_load" {
+  bucket = aws_s3_bucket.lambda_payment_load.id
+
+  target_bucket = module.s3-bucket-logging.bucket.id
+  target_prefix = "s3-access-logs/"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
+# Lifecycle configuration - see ADR "Payment Load S3 Bucket Retention" (SRE-25): no retention after a successful
+# load into CCMS. The payment load Lambda moves a file to completed/ only when every payment loaded, so that prefix
+# is the success signal. Pending files (bucket root) are not expired, so a file is never deleted just because it was
+# uploaded. Failed files are kept for a short period to investigate the error - the business fixes and resends them.
 resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle" {
   bucket = aws_s3_bucket.lambda_payment_load.id
-  # One lifecycle rule per prefix
+
   rule {
-    id     = "expire-${aws_s3_bucket.lambda_payment_load.id}-${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current}d"
+    id     = "expire-completed-after-successful-load"
+    status = "Enabled"
+
+    filter {
+      prefix = "completed/"
+    }
+
+    expiration {
+      days = local.application_data.accounts[local.environment].payment_load_s3_days_expiration_completed
+    }
+  }
+
+  rule {
+    id     = "expire-failed-after-investigation"
+    status = "Enabled"
+
+    filter {
+      prefix = "failed/"
+    }
+
+    expiration {
+      days = local.application_data.accounts[local.environment].payment_load_s3_days_expiration_failed
+    }
+  }
+
+  # The bucket is versioned and the Lambda moves files by copy and delete, so remove the previous versions
+  # and leftover delete markers too - otherwise the data would still be held as noncurrent versions
+  rule {
+    id     = "expire-noncurrent-versions"
     status = "Enabled"
 
     filter {
       prefix = ""
     }
 
-    expiration {
-      days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
-    }
-
-    noncurrent_version_transition {
-      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
-      storage_class   = "STANDARD_IA"
-    }
-
-    noncurrent_version_transition {
-      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
-      storage_class   = "GLACIER"
-    }
-
     noncurrent_version_expiration {
-      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+      noncurrent_days = local.application_data.accounts[local.environment].payment_load_s3_days_expiration_noncurrent
+    }
+
+    expiration {
+      expired_object_delete_marker = true
     }
 
     abort_incomplete_multipart_upload {
       days_after_initiation = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+    }
+  }
+}
+
+data "aws_iam_policy_document" "payment_load_bucket_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.lambda_payment_load.arn,
+      "${aws_s3_bucket.lambda_payment_load.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "payment_load_bucket_secure_transport" {
+  bucket = aws_s3_bucket.lambda_payment_load.id
+  policy = data.aws_iam_policy_document.payment_load_bucket_secure_transport.json
+}
+
+resource "aws_s3_bucket_object_lock_configuration" "dbbackup" {
+  count  = local.is-test ? 1 : 0
+  bucket = module.s3-bucket-dbbackup.bucket.id
+
+  rule {
+    default_retention {
+      mode = "COMPLIANCE"
+      days = local.application_data.accounts[local.environment].rman_s3_lifecycle_days_expiration_current
     }
   }
 }

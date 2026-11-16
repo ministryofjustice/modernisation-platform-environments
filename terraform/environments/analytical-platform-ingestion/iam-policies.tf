@@ -17,7 +17,7 @@ module "transfer_server_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.4.0"
+  version = "6.6.0"
 
   name_prefix = "transfer-server"
   description = "IAM Policy"
@@ -73,7 +73,7 @@ module "datasync_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.4.0"
+  version = "6.6.0"
 
   name_prefix = "datasync"
   description = "IAM Policy"
@@ -140,7 +140,7 @@ module "datasync_replication_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.4.0"
+  version = "6.6.0"
 
   name_prefix = "datasync-replication"
   description = "IAM Policy"
@@ -207,7 +207,7 @@ module "datasync_opg_replication_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.4.0"
+  version = "6.6.0"
 
   name_prefix = "datasync-opg-ingress-${local.environment}-replication"
   description = "IAM Policy"
@@ -355,7 +355,7 @@ module "guard_duty_s3_malware_protection_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.4.0"
+  version = "6.6.0"
 
   name_prefix = "guard-duty-s3-malware-protection-${local.environment}-scan"
   description = "IAM Policy"
@@ -454,7 +454,7 @@ module "laa_data_analysis_iam_policy" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.4.0"
+  version = "6.6.0"
 
   name_prefix = "laa-data-analysis"
   description = "IAM Policy"
@@ -540,7 +540,7 @@ module "laa_data_analysis_replication_iam_policy" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.4.0"
+  version = "6.6.0"
 
   name_prefix = "laa-data-analysis-${local.environment}-replication"
   description = "IAM Policy"

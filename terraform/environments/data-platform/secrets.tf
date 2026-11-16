@@ -1,7 +1,5 @@
 module "cloud_platform_live_secret" {
-  count = terraform.workspace == "data-platform-development" ? 1 : 0
-
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
   name = "cloud-platform/live"
 
@@ -9,6 +7,20 @@ module "cloud_platform_live_secret" {
     ca_certificate   = "CHANGEME"
     cluster_endpoint = "CHANGEME"
     oidc_provider    = "CHANGEME"
+  })
+  ignore_secret_changes = true
+}
+
+module "justiceuk_entra_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name = "justiceuk/entra"
+
+  secret_string = jsonencode({
+    tenant_id = "CHANGEME"
+    client_id_map = {
+      amazon_sts = "sts.amazonaws.com"
+    }
   })
   ignore_secret_changes = true
 }

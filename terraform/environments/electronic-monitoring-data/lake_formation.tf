@@ -26,6 +26,7 @@ resource "aws_lakeformation_data_lake_settings" "settings" {
       aws_iam_role.clean_after_dlt_load.arn,
       aws_iam_role.glue_db_count_metrics.arn,
       aws_iam_role.staging_db_janitor.arn,
+      aws_iam_role.lake_formation_permission_granter.arn,
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
     ]
@@ -79,6 +80,120 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
 }
 
 # ------------------------------------------------------------------------
+# Lake Formation for FMS validation reporter
+# The reporter only reads FMS audit and metadata tables.
+# ------------------------------------------------------------------------
+
+resource "aws_lakeformation_permissions" "fms_validation_reporter_database" {
+  principal   = aws_iam_role.fms_validation_reporter.arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = "serco_fms${local.db_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "fms_validation_reporter_tables" {
+  principal   = aws_iam_role.fms_validation_reporter.arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = "serco_fms${local.db_suffix}"
+    wildcard      = true
+  }
+}
+
+# ------------------------------------------------------------------------
+# Lake Formation for downstream position reconciliation
+# ------------------------------------------------------------------------
+
+resource "aws_lakeformation_permissions" "merge_redrive_planner_database_access" {
+  for_each = toset([
+    "allied_mdss${local.db_suffix}",
+    "staged_mdss${local.dbt_suffix}",
+    "acquisitive_crime${local.dbt_suffix}",
+    "data_insights${local.dbt_suffix}",
+  ])
+
+  principal   = aws_iam_role.merge_redrive_planner.arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_redrive_planner_table_access" {
+  for_each = {
+    raw_position = {
+      database = "allied_mdss${local.db_suffix}"
+      table    = "position"
+    }
+
+    staged_position = {
+      database = "staged_mdss${local.dbt_suffix}"
+      table    = "position"
+    }
+
+    ac_position = {
+      database = "acquisitive_crime${local.dbt_suffix}"
+      table    = "position"
+    }
+
+    ac_device_activations = {
+      database = "acquisitive_crime${local.dbt_suffix}"
+      table    = "device_activations"
+    }
+
+    emdi_position = {
+      database = "data_insights${local.dbt_suffix}"
+      table    = "position"
+    }
+
+    emdi_device_activations = {
+      database = "data_insights${local.dbt_suffix}"
+      table    = "device_activations"
+    }
+  }
+
+  principal   = aws_iam_role.merge_redrive_planner.arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = each.value.database
+    name          = each.value.table
+  }
+}
+
+# ------------------------------------------------------------------------
+# Lake Formation for Observability Platform
+# Limit Grafana Athena access to operational monitoring data only.
+# ------------------------------------------------------------------------
+
+resource "aws_lakeformation_permissions" "observability_platform_database" {
+  principal   = data.aws_iam_role.observability_platform.arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = aws_glue_catalog_database.ops_monitoring.name
+  }
+
+  depends_on = [module.observability_platform_tenant]
+}
+
+resource "aws_lakeformation_permissions" "observability_platform_tables" {
+  principal   = data.aws_iam_role.observability_platform.arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = aws_glue_catalog_database.ops_monitoring.name
+    wildcard      = true
+  }
+
+  depends_on = [module.observability_platform_tenant]
+}
+
+# ------------------------------------------------------------------------
 # Lake Formation - admin permissions
 # https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/adding-admin-data-lake-formation-permissions.html
 # ------------------------------------------------------------------------
@@ -117,12 +232,12 @@ module "lakeformation_registration_iam_role" {
     S3BucketAccess = {
       effect    = "Allow"
       actions   = ["s3:ListBucket"]
-      resources = [module.s3-create-a-derived-table-bucket.bucket.arn]
+      resources = [module.s3-create-a-derived-table-bucket.bucket.arn, module.s3-raw-formatted-data-bucket.bucket.arn]
     }
     S3ObjectAccess = {
       effect    = "Allow"
       actions   = ["s3:DeleteObject", "s3:GetObject", "s3:PutObject"]
-      resources = ["${module.s3-create-a-derived-table-bucket.bucket.arn}/*"]
+      resources = ["${module.s3-create-a-derived-table-bucket.bucket.arn}/*", "${module.s3-raw-formatted-data-bucket.bucket.arn}/*"]
     }
     KMSKeyAccess = {
       effect = "Allow"
@@ -137,3 +252,4 @@ module "lakeformation_registration_iam_role" {
     }
   }
 }
+

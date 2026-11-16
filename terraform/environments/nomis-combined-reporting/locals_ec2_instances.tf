@@ -46,6 +46,7 @@ locals {
         description            = "ncr bip mid-tier component"
         instance-access-policy = "full"
         os-type                = "Linux"
+        "Patch Group"          = "patchgroup1"
         server-type            = "ncr-bip-app"
         update-ssm-agent       = "patchgroup1"
       }
@@ -95,6 +96,7 @@ locals {
         description            = "ncr bip CMS"
         instance-access-policy = "full"
         os-type                = "Linux"
+        "Patch Group"          = "patchgroup1"
         server-type            = "ncr-bip-cms"
         update-ssm-agent       = "patchgroup1"
       }
@@ -144,6 +146,7 @@ locals {
         description            = "ncr bip web for CMS"
         instance-access-policy = "full"
         os-type                = "Linux"
+        "Patch Group"          = "patchgroup1"
         server-type            = "ncr-webadmin"
         update-ssm-agent       = "patchgroup1"
       }
@@ -192,6 +195,7 @@ locals {
         backup                 = "false"
         instance-access-policy = "full"
         os-type                = "Linux"
+        "Patch Group"          = "patchgroup1"
         server-type            = "ncr-web"
         update-ssm-agent       = "patchgroup1"
       }
@@ -255,6 +259,7 @@ locals {
         backup               = false
         server-type          = "ncr-db"
         os-type              = "Linux"
+        "Patch Group"        = "patchgroup1"
         licence-requirements = "Oracle Database"
         update-ssm-agent     = "patchgroup1"
       }

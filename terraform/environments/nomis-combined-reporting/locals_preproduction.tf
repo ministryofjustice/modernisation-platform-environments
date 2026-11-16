@@ -80,6 +80,9 @@ locals {
             "Ec2PPReportingPolicy",
           ])
         })
+        instance = merge(local.ec2_instances.bip_app.instance, {
+          instance_type = "r6i.2xlarge"
+        })
         tags = merge(local.ec2_instances.bip_app.tags, {
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"
@@ -455,6 +458,17 @@ locals {
       "/oracle/database/LSBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/lsast"            = local.secretsmanager_secrets.bip
       "/sap/bip/pp"               = local.secretsmanager_secrets.bip
+    }
+
+    ssm_patch_baselines = {
+      OracleLinuxPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["OracleLinuxPatchGroup1Baseline"], {
+        rule1_approve_after_days = null
+        rule1_approve_until_date = "2026-11-04"
+      })
+      RedHatPatchGroup1Baseline = merge(module.baseline_presets.ssm_patch_baselines["RedHatPatchGroup1Baseline"], {
+        rule1_approve_after_days = null
+        rule1_approve_until_date = "2026-11-04"
+      })
     }
   }
 }

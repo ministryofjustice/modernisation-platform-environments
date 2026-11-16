@@ -48,6 +48,12 @@ variable "deploy_oracle_stats" {
   type        = bool
 }
 
+variable "deploy_oracle_rat" {
+  description = "for deploying Oracle RAT capture bucket"
+  default     = true
+  type        = bool
+}
+
 variable "db_suffix" {
   description = "identifier to append to name e.g. dsd, boe"
   type        = string
@@ -103,8 +109,8 @@ variable "ecs_cluster_arn" {
 }
 
 # Only create one per account
-variable "create_backup_role" {
-  description = "Role used to run AWS Backups i.e. AWSBackupDefaultServiceRole"
+variable "create_aws_backup_service_role" {
+  description = "Create the AWS Backup default service role"
   type        = bool
   default     = false
 }
