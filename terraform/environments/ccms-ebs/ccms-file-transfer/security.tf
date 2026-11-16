@@ -187,19 +187,19 @@ resource "aws_security_group" "cluster_ec2" {
   )
 }
 
-resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_rule" {
-  for_each = toset([
-    data.aws_subnet.data_subnets_a.cidr_block,
-    data.aws_subnet.data_subnets_b.cidr_block,
-    data.aws_subnet.data_subnets_c.cidr_block,
-  ])
-  security_group_id = aws_security_group.cluster_ec2.id
-  description       = "Allow Oracle DB access"
-  ip_protocol       = "tcp"
-  from_port         = 1521
-  to_port           = 1522
-  cidr_ipv4         = each.value
-}
+# resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_rule" {
+#   for_each = toset([
+#     data.aws_subnet.data_subnets_a.cidr_block,
+#     data.aws_subnet.data_subnets_b.cidr_block,
+#     data.aws_subnet.data_subnets_c.cidr_block,
+#   ])
+#   security_group_id = aws_security_group.cluster_ec2.id
+#   description       = "Allow Oracle DB access"
+#   ip_protocol       = "tcp"
+#   from_port         = 1521
+#   to_port           = 1522
+#   cidr_ipv4         = each.value
+# }
 
 resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_vpce" {
   for_each = toset([
