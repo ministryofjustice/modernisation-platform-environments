@@ -802,3 +802,32 @@ resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_executio
   ]
 }
 
+
+resource "aws_cloudwatch_log_metric_filter" "cadt_task_failed" {
+  name           = "cadt-task-failed"
+  log_group_name = "/ecs/create-a-derived-table"
+  pattern        = "[ERROR] || [CRITICAL] || Exception || { $.exit_code != 0 }"
+
+  metric_transformation {
+    name      = "CadtTaskFailureCount"
+    namespace = "EMDS/ECS"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "cadt_task_failed" {
+  alarm_name          = "cadt-ecs-task-failed"
+  alarm_description   = "ECS task for create-a-derived-table (CADT) has failed. Check logs at https://eu-west-2.console.aws.amazon.com/cloudwatch/home?region=eu-west-2#logsV2:log-groups/log-group/$252Fecs$252Fcreate-a-derived-table"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  metric_name         = "CadtTaskFailureCount"
+  namespace           = "EMDS/ECS"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 1
+  treat_missing_data  = "notBreaching"
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
