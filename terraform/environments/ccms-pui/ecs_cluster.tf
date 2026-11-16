@@ -106,7 +106,25 @@ resource "aws_ecs_service" "pui" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.pui.arn
   desired_count   = local.application_data.accounts[local.environment].app_count
-  launch_type     = "EC2"
+
+
+  # Required by the AWS provider whenever capacity_provider_strategy is
+  # added/changed on an existing service (here: switching from launch_type
+  # to capacity_provider_strategy), so the change is applied via a fresh
+  # deployment rather than an in-place update.
+  force_new_deployment = true
+
+  # Use the cluster's capacity provider (with managed scaling enabled)
+  # instead of a bare EC2 launch type, so ECS can grow the ASG automatically
+  # to provide extra instance capacity for rolling deployments instead of
+  # stalling with "insufficient resources" because there is no room to place
+  # the new task revision alongside the old one.
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.capacity-provider.name
+    weight            = 1
+    base              = 1
+  }
+
 
   health_check_grace_period_seconds = 120
   lifecycle {
@@ -135,4 +153,35 @@ resource "aws_ecs_service" "pui" {
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_autoscaling_group.cluster-scaling-group
   ]
+}
+
+# Scale on CPU usage
+resource "aws_appautoscaling_target" "pui" {
+  max_capacity       = local.application_data.accounts[local.environment].ecs_tasks_max_count
+  min_capacity       = local.application_data.accounts[local.environment].app_count
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.pui.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-appautoscaling_target", local.application_name, local.environment)) },
+    { "slack-channel" = "ask-laa-sre" }
+  )
+}
+
+resource "aws_appautoscaling_policy" "pui" {
+  name               = "${local.application_name}-cpu-scaling-policy"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.pui.resource_id
+  scalable_dimension = aws_appautoscaling_target.pui.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.pui.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+    target_value       = 85
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
+  }
 }

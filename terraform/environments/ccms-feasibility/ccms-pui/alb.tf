@@ -1,0 +1,40 @@
+# Shared load balancer access log bucket, managed in ccms-feasibility root
+data "aws_s3_bucket" "lb_access_logs" {
+  bucket = "${local.application_name}-lb-access-logs"
+}
+
+module "alb" {
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/10d2292
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/alb?ref=10d2292"
+
+  name               = "${local.component_name}-${local.env_label}"
+  subnet_ids         = data.aws_subnets.shared-private.ids
+  security_group_ids = [aws_security_group.alb.id]
+  vpc_id             = data.aws_vpc.shared.id
+  certificate_arn    = data.aws_acm_certificate.wildcard.arn
+  target_port        = local.application_data.accounts[local.environment].pui_server_port
+  target_type        = "ip"
+
+  health_check = {
+    path = "/civil/actuator/health"
+  }
+
+  stickiness = {
+    enabled  = true
+    duration = 7200
+  }
+
+  enable_deletion_protection = local.application_data.accounts[local.environment].alb_deletion_protection
+
+  access_logs = {
+    bucket = data.aws_s3_bucket.lb_access_logs.id
+    prefix = local.component_name
+  }
+
+  alarms = {
+    topic_arn         = data.aws_sns_topic.alerts.arn
+    min_healthy_hosts = local.application_data.accounts[local.environment].app_count # same as the ECS service's desired_count
+  }
+
+  tags = local.tags
+}

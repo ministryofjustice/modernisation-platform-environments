@@ -20,6 +20,12 @@ resource "aws_security_group" "athena_federated_query_lambda_sg_oracle" {
     create_before_destroy = true
   }
 
+  # The Lambda's network interfaces can hang around for a while after the
+  # function is deleted, so keep retrying the delete rather than failing.
+  timeouts {
+    delete = var.security_group_delete_timeout
+  }
+
   egress {
     description = "Allow connections to Oracle"
     from_port   = 1521
@@ -56,6 +62,12 @@ resource "aws_security_group" "athena_federated_query_lambda_sg_postgresql" {
     create_before_destroy = true
   }
 
+  # The Lambda's network interfaces can hang around for a while after the
+  # function is deleted, so keep retrying the delete rather than failing.
+  timeouts {
+    delete = var.security_group_delete_timeout
+  }
+
   egress {
     description = "Allow connections to Postgresql"
     from_port   = 5432
@@ -83,6 +95,12 @@ resource "aws_security_group" "athena_federated_query_lambda_sg_redshift" {
 
   lifecycle {
     create_before_destroy = true
+  }
+
+  # The Lambda's network interfaces can hang around for a while after the
+  # function is deleted, so keep retrying the delete rather than failing.
+  timeouts {
+    delete = var.security_group_delete_timeout
   }
 
   egress {

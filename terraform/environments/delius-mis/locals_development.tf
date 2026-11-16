@@ -4,12 +4,17 @@ locals {
   environment_config_dev = {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
+    legacy_ad_domain_name                  = null
+    legacy_dns_ip_addrs                    = []
+    legacy_resolver_ip_addrs               = ["10.162.33.11", "10.162.38.123", "10.162.43.195"]
+    legacy_nextcloud_efs_dns_name          = "fs-92b7c763.efs.eu-west-2.amazonaws.com"
+    legacy_nextcloud_efs_id                = "fs-92b7c763"
     ad_domain_name                         = "delius-mis-dev.internal"
     ad_trust_domain_name                   = "azure.noms.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.azure.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_azure_domain_controllers
     core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-non-live-data"]
-    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub.lostprivatekey")
     lb_additional_allowed_public_cidrs     = module.ip_addresses.mp_cidrs.non_live_eu_west_nat
     migration_environment_full_name        = "dmd-mis-dev"
     migration_environment_abbreviated_name = "dmd"
@@ -251,7 +256,8 @@ locals {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "t2.xlarge" # see TM-1305
+      ebs_optimized                = false
+      instance_type                = "t3.xlarge" # no capacity for t2
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"
@@ -274,8 +280,10 @@ locals {
 
   # base config for each database
   base_db_config_dev = {
-    instance_type  = "m7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type          = "m7i.large"
+    primary_instance_count = 1
+    standby_instance_count = 0
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -341,8 +349,16 @@ locals {
     throughtput_capacity = 16
   }
 
+  acm_certificate_dev = {
+    domain_name                         = "modernisation-platform.service.justice.gov.uk"
+    external_validation_records_created = true
+    additional_subject_alternate_names  = []
+  }
+
   lb_config_dev = {
     bucket_policy_enabled = true
+    bws_lb_rule_priority  = 1300
+    maintenance_message   = "NDMIS Reporting Dev is rarely used so is started on demand. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C032BQQHJE5\">#ask-probation-hosting</a> slack channel if you need the environment starting."
   }
 
   datasync_config_dev = {

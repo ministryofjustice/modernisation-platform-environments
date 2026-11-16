@@ -4,6 +4,17 @@ locals {
   shred_unstructured_docker_image_uri = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/${local.emds_gdpr_ecr_name}:${local.shred_unstructured_image_name}-${local.environment_shorthand}"
 }
 
+variable "sqlserver_https_ports" {
+  description = "List of ports required for Glue outbound connections"
+  type        = list(number)
+  default     = [1433, 443]
+}
+
+data "aws_ip_ranges" "london_s3" {
+  regions  = ["eu-west-2"]
+  services = ["s3"]
+}
+
 # ==============================================================================
 # 1. IAM: Batch Service Role (Allows AWS Batch to manage EC2 instances)
 # ==============================================================================
@@ -115,11 +126,11 @@ resource "aws_batch_job_queue" "shred_unstructured_from_zip_batch_queue" {
   state    = "ENABLED"
   priority = 1
   compute_environment_order {
-    order               = 1
+    order               = 2
     compute_environment = aws_batch_compute_environment.shred_unstructured_from_zip_batch_compute_env[count.index].arn
   }
   compute_environment_order {
-    order               = 2
+    order               = 1
     compute_environment = aws_batch_compute_environment.shred_unstructured_from_zip_batch_on_demand_compute_env[count.index].arn
   }
   tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
@@ -297,7 +308,9 @@ data "aws_iam_policy_document" "gdpr_batch_jobs_s3_access_policy_document" {
     ]
     resources = [
       module.s3-data-bucket.bucket.arn,
-      "${module.s3-data-bucket.bucket.arn}/*"
+      "${module.s3-data-bucket.bucket.arn}/*",
+      module.s3-gdpr-audit-bucket.bucket.arn,
+      "${module.s3-gdpr-audit-bucket.bucket.arn}/*"
     ]
   }
 }
@@ -318,7 +331,7 @@ resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_s3_access_policy_atta
 
 resource "aws_security_group" "gdpr_batch_sg" {
   #checkov:skip=CKV2_AWS_5
-  count       = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
+  count       = 1
   name_prefix = "emds-gdpr-batch-sg-"
   description = "Secuity Group for GDPR Batch Compute Environment"
   vpc_id      = data.aws_vpc.shared.id
@@ -333,7 +346,7 @@ resource "aws_security_group" "gdpr_batch_sg" {
 }
 
 resource "aws_security_group_rule" "gdpr_batch_egress_s3" {
-  for_each          = local.is-production || local.is-development || local.is-preproduction ? toset([for port in var.sqlserver_https_ports : tostring(port)]) : toset([])
+  for_each          = toset([for port in var.sqlserver_https_ports : tostring(port)])
   security_group_id = aws_security_group.gdpr_batch_sg[0].id
   type              = "egress"
   cidr_blocks       = data.aws_ip_ranges.london_s3.cidr_blocks
@@ -344,7 +357,7 @@ resource "aws_security_group_rule" "gdpr_batch_egress_s3" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "gdpr_batch_egress_vpc" {
-  count             = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
+  count             = 1
   security_group_id = aws_security_group.gdpr_batch_sg[0].id
   description       = "AWS Batch -----[https]-----+ AWS APIs via NAT Gateway"
   ip_protocol       = "tcp"

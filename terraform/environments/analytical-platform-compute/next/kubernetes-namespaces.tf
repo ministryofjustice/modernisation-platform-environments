@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "main" {
+resource "kubernetes_namespace_v1" "main" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   metadata {
@@ -10,7 +10,3 @@ resource "kubernetes_namespace" "main" {
   }
 }
 
-moved {
-  from = kubernetes_namespace.next
-  to   = kubernetes_namespace.main
-}

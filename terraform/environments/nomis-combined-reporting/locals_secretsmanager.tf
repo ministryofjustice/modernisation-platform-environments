@@ -17,11 +17,20 @@ locals {
         }
       }
     }
+    sharepoint = {
+      secrets = {
+        app-registration = {
+          description = "App registration credentials for SharePoint access"
+        }
+        drive-ids = {
+          description = "SharePoint Drive Ids"
+        }
+      }
+    }
     db = {
       secrets = {
         passwords = { description = "database passwords" }
       }
     }
-
   }
 }

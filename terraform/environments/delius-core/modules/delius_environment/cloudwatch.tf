@@ -16,3 +16,138 @@ resource "aws_cloudwatch_log_resource_policy" "log_group_policy" {
     }]
   })
 }
+
+######################################
+###           ALB Alarms           ###
+######################################
+resource "aws_cloudwatch_metric_alarm" "alb_client_tls_negotiation_error_warning" {
+  alarm_name          = "weblogic-${var.env_name}-client-tls-negotiation-error-warning"
+  alarm_description   = "The ${var.env_name} Weblogic ALB experienced more than 50 client TLS negotiation errors."
+  namespace           = "AWS/ApplicationELB"
+  statistic           = "Sum"
+  metric_name         = "ClientTLSNegotiationErrorCount"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 50
+  treat_missing_data  = "notBreaching"
+  evaluation_periods  = 2
+  period              = 60
+  alarm_actions       = [aws_sns_topic.delius_core_alarms.arn]
+  ok_actions          = [aws_sns_topic.delius_core_alarms.arn]
+
+  dimensions = {
+    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+  }
+
+  tags = merge(var.tags, { "Name" = local.alb_name })
+}
+
+resource "aws_cloudwatch_metric_alarm" "alb_4xx_warning" {
+  alarm_name          = "weblogic-${var.env_name}-alb-4xx-warning"
+  alarm_description   = "The ${var.env_name} Weblogic ALB experienced more than 50 4xx errors."
+  namespace           = "AWS/ApplicationELB"
+  statistic           = "Sum"
+  metric_name         = "HTTPCode_ELB_4XX_Count"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 200
+  treat_missing_data  = "notBreaching"
+  evaluation_periods  = 2
+  period              = 60
+  alarm_actions       = [aws_sns_topic.delius_core_alarms.arn]
+  ok_actions          = [aws_sns_topic.delius_core_alarms.arn]
+
+  dimensions = {
+    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+  }
+
+  tags = merge(var.tags, { "Name" = local.alb_name })
+}
+
+resource "aws_cloudwatch_metric_alarm" "alb_5xx_warning" {
+  alarm_name          = "weblogic-${var.env_name}-alb-5xx-warning"
+  alarm_description   = "The ${var.env_name} Weblogic ALB experienced 5xx errors."
+  namespace           = "AWS/ApplicationELB"
+  statistic           = "Sum"
+  metric_name         = "HTTPCode_ELB_5XX_Count"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 10
+  treat_missing_data  = "notBreaching"
+  evaluation_periods  = 2
+  period              = 60
+  alarm_actions       = [aws_sns_topic.delius_core_alarms.arn]
+  ok_actions          = [aws_sns_topic.delius_core_alarms.arn]
+
+  dimensions = {
+    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+  }
+
+  tags = merge(var.tags, { "Name" = local.alb_name })
+}
+
+resource "aws_cloudwatch_metric_alarm" "alb_rejected_connections_warning" {
+  alarm_name          = "weblogic-${var.env_name}-alb-rejected-connections-warning"
+  alarm_description   = "The ${var.env_name} Weblogic ALB rejected connections."
+  namespace           = "AWS/ApplicationELB"
+  statistic           = "Sum"
+  metric_name         = "RejectedConnectionCount"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 1
+  treat_missing_data  = "notBreaching"
+  evaluation_periods  = 2
+  period              = 60
+  alarm_actions       = [aws_sns_topic.delius_core_alarms.arn]
+  ok_actions          = [aws_sns_topic.delius_core_alarms.arn]
+
+  dimensions = {
+    LoadBalancer = aws_lb.delius_core_frontend.arn_suffix
+  }
+
+  tags = merge(var.tags, { "Name" = local.alb_name })
+}
+
+resource "aws_cloudwatch_alarm_mute_rule" "weeknight_mute" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+  name  = "weeknight-alarm-mute"
+
+  mute_targets {
+    alarm_names = compact(concat(
+      module.weblogic.alarm_names,
+      module.weblogic_eis.alarm_names,
+      try(module.weblogic_testdata_api.alarm_names, []),
+      module.pwm.alarm_names,
+      module.ldap_ecs.alarm_names,
+      try(module.oracle_db_shared.alarm_names, [])
+    ))
+  }
+
+  rule {
+    schedule {
+      expression = "cron(0 19 * * MON-FRI)"
+      duration   = "PT11H"
+      timezone   = "Europe/London"
+    }
+  }
+}
+
+resource "aws_cloudwatch_alarm_mute_rule" "weekend_mute" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+  name  = "weekend-alarm-mute"
+
+  mute_targets {
+    alarm_names = compact(concat(
+      module.weblogic.alarm_names,
+      module.weblogic_eis.alarm_names,
+      try(module.weblogic_testdata_api.alarm_names, []),
+      module.pwm.alarm_names,
+      module.ldap_ecs.alarm_names,
+      try(module.oracle_db_shared.alarm_names, [])
+    ))
+  }
+
+  rule {
+    schedule {
+      expression = "cron(0 0 * * SAT)"
+      duration   = "PT54H"
+      timezone   = "Europe/London"
+    }
+  }
+}
