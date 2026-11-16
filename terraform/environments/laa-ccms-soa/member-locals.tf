@@ -17,7 +17,7 @@ locals {
   lb_log_prefix_soa_managed = "${local.application_data.accounts[local.environment].app_name}-managed-lb"
   lb_log_prefix_soa_managed_redirect = "${local.application_data.accounts[local.environment].app_name}-managed-http-redirect-lb"
 
-  alb_80_enabled =  contains(["development"], local.environment)
+  alb_80_enabled =  contains(["preproduction","production"], local.environment)
   
   # Folders created on S3 for Lambda artifacts
   lambda_folder_name = [
