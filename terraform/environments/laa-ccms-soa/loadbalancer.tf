@@ -103,6 +103,48 @@ resource "aws_lb" "managed" {
   depends_on = [module.s3-bucket-logging]
 }
 
+resource "aws_lb" "http_redirect_managed_alb" {
+  count = local.alb_80_enabled ? 1 : 0
+  name               = "${local.application_data.accounts[local.environment].app_name}-managed-api-http-redirect-lb"
+  internal           = true
+  load_balancer_type = "application"
+  subnets                    = data.aws_subnets.shared-private.ids
+  security_groups            = [aws_security_group.alb_http_managed[count.index].id]
+  enable_deletion_protection = true
+
+  access_logs {
+    bucket  = module.s3-bucket-logging.bucket.id
+    prefix  = local.lb_log_prefix_soa_managed_redirect
+    enabled = true
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("lb-%s-managed-http-redirect", local.application_data.accounts[local.environment].app_name)) }
+  )
+
+  depends_on = [module.s3-bucket-logging]
+}
+
+resource "aws_lb_listener" "alb_managed_http_listener" {
+  count = local.alb_80_enabled ? 1 : 0
+  load_balancer_arn = aws_lb.redirect_managed_alb[count.index].arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      protocol    = "HTTPS"
+      port        = "443"
+      host        = "#{host}"
+      path        = "/#{path}"
+      query       = "#{query}"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
 resource "aws_lb_target_group" "managed_https" {
   name                 = "${local.application_data.accounts[local.environment].app_name}-managed-https-tg"
   port                 = 443
@@ -129,12 +171,43 @@ resource "aws_lb_target_group" "managed_https" {
   }
 }
 
+resource "aws_lb_target_group" "managed_alb_http" {
+  count = local.alb_80_enabled ? 1 : 0
+  name                 = "${local.application_data.accounts[local.environment].app_name}-managed-http-alb-tg"
+  port                 = 80
+  protocol             = "TCP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "alb"
+  deregistration_delay = 30
+
+  health_check {
+    protocol = "HTTP"
+    path     = "/"
+    port     = 80
+    matcher  = "200,301"
+    interval = 30
+    timeout             = 5
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+  }
+}
+
+resource "aws_lb_target_group_attachment" "nlb_to_alb_target_group_attachment" {
+  count = local.alb_80_enabled ? 1 : 0
+  target_group_arn = aws_lb_target_group.managed_alb_http[count.index].arn
+  target_id        = aws_lb.http_redirect_managed_alb.arn
+  port             = 80
+}
+
 resource "aws_lb_listener" "managed80" {
+  count = local.alb_80_enabled ? 1 : 0
   load_balancer_arn = aws_lb.managed.id
   port              = 80
+  protocol          = "TCP"
+
 
   default_action {
-    target_group_arn = aws_lb_target_group.managed_https.id
+    target_group_arn = aws_lb_target_group.managed_alb_http[count.index].arn
     type             = "forward"
   }
   lifecycle {
