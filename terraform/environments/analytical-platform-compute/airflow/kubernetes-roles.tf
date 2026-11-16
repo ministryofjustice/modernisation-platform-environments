@@ -1,8 +1,8 @@
 // Derived from https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-eks-example.html#eksctl-role
-resource "kubernetes_role" "airflow_execution" {
+resource "kubernetes_role_v1" "airflow_execution" {
   metadata {
     name      = "airflow-execution"
-    namespace = kubernetes_namespace.airflow.metadata[0].name
+    namespace = kubernetes_namespace_v1.airflow.metadata[0].name
   }
   rule {
     api_groups = [
@@ -33,10 +33,10 @@ resource "kubernetes_role" "airflow_execution" {
   }
 }
 
-resource "kubernetes_role" "airflow_serviceaccount_management" {
+resource "kubernetes_role_v1" "airflow_serviceaccount_management" {
   metadata {
     name      = "airflow-serviceaccount-management"
-    namespace = kubernetes_namespace.airflow.metadata[0].name
+    namespace = kubernetes_namespace_v1.airflow.metadata[0].name
   }
   rule {
     api_groups = [""]
@@ -52,10 +52,10 @@ resource "kubernetes_role" "airflow_serviceaccount_management" {
   }
 }
 
-resource "kubernetes_role" "mwaa_execution" {
+resource "kubernetes_role_v1" "mwaa_execution" {
   metadata {
     name      = "mwaa-execution"
-    namespace = kubernetes_namespace.mwaa.metadata[0].name
+    namespace = kubernetes_namespace_v1.mwaa.metadata[0].name
   }
   rule {
     api_groups = [
@@ -86,10 +86,10 @@ resource "kubernetes_role" "mwaa_execution" {
   }
 }
 
-resource "kubernetes_role" "mwaa_serviceaccount_management" {
+resource "kubernetes_role_v1" "mwaa_serviceaccount_management" {
   metadata {
     name      = "mwaa-serviceaccount-management"
-    namespace = kubernetes_namespace.mwaa.metadata[0].name
+    namespace = kubernetes_namespace_v1.mwaa.metadata[0].name
   }
   rule {
     api_groups = [""]
@@ -105,10 +105,10 @@ resource "kubernetes_role" "mwaa_serviceaccount_management" {
   }
 }
 
-resource "kubernetes_role" "mwaa_external_secrets" {
+resource "kubernetes_role_v1" "mwaa_external_secrets" {
   metadata {
     name      = "mwaa-external-secrets"
-    namespace = kubernetes_namespace.mwaa.metadata[0].name
+    namespace = kubernetes_namespace_v1.mwaa.metadata[0].name
 
   }
   rule {

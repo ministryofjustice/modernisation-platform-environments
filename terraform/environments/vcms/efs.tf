@@ -6,6 +6,9 @@ resource "aws_efs_file_system" "vcms" {
   kms_key_id                      = local.account_config.kms_keys.general_shared
   throughput_mode                 = "bursting"
   provisioned_throughput_in_mibps = null
+  protection {
+    replication_overwrite = "DISABLED"
+  }
 
   tags = local.tags
 }

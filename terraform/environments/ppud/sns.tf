@@ -170,7 +170,7 @@ data "aws_iam_policy_document" "sns_topic_policy_s3_notifications_dev" {
     condition {
       test     = "ArnLike"
       variable = "AWS:SourceArn"
-      values   = ["arn:aws:s3:::moj-log-files-dev"]
+      values   = ["arn:aws:s3:::moj-general-logs-dev"]
     }
 
     resources = [
@@ -347,7 +347,7 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription2" {
   count     = local.is-production == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_std_and_sms_alerts[0].arn
   protocol  = "sms"
-  endpoint  = "+447879063551" # Gabriella Browning
+  endpoint  = "+447879063551" # Gabriella Browning (work)
 }
 
 resource "aws_sns_topic_subscription" "cw_sms_subscription3" {

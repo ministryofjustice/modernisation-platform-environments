@@ -66,8 +66,20 @@ resource "aws_workspaces_ip_group" "workspaces" {
   description = "IP access control group"
 
   rules {
-    source      = "0.0.0.0/0"
-    description = "Allow all"
+    source      = "35.176.93.186/32"
+    description = "Global Protect Gateway"
+  }
+  rules {
+    source      = "18.130.148.126/32"
+    description = "Global Protect 3rd Gateway"
+  }
+  rules {
+    source      = "35.176.148.126/32"
+    description = "Global Protect 4th Gateway"
+  }
+  rules {
+    source      = "18.169.147.172/32"
+    description = "Global Protect 2nd Gateway"
   }
 
   tags = merge(
@@ -87,7 +99,7 @@ resource "aws_workspaces_workspace" "workspaces_ad" {
   for_each = local.environment == "development" ? local.workspace_users : {}
 
   directory_id = aws_workspaces_directory.workspaces_ad[0].id
-  bundle_id    = local.application_data.accounts[local.environment].workspace_bundle_id
+  bundle_id    = local.workspace_types[each.value.instance_type].bundle_id
   user_name    = each.key # AD username (sam-account-name)
 
   root_volume_encryption_enabled = true
@@ -95,9 +107,6 @@ resource "aws_workspaces_workspace" "workspaces_ad" {
   volume_encryption_key          = aws_kms_key.ebs[0].arn
 
   workspace_properties {
-    compute_type_name                         = local.workspace_types[each.value.instance_type].compute_type_name
-    root_volume_size_gib                      = local.workspace_types[each.value.instance_type].root_volume_size_gib
-    user_volume_size_gib                      = local.workspace_types[each.value.instance_type].user_volume_size_gib
     running_mode                              = local.workspace_types[each.value.instance_type].running_mode
     running_mode_auto_stop_timeout_in_minutes = local.workspace_types[each.value.instance_type].running_mode_auto_stop_timeout_in_minutes
   }
@@ -108,12 +117,14 @@ resource "aws_workspaces_workspace" "workspaces_ad" {
       "Name"       = "${local.application_name}-${local.environment}-workspace-${each.key}"
       "User"       = each.key
       "Email"      = each.value.email
+      "FirstName"  = each.value.first_name
+      "LastName"   = each.value.last_name
       "AuthSource" = "MicrosoftAD"
     }
   )
 
   depends_on = [
+    aws_workspaces_directory.workspaces_ad,
     terraform_data.ad_users,
-    aws_workspaces_directory.workspaces_ad
   ]
 }

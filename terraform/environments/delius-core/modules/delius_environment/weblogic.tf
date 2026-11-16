@@ -7,41 +7,17 @@ module "weblogic" {
   }
 
   name              = "weblogic"
-  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic.image_tag}"
+  create_service    = "false"
   env_name          = var.env_name
+  desired_count     = data.aws_ssm_parameter.weblogic_task_count.value
   account_config    = var.account_config
   account_info      = var.account_info
   capacity_provider = aws_ecs_capacity_provider.weblogic.name
-
-  desired_count = var.delius_microservice_configs.weblogic.task_count
+  asg_name          = aws_autoscaling_group.weblogic.name
 
   force_new_deployment = false
 
-  pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic.task_definition_revision, 0)
-  ignore_changes_service_task_definition = false
-
-  ecs_cluster_arn  = module.ecs.ecs_cluster_arn
-  container_memory = var.delius_microservice_configs.weblogic.container_memory
-  container_cpu    = var.delius_microservice_configs.weblogic.container_cpu
-
-  container_vars_default = var.delius_microservice_configs.weblogic_params
-
-  container_vars_env_specific = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
-
-  container_secrets_default = merge({
-    for name in local.weblogic_secrets : name => module.weblogic_ssm.arn_map[name]
-    }, {
-    "JDBC_PASSWORD" = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::"
-    }
-  )
-  container_secrets_env_specific = try(var.delius_microservice_configs.weblogic.container_secrets_env_specific, {})
-
-  container_port_config = [
-    {
-      containerPort = var.delius_microservice_configs.weblogic.container_port
-      protocol      = "tcp"
-    }
-  ]
+  ecs_cluster_arn = module.ecs.ecs_cluster_arn
 
   cluster_security_group_id = aws_security_group.cluster.id
 
@@ -51,10 +27,10 @@ module "weblogic" {
     healthy_threshold    = 5
     interval             = 30
     protocol             = "HTTP"
-    unhealthy_threshold  = 5
+    unhealthy_threshold  = 10 # Increased unhealthy threshold to allow longer for recovery, due to instances being stateful
     matcher              = "200"
-    timeout              = 5
-    grace_period_seconds = 300
+    timeout              = 15 # Should be greater than WebLogic's "Connection Reserve Timeout", which defaults to 10 seconds
+    grace_period_seconds = 480
   }
 
   certificate_arn               = aws_acm_certificate.external.arn
@@ -62,12 +38,13 @@ module "weblogic" {
 
   db_ingress_security_groups = []
 
-  microservice_lb = aws_lb.delius_core_frontend
+  microservice_lb                    = aws_lb.delius_core_frontend
+  microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
-  deployment_maximum_percent         = 200
-  deployment_minimum_healthy_percent = 100
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent         = 100
 
   ecs_service_ingress_security_group_ids = []
   ecs_service_egress_security_group_ids = [
@@ -88,7 +65,14 @@ module "weblogic" {
     }
   ]
 
-  log_error_pattern      = "FATAL"
+  log_error_pattern = "FATAL"
+  log_error_threshold_config = {
+    critical = {
+      threshold = 50
+      period    = 300
+    }
+  }
+
   sns_topic_arn          = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix = aws_lb.delius_core_frontend.arn_suffix
 
@@ -96,38 +80,10 @@ module "weblogic" {
   tags          = var.tags
 }
 
-# Search for ami id
-data "aws_ami" "ecs_ami" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  # Amazon Linux 2 optimised ECS instance
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-ecs-hvm-*"]
-  }
-
-  # correct arch
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  # Owned by Amazon
-  filter {
-    name   = "owner-alias"
-    values = ["amazon"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 resource "aws_launch_template" "weblogic" {
+  #checkov:skip=CKV_AWS_341: "To Do: Test required hop limit"
   name_prefix   = "weblogic-${var.env_name}-ecs-"
-  image_id      = data.aws_ami.ecs_ami.id
+  image_id      = var.delius_microservice_configs.weblogic.ami_id
   instance_type = var.delius_microservice_configs.weblogic.ec2_instance_type
 
   user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", { ecs_cluster_name = module.ecs.ecs_cluster_name }))
@@ -141,6 +97,17 @@ resource "aws_launch_template" "weblogic" {
 
   iam_instance_profile {
     name = aws_iam_instance_profile.weblogic.name
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = var.tags
   }
 }
 
@@ -172,12 +139,13 @@ resource "aws_iam_instance_profile" "weblogic" {
 }
 
 resource "aws_security_group" "ecs_host_sg" {
+  #checkov:skip=CKV_AWS_382: "Required for ECS tasks to access external services"
   name        = "weblogic-${var.env_name}-ecscluster-private-sg"
   description = "Shared ECS Cluster Hosts Security Group"
   vpc_id      = var.account_info.vpc_id
 
-  # Allow all outbound
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -190,9 +158,10 @@ resource "aws_security_group" "ecs_host_sg" {
 resource "aws_autoscaling_group" "weblogic" {
   name = "weblogic-${var.env_name}-ecs-asg"
 
-  max_size              = 2
-  min_size              = 1
-  protect_from_scale_in = true
+  min_size = var.delius_microservice_configs.weblogic.asg_min_size
+  max_size = var.delius_microservice_configs.weblogic.asg_max_size
+
+  protect_from_scale_in = var.enable_autoscaling_schedule ? false : true
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
 
@@ -208,6 +177,28 @@ resource "aws_autoscaling_group" "weblogic" {
   }
 }
 
+resource "aws_autoscaling_schedule" "weblogic_scale_down" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-${var.env_name}-scaledown"
+  min_size               = 0
+  max_size               = 0
+  desired_capacity       = 0
+  recurrence             = "0 19 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic.name
+}
+
+resource "aws_autoscaling_schedule" "weblogic_scale_up" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-${var.env_name}-scaleup"
+  min_size               = var.delius_microservice_configs.weblogic.asg_min_size
+  max_size               = var.delius_microservice_configs.weblogic.asg_max_size
+  desired_capacity       = var.delius_microservice_configs.weblogic.asg_min_size
+  recurrence             = "0 5 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic.name
+}
+
 resource "aws_ecs_capacity_provider" "weblogic" {
   name = "weblogic-${var.env_name}-ec2-cp"
 
@@ -219,6 +210,102 @@ resource "aws_ecs_capacity_provider" "weblogic" {
       target_capacity = 100
     }
 
-    managed_termination_protection = "ENABLED"
+    managed_termination_protection = var.enable_autoscaling_schedule ? "DISABLED" : "ENABLED"
   }
+}
+
+resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 62
+
+  condition {
+    host_header {
+      values = [
+        var.env_name == "prod" ? "ndelius.probation.service.justice.gov.uk" : "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "ndelius.${var.env_name}.${var.account_config.dns_suffix}"
+      ]
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = [
+        "/NDelius*",
+        "/jspellhtml/*"
+      ]
+    }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = module.weblogic.target_group_arn
+  }
+}
+
+# Cert for Legacy URL: https://dsdmoj.atlassian.net/browse/TM-2173
+# 1. Create ACM cert (apply this config)
+# 2. Manually validate cert by adding validation records to legacy zone
+# 3. Wait for cert to say "ISSUED"
+# 4. Uncomment aws_lb_listener_certificate and apply this config
+# 5. Create CNAME record in legacy that points ndelius.probation.service.justice.gov.uk -> ndelius.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk
+resource "aws_acm_certificate" "legacy" {
+  count = var.env_name != "prod" ? 1 : 0
+
+  domain_name       = "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
+  validation_method = "DNS"
+  tags              = var.tags
+
+  subject_alternative_names = concat(
+    ["interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"],
+    var.env_name == "test" ? ["testdata-api.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"] : []
+  )
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_listener_certificate" "legacy" {
+  count = var.env_name != "prod" ? 1 : 0
+
+  listener_arn    = aws_lb_listener.listener_https.arn
+  certificate_arn = aws_acm_certificate.legacy[0].arn
+}
+
+resource "aws_acm_certificate" "legacy_prod" {
+  count = var.env_name == "prod" ? 1 : 0
+
+  domain_name       = "ndelius.probation.service.justice.gov.uk"
+  validation_method = "DNS"
+  tags              = var.tags
+
+  subject_alternative_names = [
+    "interface.probation.service.justice.gov.uk"
+  ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_listener_certificate" "legacy_prod" {
+  count = var.env_name == "prod" ? 1 : 0
+
+  listener_arn    = aws_lb_listener.listener_https.arn
+  certificate_arn = aws_acm_certificate.legacy_prod[0].arn
+}
+
+locals {
+  weblogic_service_arn = "arn:aws:ecs:eu-west-2:${var.account_info.id}:service/${module.ecs.ecs_cluster_name}/${var.env_name}-weblogic"
+}
+
+module "ecs_nightly_restart_weblogic" {
+  count  = var.enable_autoscaling_schedule ? 0 : 1
+  source = "../components/ecs_nightly_restart"
+
+  env_name     = var.env_name
+  app_name     = "weblogic"
+  cluster_name = module.ecs.ecs_cluster_arn
+  service_arn  = local.weblogic_service_arn
+  task_count   = data.aws_ssm_parameter.weblogic_task_count.value
 }

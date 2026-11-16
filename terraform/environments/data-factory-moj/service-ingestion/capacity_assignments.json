@@ -1,0 +1,8 @@
+{
+  "sandbox-oracle/sandbox-v1": {
+    "integration": "sandbox-shared"
+  },
+  "sandbox-postgres/sandbox-v1": {
+    "integration": "sandbox-shared"
+  }
+}
