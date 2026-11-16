@@ -167,18 +167,6 @@ resource "aws_security_group_rule" "alb_managed_workspace_ingress_7002" {
   cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
 }
 
-# NEC Proxy for Notification Service
-
-resource "aws_security_group_rule" "alb_managed_workspace_ingress_80" {
-  count             = local.alb_80_enabled ? 1 : 0
-  security_group_id = aws_security_group.alb_managed.id
-  type              = "ingress"
-  description       = "Managed HTTP - NEC Proxy"
-  protocol          = "TCP"
-  from_port         = 80
-  to_port           = 80
-  cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
-}
 resource "aws_security_group_rule" "alb_managed_workspace_ingress_443" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
