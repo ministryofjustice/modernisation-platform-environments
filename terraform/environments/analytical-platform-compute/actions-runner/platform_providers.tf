@@ -53,7 +53,6 @@ provider "aws" {
   }
   default_tags { tags = local.tags }
 }
-}
 # AWS provider for managing Business Unit secrets and parameters
 provider "aws" {
   region = "eu-west-2"
