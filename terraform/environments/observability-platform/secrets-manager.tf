@@ -93,3 +93,22 @@ resource "aws_secretsmanager_secret" "grafana_cloud_github_oauth_client_secret" 
 
   name = "grafana-cloud/github-oauth/client-secret"
 }
+
+# Placeholder values so the first apply succeeds; set the real values from the GitHub OAuth app out of band
+resource "aws_secretsmanager_secret_version" "grafana_cloud_github_oauth_client_id" {
+  secret_id     = aws_secretsmanager_secret.grafana_cloud_github_oauth_client_id.id
+  secret_string = "placeholder"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "grafana_cloud_github_oauth_client_secret" {
+  secret_id     = aws_secretsmanager_secret.grafana_cloud_github_oauth_client_secret.id
+  secret_string = "placeholder"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
