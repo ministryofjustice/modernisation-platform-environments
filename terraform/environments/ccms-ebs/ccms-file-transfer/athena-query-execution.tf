@@ -1,6 +1,6 @@
 resource "null_resource" "execute_create_table_queries" {
   triggers = {
-    query_ids = join(",", ["${aws_athena_named_query.main_table_sftp_bc_internal_query.id}", "${aws_athena_named_query.http_requests_sftp_bc_internal_query.id}"
+    query_ids = join(",", ["${aws_athena_named_query.main_table_sftp_internal_query.id}", "${aws_athena_named_query.http_requests_sftp_internal_query.id}"
     ])
   }
 
@@ -11,21 +11,21 @@ export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
 export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')
 export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
 aws athena start-query-execution \
-  --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.main_table_sftp_bc_internal_query.id} --query 'NamedQuery.QueryString' --output text)" \
+  --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.main_table_sftp_internal_query.id} --query 'NamedQuery.QueryString' --output text)" \
   --work-group ${aws_athena_workgroup.lb-access-logs.name} \
   --query-execution-context Database=${aws_athena_database.lb-access-logs.name} \
-  --region ${data.aws_region.current.name}
+  --region ${data.aws_region.current.region}
 aws athena start-query-execution \
-  --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.http_requests_sftp_bc_internal_query.id} --query 'NamedQuery.QueryString' --output text)" \
+  --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.http_requests_sftp_internal_query.id} --query 'NamedQuery.QueryString' --output text)" \
   --work-group ${aws_athena_workgroup.lb-access-logs.name} \
   --query-execution-context Database=${aws_athena_database.lb-access-logs.name} \
-  --region ${data.aws_region.current.name}
+  --region ${data.aws_region.current.region}
 EOF
   }
 
   depends_on = [
-    aws_athena_named_query.main_table_sftp_bc_internal_query,
-    aws_athena_named_query.http_requests_sftp_bc_internal_query,
+    aws_athena_named_query.main_table_sftp_internal_query,
+    aws_athena_named_query.http_requests_sftp_internal_query,
     aws_athena_workgroup.lb-access-logs,
     aws_athena_database.lb-access-logs
   ]

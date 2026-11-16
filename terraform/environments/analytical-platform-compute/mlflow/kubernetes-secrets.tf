@@ -1,9 +1,9 @@
-resource "kubernetes_secret" "mlflow_auth_rds" {
+resource "kubernetes_secret_v1" "mlflow_auth_rds" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   metadata {
     name      = "mlflow-auth-rds"
-    namespace = kubernetes_namespace.mlflow[0].metadata[0].name
+    namespace = kubernetes_namespace_v1.mlflow[0].metadata[0].name
   }
 
   type = "Opaque"
@@ -16,12 +16,12 @@ resource "kubernetes_secret" "mlflow_auth_rds" {
   }
 }
 
-resource "kubernetes_secret" "mlflow_rds" {
+resource "kubernetes_secret_v1" "mlflow_rds" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   metadata {
     name      = "mlflow-rds"
-    namespace = kubernetes_namespace.mlflow[0].metadata[0].name
+    namespace = kubernetes_namespace_v1.mlflow[0].metadata[0].name
   }
 
   type = "Opaque"
@@ -34,12 +34,12 @@ resource "kubernetes_secret" "mlflow_rds" {
   }
 }
 
-resource "kubernetes_secret" "mlflow_admin" {
+resource "kubernetes_secret_v1" "mlflow_admin" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   metadata {
     name      = "mlflow-admin"
-    namespace = kubernetes_namespace.mlflow[0].metadata[0].name
+    namespace = kubernetes_namespace_v1.mlflow[0].metadata[0].name
   }
 
   type = "Opaque"
@@ -48,12 +48,12 @@ resource "kubernetes_secret" "mlflow_admin" {
   }
 }
 
-resource "kubernetes_secret" "mlflow_flask_server_secret_key" {
+resource "kubernetes_secret_v1" "mlflow_flask_server_secret_key" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   metadata {
     name      = "mlflow-flask-server-secret-key"
-    namespace = kubernetes_namespace.mlflow[0].metadata[0].name
+    namespace = kubernetes_namespace_v1.mlflow[0].metadata[0].name
   }
 
   type = "Opaque"

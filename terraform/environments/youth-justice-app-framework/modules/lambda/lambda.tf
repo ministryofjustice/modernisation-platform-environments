@@ -13,8 +13,10 @@ resource "aws_lambda_function" "main" {
   runtime          = "python3.12"
   handler          = var.lambda.handler
   role             = aws_iam_role.lambda_iam_roles.arn
-  filename         = var.lambda.function_zip_file
-  source_code_hash = filebase64sha256(var.lambda.function_zip_file)
+  filename         = var.lambda.function_zip_file != "" ? var.lambda.function_zip_file : null
+  source_code_hash = var.lambda.source_code_hash != null ? var.lambda.source_code_hash : try(filebase64sha256(var.lambda.function_zip_file), null)
+  s3_bucket        = var.lambda.s3_bucket != "" ? var.lambda.s3_bucket : null
+  s3_key           = var.lambda.s3_key != "" ? var.lambda.s3_key : null
   environment {
     variables = var.lambda.environment_variables
   }

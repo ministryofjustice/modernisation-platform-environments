@@ -38,6 +38,9 @@ locals {
           "ec2-windows",
           "rd-session-host",
         ]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
       }
       secretsmanager_secrets = {
         dso-modernisation-platform-automation = {
@@ -55,10 +58,13 @@ locals {
         description            = "Windows Server 2022 jumpserver for Hmpps"
         instance-access-policy = "full"
         os-type                = "Windows"
+        "Patch Group"          = "patchgroup1"
+        run-patch-baseline     = "weekly"
         server-type            = "HmppsJump2022"
         update-ssm-agent       = "patchgroup1"
       }
     }
+
     rdgw = {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms.ec2,
@@ -92,6 +98,9 @@ locals {
           "ad-join",
           "ec2-windows",
         ]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
@@ -99,6 +108,8 @@ locals {
       tags = {
         backup                 = "false"
         os-type                = "Windows"
+        "Patch Group"          = "patchgroup2"
+        run-patch-baseline     = "weekly"
         server-type            = "RDGateway"
         update-ssm-agent       = "patchgroup2"
         instance-access-policy = "none"
@@ -137,6 +148,9 @@ locals {
           "ad-join",
           "ec2-windows",
         ]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
@@ -144,6 +158,8 @@ locals {
       tags = {
         backup                 = "false"
         os-type                = "Windows"
+        "Patch Group"          = "patchgroup2"
+        run-patch-baseline     = "weekly"
         server-type            = "RDServices"
         update-ssm-agent       = "patchgroup2"
         instance-access-policy = "none"
@@ -151,4 +167,3 @@ locals {
     }
   }
 }
-

@@ -3,7 +3,7 @@ module "ebs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "ebs-csi-driver"
 
@@ -24,7 +24,7 @@ module "efs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "efs-csi-driver"
 
@@ -45,7 +45,7 @@ module "aws_cloudwatch_network_flow_monitor_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "aws-cloudwatch-network-flow-monitor"
 
@@ -68,7 +68,7 @@ module "cluster_autoscaler_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "cluster-autoscaler"
 
@@ -78,7 +78,7 @@ module "cluster_autoscaler_iam_role" {
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.cluster_autoscaler.metadata[0].name}:cluster-autoscaler"]
+      namespace_service_accounts = ["${kubernetes_namespace_v1.cluster_autoscaler.metadata[0].name}:cluster-autoscaler"]
     }
   }
 
@@ -90,7 +90,7 @@ module "external_dns_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "external-dns"
 
@@ -101,7 +101,7 @@ module "external_dns_iam_role" {
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.external_dns.metadata[0].name}:external-dns"]
+      namespace_service_accounts = ["${kubernetes_namespace_v1.external_dns.metadata[0].name}:external-dns"]
     }
   }
 
@@ -113,7 +113,7 @@ module "cert_manager_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "cert-manager"
 
@@ -123,7 +123,7 @@ module "cert_manager_iam_role" {
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.cert_manager.metadata[0].name}:cert-manager"]
+      namespace_service_accounts = ["${kubernetes_namespace_v1.cert_manager.metadata[0].name}:cert-manager"]
     }
   }
 
@@ -135,17 +135,21 @@ module "external_secrets_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "external-secrets"
 
   attach_external_secrets_policy = true
   external_secrets_kms_key_arns  = [module.common_secrets_manager_kms.key_arn]
+  external_secrets_secrets_manager_arns = [
+    for secret_name in local.environment_configuration.external_secrets_secrets_manager_names :
+    "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${secret_name}-*"
+  ]
 
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.external_secrets.metadata[0].name}:external-secrets"]
+      namespace_service_accounts = ["${kubernetes_namespace_v1.external_secrets.metadata[0].name}:external-secrets"]
     }
   }
 
@@ -157,7 +161,7 @@ module "aws_for_fluent_bit_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "aws-for-fluent-bit"
 
@@ -169,7 +173,7 @@ module "aws_for_fluent_bit_iam_role" {
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
+      namespace_service_accounts = ["${kubernetes_namespace_v1.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
     }
   }
 
@@ -181,7 +185,7 @@ module "amazon_prometheus_proxy_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "amazon-prometheus-proxy"
 
@@ -192,7 +196,7 @@ module "amazon_prometheus_proxy_iam_role" {
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:amazon-prometheus-proxy"]
+      namespace_service_accounts = ["${kubernetes_namespace_v1.aws_observability.metadata[0].name}:amazon-prometheus-proxy"]
     }
   }
 
@@ -204,7 +208,7 @@ module "vpc_cni_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "vpc-cni"
 
@@ -226,7 +230,7 @@ module "velero_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.3.0"
+  version = "6.6.0"
 
   name = "velero"
 
@@ -240,7 +244,7 @@ module "velero_iam_role" {
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.velero.metadata[0].name}:velero-server"]
+      namespace_service_accounts = ["${kubernetes_namespace_v1.velero.metadata[0].name}:velero-server"]
     }
   }
 
