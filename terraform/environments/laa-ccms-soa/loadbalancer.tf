@@ -127,7 +127,7 @@ resource "aws_lb" "http_redirect_managed_alb" {
 
 resource "aws_lb_listener" "alb_managed_http_listener" {
   count = local.alb_80_enabled ? 1 : 0
-  load_balancer_arn = aws_lb.redirect_managed_alb[count.index].arn
+  load_balancer_arn = aws_lb.http_redirect_managed_alb[count.index].arn
   port              = 80
   protocol          = "HTTP"
 
@@ -195,7 +195,7 @@ resource "aws_lb_target_group" "managed_alb_http" {
 resource "aws_lb_target_group_attachment" "nlb_to_alb_target_group_attachment" {
   count = local.alb_80_enabled ? 1 : 0
   target_group_arn = aws_lb_target_group.managed_alb_http[count.index].arn
-  target_id        = aws_lb.http_redirect_managed_alb.arn
+  target_id        = aws_lb.http_redirect_managed_alb[count.index].arn
   port             = 80
 }
 
