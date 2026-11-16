@@ -22,7 +22,6 @@ resource "aws_ecs_task_definition" "opahub" {
     {
       app_name            = local.opa_app_name
       app_image           = local.application_data.accounts[local.environment].opa_app_image
-      server_port         = local.application_data.accounts[local.environment].opa_server_port
       ssl_port            = local.application_data.accounts[local.environment].opa_ssl_port
       health_check_port   = local.application_data.accounts[local.environment].opa_health_check_port
       aws_region          = local.application_data.accounts[local.environment].aws_region

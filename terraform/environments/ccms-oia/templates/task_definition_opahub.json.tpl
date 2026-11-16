@@ -12,9 +12,6 @@
     },
     "portMappings": [
       {
-        "containerPort": ${server_port}
-      },
-      {
         "containerPort": ${ssl_port},
         "hostPort": ${ssl_port}
       },
