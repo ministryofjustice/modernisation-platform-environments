@@ -9,7 +9,7 @@ resource "aws_db_instance" "dacp_db_v2" {
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   #checkov:skip=CKV_AWS_354: "Ensure RDS Performance Insights are encrypted using KMS CMKs"
-  #checkov:skip=CKV2_AWS_69: "Ensure AWS RDS database instance configured with encryption in transit" - app does not yet support SSL & aws_db_parameter_group.dacp_analyse is for development only
+  #checkov:skip=CKV2_AWS_69: "Ensure AWS RDS database instance configured with encryption in transit" - app does not yet support SSL
   allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
   db_name                         = local.application_data.accounts[local.environment].db_name
   storage_type                    = local.application_data.accounts[local.environment].storage_type
@@ -31,6 +31,7 @@ resource "aws_db_instance" "dacp_db_v2" {
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
   apply_immediately               = local.is-production ? false : true
   copy_tags_to_snapshot           = true
+  parameter_group_name            = "default.${local.db_parameter_group_family}"
   maintenance_window              = local.is-production ? "sun:04:00-sun:04:30" : "wed:19:20-wed:19:50"
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 }
