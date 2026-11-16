@@ -150,7 +150,7 @@ jobs:
           aws-region: "eu-west-2"
 
       - name: Setup Python
-        uses: actions/setup-python@0b93645e9e0d6c9b59cd0d315b9c0d1f7ad64946  # v5.0.1
+        uses: actions/setup-python@v5.0.1
         with:
           python-version: "3.12"
 
@@ -390,7 +390,7 @@ jobs:
           aws-region: "eu-west-2"
 
       - name: Setup Python
-        uses: actions/setup-python@0b93645e9e0d6c9b59cd0d315b9c0d1f7ad64946  # v5.0.1
+        uses: actions/setup-python@v5.0.1
         with:
           python-version: "3.12"
 
