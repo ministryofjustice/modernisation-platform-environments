@@ -6,11 +6,38 @@ locals {
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     try(length(var.options.cloudwatch_metric_oam_links), 0) != 0 ? ["CloudWatch-CrossAccountSharingRole"] : [],
+    length(var.options.ssm_maintenance_window_run_commands) != 0 ? ["SSMPatchManagerTaskPolicy"] : [],
     var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessRole"] : [],
     var.options.enable_vmimport ? ["vmimport"] : [],
+    var.options.aws_health_lambda_configuration.enabled ? ["EventBridgeInvokeAWSHealthLambda"] : [],
+    var.options.aws_securityhub_lambda_configuration.enabled ? ["EventBridgeInvokeAWSSecurityHubLambda"] : [],
   ]))
 
   iam_roles = {
+    EventBridgeInvokeAWSHealthLambda = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
+        principals = {
+          type        = "Service"
+          identifiers = ["events.amazonaws.com"]
+        }
+      }]
+      policy_attachments = ["InvokeAWSHealthLambda"]
+    }
+
+    EventBridgeInvokeAWSSecurityHubLambda = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
+        principals = {
+          type        = "Service"
+          identifiers = ["events.amazonaws.com"]
+        }
+      }]
+      policy_attachments = ["InvokeAWSSecurityHubLambda"]
+    }
+
     # prereq: ImageBuilderLaunchTemplatePolicy and BusinessUnitKmsCmkPolicy 
     # policies must be included in iam_policies
     EC2ImageBuilderDistributionCrossAccountRole = {
@@ -111,6 +138,23 @@ locals {
       }]
       policy_attachments = [
         "CortexXsiamS3AccessPolicy"
+      ]
+    }
+
+    SSMPatchManagerTaskRole = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
+        principals = {
+          type = "Service"
+          identifiers = [
+            "ssm.amazonaws.com",
+            "iam.amazonaws.com",
+          ]
+        }
+      }]
+      policy_attachments = [
+        "SSMPatchManagerTaskPolicy"
       ]
     }
 

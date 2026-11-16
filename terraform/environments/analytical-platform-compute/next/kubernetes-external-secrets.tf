@@ -8,7 +8,7 @@ resource "kubernetes_manifest" "azure_secrets" {
     "kind"       = "ExternalSecret"
     "metadata" = {
       "name"      = "azure"
-      "namespace" = kubernetes_namespace.main[0].metadata[0].name
+      "namespace" = kubernetes_namespace_v1.main[0].metadata[0].name
     }
     "spec" = {
       "secretStoreRef" = {

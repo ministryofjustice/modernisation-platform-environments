@@ -3,7 +3,7 @@ module "chainguard_pull_credentials" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.0.1"
+  version = "2.1.0"
 
   name        = "compute/chainguard/pull-credentials"
   description = "Chainguard dockerconfigjson pull credentials for cgr.dev/justice.gov.uk"
@@ -19,7 +19,7 @@ module "ecr_github_pull_through_cache_secret" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.0.1"
+  version = "2.1.0"
 
   name        = "ecr-pullthroughcache/github"
   description = "GitHub credentials for ECR pull-through cache"

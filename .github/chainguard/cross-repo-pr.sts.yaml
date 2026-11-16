@@ -1,0 +1,6 @@
+issuer: https://token.actions.githubusercontent.com
+subject: repo:ministryofjustice/modernisation-platform:.*
+
+permissions:
+  contents: write
+  pull_requests: write

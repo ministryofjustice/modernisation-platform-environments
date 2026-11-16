@@ -3,7 +3,7 @@ module "managed_prometheus" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/managed-service-prometheus/aws"
-  version = "4.2.1"
+  version = "4.3.1"
 
   workspace_alias = local.amp_workspace_alias
   kms_key_arn     = module.managed_prometheus_kms.key_arn
@@ -15,7 +15,8 @@ module "managed_prometheus" {
   # Setting retention_period_in_days prevents "Empty workspace configuration" API error
   retention_period_in_days = 150
 
-  tags = local.tags
+  tags                 = local.tags
+  limits_per_label_set = []
 }
 
 moved {
