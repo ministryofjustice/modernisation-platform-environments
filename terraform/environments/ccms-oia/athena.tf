@@ -33,7 +33,7 @@ resource "aws_athena_named_query" "main_table_connector_internal" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = "${local.connector_app_name}-internal-lb"
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }
@@ -49,7 +49,7 @@ resource "aws_athena_named_query" "http_requests_connector_internal" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = "${local.connector_app_name}-internal-lb"
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }
@@ -65,7 +65,7 @@ resource "aws_athena_named_query" "main_table_opa" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = "${local.opa_app_name}-lb"
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }
@@ -81,7 +81,7 @@ resource "aws_athena_named_query" "http_requests_opa" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = "${local.opa_app_name}-lb"
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }
@@ -97,7 +97,7 @@ resource "aws_athena_named_query" "main_table_adaptor_internal" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = "${local.adaptor_app_name}-internal-lb"
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }
@@ -113,7 +113,7 @@ resource "aws_athena_named_query" "http_requests_adaptor_internal" {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = "${local.adaptor_app_name}-internal-lb"
       account_id = data.aws_caller_identity.current.id
-      region     = data.aws_region.current.id
+      region     = data.aws_region.current.region
     }
   )
 }

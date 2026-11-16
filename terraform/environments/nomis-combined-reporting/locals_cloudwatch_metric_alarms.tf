@@ -43,5 +43,8 @@ locals {
     db_backup = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_backup,
     )
+    rclone = merge(
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_rclone_sync,
+    )
   }
 }

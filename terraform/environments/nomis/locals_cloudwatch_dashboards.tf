@@ -36,17 +36,6 @@ locals {
       ]
     }
 
-    connectivity = {
-      header_markdown = "## Connectivity"
-      width           = 8
-      height          = 8
-      widgets = [
-        module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_connectivity_test.connectivity-test-all-failed,
-        null,
-        null
-      ]
-    }
-
     db = {
       header_markdown = "## EC2 Oracle Database"
       width           = 8

@@ -38,8 +38,8 @@ As, currently, the default AWS key is used for encryption, permissions are not n
 
 | Account | Old Secret | New Secret |
 | ------- | ---------- | ---------- |
-| postgres | `AuroraPostgres`| `yjafrds01-cluster-db-postgres-password` |
-| read-only |`<env>/yjaf/rds` (e.g. `preprod/yjaf/rds`) |`yjafrds01-cluster-db-redshift_readonly-password` |
+| postgres | `AuroraPostgres` | `yjafrds01-cluster-db-postgres-password` |
+| read-only | `<env>/yjaf/rds` (e.g. `preprod/yjaf/rds`) | `yjafrds01-cluster-db-redshift_readonly-password` |
 
 
 2. Afrer copying the password as descripbed in step *1* use the `Rotation` function to reset it. While in the Secret select the `Rotation` tab and `Rotate secret immediatly`. Ti will be scheduled to later on the same day.

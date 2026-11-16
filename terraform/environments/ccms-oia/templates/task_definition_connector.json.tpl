@@ -130,6 +130,22 @@
       {
         "name": "OPA_SECURITY_PASSWORD",
         "valueFrom": "${opa_security_password}"
+      },
+      {
+        "name": "ccms_bc_url",
+        "valueFrom": "${ccms_bc_url}"
+      },
+      {
+        "name": "ccms_bc_lscServiceName",
+        "valueFrom": "${ccms_bc_lscServiceName}"
+      },
+      {
+        "name": "ccms_bc_clientOrgId",
+        "valueFrom": "${ccms_bc_clientOrgId}"
+      },
+      {
+        "name": "ccms_bc_clientUserId",
+        "valueFrom": "${ccms_bc_clientUserId}"
       }
     ]
   }
