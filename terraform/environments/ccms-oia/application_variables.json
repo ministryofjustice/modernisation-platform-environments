@@ -18,7 +18,6 @@
       "conn_saa_ec2_max_size": "1",
       "conn_saa_ec2_min_size": "1",
       "opa_app_count": "1",
-      "opa_server_port": "7001",
       "opa_ssl_port": "7002",
       "opa_health_check_port": "9002",
       "db_user": "opahubdb",
