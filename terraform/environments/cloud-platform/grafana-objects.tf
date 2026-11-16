@@ -54,7 +54,10 @@ locals {
     for tier in ["live", "nonlive"] : tier => {
       for k, bu in local.business_units : k => {
         amp_workspace_alias = bu.amp_workspace_aliases[tier]
-        idc_group_names     = [bu.parent_group]
+        idc_group_names = k == "octo" && tier == "nonlive" ? [
+          bu.parent_group,
+          "test-webops",
+        ] : [bu.parent_group]
       } if try(bu.grafana_enabled[tier], false)
     }
   }

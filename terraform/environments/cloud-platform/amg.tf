@@ -212,8 +212,11 @@ resource "aws_grafana_role_association" "platform_admin" {
 resource "aws_grafana_role_association" "octo_nonlive_viewer" {
   count = local.enable_amg && terraform.workspace == "cloud-platform-nonlive" ? 1 : 0
 
-  role         = "VIEWER"
-  group_ids    = local.enable_amg && terraform.workspace == "cloud-platform-nonlive" ? [local.idc_group_id_by_name[local.business_units.octo.parent_group]] : []
+  role = "VIEWER"
+  group_ids = local.enable_amg && terraform.workspace == "cloud-platform-nonlive" ? [
+    local.idc_group_id_by_name[local.business_units.octo.parent_group],
+    local.idc_group_id_by_name["test-webops"],
+  ] : []
   workspace_id = aws_grafana_workspace.this[0].id
 }
 
