@@ -96,20 +96,6 @@ resource "aws_security_group_rule" "alb_managed_ingress_443" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-#Internal Traffic on port 80
-# resource "aws_security_group_rule" "alb_managed_ingress_80" {
-
-#   count = local.alb_80_enabled ? 1 : 0
-
-#   security_group_id = aws_security_group.alb_managed.id
-#   type              = "ingress"
-#   description       = "HTTP - Internal Subnets"
-#   protocol          = "TCP"
-#   from_port         = 80
-#   to_port           = 80
-#   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-# }
-
 resource "aws_security_group_rule" "alb_managed_ingress_443_databases" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
