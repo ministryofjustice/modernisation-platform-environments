@@ -2,8 +2,8 @@
 
 `grafana-cloud-stack.tf` creates a new Grafana Cloud stack alongside the existing
 Amazon Managed Grafana platform. It does not import or modify the `mojdigital`
-test stack, migrate dashboards, or configure data sources. Private
-connectivity (PDC) is not deployed here, see below.
+test stack, migrate dashboards, or configure data sources. PDC networks and
+tokens are in `grafana-cloud-pdc-tenants.tf`, described below.
 
 | Terraform workspace | AWS account | Grafana Cloud stack |
 | --- | --- | --- |
@@ -17,7 +17,10 @@ Stack names must be globally available.
 ## Credentials
 
 Create a Grafana Cloud access policy token in the intended Grafana Cloud
-organisation with `stacks:read`, `stacks:write`, and `stacks:delete` scopes.
+organisation with `stacks:read`, `stacks:write`, and `stacks:delete` scopes,
+plus `stack-plugins:read`/`write`, `stack-service-accounts:read`/`write` and
+`accesspolicies:read`/`write`/`delete` (PDC networks and their tokens are access
+policies). Create the policy in the `prod-gb-south-1` region.
 Its realm must permit organisation-level stack creation, rather than only
 access to an existing stack. The organisation associated with this token
 determines where the new stacks are created; the AWS account does not.
@@ -64,9 +67,26 @@ deletion requires an explicitly reviewed change to this protection.
 
 ## Private Data Source Connect (PDC)
 
-PDC isn't deployed from this environment. The pilot was removed from the
-observability-platform accounts. It will be provided per tenant VPC by the
-tenant module, together with the networking for each shared VPC.
+`grafana-cloud-pdc-tenants.tf` creates, for each tenant in
+`grafana-cloud-tenant-environment-configurations.tf` with `pdc_enabled = true`
+on at least one account:
+
+- a PDC network and a PDC network token
+- a customer managed KMS key
+- a `grafana-cloud/pdc/<tenant>` secret holding the token, written by Terraform
+
+The agents run in the tenant accounts and are deployed by the tenant module. The
+secret and KMS key policies allow only the `grafana-pdc-agent-execution` role in
+the tenant's accounts to read the token. The tenant module must also give that role
+an identity policy allowing `secretsmanager:GetSecretValue` on the secret and
+`kms:Decrypt` on the key, and reference the secret by its full ARN. Restart the agent
+service after the token changes, because ECS reads the secret at task start.
+
+The `grafana_cloud_pdc_tenants` output gives each tenant's PDC network ID and token
+secret ARN to pass to the tenant module.
+
+PDC agents are not deployed from this environment. The tenant module provides them,
+together with the networking for each shared VPC.
 
 Grafana Cloud management API calls, browser access and alert notifications
 go over public HTTPS.
