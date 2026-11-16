@@ -20,16 +20,16 @@ module "oracle_db_shared" {
   public_keys        = local.db_public_key_data.keys[var.env_name]
 
   # The following variables are required for setting up the Data Guard Observer as a Microservice
-  app_name                    = var.app_name
-  database_name               = var.db_config.database_name
-  database_port               = var.db_config.database_port
-  sns_topic_arn               = aws_sns_topic.delius_core_alarms.arn
-  oracle_db_server_names      = local.oracle_db_server_names
-  bastion_sg_id               = module.bastion_linux.bastion_security_group
-  cluster_security_group_id   = aws_security_group.cluster.id
-  delius_microservice_configs = var.delius_microservice_configs
-  ecs_cluster_arn             = module.ecs.ecs_cluster_arn
-  create_backup_role          = var.create_backup_role
+  app_name                       = var.app_name
+  database_name                  = var.db_config.database_name
+  database_port                  = var.db_config.database_port
+  sns_topic_arn                  = aws_sns_topic.delius_core_alarms.arn
+  oracle_db_server_names         = local.oracle_db_server_names
+  bastion_sg_id                  = module.bastion_linux.bastion_security_group
+  cluster_security_group_id      = aws_security_group.cluster.id
+  delius_microservice_configs    = var.delius_microservice_configs
+  ecs_cluster_arn                = module.ecs.ecs_cluster_arn
+  create_aws_backup_service_role = var.create_account_service_roles
 
   providers = {
     aws.bucket-replication    = aws
@@ -92,8 +92,9 @@ module "oracle_db_standby" {
   account_info   = var.account_info
 
   db_ami = {
-    name_regex = var.db_config.ami_name_regex
-    owner      = "self"
+    name_regex    = var.db_config.ami_name_regex
+    owner         = "self"
+    pinned_ami_id = try(var.db_config.pinned_ami_id, null)
   }
   db_type         = "standby"
   db_suffix       = "db"

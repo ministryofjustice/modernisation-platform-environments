@@ -35,9 +35,6 @@ locals {
         })
       },
     )
-    db_connectivity_test = merge(
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_connectivity_test,
-    )
     db_connected = merge(
       # DBAs have slack integration via OEM for this so don't include pagerduty integration
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_oracle_db_connected,
