@@ -30,8 +30,8 @@ resource "aws_iam_role" "ap_airflow_redshift_ingestion" {
         StringEquals = {
           "${local.ap_compute_oidc_host}:aud" = "sts.amazonaws.com"
           "${local.ap_compute_oidc_host}:sub" = [
-            "system:serviceaccount:mwaa:youth-justice-board-redshift-ingestion",
-            "system:serviceaccount:mwaa:youth-justice-board-redshift-ingestion-dev",
+            "system:serviceaccount:mwaa:yjb-redshift-ingestion",
+            "system:serviceaccount:mwaa:yjb-redshift-ingestion-dev",
           ]
         }
       }
