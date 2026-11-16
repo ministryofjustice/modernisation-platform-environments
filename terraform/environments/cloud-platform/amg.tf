@@ -206,6 +206,17 @@ resource "aws_grafana_role_association" "platform_admin" {
   workspace_id = aws_grafana_workspace.this[0].id
 }
 
+# Octo nonlive users need a workspace role before AMG permits SSO sign-in. Their
+# Grafana team membership and BU-scoped data permissions are managed separately
+# in grafana-objects.tf.
+resource "aws_grafana_role_association" "octo_nonlive_viewer" {
+  count = local.enable_amg && terraform.workspace == "cloud-platform-nonlive" ? 1 : 0
+
+  role         = "VIEWER"
+  group_ids    = local.enable_amg && terraform.workspace == "cloud-platform-nonlive" ? [local.idc_group_id_by_name[local.business_units.octo.parent_group]] : []
+  workspace_id = aws_grafana_workspace.this[0].id
+}
+
 #------------------------------------------------------------------------------
 # AMG service account — used to manage Grafana-internal objects as code
 #
