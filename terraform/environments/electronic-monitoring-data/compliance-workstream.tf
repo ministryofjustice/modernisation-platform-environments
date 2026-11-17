@@ -121,8 +121,8 @@ data "aws_iam_policy_document" "compliance_athena_access" {
 }
 
 resource "aws_lakeformation_permissions" "em_compliance_db_access" {
-  count   = local.compliance_accounts
-  principal   = module.compliance_role[0].iam_role_arn
+  count = local.compliance_accounts
+  principal   = module.compliance_role[0].arn
   permissions = ["DESCRIBE"]
   database {
     name = "staged_mdss${local.dbt_suffix}"
@@ -130,8 +130,8 @@ resource "aws_lakeformation_permissions" "em_compliance_db_access" {
 }
 
 resource "aws_lakeformation_permissions" "em_compliance_tb_access" {
-  count   = local.compliance_accounts
-  principal   = module.compliance_role[0].iam_role_arn
+  count = local.compliance_accounts
+  principal   = module.compliance_role[0].arn
   permissions = ["DESCRIBE"]
   table {
     database_name = "staged_mdss${local.dbt_suffix}"
@@ -140,19 +140,21 @@ resource "aws_lakeformation_permissions" "em_compliance_tb_access" {
 }
 
 resource "aws_lakeformation_data_cells_filter" "compliance_data_filter" {
-  count   = local.compliance_accounts
+  count = local.compliance_accounts
   table_data {
     database_name    = "staged_mdss${local.dbt_suffix}"
     name             = "filter-for-staged_mdss${local.dbt_suffix}-event-table"
     table_catalog_id = data.aws_caller_identity.current.account_id
     table_name       = "event"
-    row_filter       = "device_id in (1121)"
+    row_filter {
+      filter_expression = "device_id in (1121)"
+    }
   }
 }
 
 resource "aws_lakeformation_permissions" "em_compliance_s3_access" {
-  count   = local.compliance_accounts
-  principal   = module.compliance_role[0].iam_role_arn
+  count       = local.compliance_accounts
+  principal   = module.compliance_role[0].arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
     arn = module.s3-create-a-derived-table-bucket.bucket.arn
@@ -160,9 +162,9 @@ resource "aws_lakeformation_permissions" "em_compliance_s3_access" {
 }
 
 resource "aws_lakeformation_permissions" "em_compliance_row_access" {
-  count   = local.compliance_accounts
-  principal   = module.compliance_role[0].iam_role_arn
-  permissions = ["DESCRIBE", SELECT]
+  count = local.compliance_accounts
+  principal   = module.compliance_role[0].arn
+  permissions = ["DESCRIBE", "SELECT"]
   data_cells_filter {
     database_name    = "staged_mdss${local.dbt_suffix}"
     name             = "filter-for-staged_mdss${local.dbt_suffix}-event-table"
