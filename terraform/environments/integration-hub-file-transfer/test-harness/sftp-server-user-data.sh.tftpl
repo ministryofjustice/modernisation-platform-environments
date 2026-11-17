@@ -23,8 +23,7 @@ AllowUsers ${username}
 Match User ${username}
   ChrootDirectory /srv/sftp/${username}
   ForceCommand internal-sftp
-  AllowTcpForwarding no
-  X11Forwarding no
+  DisableForwarding yes
 EOF
 
 cat > /usr/local/bin/hub-sftp-refresh-credentials <<'EOF'
@@ -82,7 +81,7 @@ while true; do
   if systemctl is-active --quiet sshd.service; then
     # Temporary upload files are excluded: only completed renames reach the read-back bucket.
     aws s3 sync /srv/sftp/${username}/incoming "s3://${bucket_name}/${readback_prefix}" \
-      --region "${region}" --exclude ".mft-*" --exclude "*/.mft-*" --only-show-errors || echo "read-back sync failed"
+      --region "${region}" --no-follow-symlinks --exclude ".mft-*" --exclude "*/.mft-*" --only-show-errors || echo "read-back sync failed"
   fi
   sleep 5
 done

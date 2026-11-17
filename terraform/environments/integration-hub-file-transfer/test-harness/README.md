@@ -76,8 +76,8 @@ the destination network to that address's `/32`.
 
 The writer uploads temporary files and renames them into their completed paths
 under `incoming/`. A server agent runs `aws s3 sync` to the read-back prefix,
-excluding `.mft-*` files at the root and in nested directories, with a
-five-second pause between iterations. GitHub Actions observes this S3 copy
+excluding symbolic links and `.mft-*` files at the root and in nested directories,
+with a five-second pause between iterations. GitHub Actions observes this S3 copy
 without requiring direct access to the private SFTP endpoint. The agent copies
 files; it does not delete the server originals.
 
