@@ -3,7 +3,7 @@ resource "aws_kinesis_firehose_delivery_stream" "xsiam" {
   destination = "http_endpoint"
 
   http_endpoint_configuration {
-    url                = aws_ssm_parameter.xsiam_endpoint.value
+    url                = data.aws_secretsmanager_secret_version.xsiam_endpoint.secret_string
     name               = "XSIAM"
     buffering_interval = 60
     buffering_size     = 4

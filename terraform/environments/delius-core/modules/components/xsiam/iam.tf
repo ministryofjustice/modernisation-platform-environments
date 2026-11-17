@@ -93,22 +93,6 @@ resource "aws_iam_policy" "firehose_kms_secret_access_xsiam" {
   })
 }
 
-resource "aws_iam_policy" "firehose_ssm_access_xsiam" {
-  name = "${local.name}-FirehoseSsmAccessXsiam"
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "ssm:GetParameter"
-        ],
-        Resource = aws_ssm_parameter.xsiam_endpoint.arn
-      }
-    ]
-  })
-}
-
 resource "aws_iam_policy" "firehose_secrets_access_xsiam" {
   name = "${local.name}-FirehoseSecretsAccessXsiam"
   policy = jsonencode({
@@ -119,7 +103,7 @@ resource "aws_iam_policy" "firehose_secrets_access_xsiam" {
         Action = [
           "secretsmanager:GetSecretValue"
         ],
-        Resource = aws_secretsmanager_secret.xsiam_api.arn
+        Resource = [aws_secretsmanager_secret.xsiam_endpoint.arn, aws_secretsmanager_secret.xsiam_api.arn]
       }
     ]
   })
