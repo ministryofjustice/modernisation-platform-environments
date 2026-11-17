@@ -94,7 +94,6 @@ locals {
 
   backup_schedule_tags       = local.environment == "production" ? { "snapshot-35-day-retention" = "yes" } : null
   database-instance-userdata = <<EOF
-#!/bin/bash
 cd /tmp
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 
