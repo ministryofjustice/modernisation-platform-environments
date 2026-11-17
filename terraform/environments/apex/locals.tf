@@ -95,10 +95,6 @@ locals {
   backup_schedule_tags       = local.environment == "production" ? { "snapshot-35-day-retention" = "yes" } : null
   database-instance-userdata = <<EOF
 cd /tmp
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-
-# Block the eMudhra/emSign and Comodo AAA root CAs. Run in a subshell so an
-# early exit doesn't skip the rest of the user data.
 (
 B=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
 S=/etc/pki/ca-trust/source
@@ -167,6 +163,7 @@ echo
 
 cd / && rm -rf "$D"
 )
+yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
 sudo sed -i '/laa-software-library/d' /etc/fstab
