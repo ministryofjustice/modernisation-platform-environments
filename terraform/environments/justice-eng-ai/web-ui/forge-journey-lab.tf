@@ -42,17 +42,19 @@ locals {
   forge_hostname           = local.application_data.accounts[local.environment].forge_hostname
   forge_ecr_repository_url = local.ui_ecr_repository_url
   forge_container_port     = local.forge_upstream_port
-  # Tunable per environment in application_variables.json. The cpu/memory pair
-  # must be a valid Fargate combination; the 2 vCPU / 8 GiB default leaves
-  # headroom for concurrent Chromium design checks and the in-memory build
-  # registry.
-  forge_task_cpu      = try(local.application_data.accounts[local.environment].forge_task_cpu, 2048)
-  forge_task_memory   = try(local.application_data.accounts[local.environment].forge_task_memory, 8192)
+  # Set per environment in web-ui/application_variables.json (not the one in the
+  # parent directory), with no fallback so a missing key fails the plan. The
+  # cpu/memory pair must be a valid Fargate combination.
+  forge_task_cpu      = local.application_data.accounts[local.environment].forge_task_cpu
+  forge_task_memory   = local.application_data.accounts[local.environment].forge_task_memory
   forge_desired_count = 1
 
-  forge_max_builds_in_memory          = try(local.application_data.accounts[local.environment].forge_max_builds_in_memory, 200)
-  forge_design_check_concurrency      = try(local.application_data.accounts[local.environment].forge_design_check_concurrency, 3)
-  forge_design_check_queue_timeout_ms = try(local.application_data.accounts[local.environment].forge_design_check_queue_timeout_ms, 120000)
+  forge_max_builds_in_memory          = local.application_data.accounts[local.environment].forge_max_builds_in_memory
+  forge_design_check_concurrency      = local.application_data.accounts[local.environment].forge_design_check_concurrency
+  forge_design_check_queue_timeout_ms = local.application_data.accounts[local.environment].forge_design_check_queue_timeout_ms
+
+  # Node heap limit, 75% of the task memory so the rest is left for Chromium and the OS.
+  forge_node_heap_mb = floor(local.forge_task_memory * 0.75)
 }
 
 resource "random_password" "forge_session_secret" {
@@ -567,7 +569,7 @@ resource "aws_ecs_task_definition" "forge" {
           { name = "FORGE_MAX_BUILDS_IN_MEMORY", value = tostring(local.forge_max_builds_in_memory) },
           # Cap the V8 heap below the task limit (8192 MiB) so Chromium and
           # native memory still fit and Node fails with a clear error, not an OOM kill.
-          { name = "NODE_OPTIONS", value = "--max-old-space-size=6144" },
+          { name = "NODE_OPTIONS", value = "--max-old-space-size=${local.forge_node_heap_mb}" },
           { name = "FORGE_PACKAGE_S3_BUCKET", value = local.forge_package_s3_bucket },
           { name = "FORGE_PACKAGE_KEY_VERSION", value = "2" },
           { name = "FORGE_PACKAGE_S3_PREFIX", value = var.forge_package_s3_prefix },

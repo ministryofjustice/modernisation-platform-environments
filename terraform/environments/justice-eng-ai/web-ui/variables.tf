@@ -138,18 +138,6 @@ variable "app_container_port" {
   default     = 8000
 }
 
-variable "task_cpu" {
-  type        = number
-  description = "CPU units for the ECS task."
-  default     = 512
-}
-
-variable "task_memory" {
-  type        = number
-  description = "Memory in MiB for the ECS task."
-  default     = 1024
-}
-
 variable "app_desired_count" {
   type        = number
   description = "Desired number of UI tasks. Set to 0 to stop the service without destroying resources."
