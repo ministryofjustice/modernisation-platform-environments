@@ -21,15 +21,6 @@ resource "aws_security_group" "lambda_security_group" {
   )
 }
 
-# hashicorp recommened Ingress rule of lambda_security_group
-resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
-  security_group_id            = aws_security_group.lambda_security_group.id
-  description                  = "Allow FTP lambda inbound traffic from EBS DB EC2"
-  referenced_security_group_id = aws_security_group.ec2_sg_ebsdb.id
-  from_port                    = 443
-  ip_protocol                  = "tcp"
-  to_port                      = 443
-}
 
 # hashicorp recommened egress rule of lambda_security_group
 resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
