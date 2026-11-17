@@ -5,7 +5,7 @@ output "contract_deployment_references" {
   value = local.contract_management_enabled ? {
     registration = local.registration_enabled ? {
       kind = "lambda"
-      arn  = module.schema_registration[0].function_arn
+      arn  = module.schema_registration[0].function_qualified_arn
     } : null
 
     registry = local.registration_enabled ? {
@@ -16,7 +16,7 @@ output "contract_deployment_references" {
     generation = {
       for name, deployment in module.schema_generation : name => {
         kind          = "lambda"
-        arn           = deployment.function_arn
+        arn           = deployment.function_qualified_arn
         source        = local.generation_sources[name].service
         database_name = local.generation_sources[name].database_name
         schema_name   = local.generation_sources[name].schema_name
@@ -27,7 +27,7 @@ output "contract_deployment_references" {
     validation = {
       for name, deployment in module.schema_validation : name => {
         kind            = "lambda"
-        arn             = deployment.function_arn
+        arn             = deployment.function_qualified_arn
         source_mappings = local.validation_deployments[name].source_mappings
       }
     }
