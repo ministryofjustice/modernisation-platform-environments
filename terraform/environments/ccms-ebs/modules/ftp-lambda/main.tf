@@ -11,6 +11,22 @@ resource "aws_security_group" "ftp_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  egress {
+    from_port                = 8022
+    to_port                  = 8022
+    protocol                 = "tcp"
+    security_groups          = [data.aws_security_group.ec2_sg_ftp.id]
+  }
+}
+
+# Reference FTP EC2 security group
+data "aws_security_group" "ec2_sg_ftp" {
+  vpc_id = var.vpc_id
+  filter {
+    name   = "group-name"
+    values = ["ec2_sg_ftp"]
+  }
 }
 
 ## lambda role for ftp
