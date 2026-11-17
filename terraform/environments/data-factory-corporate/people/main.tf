@@ -319,6 +319,35 @@ module "sherlock_glue_database" {
 
 }
 
+resource "aws_lakeformation_permissions" "airflow-sherlock-database" {
+  count = local.enable_airflow_iam_role ? 1 : 0
+
+  principal   = module.data_platform_airflow_iam_role[0].role_arn
+  permissions = ["DESCRIBE", "CREATE_TABLE"]
+
+  database {
+    name       = module.sherlock_glue_database.glue_database_name
+    catalog_id = data.aws_caller_identity.current.account_id
+  }
+
+  depends_on = [aws_lakeformation_data_lake_settings.your_lake_settings_name]
+}
+
+resource "aws_lakeformation_permissions" "airflow-sherlock-tables" {
+  count = local.enable_airflow_iam_role ? 1 : 0
+
+  principal   = module.data_platform_airflow_iam_role[0].role_arn
+  permissions = ["DESCRIBE", "ALTER"]
+
+  table {
+    database_name = module.sherlock_glue_database.glue_database_name
+    catalog_id    = data.aws_caller_identity.current.account_id
+    wildcard      = true
+  }
+
+  depends_on = [aws_lakeformation_data_lake_settings.your_lake_settings_name]
+}
+
 module "assume_iam_role" {
   count  = local.enable_external_iam_role ? 1 : 0
   source = "./modules/external-iam-role"
