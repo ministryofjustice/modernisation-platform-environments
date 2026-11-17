@@ -13,11 +13,14 @@
 #     xray                = { enabled = false }
 #     # Optional, with no default: adds an Amazon Managed Service for Prometheus data source
 #     # amazon_prometheus = { workspace_id = "ws-...", region = "eu-west-2" }
+#     push                = { metrics = false, logs = false, traces = false }
 #   }
 #
 # so `"<account name>" = {}` gives an account a PDC network (grafana-cloud-pdc-accounts.tf) and a
 # CloudWatch data source (grafana-cloud-data-sources.tf). AWS data sources use the account's
-# `grafana-cloud` role, created by the tenant module.
+# `grafana-cloud` role, created by the tenant module. `push` gives the account a write token for the
+# signals it sends to Grafana Cloud (grafana-cloud-push-accounts.tf), and lets the teams that can
+# query the account see its data in the shared data sources (grafana-cloud-shared-data-sources.tf).
 locals {
   environment_configuration_gc = local.environment_configurations_gc[local.environment]
   environment_configurations_gc = {
@@ -34,6 +37,9 @@ locals {
             # Modernisation Platform sandbox accounts, used to test the tenant module.
             "sprinkler-development" = {
               xray = { enabled = true }
+              # Tests the Grafana Cloud path end to end: OTLP pushed with the account's write token
+              # is visible to the team through the shared data sources.
+              push = { metrics = true, logs = true, traces = true }
             }
             "cooker-development" = {}
           }

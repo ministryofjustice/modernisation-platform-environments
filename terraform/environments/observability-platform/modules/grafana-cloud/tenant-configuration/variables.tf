@@ -22,6 +22,14 @@ variable "tenants" {
         workspace_id = string
         region       = optional(string, "eu-west-2")
       }))
+      # Signals the account pushes to the stack's Grafana Cloud Metrics (Mimir), Logs (Loki) and
+      # Traces (Tempo) over OTLP. Each enabled signal adds the account to the write token and to the
+      # label-based access rules of the shared data source.
+      push = optional(object({
+        metrics = optional(bool, false)
+        logs    = optional(bool, false)
+        traces  = optional(bool, false)
+      }), {})
     })), {})
   }))
 

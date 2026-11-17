@@ -3,8 +3,10 @@
 `grafana-cloud-stack.tf` creates a new Grafana Cloud stack alongside the existing
 Amazon Managed Grafana platform. It does not import or modify the `mojdigital`
 test stack or migrate dashboards. Tenants and their AWS accounts, described
-below, drive the PDC networks and tokens in `grafana-cloud-pdc-accounts.tf` and
-the AWS data sources in `grafana-cloud-data-sources.tf`.
+below, drive the PDC networks and tokens in `grafana-cloud-pdc-accounts.tf`,
+the AWS data sources in `grafana-cloud-data-sources.tf`, the push tokens in
+`grafana-cloud-push-accounts.tf` and the shared Metrics, Logs and Traces data
+sources in `grafana-cloud-shared-data-sources.tf`.
 
 | Terraform workspace | AWS account | Grafana Cloud stack |
 | --- | --- | --- |
@@ -20,8 +22,9 @@ Stack names must be globally available.
 Create a Grafana Cloud access policy token in the intended Grafana Cloud
 organisation with `stacks:read`, `stacks:write`, and `stacks:delete` scopes,
 plus `stack-plugins:read`/`write`, `stack-service-accounts:read`/`write` and
-`accesspolicies:read`/`write`/`delete` (PDC networks and their tokens are access
-policies). Create the policy in the `prod-gb-south-1` region.
+`accesspolicies:read`/`write`/`delete` (PDC networks and their tokens, the push
+tokens and the shared data sources' read token are access policies and tokens).
+Create the policy in the `prod-gb-south-1` region.
 Its realm must permit organisation-level stack creation, rather than only
 access to an existing stack. The organisation associated with this token
 determines where the new stacks are created; the AWS account does not.
@@ -87,6 +90,7 @@ tenant_configuration = {
         cloudwatch          = { custom_namespaces = ["ECS/ContainerInsights", "CWAgent"] }
         xray                = { enabled = true }
         amazon_prometheus   = { workspace_id = "ws-..." }
+        push                = { metrics = true, logs = true, traces = true }
       }
     }
   }
@@ -104,6 +108,7 @@ tenant_configuration = {
 | `cloudwatch.custom_namespaces` | `[]` | Custom metric namespaces, one per item |
 | `xray.enabled` | `false` | `<account>-xray` data source. Opt in: Grafana Cloud Tempo is the preferred trace store |
 | `amazon_prometheus` | unset | `<account>-amp` data source for the workspace: `workspace_id`, and `region` (default `eu-west-2`) |
+| `push.metrics`, `push.logs`, `push.traces` | `false` | The account pushes the signal to Grafana Cloud: its push token can write it, and the shared data source shows the account's data. See [Grafana Cloud Metrics, Logs and Traces](#grafana-cloud-metrics-logs-and-traces) |
 
 The configuration is rejected if an account is listed under more than one
 tenant, if `shared_with_tenants` names the owning tenant or a tenant that isn't
@@ -197,7 +202,199 @@ Query to the owning tenant's team and to the teams of the tenants in
 and Editor access, so no other users can query the data source. Admins keep
 access, including the platform team and the Terraform service account. If none
 of those tenants has a team, only Admins can query the data source. The GitHub
-data source keeps Grafana's default permissions.
+data source keeps Grafana's default permissions. The shared Metrics, Logs and
+Traces data sources also have label-based access control rules: see
+[Label-based access control](#label-based-access-control).
+
+## Grafana Cloud Metrics, Logs and Traces
+
+Each stack has one Metrics (Mimir), one Logs (Loki) and one Traces (Tempo)
+store, and every tenant account pushes to the same stores. An OpenTelemetry
+(OTLP) gateway in the account sends the account's telemetry, with the account ID
+in the `cloud.account.id` resource attribute, using a write token from this
+environment. Teams query the stores through three shared data sources, whose
+label-based access control (LBAC) rules limit each team to the accounts it can
+query.
+
+The gateway isn't deployed yet. It will be part of a later tenant module
+release.
+
+### Push tokens
+
+`grafana-cloud-push-accounts.tf` creates, for each account that pushes at least
+one signal:
+
+- an access policy, `<stack slug>-<account name>-push`, and its token,
+  `<stack slug>-<account name>-push-gateway`. The policy can only write the
+  signals the account pushes (`metrics:write`, `logs:write` and
+  `traces:write`), and only to this environment's stack
+- a customer managed KMS key, aliased `alias/grafana-cloud-push-<account name>`
+- a `grafana-cloud/push/<account ID>` secret, written by Terraform, holding this
+  JSON object:
+
+| Key | Value |
+| --- | --- |
+| `otlp_endpoint` | The stack's OTLP endpoint. OTLP/HTTP exporters append `/v1/metrics`, `/v1/logs` or `/v1/traces` |
+| `username` | The stack ID: the basic auth username |
+| `token` | The token: the basic auth password |
+| `signals` | The signals the token can write, such as `["logs", "metrics", "traces"]` |
+
+As for PDC, the secret and KMS key policies allow only the account's
+`grafana-otlp-gateway-execution` role to read the token. The tenant module must
+create the gateway execution role with that name, give it an identity policy
+allowing `secretsmanager:GetSecretValue` on the secret and `kms:Decrypt` on the
+key, and derive the secret ARN from this account's ID and the tenant account ID.
+
+The tokens don't expire, like the PDC tokens. To rotate one, replace its
+`grafana_cloud_access_policy_token.push` resource, then restart the gateway.
+The `grafana_cloud_push_accounts` output gives each pushing account's ID,
+signals and token secret ARN, keyed by account name.
+
+A write token can't be limited to labels. It can write data with any
+`cloud.account.id`, which is what the LBAC rules match. So only the gateway may
+hold the token, not applications, and the gateway must set `cloud.account.id`
+to its own account ID, overwriting any value that applications send.
+
+### Shared data sources
+
+`grafana-cloud-shared-data-sources.tf` calls
+`modules/grafana-cloud/shared-data-sources` once at least one account in the
+environment pushes a signal. Until then it creates nothing, so production has no
+shared data sources yet.
+
+| Data source | Type | URL |
+| --- | --- | --- |
+| `shared-metrics` | `prometheus` | The stack's `prometheus_remote_endpoint` |
+| `shared-logs` | `loki` | The stack's `logs_url` |
+| `shared-traces` | `tempo` | The stack's `traces_url`, followed by `/tempo` |
+
+The UIDs are the same as the names, so the data sources can link to each other.
+They use basic auth: the store's user ID, and a token from one read-only access
+policy, `<stack slug>-shared-read`, with the `metrics:read`, `logs:read` and
+`traces:read` scopes. The policy must not have label selectors, because those
+take precedence over LBAC rules.
+
+Spans link to the service's logs for the trace, to the service's metrics, and to
+the service graph. Log records link to their traces through the `trace_id`
+structured metadata, and metric exemplars through their `trace_id` label.
+
+### Label-based access control
+
+Each shared data source has one `grafana_data_source_config_lbac_rules`
+resource, which is authoritative over all of the data source's rules. A team
+gets one rule for each account it can query (its tenant's accounts and those
+shared with it) that pushes the signal. A team's rules are combined with OR.
+
+| Data source | Rule |
+| --- | --- |
+| `shared-metrics` | `{ cloud_account_id="<account ID>" }` |
+| `shared-logs` | `{ cloud_account_id="<account ID>" }` |
+| `shared-traces` | `{ resource.cloud.account.id="<account ID>" }` |
+
+Each data source also has one authoritative `grafana_data_source_permission`,
+which grants Query only to the teams that have at least one of those accounts.
+It removes Grafana's default Viewer and Editor access. If no team has one, only
+Admins can query the data source.
+
+If none of a user's teams has rules on a data source, the user can query all of
+its data. So a team with no account pushing the signal gets a rule that matches
+no data, `cloud_account_id="none"`, rather than no rules, and Terraform applies
+rules before permissions. A team never has Query without rules, and a Query
+permission granted by hand can't expose other teams' data.
+
+The rules also apply to Admins in a team with rules, so platform team members
+only see their own accounts' data through the shared data sources. Admins who
+aren't in such a team, including the Terraform service account, see all of it.
+A data source can have roughly 5,000 to 6,000 rules.
+
+### Built-in data sources
+
+Each stack also has built-in data sources for these stores,
+`grafanacloud-<stack slug>-prom`, `grafanacloud-<stack slug>-logs` and
+`grafanacloud-<stack slug>-traces`, which have no LBAC rules. Every Viewer could
+query every account's data through them. So the module looks them up by name and
+gives each an authoritative `grafana_data_source_permission` with no grants,
+making them admin-only. Grafana Cloud apps that use them, such as Application
+Observability, are then only for Admins. Removing the permission resource
+doesn't restore other users' access. If a lookup fails, check the names in the
+stack's **Connections** > **Data sources** page.
+
+### Before pushing real data
+
+Complete these before any account pushes real data:
+
+- **Promote the account ID label.** Grafana Cloud doesn't turn the OTLP
+  `cloud.account.id` resource attribute into a `cloud_account_id` label by
+  default, so the metrics and logs rules match nothing until it does: the
+  shared data sources fail closed. For Metrics, ask Grafana Support, because
+  the self-serve option is experimental. For Logs, add the attribute as an
+  index label in the stack's OTLP configuration, within the limit on index
+  labels (15 by default). Traces need no change.
+- **Change the Tempo redaction mode.** Tempo LBAC is in public preview. By
+  default, a query for a trace by ID keeps the spans the user can't see,
+  removing their attributes but not their names, IDs, timings or status. Ask
+  Grafana Support to use the Spans or Error redaction mode, which removes those
+  spans or rejects the query.
+- **Check the built-in data sources** are admin-only after the first apply, and
+  stay that way.
+- **Check the Grafana Cloud plan** includes team LBAC for Metrics, Logs and
+  Traces.
+- **Deploy the gateway**, which holds the token and overwrites
+  `cloud.account.id`.
+- **Get security and data protection impact assessment (DPIA) sign-off** for
+  teams sharing the stores.
+
+Metrics that Tempo generates from traces, such as the service graph and span
+metrics, have no `cloud_account_id` label. They aren't visible through
+`shared-metrics` until it's added as a dimension.
+
+### Changing tenants and teams
+
+- **Removing a tenant, or its `github_team`:** apply this in two steps. First
+  remove the tenant's accounts and any `shared_with_tenants` entries naming it,
+  so that its team loses Query. Then remove the tenant. Doing both at once
+  briefly leaves the team with Query but no rules.
+- **New data sources:** Grafana gives Viewers and Editors Query on a new data
+  source until its permission applies, a few seconds later. Create the shared
+  data sources before real data is pushed, and don't replace them.
+
+### Testing in development
+
+`sprinkler-development` pushes all three signals in development, so the
+platform team can test the whole path before the gateway exists:
+
+1. With credentials for the observability-platform-development account, send
+   test data with sprinkler's push token, once with sprinkler's account ID and
+   once with another account ID. For example, with
+   [telemetrygen](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/cmd/telemetrygen):
+
+   ```bash
+   secret=$(aws secretsmanager get-secret-value --query SecretString --output text \
+     --secret-id "grafana-cloud/push/${SPRINKLER_ACCOUNT_ID}")
+   otlp=$(jq -r .otlp_endpoint <<<"${secret}" | sed 's|^https://||')
+   auth=$(jq -j '"\(.username):\(.token)"' <<<"${secret}" | base64 | tr -d '\n')
+   for account_id in "${SPRINKLER_ACCOUNT_ID}" 000000000000; do
+     for signal in traces metrics logs; do
+       telemetrygen "${signal}" --otlp-http \
+         --otlp-endpoint "${otlp%%/*}:443" \
+         --otlp-http-url-path "/${otlp#*/}/v1/${signal}" \
+         --otlp-header "Authorization=\"Basic ${auth}\"" \
+         --otlp-attributes "cloud.account.id=\"${account_id}\""
+     done
+   done
+   ```
+
+   Keep the quotes around the account ID, so that telemetrygen sends it as a
+   string, which the rules match.
+
+2. As a member of the `observability-platform` team, check that `shared-traces`
+   shows only sprinkler's traces, and the built-in traces data source shows
+   both. `shared-metrics` and `shared-logs` show nothing until the label is
+   promoted, and then only sprinkler's data.
+3. As a Viewer who isn't in a tenant team, check that you can't query the shared
+   or built-in data sources.
+4. To check that the token can only write its signals, remove one from
+   sprinkler's `push`, apply, and check that pushing it fails.
 
 ## CloudWatch (Grafana Assume Role)
 

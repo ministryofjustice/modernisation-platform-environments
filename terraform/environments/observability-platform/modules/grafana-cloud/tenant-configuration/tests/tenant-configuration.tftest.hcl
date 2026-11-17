@@ -14,6 +14,7 @@ run "defaults_and_sharing" {
             cloudwatch          = { custom_namespaces = ["ECS/ContainerInsights", "CWAgent"] }
             xray                = { enabled = true }
             amazon_prometheus   = { workspace_id = "ws-bfdd5d7a-5571-4686-bfd4-43ab07cf8d54ba" }
+            push                = { metrics = true, traces = true }
           }
         }
       }
@@ -26,9 +27,21 @@ run "defaults_and_sharing" {
       output.accounts["account-a"].pdc_enabled &&
       output.accounts["account-a"].cloudwatch.enabled &&
       !output.accounts["account-a"].xray.enabled &&
-      output.accounts["account-a"].amazon_prometheus == null
+      output.accounts["account-a"].amazon_prometheus == null &&
+      !output.accounts["account-a"].push.metrics &&
+      !output.accounts["account-a"].push.logs &&
+      !output.accounts["account-a"].push.traces
     )
-    error_message = "An empty account entry should give PDC and CloudWatch only."
+    error_message = "An empty account entry should give PDC and CloudWatch only, and push nothing."
+  }
+
+  assert {
+    condition = (
+      output.accounts["account-b"].push.metrics &&
+      !output.accounts["account-b"].push.logs &&
+      output.accounts["account-b"].push.traces
+    )
+    error_message = "Push signals that aren't set should default to false."
   }
 
   assert {
