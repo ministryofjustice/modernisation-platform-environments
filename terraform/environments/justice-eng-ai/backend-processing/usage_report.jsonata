@@ -1,0 +1,67 @@
+/* Builds the Chatbot custom notification for the usage report.
+   Inputs: $env (environment name), $interval (minutes per row), $window (minutes in
+   the report) and $states.result (GetMetricData response). The query IDs are bcpu,
+   bmem, fcpu and fmem (Builder and Forge). Each value is the peak in one interval. */
+(
+  $bucket := $interval * 60000;
+  $buckets := $window / $interval;
+  $end := $floor($toMillis($states.context.Execution.StartTime) / $bucket) * $bucket;
+  $start := $end - $buckets * $bucket;
+
+  /* JSONata only takes fixed offsets, so UK summer time is worked out here:
+     it runs from 01:00 UTC on the last Sunday of March to the same time in October. */
+  $lastSunday := function($y, $m) {(
+    $d := $toMillis($string($y) & '-' & $m & '-31T01:00:00Z');
+    $d - (($floor($d / 86400000) + 4) % 7) * 86400000
+  )};
+  $offset := function($ms) {(
+    $y := $number($fromMillis($ms, '[Y0001]'));
+    ($ms >= $lastSunday($y, '03') and $ms < $lastSunday($y, '10')) ? '+0100' : '+0000'
+  )};
+  $clock := function($ms) { $fromMillis($ms, '[H01]:[m01]', $offset($ms)) };
+
+  /* The SDK integration may return timestamps as epoch seconds or as ISO strings. */
+  $toMs := function($t) {
+    $type($t) = 'number' ? ($t > 100000000000 ? $t : $t * 1000) : $toMillis($t)
+  };
+  $series := function($id) {(
+    $r := $states.result.MetricDataResults[Id = $id][0];
+    {
+      'points': $merge($append([{}], $map($r.Timestamps, function($t, $i) {
+        { $string($round($toMs($t))): $r.Values[$i] }
+      }))),
+      'peak': $max($r.Values)
+    }
+  )};
+  $cols := [$series('bcpu'), $series('bmem'), $series('fcpu'), $series('fmem')];
+
+  /* Four digits right-aligned, then a flag column. Missing buckets show --. */
+  $cell := function($v) {
+    $exists($v) ? $pad($string($round($v)), -4) & ($v >= 80 ? '!' : ' ') : '  -- '
+  };
+  /* $pick returns a column's value, or nothing when the bucket has no datapoint. */
+  $line := function($label, $pick) {
+    $pad($label, 5) & $join($map($cols, function($c) { ' ' & $cell($pick($c)) }))
+  };
+
+  $rows := $map([0..($buckets - 1)], function($i) {(
+    $ms := $start + $i * $bucket;
+    $line($clock($ms), function($c) { $lookup($c.points, $string($ms)) })
+  )});
+
+  $table := [
+    'Time  B-CPU B-Mem F-CPU F-Mem',
+    $rows,
+    $line('Peak', function($c) { $c.peak })
+  ];
+
+  $string({
+    'version': '1.0',
+    'source': 'custom',
+    'content': {
+      'textType': 'client-markdown',
+      'title': '[' & $env & '] Task CPU and memory, ' & ($window / 60) & ' hours to ' & $clock($end) & ' (' & $interval & '-minute peaks, %)',
+      'description': '```\n' & $join($table, '\n') & '\n```\nB = Builder, F = Forge. ! marks 80% or more.'
+    }
+  })
+)

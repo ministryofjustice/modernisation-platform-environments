@@ -85,6 +85,10 @@ locals {
   # in a later apply than the one that creates the workspace and service account.
   grafana_bus            = local.enable_amg ? lookup(local.bus_by_workspace, terraform.workspace, {}) : {}
   manage_grafana_objects = length(local.grafana_bus) > 0
+  load_idc_group_ids     = local.manage_grafana_objects || (local.enable_amg && terraform.workspace == "cloud-platform-nonlive")
+
+  # Name of the per-BU query role created in each BU account by cluster-components.
+  bu_amp_query_role_name = "amg-amp-query"
 
   bu_permission = terraform.workspace == "cloud-platform-nonlive" ? "Edit" : "View"
 
@@ -93,7 +97,7 @@ locals {
   # source (ListGroups API); the singular data source's GetGroupId /
   # alternate_identifier path is denied for this role, and its filter{} block
   # was removed in AWS provider v6. Verified via spike (cloud-platform#8509).
-  idc_group_id_by_name = local.manage_grafana_objects ? {
+  idc_group_id_by_name = local.load_idc_group_ids ? {
     for g in data.aws_identitystore_groups.all[0].groups : g.display_name => g.group_id
   } : {}
 }
@@ -103,31 +107,32 @@ locals {
 #------------------------------------------------------------------------------
 
 data "aws_ssoadmin_instances" "this" {
-  count    = local.manage_grafana_objects ? 1 : 0
+  count    = local.load_idc_group_ids ? 1 : 0
   provider = aws.sso-readonly
 }
 
 data "aws_identitystore_groups" "all" {
-  count    = local.manage_grafana_objects ? 1 : 0
+  count    = local.load_idc_group_ids ? 1 : 0
   provider = aws.sso-readonly
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.this[0].identity_store_ids)[0]
 }
 
 #------------------------------------------------------------------------------
-# Per-BU AMP workspace lookup (by alias) to obtain the query endpoint
+# Per-BU AMP workspace ID
+#
+# The AMP workspace lives in the BU's own account, which the hub cannot list, so
+# the ID is read from an SSM parameter published by the BU's cluster-components
+# in core-shared-services-production (via the shared-configuration-access role).
+# cluster-components must therefore be applied on the BU's workspace before its
+# grafana_enabled flag is set.
 #------------------------------------------------------------------------------
 
-data "aws_prometheus_workspaces" "bu" {
+data "aws_ssm_parameter" "bu_amp_workspace_id" {
   for_each = local.grafana_bus
+  provider = aws.shared-configuration-access
 
-  alias_prefix = each.value.amp_workspace_alias
-}
-
-data "aws_prometheus_workspace" "bu" {
-  for_each = local.grafana_bus
-
-  workspace_id = one(data.aws_prometheus_workspaces.bu[each.key].workspace_ids)
+  name = "/${lower(local.vpc_name)}/cloud-platform/amp/${each.value.amp_workspace_alias}/workspace-id"
 }
 
 #------------------------------------------------------------------------------
@@ -158,8 +163,9 @@ resource "grafana_team_external_group" "bu" {
 # Per-BU AMP data source
 #
 # AMG v12+ uses the dedicated Amazon Managed Service for Prometheus plugin;
-# SigV4 is built in and signed with the AMG workspace's own IAM role, so no
-# credentials are configured here.
+# SigV4 is built in. The AMP workspace lives in the BU's own account, so the AMG
+# workspace role assumes that account's amg-amp-query role (created by
+# cluster-components) to query it.
 #------------------------------------------------------------------------------
 
 resource "grafana_data_source" "bu_amp" {
@@ -167,13 +173,15 @@ resource "grafana_data_source" "bu_amp" {
 
   type = "grafana-amazonprometheus-datasource"
   name = "amp-${each.key}"
-  url  = data.aws_prometheus_workspace.bu[each.key].prometheus_endpoint
+  url  = "https://aps-workspaces.${data.aws_region.current.region}.amazonaws.com/workspaces/${data.aws_ssm_parameter.bu_amp_workspace_id[each.key].value}"
 
   json_data_encoded = jsonencode({
     httpMethod    = "POST"
     sigV4Auth     = true
     sigV4AuthType = "ec2_iam_role"
     sigV4Region   = data.aws_region.current.region
+
+    sigV4AssumeRoleArn = "arn:aws:iam::${local.environment_management.account_ids[each.value.amp_workspace_alias]}:role/${local.bu_amp_query_role_name}"
   })
 }
 

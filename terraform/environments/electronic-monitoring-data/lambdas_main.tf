@@ -1721,3 +1721,24 @@ module "register_athena" {
     aws_lakeformation_permissions.api_int_table_level_perms,
   ]
 }
+
+module "trigger_cadt_daily_run" {
+  count                          = local.is-production || local.is-preproduction ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "trigger_cadt_daily_run"
+  image_name                     = "trigger_cadt_daily_run"
+  role_name                      = module.trigger_cadt_daily_run_iam_role.name
+  role_arn                       = module.trigger_cadt_daily_run_iam_role.arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    TRIGGER_CADT_URL = "https://${module.trigger_cadt_api.api_gateway_id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${module.trigger_cadt_api.resource_request_id}"
+  }
+}

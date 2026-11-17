@@ -25,14 +25,13 @@ module "lambda_notifier" {
   function_name = local.pattern_name
   role_name     = local.pattern_name
   description   = "Notify recipients in Slack with an authenticated file-transfer portal link"
-  runtime       = "python3.12"
+  runtime       = "python3.14"
   architectures = ["arm64"]
   handler       = "handler.lambda_handler"
   source_path   = [{ path = "${path.module}/lambda/notifier", patterns = ["!tests/.*", "!.*__pycache__/.*"] }]
   # Match the other delivery components: the content-derived package filename
   # tracks code changes without comparing rebuilt ZIP bytes during apply.
   ignore_source_code_hash           = true
-  trigger_on_package_timestamp      = false
   timeout                           = 900
   memory_size                       = 512
   cloudwatch_logs_retention_in_days = 90
