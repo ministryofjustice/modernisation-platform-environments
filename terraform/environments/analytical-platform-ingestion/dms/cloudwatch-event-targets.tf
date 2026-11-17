@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_event_target" "tariff_metadata_generator" {
-  rule      = aws_cloudwatch_event_rule.metadata_generator.name
+  rule      = aws_cloudwatch_event_rule.tariff_metadata_generator.name
   target_id = "tariff-metadata-generator"
   arn       = module.cica_dms_tariff_dms_implementation.metadata_generator_lambda_arn
 }

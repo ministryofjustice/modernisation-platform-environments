@@ -177,6 +177,9 @@ module "metadata_generator" {
   # Commit hash for v7.20.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=84dfbfddf9483bc56afa0aff516177c03652f0c7"
 
+  # Each module instance builds identical source; without this, parallel builds race on the same zip filename
+  hash_extra = var.db
+
   function_name           = "${var.db}-metadata-generator"
   description             = "Lambda to generate metadata for ${var.db} DMS data output"
   handler                 = "main.handler"
