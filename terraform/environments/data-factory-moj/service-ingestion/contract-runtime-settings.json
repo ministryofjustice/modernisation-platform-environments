@@ -99,6 +99,16 @@
         },
         {
           "Effect": "Allow",
+          "Action": "kms:Decrypt",
+          "Resource": "arn:aws:kms:eu-west-2:110695445580:key/a1d0c432-5563-4b74-b463-bd0f4458fdd8",
+          "Condition": {
+            "StringEquals": {
+              "kms:ViaService": "dynamodb.eu-west-2.amazonaws.com"
+            }
+          }
+        },
+        {
+          "Effect": "Allow",
           "Action": [
             "kms:GenerateDataKey"
           ],
@@ -206,6 +216,16 @@
             "arn:aws:kms:eu-west-2:110695445580:key/ef8c1a75-ce5a-4f62-b5e9-47b1251d89e0",
             "arn:aws:kms:eu-west-2:110695445580:key/645bbf6b-fb7c-433f-8981-7a35598dd798"
           ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": "kms:Decrypt",
+          "Resource": "arn:aws:kms:eu-west-2:110695445580:key/a1d0c432-5563-4b74-b463-bd0f4458fdd8",
+          "Condition": {
+            "StringEquals": {
+              "kms:ViaService": "dynamodb.eu-west-2.amazonaws.com"
+            }
+          }
         },
         {
           "Effect": "Allow",
