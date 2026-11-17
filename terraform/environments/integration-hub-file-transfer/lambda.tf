@@ -159,6 +159,7 @@ module "lambda_stage" {
   description                       = "Copies exact incoming object versions to processing for malware scanning"
   function_name                     = "${local.application_name}-stage"
   handler                           = "stage_lambda.lambda_handler"
+  hash_extra                        = "stage"
   ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
@@ -284,6 +285,7 @@ module "lambda_route" {
   description                       = "Routes exact processing object versions according to the current malware scan result"
   function_name                     = "${local.application_name}-route"
   handler                           = "route_lambda.lambda_handler"
+  hash_extra                        = "route"
   ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
