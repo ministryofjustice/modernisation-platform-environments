@@ -1,7 +1,7 @@
 module "schema_validation" {
   for_each = local.validation_deployments
 
-  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-validation?ref=13bf052ef105c3a01ce66254f2750332e7270c72"
+  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-validation?ref=081e94da70773b718899d598f5f6f1602510ee64"
 
   name         = "${local.validation_function_prefix}-${each.key}"
   image_uri    = each.value.image_uri
