@@ -31,7 +31,6 @@ module "lambda_custom_idp" {
   source_path                    = "lambda/custom-idp/idp_handler"
   timeout                        = 30
   tracing_mode                   = "Active"
-  trigger_on_package_timestamp   = false
 
   environment_variables = {
     LOGLEVEL                = local.custom_idp_configuration.log_level

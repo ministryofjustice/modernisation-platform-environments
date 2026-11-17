@@ -21,7 +21,6 @@ module "lambda_file_received_adapter" {
   source_path                       = "lambda/file-received-adapter"
   timeout                           = 30
   tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
 
   environment_variables = {
     EVENT_BUS_ARN              = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
@@ -88,7 +87,6 @@ module "lambda_file_scan_result_recorded_adapter" {
   source_path                       = "lambda/file-scan-result-recorded-adapter"
   timeout                           = 30
   tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
 
   environment_variables = {
     AWS_ACCOUNT_ID             = data.aws_caller_identity.current.account_id
@@ -167,7 +165,6 @@ module "lambda_stage" {
   source_path                       = "lambda/file-mover"
   timeout                           = 900
   tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
 
   environment_variables = {
     AWS_ACCOUNT_ID               = data.aws_caller_identity.current.account_id
@@ -292,7 +289,6 @@ module "lambda_route" {
   source_path                       = "lambda/file-mover"
   timeout                           = 900
   tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
 
   environment_variables = {
     AWS_ACCOUNT_ID               = data.aws_caller_identity.current.account_id
@@ -416,7 +412,6 @@ module "lambda_file_action_execution_requested_adapter" {
   source_path                       = "lambda/file-action-execution-requested-adapter"
   timeout                           = 30
   tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
 
   environment_variables = {
     DISPATCH_SECRET_NAME_PREFIX  = local.file_dispatch_secret_name_prefix

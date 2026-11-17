@@ -32,7 +32,6 @@ module "lambda_notifier" {
   # Match the other delivery components: the content-derived package filename
   # tracks code changes without comparing rebuilt ZIP bytes during apply.
   ignore_source_code_hash           = true
-  trigger_on_package_timestamp      = false
   timeout                           = 900
   memory_size                       = 512
   cloudwatch_logs_retention_in_days = 90
