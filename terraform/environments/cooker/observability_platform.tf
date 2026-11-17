@@ -11,6 +11,12 @@ module "observability_platform_tenant" {
 
   grafana_cloud = {
     stack = "development"
+    pdc_agent = {
+      # The test HTTPS server in network-test-infra.tf. Its subnet's CIDR is known at plan time, unlike its private IP
+      allowed_targets = [
+        { cidr_block = data.aws_subnet.private_subnets_a.cidr_block, port = 443 },
+      ]
+    }
   }
 
   tags = local.tags
