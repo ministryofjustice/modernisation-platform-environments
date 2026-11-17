@@ -6,12 +6,13 @@ locals {
 
   # One directory per load balancer.
   alb_access_log_prefixes = [
-    "ccms-ebs",       # ccms-ebs/ebsapps-alb.tf
-    "ccms-edrms",     # ccms-edrms/alb.tf
-    "ccms-opahub",    # ccms-oia/alb.tf
-    "ccms-connector", # ccms-oia/alb.tf
-    "ccms-adaptor",   # ccms-oia/alb.tf
-    "ccms-pui",       # ccms-pui/alb.tf
+    "ccms-ebs",          # ccms-ebs/ebsapps-alb.tf
+    "ccms-edrms",        # ccms-edrms/alb.tf
+    "ccms-fin-transfer", # ccms-file-transfer/alb.tf
+    "ccms-opahub",       # ccms-oia/alb.tf
+    "ccms-connector",    # ccms-oia/alb.tf
+    "ccms-adaptor",      # ccms-oia/alb.tf
+    "ccms-pui",          # ccms-pui/alb.tf
   ]
 
   # NLBs only write access logs for TLS listeners

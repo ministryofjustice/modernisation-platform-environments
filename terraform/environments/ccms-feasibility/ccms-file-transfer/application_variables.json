@@ -1,0 +1,25 @@
+{
+  "accounts": {
+    "development": {
+      "ami_image_id": "ami-0ff750c02625633f5",
+      "root_volume_size": 30,
+
+      "ec2_instance_type": "m5.large",
+      "ec2_min_capacity": 1,
+      "ec2_max_capacity": 2,
+      "ec2_desired_capacity": 1,
+
+      "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-financial-transfers",
+      "container_version": "financial-transfers-api-0.0.6-development",
+      "app_count": 1,
+      "api_server_port": 8443,
+      "container_cpu": 1024,
+      "container_memory": 3072,
+      "logging_level_root": "info",
+      "logging_level_uk_gov_laa_ccms": "debug",
+
+      "alb_deletion_protection": true,
+      "aws_workspace": "10.200.0.0/19"
+    }
+  }
+}
