@@ -14,18 +14,11 @@ locals {
   # Must match the name of the agent execution role created by the tenant module.
   gc_pdc_agent_execution_role_name = "grafana-pdc-agent-execution"
 
-  # Account name => account ID, for the tenant accounts that run PDC agents. Must match the tenant
-  # module's `grafana_cloud.pdc_agent.enabled`, which defaults to true. An account can belong to only
-  # one tenant; Terraform fails on a duplicate key.
+  # Account name => account ID, for the tenant accounts that run PDC agents. `pdc_enabled` must
+  # match the tenant module's `grafana_cloud.pdc_agent.enabled`; both default to true.
   gc_pdc_accounts = {
-    for account in flatten([
-      for tenant in values(local.environment_configuration_gc.tenant_configuration) : [
-        for account_name, account_config in tenant.aws_accounts : {
-          name        = account_name
-          pdc_enabled = lookup(account_config, "pdc_enabled", true)
-        }
-      ]
-    ]) : account.name => local.all_account_ids[account.name] if account.pdc_enabled
+    for account_name, account in local.gc_accounts :
+    account_name => local.all_account_ids[account_name] if account.pdc_enabled
   }
 
   # Trust the tenant account, restricted to the agent execution role. The role is matched by ARN in a
