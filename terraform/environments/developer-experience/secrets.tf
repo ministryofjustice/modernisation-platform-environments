@@ -7,6 +7,7 @@ module "cloud_platform_live_1_secret" {
     cluster_name           = "live-1"
     cluster_endpoint       = "CHANGEME"
     cluster_ca_certificate = "CHANGEME"
+    cluster_oidc           = "CHANGEME"
   })
 
   ignore_secret_changes = true
