@@ -1,4 +1,4 @@
-# Business Central inbound bucket. Files land in <base path>/inbound, trigger the process-file Lambda,
+# Business Central inbound bucket. Files land in <base path>/inbound, trigger the process-file Lambda (lambda.tf),
 # and are moved to archive/ or error/ by the Financial Transfers API.
 
 module "s3_bc_inbound" {
@@ -83,16 +83,4 @@ resource "aws_s3_object" "bc_inbound_folders" {
 
   bucket = module.s3_bc_inbound.bucket.id
   key    = "${each.value}/"
-}
-
-resource "aws_s3_bucket_notification" "bc_inbound" {
-  bucket = module.s3_bc_inbound.bucket.id
-
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.process_file_from_bucket.arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "${local.bc_bucket_base_path}/inbound/"
-  }
-
-  depends_on = [aws_lambda_permission.allow_s3_invoke]
 }

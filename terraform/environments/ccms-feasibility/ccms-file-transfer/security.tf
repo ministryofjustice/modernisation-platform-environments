@@ -80,28 +80,6 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_ebsdb" {
   referenced_security_group_id = data.aws_security_group.ebsdb.id
 }
 
-# Process File From Bucket Lambda Security Group
-
-resource "aws_security_group" "process_file_lambda" {
-  name        = "${local.component_name}-${local.env_label}-process-file-lambda-sg"
-  description = "Controls access from the process file from bucket Lambda"
-  vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(local.tags, {
-    Name = "${local.component_name}-${local.env_label}-process-file-lambda-sg"
-  })
-}
-
-# Financial Transfers API via its ALB, Secrets Manager and the Slack webhook
-resource "aws_vpc_security_group_egress_rule" "process_file_lambda_egress_https" {
-  security_group_id = aws_security_group.process_file_lambda.id
-  description       = "Allow outbound HTTPS"
-  ip_protocol       = "tcp"
-  from_port         = 443
-  to_port           = 443
-  cidr_ipv4         = "0.0.0.0/0"
-}
-
 # Cluster EC2 Security Group (the underlying hosts)
 
 resource "aws_security_group" "cluster_ec2" {
