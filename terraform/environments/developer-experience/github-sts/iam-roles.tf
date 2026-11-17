@@ -16,7 +16,7 @@ module "cloud_platform_eso_iam_role" {
     KMSAccess = {
       effect    = "Allow"
       actions   = ["kms:Decrypt"]
-      resources = [module.kms_key.arn]
+      resources = [module.kms_key.key_arn]
     }
     SecretsManagerAccess = {
       effect    = "Allow"
