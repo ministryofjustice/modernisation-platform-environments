@@ -1,4 +1,4 @@
-local {
+locals {
     compliance_accounts = local.is-development || local.is-test ? 1 : 0
 }
 module "compliance_role" {
