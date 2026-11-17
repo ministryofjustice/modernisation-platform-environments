@@ -112,7 +112,7 @@ resource "aws_security_group_rule" "ingress_managed_9514_avd" {
   from_port         = 9514
   to_port           = 9514
   protocol          = "tcp"
-  cidr_blocks       = [local.avd_poc_cidr_blocks]
+  cidr_blocks       = local.avd_poc_cidr_blocks
 }
 
 ######################################
@@ -187,6 +187,6 @@ resource "aws_security_group_rule" "egress_managed_9514_avd" {
   from_port         = 9514
   to_port           = 9514
   protocol          = "tcp"
-  cidr_blocks       = [local.avd_poc_cidr_blocks]
+  cidr_blocks       = local.avd_poc_cidr_blocks
 }
 
