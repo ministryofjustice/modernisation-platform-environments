@@ -5,23 +5,10 @@ locals {
   )
 
   dms_alert_input_paths = {
-    category = "$.detail.category"
-    event    = "$.detail.eventType"
-    message  = "$.detail.detailMessage"
-    resource = "$.resources[0]"
-    time     = "$.time"
+    event   = "$.detail.eventType"
+    message = "$.detail.detailMessage"
+    link    = "$.detail.resourceLink"
   }
-
-  dms_alert_input_template = <<TEMPLATE
-{
-  "SourceDB": "${var.db}",
-  "Category": "<category>",
-  "Event":    "<event>",
-  "Resource": "<resource>",
-  "Message":  "<message>",
-  "Time":     "<time>"
-}
-TEMPLATE
 }
 
 module "sns_kms" {
@@ -98,7 +85,7 @@ resource "aws_sns_topic_subscription" "slack" {
   endpoint  = data.aws_secretsmanager_secret_version.slack_webhook[0].secret_string
 }
 
-# Started / stopped / reload / reading paused+resumed / deleted
+# Started / stopped / reload / reading paused+resumed / deleted; DMS auto-retry "resume" starts are skipped
 resource "aws_cloudwatch_event_rule" "dms_task_events" {
   name        = "${var.db}-dms-task-events"
   description = "DMS replication task state changes for ${var.db}"
@@ -108,13 +95,15 @@ resource "aws_cloudwatch_event_rule" "dms_task_events" {
     "detail-type" = ["DMS Replication Task State Change"]
     resources     = local.dms_alert_task_arns
     detail = {
-      category = ["StateChange", "Deletion"]
+      category      = ["StateChange", "Deletion"]
+      detailMessage = [{ "anything-but" = { wildcard = "*resume*" } }]
     }
   })
 
   tags = var.tags
 }
 
+# RECOVERABLE failures are skipped: DMS retries them and sends a FATAL failure if retries run out
 resource "aws_cloudwatch_event_rule" "dms_task_events_by_category" {
   name        = "${var.db}-dms-task-events-by-category"
   description = "DMS replication task creation/config/failure events for ${var.db}"
@@ -124,7 +113,8 @@ resource "aws_cloudwatch_event_rule" "dms_task_events_by_category" {
     "detail-type" = ["DMS Replication Task State Change"]
     resources     = local.dms_alert_task_arns
     detail = {
-      category = ["Creation", "ConfigurationChange", "Failure"]
+      category      = ["Creation", "ConfigurationChange", "Failure"]
+      detailMessage = [{ "anything-but" = { wildcard = "*Error Level RECOVERABLE*" } }]
     }
   })
 
@@ -151,7 +141,10 @@ resource "aws_cloudwatch_event_target" "dms_task_events" {
 
   input_transformer {
     input_paths    = local.dms_alert_input_paths
-    input_template = local.dms_alert_input_template
+    input_template = <<TEMPLATE
+"ℹ️ ${var.db}: <event>"
+"<message>"
+TEMPLATE
   }
 }
 
@@ -162,7 +155,11 @@ resource "aws_cloudwatch_event_target" "dms_task_events_by_category" {
 
   input_transformer {
     input_paths    = local.dms_alert_input_paths
-    input_template = local.dms_alert_input_template
+    input_template = <<TEMPLATE
+"🚨 ${var.db}: <event>"
+"<message>"
+"<link>"
+TEMPLATE
   }
 }
 
@@ -173,6 +170,9 @@ resource "aws_cloudwatch_event_target" "dms_instance_events" {
 
   input_transformer {
     input_paths    = local.dms_alert_input_paths
-    input_template = local.dms_alert_input_template
+    input_template = <<TEMPLATE
+"⚙️ ${var.db} replication instance: <event>"
+"<message>"
+TEMPLATE
   }
 }

@@ -182,6 +182,82 @@ the sign-in loop rather than working access.
 
 <!-- Describe any conditions which restrict access to the service, such as if it’s IP-restricted or only accessible from a private network.-->
 
+#### ECS task CPU and memory settings
+
+Builder and Forge task sizes and the Forge capacity limits are set per environment in
+`web-ui/application_variables.json`. The `web-ui` root reads that file, not the
+`application_variables.json` in this folder (which `backend-processing` reads). The values are
+read without fallbacks, so a missing key fails the plan.
+
+| Key | Used by | Effect | development / test | production |
+| --- | --- | --- | --- | --- |
+| `builder_task_cpu` | Builder task definition | Fargate CPU units | 512 | 2048 |
+| `builder_task_memory` | Builder task definition | Fargate memory (MiB) | 1024 | 4096 |
+| `forge_task_cpu` | Forge task definition | Fargate CPU units | 2048 | 2048 |
+| `forge_task_memory` | Forge task definition | Fargate memory (MiB); also sets the Node heap | 8192 | 8192 |
+| `forge_max_builds_in_memory` | Forge `FORGE_MAX_BUILDS_IN_MEMORY` | Builds kept in memory before the least recently used is evicted | 200 | 200 |
+| `forge_design_check_concurrency` | Forge `DESIGN_CHECK_CONCURRENCY` | Chromium design checks that run at once; the rest queue | 3 | 3 |
+| `forge_design_check_queue_timeout_ms` | Forge `DESIGN_CHECK_QUEUE_TIMEOUT_MS` | Time a design check may wait in the queue | 120000 | 120000 |
+
+- The Forge Node heap (`NODE_OPTIONS=--max-old-space-size`) is derived in `forge-journey-lab.tf`
+  as 75% of `forge_task_memory`, so it follows the memory setting.
+- Fargate only accepts certain CPU and memory pairs, and Terraform does not check them. For
+  example 2048 CPU requires 4096 to 16384 MiB.
+- Forge runs as a single task. Sessions and build state live in the task and on EFS, so it
+  cannot be scaled out horizontally; increase these values instead. Builder holds no
+  server-side session state.
+- A Builder change takes effect once the `web-ui` plan is applied in that environment. Confirm
+  the plan shows a new task definition revision for the service.
+- The Forge service ignores `task_definition` changes (`forge-journey-lab.tf`) so an apply can
+  never move it back to an older revision or image. A Forge size or environment change
+  therefore applies in two steps:
+  1. Apply `web-ui`. It registers a new `forge-journey-lab` revision but leaves the service on
+     its current one.
+  2. Run the Forge deploy (`deploy-ecs.yml` in the application repository). It clones the
+     latest revision of the family, so it picks up Terraform's CPU, memory and environment,
+     swaps in the new image and moves the service. This restarts Forge and ends active sessions.
+- The image tag is held in the SSM parameter
+  `/modernisation-platform-ai-builder-core/forge/container-image-tag` (`web-ui/parameters.tf`).
+  Terraform creates it once from `forge_container_image_tag` and then ignores its value. The
+  deploy workflow writes the tag it deployed, and Terraform reads it, so Terraform-registered
+  revisions always carry the deployed image. This is the same pattern as the script-runner
+  image tag in `backend-processing/parameters.tf`.
+- To check a Forge size, look at the task definition revision the service is running, not only
+  the newest revision of the family.
+
+### **Scheduled environment wipe (development and test only):**
+
+The `<application>-wipe-environment` state machine (`backend-processing/step_functions_wipe_environment.tf`,
+built with `modules/step_function_builder`) deletes all data so the environment is clean again. It runs
+`scripts/maintenance/wipe_environment.py` from the application repository in a dedicated script-runner task.
+
+- **Settings**, in the root `application_variables.json` under the environment:
+
+  | Key | Meaning |
+  | --- | --- |
+  | `environment_wipe_enabled` | `true` turns the schedule on; `false` creates it disabled (it can still be started by hand) |
+  | `environment_wipe_schedule` | EventBridge cron expression with six fields, evaluated in UK time, e.g. `cron(0 2 ? * SUN *)` (Sundays 02:00) or `cron(0 2 ? * MON-FRI *)` (weekdays 02:00) |
+  | `environment_wipe_efs` | `true` also empties the web UI file system (Builder and Forge files) |
+
+  Development is set to Sundays at 02:00 and test to every night at 02:00 (`cron(0 2 * * ? *)`), both with the file system included. **Preproduction and
+  production have none of these keys, so nothing is created there.** The plan fails if the keys are
+  added to those environments, and the script refuses to run unless `ENVIRONMENT` is `development`
+  or `test`.
+- **What it does**, in order: scales Builder and Forge to zero; stops running executions of the
+  other state machines; deletes all prototype resources (ECS services, task definitions, target
+  groups, listener rules, log groups, tables, DNS records); deletes every item in every other
+  DynamoDB table (including the build counters, so numbering restarts at 1), every image in the
+  user-applications ECR repository and every S3 object version in the staging bucket; purges the
+  approval dead-letter queue; empties the file system (top-level directories are kept); then
+  restores Builder and Forge to their previous task counts, also when a step fails. Builder and
+  Forge are down for the duration.
+- The shared script-runner image in `modernisation-platform-ai-builder-core` is not touched.
+- The script is baked into the script-runner image, so after changing it run the
+  `script-runner-image-build` workflow. It registers a new revision of the wipe task definition
+  where the family exists and skips it where it does not (production).
+- Run it by hand with Start execution on the state machine (input `{}`). Alerts for a failed
+  wipe come from the common state-machine failure alarm.
+
 ### **How to resolve specific issues:**
 
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
