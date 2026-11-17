@@ -128,7 +128,7 @@ variable "container_image_tag" {
 
 variable "forge_container_image_tag" {
   type        = string
-  description = "Image tag to run for the Forge Journey Lab container, pulled from the same shared-services ECR repository as the UI image. Forge continues to ignore service task_definition changes and uses CI/CD for image deployment, separately from the Terraform-managed UI configuration."
+  description = "Bootstrap image tag for the Forge Journey Lab container, used only to create the SSM parameter (parameters.tf). The deploy workflow then owns the live tag in that parameter, and Terraform reads it. Forge continues to ignore service task_definition changes and uses CI/CD for image deployment."
   default     = "forge-build-latest"
 }
 
