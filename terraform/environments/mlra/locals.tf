@@ -12,8 +12,7 @@ locals {
 
   alb_security_group_id = module.alb.security_group.id
 
-  # TODO LASB-5089 rename to user_data
-  user_data_al2023 = base64encode(templatefile("user_data_al2023.sh", {
+  user_data = base64encode(templatefile("user_data.sh", {
     app_name    = local.application_name,
     environment = local.environment,
     xdr_dir     = "/tmp/cortex-agent",
