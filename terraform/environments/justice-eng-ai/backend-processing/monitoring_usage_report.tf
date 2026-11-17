@@ -1,4 +1,4 @@
-# Twice-daily Slack post of the last 4 hours of Builder and Forge CPU and memory,
+# Twice-daily Slack post of the last 5 hours of Builder and Forge CPU and memory,
 # one row per interval (15 minutes by default). A state machine reads the ECS service metrics and posts
 # the table to the job-completion topic, which Chatbot delivers to slack_channel_id.
 # The table is built in usage_report.jsonata (JSONata), so no Lambda is needed.
@@ -10,9 +10,10 @@ locals {
   usage_report_name    = "${local.application_name}-usage-report"
   usage_report_enabled = try(local.application_data.accounts[local.environment].usage_report_enabled, false)
 
-  # Minutes per row. The 4-hour window is split into rows of this length, so it must
-  # divide 240. Smaller values give more rows and a longer Slack message.
-  usage_report_window_minutes   = 240
+  # Minutes per row. The 5-hour window is split into rows of this length, so it must
+  # divide 300. Smaller values give more rows and a longer Slack message. The 12:00
+  # and 17:00 runs then cover 07:00 to 12:00 and 12:00 to 17:00 with no gap.
+  usage_report_window_minutes   = 300
   usage_report_interval_minutes = try(local.application_data.accounts[local.environment].usage_report_interval_minutes, 15)
   usage_report_interval_ms      = local.usage_report_interval_minutes * 60000
 
@@ -52,7 +53,7 @@ locals {
   ])
 
   usage_report_definition = {
-    Comment       = "Posts the last 4 hours of Builder and Forge CPU and memory peaks, in fixed-length buckets, to Slack."
+    Comment       = "Posts the last 5 hours of Builder and Forge CPU and memory peaks, in fixed-length buckets, to Slack."
     QueryLanguage = "JSONata"
     StartAt       = "get_metrics"
     States = {
@@ -261,7 +262,7 @@ resource "aws_scheduler_schedule" "usage_report" {
   count = local.usage_report_create ? 1 : 0
 
   name                         = local.usage_report_name
-  description                  = "Posts the last 4 hours of Builder and Forge CPU and memory to Slack."
+  description                  = "Posts the last 5 hours of Builder and Forge CPU and memory to Slack."
   schedule_expression          = local.usage_report_schedule
   schedule_expression_timezone = "Europe/London"
   state                        = local.usage_report_enabled ? "ENABLED" : "DISABLED"
