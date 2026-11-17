@@ -5,7 +5,7 @@ module "observability_platform_tenant" {
   count = local.is-development ? 1 : 0
 
   # Draft ministryofjustice/terraform-aws-observability-platform-tenant#126
-  source = "github.com/ministryofjustice/terraform-aws-observability-platform-tenant?ref=a7d9e3ef30d2abfd7d80c3faa1e8718fd196dfcc"
+  source = "github.com/ministryofjustice/terraform-aws-observability-platform-tenant?ref=bb733ea58ebd2157ee02216142e37427d221d02e"
 
   observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
 
