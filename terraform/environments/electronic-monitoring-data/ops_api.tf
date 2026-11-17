@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------
 
 locals {
-  ops_api_optional_routes_enabled = (
+  ops_api_p1_ears_sars_routes_enabled = (
     local.is-development || local.is-preproduction || local.is-production
   )
   ops_api_stage_name = "v1"
@@ -34,9 +34,9 @@ locals {
     }
     ears_sars = {
       path    = "ears-sars"
-      enabled = local.ops_api_optional_routes_enabled
+      enabled = local.ops_api_p1_ears_sars_routes_enabled
       state_machine_arn = (
-        local.ops_api_optional_routes_enabled
+        local.ops_api_p1_ears_sars_routes_enabled
         ? module.ears_sars_step_function[0].arn
         : ""
       )
@@ -105,7 +105,7 @@ locals {
     name => route if route.status_enabled
   }
 
-  ops_api_p1_routes = local.ops_api_optional_routes_enabled ? toset([
+  ops_api_p1_routes = local.ops_api_p1_ears_sars_routes_enabled ? toset([
     "add",
     "remove",
   ]) : toset([])
@@ -192,7 +192,7 @@ data "aws_iam_policy_document" "ops_api" {
   }
 
   dynamic "statement" {
-    for_each = local.ops_api_optional_routes_enabled ? [1] : []
+    for_each = local.ops_api_p1_ears_sars_routes_enabled ? [1] : []
 
     content {
       sid    = "AllowP1ExportRequests"
@@ -309,7 +309,7 @@ resource "aws_api_gateway_method" "ops_api_status" {
 }
 
 resource "aws_api_gateway_model" "ops_api_p1" {
-  count        = local.ops_api_optional_routes_enabled ? 1 : 0
+  count        = local.ops_api_p1_ears_sars_routes_enabled ? 1 : 0
   rest_api_id  = aws_api_gateway_rest_api.ops_api.id
   name         = "OpsApiP1ExportModel"
   content_type = "application/json"
@@ -368,7 +368,7 @@ data "aws_iam_policy_document" "ops_api_integrations" {
     actions = ["states:StartExecution"]
     resources = compact([
       module.trigger_cadt_step_function.arn,
-      local.ops_api_optional_routes_enabled ? module.ears_sars_step_function[0].arn : null,
+      local.ops_api_p1_ears_sars_routes_enabled ? module.ears_sars_step_function[0].arn : null,
     ])
   }
 
@@ -377,12 +377,12 @@ data "aws_iam_policy_document" "ops_api_integrations" {
     actions = ["states:DescribeExecution"]
     resources = compact([
       "${replace(module.trigger_cadt_step_function.arn, "stateMachine", "execution")}:*",
-      local.ops_api_optional_routes_enabled ? "${replace(module.ears_sars_step_function[0].arn, "stateMachine", "execution")}:*" : null,
+      local.ops_api_p1_ears_sars_routes_enabled ? "${replace(module.ears_sars_step_function[0].arn, "stateMachine", "execution")}:*" : null,
     ])
   }
 
   dynamic "statement" {
-    for_each = local.ops_api_optional_routes_enabled ? [1] : []
+    for_each = local.ops_api_p1_ears_sars_routes_enabled ? [1] : []
 
     content {
       effect    = "Allow"
@@ -742,21 +742,3 @@ resource "aws_wafv2_web_acl_logging_configuration" "ops_api" {
   ]
 }
 
-# ------------------------------------------------------------------------------
-# Outputs
-# ------------------------------------------------------------------------------
-
-output "ops_api_id" {
-  description = "ID of the central operational API Gateway."
-  value       = aws_api_gateway_rest_api.ops_api.id
-}
-
-output "ops_api_base_url" {
-  description = "Base URL for the central operational API Gateway."
-  value = format(
-    "https://%s.execute-api.%s.amazonaws.com/%s",
-    aws_api_gateway_rest_api.ops_api.id,
-    data.aws_region.current.name,
-    aws_api_gateway_stage.ops_api.stage_name,
-  )
-}
