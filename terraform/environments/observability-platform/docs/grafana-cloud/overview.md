@@ -335,6 +335,17 @@ Complete these before any account pushes real data:
   removing their attributes but not their names, IDs, timings or status. Ask
   Grafana Support to use the Spans or Error redaction mode, which removes those
   spans or rejects the query.
+- **Confirm traces LBAC is enabled and enforced** on each stack before any
+  account in it pushes real traces. Traces LBAC needs Grafana's
+  `teamHttpHeadersTempo` feature toggle, which is experimental and off by
+  default. If the toggle is off, Grafana may keep the `shared-traces` rules
+  without applying them, and every team with Query on `shared-traces` would see
+  every account's traces: traces fail open, unlike metrics and logs, which fail
+  closed until the label is promoted. In development, step 2 of
+  [Testing in development](#testing-in-development) is the definitive check.
+  For production, rely on Grafana Support: ask them to confirm, or enable,
+  traces LBAC on both the development and production stacks. This can go in
+  the same ticket as the redaction mode.
 - **Check the built-in data sources** are admin-only after the first apply, and
   stay that way.
 - **Check the Grafana Cloud plan** includes team LBAC for Metrics, Logs and
@@ -389,8 +400,10 @@ platform team can test the whole path before the gateway exists:
 
 2. As a member of the `observability-platform` team, check that `shared-traces`
    shows only sprinkler's traces, and the built-in traces data source shows
-   both. `shared-metrics` and `shared-logs` show nothing until the label is
-   promoted, and then only sprinkler's data.
+   both. If `shared-traces` also shows the `000000000000` traces, traces LBAC
+   isn't enforced, and no production team may get Query on `shared-traces`
+   until it is. `shared-metrics` and `shared-logs` show nothing until the label
+   is promoted, and then only sprinkler's data.
 3. As a Viewer who isn't in a tenant team, check that you can't query the shared
    or built-in data sources.
 4. To check that the token can only write its signals, remove one from
