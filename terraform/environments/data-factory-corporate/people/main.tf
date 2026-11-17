@@ -33,6 +33,11 @@ module "data_platform_airflow_iam_role" {
       Statement = [
         {
           Effect   = "Allow"
+          Action   = ["s3:ListAllMyBuckets"]
+          Resource = "*"
+        },
+        {
+          Effect   = "Allow"
           Action   = ["s3:ListBucket"]
           Resource = module.sherlock_landing_bucket_mp.bucket.arn
         },
