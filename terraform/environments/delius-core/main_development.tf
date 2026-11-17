@@ -31,6 +31,7 @@ module "environment_dev" {
   db_config                    = local.db_config_dev
   create_account_service_roles = true
   create_ecs_lambda            = true
+  enable_xsiam_cloudwatch_logs = true
 
   delius_microservice_configs = local.delius_microservices_configs_dev
   enable_autoscaling_schedule = true

@@ -309,3 +309,17 @@ module "ecs_nightly_restart_weblogic" {
   service_arn  = local.weblogic_service_arn
   task_count   = data.aws_ssm_parameter.weblogic_task_count.value
 }
+
+module "xsiam_cloudwatch_logs"  {
+  count  = var.enable_xsiam_cloudwatch_logs ? 1 : 0
+  source = "../components/xsiam"
+
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+
+  env_name      = var.env_name
+  app_name      = var.app_name
+  log_group_name = "delius-core-${var.env_name}-weblogic"
+  log_stream_name = "delius-core-${var.env_name}-weblogic/access_log"
+}
