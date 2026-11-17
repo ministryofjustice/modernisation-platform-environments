@@ -600,3 +600,57 @@ models:
       generally_available: false
       environments_available: ["development", "production"]
       health_check_mode: "responses"
+    gpt-5-6-sol:
+      model_id: "gpt-5.6-sol"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.6 Sol"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-6-sol:
+      model_id: "gpt-6-sol"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 6 Sol"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-6-1-sol:
+      model_id: "gpt-6.1-sol"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 6.1 Sol"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-6-luna:
+      model_id: "gpt-6-luna"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 6 Luna"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-6-1-terra:
+      model_id: "gpt-6.1-terra"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 6.1 Terra"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-6-astra:
+      model_id: "gpt-6-astra"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 6 Astra"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
