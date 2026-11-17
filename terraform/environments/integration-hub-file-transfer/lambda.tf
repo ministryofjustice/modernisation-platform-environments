@@ -13,6 +13,7 @@ module "lambda_file_received_adapter" {
   description                       = "Transforms incoming S3 Object Created notifications into FileReceived.v1 events"
   function_name                     = "${local.application_name}-file-received-adapter"
   handler                           = "lambda_function.lambda_handler"
+  ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
   memory_size                       = 128
@@ -79,6 +80,7 @@ module "lambda_file_scan_result_recorded_adapter" {
   description                       = "Transforms GuardDuty malware scan results into FileScanResultRecorded.v1 events"
   function_name                     = "${local.application_name}-file-scan-result-recorded-adapter"
   handler                           = "lambda_function.lambda_handler"
+  ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
   memory_size                       = 128
@@ -157,6 +159,7 @@ module "lambda_stage" {
   description                       = "Copies exact incoming object versions to processing for malware scanning"
   function_name                     = "${local.application_name}-stage"
   handler                           = "stage_lambda.lambda_handler"
+  ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
   memory_size                       = 1024
@@ -281,6 +284,7 @@ module "lambda_route" {
   description                       = "Routes exact processing object versions according to the current malware scan result"
   function_name                     = "${local.application_name}-route"
   handler                           = "route_lambda.lambda_handler"
+  ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
   memory_size                       = 1024
@@ -404,6 +408,7 @@ module "lambda_file_action_execution_requested_adapter" {
   description                       = "Transforms configured FileRouted.v1 events into FileActionExecutionRequested.v1 events"
   function_name                     = "file-action-execution-requested-adapter"
   handler                           = "lambda_function.lambda_handler"
+  ignore_source_code_hash           = true
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
   memory_size                       = 128
