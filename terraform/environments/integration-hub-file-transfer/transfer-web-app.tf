@@ -24,12 +24,14 @@ resource "aws_transfer_web_app" "this" {
 }
 
 resource "aws_s3control_access_grants_instance" "this" {
+  account_id          = data.aws_caller_identity.current.account_id
   identity_center_arn = one(data.aws_ssoadmin_instances.this.arns)
 }
 
 resource "aws_s3control_access_grants_location" "incoming" {
   depends_on = [aws_s3control_access_grants_instance.this]
 
+  account_id     = data.aws_caller_identity.current.account_id
   iam_role_arn   = module.iam_role_s3_access_grants_location.arn
   location_scope = "s3://${module.s3_bucket["incoming"].s3_bucket_id}"
 }
@@ -37,6 +39,7 @@ resource "aws_s3control_access_grants_location" "incoming" {
 resource "aws_s3control_access_grant" "incoming_uploaders" {
   for_each = data.aws_identitystore_group.this
 
+  account_id                = data.aws_caller_identity.current.account_id
   access_grants_location_id = aws_s3control_access_grants_location.incoming.access_grants_location_id
   permission                = "READWRITE"
 
