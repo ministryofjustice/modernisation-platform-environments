@@ -191,7 +191,7 @@ resource "aws_lb_target_group" "managed_alb_http" {
     unhealthy_threshold = 3
   }
 
-  depends_on = [ "aws_lb.http_redirect_managed_alb"]
+  depends_on = [ aws_lb.http_redirect_managed_alb ]
 }
 
 resource "aws_lb_target_group_attachment" "nlb_to_alb_target_group_attachment" {
