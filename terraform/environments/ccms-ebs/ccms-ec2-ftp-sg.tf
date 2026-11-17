@@ -41,6 +41,71 @@ data "aws_secretsmanager_secret_version" "secrets" {
   secret_id = "${each.value}-${local.environment}"
 }
 
+# Data sources for Lambda FTP security groups
+data "aws_security_group" "lambda_ftp_allpay_outbound_sg" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "group-name"
+    values = ["${lower(format("LAA-ftp-allpay-outbound-ccms-%s", local.environment))}-sg"]
+  }
+}
+
+data "aws_security_group" "lambda_ftp_allpay_inbound_sg" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "group-name"
+    values = ["${lower(format("LAA-ftp-allpay-inbound-ccms-%s", local.environment))}-sg"]
+  }
+}
+
+data "aws_security_group" "lambda_ftp_xerox_outbound_sg" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "group-name"
+    values = ["${lower(format("LAA-ftp-xerox-ccms-outbound-%s", local.environment))}-sg"]
+  }
+}
+
+data "aws_security_group" "lambda_ftp_xerox_peterborough_sg" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "group-name"
+    values = ["${lower(format("LAA-ftp-xerox-ccms-outbound-peterborough-%s", local.environment))}-sg"]
+  }
+}
+
+data "aws_security_group" "lambda_ftp_eckoh_outbound_sg" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "group-name"
+    values = ["${lower(format("LAA-ftp-eckoh-outbound-ccms-%s", local.environment))}-sg"]
+  }
+}
+
+data "aws_security_group" "lambda_ftp_eckoh_inbound_sg" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "group-name"
+    values = ["${lower(format("LAA-ftp-eckoh-inbound-ccms-%s", local.environment))}-sg"]
+  }
+}
+
+data "aws_security_group" "lambda_ftp_rossendales_sg" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "group-name"
+    values = ["${lower(format("LAA-ftp-rossendales-ccms-inbound-%s", local.environment))}-sg"]
+  }
+}
+
+data "aws_security_group" "lambda_ftp_1stlocate_sg" {
+  vpc_id = data.aws_vpc.shared.id
+  filter {
+    name   = "group-name"
+    values = ["${lower(format("LAA-ftp-1stlocate-ccms-inbound-%s", local.environment))}-sg"]
+  }
+}
+
 
 # Security Group for FTP Server
 
@@ -94,32 +159,21 @@ resource "aws_security_group" "ec2_sg_ftp" {
 #   local.application_data.accounts[local.environment].lz_aws_subnet_env]
 # }
 
-resource "aws_security_group_rule" "ingress_private_traffic_lambda" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "ingress"
-  description       = "allow all tcp traffic from lambda"
-  protocol          = "TCP"
-  from_port         = 0
-  to_port           = 65535
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
-
-resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "ingress"
-  description       = "allow all tcp traffic from ebsdb"
-  protocol          = "TCP"
-  from_port         = 0
-  to_port           = 65535
-  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
-}
-
 resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_443" {
   security_group_id            = aws_security_group.ec2_sg_ftp.id
-  description                  = "Allow ingress from lambda security group on port 443"
+  description                  = "Allow ingress from lambda security group on port 22"
   ip_protocol                  = "tcp"
-  from_port                    = 443
-  to_port                      = 443
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = data.aws_security_group.lambda_security_group.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_8022" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from lambda security group on port 22"
+  ip_protocol                  = "tcp"
+  from_port                    = 8022
+  to_port                      = 8022
   referenced_security_group_id = data.aws_security_group.lambda_security_group.id
 }
 
@@ -134,11 +188,155 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_ebsdb_22" {
 
 resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_ftp_1521_1522" {
   security_group_id            = aws_security_group.ec2_sg_ftp.id
-  description                  = "Allow ingress from FTP security group on ports 1521-1522"
+  description                  = "Allow ingress from EBS DB security group on ports 1521-1522"
   ip_protocol                  = "tcp"
   from_port                    = 1521
   to_port                      = 1522
-  referenced_security_group_id = aws_security_group.ec2_sg_ftp.id
+  referenced_security_group_id = aws_security_group.ec2_sg_ebsdb.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_allpay_outbound_8022" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP allpay outbound lambda on port 8022"
+  ip_protocol                  = "tcp"
+  from_port                    = 8022
+  to_port                      = 8022
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_allpay_outbound_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_allpay_inbound_8022" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP allpay inbound lambda on port 8022"
+  ip_protocol                  = "tcp"
+  from_port                    = 8022
+  to_port                      = 8022
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_allpay_inbound_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_xerox_outbound_8022" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP xerox outbound lambda on port 8022"
+  ip_protocol                  = "tcp"
+  from_port                    = 8022
+  to_port                      = 8022
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_xerox_outbound_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_xerox_peterborough_8022" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP xerox peterborough lambda on port 8022"
+  ip_protocol                  = "tcp"
+  from_port                    = 8022
+  to_port                      = 8022
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_xerox_peterborough_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_eckoh_outbound_8022" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP eckoh outbound lambda on port 8022"
+  ip_protocol                  = "tcp"
+  from_port                    = 8022
+  to_port                      = 8022
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_eckoh_outbound_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_eckoh_inbound_8022" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP eckoh inbound lambda on port 8022"
+  ip_protocol                  = "tcp"
+  from_port                    = 8022
+  to_port                      = 8022
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_eckoh_inbound_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_rossendales_8022" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP rossendales lambda on port 8022"
+  ip_protocol                  = "tcp"
+  from_port                    = 8022
+  to_port                      = 8022
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_rossendales_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_1stlocate_8022" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP 1stlocate lambda on port 8022"
+  ip_protocol                  = "tcp"
+  from_port                    = 8022
+  to_port                      = 8022
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_1stlocate_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_allpay_outbound_22" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP allpay outbound lambda on port 22"
+  ip_protocol                  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_allpay_outbound_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_allpay_inbound_22" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP allpay inbound lambda on port 22"
+  ip_protocol                  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_allpay_inbound_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_xerox_outbound_22" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP xerox outbound lambda on port 22"
+  ip_protocol                  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_xerox_outbound_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_xerox_peterborough_22" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP xerox peterborough lambda on port 22"
+  ip_protocol                  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_xerox_peterborough_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_eckoh_outbound_22" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP eckoh outbound lambda on port 22"
+  ip_protocol                  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_eckoh_outbound_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_eckoh_inbound_22" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP eckoh inbound lambda on port 22"
+  ip_protocol                  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_eckoh_inbound_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_rossendales_22" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP rossendales lambda on port 22"
+  ip_protocol                  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_rossendales_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_ftp_lambda_1stlocate_22" {
+  security_group_id            = aws_security_group.ec2_sg_ftp.id
+  description                  = "Allow ingress from LAA FTP 1stlocate lambda on port 22"
+  ip_protocol                  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  referenced_security_group_id = data.aws_security_group.lambda_ftp_1stlocate_sg.id
 }
 
 
