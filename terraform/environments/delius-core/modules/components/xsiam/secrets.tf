@@ -25,12 +25,3 @@ resource "aws_secretsmanager_secret_version" "xsiam_api" {
     ignore_changes = [secret_string]
   }
 }
-
-data "aws_secretsmanager_secret" "xsiam_endpoint" {
-  name       = "xsiam-url-endpoint"
-  depends_on = [aws_secretsmanager_secret.xsiam_endpoint]
-}
-
-data "aws_secretsmanager_secret_version" "xsiam_endpoint" {
-  secret_id = data.aws_secretsmanager_secret.xsiam_endpoint.id
-}

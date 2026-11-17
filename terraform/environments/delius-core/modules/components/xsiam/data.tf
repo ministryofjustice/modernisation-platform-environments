@@ -13,3 +13,11 @@ data "aws_kms_alias" "ssm" {
 data "aws_kms_key" "secretsmanager" {
   key_id = "alias/aws/secretsmanager"
 }
+
+data "aws_secretsmanager_secret" "xsiam_endpoint" {
+  name = aws_secretsmanager_secret.xsiam_endpoint.name
+}
+
+data "aws_secretsmanager_secret_version" "xsiam_endpoint" {
+  secret_id = data.aws_secretsmanager_secret.xsiam_endpoint.id
+}
