@@ -257,10 +257,13 @@ data "aws_iam_policy_document" "wipe_environment_task" {
   }
 
   statement {
-    sid       = "DeletePrototypeLogGroups"
-    effect    = "Allow"
-    actions   = ["logs:DeleteLogGroup"]
-    resources = ["arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:prototype-*"]
+    sid     = "DeletePrototypeLogGroups"
+    effect  = "Allow"
+    actions = ["logs:DeleteLogGroup"]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:prototype-*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:prototype-*:*",
+    ]
   }
 
   statement {
