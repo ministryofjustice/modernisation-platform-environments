@@ -7,19 +7,19 @@ module "cloud_platform_eso_iam_role" {
   oidc_providers = {
     cloud_platform = {
       provider_arn               = data.aws_iam_openid_connect_provider.cloud_platform.arn
-      namespace_service_accounts = ["${local.cloud_platform_namespace}:${local.component_name}-eso"]
+      namespace_service_accounts = ["${local.environment_configuration.cloud_platform_namespace}:${local.component_name}-eso"]
     }
   }
 
   create_inline_policy = true
   inline_policy_permissions = {
     KMSAccess = {
-      effect = "Allow"
+      effect    = "Allow"
       actions   = ["kms:Decrypt"]
       resources = [module.kms_key.arn]
     }
     SecretsManagerAccess = {
-      effect = "Allow"
+      effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
       resources = [module.github_app_secret.secret_arn]
     }
