@@ -85,6 +85,7 @@ locals {
   # in a later apply than the one that creates the workspace and service account.
   grafana_bus            = local.enable_amg ? lookup(local.bus_by_workspace, terraform.workspace, {}) : {}
   manage_grafana_objects = length(local.grafana_bus) > 0
+  load_idc_group_ids     = local.manage_grafana_objects || (local.enable_amg && terraform.workspace == "cloud-platform-nonlive")
 
   # Name of the per-BU query role created in each BU account by cluster-components.
   bu_amp_query_role_name = "amg-amp-query"
@@ -96,7 +97,7 @@ locals {
   # source (ListGroups API); the singular data source's GetGroupId /
   # alternate_identifier path is denied for this role, and its filter{} block
   # was removed in AWS provider v6. Verified via spike (cloud-platform#8509).
-  idc_group_id_by_name = local.manage_grafana_objects ? {
+  idc_group_id_by_name = local.load_idc_group_ids ? {
     for g in data.aws_identitystore_groups.all[0].groups : g.display_name => g.group_id
   } : {}
 }
@@ -106,12 +107,12 @@ locals {
 #------------------------------------------------------------------------------
 
 data "aws_ssoadmin_instances" "this" {
-  count    = local.manage_grafana_objects ? 1 : 0
+  count    = local.load_idc_group_ids ? 1 : 0
   provider = aws.sso-readonly
 }
 
 data "aws_identitystore_groups" "all" {
-  count    = local.manage_grafana_objects ? 1 : 0
+  count    = local.load_idc_group_ids ? 1 : 0
   provider = aws.sso-readonly
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.this[0].identity_store_ids)[0]

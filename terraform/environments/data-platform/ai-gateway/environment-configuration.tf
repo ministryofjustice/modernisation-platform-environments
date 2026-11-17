@@ -4,6 +4,7 @@ locals {
   environment_configurations = {
     development = {
       litellm_version                    = "1.106.5"
+      litellm_gemini_live_defer_setup    = true
       litellm_entra_client_secret_expiry = "05-05-2027"
       ai_gateway_hostname                = "development.ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
@@ -141,6 +142,7 @@ locals {
     }
     production = {
       litellm_version                    = "1.106.5"
+      litellm_gemini_live_defer_setup    = true
       litellm_entra_client_secret_expiry = "08-05-2027"
       ai_gateway_hostname                = "ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
