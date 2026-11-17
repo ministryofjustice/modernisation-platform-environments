@@ -165,6 +165,8 @@ resource "aws_secretsmanager_secret_policy" "gc_pdc_token" {
 
 output "grafana_cloud_pdc_accounts" {
   description = "Per-account PDC network ID and token secret ARN, keyed by tenant AWS account name."
+  # Account IDs come from the sensitive environment_management secret.
+  sensitive = true
   value = {
     for account_name, account_id in local.gc_pdc_accounts : account_name => {
       account_id       = account_id
