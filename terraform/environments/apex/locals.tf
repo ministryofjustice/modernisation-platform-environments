@@ -94,6 +94,7 @@ locals {
 
   backup_schedule_tags       = local.environment == "production" ? { "snapshot-35-day-retention" = "yes" } : null
   database-instance-userdata = <<EOF
+#!/bin/bash
 cd /tmp
 (
 B=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
