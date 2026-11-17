@@ -107,7 +107,7 @@ locals {
         "property-datahub-landing-production",
         "ccms-ebs-production-bc-inbound-mp"
       ]
-      datasync_target_buckets     = ["mojap-land"]
+      datasync_target_buckets     = ["mojap-land", "alpha-hmpps-bt-pin-historic-data"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-production"]
 
       laa_data_analysis_target_buckets = [
@@ -123,6 +123,7 @@ locals {
       mojap_land_kms_key                  = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
       datasync_opg_target_bucket_kms      = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/96eb04fe-8393-402c-b1f9-71fcece99e75"
       laa_data_analysis_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/fe4674f4-52dc-4b73-a7c5-259c282742ba"
+      alpha_hmpps_bt_pin_kms_key          = "arn:aws:kms:eu-west-2:593291632749:key/example_kms_key"
 
       /* Transfer Server */
       transfer_server_hostname = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
