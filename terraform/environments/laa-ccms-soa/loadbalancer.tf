@@ -190,6 +190,8 @@ resource "aws_lb_target_group" "managed_alb_http" {
     healthy_threshold   = 3
     unhealthy_threshold = 3
   }
+
+  depends_on = [ "aws_lb.http_redirect_managed_alb"]
 }
 
 resource "aws_lb_target_group_attachment" "nlb_to_alb_target_group_attachment" {
@@ -197,6 +199,8 @@ resource "aws_lb_target_group_attachment" "nlb_to_alb_target_group_attachment" {
   target_group_arn = aws_lb_target_group.managed_alb_http[count.index].arn
   target_id        = aws_lb.http_redirect_managed_alb[count.index].arn
   port             = 80
+
+  depends_on = [ aws_lb_target_group.managed_alb_http ]
 }
 
 resource "aws_lb_listener" "managed80" {
