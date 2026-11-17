@@ -13,7 +13,7 @@
       "alerts_slack_channel_id": "C0CF8SBQ97W",
       "email_confirmations_enabled": true,
       "slack_confirmations_enabled": true,
-      "usage_report_enabled": true,
+      "usage_report_enabled": false,
       "usage_report_interval_minutes": 15
     },
     "test": {
