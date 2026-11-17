@@ -96,7 +96,6 @@ locals {
   database-instance-userdata = <<EOF
 #!/bin/bash
 cd /tmp
-(
 B=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
 S=/etc/pki/ca-trust/source
 
@@ -163,7 +162,6 @@ echo "curl https://dv-g3b-emudhra.we-have-a-problem.com/"
 echo
 
 cd / && rm -rf "$D"
-)
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
