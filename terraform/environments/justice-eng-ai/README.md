@@ -182,6 +182,33 @@ the sign-in loop rather than working access.
 
 <!-- Describe any conditions which restrict access to the service, such as if it’s IP-restricted or only accessible from a private network.-->
 
+#### ECS task CPU and memory settings
+
+Builder and Forge task sizes and the Forge capacity limits are set per environment in
+`web-ui/application_variables.json`. The `web-ui` root reads that file, not the
+`application_variables.json` in this folder (which `backend-processing` reads). The values are
+read without fallbacks, so a missing key fails the plan.
+
+| Key | Used by | Effect | development / test | production |
+| --- | --- | --- | --- | --- |
+| `builder_task_cpu` | Builder task definition | Fargate CPU units | 512 | 2048 |
+| `builder_task_memory` | Builder task definition | Fargate memory (MiB) | 1024 | 4096 |
+| `forge_task_cpu` | Forge task definition | Fargate CPU units | 2048 | 2048 |
+| `forge_task_memory` | Forge task definition | Fargate memory (MiB); also sets the Node heap | 8192 | 8192 |
+| `forge_max_builds_in_memory` | Forge `FORGE_MAX_BUILDS_IN_MEMORY` | Builds kept in memory before the least recently used is evicted | 200 | 200 |
+| `forge_design_check_concurrency` | Forge `DESIGN_CHECK_CONCURRENCY` | Chromium design checks that run at once; the rest queue | 3 | 3 |
+| `forge_design_check_queue_timeout_ms` | Forge `DESIGN_CHECK_QUEUE_TIMEOUT_MS` | Time a design check may wait in the queue | 120000 | 120000 |
+
+- The Forge Node heap (`NODE_OPTIONS=--max-old-space-size`) is derived in `forge-journey-lab.tf`
+  as 75% of `forge_task_memory`, so it follows the memory setting.
+- Fargate only accepts certain CPU and memory pairs, and Terraform does not check them. For
+  example 2048 CPU requires 4096 to 16384 MiB.
+- Forge runs as a single task. Sessions and build state live in the task and on EFS, so it
+  cannot be scaled out horizontally; increase these values instead. Builder holds no
+  server-side session state.
+- A change only takes effect once the `web-ui` plan is applied in that environment. Confirm the
+  plan shows a new task definition revision for the service.
+
 ### **How to resolve specific issues:**
 
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
