@@ -299,8 +299,11 @@ Admins can query the data source.
 If none of a user's teams has rules on a data source, the user can query all of
 its data. So a team with no account pushing the signal gets a rule that matches
 no data, `cloud_account_id="none"`, rather than no rules, and Terraform applies
-rules before permissions. A team never has Query without rules, and a Query
-permission granted by hand can't expose other teams' data.
+rules before permissions. A tenant team never has Query without rules, and a
+Query permission granted by hand to a tenant team can't expose other teams'
+data. A Query permission granted by hand to anyone else, such as a user, a basic
+role or another team, comes with no rules, so it exposes all of the data until
+the next apply, which removes it because the permission is authoritative.
 
 The rules also apply to Admins in a team with rules, so platform team members
 only see their own accounts' data through the shared data sources. Admins who
@@ -346,8 +349,11 @@ Complete these before any account pushes real data:
   For production, rely on Grafana Support: ask them to confirm, or enable,
   traces LBAC on both the development and production stacks. This can go in
   the same ticket as the redaction mode.
-- **Check the built-in data sources** are admin-only after the first apply, and
-  stay that way.
+- **Check the data source permissions** after the first apply, and that they
+  stay that way:
+  - the built-in data sources are admin-only
+  - only the expected tenant teams have Query on each shared data source
+  - the Viewer and Editor roles don't have Query on the shared data sources
 - **Check the Grafana Cloud plan** includes team LBAC for Metrics, Logs and
   Traces.
 - **Deploy the gateway**, which holds the token and overwrites
@@ -367,7 +373,12 @@ metrics, have no `cloud_account_id` label. They aren't visible through
   briefly leaves the team with Query but no rules.
 - **New data sources:** Grafana gives Viewers and Editors Query on a new data
   source until its permission applies, a few seconds later. Create the shared
-  data sources before real data is pushed, and don't replace them.
+  data sources before real data is pushed, and don't replace them. The apply
+  that creates them might fail before the permissions apply, for example
+  because Grafana rejects an LBAC rule: each permission waits for all three
+  data sources' rules. Viewers and Editors then keep Query until an apply
+  succeeds, so fix the failure and apply again before any account pushes real
+  data.
 
 ### Testing in development
 
