@@ -60,7 +60,7 @@
     'source': 'custom',
     'content': {
       'textType': 'client-markdown',
-      'title': '[' & $env & '] Task CPU and memory, 4 hours to ' & $clock($end) & ' (' & $interval & '-minute peaks, %)',
+      'title': '[' & $env & '] Task CPU and memory, ' & ($window / 60) & ' hours to ' & $clock($end) & ' (' & $interval & '-minute peaks, %)',
       'description': '```\n' & $join($table, '\n') & '\n```\nB = Builder, F = Forge. ! marks 80% or more.'
     }
   })
