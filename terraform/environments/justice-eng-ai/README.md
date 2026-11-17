@@ -206,8 +206,24 @@ read without fallbacks, so a missing key fails the plan.
 - Forge runs as a single task. Sessions and build state live in the task and on EFS, so it
   cannot be scaled out horizontally; increase these values instead. Builder holds no
   server-side session state.
-- A change only takes effect once the `web-ui` plan is applied in that environment. Confirm the
-  plan shows a new task definition revision for the service.
+- A Builder change takes effect once the `web-ui` plan is applied in that environment. Confirm
+  the plan shows a new task definition revision for the service.
+- The Forge service ignores `task_definition` changes (`forge-journey-lab.tf`) so an apply can
+  never move it back to an older revision or image. A Forge size or environment change
+  therefore applies in two steps:
+  1. Apply `web-ui`. It registers a new `forge-journey-lab` revision but leaves the service on
+     its current one.
+  2. Run the Forge deploy (`deploy-ecs.yml` in the application repository). It clones the
+     latest revision of the family, so it picks up Terraform's CPU, memory and environment,
+     swaps in the new image and moves the service. This restarts Forge and ends active sessions.
+- The image tag is held in the SSM parameter
+  `/modernisation-platform-ai-builder-core/forge/container-image-tag` (`web-ui/parameters.tf`).
+  Terraform creates it once from `forge_container_image_tag` and then ignores its value. The
+  deploy workflow writes the tag it deployed, and Terraform reads it, so Terraform-registered
+  revisions always carry the deployed image. This is the same pattern as the script-runner
+  image tag in `backend-processing/parameters.tf`.
+- To check a Forge size, look at the task definition revision the service is running, not only
+  the newest revision of the family.
 
 ### **How to resolve specific issues:**
 
