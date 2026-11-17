@@ -538,7 +538,7 @@ resource "aws_ecs_task_definition" "forge" {
   container_definitions = jsonencode([
     {
       name                   = "forge"
-      image                  = "${local.forge_ecr_repository_url}:${var.forge_container_image_tag}"
+      image                  = "${local.forge_ecr_repository_url}:${data.aws_ssm_parameter.forge_container_image_tag[0].value}"
       essential              = true
       readonlyRootFilesystem = true
       user                   = "1000:1000"
