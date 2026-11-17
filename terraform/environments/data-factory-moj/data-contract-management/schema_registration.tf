@@ -1,7 +1,7 @@
 module "schema_registration" {
   count = local.registration_enabled ? 1 : 0
 
-  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-registration?ref=e36dc233e5939ab1d676feee32d6e14855d77a42"
+  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-registration?ref=081e94da70773b718899d598f5f6f1602510ee64"
 
   name         = local.registration_name
   image_uri    = local.registration_image_uri
