@@ -123,7 +123,7 @@ terraform fmt -check -recursive terraform/environments/integration-hub-file-tran
 env AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy AWS_SESSION_TOKEN=dummy \
   AWS_DEFAULT_REGION=eu-west-2 AWS_EC2_METADATA_DISABLED=true \
   PYTHONPATH=terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer \
-  uv run --no-project --python 3.12 \
+  uv run --no-project --python 3.14 \
   --with-requirements terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer/requirements.txt \
   --with-requirements terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer/tests/requirements.txt \
   python -m pytest -q terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer/tests
