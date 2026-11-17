@@ -18,6 +18,13 @@ resource "aws_security_group" "ftp_sg" {
     protocol                 = "tcp"
     security_groups          = [data.aws_security_group.ec2_sg_ftp.id]
   }
+
+  egress {
+    from_port                = 22
+    to_port                  = 22
+    protocol                 = "tcp"
+    security_groups          = [data.aws_security_group.ec2_sg_ftp.id]
+  }
 }
 
 # Reference FTP EC2 security group
