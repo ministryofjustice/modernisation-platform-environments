@@ -65,6 +65,12 @@ resource "terraform_data" "wipe_guard" {
       error_message = "environment_wipe_schedule must be an EventBridge cron expression with six fields, e.g. cron(0 2 ? * SUN *)."
     }
 
+    # EventBridge needs exactly one of day-of-month and day-of-week to be "?".
+    precondition {
+      condition     = !local.wipe_create || try(length([for i in [2, 4] : i if split(" ", trimsuffix(trimprefix(local.wipe_schedule, "cron("), ")"))[i] == "?"]) == 1, false)
+      error_message = "environment_wipe_schedule must have \"?\" in exactly one of the day-of-month and day-of-week fields, e.g. cron(0 2 * * ? *) for daily or cron(0 2 ? * SUN *) for weekly."
+    }
+
     # Builder and Forge are stopped during the wipe, and their alarms are only muted
     # from 00:00 to 04:00 UK time (aws_cloudwatch_alarm_mute_rule.wipe_window).
     precondition {
