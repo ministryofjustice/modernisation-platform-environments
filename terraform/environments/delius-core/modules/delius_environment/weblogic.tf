@@ -318,8 +318,8 @@ module "xsiam_cloudwatch_logs"  {
     aws.bucket-replication = aws.bucket-replication
   }
 
-  env_name      = var.env_name
-  app_name      = var.app_name
-  log_group_name = "delius-core-${var.env_name}-weblogic"
+  env_name        = var.env_name
+  app_name        = "weblogic"
+  log_group_name  = "delius-core-${var.env_name}-weblogic-access-logs"
   log_stream_name = "delius-core-${var.env_name}-weblogic/access_log"
 }

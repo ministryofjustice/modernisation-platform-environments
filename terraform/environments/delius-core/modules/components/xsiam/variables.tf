@@ -18,18 +18,6 @@ variable "log_stream_name" {
   type        = string
 }
 
-# variable "kms_key_arn" {
-#   type        = string
-#   description = "ARN of the AWS KMS key to be used to encrypt secret values."
-# }
-
-# variable "kms_key_id" {
-#   description = "The ARN of the KMS key to use for encryption"
-#   type        = string
-#   default     = null
-# }
-
-
 variable "s3_versioning" {
   type        = bool
   description = "A boolean that determines whether s3 will have versioning"
