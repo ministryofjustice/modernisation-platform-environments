@@ -66,6 +66,11 @@
         },
         {
           "Effect": "Allow",
+          "Action": "s3:ListBucket",
+          "Resource": "arn:aws:s3:::data-factory-moj-development-contracts-110695445580"
+        },
+        {
+          "Effect": "Allow",
           "Action": [
             "s3:GetObject",
             "s3:GetObjectVersion"
@@ -186,6 +191,11 @@
             "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-val-postgres-test:2",
             "arn:aws:lambda:eu-west-2:110695445580:function:data-factory-moj-development-contracts:1"
           ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": "s3:ListBucket",
+          "Resource": "arn:aws:s3:::data-factory-moj-development-contracts-110695445580"
         },
         {
           "Effect": "Allow",
