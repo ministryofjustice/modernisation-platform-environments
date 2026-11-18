@@ -70,6 +70,11 @@
             "log_stream_name": "{instance_id}"
           },
           {
+            "file_path": "${ADMIN_LOG_PATH_3}",
+            "log_group_name": "cwagent-ssogen-admin-server-logs",
+            "log_stream_name": "{instance_id}"
+          },
+          {
             "file_path": "${OHS_LOG_PATH}",
             "log_group_name": "cwagent-ssogen-ohs-server-logs",
             "log_stream_name": "{instance_id}"
@@ -81,6 +86,11 @@
           },
           {
             "file_path": "${MSERVER_LOG_PATH_2}",
+            "log_group_name": "cwagent-ssogen-managed-server-logs",
+            "log_stream_name": "{instance_id}"
+          },
+          {
+            "file_path": "${MSERVER_LOG_PATH_3}",
             "log_group_name": "cwagent-ssogen-managed-server-logs",
             "log_stream_name": "{instance_id}"
           }

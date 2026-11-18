@@ -334,6 +334,29 @@ resource "aws_lambda_permission" "mdss_reconciler_allow_eventbridge" {
 }
 
 #-----------------------------------------------------------------------------------
+# Schedule MDSS received-files reconciler (every 5 minutes)
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "mdss_received_files_reconciler_schedule" {
+  name                = "mdss_received_files_reconciler_schedule"
+  description         = "Runs the MDSS received-files reconciler to backstop missed scan events"
+  schedule_expression = "rate(5 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "mdss_received_files_reconciler_target" {
+  rule = aws_cloudwatch_event_rule.mdss_received_files_reconciler_schedule.name
+  arn  = module.mdss_received_files_reconciler.lambda_function_arn
+}
+
+resource "aws_lambda_permission" "mdss_received_files_reconciler_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridgeMdssReceivedFilesReconciler"
+  action        = "lambda:InvokeFunction"
+  function_name = module.mdss_received_files_reconciler.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.mdss_received_files_reconciler_schedule.arn
+}
+
+#-----------------------------------------------------------------------------------
 # Create p1 exports
 #-----------------------------------------------------------------------------------
 
@@ -1120,7 +1143,7 @@ module "daily_cadt_eventbridge" {
     crons = [
       {
         name  = "trigger-cadt-lambda"
-        arn   = module.trigger_cadt_daily_run[0].lambda_function_arn
+        arn   = module.trigger_cadt_daily_run.lambda_function_arn
         input = jsonencode({ "job" : "cron-by-rate" })
       }
     ]
@@ -1130,7 +1153,8 @@ module "daily_cadt_eventbridge" {
 resource "aws_lambda_permission" "allow_cadt_trigger_eventbridge" {
   statement_id  = "AllowcadtExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
-  function_name = module.trigger_cadt_daily_run[0].lambda_function_arn
+  function_name = module.trigger_cadt_daily_run.lambda_function_arn
   principal     = "events.amazonaws.com"
   source_arn    = module.daily_cadt_eventbridge.eventbridge_rule_arns.crons
 }
+

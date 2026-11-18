@@ -11,7 +11,7 @@
         "nonlive": true
       },
       "grafana_enabled": {
-        "live": false,
+        "live": true,
         "nonlive": true
       }
     },

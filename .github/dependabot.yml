@@ -642,11 +642,13 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/developer-experience"
+      - "terraform/environments/developer-experience/app"
       - "terraform/environments/developer-experience/auth0-event-stream"
       - "terraform/environments/developer-experience/dns"
       - "terraform/environments/developer-experience/github-audit-log-stream"
       - "terraform/environments/developer-experience/github-backup"
       - "terraform/environments/developer-experience/github-management"
+      - "terraform/environments/developer-experience/github-sts"
     schedule:
       interval: "daily"
     groups:
@@ -872,7 +874,6 @@ updates:
       - "terraform/environments/integration-hub/api-hosting-platform"
       - "terraform/environments/integration-hub/api-platform"
       - "terraform/environments/integration-hub/downstream-mock-api"
-      - "terraform/environments/integration-hub/downstream-mock-api/modules/service"
       - "terraform/environments/integration-hub/events-platform"
       - "terraform/environments/integration-hub/iac"
       - "terraform/environments/integration-hub/managed-file-transfer"
@@ -1237,6 +1238,9 @@ updates:
       - "terraform/environments/observability-platform/modules/amazon-managed-grafana/contact-point/slack"
       - "terraform/environments/observability-platform/modules/amazon-managed-grafana/team"
       - "terraform/environments/observability-platform/modules/amazon-managed-grafana/xray-source"
+      - "terraform/environments/observability-platform/modules/grafana-cloud/aws-account-data-sources"
+      - "terraform/environments/observability-platform/modules/grafana-cloud/team"
+      - "terraform/environments/observability-platform/modules/grafana-cloud/tenant-configuration"
       - "terraform/environments/observability-platform/modules/observability-platform/tenant-configuration"
       - "terraform/environments/observability-platform/modules/prometheus/iam-role"
     schedule:
@@ -1524,7 +1528,7 @@ updates:
     directories:
       - "terraform/modules/acm_certificate"
       - "terraform/modules/aws_health_lambda"
-      - "terraform/modules/aws_health_lambda_cloudwatch_events"
+      - "terraform/modules/aws_lambda_event_forwarding"
       - "terraform/modules/aws_securityhub_lambda"
       - "terraform/modules/baseline"
       - "terraform/modules/baseline_presets"

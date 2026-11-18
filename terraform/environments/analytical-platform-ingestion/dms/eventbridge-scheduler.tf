@@ -6,7 +6,8 @@ resource "aws_scheduler_schedule" "tariff_dms_nightly_full_load" {
     mode = "OFF"
   }
 
-  schedule_expression = "cron(30 0 * * ? *)" # 12:30am every day, to capture submissions up till midnight for monthly reporting
+  # 12:30am every day, to capture submissions up till midnight for monthly reporting; dev runs at 06:30 after the Tariff dev Oracle shutdown window (21:00-06:00)
+  schedule_expression = local.environment == "development" ? "cron(30 6 * * ? *)" : "cron(30 0 * * ? *)"
   kms_key_arn         = module.cica_dms_eventscheduler_kms.key_arn
 
   target {
