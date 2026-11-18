@@ -4,6 +4,7 @@ locals {
   db_name                         = local.is-production ? "g4s_cap_dw" : "test"
   load_sqs_max_receive_count      = 2
   load_mdss_sqs_max_receive_count = 8
+  load_gems_sqs_max_receive_count = 8
 }
 
 
@@ -344,6 +345,40 @@ module "load_mdss_lambda" {
     MAX_RECEIVE_COUNT                       = tostring(local.load_mdss_sqs_max_receive_count)
     MDSS_MANIFEST_BUCKET                    = module.s3-metadata-bucket.bucket.id
     MDSS_MANIFEST_PREFIX                    = "mdss-manifest/current"
+    STUCK_STARTED_MINUTES                   = "60"
+    AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
+    AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# dlt load gems
+#-----------------------------------------------------------------------------------
+
+module "load_gems_lambda" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_gems"
+  role_name                      = aws_iam_role.load_gems.name
+  role_arn                       = aws_iam_role.load_gems.arn
+  handler                        = "load_gems.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 500
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  cloudwatch_retention_days      = 7
+
+  environment_variables = {
+    ATHENA_QUERY_BUCKET                     = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER                          = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET                          = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME                        = local.environment_shorthand
+    CLEANUP_QUEUE_URL                       = aws_sqs_queue.clean_dlt_load_queue.id
+    MAX_RECEIVE_COUNT                       = tostring(local.load_gems_sqs_max_receive_count)
+    GEMS_MANIFEST_BUCKET                    = module.s3-metadata-bucket.bucket.id
+    GEMS_MANIFEST_PREFIX                    = "gems-manifest/current"
     STUCK_STARTED_MINUTES                   = "60"
     AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
     AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"

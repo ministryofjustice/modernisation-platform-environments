@@ -209,6 +209,15 @@ module "load_mdss_event_queue" {
   max_receive_count    = local.load_mdss_sqs_max_receive_count
 }
 
+module "load_gems_event_queue" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.load_gems_lambda.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 100
+  max_receive_count    = local.load_gems_sqs_max_receive_count
+}
+
 module "load_fms_event_queue" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
