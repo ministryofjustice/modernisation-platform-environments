@@ -1,7 +1,7 @@
 module "configured_ingestion" {
   count = local.is-development ? 1 : 0
 
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/database-migration-service/modules/configured-ingestion?ref=e3af1d31d173634561c5534719a9bf971b230e77"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/database-migration-service/modules/configured-ingestion?ref=a9f1a8b97f297fd9c9ea435e886fc648b0fa5491"
 
   name_prefix = "dfmoj-ingestion"
 
