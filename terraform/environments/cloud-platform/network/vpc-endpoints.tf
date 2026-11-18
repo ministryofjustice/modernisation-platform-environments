@@ -3,8 +3,9 @@
 # Gateway VPC endpoints (S3, DynamoDB) are provisioned locally in this VPC
 # as they don't incur data transfer costs and provide optimal routing.
 #
-# Interface VPC endpoints are defined centrally in the Modernisation Platform core-network-services 
-# account and shared via Transit Gateway. This approach provides cost efficiency and centralised management.
+# AWS service interface VPC endpoints are defined centrally in the Modernisation Platform
+# core-network-services account and shared via Transit Gateway.
+# Grafana PDC endpoints are local to selected non-production VPCs; see vpc-endpoints-grafana-pdc.tf.
 # 
 # For the complete list of centrally managed interface endpoints, see:
 # https://github.com/ministryofjustice/modernisation-platform/blob/main/terraform/environments/core-network-services/centralised-vpc-endpoints.json
