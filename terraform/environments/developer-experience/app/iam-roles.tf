@@ -43,8 +43,8 @@ module "github_actions_iam_role" {
   create_inline_policy = true
   inline_policy_permissions = {
     SecretsManagerReadAccess = {
-      effect    = "Allow"
-      actions   = ["secretsmanager:GetSecretValue"]
+      effect  = "Allow"
+      actions = ["secretsmanager:GetSecretValue"]
       resources = [
         module.github_app_secret.secret_arn,
         module.entra_app_secret.secret_arn
