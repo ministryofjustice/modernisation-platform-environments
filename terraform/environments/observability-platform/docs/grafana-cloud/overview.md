@@ -197,8 +197,33 @@ Query to the owning tenant's team and to the teams of the tenants in
 `shared_with_tenants`. It is authoritative: it removes Grafana's default Viewer
 and Editor access, so no other users can query the data source. Admins keep
 access, including the platform team and the Terraform service account. If none
-of those tenants has a team, only Admins can query the data source. The GitHub
-data source keeps Grafana's default permissions.
+of those tenants has a team, only Admins and any matching development platform
+team can query the data source.
+
+On development, GitHub SSO also admits the Ministry of Justice
+`modernisation-platform` and `cloud-platform` GitHub teams. They have no basic
+Grafana role (so no inherited Viewer access to Grafana Cloud's preconfigured
+data sources), and get the Explorer role to open Explore and Drilldown.
+`observability-platform` membership still takes precedence and grants Admin.
+
+The two teams can query the shared `ministryofjustice-github` data source and
+the AWS data sources for already-onboarded accounts whose canonical
+`modernisation-platform/environments/<stem>.json` declares that account:
+
+| GitHub team | `.tags.application` |
+| --- | --- |
+| `modernisation-platform` | exactly `modernisation-platform` |
+| `cloud-platform` | starts with `container-platform-` |
+
+Terraform reads only the definitions needed for configured accounts, takes
+account names from the filename and `.environments[].name`, and grants nothing
+for missing or unmatched ownership. The match changes permissions at the next
+Terraform reconciliation; it does not create data sources or onboard accounts.
+Existing AWS tenant grants and sharing still apply, and configured tenant teams
+retain Query on the shared GitHub source. GitHub queries use the stack's shared
+GitHub App installation; Grafana permissions do not filter results by the
+signed-in user's GitHub repository access. Production keeps its existing login
+gate and data source permissions.
 
 ## CloudWatch (Grafana Assume Role)
 

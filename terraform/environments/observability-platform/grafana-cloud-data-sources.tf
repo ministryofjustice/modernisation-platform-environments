@@ -29,6 +29,24 @@ resource "grafana_data_source" "cloud_github" {
   depends_on = [grafana_cloud_plugin_installation.github]
 }
 
+resource "grafana_data_source_permission" "cloud-github" {
+  count    = length(local.gc_platform_query_teams) > 0 ? 1 : 0
+  provider = grafana.stack
+
+  datasource_uid = grafana_data_source.cloud_github.uid
+
+  dynamic "permissions" {
+    for_each = concat(
+      [for team in grafana_team.platform-query : team.id],
+      [for team in module.grafana_cloud_team : team.team_id],
+    )
+    content {
+      team_id    = permissions.value
+      permission = "Query"
+    }
+  }
+}
+
 locals {
   # IAM role created in each tenant account by the tenant module
   # (ministryofjustice/terraform-aws-observability-platform-tenant). Grafana Cloud's AWS account
@@ -74,12 +92,16 @@ module "grafana_cloud_aws_data_sources" {
   cloudwatch        = each.value.cloudwatch
   xray              = each.value.xray
   amazon_prometheus = each.value.amazon_prometheus
-  # The teams of the owning tenant and the tenants the account is shared with. Only tenants with a
-  # GitHub team have a Grafana team.
-  query_team_ids = [
-    for tenant in each.value.query_tenants : module.grafana_cloud_team[tenant].team_id
-    if contains(keys(module.grafana_cloud_team), tenant)
-  ]
+  query_team_ids = concat(
+    [
+      for tenant in each.value.query_tenants : module.grafana_cloud_team[tenant].team_id
+      if contains(keys(module.grafana_cloud_team), tenant)
+    ],
+    [
+      for slug, team in grafana_team.platform-query : team.id
+      if slug == lookup(local.gc_platform_query_team_by_account, each.key, null)
+    ],
+  )
 
   depends_on = [grafana_cloud_plugin_installation.aws]
 }

@@ -5,7 +5,7 @@ resource "grafana_team" "this" {
 # Requires team sync (GitHub) to be available on the Grafana Cloud plan
 resource "grafana_team_external_group" "this" {
   team_id = grafana_team.this.id
-  groups  = [var.github_team]
+  groups  = ["@ministryofjustice/${var.github_team}"]
 }
 
 resource "grafana_folder" "this" {
