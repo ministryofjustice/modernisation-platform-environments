@@ -39,6 +39,12 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
     filter_prefix = "allied/mdss"
   }
   queue {
+    queue_arn     = module.copy_gems_data_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".jsonl"
+    filter_prefix = "allied/gems"
+  }
+  queue {
     queue_arn     = module.fms_raw_file_formatter_sqs.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".JSON"
@@ -69,6 +75,13 @@ module "copy_mdss_data_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
   lambda_function_name = module.mdss_raw_file_stager.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+}
+
+module "copy_gems_data_sqs" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-data-bucket.bucket
+  lambda_function_name = module.gems_raw_file_stager.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
