@@ -73,8 +73,8 @@ deletion requires an explicitly reviewed change to this protection.
 `grafana-cloud-tenant-environment-configurations.tf` lists each environment's
 tenants and the AWS accounts they own, keyed by account name. The
 `modules/grafana-cloud/tenant-configuration` module applies the defaults and
-validates the configuration. An account with no settings gets a PDC network and
-a CloudWatch data source:
+validates the configuration. An account with no settings gets a CloudWatch data
+source. PDC is opt-in, for accounts with private data sources to query:
 
 ```hcl
 tenant_configuration = {
@@ -83,6 +83,7 @@ tenant_configuration = {
     aws_accounts = {
       "team-a-development" = {}
       "team-a-production" = {
+        pdc_enabled         = true # also set grafana_cloud.pdc_agent.enabled in the tenant module
         shared_with_tenants = ["team-b"]
         cloudwatch          = { custom_namespaces = ["ECS/ContainerInsights", "CWAgent"] }
         xray                = { enabled = true }
@@ -98,7 +99,7 @@ tenant_configuration = {
 
 | Account setting | Default | Effect |
 | --- | --- | --- |
-| `pdc_enabled` | `true` | PDC network and token for the account. Must match the tenant module's `grafana_cloud.pdc_agent.enabled` |
+| `pdc_enabled` | `false` | Opt in to a PDC network and token for the account, for private data sources. Must match the tenant module's `grafana_cloud.pdc_agent.enabled` |
 | `shared_with_tenants` | `[]` | Other tenants whose teams can also query the account's data sources |
 | `cloudwatch.enabled` | `true` | `<account>-cloudwatch` data source |
 | `cloudwatch.custom_namespaces` | `[]` | Custom metric namespaces, one per item |
@@ -113,8 +114,8 @@ or if the workspace ID or region is malformed.
 ## Private Data Source Connect (PDC)
 
 `grafana-cloud-pdc-accounts.tf` creates, for each AWS account in
-`grafana-cloud-tenant-environment-configurations.tf` with `pdc_enabled` (default
-`true`, matching the tenant module's `grafana_cloud.pdc_agent.enabled`):
+`grafana-cloud-tenant-environment-configurations.tf` with `pdc_enabled = true`
+(opt-in, matching the tenant module's `grafana_cloud.pdc_agent.enabled`):
 
 - a PDC network and a PDC network token, named
   `<stack slug>-<account name>` and `<stack slug>-<account name>-agent`
