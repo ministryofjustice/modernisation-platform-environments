@@ -1,7 +1,7 @@
 module "schema_generation" {
   for_each = local.generation_sources
 
-  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-generation?ref=9648c50849d1e0de24f3d065c1ac8afc4a5390b9"
+  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-generation?ref=dcd7fdd85337f05b2b7ca14805c490732d01d767"
 
   name         = "${local.generation_function_prefix}-${each.key}"
   image_uri    = each.value.image_uri
