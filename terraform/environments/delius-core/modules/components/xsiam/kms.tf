@@ -58,10 +58,9 @@ resource "aws_kms_key_policy" "firehose_backup_xsiam_policy" {
         Resource = "*"
         "Condition" : {
           "StringEquals" : {
-            "kms:EncryptionContext:aws:logs:arn" : data.aws_cloudwatch_log_group.logs.arn
+            "kms:EncryptionContext:aws:logs:arn" : aws_cloudwatch_log_group.firehose_log_group_xsiam.arn
           }
         }
-
       },
       {
         Sid    = "AllowAccountRootUserFullAccess",
