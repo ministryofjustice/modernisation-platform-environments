@@ -44,7 +44,7 @@ moved {
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
-  name_prefix           = "${var.app_name}-ec2-"
+  name_prefix           = "${var.app_name}-ec2-al2023-"
   desired_capacity      = var.ec2_desired_capacity
   max_size              = var.ec2_max_size
   min_size              = var.ec2_min_size
@@ -179,7 +179,7 @@ output "ami_id" {
 resource "aws_launch_template" "ec2-launch-template" {
   #checkov:skip=CKV_AWS_79:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_341:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  name_prefix            = "${var.app_name}-ec2-"
+  name_prefix            = "${var.app_name}-ec2-al2023-"
   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type          = var.instance_type
   key_name               = var.key_name
