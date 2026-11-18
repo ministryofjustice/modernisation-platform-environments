@@ -2,8 +2,9 @@
 
 `grafana-cloud-stack.tf` creates a new Grafana Cloud stack alongside the existing
 Amazon Managed Grafana platform. It does not import or modify the `mojdigital`
-test stack, migrate dashboards, or configure data sources. PDC networks and
-tokens are in `grafana-cloud-pdc-tenants.tf`, described below.
+test stack or migrate dashboards. Tenants and their AWS accounts, described
+below, drive the PDC networks and tokens in `grafana-cloud-pdc-accounts.tf` and
+the AWS data sources in `grafana-cloud-data-sources.tf`.
 
 | Terraform workspace | AWS account | Grafana Cloud stack |
 | --- | --- | --- |
@@ -29,9 +30,10 @@ Terraform creates the empty secret `grafana-cloud/terraform-access-policy-token`
 (`secrets.tf`) in each account and reads it in `data.tf`. Populate its value
 manually, as with the other Grafana secrets: the raw token as the secret
 string, not a JSON object. Use separate tokens for development and production,
-set an expiry, and rotate before expiry. The existing
-`grafana/grafana-cloud-user` and `grafana/grafana-cloud-password` secrets are
-unrelated and are not reused.
+set an expiry, and rotate before expiry. The
+`grafana-cloud/admin-user-details` secret holds the admin username and
+password as a JSON object (`{"username": "...", "password": "..."}`). It is
+unrelated and is not read by Terraform.
 
 Secret values read by Terraform are stored in state and may be present in
 saved plans: restrict access to both and to the state backend.
@@ -56,34 +58,84 @@ before applying; the new resources must not replace existing Amazon Managed
 Grafana resources.
 
 The default `grafana` provider still targets Amazon Managed Grafana.
-Cloud account resources explicitly use `provider = grafana.cloud`.
-Future dashboards, folders, and data sources in Grafana Cloud need a separate
-stack-level provider alias, authenticated with a service-account token for
-that Cloud stack. Do not repoint the default provider or existing resources.
+Cloud account resources, such as the stack, plugins and PDC networks, explicitly
+use `provider = grafana.cloud`. Resources inside the stack, such as SSO, teams,
+folders and data sources, use `provider = grafana.stack`, authenticated with the
+stack's Terraform service account. Do not repoint the default provider or
+existing resources.
 
 Stack destruction and replacement are blocked by `prevent_destroy`, including
 the existing workflow's development destroy action. Any intentional stack
 deletion requires an explicitly reviewed change to this protection.
 
+## Tenant configuration
+
+`grafana-cloud-tenant-environment-configurations.tf` lists each environment's
+tenants and the AWS accounts they own, keyed by account name. The
+`modules/grafana-cloud/tenant-configuration` module applies the defaults and
+validates the configuration. An account with no settings gets a CloudWatch data
+source. PDC is opt-in, for accounts with private data sources to query:
+
+```hcl
+tenant_configuration = {
+  "team-a" = {
+    github_team = "team-a" # optional: gives the tenant a Grafana team and folder
+    aws_accounts = {
+      "team-a-development" = {}
+      "team-a-production" = {
+        pdc_enabled         = true # also set grafana_cloud.pdc_agent.enabled in the tenant module
+        shared_with_tenants = ["team-b"]
+        cloudwatch          = { custom_namespaces = ["ECS/ContainerInsights", "CWAgent"] }
+        xray                = { enabled = true }
+        amazon_prometheus   = { workspace_id = "ws-..." }
+      }
+    }
+  }
+  "team-b" = {
+    github_team = "team-b"
+  }
+}
+```
+
+| Account setting | Default | Effect |
+| --- | --- | --- |
+| `pdc_enabled` | `false` | Opt in to a PDC network and token for the account, for private data sources. Must match the tenant module's `grafana_cloud.pdc_agent.enabled` |
+| `shared_with_tenants` | `[]` | Other tenants whose teams can also query the account's data sources |
+| `cloudwatch.enabled` | `true` | `<account>-cloudwatch` data source |
+| `cloudwatch.custom_namespaces` | `[]` | Custom metric namespaces, one per item |
+| `xray.enabled` | `false` | `<account>-xray` data source. Opt in: Grafana Cloud Tempo is the preferred trace store |
+| `amazon_prometheus` | unset | `<account>-amp` data source for the workspace: `workspace_id`, and `region` (default `eu-west-2`) |
+
+The configuration is rejected if an account is listed under more than one
+tenant, if `shared_with_tenants` names the owning tenant or a tenant that isn't
+in the configuration, if a custom namespace isn't a single CloudWatch namespace,
+or if the workspace ID or region is malformed.
+
 ## Private Data Source Connect (PDC)
 
-`grafana-cloud-pdc-tenants.tf` creates, for each tenant in
+`grafana-cloud-pdc-accounts.tf` creates, for each AWS account in
 `grafana-cloud-tenant-environment-configurations.tf` with `pdc_enabled = true`
-on at least one account:
+(opt-in, matching the tenant module's `grafana_cloud.pdc_agent.enabled`):
 
-- a PDC network and a PDC network token
-- a customer managed KMS key
-- a `grafana-cloud/pdc/<tenant>` secret holding the token, written by Terraform
+- a PDC network and a PDC network token, named
+  `<stack slug>-<account name>` and `<stack slug>-<account name>-agent`
+- a customer managed KMS key, aliased `alias/grafana-cloud-pdc-<account name>`
+- a `grafana-cloud/pdc/<account ID>` secret holding the token, written by Terraform
 
-The agents run in the tenant accounts and are deployed by the tenant module. The
-secret and KMS key policies allow only the `grafana-pdc-agent-execution` role in
-the tenant's accounts to read the token. The tenant module must also give that role
-an identity policy allowing `secretsmanager:GetSecretValue` on the secret and
-`kms:Decrypt` on the key, and reference the secret by its full ARN. Restart the agent
-service after the token changes, because ECS reads the secret at task start.
+Networks are per account, not per tenant. PDC load-balances across every agent in
+a network, so every agent must reach the same targets, and a tenant's accounts
+sit in different VPCs. An account can belong to only one tenant.
 
-The `grafana_cloud_pdc_tenants` output gives each tenant's PDC network ID and token
-secret ARN to pass to the tenant module.
+The agents run in the tenant accounts and are deployed by the tenant module, which
+derives the secret ARN from this account's ID and the tenant account ID, so the
+secret name must not change. The secret and KMS key policies allow only that
+account's `grafana-pdc-agent-execution` role to read the token. The tenant module
+also gives that role an identity policy allowing `secretsmanager:GetSecretValue`
+on the secret and `kms:Decrypt` on the key. Restart the agent service after the
+token changes, because ECS reads the secret at task start.
+
+The `grafana_cloud_pdc_accounts` output gives each account's ID, PDC network ID
+and token secret ARN, keyed by account name.
 
 PDC agents are not deployed from this environment. The tenant module provides them,
 together with the networking for each shared VPC.
@@ -91,11 +143,71 @@ together with the networking for each shared VPC.
 Grafana Cloud management API calls, browser access and alert notifications
 go over public HTTPS.
 
+## AWS data sources
+
+`grafana-cloud-data-sources.tf` calls `modules/grafana-cloud/aws-account-data-sources`
+for each account in the tenant configuration, creating the data sources that
+the account enables:
+
+| Data source | Type | Plugin |
+| --- | --- | --- |
+| `<account>-cloudwatch` | `cloudwatch` | Core |
+| `<account>-xray` | `grafana-x-ray-datasource` (AWS Application Signals) | Installed when an account enables X-Ray |
+| `<account>-amp` | `grafana-amazonprometheus-datasource` (Amazon Managed Service for Prometheus) | Installed when an account sets `amazon_prometheus` |
+
+The names match the Amazon Managed Grafana data sources, so dashboards can move
+by name. Grafana generates the UIDs. The data sources are keyed by account, so
+moving an account to another tenant only changes who can query them. Plugin
+versions are pinned in `grafana-cloud-data-sources.tf`.
+
+The data sources use Grafana Assume Role. Grafana Cloud's AWS account
+(`008923505280`) assumes the account's `grafana-cloud` role, which the tenant
+module creates with `CloudWatchReadOnlyAccess`, `AWSXrayReadOnlyAccess` and
+`AmazonPrometheusQueryAccess`. The external ID is this environment's stack ID.
+Grafana sets it, and it can't be configured. The data sources set
+`usePerDatasourceExternalId`, or `sigV4UsePerDatasourceExternalId` for Amazon
+Managed Service for Prometheus, to `false`. This stops Grafana generating an
+external ID per data source, which the role wouldn't trust.
+
+The CloudWatch data source links trace IDs in logs to the account's X-Ray data
+source, when there is one. Amazon Managed Service for Prometheus uses its own
+plugin, which signs requests with SigV4, because SigV4 in the core Prometheus
+data source is deprecated.
+
+These are AWS APIs, not services in the VPC, so the data sources don't use PDC.
+
+### Observability Platform accounts
+
+`observability-platform.tf` still calls the tenant module at version 1.2.0. The
+version that creates the `grafana-cloud` role needs AWS provider 6, and this
+environment uses 5. So the Observability Platform accounts have no
+`grafana-cloud` role, and the development configuration sets
+`cloudwatch = { enabled = false }` for `observability-platform-development`.
+Turn its data sources on when that module call is upgraded.
+
+## Teams, permissions and sharing
+
+`grafana-cloud-sso.tf` creates a Grafana team and folder for each tenant with a
+`github_team`, synced from that GitHub team. The `team_uid` output of
+`modules/grafana-cloud/team` identifies the team in label-based access control
+rules.
+
+Each AWS data source has one `grafana_data_source_permission`, which grants
+Query to the owning tenant's team and to the teams of the tenants in
+`shared_with_tenants`. It is authoritative: it removes Grafana's default Viewer
+and Editor access, so no other users can query the data source. Admins keep
+access, including the platform team and the Terraform service account. If none
+of those tenants has a team, only Admins can query the data source. The GitHub
+data source keeps Grafana's default permissions.
+
 ## CloudWatch (Grafana Assume Role)
 
 `grafana-cloud-cloudwatch.tf` creates the `grafana-cloud-cloudwatch` IAM role
 with `CloudWatchReadOnlyAccess`. Grafana Cloud's AWS account (`008923505280`)
-can assume it only with this environment's stack ID as the external ID.
+can assume it only with this environment's stack ID as the external ID. This
+pilot role is in the Observability Platform account only. The AWS data sources
+above don't use it. Retire it once this account has the tenant module's
+`grafana-cloud` role.
 
 CloudWatch is an AWS API, not a service in the VPC, so CloudWatch data sources
 don't use PDC. In the data source, set **Authentication Provider** to

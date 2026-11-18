@@ -7,6 +7,12 @@ locals {
   # Per-environment hostnames come from application_variables.json (see
   # local.application_data in platform_locals.tf) so dev and prod stay
   # distinct without hardcoding environment logic here.
+  # Builder task size is set per environment in web-ui/application_variables.json
+  # (not the one in the parent directory). There is no fallback, so a missing key
+  # fails the plan. The pair must be a valid Fargate cpu/memory combination.
+  builder_task_cpu    = local.application_data.accounts[local.environment].builder_task_cpu
+  builder_task_memory = local.application_data.accounts[local.environment].builder_task_memory
+
   builder_hostname = var.builder_hostname != "" ? var.builder_hostname : local.application_data.accounts[local.environment].builder_hostname
 
   # var.forge_package_s3_bucket stays an explicit override (and keeps the

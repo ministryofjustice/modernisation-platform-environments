@@ -194,6 +194,52 @@ resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   ]
 }
 
+resource "aws_cloudwatch_metric_alarm" "mdss_received_files_reconciler_errors" {
+  alarm_name        = "mdss_received_files_reconciler_errors"
+  alarm_description = "Triggered when the MDSS received-files reconciler records errors"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "Errors"
+  namespace   = "AWS/Lambda"
+  period      = 60
+  statistic   = "Sum"
+
+  dimensions = {
+    FunctionName = module.mdss_received_files_reconciler.lambda_function_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "mdss_received_files_reconcile_exhausted" {
+  alarm_name        = "mdss_received_files_reconcile_exhausted"
+  alarm_description = "Triggered when stale MDSS received files reach the automatic redrive limit"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "MdssReceivedReconcilerSkippedMaxRedrivesCount"
+  namespace   = "EMDS/MDSS"
+  period      = 300
+  statistic   = "Maximum"
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
 resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
   alarm_name          = "glue_database_count_high"
   alarm_description   = "Triggered when Glue database count is above 8000 (approaching 10k limit)"
@@ -802,3 +848,32 @@ resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_executio
   ]
 }
 
+
+resource "aws_cloudwatch_log_metric_filter" "cadt_task_failed" {
+  name           = "cadt-task-failed"
+  log_group_name = "/ecs/create-a-derived-table"
+  pattern        = "Dataset Check Failed"
+
+  metric_transformation {
+    name      = "CadtTaskFailureCount"
+    namespace = "EMDS/ECS"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "cadt_task_failed" {
+  alarm_name          = "cadt-ecs-task-failed"
+  alarm_description   = "ECS task for create-a-derived-table (CADT) has failed. Check logs at https://eu-west-2.console.aws.amazon.com/cloudwatch/home?region=eu-west-2#logsV2:log-groups/log-group/$252Fecs$252Fcreate-a-derived-table"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  metric_name         = "CadtTaskFailureCount"
+  namespace           = "EMDS/ECS"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 1
+  treat_missing_data  = "notBreaching"
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}

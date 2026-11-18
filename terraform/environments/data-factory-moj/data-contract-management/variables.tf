@@ -31,3 +31,13 @@ variable "registration_alarm_action_arns" {
   type        = list(string)
   default     = []
 }
+
+variable "generation_contract_control" {
+  description = "Development Ingestion Registry used by schema generators."
+  type = object({
+    table_name  = string
+    table_arn   = string
+    kms_key_arn = string
+  })
+  default = null
+}
