@@ -11,8 +11,8 @@ resource "aws_kinesis_firehose_delivery_stream" "xsiam" {
 
     cloudwatch_logging_options {
       enabled         = true
-      log_group_name  = var.log_group_name
-      log_stream_name = var.log_stream_name
+      log_group_name  = aws_cloudwatch_log_group.firehose_log_group_xsiam.name
+      log_stream_name = aws_cloudwatch_log_stream.firehose_log_stream_xsiam.name
     }
 
     request_configuration {
@@ -40,6 +40,17 @@ resource "aws_kinesis_firehose_delivery_stream" "xsiam" {
     key_arn  = aws_kms_key.firehose_backup_xsiam.arn
     key_type = "CUSTOMER_MANAGED_CMK"
   }
+}
+
+resource "aws_cloudwatch_log_group" "firehose_log_group_xsiam" {
+  name              = "${local.name}-firehose-xsiam-error-logs"
+  retention_in_days = 400
+  kms_key_id        = aws_kms_key.firehose_backup_xsiam.arn
+}
+
+resource "aws_cloudwatch_log_stream" "firehose_log_stream_xsiam" {
+  name           = "${local.name}-firehose-xsiam-http"
+  log_group_name = aws_cloudwatch_log_group.firehose_log_group_xsiam.name
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "userjourney_to_xsiam" {
