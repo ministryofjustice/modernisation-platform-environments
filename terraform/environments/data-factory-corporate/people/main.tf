@@ -3,7 +3,7 @@ locals {
   application                          = "data-factory-corporate"
   component                            = "people"
   eventbridge_rule_name                = "eventbridge-malware-rule"
-  enable_external_iam_role             = false
+  enable_external_iam_role             = true
   enable_guardduty_slack_notifications = true
   cloudtrail_name                      = "corporate-cloudtrail"
 
