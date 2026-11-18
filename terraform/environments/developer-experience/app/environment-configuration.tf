@@ -7,5 +7,11 @@ locals {
     production = {
       cloud_platform_namespace = "developer-experience-app-prod"
     }
+    preproduction = {
+      cloud_platform_namespace = "developer-experience-app-preprod"
+    }
+    test = {
+      cloud_platform_namespace = "developer-experience-app-test"
+    }
   }
 }
