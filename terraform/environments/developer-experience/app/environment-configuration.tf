@@ -1,0 +1,11 @@
+locals {
+  environment_configuration = local.environment_configuration[local.environment]
+  environment_configurations = {
+    development = {
+      cloud_platform_namespace = "developer-experience-app-dev"
+    }
+    production = {
+      cloud_platform_namespace = "developer-experience-app-prod"
+    }
+  }
+}
