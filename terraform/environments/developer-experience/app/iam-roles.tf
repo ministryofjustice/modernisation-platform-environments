@@ -19,9 +19,12 @@ module "cloud_platform_eso_iam_role" {
       resources = [module.kms_key.key_arn]
     }
     SecretsManagerAccess = {
-      effect    = "Allow"
-      actions   = ["secretsmanager:GetSecretValue"]
-      resources = [module.secrets_manager.secret_arn]
+      effect  = "Allow"
+      actions = ["secretsmanager:GetSecretValue"]
+      resources = [
+        module.github_app_secret.secret_arn,
+        module.entra_app_secret.secret_arn
+      ]
     }
   }
 }
