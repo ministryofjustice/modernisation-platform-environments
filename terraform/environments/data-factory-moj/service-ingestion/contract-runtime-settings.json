@@ -59,7 +59,7 @@
             "lambda:InvokeFunction"
           ],
           "Resource": [
-            "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-gen-oracle-test:2",
+            "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-gen-oracle-test:3",
             "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-val-oracle-test:2",
             "arn:aws:lambda:eu-west-2:110695445580:function:data-factory-moj-development-contracts:1"
           ]
@@ -187,7 +187,7 @@
             "lambda:InvokeFunction"
           ],
           "Resource": [
-            "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-gen-postgres-test:2",
+            "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-gen-postgres-test:3",
             "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-val-postgres-test:2",
             "arn:aws:lambda:eu-west-2:110695445580:function:data-factory-moj-development-contracts:1"
           ]
