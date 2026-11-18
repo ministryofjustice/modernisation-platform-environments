@@ -5,8 +5,9 @@ variable "tenants" {
     github_team = optional(string)
     # AWS accounts owned by the tenant, keyed by account name
     aws_accounts = optional(map(object({
-      # Must match the tenant module's grafana_cloud.pdc_agent.enabled in the account
-      pdc_enabled = optional(bool, true)
+      # Opt in, for accounts with private data sources. Must match the tenant module's
+      # grafana_cloud.pdc_agent.enabled in the account.
+      pdc_enabled = optional(bool, false)
       # Other tenants whose teams can also query the account's data
       shared_with_tenants = optional(list(string), [])
       cloudwatch = optional(object({
