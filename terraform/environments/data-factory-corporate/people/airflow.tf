@@ -122,3 +122,18 @@ resource "aws_lakeformation_permissions" "airflow-sherlock-tables" {
 
   depends_on = [aws_lakeformation_data_lake_settings.your_lake_settings_name]
 }
+
+# The development smoke-test prefix is outside the Glue database's default location.
+resource "aws_lakeformation_permissions" "airflow-sherlock-test-location" {
+  count = local.enable_airflow_iam_role && local.environment == "development" ? 1 : 0
+
+  principal   = module.data_platform_airflow_iam_role[0].role_arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+
+  data_location {
+    arn        = "${module.lakeformation_locations["sherlock"].location_arn}/airflow-test"
+    catalog_id = data.aws_caller_identity.current.account_id
+  }
+
+  depends_on = [aws_lakeformation_data_lake_settings.your_lake_settings_name]
+}
