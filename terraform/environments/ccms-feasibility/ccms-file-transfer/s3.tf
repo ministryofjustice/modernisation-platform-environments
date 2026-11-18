@@ -1,3 +1,8 @@
+# Shared S3 server access logs bucket, managed in ccms-feasibility root
+data "aws_s3_bucket" "s3_access_logs" {
+  bucket = "${local.application_name}-s3-access-logs"
+}
+
 # Business Central inbound bucket. Files land in <base path>/inbound, trigger the process-file Lambda (lambda.tf),
 # and are moved to archive/ or error/ by the Financial Transfers API.
 
@@ -76,6 +81,18 @@ module "s3_bc_inbound" {
   tags = merge(local.tags, {
     Name = local.bc_bucket_name
   })
+}
+
+resource "aws_s3_bucket_logging" "s3_bc_inbound" {
+  bucket        = module.s3_bc_inbound.bucket.id
+  target_bucket = data.aws_s3_bucket.s3_access_logs.id
+  target_prefix = "${module.s3_bc_inbound.bucket.id}/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
 }
 
 resource "aws_s3_object" "bc_inbound_folders" {
