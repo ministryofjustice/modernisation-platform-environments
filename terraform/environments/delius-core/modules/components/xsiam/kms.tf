@@ -52,13 +52,14 @@ resource "aws_kms_key_policy" "firehose_backup_xsiam_policy" {
         Action = [
           "kms:Encrypt",
           "kms:Decrypt",
+          "kms:ReEncrypt*",
           "kms:DescribeKey",
           "kms:GenerateDataKey"
         ],
         Resource = "*"
         "Condition" : {
           "StringEquals" : {
-            "kms:EncryptionContext:aws:logs:arn" : aws_cloudwatch_log_group.firehose_log_group_xsiam.arn
+            "kms:EncryptionContext:aws:logs:arn" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current_xsiam.account_id}:log-group:${local.name}-firehose-xsiam-error-logs"
           }
         }
       },
