@@ -2,7 +2,7 @@ module "observability_platform_tenant" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "ministryofjustice/observability-platform-tenant/aws"
-  version = "2.0.0"
+  version = "9.9.9"
 
   observability_platform_account_id = local.environment_management.account_ids["observability-platform-production"]
   enable_xray                       = true
