@@ -16,10 +16,10 @@
       "usage_report_enabled": false,
       "usage_report_interval_minutes": 15,
       "environment_wipe_enabled": true,
-      "environment_wipe_schedule": "cron(0 5 ? * SUN *)",
+      "environment_wipe_schedule": "cron(0 2 ? * SUN *)",
       "environment_wipe_efs": true,
       "prototype_expiry_enabled": true,
-      "prototype_expiry_schedule": "cron(0 3 * * ? *)",
+      "prototype_expiry_schedule": "cron(0 1 * * ? *)",
       "prototype_expiry_max_age_days": 6
     },
     "test": {
@@ -38,10 +38,10 @@
       "usage_report_enabled": false,
       "usage_report_interval_minutes": 15,
       "environment_wipe_enabled": true,
-      "environment_wipe_schedule": "cron(0 5 ? * SUN *)",
+      "environment_wipe_schedule": "cron(0 2 ? * SUN *)",
       "environment_wipe_efs": true,
       "prototype_expiry_enabled": true,
-      "prototype_expiry_schedule": "cron(0 3 * * ? *)",
+      "prototype_expiry_schedule": "cron(0 1 * * ? *)",
       "prototype_expiry_max_age_days": 1
     },
     "preproduction": {
@@ -60,7 +60,7 @@
       "usage_report_enabled": false,
       "usage_report_interval_minutes": 15,
       "prototype_expiry_enabled": false,
-      "prototype_expiry_schedule": "cron(0 3 * * ? *)",
+      "prototype_expiry_schedule": "cron(0 2 * * ? *)",
       "prototype_expiry_max_age_days": 30
     },
     "production": {
@@ -79,7 +79,7 @@
       "usage_report_enabled": true,
       "usage_report_interval_minutes": 15,
       "prototype_expiry_enabled": false,
-      "prototype_expiry_schedule": "cron(0 3 * * ? *)",
+      "prototype_expiry_schedule": "cron(0 2 * * ? *)",
       "prototype_expiry_max_age_days": 180
     }
   }
