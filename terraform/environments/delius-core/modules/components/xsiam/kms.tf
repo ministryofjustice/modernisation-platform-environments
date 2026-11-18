@@ -59,7 +59,7 @@ resource "aws_kms_key_policy" "firehose_backup_xsiam_policy" {
         Resource = "*"
         "Condition" : {
           "StringEquals" : {
-            "kms:EncryptionContext:aws:logs:arn" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current_xsiam.account_id}:log-group:${local.name}-firehose-xsiam-error-logs"
+            "kms:EncryptionContext:aws:logs:arn" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:${local.name}-firehose-xsiam-error-logs"
           }
         }
       },
