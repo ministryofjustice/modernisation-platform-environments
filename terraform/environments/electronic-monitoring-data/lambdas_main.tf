@@ -186,6 +186,25 @@ module "mdss_raw_file_stager" {
   }
 }
 
+module "gems_raw_file_stager" {
+  source                         = "./modules/lambdas"
+  function_name                  = "gems_raw_file_stager"
+  image_name                     = "copy_data"
+  is_image                       = true
+  role_name                      = aws_iam_role.copy_mdss_data.name
+  role_arn                       = aws_iam_role.copy_mdss_data.arn
+  memory_size                    = 1024
+  timeout                        = 900
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  reserved_concurrent_executions = 1000
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    DESTINATION_BUCKET = module.s3-raw-formatted-data-bucket.bucket.id
+  }
+}
+
 #-----------------------------------------------------------------------------------
 # Clean after MDSS load
 #-----------------------------------------------------------------------------------
