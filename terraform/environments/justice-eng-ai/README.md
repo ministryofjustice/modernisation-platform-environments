@@ -250,13 +250,56 @@ built with `modules/step_function_builder`) deletes all data so the environment 
   user-applications ECR repository and every S3 object version in the staging bucket; purges the
   approval dead-letter queue; empties the file system (top-level directories are kept); then
   restores Builder and Forge to their previous task counts, also when a step fails. Builder and
-  Forge are down for the duration.
+  Forge are down for the duration. They have to be: Forge holds an index of the file system in
+  memory and would write stale data back if it kept running.
+- **Alarms**: where the schedule is enabled, the alarm mute rule
+  `justice-eng-ai-<environment>-wipe-window` mutes the Builder and Forge alarms (web UI no running
+  tasks, web UI unhealthy hosts and the web UI load balancer alarms) from 00:00 to 04:00 UK time.
+  The alarms are still evaluated; one that is still in ALARM at 04:00 notifies then. The schedule
+  must start between 00:00 and 02:59, and the plan fails otherwise.
 - The shared script-runner image in `modernisation-platform-ai-builder-core` is not touched.
 - The script is baked into the script-runner image, so after changing it run the
   `script-runner-image-build` workflow. It registers a new revision of the wipe task definition
   where the family exists and skips it where it does not (production).
 - Run it by hand with Start execution on the state machine (input `{}`). Alerts for a failed
   wipe come from the common state-machine failure alarm.
+
+### **Scheduled prototype expiry:**
+
+The `<application>-expire-prototypes` state machine (`backend-processing/step_functions_expire_prototypes.tf`,
+built with `modules/step_function_builder`) removes dormant prototypes: those whose image has not been redeployed for a set number of
+days. It runs `scripts/maintenance/expire_prototypes.py` from the application repository in a dedicated
+script-runner task.
+
+- **Settings**, in the root `application_variables.json` under the environment:
+
+  | Key | Meaning |
+  | --- | --- |
+  | `prototype_expiry_enabled` | `true` turns the schedule on; `false` creates it disabled (it can still be started by hand) |
+  | `prototype_expiry_schedule` | EventBridge cron expression with six fields, evaluated in UK time, e.g. `cron(0 3 * * ? *)` (every night at 03:00) |
+  | `prototype_expiry_max_age_days` | Whole number of days. Prototypes whose current image was deployed more than this many days ago are removed |
+
+  Nothing is created for an environment without `prototype_expiry_schedule`. It is enabled in development
+  and test and created disabled in preproduction and production, all at 03:00 with a 30-day limit.
+- **What it does**: lists the `prototype-*` services in the prototype cluster and picks those whose current image
+  was deployed (the service's PRIMARY deployment) more than the limit ago. Every redeploy resets the
+  age, so prototypes still being worked on are kept and dormant ones are removed. For each, it reads the full AppID from the
+  image tag and deletes, in order: the `<AppID>-<BuildID>` images in the user-applications ECR
+  repository, every version of the `<AppID>` packages in the staging bucket, the AppID's items in the
+  build-details table (including its build counter), its DNS record, its listener rules, its prototype
+  DynamoDB table, its ECS service, its target group, its task definitions and its log group. The web UI
+  file system (EFS) is not mounted and Builder and Forge keep running.
+- **Deletion log**: one JSON line per prototype (AppID, deployment date, age and counts of what was
+  deleted, or the error) plus a run summary, in a stream per run in the `/<application>/prototype-expiry`
+  log group, kept for 10 years.
+- **Report**: a message listing the removed AppIDs (and any failures) is posted to `slack_channel_id`
+  through the job-completion topic after every run, including runs that remove nothing.
+- A failure on one prototype does not stop the others. The run then fails, so the common state-machine
+  failure alarm fires, and the next run picks the prototype up again.
+- The script is baked into the script-runner image, so after changing it run the
+  `script-runner-image-build` workflow. It registers a new revision of the expiry task definition where
+  the family exists and skips it where it does not.
+- Run it by hand with Start execution on the state machine (input `{}`).
 
 ### **How to resolve specific issues:**
 

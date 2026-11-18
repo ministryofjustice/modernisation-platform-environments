@@ -18,6 +18,7 @@ locals {
     },
     { for m in module.step_functions_notify : "notify" => m.arn },
     { for m in module.step_functions_wipe_environment : "wipe_environment" => m.arn },
+    { for m in module.step_functions_expire_prototypes : "expire_prototypes" => m.arn },
   )
 
   # Bedrock errors are matched in the existing ECS logs by text. Thresholds are counts
