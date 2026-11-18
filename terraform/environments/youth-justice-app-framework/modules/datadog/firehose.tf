@@ -193,6 +193,14 @@ resource "aws_iam_role_policy" "cw_logs_to_firehose_policy" {
           "kinesis:PutRecords"
         ],
         Resource = aws_kinesis_firehose_delivery_stream.to_datadog.arn
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "kms:GenerateDataKey",
+          "kms:Decrypt"
+        ],
+        Resource = aws_kms_key.firehose_backup.arn
       }
     ]
   })
