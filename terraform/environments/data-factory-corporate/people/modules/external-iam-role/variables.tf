@@ -13,6 +13,21 @@ variable "trusted_account_id" {
   #}
 }
 
+variable "external_id" {
+  description = "External ID the trusted caller must include in its STS AssumeRole request."
+  type        = string
+  nullable    = false
+  sensitive   = true
+
+  validation {
+    condition = (
+      length(var.external_id) >= 2 && length(var.external_id) <= 1224 &&
+      can(regex("^[A-Za-z0-9_+=,.@:/-]+$", var.external_id))
+    )
+    error_message = "external_id must contain 2 to 1224 characters: letters, digits, underscore or +=,.@:/-; whitespace and wildcards are not allowed."
+  }
+}
+
 variable "max_session_duration" {
   description = "Maximum session duration for the IAM role, in seconds."
   type        = number

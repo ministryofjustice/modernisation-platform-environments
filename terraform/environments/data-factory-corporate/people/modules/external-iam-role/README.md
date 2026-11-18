@@ -5,13 +5,35 @@ The role's inline policy grants access to objects under one S3 prefix, the
 specified KMS key, and tables in a Glue database. Bucket listing is limited to
 the prefix; object, KMS, and Glue actions are supplied by the caller.
 
-The trust policy names the trusted account root, so that account controls which
-of its principals can assume the role. Set `glue_table_name` to `"*"` only
-when the external account must manage all tables in the database.
+The trust policy names the trusted account root and requires an exact
+`sts:ExternalId` match. The caller needs permission in that account and must pass
+the required `ExternalId` to STS. 
+
+The required `external_id` input accepts
+2 to 1,224 characters from the AWS-supported character set, without whitespace
+or wildcards. The [People caller](../../external-access.tf) retrieves it from the
+KMS-encrypted `sherlock-external-id` secret; the module does not create secrets.
+
+Initial set up: `enable_external_iam_role = false`, deploy, populate the secret, 
+coordinate Avature's `ExternalId`, then set the toggle back to `true` and deploy again.
+The toggle belongs to the parent configuration, not this module.
+
+Sensitivity redacts ordinary Terraform output, not the IAM trust policy or
+Terraform state.
 
 ## Access flow
 
 ![External IAM role trust and scoped S3, KMS and Glue access](architecture.excalidraw.svg)
+
+[Editable Excalidraw diagram](architecture.excalidraw).
+
+## Lake Formation
+
+This module grants IAM permissions only. Lake Formation-governed catalogue
+resources require additional grants for the local assumed role, not the external
+account's original identity. The [People caller](../../external-access.tf) grants
+Sherlock database `DESCRIBE`/`CREATE_TABLE` and table `DESCRIBE`/`ALTER`/`DROP`
+separately. Those grants do not widen the role's S3 prefix restriction.
 
 
 ## Usage
@@ -21,7 +43,8 @@ module "assume_iam_role" {
     source = "./modules/external-iam-role"
 
     role_name          = "datafactory_external_assume_role"
-    trusted_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
+    trusted_account_id = data.aws_secretsmanager_secret_version.external_account_id[0].secret_string
+    external_id        = data.aws_secretsmanager_secret_version.external-id[0].secret_string
     bucket_arn         = module.sherlock_landing_bucket_mp.bucket.arn
     s3_prefix          = "avature-sherlock"
     s3_object_actions  = ["s3:GetObject", "s3:PutObject"]
@@ -76,6 +99,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_bucket_arn"></a> [bucket\_arn](#input\_bucket\_arn) | ARN of the S3 bucket containing the allocated prefix. | `string` | n/a | yes |
+| <a name="input_external_id"></a> [external\_id](#input\_external\_id) | External ID the trusted caller must include in its STS AssumeRole request. | `string` | n/a | yes |
 | <a name="input_glue_actions"></a> [glue\_actions](#input\_glue\_actions) | Glue table actions allowed within the allocated database. | `list(string)` | `[]` | no |
 | <a name="input_glue_catalog_arn"></a> [glue\_catalog\_arn](#input\_glue\_catalog\_arn) | ARN of the Glue catalog. | `string` | n/a | yes |
 | <a name="input_glue_database_arn"></a> [glue\_database\_arn](#input\_glue\_database\_arn) | ARN of the Glue database allocated to the external client. | `string` | n/a | yes |

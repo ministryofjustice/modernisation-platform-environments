@@ -25,6 +25,11 @@ resource "aws_iam_role" "this" {
         }
 
         Action = "sts:AssumeRole"
+        Condition = {
+          StringEquals = {
+            "sts:ExternalId" = var.external_id
+          }
+        }
       }
     ]
   })

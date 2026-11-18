@@ -3,7 +3,7 @@
 Routes GuardDuty Malware Protection for S3 events for the configured buckets to
 a quarantine Lambda and an SNS alerts topic. Object scan results matching
 `alert_scan_result_statuses` trigger SNS alerts, while results matching
-`quarantine_scan_result_statuses` invoke the Lambda. Protection plan warnings and
+`scan_result_statuses` invoke the Lambda. Protection plan warnings and
 errors trigger SNS alerts independently. The Lambda decides which matched objects
 to quarantine using its own configured statuses.
 
@@ -18,6 +18,13 @@ without invoking the quarantine Lambda.
 
 ![GuardDuty EventBridge quarantine and alert flow](architecture.excalidraw.svg)
 
+[Editable Excalidraw diagram](architecture.excalidraw).
+
+The module defaults both status lists to all five outcomes, including clean scans.
+The [People caller](../../monitoring.tf) excludes clean scans from Lambda invocation
+but includes them in notifications. Supply `kms_key_arn` for SNS encryption and
+allow EventBridge to use that key for the alerts topic in its key policy.
+
 
 ## Usage
 
@@ -28,7 +35,8 @@ module "data_factory_guardduty_eventbridge" {
     name                 = "eventbridge-malware-rule"
     bucket_names         = [module.sherlock_landing_bucket_mp.bucket.bucket]
     alert_scan_result_statuses      = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
-    quarantine_scan_result_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
+    scan_result_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED"]
+    kms_key_arn          = module.corporate_logging_kms_key.key_arn
     target_lambda_name   = module.data_factory_guardduty_lambda.name
     target_lambda_arn    = module.data_factory_guardduty_lambda.arn
 
@@ -77,10 +85,11 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_bucket_names"></a> [bucket\_names](#input\_bucket\_names) | Names of the S3 buckets to apply rule to. | `list(string)` | `[]` | no |
-| <a name="input_name"></a> [name](#input\_name) | Name of the EventBridge rule. | `string` | `"eventbridge-guardduty-quarantine"` | no |
 | <a name="input_alert_scan_result_statuses"></a> [alert\_scan\_result\_statuses](#input\_alert\_scan\_result\_statuses) | List of scan result statuses to publish to the alerts topic. | `list(string)` | <pre>[<br/>  "THREATS_FOUND",<br/>  "FAILED",<br/>  "ACCESS_DENIED",<br/>  "UNSUPPORTED",<br/>  "NO_THREATS_FOUND"<br/>]</pre> | no |
-| <a name="input_quarantine_scan_result_statuses"></a> [quarantine\_scan\_result\_statuses](#input\_quarantine\_scan\_result\_statuses) | List of scan result statuses that invoke the quarantine Lambda. | `list(string)` | <pre>[<br/>  "THREATS_FOUND",<br/>  "FAILED",<br/>  "ACCESS_DENIED"<br/>]</pre> | no |
+| <a name="input_bucket_names"></a> [bucket\_names](#input\_bucket\_names) | Names of the S3 buckets to apply rule to. | `list(string)` | `[]` | no |
+| <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | ARN of the KMS key used to encrypt the scan alerts SNS topic. | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | Name of the EventBridge rule. | `string` | `"eventbridge-guardduty-quarantine"` | no |
+| <a name="input_scan_result_statuses"></a> [scan\_result\_statuses](#input\_scan\_result\_statuses) | List of scan result statuses that invoke the Lambda. | `list(string)` | <pre>[<br/>  "THREATS_FOUND",<br/>  "FAILED",<br/>  "ACCESS_DENIED",<br/>  "UNSUPPORTED",<br/>  "NO_THREATS_FOUND"<br/>]</pre> | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to created resources. | `map(string)` | `{}` | no |
 | <a name="input_target_lambda_arn"></a> [target\_lambda\_arn](#input\_target\_lambda\_arn) | ARN of the target Lambda function. | `string` | n/a | yes |
 | <a name="input_target_lambda_name"></a> [target\_lambda\_name](#input\_target\_lambda\_name) | Name of the target Lambda function. | `string` | `"quarantine-lambda"` | no |

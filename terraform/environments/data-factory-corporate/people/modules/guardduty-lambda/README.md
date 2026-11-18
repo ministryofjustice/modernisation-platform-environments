@@ -1,7 +1,8 @@
 # GuardDuty Lambda
 
 Creates the Lambda invoked by the GuardDuty EventBridge rule. It logs the scan
-result and copies objects with statuses in `quarantine_statuses` to the quarantine
+result, adds `classification=official-sensitive` while preserving other object
+tags, and copies objects with statuses in `quarantine_statuses` to the quarantine
 bucket before deleting the source object. An SQS dead-letter queue captures
 failed asynchronous invocations.
 
@@ -9,6 +10,9 @@ failed asynchronous invocations.
 
 ![GuardDuty Lambda selected-object quarantine flow](architecture.excalidraw.svg)
 
+[Editable Excalidraw diagram](architecture.excalidraw).
+
+Event matching is configured separately in the EventBridge module. 
 
 ## Usage
 

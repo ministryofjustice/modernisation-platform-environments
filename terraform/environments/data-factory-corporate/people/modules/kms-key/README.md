@@ -4,11 +4,16 @@ Creates a customer-managed KMS key with automatic rotation and an alias. The
 key policy permits IAM permissions in the owning account. Set `cloudtrail_name`
 to grant that trail access to encrypt logs and publish to an encrypted SNS
 topic. Set `enable_cloudwatch_logs` to allow regional CloudWatch Logs groups
-in the account to use the key. Both service grants are optional.
+in the account to use the key. Set `eventbridge_sns_topic_name` to permit
+EventBridge encryption for that SNS topic in this region and account, restricted
+by its SNS encryption context. All service grants are optional. The account-root
+statement enables IAM delegation; it does not give every role key access.
 
 ## Key access
 
 ![Customer-managed KMS key and optional service grants](architecture.excalidraw.svg)
+
+[Editable Excalidraw diagram](architecture.excalidraw).
 
 
 ## Usage
@@ -66,6 +71,7 @@ No modules.
 | <a name="input_cloudtrail_name"></a> [cloudtrail\_name](#input\_cloudtrail\_name) | Name of the CloudTrail trail permitted to use this key. Leave null to omit the CloudTrail key policy statements. | `string` | `null` | no |
 | <a name="input_deletion_window_in_days"></a> [deletion\_window\_in\_days](#input\_deletion\_window\_in\_days) | Waiting period before the key is deleted. | `number` | `30` | no |
 | <a name="input_enable_cloudwatch_logs"></a> [enable\_cloudwatch\_logs](#input\_enable\_cloudwatch\_logs) | Whether to allow CloudWatch Logs to use this key for log group encryption. | `bool` | `false` | no |
+| <a name="input_eventbridge_sns_topic_name"></a> [eventbridge\_sns\_topic\_name](#input\_eventbridge\_sns\_topic\_name) | Name of the SNS topic EventBridge is permitted to encrypt messages for. Leave null to omit the EventBridge key policy statement. | `string` | `null` | no |
 | <a name="input_rotation_period_in_days"></a> [rotation\_period\_in\_days](#input\_rotation\_period\_in\_days) | Number of days between automatic key rotations. | `number` | `365` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to created resources. | `map(string)` | `{}` | no |
 
