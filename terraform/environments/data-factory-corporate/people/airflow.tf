@@ -55,7 +55,8 @@ module "data_platform_airflow_iam_role" {
           Effect = "Allow"
           Action = [
             "s3:GetObject",
-            "s3:PutObject"
+            "s3:PutObject",
+            "s3:DeleteObject"
           ]
           Resource = "${module.sherlock_landing_bucket_mp.bucket.arn}/*"
         },
