@@ -12,6 +12,9 @@
 # Builder and Forge are stopped while the wipe runs. Their alarms are muted from 00:00 to
 # 04:00 UK time (monitoring_runtime.tf), so the schedule must start before 03:00.
 #
+# After every run, including failed ones, a report listing every AppID that was wiped is
+# posted to Slack through the job-completion topic.
+#
 # Nothing is created unless those keys are set, and they must not be set for preproduction
 # or production. The plan fails if they are, and the script refuses to run there as well.
 
@@ -46,6 +49,7 @@ locals {
     { name = "DLQ_URL", value = aws_sqs_queue.build_approval_pipe_dlq.url },
     { name = "WIPE_EFS", value = tostring(local.wipe_efs) },
     { name = "EFS_MOUNT", value = local.wipe_efs_mount_path },
+    { name = "TOPIC_ARN", value = aws_sns_topic.job_completion.arn },
   ]
 }
 
@@ -318,6 +322,20 @@ data "aws_iam_policy_document" "wipe_environment_task" {
     effect    = "Allow"
     actions   = ["sqs:PurgeQueue"]
     resources = [aws_sqs_queue.build_approval_pipe_dlq.arn]
+  }
+
+  statement {
+    sid       = "PostSlackReport"
+    effect    = "Allow"
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.job_completion.arn]
+  }
+
+  statement {
+    sid       = "UseJobCompletionTopicKey"
+    effect    = "Allow"
+    actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
+    resources = [aws_kms_key.job_completion.arn]
   }
 }
 
