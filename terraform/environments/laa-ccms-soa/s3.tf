@@ -30,7 +30,7 @@ module "s3-bucket-logging" {
           Sid    = "AWSLogDeliveryWrite",
           Effect = "Allow",
           Principal = {
-            Service = concat(["delivery.logs.amazonaws.com"],local.alb_80_enabled ? ["logdelivery.elasticloadbalancing.amazonaws.com"]: [])
+            Service = concat(["delivery.logs.amazonaws.com"], local.alb_80_enabled ? ["logdelivery.elasticloadbalancing.amazonaws.com"] : [])
           },
           Action   = "s3:PutObject",
           Resource = "${module.s3-bucket-logging.bucket.arn}/*",
@@ -45,7 +45,7 @@ module "s3-bucket-logging" {
           Sid    = "AWSLogDeliveryAclCheck",
           Effect = "Allow",
           Principal = {
-            Service = concat(["delivery.logs.amazonaws.com"],local.alb_80_enabled ? ["logdelivery.elasticloadbalancing.amazonaws.com"]: [])
+            Service = concat(["delivery.logs.amazonaws.com"], local.alb_80_enabled ? ["logdelivery.elasticloadbalancing.amazonaws.com"] : [])
           },
           Action   = "s3:GetBucketAcl",
           Resource = module.s3-bucket-logging.bucket.arn,
