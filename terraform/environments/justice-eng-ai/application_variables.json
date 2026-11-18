@@ -17,7 +17,10 @@
       "usage_report_interval_minutes": 15,
       "environment_wipe_enabled": true,
       "environment_wipe_schedule": "cron(0 2 ? * SUN *)",
-      "environment_wipe_efs": true
+      "environment_wipe_efs": true,
+      "prototype_expiry_enabled": true,
+      "prototype_expiry_schedule": "cron(0 1 * * ? *)",
+      "prototype_expiry_max_age_days": 6
     },
     "test": {
       "vpc_cidr": "10.0.0.0/16",
@@ -35,8 +38,11 @@
       "usage_report_enabled": false,
       "usage_report_interval_minutes": 15,
       "environment_wipe_enabled": true,
-      "environment_wipe_schedule": "cron(0 2 * * ? *)",
-      "environment_wipe_efs": true
+      "environment_wipe_schedule": "cron(0 2 ? * SUN *)",
+      "environment_wipe_efs": true,
+      "prototype_expiry_enabled": true,
+      "prototype_expiry_schedule": "cron(0 1 * * ? *)",
+      "prototype_expiry_max_age_days": 1
     },
     "preproduction": {
       "vpc_cidr": "10.0.0.0/16",
@@ -52,7 +58,10 @@
       "email_confirmations_enabled": true,
       "slack_confirmations_enabled": true,
       "usage_report_enabled": false,
-      "usage_report_interval_minutes": 15
+      "usage_report_interval_minutes": 15,
+      "prototype_expiry_enabled": false,
+      "prototype_expiry_schedule": "cron(0 2 * * ? *)",
+      "prototype_expiry_max_age_days": 30
     },
     "production": {
       "vpc_cidr": "10.0.0.0/16",
@@ -68,7 +77,10 @@
       "email_confirmations_enabled": true,
       "slack_confirmations_enabled": true,
       "usage_report_enabled": true,
-      "usage_report_interval_minutes": 15
+      "usage_report_interval_minutes": 15,
+      "prototype_expiry_enabled": false,
+      "prototype_expiry_schedule": "cron(0 2 * * ? *)",
+      "prototype_expiry_max_age_days": 180
     }
   }
 }
