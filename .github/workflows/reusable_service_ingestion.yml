@@ -84,7 +84,7 @@ jobs:
           esac
 
       - name: Decrypt deployment settings
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@09f7bbe4b51fbdfc068014571c201d2c5b3704c0 # v6.3.0
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -216,7 +216,7 @@ jobs:
           persist-credentials: false
 
       - name: Decrypt deployment settings
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5ec14e836f3de882a84f1c0b919645846a9d4f8e # v6.2.13
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@09f7bbe4b51fbdfc068014571c201d2c5b3704c0 # v6.3.0
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
