@@ -225,6 +225,39 @@ read without fallbacks, so a missing key fails the plan.
 - To check a Forge size, look at the task definition revision the service is running, not only
   the newest revision of the family.
 
+### **Scheduled environment wipe (development and test only):**
+
+The `<application>-wipe-environment` state machine (`backend-processing/step_functions_wipe_environment.tf`,
+built with `modules/step_function_builder`) deletes all data so the environment is clean again. It runs
+`scripts/maintenance/wipe_environment.py` from the application repository in a dedicated script-runner task.
+
+- **Settings**, in the root `application_variables.json` under the environment:
+
+  | Key | Meaning |
+  | --- | --- |
+  | `environment_wipe_enabled` | `true` turns the schedule on; `false` creates it disabled (it can still be started by hand) |
+  | `environment_wipe_schedule` | EventBridge cron expression with six fields, evaluated in UK time, e.g. `cron(0 2 ? * SUN *)` (Sundays 02:00) or `cron(0 2 ? * MON-FRI *)` (weekdays 02:00) |
+  | `environment_wipe_efs` | `true` also empties the web UI file system (Builder and Forge files) |
+
+  Development is set to Sundays at 02:00 and test to every night at 02:00 (`cron(0 2 * * ? *)`), both with the file system included. **Preproduction and
+  production have none of these keys, so nothing is created there.** The plan fails if the keys are
+  added to those environments, and the script refuses to run unless `ENVIRONMENT` is `development`
+  or `test`.
+- **What it does**, in order: scales Builder and Forge to zero; stops running executions of the
+  other state machines; deletes all prototype resources (ECS services, task definitions, target
+  groups, listener rules, log groups, tables, DNS records); deletes every item in every other
+  DynamoDB table (including the build counters, so numbering restarts at 1), every image in the
+  user-applications ECR repository and every S3 object version in the staging bucket; purges the
+  approval dead-letter queue; empties the file system (top-level directories are kept); then
+  restores Builder and Forge to their previous task counts, also when a step fails. Builder and
+  Forge are down for the duration.
+- The shared script-runner image in `modernisation-platform-ai-builder-core` is not touched.
+- The script is baked into the script-runner image, so after changing it run the
+  `script-runner-image-build` workflow. It registers a new revision of the wipe task definition
+  where the family exists and skips it where it does not (production).
+- Run it by hand with Start execution on the state machine (input `{}`). Alerts for a failed
+  wipe come from the common state-machine failure alarm.
+
 ### **How to resolve specific issues:**
 
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->

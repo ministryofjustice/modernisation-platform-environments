@@ -4560,30 +4560,12 @@ module "trigger_cadt_daily_run_iam_role" {
 
 data "aws_iam_policy_document" "trigger_cadt_daily_run_iam_role" {
   statement {
-    effect  = "Allow"
-    actions = ["apigateway:POST"]
-    resources = [
-      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_request_id}/methods/POST"
-    ]
-  }
-  statement {
     effect = "Allow"
     actions = [
-      "apigateway:GET",
-      "apigateway:POST"
+      "execute-api:Invoke"
     ]
     resources = [
-      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_status_id}/methods/GET"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "apigateway:GET",
-      "apigateway:POST"
-    ]
-    resources = [
-      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_execution_id_id}/methods/GET"
+      "${module.trigger_cadt_api.api_gateway_arn}/*"
     ]
   }
 }

@@ -42,10 +42,13 @@ module "validation_lambda_function" {
   # Commit hash for v7.20.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=84dfbfddf9483bc56afa0aff516177c03652f0c7"
 
+  # Each module instance builds identical source; without this, parallel builds race on the same zip filename
+  hash_extra = var.db
+
   function_name           = "${var.db}-validation"
   description             = "Lambda to validate DMS data output"
   handler                 = "main.handler"
-  runtime                 = "python3.12"
+  runtime                 = "python3.14"
   timeout                 = 60
   architectures           = ["x86_64"]
   build_in_docker         = false

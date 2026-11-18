@@ -1758,7 +1758,6 @@ module "register_athena" {
 }
 
 module "trigger_cadt_daily_run" {
-  count                          = local.is-production || local.is-preproduction ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "trigger_cadt_daily_run"
@@ -1774,6 +1773,6 @@ module "trigger_cadt_daily_run" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    TRIGGER_CADT_URL = "https://${module.trigger_cadt_api.api_gateway_id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${module.trigger_cadt_api.resource_request_id}"
+    TRIGGER_CADT_URL = "https://${module.trigger_cadt_api.api_gateway_id}.execute-api.${data.aws_region.current.name}.amazonaws.com/request/execute"
   }
 }

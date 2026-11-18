@@ -1,7 +1,7 @@
 module "schema_generation" {
   for_each = local.generation_sources
 
-  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-generation?ref=3b181c61e6fd0b49efeeb607d714dce278c2fc3e"
+  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-generation?ref=4a672434bdc79bf9793e32379c17eed784973667"
 
   name         = "${local.generation_function_prefix}-${each.key}"
   image_uri    = each.value.image_uri
@@ -24,8 +24,15 @@ module "schema_generation" {
 
   schema_registry_bucket_name = aws_s3_bucket.contract_management["contracts"].id
 
+  candidate_storage = {
+    bucket_name             = aws_s3_bucket.contract_management["contracts"].id
+    bucket_owner_account_id = data.aws_caller_identity.current.account_id
+    kms_key_arn             = aws_kms_key.contract_management["contracts"].arn
+  }
+
   contract_object_arns = [
     "${aws_s3_bucket.contract_management["contracts"].arn}/${each.value.contract_object_prefix}/*",
+    "${aws_s3_bucket.contract_management["contracts"].arn}/candidates/*",
   ]
 
   contract_kms_key_arns = [
