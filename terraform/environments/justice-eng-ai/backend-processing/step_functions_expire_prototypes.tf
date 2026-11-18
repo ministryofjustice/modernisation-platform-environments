@@ -7,7 +7,10 @@
 # all data held for its AppID (ECS service, listener rules, target group, task definitions,
 # log group, prototype table, DNS record, ECR images, S3 packages and build-details items),
 # writes a JSON line per prototype to a deletion log group and posts a report of the removed
-# AppIDs to Slack through the job-completion topic. The web UI file system (EFS) is never
+# AppIDs to Slack through the job-completion topic. Owners are emailed through GOV.UK Notify
+# (the build-deployed email template, copied to the team mailbox) a set number of days before
+# their prototype is deleted, and again once it has been; a prototype is only deleted after
+# its owner has had the full warning period. The web UI file system (EFS) is never
 # mounted, so Builder and Forge files are kept.
 #
 # The settings come from the root application_variables.json:
@@ -16,6 +19,8 @@
 #   prototype_expiry_schedule       EventBridge cron expression, evaluated in UK time,
 #                                   e.g. "cron(0 3 * * ? *)"
 #   prototype_expiry_max_age_days   prototypes whose image was deployed more than this many days ago are removed
+#   prototype_expiry_warning_days   owners are warned this many days before removal (0 to the max age;
+#                                   0 sends no warning, only the email after removal)
 #
 # Nothing is created unless prototype_expiry_schedule is set for the environment.
 
@@ -26,6 +31,7 @@ locals {
   expiry_enabled      = try(local.expiry_account_data.prototype_expiry_enabled, false)
   expiry_schedule     = try(local.expiry_account_data.prototype_expiry_schedule, "")
   expiry_max_age_days = try(local.expiry_account_data.prototype_expiry_max_age_days, null)
+  expiry_warning_days = try(local.expiry_account_data.prototype_expiry_warning_days, null)
 
   expiry_name                 = "${local.application_name}-expire-prototypes"
   expiry_task_family          = local.expiry_name
@@ -45,6 +51,10 @@ locals {
     { name = "MAX_AGE_DAYS", value = tostring(local.expiry_max_age_days) },
     { name = "TOPIC_ARN", value = aws_sns_topic.job_completion.arn },
     { name = "LOG_GROUP", value = local.expiry_log_group_name },
+    { name = "WARNING_DAYS", value = tostring(local.expiry_warning_days) },
+    { name = "NOTIFY_TEMPLATE_ID", value = local.expiry_account_data.notify_template_id },
+    { name = "CC_EMAIL", value = local.notify_cc_email },
+    { name = "BUILDER_URL", value = local.notify_builder_url },
   ]
 }
 
@@ -60,6 +70,11 @@ resource "terraform_data" "expiry_guard" {
     precondition {
       condition     = try(floor(local.expiry_max_age_days) == local.expiry_max_age_days && local.expiry_max_age_days >= 1, false)
       error_message = "prototype_expiry_max_age_days must be set to a whole number of days of 1 or more when prototype_expiry_schedule is set."
+    }
+
+    precondition {
+      condition     = try(floor(local.expiry_warning_days) == local.expiry_warning_days && local.expiry_warning_days >= 0 && local.expiry_warning_days <= local.expiry_max_age_days, false)
+      error_message = "prototype_expiry_warning_days must be set to a whole number of days from 0 to prototype_expiry_max_age_days when prototype_expiry_schedule is set."
     }
   }
 }
@@ -156,6 +171,17 @@ data "aws_iam_policy_document" "expire_prototypes_task" {
       "arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:service/${data.aws_ecs_cluster.prototype_deployment.cluster_name}/*",
       data.aws_ecs_cluster.prototype_deployment.arn,
     ]
+  }
+
+  # The owner warning is recorded as tags on the prototype's service.
+  statement {
+    sid    = "RecordPrototypeWarnings"
+    effect = "Allow"
+    actions = [
+      "ecs:ListTagsForResource",
+      "ecs:TagResource",
+    ]
+    resources = ["arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:service/${data.aws_ecs_cluster.prototype_deployment.cluster_name}/*"]
   }
 
   statement {
