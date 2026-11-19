@@ -6,8 +6,8 @@ PagerDuty Terraform configuration in
 to PagerDuty itself.
 
 The resources are created only in the `integration-hub-production` workspace.
-The production plan adds 12 resources; plans for development, test and
-preproduction make no changes. This configuration has its own state in
+Plans for development, test and preproduction make no changes. This
+configuration has its own state in
 `modernisation-platform-terraform-state`.
 
 ## What this creates
@@ -25,12 +25,18 @@ The bucket policy denies access to everyone except these roles:
 - `github-actions-plan`
 - `github-actions-apply`
 - `/github-actions/integration-hub-pagerduty`
+- `/github-actions/integration-hub-pagerduty-plan`
 
 ### API key secret
 
 The `pagerduty/api-key` secret is created without a value or a secret
 version. It has the tag `credential-expiration=none`. An authorised person
 must add the PagerDuty API token after the first apply.
+
+The `pagerduty/api-key-read-only` secret is created the same way, without a
+value or version, and uses the same token KMS key. An authorised person must
+add a read-only PagerDuty API key. Check its access level in PagerDuty first;
+the secret name does not enforce it. Do not reuse the write-capable token.
 
 ### Encryption keys
 
@@ -55,6 +61,30 @@ The role can:
 
 It cannot delete state or write the secret.
 
+### GitHub Actions plan role
+
+The `/github-actions/integration-hub-pagerduty-plan` role is for pull request
+plans. It uses the same IAM module version and OIDC provider, but trusts only
+the subject `repo:ministryofjustice/integration-hub:environment:pagerduty-production-plan`
+with audience `sts.amazonaws.com`, not the plain `pull_request` subject.
+
+The role can:
+
+- Read `pagerduty/terraform.tfstate` and manage its `.tflock` file.
+- Use the state key through S3.
+- Read `pagerduty/api-key-read-only` over TLS and decrypt it through Secrets Manager.
+
+It cannot write state or read the write-capable `pagerduty/api-key`. Create
+the initial state with the apply role first.
+
+Before deploying, create the `pagerduty-production-plan` environment in the
+`integration-hub` repository with required reviewers, no self-review and
+administrator bypass off. A workflow that names a missing environment creates it unprotected,
+and the role trusts that name. Add the deployment branch rule
+`refs/pull/*/merge` so `pull_request` jobs can use it. Approved PR code can
+read production state and the read-only token, so only approve changes you
+trust.
+
 ## Before deploying
 
 You need Terraform 1.11 or later, but below 2.0, the Modernisation Platform
@@ -72,22 +102,28 @@ and `terraform validate`. Run plans and applies only through GitHub Actions.
 
 ## Deployment
 
-1. Merge the pull request. The integration-hub workflow plans the change and,
-   with the usual approval, applies it to production.
-2. After the first apply, an authorised person adds the PagerDuty API token to
-   the secret in Secrets Manager. Do not put the token in code or Terraform;
-   this configuration does not read or store it.
-3. In `integration-hub`, add the role ARN and state KMS key ARN as repository
-   secrets. The job that assumes the role must run on `main` and must not use
-   a GitHub environment, because GitHub sends a different subject for those.
-   Anyone who can run a workflow on `main` can assume the role, so keep `main`
-   protected.
-4. Run the PagerDuty Terraform workflow in that repository, plan-only for now.
-   The workflow does not yet exist.
+This deploys the AWS resources only. The PagerDuty Terraform workflow is in the
+separate `ministryofjustice/integration-hub` repository and is set up on its
+own.
 
-Pass backend settings to `terraform init` using `-backend-config`; do not
-commit them. Include `kms_key_id`, because `encrypt=true` alone uses SSE-S3
-rather than the KMS key.
+1. In the `integration-hub` repository, create the `pagerduty-production-plan`
+   environment as above.
+2. Merge this pull request. The `integration-hub` workflow in this repository
+   plans the change and, with the usual approval, applies it to production.
+3. After the first apply, an authorised person adds the PagerDuty API token to
+   `pagerduty/api-key` and a read-only key to `pagerduty/api-key-read-only`.
+   Do not put either in code or Terraform; this configuration does not read or
+   store them.
+4. In the `integration-hub` repository, add the production account ID as the
+   `PRODUCTION_ACCOUNT_ID` secret. The apply job there must run on `main` and
+   must not use a GitHub environment, because GitHub sends a different subject
+   for those. Anyone who can run a workflow on `main` can assume the apply
+   role, so keep `main` protected. The plan job uses the
+   `pagerduty-production-plan` environment and the plan role.
+
+The backend in the `integration-hub` repository uses
+`alias/s3/integration-hub-production-pagerduty-tfstate` with `encrypt = true`,
+so no key ARN is passed to `terraform init`.
 
 ## Known gaps
 

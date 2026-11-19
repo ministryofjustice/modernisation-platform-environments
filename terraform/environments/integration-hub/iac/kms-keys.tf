@@ -31,7 +31,36 @@ module "pagerduty_state_kms" {
         {
           test     = "ArnLike"
           variable = "aws:PrincipalArn"
-          values   = local.pagerduty_state_allowed_principal_arns
+          values   = local.pagerduty_state_kms_principal_arns
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["s3.eu-west-2.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:EncryptionContext:aws:s3:arn"
+          values   = ["arn:aws:s3:::${local.pagerduty_state_bucket_name}"]
+        }
+      ]
+    },
+    {
+      sid       = "AllowPagerDutyPlanStateAndLockUse"
+      effect    = "Allow"
+      actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+      resources = ["*"]
+
+      principals = [{
+        type        = "AWS"
+        identifiers = ["*"]
+      }]
+
+      condition = [
+        {
+          test     = "ArnEquals"
+          variable = "aws:PrincipalArn"
+          values   = [local.pagerduty_plan_role_arn]
         },
         {
           test     = "StringEquals"
@@ -94,6 +123,35 @@ module "pagerduty_api_key_kms" {
           test     = "StringLike"
           variable = "kms:EncryptionContext:SecretARN"
           values   = ["arn:aws:secretsmanager:eu-west-2:${local.account_id}:secret:${local.pagerduty_secret_name}-*"]
+        }
+      ]
+    },
+    {
+      sid       = "AllowPagerDutyPlanReadOnlyApiKeyDecryption"
+      effect    = "Allow"
+      actions   = ["kms:Decrypt"]
+      resources = ["*"]
+
+      principals = [{
+        type        = "AWS"
+        identifiers = ["*"]
+      }]
+
+      condition = [
+        {
+          test     = "ArnEquals"
+          variable = "aws:PrincipalArn"
+          values   = [local.pagerduty_plan_role_arn]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["secretsmanager.eu-west-2.amazonaws.com"]
+        },
+        {
+          test     = "StringLike"
+          variable = "kms:EncryptionContext:SecretARN"
+          values   = ["arn:aws:secretsmanager:eu-west-2:${local.account_id}:secret:${local.pagerduty_plan_secret_name}-*"]
         }
       ]
     }

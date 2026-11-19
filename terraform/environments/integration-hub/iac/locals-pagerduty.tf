@@ -5,14 +5,22 @@ locals {
   pagerduty_state_key         = "pagerduty/terraform.tfstate"
   pagerduty_secret_name       = "pagerduty/api-key"
   pagerduty_role_name         = "integration-hub-pagerduty"
+  pagerduty_plan_role_name    = "integration-hub-pagerduty-plan"
+  pagerduty_plan_role_arn     = "arn:aws:iam::${local.account_id}:role/github-actions/${local.pagerduty_plan_role_name}"
+  pagerduty_plan_secret_name  = "pagerduty/api-key-read-only"
 
-  pagerduty_state_allowed_principal_arns = [
+  pagerduty_state_kms_principal_arns = [
     "arn:aws:iam::${local.account_id}:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*",
     "arn:aws:iam::${local.account_id}:role/MemberInfrastructureAccess",
     "arn:aws:iam::${local.account_id}:role/github-actions-plan",
     "arn:aws:iam::${local.account_id}:role/github-actions-apply",
     "arn:aws:iam::${local.account_id}:role/github-actions/${local.pagerduty_role_name}"
   ]
+
+  pagerduty_state_allowed_principal_arns = concat(
+    local.pagerduty_state_kms_principal_arns,
+    [local.pagerduty_plan_role_arn]
+  )
 
   pagerduty_api_key_kms_principal_arns = [
     "arn:aws:iam::${local.account_id}:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*",
