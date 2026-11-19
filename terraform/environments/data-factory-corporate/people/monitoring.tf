@@ -125,9 +125,53 @@ resource "aws_cloudwatch_event_rule" "guardduty_all_findings" {
   }
 }
 
-# Route all GuardDuty findings to the existing SNS topic (which connects to Slack)
+resource "aws_iam_role" "guardduty-findings-publish" {
+  name = "${aws_cloudwatch_event_rule.guardduty_all_findings.name}-publish"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Action    = "sts:AssumeRole"
+      Principal = { Service = "events.amazonaws.com" }
+      Condition = {
+        ArnEquals = { "aws:SourceArn" = aws_cloudwatch_event_rule.guardduty_all_findings.arn }
+      }
+    }]
+  })
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy" "guardduty-findings-publish" {
+  name = "guardduty-findings-publish"
+  role = aws_iam_role.guardduty-findings-publish.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "sns:Publish"
+        Resource = module.data_factory_guardduty_eventbridge.scan_alerts_topic_arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["kms:GenerateDataKey", "kms:Decrypt"]
+        Resource = module.corporate_logging_kms_key.key_arn
+        Condition = {
+          StringEquals = {
+            "kms:EncryptionContext:aws:sns:topicArn" = module.data_factory_guardduty_eventbridge.scan_alerts_topic_arn
+          }
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_cloudwatch_event_target" "guardduty_all_findings_to_sns" {
   rule      = aws_cloudwatch_event_rule.guardduty_all_findings.name
   target_id = "guardduty-all-findings-sns"
   arn       = module.data_factory_guardduty_eventbridge.scan_alerts_topic_arn
+  role_arn  = aws_iam_role.guardduty-findings-publish.arn
+
+  depends_on = [aws_iam_role_policy.guardduty-findings-publish]
 }
