@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "lambda_policy_document" {
   statement {
     sid       = "Parameters"
     effect    = "Allow"
-    resources = ["arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/platform-operations/slack-token"]
+    resources = ["arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/deliusawsalerts/slack-token"]
     actions   = ["ssm:GetParameter"]
   }
   statement {
