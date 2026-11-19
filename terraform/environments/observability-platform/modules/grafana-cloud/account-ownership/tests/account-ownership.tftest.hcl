@@ -90,10 +90,10 @@ run "disabled_environment" {
   command = plan
 
   variables {
-    enabled                          = false
-    accounts                         = ["modernisation-platform-development"]
+    enabled                              = false
+    accounts                             = ["modernisation-platform-development"]
     modernisation_platform_account_names = ["modernisation-platform-development"]
-    nonmp_account_names              = []
+    nonmp_account_names                  = []
   }
 
   assert {
