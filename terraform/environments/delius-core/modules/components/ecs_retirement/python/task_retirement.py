@@ -80,7 +80,6 @@ def service_message_markup(resources, env, event):
     '''
     This logic will parse the service task event message
     '''
-
     def detect_environment_from_cluster(cluster_name):
         cluster_name = cluster_name.lower()
         if "-prod-" in cluster_name:
@@ -133,7 +132,13 @@ def service_message_markup(resources, env, event):
 
     attachments = []
 
+    # need this function for only prod now and later we can use for other envs. so filtering out the 
+    # loop for other envs for now. we can use it later if needed.
+
     for env_name, services in env_groups.items():
+        if env_name not in ["prod"]:
+            continue
+
         service_list = ""
         for cluster, svc in services:
             service_list += f"• Cluster: _{cluster}_    |   Service: _{svc}_\n"
