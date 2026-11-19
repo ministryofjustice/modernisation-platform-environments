@@ -3,51 +3,15 @@ locals {
     "modernisation-platform",
     "cloud-platform",
   ]) : toset([])
-
-  # Upstream account names are <definition filename stem>-<environment name>. The suffix is a
-  # single token; confirm the full name against the file instead of trusting the split alone.
-  gc_account_name_pattern = "^([a-z0-9][a-z0-9-]*)-[a-z0-9]+$"
-  gc_account_definition_stems = {
-    for account in keys(local.gc_accounts) : account => regex(local.gc_account_name_pattern, account)[0]
-    if length(local.gc_platform_query_teams) > 0 && can(regex(local.gc_account_name_pattern, account))
-  }
-  gc_account_definitions = {
-    for stem, definition in data.http.gc-account-definition : stem => jsondecode(definition.response_body)
-    if definition.status_code == 200
-  }
-  gc_declared_account_names = {
-    for stem, definition in local.gc_account_definitions : stem => [
-      for environment in definition.environments : "${stem}-${environment.name}"
-    ]
-  }
-  gc_account_applications = {
-    for account, stem in local.gc_account_definition_stems : account => try(local.gc_account_definitions[stem].tags.application, null)
-    if contains(lookup(local.gc_declared_account_names, stem, []), account) && nonsensitive(
-      contains(keys(local.environment_management.account_ids), account) &&
-      !contains(keys(local.nonmp_account_ids), account)
-    )
-  }
-
-  gc_platform_query_team_by_account = {
-    for account, application in local.gc_account_applications : account => (
-      application == "modernisation-platform" ? "modernisation-platform" :
-      try(startswith(application, "container-platform-"), false) ? "cloud-platform" : null
-    )
-  }
 }
 
-# Read only the definitions needed by onboarded accounts, using the same public source as platform_data.tf.
-data "http" "gc-account-definition" {
-  for_each = toset(values(local.gc_account_definition_stems))
+module "grafana_cloud_account_ownership" {
+  source = "./modules/grafana-cloud/account-ownership"
 
-  url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${each.key}.json"
-
-  lifecycle {
-    postcondition {
-      condition     = contains([200, 404], self.status_code)
-      error_message = "Could not read the Modernisation Platform account definition for ${each.key}."
-    }
-  }
+  enabled                              = length(local.gc_platform_query_teams) > 0
+  accounts                             = toset(keys(local.gc_accounts))
+  modernisation_platform_account_names = nonsensitive(toset(keys(local.environment_management.account_ids)))
+  nonmp_account_names                  = nonsensitive(toset(keys(local.nonmp_account_ids)))
 }
 
 resource "grafana_team" "platform-query" {

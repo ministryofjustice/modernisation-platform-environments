@@ -213,7 +213,7 @@ the AWS data sources for already-onboarded accounts whose canonical
 | GitHub team | `.tags.application` |
 | --- | --- |
 | `modernisation-platform` | exactly `modernisation-platform` |
-| `cloud-platform` | starts with `container-platform-` |
+| `cloud-platform` | exactly `cloud-platform`, or starts with `container-platform-` |
 
 Terraform reads only the definitions needed for configured accounts, takes
 account names from the filename and `.environments[].name`, and grants nothing

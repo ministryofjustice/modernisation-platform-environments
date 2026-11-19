@@ -99,7 +99,7 @@ module "grafana_cloud_aws_data_sources" {
     ],
     [
       for slug, team in grafana_team.platform-query : team.id
-      if slug == lookup(local.gc_platform_query_team_by_account, each.key, null)
+      if slug == lookup(module.grafana_cloud_account_ownership.team_by_account, each.key, null)
     ],
   )
 
