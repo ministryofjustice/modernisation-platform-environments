@@ -32,10 +32,14 @@ data "aws_iam_policy_document" "step_functions_common" {
     sid     = "RunScriptRunnerTasks"
     effect  = "Allow"
     actions = ["ecs:RunTask"]
-    resources = [
-      for family in local.script_runner_task_definition_families :
-      "arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${family}:*"
-    ]
+    resources = concat(
+      [
+        for family in local.script_runner_task_definition_families :
+        "arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${family}:*"
+      ],
+      local.wipe_create ? local.wipe_task_definition_arns : [],
+      local.expiry_create ? local.expiry_task_definition_arns : [],
+    )
 
     condition {
       test     = "ArnEquals"
@@ -56,10 +60,14 @@ data "aws_iam_policy_document" "step_functions_common" {
     sid     = "PassScriptRunnerRoles"
     effect  = "Allow"
     actions = ["iam:PassRole"]
-    resources = [
-      aws_iam_role.script_runner_ecs_execution.arn,
-      aws_iam_role.script_runner_ecs_task.arn,
-    ]
+    resources = concat(
+      [
+        aws_iam_role.script_runner_ecs_execution.arn,
+        aws_iam_role.script_runner_ecs_task.arn,
+      ],
+      aws_iam_role.wipe_environment_task[*].arn,
+      aws_iam_role.expire_prototypes_task[*].arn,
+    )
   }
 
   statement {

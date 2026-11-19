@@ -294,6 +294,41 @@ locals {
         })
       })
 
+      preprod-nomis-db-3-a = merge(local.ec2_instances.db, {
+        cloudwatch_metric_alarms = merge(
+          local.cloudwatch_metric_alarms.db,
+          local.cloudwatch_metric_alarms.db_connected,
+          local.cloudwatch_metric_alarms.db_textfile_metric_not_updated,
+        )
+        config = merge(local.ec2_instances.db.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.ec2_instances.db.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 512 }
+        })
+        ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
+        })
+        instance = merge(local.ec2_instances.db.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
+        })
+        tags = merge(local.ec2_instances.db.tags, {
+          description         = "PreProduction NOMIS MIS and Audit database"
+          instance-scheduling = "skip-scheduling"
+          misload-dbname      = "PPMIS"
+          nomis-environment   = "preprod"
+          oracle-sids         = "PPMIS PPCNMAUD"
+          update-ssm-agent    = "patchgroup2"
+        })
+      })
+
       preprod-nomis-xtag-a = merge(local.ec2_instances.xtag, {
         cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.xtag
         config = merge(local.ec2_instances.xtag.config, {

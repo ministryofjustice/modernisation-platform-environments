@@ -104,34 +104,3 @@ module "octo_access_iam_role" {
     }
   }
 }
-
-module "blueprint_iam_role" {
-  count = local.is-development ? 1 : 0
-
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=ba3fd6ded6911e0454092147fe3704171cc05e00" # v6.8.1
-
-  name            = "blueprint-github-actions"
-  use_name_prefix = false
-
-  enable_github_oidc     = true
-  oidc_wildcard_subjects = ["ministryofjustice@2203574/developer-experience-app@1324040641:*"]
-
-  create_inline_policy = true
-  inline_policy_permissions = {
-    SecretsManagerReadAccess = {
-      effect    = "Allow"
-      actions   = ["secretsmanager:GetSecretValue"]
-      resources = [module.blueprint_github_app_secret[0].secret_arn]
-    }
-    SecretsManagerListAccess = {
-      effect    = "Allow"
-      actions   = ["secretsmanager:ListSecrets"]
-      resources = ["*"]
-    }
-    KMSDecryptAccess = {
-      effect    = "Allow"
-      actions   = ["kms:Decrypt"]
-      resources = [module.kms_key[0].key_arn]
-    }
-  }
-}

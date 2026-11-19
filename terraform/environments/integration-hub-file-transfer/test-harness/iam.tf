@@ -16,6 +16,18 @@ data "aws_s3_bucket" "clean" {
   bucket = local.clean_bucket_name
 }
 
+data "aws_s3_bucket" "investigation" {
+  count = local.create_test_harness ? 1 : 0
+
+  bucket = local.investigation_bucket_name
+}
+
+data "aws_s3_bucket" "quarantine" {
+  count = local.create_test_harness ? 1 : 0
+
+  bucket = local.quarantine_bucket_name
+}
+
 data "aws_iam_policy_document" "test_harness_trust" {
   count = local.create_test_harness ? 1 : 0
 
@@ -74,7 +86,7 @@ data "aws_iam_policy_document" "test_harness_permissions" {
     actions = ["s3:PutObject"]
 
     resources = [
-      "${data.aws_s3_bucket.incoming[0].arn}/${local.incoming_prefix}*"
+      for prefix in local.fixture_upload_prefixes : "${data.aws_s3_bucket.incoming[0].arn}/${prefix}*"
     ]
   }
 
@@ -94,8 +106,25 @@ data "aws_iam_policy_document" "test_harness_permissions" {
       test     = "ArnLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
       values = [
-        "${data.aws_s3_bucket.incoming[0].arn}/${local.incoming_prefix}*"
+        for prefix in local.fixture_upload_prefixes : "${data.aws_s3_bucket.incoming[0].arn}/${prefix}*"
       ]
+    }
+  }
+
+  statement {
+    sid     = "CheckRoutingTestOutcome"
+    effect  = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [
+      data.aws_s3_bucket.clean[0].arn,
+      data.aws_s3_bucket.investigation[0].arn,
+      data.aws_s3_bucket.quarantine[0].arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = [for prefix in local.routing_test_prefixes : "${prefix}*"]
     }
   }
 
