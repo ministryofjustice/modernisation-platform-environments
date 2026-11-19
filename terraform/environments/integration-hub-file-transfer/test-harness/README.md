@@ -65,10 +65,14 @@ the authorised feature branches needed to test changes before merging. The IAM
 trust policy does not restrict branches itself; access is controlled by the
 GitHub environment's protection rules.
 
-The harness role can upload only beneath its incoming prefix, list and read only
-its destination prefix, and use the relevant KMS keys only through S3 with the
-configured encryption contexts. It has no destination-write, delete or
-administrative permissions. Delivery uses a separate role managed by `push-to-s3`.
+The harness role can upload beneath `test-harness/push-to-s3/`,
+`test-harness/investigation/` and `test-harness/quarantine/` in the test incoming
+bucket. For the investigation and quarantine checks, it can list those two
+routing prefixes in the clean, investigation and quarantine buckets to verify
+where each fixture landed, but cannot read the objects there. It can list and
+read delivered fixtures under its own destination prefix. KMS access is limited
+to S3 with the configured encryption contexts. The role has no destination-write,
+delete or administrative permissions. Delivery uses a separate role managed by `push-to-s3`.
 
 ## Retention and costs
 
@@ -112,7 +116,7 @@ It does not test customer authentication, SFTP, FTPS, HTTP API or browser upload
 
 ## Deployment order
 
-1. Confirm the parent test file-transfer infrastructure exists, including the incoming and clean buckets and their KMS keys.
+1. Confirm the parent test file-transfer infrastructure exists, including the incoming, clean, investigation and quarantine buckets and their KMS keys.
 2. Deploy this test-harness component and confirm its destination bucket and KMS key outputs. Destination creation must not depend on the delivery role.
 3. Confirm the destination key alias exists and that the shared test dispatch route resolves the expected key ARN, then deploy the parent file-transfer state to create or update the dispatch secret.
 4. For an existing dispatch entry, ensure its secret value matches the configured action through the approved Secrets Manager process.

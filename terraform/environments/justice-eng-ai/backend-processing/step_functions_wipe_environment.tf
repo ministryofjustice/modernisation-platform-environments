@@ -9,6 +9,12 @@
 #                              e.g. "cron(0 2 ? * SUN *)" or "cron(0 2 ? * MON-FRI *)"
 #   environment_wipe_efs       true also empties the web UI file system (Builder and Forge files)
 #
+# Builder and Forge are stopped while the wipe runs. Their alarms are muted from 00:00 to
+# 04:00 UK time (monitoring_runtime.tf), so the schedule must start before 03:00.
+#
+# After every run, including failed ones, a report listing every AppID that was wiped is
+# posted to Slack through the job-completion topic.
+#
 # Nothing is created unless those keys are set, and they must not be set for preproduction
 # or production. The plan fails if they are, and the script refuses to run there as well.
 
@@ -43,6 +49,7 @@ locals {
     { name = "DLQ_URL", value = aws_sqs_queue.build_approval_pipe_dlq.url },
     { name = "WIPE_EFS", value = tostring(local.wipe_efs) },
     { name = "EFS_MOUNT", value = local.wipe_efs_mount_path },
+    { name = "TOPIC_ARN", value = aws_sns_topic.job_completion.arn },
   ]
 }
 
@@ -56,6 +63,19 @@ resource "terraform_data" "wipe_guard" {
     precondition {
       condition     = !local.wipe_create || can(regex("^cron\\([^ ()]+( [^ ()]+){5}\\)$", local.wipe_schedule))
       error_message = "environment_wipe_schedule must be an EventBridge cron expression with six fields, e.g. cron(0 2 ? * SUN *)."
+    }
+
+    # EventBridge needs exactly one of day-of-month and day-of-week to be "?".
+    precondition {
+      condition     = !local.wipe_create || try(length([for i in [2, 4] : i if split(" ", trimsuffix(trimprefix(local.wipe_schedule, "cron("), ")"))[i] == "?"]) == 1, false)
+      error_message = "environment_wipe_schedule must have \"?\" in exactly one of the day-of-month and day-of-week fields, e.g. cron(0 2 * * ? *) for daily or cron(0 2 ? * SUN *) for weekly."
+    }
+
+    # Builder and Forge are stopped during the wipe, and their alarms are only muted
+    # from 00:00 to 04:00 UK time (aws_cloudwatch_alarm_mute_rule.wipe_window).
+    precondition {
+      condition     = !local.wipe_create || contains(["0", "1", "2"], try(split(" ", trimprefix(local.wipe_schedule, "cron("))[1], ""))
+      error_message = "environment_wipe_schedule must start between 00:00 and 02:59 so the wipe finishes inside the 00:00-04:00 alarm mute window."
     }
   }
 }
@@ -214,13 +234,19 @@ data "aws_iam_policy_document" "wipe_environment_task" {
     resources = ["*"]
   }
 
+  # DeregisterTaskDefinition has no resource type, so it can only be granted on "*". The
+  # script only deregisters prototype-* families, and deleting stays scoped to them below.
   statement {
-    sid    = "DeletePrototypeTaskDefinitions"
-    effect = "Allow"
-    actions = [
-      "ecs:DeregisterTaskDefinition",
-      "ecs:DeleteTaskDefinitions",
-    ]
+    sid       = "DeregisterPrototypeTaskDefinitions"
+    effect    = "Allow"
+    actions   = ["ecs:DeregisterTaskDefinition"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "DeletePrototypeTaskDefinitions"
+    effect    = "Allow"
+    actions   = ["ecs:DeleteTaskDefinitions"]
     resources = ["arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/prototype-*:*"]
   }
 
@@ -302,6 +328,20 @@ data "aws_iam_policy_document" "wipe_environment_task" {
     effect    = "Allow"
     actions   = ["sqs:PurgeQueue"]
     resources = [aws_sqs_queue.build_approval_pipe_dlq.arn]
+  }
+
+  statement {
+    sid       = "PostSlackReport"
+    effect    = "Allow"
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.job_completion.arn]
+  }
+
+  statement {
+    sid       = "UseJobCompletionTopicKey"
+    effect    = "Allow"
+    actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
+    resources = [aws_kms_key.job_completion.arn]
   }
 }
 
