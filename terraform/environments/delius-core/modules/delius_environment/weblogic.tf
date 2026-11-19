@@ -310,7 +310,7 @@ module "ecs_nightly_restart_weblogic" {
   task_count   = data.aws_ssm_parameter.weblogic_task_count.value
 }
 
-module "xsiam_cloudwatch_logs"  {
+module "xsiam_cloudwatch_logs" {
   count  = var.enable_xsiam_cloudwatch_logs ? 1 : 0
   source = "../components/xsiam"
 
