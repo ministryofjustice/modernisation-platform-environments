@@ -4,7 +4,7 @@ locals {
   component                            = "people"
   eventbridge_rule_name                = "eventbridge-malware-rule"
   enable_external_iam_role             = true
-  enable_guardduty_slack_notifications = false
+  enable_guardduty_slack_notifications = true
   cloudtrail_name                      = "corporate-cloudtrail"
 
   # Apply with false, populate the secret, then set true and apply again.
