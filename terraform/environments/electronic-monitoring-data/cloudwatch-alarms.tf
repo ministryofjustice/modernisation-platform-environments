@@ -805,7 +805,7 @@ resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_executio
 
 resource "aws_cloudwatch_log_metric_filter" "cadt_task_failed" {
   name           = "cadt-task-failed"
-  log_group_name = "/ecs/create-a-derived-table"
+  log_group_name = aws_cloudwatch_log_group.ecs_cadt.name
   pattern        = "Dataset Check Failed"
 
   metric_transformation {
