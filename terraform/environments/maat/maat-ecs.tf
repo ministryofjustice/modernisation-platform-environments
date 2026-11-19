@@ -519,7 +519,7 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
       maat_ats_oauth_url     = local.application_data.accounts[local.environment].maat_ats_oauth_url
       maat_ats_endpoint      = local.application_data.accounts[local.environment].maat_ats_endpoint
       maat_ats_base_url      = local.application_data.accounts[local.environment].maat_ats_base_url
-
+      jacoco_enabled         = local.application_data.accounts[local.environment].jacoco_enabled
     }
   )
 
