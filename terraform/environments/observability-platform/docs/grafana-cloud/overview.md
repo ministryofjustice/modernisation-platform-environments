@@ -53,9 +53,9 @@ Alternatively, create and populate the secret manually first, then
 
 The existing `.github/workflows/observability-platform.yml` workflow covers
 these files and selects the corresponding account and Terraform workspace.
-No new workflow or backend is needed. Review plans for both environments
-before applying; the new resources must not replace existing Amazon Managed
-Grafana resources.
+Pull requests plan both environments without applying; after a merge to main,
+the workflow plans and applies both. Review both plans before merging; the new
+resources must not replace existing Amazon Managed Grafana resources.
 
 The default `grafana` provider still targets Amazon Managed Grafana.
 Cloud account resources, such as the stack, plugins and PDC networks, explicitly
@@ -197,10 +197,10 @@ Query to the owning tenant's team and to the teams of the tenants in
 `shared_with_tenants`. It is authoritative: it removes Grafana's default Viewer
 and Editor access, so no other users can query the data source. Admins keep
 access, including the platform team and the Terraform service account. If none
-of those tenants has a team, only Admins and any matching development platform
+of those tenants has a team, only Admins and any matching platform
 team can query the data source.
 
-On development, GitHub SSO also admits the Ministry of Justice
+In development and production, GitHub SSO also admits the Ministry of Justice
 `modernisation-platform` and `cloud-platform` GitHub teams. They have no basic
 Grafana role (so no inherited Viewer access to Grafana Cloud's preconfigured
 data sources), and get the Explorer role to open Explore and Drilldown.
@@ -222,8 +222,10 @@ Terraform reconciliation; it does not create data sources or onboard accounts.
 Existing AWS tenant grants and sharing still apply, and configured tenant teams
 retain Query on the shared GitHub source. GitHub queries use the stack's shared
 GitHub App installation; Grafana permissions do not filter results by the
-signed-in user's GitHub repository access. Production keeps its existing login
-gate and data source permissions.
+signed-in user's GitHub repository access. Production currently has no onboarded
+AWS accounts; the two teams can query the GitHub source but no AWS sources.
+Managing the GitHub source's permissions removes its default Viewer and Editor
+grants in both stacks; Admins retain access.
 
 ## CloudWatch (Grafana Assume Role)
 

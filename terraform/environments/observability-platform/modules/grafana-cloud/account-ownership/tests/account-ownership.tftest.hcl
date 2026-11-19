@@ -101,3 +101,19 @@ run "disabled_environment" {
     error_message = "Do not query ownership definitions or grant access when the feature is disabled."
   }
 }
+
+run "enabled_without_accounts" {
+  command = plan
+
+  variables {
+    enabled                              = true
+    accounts                             = []
+    modernisation_platform_account_names = ["cloud-platform-production"]
+    nonmp_account_names                  = []
+  }
+
+  assert {
+    condition     = length(data.http.account_definition) == 0 && length(output.team_by_account) == 0
+    error_message = "An enabled stack with no onboarded accounts must not grant access or fetch account definitions."
+  }
+}

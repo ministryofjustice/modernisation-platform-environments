@@ -1,8 +1,8 @@
 locals {
-  gc_platform_query_teams = local.environment == "development" ? toset([
+  gc_platform_query_teams = toset([
     "modernisation-platform",
     "cloud-platform",
-  ]) : toset([])
+  ])
 }
 
 module "grafana_cloud_account_ownership" {
