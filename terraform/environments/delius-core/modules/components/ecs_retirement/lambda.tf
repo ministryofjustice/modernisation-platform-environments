@@ -26,7 +26,7 @@ resource "aws_lambda_function" "task_retirement_lambda" {
     variables = {
       ENVIRONMENT   = var.env_name
       SLACK_TOKEN   = "/deliusawsalerts/slack-token"
-      SLACK_CHANNEL = "probation-migrations-team"
+      SLACK_CHANNEL = "internal-platform-operations"
     }
   }
 
