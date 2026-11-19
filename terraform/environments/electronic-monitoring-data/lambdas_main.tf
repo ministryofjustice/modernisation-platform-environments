@@ -4,7 +4,6 @@ locals {
   db_name                         = local.is-production ? "g4s_cap_dw" : "test"
   load_sqs_max_receive_count      = 2
   load_mdss_sqs_max_receive_count = 8
-  load_gems_sqs_max_receive_count = 8
 }
 
 
@@ -355,6 +354,7 @@ module "load_mdss_lambda" {
 # dlt load gems
 #-----------------------------------------------------------------------------------
 
+
 module "load_gems_lambda" {
   source                         = "./modules/lambdas"
   is_image                       = true
@@ -368,20 +368,21 @@ module "load_gems_lambda" {
   ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
-
   environment_variables = {
-    ATHENA_QUERY_BUCKET                     = module.s3-athena-bucket.bucket.id
-    ACCOUNT_NUMBER                          = data.aws_caller_identity.current.account_id
-    STAGING_BUCKET                          = module.s3-create-a-derived-table-bucket.bucket.id
-    ENVIRONMENT_NAME                        = local.environment_shorthand
-    CLEANUP_QUEUE_URL                       = aws_sqs_queue.clean_dlt_load_queue.id
-    MAX_RECEIVE_COUNT                       = tostring(local.load_gems_sqs_max_receive_count)
-    GEMS_MANIFEST_BUCKET                    = module.s3-metadata-bucket.bucket.id
-    GEMS_MANIFEST_PREFIX                    = "gems-manifest/current"
-    STUCK_STARTED_MINUTES                   = "60"
-    AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
-    AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
+    ATHENA_QUERY_BUCKET     = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER          = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET          = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME        = local.environment_shorthand
+    CLEANUP_QUEUE_URL       = aws_sqs_queue.clean_dlt_load_queue.id
+    SNS_TOPIC_ARN           = aws_sns_topic.emds_alerts.arn
+    MAX_RECEIVE_COUNT       = tostring(local.load_sqs_max_receive_count)
+    SCHEMA_BUCKET           = module.s3-metadata-bucket.bucket.id
+    SCHEMA_PATH             = "schemas/allied/gems/",
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
 }
 
