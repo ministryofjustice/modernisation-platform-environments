@@ -13,13 +13,15 @@
       "alerts_slack_channel_id": "C0CF8SBQ97W",
       "email_confirmations_enabled": true,
       "slack_confirmations_enabled": true,
-      "builder_task_cpu": 512,
-      "builder_task_memory": 1024,
-      "forge_task_cpu": 2048,
-      "forge_task_memory": 8192,
-      "forge_max_builds_in_memory": 200,
-      "forge_design_check_concurrency": 3,
-      "forge_design_check_queue_timeout_ms": 120000
+      "usage_report_enabled": false,
+      "usage_report_interval_minutes": 15,
+      "environment_wipe_enabled": true,
+      "environment_wipe_schedule": "cron(0 2 ? * SUN *)",
+      "environment_wipe_efs": true,
+      "prototype_expiry_enabled": true,
+      "prototype_expiry_schedule": "cron(0 1 * * ? *)",
+      "prototype_expiry_max_age_days": 6,
+      "prototype_expiry_warning_days": 1
     },
     "test": {
       "vpc_cidr": "10.0.0.0/16",
@@ -34,13 +36,15 @@
       "alerts_slack_channel_id": "C0CF8SBQ97W",
       "email_confirmations_enabled": true,
       "slack_confirmations_enabled": true,
-      "builder_task_cpu": 512,
-      "builder_task_memory": 1024,
-      "forge_task_cpu": 2048,
-      "forge_task_memory": 8192,
-      "forge_max_builds_in_memory": 200,
-      "forge_design_check_concurrency": 3,
-      "forge_design_check_queue_timeout_ms": 120000
+      "usage_report_enabled": false,
+      "usage_report_interval_minutes": 15,
+      "environment_wipe_enabled": true,
+      "environment_wipe_schedule": "cron(0 2 * * ? *)",
+      "environment_wipe_efs": true,
+      "prototype_expiry_enabled": false,
+      "prototype_expiry_schedule": "cron(0 1 * * ? *)",
+      "prototype_expiry_max_age_days": 1,
+      "prototype_expiry_warning_days": 1
     },
     "preproduction": {
       "vpc_cidr": "10.0.0.0/16",
@@ -55,13 +59,12 @@
       "builder_hostname": "ai-builder-preproduction.modernisation-platform.service.justice.gov.uk",
       "email_confirmations_enabled": true,
       "slack_confirmations_enabled": true,
-      "builder_task_cpu": 512,
-      "builder_task_memory": 1024,
-      "forge_task_cpu": 2048,
-      "forge_task_memory": 8192,
-      "forge_max_builds_in_memory": 200,
-      "forge_design_check_concurrency": 3,
-      "forge_design_check_queue_timeout_ms": 120000
+      "usage_report_enabled": false,
+      "usage_report_interval_minutes": 15,
+      "prototype_expiry_enabled": false,
+      "prototype_expiry_schedule": "cron(0 1 * * ? *)",
+      "prototype_expiry_max_age_days": 30,
+      "prototype_expiry_warning_days": 7
     },
     "production": {
       "vpc_cidr": "10.0.0.0/16",
@@ -76,13 +79,12 @@
       "alerts_slack_channel_id": "C0CGCRZ19S4",
       "email_confirmations_enabled": true,
       "slack_confirmations_enabled": true,
-      "builder_task_cpu": 2048,
-      "builder_task_memory": 4096,
-      "forge_task_cpu": 2048,
-      "forge_task_memory": 8192,
-      "forge_max_builds_in_memory": 200,
-      "forge_design_check_concurrency": 3,
-      "forge_design_check_queue_timeout_ms": 120000
+      "usage_report_enabled": true,
+      "usage_report_interval_minutes": 15,
+      "prototype_expiry_enabled": false,
+      "prototype_expiry_schedule": "cron(0 1 * * ? *)",
+      "prototype_expiry_max_age_days": 180,
+      "prototype_expiry_warning_days": 7
     }
   }
 }

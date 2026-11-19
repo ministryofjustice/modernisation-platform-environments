@@ -84,7 +84,7 @@ Duration alarms use the maximum invocation duration over one five-minute period,
 
 ## Local checks
 
-Terraform builds both Python 3.12 packages in an x86 Docker container, so the workflow does not need ARM emulation. Pip installs only ARM64 Linux wheels compatible with the Lambda runtime; the build fails if a dependency has no compatible wheel.
+Terraform builds both Python 3.14 packages in an x86 Docker container, so the workflow does not need ARM emulation. Pip installs only ARM64 Linux wheels compatible with the Lambda runtime; the build fails if a dependency has no compatible wheel.
 
 The Lambda module uses its default SAM build image. Do not set `docker_image` to the SAM image tag without also providing a local image or a Docker build configuration: the module tries to build a missing custom image rather than pulling it.
 
@@ -95,7 +95,7 @@ terraform fmt -check -recursive terraform/environments/integration-hub-file-tran
 env AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy AWS_SESSION_TOKEN=dummy \
   AWS_DEFAULT_REGION=eu-west-2 AWS_EC2_METADATA_DISABLED=true \
   PYTHONPATH=terraform/environments/integration-hub-file-transfer/push-to-sftp/lambda/push-to-sftp-writer \
-  uv run --no-project --python 3.12 \
+  uv run --no-project --python 3.14 \
   --with-requirements terraform/environments/integration-hub-file-transfer/push-to-sftp/lambda/push-to-sftp-writer/requirements.txt \
   --with-requirements terraform/environments/integration-hub-file-transfer/push-to-sftp/lambda/push-to-sftp-writer/tests/requirements.txt \
   python -m pytest -q terraform/environments/integration-hub-file-transfer/push-to-sftp/lambda/push-to-sftp-writer/tests

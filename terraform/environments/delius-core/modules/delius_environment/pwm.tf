@@ -88,17 +88,20 @@ module "pwm" {
   }
 
   container_secrets_env_specific = try(var.delius_microservice_configs.pwm.container_secrets_env_specific, {})
-
-  container_vars_default = {
-    "CONFIG_XML_BASE64" = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
-      ldap_host_url      = "ldap://${module.ldap_ecs.nlb_service_r53_record}:${var.ldap_config.port}"
-      ldap_user          = nonsensitive(aws_ssm_parameter.ldap_principal.arn)
-      pwm_url            = "https://pwm.${var.env_name}.${var.account_config.dns_suffix}"
-      email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
-      email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
-    })),
-    "JAVA_OPTS" = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
-  }
+  
+  container_vars_default = merge(
+    {
+      "CONFIG_XML_BASE64" = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
+        ldap_host_url      = "ldap://${module.ldap_ecs.nlb_service_r53_record}:${var.ldap_config.port}"
+        ldap_user          = nonsensitive(aws_ssm_parameter.ldap_principal.arn)
+        pwm_url            = "https://pwm.${var.env_name}.${var.account_config.dns_suffix}"
+        email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
+        email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
+      }))
+      "JAVA_OPTS" = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
+    },
+    var.env_name != "prod" ? { "JAVA_TOOL_OPTIONS" = "-XX:-UseBASE64Intrinsics"} : {}
+  )
   container_vars_env_specific = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
 
   ignore_changes_service_task_definition = true

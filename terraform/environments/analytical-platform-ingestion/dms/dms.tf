@@ -76,9 +76,10 @@ module "cica_dms_tariff_dms_implementation" {
   metadata_generator_allowed_triggers = {
     EventBridge = {
       principal  = "events.amazonaws.com"
-      source_arn = aws_cloudwatch_event_rule.metadata_generator.arn
+      source_arn = aws_cloudwatch_event_rule.tariff_metadata_generator.arn
     }
   }
+  slack_webhook_secret_id = local.environment == "development" ? module.cica_dms_slack_webhook.secret_id : null
 }
 
 module "cica_dms_tempus_dms_implementation" {
@@ -133,4 +134,5 @@ module "cica_dms_tempus_dms_implementation" {
       source_arn = aws_cloudwatch_event_rule.metadata_generator.arn
     }
   }
+  slack_webhook_secret_id = local.environment == "development" ? module.cica_dms_slack_webhook.secret_id : null
 }

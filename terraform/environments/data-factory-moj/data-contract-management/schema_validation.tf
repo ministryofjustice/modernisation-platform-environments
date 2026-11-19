@@ -1,7 +1,7 @@
 module "schema_validation" {
   for_each = local.validation_deployments
 
-  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-validation?ref=13bf052ef105c3a01ce66254f2750332e7270c72"
+  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/data-contract-management/modules/schema-validation?ref=4a672434bdc79bf9793e32379c17eed784973667"
 
   name         = "${local.validation_function_prefix}-${each.key}"
   image_uri    = each.value.image_uri
@@ -9,6 +9,32 @@ module "schema_validation" {
 
   ingestion_type  = each.value.ingestion_type
   source_mappings = each.value.source_mappings
+  contract_assessment = {
+    assessor_revision = split("@", each.value.image_uri)[1]
+
+    candidate = {
+      bucket_name             = aws_s3_bucket.contract_management["contracts"].id
+      prefix                  = "candidates/"
+      bucket_owner_account_id = data.aws_caller_identity.current.account_id
+    }
+
+    baseline = {
+      bucket_name             = aws_s3_bucket.contract_management["contracts"].id
+      prefix                  = "${one(distinct([for mapping in each.value.source_mappings : mapping.source]))}/"
+      bucket_owner_account_id = data.aws_caller_identity.current.account_id
+    }
+
+    evidence = {
+      bucket_name             = aws_s3_bucket.contract_management["contracts"].id
+      prefix                  = "assessment-evidence/"
+      bucket_owner_account_id = data.aws_caller_identity.current.account_id
+      kms_key_arn             = aws_kms_key.contract_management["contracts"].arn
+    }
+
+    read_kms_key_arns = [
+      aws_kms_key.contract_management["contracts"].arn,
+    ]
+  }
 
   registry_table_name = module.schema_registration[0].contract_table_name
   registry_table_arn  = module.schema_registration[0].contract_table_arn
