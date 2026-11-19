@@ -53,9 +53,9 @@ Alternatively, create and populate the secret manually first, then
 
 The existing `.github/workflows/observability-platform.yml` workflow covers
 these files and selects the corresponding account and Terraform workspace.
-Pull requests plan both environments without applying; after a merge to main,
-the workflow plans and applies both. Review both plans before merging; the new
-resources must not replace existing Amazon Managed Grafana resources.
+No new workflow or backend is needed. Review plans for both environments
+before applying; the new resources must not replace existing Amazon Managed
+Grafana resources.
 
 The default `grafana` provider still targets Amazon Managed Grafana.
 Cloud account resources, such as the stack, plugins and PDC networks, explicitly

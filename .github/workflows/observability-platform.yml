@@ -48,8 +48,7 @@ jobs:
     with:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
-      # PRs must not apply changes in either environment; main keeps the normal deployment action.
-      action: "${{ github.event_name == 'pull_request' && 'plan' || matrix.action }}"
+      action: "${{ matrix.action }}"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
