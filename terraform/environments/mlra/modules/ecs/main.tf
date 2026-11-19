@@ -22,6 +22,11 @@ data "aws_subnets" "shared-private" {
   }
 }
 
+moved {
+  from = aws_ecs_capacity_provider.mlra
+  to   = aws_ecs_capacity_provider.mlra-al2023
+}
+
 resource "aws_autoscaling_group" "cluster-scaling-group-al2023" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
   name_prefix           = "${var.app_name}-ec2-al2023-"
@@ -151,7 +156,6 @@ output "ami_id" {
   sensitive = true
 }
 
-# TODO LASB-5089 rename to ami_id after migration
 output "ami_id_al2023" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   sensitive = true
