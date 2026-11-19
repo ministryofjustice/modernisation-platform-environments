@@ -261,6 +261,13 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
   }
 
   queue {
+    queue_arn     = module.load_gems_event_queue.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "allied/gems/"
+    filter_suffix = ".jsonl"
+  }
+
+  queue {
     queue_arn     = module.load_fms_event_queue.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "serco/fms"
