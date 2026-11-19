@@ -39,7 +39,7 @@ locals {
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
         # GitHub Runner
-        "20.58.27.30/32"      # octo-production
+        "20.58.27.30/32" # octo-production
       ]
       rds = {
         engine_version          = "18.4"
@@ -64,7 +64,7 @@ locals {
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
         # GitHub Runner
-        "20.58.27.30/32"      # octo-production
+        "20.58.27.30/32" # octo-production
       ]
       rds = {
         engine_version          = "18.4"
