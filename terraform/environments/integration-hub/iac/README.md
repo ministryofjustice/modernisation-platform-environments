@@ -32,11 +32,6 @@ The `pagerduty/api-key` secret is created without a value or a secret
 version. It has the tag `credential-expiration=none`. An authorised person
 must add the PagerDuty API token after the first apply.
 
-The `pagerduty/api-key-read-only` secret is created the same way, without a
-value or version, and uses the same KMS key. An authorised person must add a
-read-only PagerDuty API key to it. Check its access level in PagerDuty first;
-the secret name does not enforce it. Do not reuse the write-capable token.
-
 ### Encryption keys
 
 The bucket and secret each have a KMS key. Both keys have rotation enabled
@@ -58,16 +53,15 @@ The role can:
 - List and read `pagerduty/terraform.tfstate`, and create and delete its
   `.tflock` file. This applies to every session.
 - Use the state key through S3.
-- Read the `pagerduty/api-key-read-only` secret over TLS and decrypt it through
-  Secrets Manager. This applies to every session.
+- Read the API key secret over TLS and decrypt it through Secrets Manager. This
+  applies to every session, because plans need the token.
 
-Only sessions with the `main` subject can also write `pagerduty/terraform.tfstate`
-and read the write-capable `pagerduty/api-key` secret. Pull request sessions are
-denied both. The role's permissions use the
-`token.actions.githubusercontent.com:sub` condition key for this, as well as its
-trust policy.
+Only sessions with the `main` subject can also write `pagerduty/terraform.tfstate`,
+because a plan only writes the lock file. This uses the
+`token.actions.githubusercontent.com:sub` condition key, as well as the trust
+policy.
 
-It cannot delete state or write either secret.
+It cannot delete state or write the secret.
 
 ## Before deploying
 
@@ -93,20 +87,18 @@ their own.
 1. Merge this pull request. The `integration-hub` workflow in this repository
    plans the change and, with the usual approval, applies it to production.
 2. After the first apply, an authorised person adds the PagerDuty API token to
-   `pagerduty/api-key` and a read-only key to `pagerduty/api-key-read-only`.
-   Do not put either in code or Terraform; this configuration does not read or
-   store them.
+   `pagerduty/api-key`. Do not put it in code or Terraform; this configuration
+   does not read or store it.
 3. In the `integration-hub` repository, add the production account ID as the
    `PRODUCTION_ACCOUNT_ID` repository secret. The jobs that assume the role must
    not use a GitHub environment, because GitHub sends a different subject for
    those. Pull request jobs in that repository can assume the role, so anyone
-   who can push a branch there can read the state and the read-only token. Keep
+   who can push a branch there can read the state and the PagerDuty token. Keep
    `main` protected and use CODEOWNERS for the workflows and `terraform/pagerduty`.
    Do not add `pull_request_target`, `workflow_run` or `issue_comment` workflows
    that run pull request code, because they run with the `main` subject.
-4. In that repository, the plan workflow runs on pull requests, reads
-   `pagerduty/api-key-read-only` and does not apply. The apply workflow runs on
-   merges to `main` and reads `pagerduty/api-key`.
+4. In that repository, the plan workflow runs on pull requests and does not
+   apply. The apply workflow runs on merges to `main`.
 
 The backend in the `integration-hub` repository uses
 `alias/s3/integration-hub-production-pagerduty-tfstate` with `encrypt = true`,

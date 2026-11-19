@@ -105,28 +105,6 @@ module "iam_role_pagerduty" {
     ReadPagerDutyApiToken = {
       actions   = ["secretsmanager:DescribeSecret", "secretsmanager:GetSecretValue"]
       resources = [module.pagerduty_api_key_secret[0].secret_arn]
-      condition = [
-        {
-          test     = "Bool"
-          variable = "aws:SecureTransport"
-          values   = ["true"]
-        },
-        {
-          test     = "StringEquals"
-          variable = "token.actions.githubusercontent.com:sub"
-          values   = ["repo:ministryofjustice/integration-hub:ref:refs/heads/main"]
-        }
-      ]
-    }
-
-    ReadPagerDutyReadOnlyApiToken = {
-      actions   = ["secretsmanager:DescribeSecret", "secretsmanager:GetSecretValue"]
-      resources = [module.pagerduty_read_only_api_key_secret[0].secret_arn]
-      condition = [{
-        test     = "Bool"
-        variable = "aws:SecureTransport"
-        values   = ["true"]
-      }]
     }
 
     DecryptPagerDutyApiToken = {
@@ -141,10 +119,7 @@ module "iam_role_pagerduty" {
         {
           test     = "StringEquals"
           variable = "kms:EncryptionContext:SecretARN"
-          values = [
-            module.pagerduty_api_key_secret[0].secret_arn,
-            module.pagerduty_read_only_api_key_secret[0].secret_arn
-          ]
+          values   = [module.pagerduty_api_key_secret[0].secret_arn]
         }
       ]
     }
