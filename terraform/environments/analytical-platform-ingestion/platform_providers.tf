@@ -52,6 +52,7 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
   default_tags { tags = local.tags }
+<<<<<<< HEAD
 }
 
 # AWS provider for managing Business Unit secrets and parameters
@@ -62,4 +63,6 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:role/${local.vpc_name}-shared-configuration-access"
   }
+=======
+>>>>>>> 34487da1c9 (feat(terraform): add default tags to AWS providers in analytical-platform-ingestion)
 }
