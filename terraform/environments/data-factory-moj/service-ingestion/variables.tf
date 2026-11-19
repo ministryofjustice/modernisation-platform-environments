@@ -8,6 +8,11 @@ variable "deployment" {
     compiler_commit = string
 
     compiled_artifacts = any
+    contract_catalogs  = optional(any, {})
+    contract_runtimes = optional(map(object({
+      configuration_json = string
+      execution_policy   = string
+    })), {})
 
     artifact = object({
       bucket_name      = string

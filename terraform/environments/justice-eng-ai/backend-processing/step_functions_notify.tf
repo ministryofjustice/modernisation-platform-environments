@@ -2,6 +2,8 @@ locals {
   notify_state_machine_name = "${local.application_name}-notify"
 
   notify_builder_url = "https://${local.application_data.accounts[local.environment].builder_hostname}"
+  # GOV.UK Notify has no CC, so the scripts send this mailbox a separate copy.
+  notify_cc_email = "ModernisationPlatform-gg@justice.gov.uk"
 
   # Mirrors the URL built by scripts/deployment/prototype_deployment.py: the hostname uses the
   # first two dash-separated segments of the app ID, followed by the app's entry path.
@@ -32,7 +34,7 @@ locals {
       { name = "BUILD_ID", path = "States.Format('{}', $.latest.BuildID)" },
       { name = "AWS_REGION", value = local.aws_region },
       { name = "REVIEW_TABLE_NAME", value = aws_dynamodb_table.build_review.name },
-      { name = "CC_EMAIL", value = "ModernisationPlatform-gg@justice.gov.uk" },
+      { name = "CC_EMAIL", value = local.notify_cc_email },
       { name = "EMAIL_SUBJECT", value = "Your application has been built and deployed" },
       { name = "EMAIL_BODY_FILE", value = "scripts/notification/email-body.md" },
       {

@@ -67,6 +67,11 @@ module "iam_role_pagerduty" {
       resources = ["${module.pagerduty_state_bucket[0].s3_bucket_arn}/${local.pagerduty_state_key}.tflock"]
     }
 
+    DescribePagerDutyStateKey = {
+      actions   = ["kms:DescribeKey"]
+      resources = [module.pagerduty_state_kms[0].key_arn]
+    }
+
     UsePagerDutyStateKmsKeyThroughS3 = {
       actions   = ["kms:Decrypt", "kms:Encrypt", "kms:GenerateDataKey"]
       resources = [module.pagerduty_state_kms[0].key_arn]
