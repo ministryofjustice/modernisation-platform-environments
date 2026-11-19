@@ -171,3 +171,41 @@ data "aws_secretsmanager_secret_version" "gov_notify_details" {
   count     = local.is-test ? 0 : 1
   secret_id = module.gov_notify_details[0].secret_id
 }
+
+module "cpr_api_trigger" {
+  source = "terraform-aws-modules/secrets-manager/aws"
+
+  name        = "cpr/trigger-pipeline/key"
+  description = "API key for CPR"
+
+  create_secret_version = false
+
+  create_policy       = true
+  block_public_policy = true
+  policy_statements = {
+    lambda = {
+      sid = "LambdaReadWrite"
+      principals = [{
+        type        = "AWS"
+        identifiers = [module.trigger_api_integration.lambda_function_arn]
+      }]
+      actions = [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue",
+      ]
+      resources = ["*"]
+    }
+    read = {
+      sid = "AllowAccountRead"
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      }]
+      actions   = ["secretsmanager:DescribeSecret"]
+      resources = ["*"]
+    }
+  }
+
+
+  tags = local.tags
+}
