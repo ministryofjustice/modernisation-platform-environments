@@ -132,12 +132,7 @@ def service_message_markup(resources, env, event):
 
     attachments = []
 
-    # need this function for only prod now and later we can use for other envs. so filtering out the 
-    # loop for other envs for now. we can use it later if needed.
-
     for env_name, services in env_groups.items():
-        if env_name not in ["prod"]:
-            continue
 
         service_list = ""
         for cluster, svc in services:
@@ -207,6 +202,17 @@ def lambda_handler(event, context):
             raise 'Environment variable ' + var + ' not set'
 
     env = os.environ['ENVIRONMENT']
+
+    # need this function for only prod now and later we can use for other envs.
+    # just comment out the if condition to enable for other envs.
+
+    if env not in ['prod']:
+        logger.info(f"Skipping Slack notification for environment: {env} as its not Prod!")
+        return {
+            'statusCode': 200,
+            'body': json.dumps(f"Skipped Slack notification for environment: {env}")
+        }
+    
     slack_token = get_slack_token(os.environ['SLACK_TOKEN'])
     slack_channel = os.environ['SLACK_CHANNEL']
 
