@@ -187,7 +187,7 @@ module "cpr_api_trigger" {
       sid = "LambdaReadWrite"
       principals = [{
         type        = "AWS"
-        identifiers = [module.trigger_api_integration[0].lambda_function_arn]
+        identifiers = [module.trigger_cpr_job_iam_role.arn]
       }]
       actions = [
         "secretsmanager:DescribeSecret",
