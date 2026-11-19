@@ -10,7 +10,7 @@
       "ec2_desired_capacity": 1,
 
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-financial-transfers",
-      "container_version": "financial-transfers-api-0.0.6-development",
+      "container_version": "financial-transfers-api-0.0.18-SNAPSHOT-feasibility",
       "app_count": 1,
       "api_server_port": 8443,
       "container_cpu": 1024,
