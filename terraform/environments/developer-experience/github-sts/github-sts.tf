@@ -1,15 +1,14 @@
 locals {
-  github_sts_name   = "github-sts"
   github_sts_port   = 8080
   github_sts_host   = "sts.github.engineering.justice.gov.uk"
-  github_sts_labels = { "app.kubernetes.io/name" = local.github_sts_name }
+  github_sts_labels = { "app.kubernetes.io/name" = local.component_name }
 }
 
-resource "kubernetes_deployment_v1" "github-sts" {
+resource "kubernetes_deployment_v1" "github_sts" {
   count = local.is-production ? 1 : 0
 
   metadata {
-    name      = local.github_sts_name
+    name      = local.component_name
     namespace = local.environment_configuration.cloud_platform_namespace
     labels    = local.github_sts_labels
   }
@@ -40,7 +39,7 @@ resource "kubernetes_deployment_v1" "github-sts" {
         }
 
         container {
-          name  = local.github_sts_name
+          name  = local.component_name
           image = "ghcr.io/octo-sts/app:0.14.3@sha256:cb91dd3e7adbf15f9cacb8dd0f718fbc39eef038604869f53e011062747314f1"
 
           port {
@@ -130,11 +129,11 @@ resource "kubernetes_deployment_v1" "github-sts" {
   }
 }
 
-resource "kubernetes_service_v1" "github-sts" {
+resource "kubernetes_service_v1" "github_sts" {
   count = local.is-production ? 1 : 0
 
   metadata {
-    name      = local.github_sts_name
+    name      = local.component_name
     namespace = local.environment_configuration.cloud_platform_namespace
     labels    = local.github_sts_labels
   }
@@ -151,16 +150,16 @@ resource "kubernetes_service_v1" "github-sts" {
   }
 }
 
-resource "kubernetes_ingress_v1" "github-sts" {
+resource "kubernetes_ingress_v1" "github_sts" {
   count = local.is-production ? 1 : 0
 
   metadata {
-    name      = local.github_sts_name
+    name      = local.component_name
     namespace = local.environment_configuration.cloud_platform_namespace
     labels    = local.github_sts_labels
     annotations = {
       "external-dns.alpha.kubernetes.io/aws-weight"     = "100"
-      "external-dns.alpha.kubernetes.io/set-identifier" = "${local.github_sts_name}-${local.environment_configuration.cloud_platform_namespace}-green"
+      "external-dns.alpha.kubernetes.io/set-identifier" = "${local.component_name}-${local.environment_configuration.cloud_platform_namespace}-green"
       "nginx.ingress.kubernetes.io/ssl-redirect"        = "true"
     }
   }
@@ -183,7 +182,7 @@ resource "kubernetes_ingress_v1" "github-sts" {
 
           backend {
             service {
-              name = kubernetes_service_v1.github-sts[0].metadata[0].name
+              name = kubernetes_service_v1.github_sts[0].metadata[0].name
               port {
                 name = "http"
               }
