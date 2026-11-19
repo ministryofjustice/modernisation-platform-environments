@@ -18,13 +18,13 @@ module "pagerduty_api_key_secret" {
   )
 }
 
-module "pagerduty_plan_api_key_secret" {
+module "pagerduty_read_only_api_key_secret" {
   count = local.is-production ? 1 : 0
 
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "2.2.0"
 
-  name                    = local.pagerduty_plan_secret_name
+  name                    = local.pagerduty_read_only_secret_name
   description             = "Read-only PagerDuty API token for Integration Hub Terraform plans"
   kms_key_id              = module.pagerduty_api_key_kms[0].key_arn
   create_secret_version   = false
