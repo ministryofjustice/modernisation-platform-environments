@@ -68,7 +68,7 @@ module "weblogic" {
   log_error_pattern = "FATAL"
   log_error_threshold_config = {
     critical = {
-      threshold = 50
+      threshold = 150
       period    = 300
     }
   }

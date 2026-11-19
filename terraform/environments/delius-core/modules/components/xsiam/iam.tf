@@ -33,18 +33,25 @@ resource "aws_iam_role" "firehose_xsiam" {
 resource "aws_iam_role_policy" "cw_logs_to_firehose_xsiam_policy" {
   name = "${local.name}-AllowCWLogsToWriteToFirehose"
   role = aws_iam_role.cw_logs_to_firehose_xsiam.id
+
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow",
+        Effect = "Allow"
         Action = [
           "firehose:PutRecord",
-          "firehose:PutRecordBatch",
-          "kinesis:PutRecord",
-          "kinesis:PutRecords"
-        ],
+          "firehose:PutRecordBatch"
+        ]
         Resource = aws_kinesis_firehose_delivery_stream.xsiam.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:GenerateDataKey",
+          "kms:Decrypt"
+        ]
+        Resource = aws_kms_key.firehose_backup_xsiam.arn
       }
     ]
   })
