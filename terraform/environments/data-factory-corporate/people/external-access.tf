@@ -47,7 +47,7 @@ module "assume_iam_role" {
 
   bucket_arn = module.sherlock_landing_bucket_mp.bucket.arn
 
-  s3_prefix = "avature-sherlock"
+  s3_prefix = local.sherlock_landing_prefix
 
   s3_object_actions = [
     "s3:GetObject",

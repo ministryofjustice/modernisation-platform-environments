@@ -1,5 +1,6 @@
 locals {
-  glue_catalog_arn = "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog"
+  glue_catalog_arn       = "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog"
+  sherlock_landing_prefix = "avature-sherlock"
 
   # Add independent buckets or prefixes here; an empty prefix registers the whole bucket.
   lakeformation_locations = {
@@ -39,8 +40,7 @@ module "sherlock_glue_database" {
 
   storage = {
     bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
-
-    prefix = "avature-sherlock-${local.environment}"
+    prefix      = local.sherlock_landing_prefix
   }
 
 }
@@ -53,20 +53,4 @@ module "lakeformation_locations" {
   prefix      = each.value.prefix
   kms_key_arn = each.value.kms_key_arn
   role_name   = each.value.role_name
-}
-
-# Retain existing registrations and IAM resources when separating storage from the database.
-moved {
-  from = module.sherlock_glue_database.aws_iam_role.lakeformation_s3_access_role[0]
-  to   = module.lakeformation_locations["sherlock"].aws_iam_role.lakeformation_s3_access_role
-}
-
-moved {
-  from = module.sherlock_glue_database.aws_iam_role_policy.lakeformation_s3_access_policy[0]
-  to   = module.lakeformation_locations["sherlock"].aws_iam_role_policy.lakeformation_s3_access_policy
-}
-
-moved {
-  from = module.sherlock_glue_database.aws_lakeformation_resource.s3_location[0]
-  to   = module.lakeformation_locations["sherlock"].aws_lakeformation_resource.s3_location
 }
