@@ -6,9 +6,8 @@ PagerDuty Terraform configuration in
 to PagerDuty itself.
 
 The resources are created only in the `integration-hub-production` workspace.
-The production plan adds 12 resources; plans for development, test and
-preproduction make no changes. This configuration has its own state in
-`modernisation-platform-terraform-state`.
+Plans for development, test and preproduction make no changes. This
+configuration has its own state in `modernisation-platform-terraform-state`.
 
 ## What this creates
 
@@ -50,18 +49,12 @@ trusts the account's GitHub OIDC provider only when the audience is
 
 The role can:
 
-- List and read `pagerduty/terraform.tfstate`, and create and delete its
-  `.tflock` file. This applies to every session.
+- List the state path, read and write `pagerduty/terraform.tfstate`, and
+  read, create and delete its `.tflock` file.
 - Use the state key through S3.
-- Read the API key secret over TLS and decrypt it through Secrets Manager. This
-  applies to every session, because plans need the token.
+- Read the `pagerduty/api-key` secret and decrypt it through Secrets Manager.
 
-Only sessions with the `main` subject can also write `pagerduty/terraform.tfstate`,
-because a plan only writes the lock file. This uses the
-`token.actions.githubusercontent.com:sub` condition key, as well as the trust
-policy.
-
-It cannot delete state or write the secret.
+Both jobs have these permissions. Neither can delete state or change the token.
 
 ## Before deploying
 
@@ -84,21 +77,12 @@ This deploys the AWS resources only. The PagerDuty Terraform workflows are in
 the separate `ministryofjustice/integration-hub` repository and are set up on
 their own.
 
-1. Merge this pull request. The `integration-hub` workflow in this repository
-   plans the change and, with the usual approval, applies it to production.
-2. After the first apply, an authorised person adds the PagerDuty API token to
-   `pagerduty/api-key`. Do not put it in code or Terraform; this configuration
-   does not read or store it.
-3. In the `integration-hub` repository, add the production account ID as the
-   `PRODUCTION_ACCOUNT_ID` repository secret. The jobs that assume the role must
-   not use a GitHub environment, because GitHub sends a different subject for
-   those. Pull request jobs in that repository can assume the role, so anyone
-   who can push a branch there can read the state and the PagerDuty token. Keep
-   `main` protected and use CODEOWNERS for the workflows and `terraform/pagerduty`.
-   Do not add `pull_request_target`, `workflow_run` or `issue_comment` workflows
-   that run pull request code, because they run with the `main` subject.
-4. In that repository, the plan workflow runs on pull requests and does not
-   apply. The apply workflow runs on merges to `main`.
+1. Deploy this configuration. After initial setup, an authorised person sets the
+   token in `pagerduty/api-key`. Do not put the token in Terraform or GitHub.
+2. Set the `PRODUCTION_ACCOUNT_ID` repository secret in `integration-hub`.
+   The workflow plans pull requests from branches in that repository and
+   applies on pushes to `main`. PR code that runs the plan has access to
+   production state and the PagerDuty token before merge.
 
 The backend in the `integration-hub` repository uses
 `alias/s3/integration-hub-production-pagerduty-tfstate` with `encrypt = true`,

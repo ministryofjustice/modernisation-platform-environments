@@ -16,7 +16,7 @@ module "iam_role_pagerduty" {
   path            = "/github-actions/"
 
   trust_policy_permissions = {
-    GitHubActionsPagerDuty = {
+    IntegrationHubPagerDuty = {
       actions = ["sts:AssumeRoleWithWebIdentity"]
       principals = [{
         type        = "Federated"
@@ -60,19 +60,9 @@ module "iam_role_pagerduty" {
       resources = [module.pagerduty_state_bucket[0].s3_bucket_arn]
     }
 
-    ReadPagerDutyState = {
-      actions   = ["s3:GetObject"]
+    ReadWritePagerDutyState = {
+      actions   = ["s3:GetObject", "s3:PutObject"]
       resources = ["${module.pagerduty_state_bucket[0].s3_bucket_arn}/${local.pagerduty_state_key}"]
-    }
-
-    WritePagerDutyState = {
-      actions   = ["s3:PutObject"]
-      resources = ["${module.pagerduty_state_bucket[0].s3_bucket_arn}/${local.pagerduty_state_key}"]
-      condition = [{
-        test     = "StringEquals"
-        variable = "token.actions.githubusercontent.com:sub"
-        values   = ["repo:ministryofjustice/integration-hub:ref:refs/heads/main"]
-      }]
     }
 
     ManagePagerDutyStateLock = {
