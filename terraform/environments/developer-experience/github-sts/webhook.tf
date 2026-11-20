@@ -75,7 +75,7 @@ resource "kubernetes_deployment_v1" "github_sts_webhook" {
             name = "GITHUB_WEBHOOK_SECRET"
             value_from {
               secret_key_ref {
-                name = "github-app"
+                name = "${local.component_name}-webhook"
                 key  = "webhook_secret"
               }
             }

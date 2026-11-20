@@ -20,6 +20,10 @@ terraform {
       version = "~> 2.0"
       source  = "hashicorp/kubernetes"
     }
+    random = {
+      version = "~> 3.0"
+      source  = "hashicorp/random"
+    }
   }
   required_version = "~> 1.0"
 }
