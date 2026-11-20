@@ -25,6 +25,7 @@ module "github_app_secret" {
     client_id       = "CHANGEME"
     installation_id = "CHANGEME"
     private_key     = "CHANGEME"
+    webhook_secret  = "CHANGEME"
   })
 
   ignore_secret_changes = true

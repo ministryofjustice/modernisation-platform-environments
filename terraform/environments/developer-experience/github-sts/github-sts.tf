@@ -1,7 +1,9 @@
 locals {
-  github_sts_port   = 8080
-  github_sts_host   = "sts.github.engineering.justice.gov.uk"
-  github_sts_labels = { "app.kubernetes.io/name" = local.component_name }
+  github_sts_port        = 8080
+  github_sts_host        = "sts.github.engineering.justice.gov.uk"
+  github_sts_policy_dir  = ".github/sts"
+  github_sts_policy_repo = ".github"
+  github_sts_labels      = { "app.kubernetes.io/name" = local.component_name }
 }
 
 resource "kubernetes_deployment_v1" "github_sts" {
@@ -59,7 +61,12 @@ resource "kubernetes_deployment_v1" "github_sts" {
 
           env {
             name  = "OCTOSTS_POLICY_DIR"
-            value = ".github/sts"
+            value = local.github_sts_policy_dir
+          }
+
+          env {
+            name  = "ORG_POLICY_REPO"
+            value = local.github_sts_policy_repo
           }
 
           env {
@@ -176,6 +183,20 @@ resource "kubernetes_ingress_v1" "github_sts" {
       host = local.github_sts_host
 
       http {
+        path {
+          path      = "/webhook"
+          path_type = "Prefix"
+
+          backend {
+            service {
+              name = kubernetes_service_v1.github_sts_webhook[0].metadata[0].name
+              port {
+                name = "http"
+              }
+            }
+          }
+        }
+
         path {
           path      = "/"
           path_type = "Prefix"
