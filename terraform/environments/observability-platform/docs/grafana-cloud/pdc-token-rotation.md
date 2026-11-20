@@ -40,7 +40,6 @@ an integration contract for the future rotator, not existing Lambda behaviour:
 | `pdc:ecs-region` | ECS region; current pilot accounts use the central account's region |
 | `pdc:ecs-cluster` | `grafana-pdc-agent` |
 | `pdc:ecs-service` | `grafana-pdc-agent` |
-| `pdc:metrics-tunnel-id` | Observed `tunnelID` label for this network in the usage data source; added only when configured |
 
 The Lambda must read and validate these settings rather than hard-code another
 cadence. Shortening an interval or changing expiry settings must not change the
@@ -70,7 +69,6 @@ environment configuration can be set to an object containing:
 | `credential_kms_key_arn` | Customer-managed KMS key encrypting that credential |
 | `stack_query_credential_secret_arn` | Separate read-only stack service-account token secret in this account/region |
 | `stack_query_credential_kms_key_arn` | Customer-managed KMS key encrypting the stack query credential |
-| `metrics_tunnel_ids` | Map of account name to verified `tunnelID` label; one distinct value per opted-in account |
 | `failure_topic_arn` | Operational SNS topic in this account/region |
 
 This deploys the Lambda using the existing module/version, exact execution role
@@ -94,9 +92,12 @@ generate or read its value in Terraform, where it could enter state. Use the
 stack URL passed in `GRAFANA_STACK_URL` and confirm during the pilot that
 `GRAFANA_USAGE_DATASOURCE_UID` (`grafanacloud-usage`) resolves to the usage data
 source and that the credential can query it. Cadence comes from secret metadata.
-Record the observed `tunnelID` in `metrics_tunnel_ids`; do not assume it equals
-the access policy ID. Confirm scrape and ingestion lag before choosing the
-runtime's metric freshness, settling and stability settings.
+The rotator derives the metric's `tunnelID` as `<stack ID>/<access policy ID>`
+from the existing tags; no manual mapping is needed. The development pilot's
+`testSecret` preflight must find a single fresh series with matching stack,
+network, tunnel and region labels. Missing or ambiguous matches fail before
+promotion. Confirm scrape and ingestion lag before choosing the runtime's metric
+freshness, settling and stability settings.
 Setting this object does **not** enable secret rotation or perform state handoff.
 
 ## Dependencies before activation

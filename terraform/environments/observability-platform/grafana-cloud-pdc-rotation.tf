@@ -16,7 +16,7 @@ locals {
   }
 
   gc_pdc_rotation_tags = {
-    for account_name, account_id in local.gc_pdc_accounts : account_name => merge({
+    for account_name, account_id in local.gc_pdc_accounts : account_name => {
       "pdc:tenant-account-id" = account_id
       "pdc:access-policy-id"  = grafana_cloud_private_data_source_connect_network.account[account_name].pdc_network_id
       "pdc:region"            = grafana_cloud_private_data_source_connect_network.account[account_name].region
@@ -25,8 +25,6 @@ locals {
       "pdc:ecs-region"        = data.aws_region.current.name
       "pdc:ecs-cluster"       = "grafana-pdc-agent"
       "pdc:ecs-service"       = "grafana-pdc-agent"
-      }, try(local.environment_configuration_gc.pdc_token_rotator.metrics_tunnel_ids[account_name], null) == null ? {} : {
-      "pdc:metrics-tunnel-id" = local.environment_configuration_gc.pdc_token_rotator.metrics_tunnel_ids[account_name]
-    })
+    }
   }
 }

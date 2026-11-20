@@ -17,7 +17,6 @@ variable "rotator" {
     stack_query_credential_secret_arn  = string
     stack_query_credential_kms_key_arn = string
     failure_topic_arn                  = string
-    metrics_tunnel_ids                 = map(string)
   })
   default = null
 }

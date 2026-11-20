@@ -124,14 +124,6 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
     }
     precondition {
       condition = (
-        toset(keys(each.value.metrics_tunnel_ids)) == toset(keys(local.gc_pdc_accounts)) &&
-        length(distinct(values(each.value.metrics_tunnel_ids))) == length(local.gc_pdc_accounts) &&
-        alltrue([for id in values(each.value.metrics_tunnel_ids) : try(trimspace(id) != "", false)])
-      )
-      error_message = "Configure a distinct, non-empty metrics tunnelID label for every opted-in PDC account."
-    }
-    precondition {
-      condition = (
         can(regex("^arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:", each.value.credential_secret_arn)) &&
         can(regex("^arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/", each.value.credential_kms_key_arn))
       )

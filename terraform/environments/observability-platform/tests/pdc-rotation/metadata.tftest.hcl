@@ -52,7 +52,6 @@ run "central_metadata_without_activation" {
   assert {
     condition = (
       aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].name == "grafana-cloud/pdc/111111111111" &&
-      !contains(keys(aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].tags), "pdc:metrics-tunnel-id") &&
       aws_secretsmanager_secret.gc_pdc_token["cooker-development"].name == "grafana-cloud/pdc/222222222222" &&
       aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].tags["pdc:access-policy-id"] == "sprinkler-network" &&
       aws_secretsmanager_secret.gc_pdc_token["cooker-development"].tags["pdc:access-policy-id"] == "cooker-network" &&
@@ -102,10 +101,6 @@ run "prepared_runtime_permissions" {
       failure_topic_arn                  = "arn:aws:sns:eu-west-2:444444444444:test-pdc-failures"
       stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-stack-query-ABCDEF"
       stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:444444444444:key/12345678-4321-4321-4321-210987654321"
-      metrics_tunnel_ids = {
-        sprinkler-development = "observed-sprinkler-tunnel"
-        cooker-development    = "observed-cooker-tunnel"
-      }
     }
   }
 
@@ -142,7 +137,6 @@ run "prepared_runtime_permissions" {
     condition = (
       local.gc_pdc_rotator_environment.this.GRAFANA_STACK_URL == grafana_cloud_stack.observability_platform.url &&
       local.gc_pdc_rotator_environment.this.GRAFANA_USAGE_DATASOURCE_UID == "grafanacloud-usage" &&
-      aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].tags["pdc:metrics-tunnel-id"] == "observed-sprinkler-tunnel" &&
       local.gc_pdc_rotator_environment.this.GRAFANA_STACK_QUERY_CREDENTIAL_SECRET_ARN == var.rotator.stack_query_credential_secret_arn &&
       local.gc_pdc_rotator_environment.this.GRAFANA_API_CREDENTIAL_SECRET_ARN == var.rotator.credential_secret_arn
     )
@@ -184,10 +178,6 @@ run "reject_cross_account_credential" {
       failure_topic_arn                  = "arn:aws:sns:eu-west-2:444444444444:test-pdc-failures"
       stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-stack-query-ABCDEF"
       stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:444444444444:key/12345678-4321-4321-4321-210987654321"
-      metrics_tunnel_ids = {
-        sprinkler-development = "observed-sprinkler-tunnel"
-        cooker-development    = "observed-cooker-tunnel"
-      }
     }
   }
 
@@ -205,10 +195,6 @@ run "reject_wrong_region_failure_destination" {
       failure_topic_arn                  = "arn:aws:sns:eu-west-1:444444444444:test-pdc-failures"
       stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-stack-query-ABCDEF"
       stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:444444444444:key/12345678-4321-4321-4321-210987654321"
-      metrics_tunnel_ids = {
-        sprinkler-development = "observed-sprinkler-tunnel"
-        cooker-development    = "observed-cooker-tunnel"
-      }
     }
   }
 
@@ -226,10 +212,6 @@ run "reject_out_of_region_stack_query_key" {
       failure_topic_arn                  = "arn:aws:sns:eu-west-2:444444444444:test-pdc-failures"
       stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-stack-query-ABCDEF"
       stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-1:444444444444:key/12345678-4321-4321-4321-210987654321"
-      metrics_tunnel_ids = {
-        sprinkler-development = "observed-sprinkler-tunnel"
-        cooker-development    = "observed-cooker-tunnel"
-      }
     }
   }
 
