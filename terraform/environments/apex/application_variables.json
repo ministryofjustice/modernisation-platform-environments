@@ -28,7 +28,7 @@
       "ec2_instance_warmup_period": 300,
       "container_memory_allocation": 1000,
       "region": "eu-west-2",
-      "docker_image_tag": "development",
+      "docker_image_tag": "1.0.0",
       "app_debug_enabled": "false",
       "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
       "server_port": 8080,
