@@ -25,10 +25,7 @@ resource "aws_instance" "ec2_clamav" {
   templatefile("./templates/ec2_user_data_clamav.sh", { hostname = "clamav" }),
   file("./templates/ec2_user_data_distrust_emudhra.sh")
 ]))
-  # user_data = base64encode(templatefile("./templates/ec2_user_data_clamav.sh", {
-  #   hostname = "clamav"
-  # }))
-
+  
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
