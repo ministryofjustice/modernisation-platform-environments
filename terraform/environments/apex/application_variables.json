@@ -20,7 +20,7 @@
       "ec2_min_size": 0,
       "task_definition_volume": "upload_volume",
       "network_mode": "bridge",
-      "app_count": 1,
+      "app_count": 0,
       "appscaling_min_capacity": 0,
       "appscaling_max_capacity": 0,
       "ecs_scaling_cpu_threshold": 80,
