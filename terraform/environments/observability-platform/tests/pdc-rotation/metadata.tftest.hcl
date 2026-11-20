@@ -22,6 +22,7 @@ mock_provider "aws" {
   mock_resource "aws_kms_key" {
     defaults = { arn = "arn:aws:kms:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:key/12345678-1234-1234-1234-abcdefabcdef" }
   }
+  mock_resource "aws_ssm_parameter" {}
 }
 
 mock_provider "grafana" {
@@ -51,6 +52,13 @@ run "central_metadata_without_activation" {
 
   assert {
     condition = (
+      aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri[0].name == "/observability-platform/grafana-pdc-token-rotator/ecr-repository-uri" &&
+      aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri[0].type == "String" &&
+      nonsensitive(aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri[0].value) == format(
+        "%s.dkr.ecr.eu-west-2.amazonaws.com/observability-platform-grafana-pdc-token-rotator",
+        local.environment_management.account_ids["core-shared-services-production"]
+      ) &&
+      aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri[0].tags.application == local.tags.application &&
       aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].name == "grafana-cloud/pdc/${format("%012d", 1)}" &&
       aws_secretsmanager_secret.gc_pdc_token["cooker-development"].name == "grafana-cloud/pdc/${format("%012d", 2)}" &&
       aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].tags["pdc:access-policy-id"] == "sprinkler-network" &&

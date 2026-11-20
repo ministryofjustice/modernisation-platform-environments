@@ -9,6 +9,11 @@ variable "accounts" {
   }
 }
 
+variable "environment" {
+  type    = string
+  default = "development"
+}
+
 variable "rotator" {
   type = object({
     image_uri                          = string
@@ -22,14 +27,19 @@ variable "rotator" {
 }
 
 locals {
-  environment      = "development"
+  environment      = var.environment
   application_name = "observability-platform"
-  tags             = {}
+  tags             = { application = "observability-platform" }
   gc_accounts      = var.accounts
   all_account_ids = {
     sprinkler-development = format("%012d", 1)
     cooker-development    = format("%012d", 2)
     disabled-development  = format("%012d", 3)
+  }
+  environment_management = {
+    account_ids = {
+      core-shared-services-production = format("%012d", 5)
+    }
   }
   environment_configuration_gc = {
     pdc_token_rotator = var.rotator

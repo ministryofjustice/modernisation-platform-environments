@@ -16,6 +16,19 @@ locals {
   }
 }
 
+resource "aws_ssm_parameter" "gc_pdc_rotator_ecr_repository_uri" {
+  count = local.environment == "development" ? 1 : 0
+
+  name = "/observability-platform/grafana-pdc-token-rotator/ecr-repository-uri"
+  type = "String"
+  value = format(
+    "%s.dkr.ecr.%s.amazonaws.com/observability-platform-grafana-pdc-token-rotator",
+    local.environment_management.account_ids["core-shared-services-production"],
+    data.aws_region.current.name
+  )
+  tags = local.tags
+}
+
 resource "aws_dynamodb_table" "gc_pdc_rotation_state" {
   for_each = local.gc_pdc_rotator_deployments
 

@@ -20,3 +20,17 @@ run "no_pdc_accounts" {
     error_message = "An environment without opted-in accounts must not create PDC secrets or a rotator."
   }
 }
+
+run "production_has_no_development_ecr_parameter" {
+  command = plan
+
+  variables {
+    environment = "production"
+    accounts    = {}
+  }
+
+  assert {
+    condition     = length(aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri) == 0
+    error_message = "The rotator ECR repository URI parameter is development-only."
+  }
+}

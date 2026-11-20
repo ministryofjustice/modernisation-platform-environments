@@ -59,6 +59,13 @@ The dedicated repository is
 release is not yet available. There is deliberately no guessed ECR URI or
 placeholder version that a deployment might try to pull.
 
+The development environment publishes the repository URI as an SSM `String`
+parameter at
+`/observability-platform/grafana-pdc-token-rotator/ecr-repository-uri`. It
+constructs the URI in `eu-west-2` from the core shared services production
+account ID in `environment_management` and the repository name. This parameter
+is development-only; it does not deploy the image or activate rotation.
+
 Once the dependencies below are met, `pdc_token_rotator` in the relevant
 environment configuration can be set to an object containing:
 
