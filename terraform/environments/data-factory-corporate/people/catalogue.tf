@@ -1,5 +1,5 @@
 locals {
-  glue_catalog_arn       = "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog"
+  glue_catalog_arn        = "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog"
   sherlock_landing_prefix = "avature-sherlock"
 
   # Add independent buckets or prefixes here; an empty prefix registers the whole bucket.
@@ -43,6 +43,24 @@ module "sherlock_glue_database" {
     prefix      = local.sherlock_landing_prefix
   }
 
+  lf_tags = {
+    domain         = one(aws_lakeformation_lf_tag.domain.values)
+    classification = one(aws_lakeformation_lf_tag.classification.values)
+  }
+}
+
+resource "aws_lakeformation_lf_tag" "domain" {
+  key    = "domain"
+  values = ["avature"]
+
+  depends_on = [aws_lakeformation_data_lake_settings.your_lake_settings_name]
+}
+
+resource "aws_lakeformation_lf_tag" "classification" {
+  key    = "classification"
+  values = ["official-sensitive"]
+
+  depends_on = [aws_lakeformation_data_lake_settings.your_lake_settings_name]
 }
 
 module "lakeformation_locations" {

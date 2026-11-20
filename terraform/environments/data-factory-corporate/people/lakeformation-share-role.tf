@@ -62,8 +62,3 @@ resource "aws_lakeformation_permissions" "data-share-sherlock-location" {
     module.lakeformation_locations
   ]
 }
-
-moved {
-  from = aws_lakeformation_permissions.data-share-sherlock-location
-  to   = aws_lakeformation_permissions.data-share-sherlock-location["sherlock"]
-}

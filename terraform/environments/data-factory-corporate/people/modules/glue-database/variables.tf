@@ -23,6 +23,12 @@ variable "storage" {
 
 variable "tags" {
   type        = map(string)
-  description = "Tags to apply to created resources."
+  description = "AWS resource tags to apply to the database."
+  default     = {}
+}
+
+variable "lf_tags" {
+  type        = map(string)
+  description = "Existing Lake Formation tag keys and values to associate with the database."
   default     = {}
 }
