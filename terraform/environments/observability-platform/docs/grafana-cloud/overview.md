@@ -140,6 +140,11 @@ and token secret ARN, keyed by account name.
 PDC agents are not deployed from this environment. The tenant module provides them,
 together with the networking for each shared VPC.
 
+Automatic rotation is not enabled yet. The secrets carry rotation metadata and
+the bootstrap token resources block destructive replacement. See the
+[rotation contract and non-destructive state handoff](pdc-token-rotation.md)
+before changing token ownership or enabling a rotator.
+
 Grafana Cloud management API calls, browser access and alert notifications
 go over public HTTPS.
 

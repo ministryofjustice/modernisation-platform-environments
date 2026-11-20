@@ -23,6 +23,8 @@ locals {
   environment_configuration_gc = local.environment_configurations_gc[local.environment]
   environment_configurations_gc = {
     development = {
+      # Set only after a released image, dedicated credential and alert destination are available.
+      pdc_token_rotator = null
       tenant_configuration = {
         "observability-platform" = {
           github_team = "observability-platform"
@@ -45,6 +47,7 @@ locals {
       }
     }
     production = {
+      pdc_token_rotator    = null
       tenant_configuration = {}
     }
   }
