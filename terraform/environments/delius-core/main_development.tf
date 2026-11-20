@@ -34,7 +34,6 @@ module "environment_dev" {
 
   delius_microservice_configs = local.delius_microservices_configs_dev
   enable_autoscaling_schedule = true
-  enable_xsiam_cloudwatch_logs = true
 
   tags = local.tags
 
