@@ -18,7 +18,7 @@ terraform {
     }
     archive = {
       source  = "hashicorp/archive"
-      version = "2.7.1"
+      version = "2.8.1"
     }
     null = {
       source  = "hashicorp/null"
