@@ -73,8 +73,8 @@ deletion requires an explicitly reviewed change to this protection.
 `grafana-cloud-tenant-environment-configurations.tf` lists each environment's
 tenants and the AWS accounts they own, keyed by account name. The
 `modules/grafana-cloud/tenant-configuration` module applies the defaults and
-validates the configuration. An account with no settings gets a PDC network and
-a CloudWatch data source:
+validates the configuration. An account with no settings gets a CloudWatch data
+source. PDC is opt-in, for accounts with private data sources to query:
 
 ```hcl
 tenant_configuration = {
@@ -83,6 +83,7 @@ tenant_configuration = {
     aws_accounts = {
       "team-a-development" = {}
       "team-a-production" = {
+        pdc_enabled         = true # also set grafana_cloud.pdc_agent.enabled in the tenant module
         shared_with_tenants = ["team-b"]
         cloudwatch          = { custom_namespaces = ["ECS/ContainerInsights", "CWAgent"] }
         xray                = { enabled = true }
@@ -98,7 +99,7 @@ tenant_configuration = {
 
 | Account setting | Default | Effect |
 | --- | --- | --- |
-| `pdc_enabled` | `true` | PDC network and token for the account. Must match the tenant module's `grafana_cloud.pdc_agent.enabled` |
+| `pdc_enabled` | `false` | Opt in to a PDC network and token for the account, for private data sources. Must match the tenant module's `grafana_cloud.pdc_agent.enabled` |
 | `shared_with_tenants` | `[]` | Other tenants whose teams can also query the account's data sources |
 | `cloudwatch.enabled` | `true` | `<account>-cloudwatch` data source |
 | `cloudwatch.custom_namespaces` | `[]` | Custom metric namespaces, one per item |
@@ -113,8 +114,8 @@ or if the workspace ID or region is malformed.
 ## Private Data Source Connect (PDC)
 
 `grafana-cloud-pdc-accounts.tf` creates, for each AWS account in
-`grafana-cloud-tenant-environment-configurations.tf` with `pdc_enabled` (default
-`true`, matching the tenant module's `grafana_cloud.pdc_agent.enabled`):
+`grafana-cloud-tenant-environment-configurations.tf` with `pdc_enabled = true`
+(opt-in, matching the tenant module's `grafana_cloud.pdc_agent.enabled`):
 
 - a PDC network and a PDC network token, named
   `<stack slug>-<account name>` and `<stack slug>-<account name>-agent`
@@ -196,8 +197,35 @@ Query to the owning tenant's team and to the teams of the tenants in
 `shared_with_tenants`. It is authoritative: it removes Grafana's default Viewer
 and Editor access, so no other users can query the data source. Admins keep
 access, including the platform team and the Terraform service account. If none
-of those tenants has a team, only Admins can query the data source. The GitHub
-data source keeps Grafana's default permissions.
+of those tenants has a team, only Admins and any matching platform
+team can query the data source.
+
+In development and production, GitHub SSO also admits the Ministry of Justice
+`modernisation-platform` and `cloud-platform` GitHub teams. They have no basic
+Grafana role (so no inherited Viewer access to Grafana Cloud's preconfigured
+data sources), and get the Explorer role to open Explore and Drilldown.
+`observability-platform` membership still takes precedence and grants Admin.
+
+The two teams can query the shared `ministryofjustice-github` data source and
+the AWS data sources for already-onboarded accounts whose canonical
+`modernisation-platform/environments/<stem>.json` declares that account:
+
+| GitHub team | `.tags.application` |
+| --- | --- |
+| `modernisation-platform` | exactly `modernisation-platform` |
+| `cloud-platform` | exactly `cloud-platform`, or starts with `container-platform-` |
+
+Terraform reads only the definitions needed for configured accounts, takes
+account names from the filename and `.environments[].name`, and grants nothing
+for missing or unmatched ownership. The match changes permissions at the next
+Terraform reconciliation; it does not create data sources or onboard accounts.
+Existing AWS tenant grants and sharing still apply, and configured tenant teams
+retain Query on the shared GitHub source. GitHub queries use the stack's shared
+GitHub App installation; Grafana permissions do not filter results by the
+signed-in user's GitHub repository access. Production currently has no onboarded
+AWS accounts; the two teams can query the GitHub source but no AWS sources.
+Managing the GitHub source's permissions removes its default Viewer and Editor
+grants in both stacks; Admins retain access.
 
 ## CloudWatch (Grafana Assume Role)
 

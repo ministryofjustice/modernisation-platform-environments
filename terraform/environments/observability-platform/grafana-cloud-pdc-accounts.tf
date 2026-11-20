@@ -15,7 +15,7 @@ locals {
   gc_pdc_agent_execution_role_name = "grafana-pdc-agent-execution"
 
   # Account name => account ID, for the tenant accounts that run PDC agents. `pdc_enabled` must
-  # match the tenant module's `grafana_cloud.pdc_agent.enabled`; both default to true.
+  # match the tenant module's `grafana_cloud.pdc_agent.enabled`; both are opt-in, defaulting to false.
   gc_pdc_accounts = {
     for account_name, account in local.gc_accounts :
     account_name => local.all_account_ids[account_name] if account.pdc_enabled

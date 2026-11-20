@@ -43,6 +43,12 @@ locals {
         velero                 = "12.1.0"
       }
 
+      /* Ingress NGINX */
+      ingress_nginx_controller_image = {
+        tag    = "v1.15.16-nginx.1.27"
+        digest = "sha256:fd4f9d94b5ec5297dbeba6e915b0e50e779d4fe816bfe8d95a36dc63d5504739"
+      }
+
       /* Velero */
       velero_aws_plugin_version = "v1.14.0"
 
@@ -102,6 +108,12 @@ locals {
         velero                 = "12.1.0"
       }
 
+      /* Ingress NGINX */
+      ingress_nginx_controller_image = {
+        tag    = "v1.15.10-nginx.1.27"
+        digest = "sha256:ed6ae17777a335c44c1d3a9f7c08498571967d17646d0de59c1849db6aa0c08d"
+      }
+
       /* Velero */
       velero_aws_plugin_version = "v1.14.0"
 
@@ -156,6 +168,12 @@ locals {
         kube_prometheus_stack  = "88.3.0"
         kyverno                = "3.8.1"
         velero                 = "12.1.0"
+      }
+
+      /* Ingress NGINX */
+      ingress_nginx_controller_image = {
+        tag    = "v1.15.10-nginx.1.27"
+        digest = "sha256:ed6ae17777a335c44c1d3a9f7c08498571967d17646d0de59c1849db6aa0c08d"
       }
 
       /* Velero */

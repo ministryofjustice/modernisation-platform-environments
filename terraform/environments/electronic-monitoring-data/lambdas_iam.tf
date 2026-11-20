@@ -2200,6 +2200,81 @@ resource "aws_iam_role_policy_attachment" "mdss_reconciler_lambda_policy_attachm
 }
 
 #-----------------------------------------------------------------------------------
+# MDSS received-files reconciler IAM Role
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "mdss_received_files_reconciler" {
+  name               = "mdss_received_files_reconciler_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "mdss_received_files_reconciler_policy_document" {
+  statement {
+    sid    = "ListReceivedMdssFiles"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-received-files-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values = [
+        "allied/mdss/*",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "ReadWriteReceivedManifestMarkers"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = [
+      "${module.s3-metadata-bucket.bucket.arn}/mdss-received-manifest/*",
+    ]
+  }
+
+  statement {
+    sid    = "SendRedriveMessagesToScanQueue"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [
+      module.virus_scan_file_sqs.sqs_queue.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowUseOfMetadataBucketKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+    resources = [
+      module.kms_metadata_key.key_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "mdss_received_files_reconciler" {
+  name   = "mdss_received_files_reconciler_lambda_policy"
+  policy = data.aws_iam_policy_document.mdss_received_files_reconciler_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "mdss_received_files_reconciler" {
+  role       = aws_iam_role.mdss_received_files_reconciler.name
+  policy_arn = aws_iam_policy.mdss_received_files_reconciler.arn
+}
+
+#-----------------------------------------------------------------------------------
 # Staging DB janitor IAM Role
 #-----------------------------------------------------------------------------------
 
@@ -4625,7 +4700,7 @@ resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
 # ------------------------------------------------------------
 
 module "trigger_cadt_daily_run_iam_role" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+ source  = "terraform-aws-modules/iam/aws//modules/iam-role"
 
   name = "trigger_cadt_daily_run"
 
@@ -4667,3 +4742,4 @@ resource "aws_iam_policy" "trigger_cadt_daily_run_iam_policy" {
   name   = "trigger_cadt_daily_run_iam_policy"
   policy = data.aws_iam_policy_document.cadt_policy_document.json
 }
+
