@@ -1,7 +1,7 @@
 module "kms_cloudwatch_logs" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.2"
 
   aliases                 = ["integration-hub-api/logs/${local.component_name}"]
   description             = "KMS CMK for Integration Hub API CloudWatch Logs encryption"
