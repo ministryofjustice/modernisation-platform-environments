@@ -1,3 +1,8 @@
+# Shared S3 server access logs bucket, managed in ccms-feasibility root
+data "aws_s3_bucket" "s3_access_logs" {
+  bucket = "${local.application_name}-s3-access-logs"
+}
+
 module "s3_docs" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
@@ -70,4 +75,16 @@ module "s3_docs" {
   tags = merge(local.tags, {
     Name = local.docs_bucket_name
   })
+}
+
+resource "aws_s3_bucket_logging" "s3_docs" {
+  bucket        = module.s3_docs.bucket.id
+  target_bucket = data.aws_s3_bucket.s3_access_logs.id
+  target_prefix = "${module.s3_docs.bucket.id}/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
 }

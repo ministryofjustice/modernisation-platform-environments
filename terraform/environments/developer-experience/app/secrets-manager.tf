@@ -40,3 +40,23 @@ module "entra_app_secret" {
     { "credential-expiration" = "2027-03-03" }
   )
 }
+
+module "notify_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f3d3da1c801816563080065c5f37f212c8dee444" # v2.2.0
+
+  name       = "${local.component_name}/notify"
+  kms_key_id = module.kms_key.key_arn
+
+  secret_string = jsonencode({
+    api_key                            = "CHANGEME"
+    project_member_added_template_id   = "CHANGEME"
+    project_member_removed_template_id = "CHANGEME"
+  })
+
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "none" }
+  )
+}
