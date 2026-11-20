@@ -536,7 +536,7 @@ module "LAA-ftp-eckoh-inbound-ccms" {
   secret_arn                   = aws_secretsmanager_secret.secrets["LAA-ftp-eckoh-inbound-ccms"].arn
   s3_bucket_ftp                = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_bucket_layer_ftp          = aws_s3_bucket.ccms_ebs_shared.bucket
-  s3_object_ftp_clientlibs     = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layerv2.zip"
+  s3_object_ftp_clientlibs     = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layerV2.zip"
   s3_object_ftp_client         = aws_s3_object.ftp_client.key
   ftp_cron                     = lower(local.environment) == "production" ? "cron(0 10 * * ? *)" : "cron(0 10 ? * MON-FRI *)"
   enabled_cron_in_environments = local.enable_cron_in_environments
