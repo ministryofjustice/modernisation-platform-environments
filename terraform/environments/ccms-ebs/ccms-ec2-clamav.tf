@@ -19,7 +19,8 @@ resource "aws_instance" "ec2_clamav" {
       user_data_replace_on_change
     ]
   }
-  #  user_data_replace_on_change = false
+  user_data_replace_on_change = false
+
   user_data = base64encode(templatefile("./templates/ec2_user_data_clamav.sh", {
     hostname = "clamav"
   }))
