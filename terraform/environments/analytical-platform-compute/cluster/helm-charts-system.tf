@@ -268,6 +268,8 @@ resource "helm_release" "ingress_nginx" {
     templatefile(
       "${path.module}/src/helm/values/ingress-nginx/values.yml.tftpl",
       {
+        controller_image_tag      = local.environment_configuration.ingress_nginx_controller_image.tag
+        controller_image_digest   = local.environment_configuration.ingress_nginx_controller_image.digest
         default_ssl_certificate   = "${kubernetes_namespace_v1.ingress_nginx.metadata[0].name}/default-certificate"
         ingress_hostname          = "ingress.${local.environment_configuration.route53_zone}"
         service_monitor_namespace = kubernetes_namespace_v1.ingress_nginx.metadata[0].name
