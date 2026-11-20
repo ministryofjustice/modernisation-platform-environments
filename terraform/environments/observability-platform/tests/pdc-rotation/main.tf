@@ -46,9 +46,5 @@ locals {
   }
 }
 
-provider "grafana" {
-  alias = "cloud"
-}
-
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}

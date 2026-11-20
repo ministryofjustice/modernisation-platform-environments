@@ -31,7 +31,8 @@ def run():
             "grafana-cloud-pdc-rotator.tf",
         ):
             shutil.copyfile(ROOT / name, directory / name)
-        shutil.copyfile(FIXTURE / "main.tf", directory / "main.tf")
+        for name in ("main.tf", "providers.tf"):
+            shutil.copyfile(FIXTURE / name, directory / name)
         tests = directory / "tests"
         tests.mkdir()
         for source in FIXTURE.glob("*.tftest.hcl"):
