@@ -48,7 +48,7 @@ module "pagerduty_state_bucket" {
   count = local.is-production ? 1 : 0
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.9.0"
+  version = "5.17.0"
 
   bucket        = local.pagerduty_state_bucket_name
   force_destroy = false
