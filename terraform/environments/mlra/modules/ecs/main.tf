@@ -151,7 +151,6 @@ output "ami_id" {
   sensitive = true
 }
 
-# TODO LASB-5089 rename to ami_id after migration
 output "ami_id_al2023" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   sensitive = true
