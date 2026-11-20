@@ -16,7 +16,7 @@ module "iam_role_pagerduty" {
   path            = "/github-actions/"
 
   trust_policy_permissions = {
-    GitHubActionsPagerDuty = {
+    IntegrationHubPagerDuty = {
       actions = ["sts:AssumeRoleWithWebIdentity"]
       principals = [{
         type        = "Federated"
@@ -31,7 +31,10 @@ module "iam_role_pagerduty" {
         {
           test     = "StringEquals"
           variable = "token.actions.githubusercontent.com:sub"
-          values   = ["repo:ministryofjustice/integration-hub:ref:refs/heads/main"]
+          values = [
+            "repo:ministryofjustice/integration-hub:ref:refs/heads/main",
+            "repo:ministryofjustice/integration-hub:pull_request"
+          ]
         }
       ]
     }
@@ -92,11 +95,6 @@ module "iam_role_pagerduty" {
     ReadPagerDutyApiToken = {
       actions   = ["secretsmanager:DescribeSecret", "secretsmanager:GetSecretValue"]
       resources = [module.pagerduty_api_key_secret[0].secret_arn]
-      condition = [{
-        test     = "Bool"
-        variable = "aws:SecureTransport"
-        values   = ["true"]
-      }]
     }
 
     DecryptPagerDutyApiToken = {
