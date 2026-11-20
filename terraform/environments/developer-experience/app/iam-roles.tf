@@ -47,7 +47,8 @@ module "github_actions_iam_role" {
       actions = ["secretsmanager:GetSecretValue"]
       resources = [
         module.github_app_secret.secret_arn,
-        module.entra_app_secret.secret_arn
+        module.entra_app_secret.secret_arn,
+        module.notify_secret.secret_arn,
       ]
     }
     SecretsManagerListAccess = {
