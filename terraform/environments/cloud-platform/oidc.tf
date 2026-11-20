@@ -532,3 +532,64 @@ data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_
     resources = ["arn:aws:kms:eu-west-2:${local.modernisation_platform_account_id}:key/${data.aws_secretsmanager_secret.environment_management.kms_key_id}"]
   }
 }
+
+# OIDC Role for GitHub Actions - CP3 User Terraform Plan (read-only)
+# Assumable from pull request workflows in container-platform-environments.
+# Can read Terraform state in business unit accounts but cannot modify resources.
+# Trust relationship: assumes BU-level user-terraform-plan roles via cross-account.
+module "github_actions_cp3_user_terraform_oidc_role_plan" {
+  #Need to figure out how to have it so that the role is created for the appropriate workspace
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-cp3-user-terraform-plan"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_cp3_user_terraform_oidc_policy_plan.json]
+  subject_claim       = "pull_request"
+  tags                = merge({ "Name" = "GitHub Actions CP3 User Terraform Plan Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_cp3_user_terraform_oidc_policy_plan" {
+  statement {
+    sid    = "AssumeUserTerraformPlanRolesInBusinessUnits"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::*:role/user-terraform-plan"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceOrgID"
+      values   = [data.aws_organizations_organization.root_account.id]
+    }
+  }
+}
+
+# OIDC Role for GitHub Actions - CP3 User Terraform Apply (destructive)
+# Assumable only from main branch workflows in container-platform-environments.
+# Can read/write Terraform state and modify user resources in business unit accounts.
+# Trust relationship: assumes BU-level user-terraform-apply roles via cross-account.
+module "github_actions_cp3_user_terraform_oidc_role_apply" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-cp3-user-terraform-apply"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_cp3_user_terraform_oidc_policy_apply.json]
+  subject_claim       = "ref:refs/heads/main"
+  tags                = merge({ "Name" = "GitHub Actions CP3 User Terraform Apply Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_cp3_user_terraform_oidc_policy_apply" {
+  statement {
+    sid    = "AssumeUserTerraformApplyRolesInBusinessUnits"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::*:role/user-terraform-apply"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceOrgID"
+      values   = [data.aws_organizations_organization.root_account.id]
+    }
+  }
+}
