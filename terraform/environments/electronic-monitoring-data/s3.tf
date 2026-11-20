@@ -1742,7 +1742,7 @@ module "s3-macie-results-bucket" {
 # ------------------------------------------------
 
 module "s3-gems-general-landing-bucket" {
-  count  = local.is-test || local.is-development ? 1 : 0 
+  count  = local.is-test || local.is-development ? 1 : 0
   source = "./modules/landing_bucket/"
 
   data_feed  = "gems"
@@ -1767,7 +1767,7 @@ module "s3-gems-general-landing-bucket" {
 }
 
 module "s3-gems-general-landing-bucket-iam-user" {
-  count  = local.is-test || local.is-development ? 1 : 0 
+  count  = local.is-test || local.is-development ? 1 : 0
   source = "./modules/landing_bucket_iam_user_access/"
 
   data_feed  = "gems"
