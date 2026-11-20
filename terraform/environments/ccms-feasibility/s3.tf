@@ -1,7 +1,7 @@
 # Shared S3 bucket for access logs from every load balancer in the feasibility account.
 
 module "s3_lb_access_logs" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.2.0"
 
   bucket_name        = local.lb_access_logs_bucket_name
   versioning_enabled = false
