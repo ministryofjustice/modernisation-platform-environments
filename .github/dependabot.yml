@@ -184,6 +184,7 @@ updates:
     directories:
       - "terraform/environments/ccms-feasibility"
       - "terraform/environments/ccms-feasibility/ccms-ebs"
+      - "terraform/environments/ccms-feasibility/ccms-ebs-fin"
       - "terraform/environments/ccms-feasibility/ccms-edrms"
       - "terraform/environments/ccms-feasibility/ccms-file-transfer"
       - "terraform/environments/ccms-feasibility/ccms-oia"
@@ -573,6 +574,7 @@ updates:
       - "terraform/environments/delius-core/modules/components/ldap/circuit_breaker"
       - "terraform/environments/delius-core/modules/components/oracle_db_instance"
       - "terraform/environments/delius-core/modules/components/oracle_db_shared"
+      - "terraform/environments/delius-core/modules/components/xsiam"
       - "terraform/environments/delius-core/modules/delius_environment"
       - "terraform/environments/delius-core/modules/helpers/delius_microservice"
       - "terraform/environments/delius-core/modules/helpers/ebs_volume"
@@ -1238,6 +1240,7 @@ updates:
       - "terraform/environments/observability-platform/modules/amazon-managed-grafana/contact-point/slack"
       - "terraform/environments/observability-platform/modules/amazon-managed-grafana/team"
       - "terraform/environments/observability-platform/modules/amazon-managed-grafana/xray-source"
+      - "terraform/environments/observability-platform/modules/grafana-cloud/account-ownership"
       - "terraform/environments/observability-platform/modules/grafana-cloud/aws-account-data-sources"
       - "terraform/environments/observability-platform/modules/grafana-cloud/team"
       - "terraform/environments/observability-platform/modules/grafana-cloud/tenant-configuration"
