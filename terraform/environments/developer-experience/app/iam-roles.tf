@@ -23,7 +23,8 @@ module "cloud_platform_eso_iam_role" {
       actions = ["secretsmanager:GetSecretValue"]
       resources = [
         module.github_app_secret.secret_arn,
-        module.entra_app_secret.secret_arn
+        module.entra_app_secret.secret_arn,
+        module.notify_secret.secret_arn
       ]
     }
   }
