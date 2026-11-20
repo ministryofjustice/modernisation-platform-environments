@@ -1,12 +1,12 @@
 mock_provider "aws" {
   mock_resource "aws_iam_policy" {
-    defaults = { arn = "arn:aws:iam::444444444444:policy/grafana-pdc-token-rotator" }
+    defaults = { arn = "arn:aws:iam::@MOCK_PLATFORM_ACCOUNT@:policy/grafana-pdc-token-rotator" }
   }
   mock_resource "aws_iam_role" {
-    defaults = { arn = "arn:aws:iam::444444444444:role/grafana-pdc-token-rotator" }
+    defaults = { arn = "arn:aws:iam::@MOCK_PLATFORM_ACCOUNT@:role/grafana-pdc-token-rotator" }
   }
   mock_data "aws_caller_identity" {
-    defaults = { account_id = "444444444444" }
+    defaults = { account_id = "@MOCK_PLATFORM_ACCOUNT@" }
   }
   mock_data "aws_region" {
     defaults = { name = "eu-west-2" }
@@ -17,10 +17,10 @@ mock_provider "aws" {
     }
   }
   mock_resource "aws_secretsmanager_secret" {
-    defaults = { arn = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:grafana-cloud/pdc/mock-ABCDEF" }
+    defaults = { arn = "arn:aws:secretsmanager:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:secret:grafana-cloud/pdc/mock-ABCDEF" }
   }
   mock_resource "aws_kms_key" {
-    defaults = { arn = "arn:aws:kms:eu-west-2:444444444444:key/12345678-1234-1234-1234-123456789012" }
+    defaults = { arn = "arn:aws:kms:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:key/12345678-1234-1234-1234-abcdefabcdef" }
   }
 }
 
@@ -51,12 +51,12 @@ run "central_metadata_without_activation" {
 
   assert {
     condition = (
-      aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].name == "grafana-cloud/pdc/111111111111" &&
-      aws_secretsmanager_secret.gc_pdc_token["cooker-development"].name == "grafana-cloud/pdc/222222222222" &&
+      aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].name == "grafana-cloud/pdc/${format("%012d", 1)}" &&
+      aws_secretsmanager_secret.gc_pdc_token["cooker-development"].name == "grafana-cloud/pdc/${format("%012d", 2)}" &&
       aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].tags["pdc:access-policy-id"] == "sprinkler-network" &&
       aws_secretsmanager_secret.gc_pdc_token["cooker-development"].tags["pdc:access-policy-id"] == "cooker-network" &&
-      aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].tags["pdc:tenant-account-id"] == "111111111111" &&
-      aws_secretsmanager_secret.gc_pdc_token["cooker-development"].tags["pdc:tenant-account-id"] == "222222222222"
+      aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].tags["pdc:tenant-account-id"] == format("%012d", 1) &&
+      aws_secretsmanager_secret.gc_pdc_token["cooker-development"].tags["pdc:tenant-account-id"] == format("%012d", 2)
     )
     error_message = "Keep the existing per-account secret names and map metadata to each account's own network."
   }
@@ -95,20 +95,20 @@ run "prepared_runtime_permissions" {
 
   variables {
     rotator = {
-      image_uri                          = "444444444444.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-credential-ABCDEF"
-      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:444444444444:key/87654321-4321-4321-4321-210987654321"
-      failure_topic_arn                  = "arn:aws:sns:eu-west-2:444444444444:test-pdc-failures"
-      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-stack-query-ABCDEF"
-      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:444444444444:key/12345678-4321-4321-4321-210987654321"
+      image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-credential-ABCDEF"
+      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
+      failure_topic_arn                  = "arn:aws:sns:eu-west-2:${format("%012d", 4)}:test-pdc-failures"
+      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
+      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
     }
   }
 
   assert {
     condition = (
       toset(one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "AssumeTenantRestarters"])) == toset([
-        "arn:aws:iam::111111111111:role/grafana-pdc-agent-restarter",
-        "arn:aws:iam::222222222222:role/grafana-pdc-agent-restarter",
+        "arn:aws:iam::${format("%012d", 1)}:role/grafana-pdc-agent-restarter",
+        "arn:aws:iam::${format("%012d", 2)}:role/grafana-pdc-agent-restarter",
       ]) &&
       one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "ReadGrafanaCredential"]) == [var.rotator.credential_secret_arn] &&
       one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s if s.Sid == "ReadStackQueryCredential"]) == {
@@ -172,12 +172,12 @@ run "reject_cross_account_credential" {
 
   variables {
     rotator = {
-      image_uri                          = "444444444444.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:999999999999:secret:test-pdc-credential-ABCDEF"
-      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:444444444444:key/87654321-4321-4321-4321-210987654321"
-      failure_topic_arn                  = "arn:aws:sns:eu-west-2:444444444444:test-pdc-failures"
-      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-stack-query-ABCDEF"
-      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:444444444444:key/12345678-4321-4321-4321-210987654321"
+      image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 9)}:secret:test-pdc-credential-ABCDEF"
+      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
+      failure_topic_arn                  = "arn:aws:sns:eu-west-2:${format("%012d", 4)}:test-pdc-failures"
+      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
+      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
     }
   }
 
@@ -189,12 +189,12 @@ run "reject_wrong_region_failure_destination" {
 
   variables {
     rotator = {
-      image_uri                          = "444444444444.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-credential-ABCDEF"
-      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:444444444444:key/87654321-4321-4321-4321-210987654321"
-      failure_topic_arn                  = "arn:aws:sns:eu-west-1:444444444444:test-pdc-failures"
-      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-stack-query-ABCDEF"
-      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:444444444444:key/12345678-4321-4321-4321-210987654321"
+      image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-credential-ABCDEF"
+      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
+      failure_topic_arn                  = "arn:aws:sns:eu-west-1:${format("%012d", 4)}:test-pdc-failures"
+      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
+      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
     }
   }
 
@@ -206,12 +206,12 @@ run "reject_out_of_region_stack_query_key" {
 
   variables {
     rotator = {
-      image_uri                          = "444444444444.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-credential-ABCDEF"
-      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:444444444444:key/87654321-4321-4321-4321-210987654321"
-      failure_topic_arn                  = "arn:aws:sns:eu-west-2:444444444444:test-pdc-failures"
-      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:test-pdc-stack-query-ABCDEF"
-      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-1:444444444444:key/12345678-4321-4321-4321-210987654321"
+      image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-credential-ABCDEF"
+      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
+      failure_topic_arn                  = "arn:aws:sns:eu-west-2:${format("%012d", 4)}:test-pdc-failures"
+      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
+      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-1:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
     }
   }
 

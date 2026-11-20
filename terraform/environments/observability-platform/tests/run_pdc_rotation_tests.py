@@ -11,6 +11,14 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "pdc-rotation"
 
 
+def write_test_fixture(source, destination):
+    # Mock provider defaults only accept literals; generate synthetic IDs in the temporary root.
+    destination.write_text(
+        source.read_text(encoding="utf-8").replace("@MOCK_PLATFORM_ACCOUNT@", f"{4:012d}"),
+        encoding="utf-8",
+    )
+
+
 def run():
     # Copy production files, not a second implementation. Never initialise the live backend.
     with tempfile.TemporaryDirectory(prefix="pdc-rotation-tests-") as temporary:
@@ -27,7 +35,7 @@ def run():
         tests = directory / "tests"
         tests.mkdir()
         for source in FIXTURE.glob("*.tftest.hcl"):
-            shutil.copyfile(source, tests / source.name)
+            write_test_fixture(source, tests / source.name)
         environment = os.environ | {
             "TF_IN_AUTOMATION": "1",
             "TF_INPUT": "0",
@@ -54,7 +62,7 @@ def run():
                 print(result.stdout)
 
         # Lifecycle destruction errors cannot be captured by Terraform's expect_failures.
-        shutil.copyfile(
+        write_test_fixture(
             FIXTURE / "token-destruction.hcl",
             tests / "token-destruction.tftest.hcl",
         )

@@ -1,6 +1,6 @@
 mock_provider "aws" {
   mock_data "aws_caller_identity" {
-    defaults = { account_id = "444444444444" }
+    defaults = { account_id = "@MOCK_PLATFORM_ACCOUNT@" }
   }
   mock_data "aws_region" {
     defaults = { name = "eu-west-2" }
@@ -11,10 +11,10 @@ mock_provider "aws" {
     }
   }
   mock_resource "aws_secretsmanager_secret" {
-    defaults = { arn = "arn:aws:secretsmanager:eu-west-2:444444444444:secret:grafana-cloud/pdc/mock-ABCDEF" }
+    defaults = { arn = "arn:aws:secretsmanager:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:secret:grafana-cloud/pdc/mock-ABCDEF" }
   }
   mock_resource "aws_kms_key" {
-    defaults = { arn = "arn:aws:kms:eu-west-2:444444444444:key/12345678-1234-1234-1234-123456789012" }
+    defaults = { arn = "arn:aws:kms:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:key/12345678-1234-1234-1234-abcdefabcdef" }
   }
 }
 

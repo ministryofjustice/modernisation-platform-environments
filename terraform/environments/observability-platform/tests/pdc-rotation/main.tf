@@ -27,9 +27,9 @@ locals {
   tags             = {}
   gc_accounts      = var.accounts
   all_account_ids = {
-    sprinkler-development = "111111111111"
-    cooker-development    = "222222222222"
-    disabled-development  = "333333333333"
+    sprinkler-development = format("%012d", 1)
+    cooker-development    = format("%012d", 2)
+    disabled-development  = format("%012d", 3)
   }
   environment_configuration_gc = {
     pdc_token_rotator = var.rotator
