@@ -9,7 +9,7 @@ data "aws_kms_key" "logs" {
 module "lambda_file_mover" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.13.0"
 
   architectures                     = ["arm64"]
   attach_tracing_policy             = true
@@ -143,7 +143,7 @@ resource "terraform_data" "delivery_configuration" {
 module "lambda_dlq_reporter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.13.0"
 
   architectures                     = ["arm64"]
   attach_tracing_policy             = true
