@@ -104,3 +104,68 @@ module "octo_access_iam_role" {
     }
   }
 }
+
+module "ghas_monitor" {
+  # Both monitor roles use resources in the production account.
+  for_each = local.is-production ? {
+    ghas-monitor     = "ghas-monitor/state.json"
+    ghas-monitor-dev = "ghas-monitor/dev-state.json"
+  } : {}
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=ba3fd6ded6911e0454092147fe3704171cc05e00" # v6.8.1
+
+  name            = each.key
+  use_name_prefix = false
+
+  enable_github_oidc = true
+  oidc_audiences     = ["sts.amazonaws.com"]
+  oidc_subjects      = ["ministryofjustice@2203574/developer-experience-security@1302953421:environment:${each.key}"]
+
+  create_inline_policy = true
+  inline_policy_permissions = {
+    StateAccess = {
+      effect    = "Allow"
+      actions   = ["s3:GetObject", "s3:PutObject"]
+      resources = ["${module.ghas_monitor_bucket[0].s3_bucket_arn}/${each.value}"]
+    }
+    StateKMSAccess = {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+      resources = [module.kms_key[0].key_arn]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["s3.${data.aws_region.current.region}.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:EncryptionContext:aws:s3:arn"
+          values   = ["${module.ghas_monitor_bucket[0].s3_bucket_arn}/${each.value}"]
+        }
+      ]
+    }
+    GitHubAppSecretAccess = {
+      effect    = "Allow"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [module.github_app_secret[0].secret_arn]
+    }
+    GitHubAppSecretKMSAccess = {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt"]
+      resources = [module.kms_key[0].key_arn]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["secretsmanager.${data.aws_region.current.region}.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:EncryptionContext:SecretARN"
+          values   = [module.github_app_secret[0].secret_arn]
+        }
+      ]
+    }
+  }
+}
