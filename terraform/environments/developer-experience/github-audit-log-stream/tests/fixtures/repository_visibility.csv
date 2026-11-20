@@ -1,0 +1,4 @@
+snapshot_run_id,repo,visibility
+synthetic-run,beta/repo-internal,internal
+synthetic-run,beta/repo-private,private
+synthetic-run,beta/repo-public,public
