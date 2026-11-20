@@ -6,7 +6,7 @@ Tracks [ministryofjustice/observability-platform#338](https://github.com/ministr
 
 Rotation is **not enabled**. Terraform still creates the initial token and writes
 the plain token to the existing central secret. Both environments leave
-`pdc_token_rotator = null`, so no Lambda, IAM policy, alarms, rotation invocation
+`pdc_token_rotator = null`, so no Lambda, journal, IAM policy, alarms, rotation invocation
 or expiry is deployed by this preparation. Existing tokens remain valid, and
 new opted-in accounts retain the current bootstrap behaviour.
 The secret names, per-account networks, KMS policies and tenant read permissions
@@ -40,6 +40,7 @@ an integration contract for the future rotator, not existing Lambda behaviour:
 | `pdc:ecs-region` | ECS region; current pilot accounts use the central account's region |
 | `pdc:ecs-cluster` | `grafana-pdc-agent` |
 | `pdc:ecs-service` | `grafana-pdc-agent` |
+| `pdc:metrics-tunnel-id` | Observed `tunnelID` label for this network in the usage data source; added only when configured |
 
 The Lambda must read and validate these settings rather than hard-code another
 cadence. Shortening an interval or changing expiry settings must not change the
@@ -67,19 +68,35 @@ environment configuration can be set to an object containing:
 | `image_uri` | Actual released ECR image URI, preferably pinned by digest |
 | `credential_secret_arn` | Dedicated Cloud API credential secret in this account/region |
 | `credential_kms_key_arn` | Customer-managed KMS key encrypting that credential |
+| `stack_query_credential_secret_arn` | Separate read-only stack service-account token secret in this account/region |
+| `stack_query_credential_kms_key_arn` | Customer-managed KMS key encrypting the stack query credential |
+| `metrics_tunnel_ids` | Map of account name to verified `tunnelID` label; one distinct value per opted-in account |
 | `failure_topic_arn` | Operational SNS topic in this account/region |
 
 This deploys the Lambda using the existing module/version, exact execution role
 name, scoped IAM permissions, per-secret Secrets Manager invocation permissions,
 Lambda error alarm and a Secrets Manager `RotationFailed` EventBridge target.
 Initial reserved concurrency is one to serialise rotation invocations.
+The Lambda uses a central DynamoDB table (`ROTATION_STATE_TABLE_NAME`) to resume
+interrupted rotations. The journal stores progress and version/deployment
+identifiers, not credentials. It has point-in-time recovery and deletion
+protection; retain it across runtime changes and review retention before
+activation. Do not remove it while any rotation could still be retried.
 The topic's owning configuration must permit EventBridge `sns:Publish` from the
 rule ARN (and CloudWatch alarm delivery); this configuration does not overwrite
 an existing topic policy. Confirm its subscriptions and delivery.
 
-The dedicated credential stays a plain token. The Lambda receives only its ARN
-through `GRAFANA_API_CREDENTIAL_SECRET_ARN`. Neither its value nor PDC token values
-are placed in Lambda environment variables. Cadence comes from secret metadata.
+Store each credential as a plain token. Lambda receives only the management and
+stack query secret ARNs through `GRAFANA_API_CREDENTIAL_SECRET_ARN` and
+`GRAFANA_STACK_QUERY_CREDENTIAL_SECRET_ARN`. Provision the query token separately
+for a dedicated Viewer/read-only service account in the target stack. Do not
+generate or read its value in Terraform, where it could enter state. Use the
+stack URL passed in `GRAFANA_STACK_URL` and confirm during the pilot that
+`GRAFANA_USAGE_DATASOURCE_UID` (`grafanacloud-usage`) resolves to the usage data
+source and that the credential can query it. Cadence comes from secret metadata.
+Record the observed `tunnelID` in `metrics_tunnel_ids`; do not assume it equals
+the access policy ID. Confirm scrape and ingestion lag before choosing the
+runtime's metric freshness, settling and stability settings.
 Setting this object does **not** enable secret rotation or perform state handoff.
 
 ## Dependencies before activation
@@ -99,7 +116,11 @@ Setting this object does **not** enable secret rotation or perform state handoff
   read/write/staging and KMS permissions restricted to this environment's PDC
   secrets and keys.
 - A proven token acceptance check and a reconnection signal attributable to the
-  **replacement** agents. ECS service stability alone is insufficient: an
+  **replacement** agents. The rotator queries
+  `grafanacloud_grafana_pdc_connected_agents` for the network's `tunnelID`.
+  Verify during the pilot that the metric is fresh enough and measures the
+  replacement deployment rather than still-connected old agents.
+  ECS service stability alone is insufficient: an
   unauthenticated agent can stay running and retrying. Agree any additional log
   or metric permissions before extending the tenant role.
 - A bounded restart/verification/rollback sequence within Lambda's 15-minute

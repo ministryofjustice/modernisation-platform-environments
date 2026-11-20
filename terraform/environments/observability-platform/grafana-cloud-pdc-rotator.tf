@@ -3,6 +3,35 @@ locals {
   gc_pdc_rotator_deployments = local.environment_configuration_gc.pdc_token_rotator == null ? {} : {
     this = local.environment_configuration_gc.pdc_token_rotator
   }
+
+  gc_pdc_usage_datasource_uid = "grafanacloud-usage"
+  gc_pdc_rotator_environment = {
+    for key, config in local.gc_pdc_rotator_deployments : key => {
+      GRAFANA_API_CREDENTIAL_SECRET_ARN         = config.credential_secret_arn
+      GRAFANA_STACK_URL                         = grafana_cloud_stack.observability_platform.url
+      GRAFANA_USAGE_DATASOURCE_UID              = local.gc_pdc_usage_datasource_uid
+      GRAFANA_STACK_QUERY_CREDENTIAL_SECRET_ARN = config.stack_query_credential_secret_arn
+      ROTATION_STATE_TABLE_NAME                 = aws_dynamodb_table.gc_pdc_rotation_state[key].name
+    }
+  }
+}
+
+resource "aws_dynamodb_table" "gc_pdc_rotation_state" {
+  for_each = local.gc_pdc_rotator_deployments
+
+  name                        = "${local.gc_pdc_rotator_role_name}-state"
+  billing_mode                = "PAY_PER_REQUEST"
+  hash_key                    = "rotation_id"
+  deletion_protection_enabled = true
+
+  attribute {
+    name = "rotation_id"
+    type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
+  }
 }
 
 resource "aws_iam_policy" "gc_pdc_rotator" {
@@ -32,6 +61,12 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
         Resource = [each.value.credential_secret_arn]
       },
       {
+        Sid      = "ReadStackQueryCredential"
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = [each.value.stack_query_credential_secret_arn]
+      },
+      {
         Sid      = "UsePdcSecretKeys"
         Effect   = "Allow"
         Action   = ["kms:Decrypt", "kms:GenerateDataKey"]
@@ -56,10 +91,28 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
         }
       },
       {
+        Sid      = "DecryptStackQueryCredential"
+        Effect   = "Allow"
+        Action   = ["kms:Decrypt"]
+        Resource = [each.value.stack_query_credential_kms_key_arn]
+        Condition = {
+          StringEquals = {
+            "kms:ViaService"                  = "secretsmanager.${data.aws_region.current.name}.amazonaws.com"
+            "kms:EncryptionContext:SecretARN" = each.value.stack_query_credential_secret_arn
+          }
+        }
+      },
+      {
         Sid      = "AssumeTenantRestarters"
         Effect   = "Allow"
         Action   = ["sts:AssumeRole"]
         Resource = values(local.gc_pdc_restarter_role_arns)
+      },
+      {
+        Sid      = "ManageRotationJournal"
+        Effect   = "Allow"
+        Action   = ["dynamodb:GetItem", "dynamodb:PutItem"]
+        Resource = [aws_dynamodb_table.gc_pdc_rotation_state[each.key].arn]
       },
     ]
   })
@@ -71,10 +124,26 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
     }
     precondition {
       condition = (
+        toset(keys(each.value.metrics_tunnel_ids)) == toset(keys(local.gc_pdc_accounts)) &&
+        length(distinct(values(each.value.metrics_tunnel_ids))) == length(local.gc_pdc_accounts) &&
+        alltrue([for id in values(each.value.metrics_tunnel_ids) : try(trimspace(id) != "", false)])
+      )
+      error_message = "Configure a distinct, non-empty metrics tunnelID label for every opted-in PDC account."
+    }
+    precondition {
+      condition = (
         can(regex("^arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:", each.value.credential_secret_arn)) &&
         can(regex("^arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/", each.value.credential_kms_key_arn))
       )
       error_message = "The dedicated Grafana credential and its KMS key must be in this Observability Platform account and region."
+    }
+    precondition {
+      condition = (
+        each.value.stack_query_credential_secret_arn != each.value.credential_secret_arn &&
+        can(regex("^arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:", each.value.stack_query_credential_secret_arn)) &&
+        can(regex("^arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/", each.value.stack_query_credential_kms_key_arn))
+      )
+      error_message = "The stack query credential must be separate from the management credential, with its secret and KMS key in this Observability Platform account and region."
     }
   }
 }
@@ -103,9 +172,7 @@ module "grafana_pdc_token_rotator" {
   attach_policy                     = true
   policy                            = aws_iam_policy.gc_pdc_rotator[each.key].arn
 
-  environment_variables = {
-    GRAFANA_API_CREDENTIAL_SECRET_ARN = each.value.credential_secret_arn
-  }
+  environment_variables = local.gc_pdc_rotator_environment[each.key]
 
   # Secrets Manager invokes the unqualified function, not an immutable published version.
   create_current_version_allowed_triggers = false
