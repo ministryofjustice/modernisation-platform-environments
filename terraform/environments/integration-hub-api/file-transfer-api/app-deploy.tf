@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "app_deploy" {
 module "app_deploy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.0"
+  version = "6.8.2"
 
   name            = "${local.resource_name_prefix}-app-deploy"
   use_name_prefix = false
