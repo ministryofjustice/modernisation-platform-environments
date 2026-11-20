@@ -21,7 +21,7 @@ module "eks" {
       cidr_blocks = [data.aws_vpc.main.cidr_block]
     }
   }
-  deletion_protection = true
+  deletion_protection = false
 
   create_node_security_group = false
 
