@@ -4,7 +4,7 @@ data "aws_s3_bucket" "s3_access_logs" {
 }
 
 module "s3_dbbackup" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.2.0"
 
   bucket_name        = "${local.component_name}-${local.env_label}-dbbackup"
   versioning_enabled = false
