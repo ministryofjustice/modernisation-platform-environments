@@ -60,20 +60,20 @@ resource "aws_iam_role_policy" "cw_logs_to_firehose_xsiam_policy" {
 resource "aws_iam_policy" "firehose_policy_xsiam" {
   name        = "${local.name}-FirehoseToXsiamPolicy"
   description = "Allows Firehose to send data to Xsiam, write logs"
+
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow",
+        Effect = "Allow"
         Action = [
           "logs:PutLogEvents",
           "logs:DescribeLogStreams",
           "logs:GetLogEvents"
-        ],
-        Resource = [
-          data.aws_cloudwatch_log_group.logs.arn,
-          "${data.aws_cloudwatch_log_group.logs.arn}:log-stream:*"
         ]
+        Resource = flatten([
+          for lg in data.aws_cloudwatch_log_group.logs : [lg.arn, "${lg.arn}:log-stream:*"]
+        ])
       }
     ]
   })
