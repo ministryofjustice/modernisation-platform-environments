@@ -68,7 +68,7 @@ module "weblogic" {
   log_error_pattern = "FATAL"
   log_error_threshold_config = {
     critical = {
-      threshold = 50
+      threshold = 150
       period    = 300
     }
   }
@@ -318,8 +318,7 @@ module "xsiam_cloudwatch_logs"  {
     aws.bucket-replication = aws.bucket-replication
   }
 
-  env_name        = var.env_name
-  app_name        = "weblogic"
-  log_group_name  = "delius-core-${var.env_name}-weblogic-access-logs"
-  log_stream_name = "delius-core-${var.env_name}-weblogic/access_log"
+  env_name         = var.env_name
+  app_name         = "weblogic"
+  log_group_names  = ["delius-core-${var.env_name}-weblogic", "delius-core-${var.env_name}-weblogic-access-logs"]
 }

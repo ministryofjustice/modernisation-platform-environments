@@ -33,18 +33,25 @@ resource "aws_iam_role" "firehose_xsiam" {
 resource "aws_iam_role_policy" "cw_logs_to_firehose_xsiam_policy" {
   name = "${local.name}-AllowCWLogsToWriteToFirehose"
   role = aws_iam_role.cw_logs_to_firehose_xsiam.id
+
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow",
+        Effect = "Allow"
         Action = [
           "firehose:PutRecord",
-          "firehose:PutRecordBatch",
-          "kinesis:PutRecord",
-          "kinesis:PutRecords"
-        ],
+          "firehose:PutRecordBatch"
+        ]
         Resource = aws_kinesis_firehose_delivery_stream.xsiam.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:GenerateDataKey",
+          "kms:Decrypt"
+        ]
+        Resource = aws_kms_key.firehose_backup_xsiam.arn
       }
     ]
   })
@@ -53,20 +60,20 @@ resource "aws_iam_role_policy" "cw_logs_to_firehose_xsiam_policy" {
 resource "aws_iam_policy" "firehose_policy_xsiam" {
   name        = "${local.name}-FirehoseToXsiamPolicy"
   description = "Allows Firehose to send data to Xsiam, write logs"
+
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow",
+        Effect = "Allow"
         Action = [
           "logs:PutLogEvents",
           "logs:DescribeLogStreams",
           "logs:GetLogEvents"
-        ],
-        Resource = [
-          data.aws_cloudwatch_log_group.logs.arn,
-          "${data.aws_cloudwatch_log_group.logs.arn}:log-stream:*"
         ]
+        Resource = flatten([
+          for lg in data.aws_cloudwatch_log_group.logs : [lg.arn, "${lg.arn}:log-stream:*"]
+        ])
       }
     ]
   })

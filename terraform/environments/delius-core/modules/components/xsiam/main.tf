@@ -53,9 +53,11 @@ resource "aws_cloudwatch_log_stream" "firehose_log_stream_xsiam" {
   log_group_name = aws_cloudwatch_log_group.firehose_log_group_xsiam.name
 }
 
-resource "aws_cloudwatch_log_subscription_filter" "userjourney_to_xsiam" {
-  name            = "${local.name}-xsiam-firehose-subscription"
-  log_group_name  = var.log_group_name
+resource "aws_cloudwatch_log_subscription_filter" "xsiam" {
+  for_each = toset(var.log_group_names)
+
+  name            = "${each.value}-filter"
+  log_group_name  = each.value
   filter_pattern  = ""
   destination_arn = aws_kinesis_firehose_delivery_stream.xsiam.arn
   role_arn        = aws_iam_role.cw_logs_to_firehose_xsiam.arn

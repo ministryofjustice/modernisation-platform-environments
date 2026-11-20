@@ -21,27 +21,6 @@ data "aws_iam_policy_document" "pagerduty_state_bucket" {
       values   = local.pagerduty_state_allowed_principal_arns
     }
   }
-
-  statement {
-    sid     = "DenyInsecureTransport"
-    effect  = "Deny"
-    actions = ["s3:*"]
-    resources = [
-      "arn:aws:s3:::${local.pagerduty_state_bucket_name}",
-      "arn:aws:s3:::${local.pagerduty_state_bucket_name}/*"
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
-  }
 }
 
 module "pagerduty_state_bucket" {
@@ -53,8 +32,9 @@ module "pagerduty_state_bucket" {
   bucket        = local.pagerduty_state_bucket_name
   force_destroy = false
 
-  attach_policy = true
-  policy        = data.aws_iam_policy_document.pagerduty_state_bucket[0].json
+  attach_policy                         = true
+  policy                                = data.aws_iam_policy_document.pagerduty_state_bucket[0].json
+  attach_deny_insecure_transport_policy = true
 
   block_public_acls       = true
   block_public_policy     = true

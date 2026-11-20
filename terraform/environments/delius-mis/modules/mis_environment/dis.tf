@@ -11,6 +11,8 @@ resource "aws_security_group" "dis_ec2" {
 
 resource "aws_vpc_security_group_ingress_rule" "dis_ec2" {
   for_each = {
+    smb-from-bcs      = { ip_protocol = "TCP", port = 445, referenced_security_group_id = aws_security_group.bcs_ec2.id }
+    smb-from-bps      = { ip_protocol = "TCP", port = 445, referenced_security_group_id = aws_security_group.bps_ec2.id }
     http8080-from-alb = { referenced_security_group_id = aws_security_group.mis_alb.id, ip_protocol = "tcp", port = 8080 }
   }
 
