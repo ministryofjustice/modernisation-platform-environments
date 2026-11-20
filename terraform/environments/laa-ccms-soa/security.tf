@@ -213,7 +213,7 @@ resource "aws_security_group_rule" "alb_managed_egress_ecs_targets" {
 }
 
 resource "aws_security_group_rule" "alb_managed_egress_managed_http_lb" {
-  count = local.alb_80_enabled ? 1 : 0
+  count             = local.alb_80_enabled ? 1 : 0
   security_group_id = aws_security_group.alb_managed.id
   type              = "egress"
   description       = "Egress to Application Load Balancer on port 80"
@@ -442,18 +442,18 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_db_ingress_1521" {
 }
 
 resource "aws_security_group" "alb_http_managed" {
-  count = local.alb_80_enabled ? 1 : 0
+  count       = local.alb_80_enabled ? 1 : 0
   name        = "${local.application_data.accounts[local.environment].app_name}_alb_http_managed"
   description = "Controls Traffic for SOA Managed Application Load Balancer"
   vpc_id      = data.aws_vpc.shared.id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "soa_managed_nlb_managed_http_alb" {
-    count = local.alb_80_enabled ? 1 : 0
-    security_group_id = aws_security_group.alb_http_managed[count.index].id
-    description = "managed nlb to managed alb"
-    ip_protocol = "TCP"
-    from_port   = 80
-    to_port     = 80
-    referenced_security_group_id =aws_security_group.alb_managed.id
+  count                        = local.alb_80_enabled ? 1 : 0
+  security_group_id            = aws_security_group.alb_http_managed[count.index].id
+  description                  = "managed nlb to managed alb"
+  ip_protocol                  = "TCP"
+  from_port                    = 80
+  to_port                      = 80
+  referenced_security_group_id = aws_security_group.alb_managed.id
 }
