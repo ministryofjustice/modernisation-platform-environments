@@ -9,3 +9,20 @@ resource "aws_glue_catalog_database" "data_factory_database" {
     "Name" = "data-factory-${var.database_name}-glue-database"
   })
 }
+
+resource "aws_lakeformation_resource_lf_tags" "database" {
+  count = length(var.lf_tags) > 0 ? 1 : 0
+
+  database {
+    name = aws_glue_catalog_database.data_factory_database.name
+  }
+
+  dynamic "lf_tag" {
+    for_each = var.lf_tags
+
+    content {
+      key   = lf_tag.key
+      value = lf_tag.value
+    }
+  }
+}
