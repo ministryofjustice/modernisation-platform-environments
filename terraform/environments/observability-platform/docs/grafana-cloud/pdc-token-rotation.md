@@ -119,6 +119,8 @@ Setting this object does **not** enable secret rotation or perform state handoff
 - A proven token acceptance check and a reconnection signal attributable to the
   **replacement** agents. The rotator queries
   `grafanacloud_grafana_pdc_connected_agents` for the network's `tunnelID`.
+  Each network must be exclusive to one ECS agent service: the metric counts
+  all connected agents on the network and must match that service's desired count.
   Verify during the pilot that the metric is fresh enough and measures the
   replacement deployment rather than still-connected old agents.
   ECS service stability alone is insufficient: an
@@ -139,8 +141,12 @@ EventBridge schedule.
 
 ## Non-destructive Terraform state handoff
 
-Do not perform this handoff while the rotator is unavailable. Otherwise new
-accounts would receive empty secrets, with no mechanism to issue their tokens.
+Do not perform this handoff while the rotator is unavailable or before a
+reviewed manual bootstrap process is in place for new accounts. The rotator
+requires an existing `AWSCURRENT` token and a healthy connected-agent baseline;
+it fails closed on empty secrets and cannot issue the first token. After the
+handoff, seed the first token and verify agents connect before enabling rotation
+for a new account. Automatic first-token issuance remains unimplemented.
 Do not use a normal Terraform destroy or replace, or add `expires_at` to the
 Terraform-managed live token.
 
@@ -174,8 +180,8 @@ These addresses cover all `for_each` instances. The root's Terraform constraint
    backups as credentials.
 2. Plan each environment separately. Confirm the two resources are **forgotten,
    not destroyed**, with no network, secret, key or token replacement. Reject any
-   unexpected change. The new rotator must also support empty secrets for new
-   accounts.
+   unexpected change. Confirm an existing `AWSCURRENT` token and connected agents
+   for each secret that will be enrolled in rotation.
 3. Apply only through the usual reviewed deployment process. Forgetting the
    resources must not revoke the live token or change `AWSCURRENT`. Historical
    state versions, backups and plans still contain the old token: handle them
@@ -194,7 +200,7 @@ These addresses cover all `for_each` instances. The root's Terraform constraint
 
 The automatic expiry of newly issued tokens is a hard limit: a failed rotation
 must alert with enough time for recovery before the current token expires.
-Test a fresh account, scheduled and forced rotation, retries, reconnection
+Test manual bootstrap for a fresh account, scheduled and forced rotation, retries, reconnection
 failure/rollback and cleanup before production activation. No live rotation or
 infrastructure apply is part of this preparatory change.
 
