@@ -39,6 +39,51 @@ Modernisation Platform
 
 ## Optional
 
+### Grafana Cloud PDC PrivateLink endpoints
+
+The `network` component creates local Grafana PDC API (TCP 443) and SSH gateway
+(TCP 22) interface endpoints in these VPC workspaces only:
+
+- `cloud-platform-development`, `cloud-platform-preproduction`, `cloud-platform-nonlive`
+- `container-platform-{cd,hmpps,laa,octo}-nonlive`
+
+All live/production VPCs are excluded by an explicit allow-list. These endpoints
+use the `prod-gb-south-1` services shared by both Observability Platform Grafana
+Cloud stacks, matching [the MP implementation](https://github.com/ministryofjustice/modernisation-platform/pull/14378).
+They incur interface endpoint charges even before agents are deployed.
+
+Endpoints use the VPC's private subnets in every AZ that the service exposes
+within this VPC. Supported AZ names are discovered in the endpoint-owning account;
+a service with no matching AZ fails the plan rather than selecting a default subnet.
+Dedicated security groups allow only the relevant service port from the VPC's
+primary and secondary (pod) CIDRs. No ingress from other Transit Gateway spokes
+or new outbound security group rules are added.
+
+Private DNS is enabled on each endpoint. The VPC module enables DNS support and
+hostnames by default. Future agents must explicitly use
+`-api-fqdn private-datasource-connect-api.eu-west-2.vpce.grafana.net` and
+`-gateway-fqdn private-datasource-connect.eu-west-2.vpce.grafana.net`, as described
+in [Grafana's PrivateLink guidance](https://grafana.com/docs/grafana-cloud/observe-and-act/connect-externally-hosted/private-data-source-connect/pdc-agent-aws-privatelink/).
+Public PDC hostnames are not overridden. Existing S3/DynamoDB gateway endpoints,
+the shared AWS interface endpoint Route53 Profile association and the Transit
+Gateway routes remain unchanged.
+
+For the **CP3 OpenSearch use case**, PDC is only needed once OpenSearch moves
+into the VPC. At that point agents and PrivateLink endpoints are needed in the
+CP account hosting the domain. Confirm that the OpenSearch data source supports
+Grafana Assume Role and PDC together before rollout; that compatibility has not
+been verified here. This does not imply that other private data sources do not
+need PDC today. This configuration provisions endpoints only, not agents or
+OpenSearch changes. Future SigV4/Assume Role access also needs working STS HTTPS
+connectivity and the appropriate IAM permissions.
+
+Before deploying, review the network plans for all seven non-production and
+five live workspaces. Expect two endpoints, two security groups and four ingress
+rules per selected VPC, and no PDC resources or changes to shared endpoints in
+live workspaces. Confirm endpoint service access/acceptance and DNS resolution
+in each CP account; do not assume that access from the MP accounts proves CP
+account access.
+
 ### **Other URLs:**
 
 <!--  If you can, provide links to the service’s monitoring dashboard(s), health checks, documentation (ideally describing how to run/work with the service), and main GitHub repository. -->
