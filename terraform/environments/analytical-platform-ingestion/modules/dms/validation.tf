@@ -4,6 +4,7 @@ data "aws_iam_policy_document" "validation_lambda_function" {
   statement {
     actions = [
       "s3:PutObject",
+      "s3:PutObjectTagging",
       "s3:ListBucket"
     ]
 
@@ -25,9 +26,11 @@ data "aws_iam_policy_document" "validation_lambda_function" {
     ]
   }
 
+  # CopyObject carries source tags across, so tagged objects need the tagging permissions too
   statement {
     actions = [
       "s3:GetObject",
+      "s3:GetObjectTagging",
       "s3:DeleteObject"
     ]
 
