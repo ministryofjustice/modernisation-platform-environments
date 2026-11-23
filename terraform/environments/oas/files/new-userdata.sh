@@ -15,12 +15,19 @@ echo "Userdata started at $(date)" > /tmp/userdata_started
 yum update -y ca-certificates
 (
   B=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
-  L=/etc/pki/ca-trust/source/blocklist
+  S=/etc/pki/ca-trust/source
   if [ ! -f "$B" ]; then
     echo "CA bundle $B not found, skipping eMudhra blocklist"
     exit 0
   fi
-  mkdir -p "$L"
+  # OL8 ships the distrust directory as "blacklist"; newer releases call it
+  # "blocklist". Use whichever exists, creating "blocklist" as a last resort.
+  if [ -d "$S/blacklist" ]; then
+    L=$S/blacklist
+  else
+    L=$S/blocklist
+    mkdir -p "$L"
+  fi
   D=$(mktemp -d)
   cd "$D" || exit 0
   csplit -s -z -f cert- "$B" '/-----BEGIN TRUSTED CERTIFICATE-----/' '{*}'
