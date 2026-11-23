@@ -199,7 +199,7 @@ data "aws_iam_policy_document" "ops_api" {
       effect = "Allow"
 
       principals {
-        type        = "AWS"
+        type = "AWS"
         identifiers = local.is-preproduction || local.is-production ? [
           module.emd_update_p1_cp_role[0].iam_role_arn,
         ] : tolist(data.aws_iam_roles.mod_plat_roles.arns)

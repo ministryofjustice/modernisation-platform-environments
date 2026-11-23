@@ -88,7 +88,7 @@ module "pwm" {
   }
 
   container_secrets_env_specific = try(var.delius_microservice_configs.pwm.container_secrets_env_specific, {})
-  
+
   container_vars_default = merge(
     {
       "CONFIG_XML_BASE64" = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
@@ -100,7 +100,7 @@ module "pwm" {
       }))
       "JAVA_OPTS" = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
     },
-    var.env_name != "prod" ? { "JAVA_TOOL_OPTIONS" = "-XX:-UseBASE64Intrinsics"} : {}
+    var.env_name != "prod" ? { "JAVA_TOOL_OPTIONS" = "-XX:-UseBASE64Intrinsics" } : {}
   )
   container_vars_env_specific = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
 
