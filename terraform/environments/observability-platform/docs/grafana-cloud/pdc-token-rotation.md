@@ -6,9 +6,12 @@ Tracks [ministryofjustice/observability-platform#338](https://github.com/ministr
 
 Rotation is **not enabled**. Terraform still creates the initial token and writes
 the plain token to the existing central secret. Both environments leave
-`pdc_token_rotator = null`, so no Lambda, journal, IAM policy, alarms, rotation invocation
-or expiry is deployed by this preparation. Existing tokens remain valid, and
-new opted-in accounts retain the current bootstrap behaviour.
+`pdc_token_rotator = null`, so no Lambda, journal, rotator IAM policy, alarms,
+rotation invocation or expiry is deployed by this preparation. Development
+does deploy the failure SNS topic and Slack delivery independently, so the
+notification path can be verified before the Lambda exists. Production has no
+configured failure destination. Existing tokens remain valid, and new opted-in
+accounts retain the current bootstrap behaviour.
 The secret names, per-account networks, KMS policies and tenant read permissions
 are unchanged.
 
@@ -66,8 +69,29 @@ constructs the URI in `eu-west-2` from the core shared services production
 account ID in `environment_management` and the repository name. This parameter
 is development-only; it does not deploy the image or activate rotation.
 
-Once the dependencies below are met, `pdc_token_rotator` in the relevant
-environment configuration can be set to an object containing:
+The environment configuration's optional `pdc_failure_alerts` object declares
+the Slack destination; in development its `slack_channel_id` is
+`C06ALD6LX55`. Terraform creates a KMS-encrypted SNS topic named
+`grafana-pdc-rotation-failures-development` and an Amazon Q Developer (AWS
+Chatbot) Slack channel configuration subscribed to it. CloudWatch alarm and
+EventBridge publish permissions are restricted to their respective alert/rule
+ARNs and this AWS account. This is notification-only: the channel configuration
+has no guardrail policies or additional channel permissions. Production keeps
+`pdc_failure_alerts = null`.
+
+Before applying the development Terraform configuration, complete this
+one-time manual prerequisite: authorise the MoJ Slack workspace in **Amazon Q
+Developer in chat applications** in the Observability Platform development AWS
+account, then run `/invite @Amazon Q` in the Slack channel. The channel
+configuration cannot be created until both steps are complete.
+
+Verify delivery after applying by sending a test message from the Amazon Q
+Developer console to the configured channel, then publishing a test message to
+the SNS topic (its ARN is visible in the SNS console). Confirm both messages
+arrive in `#observability-platform-development-alerts`.
+
+Once the rotator dependencies below are met, `pdc_token_rotator` in the
+relevant environment configuration can be set to an object containing:
 
 | Field | Required value |
 | --- | --- |
@@ -76,20 +100,21 @@ environment configuration can be set to an object containing:
 | `credential_kms_key_arn` | Customer-managed KMS key encrypting that credential |
 | `stack_query_credential_secret_arn` | Separate read-only stack service-account token secret in this account/region |
 | `stack_query_credential_kms_key_arn` | Customer-managed KMS key encrypting the stack query credential |
-| `failure_topic_arn` | Operational SNS topic in this account/region |
 
 This deploys the Lambda using the existing module/version, exact execution role
 name, scoped IAM permissions, per-secret Secrets Manager invocation permissions,
 Lambda error alarm and a Secrets Manager `RotationFailed` EventBridge target.
+The alarm and EventBridge target use the SNS topic created from
+`pdc_failure_alerts`; no SNS ARN needs to be supplied.
 Initial reserved concurrency is one to serialise rotation invocations.
 The Lambda uses a central DynamoDB table (`ROTATION_STATE_TABLE_NAME`) to resume
 interrupted rotations. The journal stores progress and version/deployment
 identifiers, not credentials. It has point-in-time recovery and deletion
 protection; retain it across runtime changes and review retention before
 activation. Do not remove it while any rotation could still be retried.
-The topic's owning configuration must permit EventBridge `sns:Publish` from the
-rule ARN (and CloudWatch alarm delivery); this configuration does not overwrite
-an existing topic policy. Confirm its subscriptions and delivery.
+The SNS topic policy created with `pdc_failure_alerts` permits EventBridge and
+CloudWatch delivery from only this account's rotation-failure rule and alarm.
+Confirm the Chatbot subscription and delivery before activation.
 
 Store each credential as a plain token. Lambda receives only the management and
 stack query secret ARNs through `GRAFANA_API_CREDENTIAL_SECRET_ARN` and
@@ -135,8 +160,8 @@ Setting this object does **not** enable secret rotation or perform state handoff
   or metric permissions before extending the tenant role.
 - A bounded restart/verification/rollback sequence within Lambda's 15-minute
   limit, including retry idempotency and concurrent invocation handling.
-- An operational notification destination. Wire Lambda error alarms and Secrets
-  Manager `RotationFailed` events to it before activation, and verify delivery.
+- A configured `pdc_failure_alerts` destination in the environment. Confirm
+  both SNS and Amazon Q delivery before activation.
 
 The future Secrets Manager invocation permission must restrict
 `secretsmanager.amazonaws.com` to this AWS account and these secrets. Configure
