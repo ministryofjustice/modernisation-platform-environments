@@ -6,9 +6,37 @@ exec 2>&1
 # Create marker file to prove userdata started
 echo "Userdata started at $(date)" > /tmp/userdata_started
 
-# Distrust eMudhra/emSign and Comodo AAA roots (AL2023 fixed ca-certificates release)
-dnf update -y ca-certificates --releasever 2023.12.20261026
-update-ca-trust
+# STB-5230: distrust the eMudhra/emSign and Comodo AAA root CAs.
+# This host is Oracle Linux 8, so update the package from Oracle's repos (the
+# 2026.2.92 build already drops most emSign roots) and then blocklist any
+# emSign/eMudhra/AAA root the vendor still ships as trusted, such as
+# "emSign Root CA - G1". The blocklist step is idempotent and runs in a
+# subshell so an early exit cannot skip the rest of the user data.
+yum update -y ca-certificates
+(
+  B=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+  L=/etc/pki/ca-trust/source/blocklist
+  if [ ! -f "$B" ]; then
+    echo "CA bundle $B not found, skipping eMudhra blocklist"
+    exit 0
+  fi
+  mkdir -p "$L"
+  D=$(mktemp -d)
+  cd "$D" || exit 0
+  csplit -s -z -f cert- "$B" '/-----BEGIN TRUSTED CERTIFICATE-----/' '{*}'
+  for f in cert-*; do
+    SUBJ=$(openssl x509 -noout -subject -nameopt RFC2253 -in "$f" 2>/dev/null)
+    if echo "$SUBJ" | grep -qiE 'CN=(AAA Certificate Services|emSign|eMudhra)'; then
+      FP=$(openssl x509 -noout -fingerprint -sha256 -in "$f" | cut -d= -f2 | tr -d :)
+      openssl x509 -in "$f" -out "$L/emudhra-blocklist-$FP.pem"
+      echo "Blocklisted: $SUBJ"
+    fi
+  done
+  cd / && rm -rf "$D"
+  update-ca-trust extract
+  echo "Remaining emSign/eMudhra/AAA trust anchors (expect none):"
+  trust list --filter=ca-anchors | grep -iE 'emsign|emudhra|AAA Certificate' || echo "none"
+)
 
 # Replace SSH keys with new Terraform-generated keys
 echo "Replacing SSH keys with new Terraform-generated keys..."
