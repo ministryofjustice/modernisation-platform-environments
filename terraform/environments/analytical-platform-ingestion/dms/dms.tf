@@ -1,7 +1,7 @@
 # DMS configuration for CICA data pipelines (tariff and tempus)
 locals {
   # Dev-only alert test: non-empty uploads a bad file per pipeline; change to re-run, set "" before merging
-  dms_alert_test_run = local.environment == "development" ? "2" : ""
+  dms_alert_test_run = ""
 
   tariff = {
     short_resource_name = "tariff-${local.environment}"
