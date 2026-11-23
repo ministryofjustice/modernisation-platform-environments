@@ -16,7 +16,7 @@ The writer reads the dispatch secret version named in the request and checks its
 
 ## Network access
 
-The writer uses one shared private subnet in development and test, and all selected private subnets in preproduction and production. Its security group allows SFTP to the configured recipient CIDRs and ports, HTTPS to shared protected-subnet CIDRs, and HTTPS to the regional S3 and DynamoDB managed prefix lists.
+The writer uses one shared private subnet in development and test, and all selected private subnets in preproduction and production. Its security group allows SFTP to the configured recipient CIDRs and ports, HTTPS to the shared VPC interface-endpoint security group (looked up via `aws.core-vpc` using the `${business-unit}-${environment}-int-endpoint` `Name` tag), and HTTPS to the regional S3 and DynamoDB managed prefix lists.
 
 Check that the shared VPC has the following endpoints. This component does not create them.
 
