@@ -64,9 +64,9 @@
 /terraform/environments/data-factory-moj/ingestion-registry @ministryofjustice/probation-de @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/ingestion-artifacts @ministryofjustice/probation-de @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/service-ingestion @ministryofjustice/probation-de @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform-factory-one @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform-factory-two @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform-governance @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform-factory-one @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/azure-aws-sso-jdp-factory-one-owners @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform-factory-two @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/azure-aws-sso-jdp-factory-two-owners @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform-governance @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/azure-aws-sso-jdp-governance-admins @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/delius-alfresco @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core-training @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
