@@ -2,6 +2,10 @@
 image:
   repository: ${imageRepository}
   tag: ${imageTag}
+%{ if imagePullSecretEnabled ~}
+imagePullSecrets:
+  - name: litellm-enterprise-pull
+%{ endif ~}
 
 nameOverride: "litellm"
 
