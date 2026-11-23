@@ -1349,7 +1349,7 @@ module "live_feed_incident_manager" {
 #-----------------------------------------------------------------------------------
 
 module "trigger_api_integration" {
-  count                   = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  count                   = 1
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "trigger_cpr_job"

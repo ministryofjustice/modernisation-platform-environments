@@ -49,6 +49,12 @@ data "aws_secretsmanager_secret_version" "google_cloud_ai_gateway" {
   secret_id = module.google_cloud_ai_gateway_secret.secret_id
 }
 
+data "aws_secretsmanager_secret_version" "litellm_enterprise_registry_hostname" {
+  count = local.litellm_private_registry_enabled ? 1 : 0
+
+  secret_id = module.litellm_enterprise_registry_hostname_secret[0].secret_id
+}
+
 data "aws_secretsmanager_secret_version" "openai_ai_gateway" {
   secret_id = module.openai_ai_gateway_secret.secret_id
 }

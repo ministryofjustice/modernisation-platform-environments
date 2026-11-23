@@ -8,14 +8,9 @@ variable "app_name" {
   type        = string
 }
 
-variable "log_group_name" {
-  description = "The name of the CloudWatch log group for the Firehose delivery stream"
-  type        = string
-}
-
-variable "log_stream_name" {
-  description = "The name of the CloudWatch log stream for the Firehose delivery stream"
-  type        = string
+variable "log_group_names" {
+  description = "The names of the CloudWatch log groups for the Firehose delivery stream"
+  type        = list(string)
 }
 
 variable "s3_versioning" {

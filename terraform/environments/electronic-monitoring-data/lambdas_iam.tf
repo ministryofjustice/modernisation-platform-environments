@@ -3366,6 +3366,17 @@ module "trigger_cpr_job_iam_role" {
   }
 }
 
+data "aws_iam_policy_document" "trigger_cpr" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+    resources = [module.cpr_api_trigger.secret_arn]
+  }
+}
+
 # ------------------------------------------------------------------------------
 # IAM role and policy for the rota personal digest Lambda
 # ------------------------------------------------------------------------------
