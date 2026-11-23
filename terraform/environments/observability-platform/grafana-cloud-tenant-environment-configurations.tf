@@ -7,7 +7,7 @@
 # `shared_with_tenants` lets other tenants' teams query it too. The defaults are:
 #
 #   "<account name>" = {
-#     pdc_enabled         = true # must match the tenant module's grafana_cloud.pdc_agent.enabled
+#     pdc_enabled         = false # opt in; must match the tenant module's grafana_cloud.pdc_agent.enabled
 #     shared_with_tenants = []
 #     cloudwatch          = { enabled = true, custom_namespaces = [] }
 #     xray                = { enabled = false }
@@ -15,13 +15,16 @@
 #     # amazon_prometheus = { workspace_id = "ws-...", region = "eu-west-2" }
 #   }
 #
-# so `"<account name>" = {}` gives an account a PDC network (grafana-cloud-pdc-accounts.tf) and a
-# CloudWatch data source (grafana-cloud-data-sources.tf). AWS data sources use the account's
-# `grafana-cloud` role, created by the tenant module.
+# so `"<account name>" = {}` gives an account a CloudWatch data source (grafana-cloud-data-sources.tf).
+# Set `pdc_enabled = true` only for accounts with private data sources to query, which gives them a
+# PDC network (grafana-cloud-pdc-accounts.tf). AWS data sources use the account's `grafana-cloud`
+# role, created by the tenant module.
 locals {
   environment_configuration_gc = local.environment_configurations_gc[local.environment]
   environment_configurations_gc = {
     development = {
+      # Set only after a released image, dedicated credential and alert destination are available.
+      pdc_token_rotator = null
       tenant_configuration = {
         "observability-platform" = {
           github_team = "observability-platform"
@@ -31,16 +34,20 @@ locals {
             "observability-platform-development" = {
               cloudwatch = { enabled = false }
             }
-            # Modernisation Platform sandbox accounts, used to test the tenant module.
+            # Modernisation Platform sandbox accounts, used to test the tenant module and its PDC agent.
             "sprinkler-development" = {
-              xray = { enabled = true }
+              pdc_enabled = true
+              xray        = { enabled = true }
             }
-            "cooker-development" = {}
+            "cooker-development" = {
+              pdc_enabled = true
+            }
           }
         }
       }
     }
     production = {
+      pdc_token_rotator    = null
       tenant_configuration = {}
     }
   }

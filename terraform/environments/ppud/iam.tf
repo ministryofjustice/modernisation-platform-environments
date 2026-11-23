@@ -74,6 +74,20 @@ resource "aws_iam_policy_attachment" "ec2_describe_instances" {
   policy_arn = aws_iam_policy.ec2_describe_instances.arn
 }
 
+resource "aws_iam_policy_attachment" "cloudtrail_lookupevents" {
+  depends_on = [aws_iam_policy.cloudtrail_lookupevents]
+  name       = "cloudtrail-lookupevents-attachment"
+  roles      = [aws_iam_role.ec2_iam_role.id]
+  policy_arn = aws_iam_policy.cloudtrail_lookupevents.arn
+}
+
+resource "aws_iam_policy_attachment" "config_getresourceconfighistory" {
+  depends_on = [aws_iam_policy.config_getresourceconfighistory]
+  name       = "config-getresourceconfighistory-attachment"
+  roles      = [aws_iam_role.ec2_iam_role.id]
+  policy_arn = aws_iam_policy.config_getresourceconfighistory.arn
+}
+
 resource "aws_iam_policy_attachment" "CloudWatchAgentAdminPolicy" {
   count      = local.is-production == true ? 1 : 0
   depends_on = [aws_iam_policy.production-s3-access]
@@ -141,7 +155,45 @@ resource "aws_iam_policy" "ec2_describe_instances" {
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [{
-      "Action" : ["ec2:DescribeInstances"]
+      "Action" : ["ec2:DescribeInstances", "ec2:DescribeAddresses"]
+      "Effect" : "Allow",
+      "Resource" : [
+        "*"
+      ]
+    }]
+  })
+}
+
+########################################
+# IAM Policy for Cloudtrail LookupEvents
+########################################
+
+resource "aws_iam_policy" "cloudtrail_lookupevents" {
+  name        = "cloudtrail-lookupevents"
+  description = "Allow EC2 instances to search for cloudtrail events"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Action" : ["cloudtrail:lookupevents"]
+      "Effect" : "Allow",
+      "Resource" : [
+        "*"
+      ]
+    }]
+  })
+}
+
+############################################
+# IAM Policy for Config Get Resource History
+############################################
+
+resource "aws_iam_policy" "config_getresourceconfighistory" {
+  name        = "config-getresourceconfighistory"
+  description = "Allow EC2 instances to search resource config history"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Action" : ["config:getresourceconfighistory"]
       "Effect" : "Allow",
       "Resource" : [
         "*"

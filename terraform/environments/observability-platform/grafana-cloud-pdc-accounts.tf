@@ -15,7 +15,7 @@ locals {
   gc_pdc_agent_execution_role_name = "grafana-pdc-agent-execution"
 
   # Account name => account ID, for the tenant accounts that run PDC agents. `pdc_enabled` must
-  # match the tenant module's `grafana_cloud.pdc_agent.enabled`; both default to true.
+  # match the tenant module's `grafana_cloud.pdc_agent.enabled`; both are opt-in, defaulting to false.
   gc_pdc_accounts = {
     for account_name, account in local.gc_accounts :
     account_name => local.all_account_ids[account_name] if account.pdc_enabled
@@ -55,6 +55,11 @@ resource "grafana_cloud_private_data_source_connect_network_token" "account" {
   display_name   = "${each.key} (${grafana_cloud_stack.observability_platform.slug}) agents"
   pdc_network_id = grafana_cloud_private_data_source_connect_network.account[each.key].pdc_network_id
   region         = grafana_cloud_private_data_source_connect_network.account[each.key].region
+
+  lifecycle {
+    # Replacing this resource revokes the token before agents have read its replacement.
+    prevent_destroy = true
+  }
 }
 
 data "aws_iam_policy_document" "gc_pdc_token_kms" {
@@ -113,11 +118,12 @@ resource "aws_kms_alias" "gc_pdc_token" {
 }
 
 resource "aws_secretsmanager_secret" "gc_pdc_token" {
-  #checkov:skip=CKV2_AWS_57:Token is issued by Grafana Cloud and rotated via Terraform
+  #checkov:skip=CKV2_AWS_57:Automatic rotation awaits the tested PDC rotator; see docs/grafana-cloud/pdc-token-rotation.md
   for_each = local.gc_pdc_accounts
 
   name       = "grafana-cloud/pdc/${each.value}"
   kms_key_id = aws_kms_key.gc_pdc_token[each.key].arn
+  tags       = local.gc_pdc_rotation_tags[each.key]
 }
 
 resource "aws_secretsmanager_secret_version" "gc_pdc_token" {
@@ -125,6 +131,10 @@ resource "aws_secretsmanager_secret_version" "gc_pdc_token" {
 
   secret_id     = aws_secretsmanager_secret.gc_pdc_token[each.key].id
   secret_string = grafana_cloud_private_data_source_connect_network_token.account[each.key].token
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 data "aws_iam_policy_document" "gc_pdc_token_secret" {

@@ -1,5 +1,8 @@
 # DMS configuration for CICA data pipelines (tariff and tempus)
 locals {
+  # Dev-only alert test: non-empty uploads a bad file per pipeline; change to re-run, set "" before merging
+  dms_alert_test_run = ""
+
   tariff = {
     short_resource_name = "tariff-${local.environment}"
     resource_name       = "cica-ap-tariff-${local.environment}"
@@ -79,7 +82,8 @@ module "cica_dms_tariff_dms_implementation" {
       source_arn = aws_cloudwatch_event_rule.tariff_metadata_generator.arn
     }
   }
-  slack_webhook_secret_id = local.environment == "development" ? module.cica_dms_slack_webhook.secret_id : null
+  slack_webhook_secret_id = module.cica_dms_slack_webhook.secret_id
+  alert_test_run          = local.dms_alert_test_run
 }
 
 module "cica_dms_tempus_dms_implementation" {
@@ -134,5 +138,6 @@ module "cica_dms_tempus_dms_implementation" {
       source_arn = aws_cloudwatch_event_rule.metadata_generator.arn
     }
   }
-  slack_webhook_secret_id = local.environment == "development" ? module.cica_dms_slack_webhook.secret_id : null
+  slack_webhook_secret_id = module.cica_dms_slack_webhook.secret_id
+  alert_test_run          = local.dms_alert_test_run
 }

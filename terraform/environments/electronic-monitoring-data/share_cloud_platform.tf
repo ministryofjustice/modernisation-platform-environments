@@ -913,9 +913,12 @@ data "aws_iam_policy_document" "cmt_permissions" {
     resources = local.cmt_glue_arns
   }
   statement {
-    effect    = "Allow"
-    actions   = ["execute-api:Invoke"]
-    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.get_zipped_file_api_api.api_gateway_id}/*"]
+    effect  = "Allow"
+    actions = ["execute-api:Invoke"]
+    resources = [
+      "arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.get_zipped_file_api_api.api_gateway_id}/*",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/POST/zip-file",
+    ]
   }
 }
 
