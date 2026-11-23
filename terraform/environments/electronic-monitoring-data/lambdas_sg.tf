@@ -27,6 +27,16 @@ data "aws_prefix_list" "dynamodb" {
   name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
 }
 
+data "aws_vpc_endpoint" "secretsmanager" {
+  provider     = aws.core-vpc
+  service_name = "com.amazonaws.${data.aws_region.current.name}.secretsmanager"
+  vpc_id       = data.aws_vpc.shared.id
+
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.secretsmanager"
+  }
+}
+
 resource "aws_security_group_rule" "lambda_ingress_generic" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
   type              = "ingress"
@@ -105,6 +115,14 @@ resource "aws_security_group_rule" "cloud_platform_access" {
   protocol          = "tcp"
   cidr_blocks       = ["172.16.0.0/12"]
   security_group_id = aws_security_group.lambda_cp_sg.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "lambda_cp_to_secretsmanager" {
+  security_group_id            = aws_security_group.lambda_cp_sg.id
+  referenced_security_group_id = tolist(data.aws_vpc_endpoint.secretsmanager.security_group_ids)[0]
+  from_port                    = 443
+  to_port                      = 443
+  ip_protocol                     = "tcp"
 }
 
 resource "aws_security_group" "lambda_gov_notify_access" {
