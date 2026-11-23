@@ -94,9 +94,9 @@ module "pwm" {
         email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
         email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
       }))
-      "JAVA_OPTS" = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
-    },
-    var.env_name != "prod" ? { "JAVA_TOOL_OPTIONS" = "-XX:-UseBASE64Intrinsics"} : {}
+      "JAVA_OPTS"         = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
+      "JAVA_TOOL_OPTIONS" = "-XX:-UseBASE64Intrinsics"
+    }
   )
   container_vars_env_specific = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
 
