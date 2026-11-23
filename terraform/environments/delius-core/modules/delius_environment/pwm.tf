@@ -1,7 +1,3 @@
-locals {
-  pwm_migrated_envs = ["dev", "test", "stage", "preprod", "prod"]
-}
-
 module "pwm" {
   source = "../helpers/delius_microservice"
 
@@ -53,7 +49,7 @@ module "pwm" {
   microservice_lb                    = aws_lb.delius_core_ancillary
   microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
 
-  alb_listener_rule_host_header = !contains(local.pwm_migrated_envs, var.env_name) ? "pwm.${var.env_name}.${var.account_config.dns_suffix}" : null
+  alb_listener_rule_host_header = null
 
   platform_vars = var.platform_vars
 
@@ -130,7 +126,6 @@ module "pwm" {
 }
 
 resource "aws_lb_listener_rule" "ancillary_listener_rule" {
-  count        = contains(local.pwm_migrated_envs, var.env_name) ? 1 : 0
   listener_arn = aws_lb_listener.ancillary_https.arn
   priority     = 10
 
