@@ -1,5 +1,13 @@
 locals {
-  environment_configuration = local.environment_configurations[local.environment]
+  environment_configuration            = local.environment_configurations[local.environment]
+  litellm_registry_credentials_enabled = try(local.environment_configuration.litellm_registry_credentials_enabled, false)
+  litellm_private_registry_enabled     = try(local.environment_configuration.litellm_private_registry_enabled, false)
+
+  # Read only the registry hostname; never load the Docker pull credentials into Terraform state.
+  litellm_enterprise_registry_hostname = local.litellm_private_registry_enabled ? jsondecode(data.aws_secretsmanager_secret_version.litellm_enterprise_registry_hostname[0].secret_string)["registry_hostname"] : ""
+  litellm_image_repository             = local.litellm_private_registry_enabled ? "${local.litellm_enterprise_registry_hostname}/litellm/enterprise/litellm" : try(local.environment_configuration.litellm_image_repository, "ghcr.io/berriai/litellm-non_root")
+  litellm_image_tag                    = local.litellm_private_registry_enabled ? "v${local.environment_configuration.litellm_version}" : try(local.environment_configuration.litellm_image_tag, local.environment_configuration.litellm_version)
+  litellm_registry_hostname_valid      = nonsensitive(can(regex("^[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)+$", local.litellm_enterprise_registry_hostname)))
 
   litellm_master_key = "sk-${random_password.litellm_secret_key.result}" # "sk-" prefix is required by LiteLLM
   proxy_admin_emails = [

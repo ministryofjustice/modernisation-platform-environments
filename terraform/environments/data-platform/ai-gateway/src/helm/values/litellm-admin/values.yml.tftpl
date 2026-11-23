@@ -4,6 +4,10 @@ replicaCount: 1
 image:
   repository: ${imageRepository}
   tag: ${imageTag}
+%{ if imagePullSecretEnabled ~}
+imagePullSecrets:
+  - name: litellm-enterprise-pull
+%{ endif ~}
 
 nameOverride: "litellm-admin"
 
@@ -188,7 +192,12 @@ extraInitContainers:
         else
           proxy_dir=$(python -c 'import importlib.util; from pathlib import Path; print(Path(importlib.util.find_spec("litellm").origin).parent / "proxy")')
           cp -R "$proxy_dir/_experimental/out/." /app/var/litellm/ui/
-          cp "$proxy_dir/logo.jpg" "$proxy_dir/logo_dark.png" /app/var/litellm/assets/
+          # The enterprise image does not ship the default logos, so copy them only when present.
+          for logo in logo.jpg logo_dark.png; do
+            if [ -f "$proxy_dir/$logo" ]; then
+              cp "$proxy_dir/$logo" /app/var/litellm/assets/
+            fi
+          done
         fi
     volumeMounts:
       - name: ui
