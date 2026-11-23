@@ -288,7 +288,11 @@ data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
     sid       = "AllowAccessToTriggerUpdateP1API"
     effect    = "Allow"
     actions   = ["execute-api:Invoke"]
-    resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
+    resources = [
+      "${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/POST/add",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/POST/remove",
+    ]
   }
   statement {
     sid       = "ListAccountAliasForEnvironmentClass"
