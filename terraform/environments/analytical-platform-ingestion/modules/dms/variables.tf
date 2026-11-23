@@ -177,3 +177,27 @@ variable "slack_webhook_secret_id" {
   default     = null
   description = "Secrets Manager ID holding the Slack workflow webhook URL for DMS alerts. Alerts are not sent to Slack when null."
 }
+
+variable "dms_events_log_retention_days" {
+  type        = number
+  default     = 90
+  description = "Retention for the CloudWatch log group holding a copy of DMS events."
+}
+
+variable "replication_instance_freeable_memory_threshold_bytes" {
+  type        = number
+  default     = 1073741824
+  description = "Alarm when the DMS replication instance FreeableMemory drops below this many bytes (default 1 GiB)."
+}
+
+variable "replication_instance_cpu_threshold_percent" {
+  type        = number
+  default     = 90
+  description = "Alarm when the DMS replication instance average CPU stays above this percentage for 15 minutes."
+}
+
+variable "alert_test_run" {
+  type        = string
+  default     = ""
+  description = "Development only: when non-empty, uploads an invalid file to the landing bucket to test validation alerts end to end. Change the value to re-run the test."
+}
