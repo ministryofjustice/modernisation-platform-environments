@@ -21,7 +21,7 @@ resource "aws_lb_target_group" "frontend" {
   vpc_id                        = var.account_config.shared_vpc_id
   target_type                   = "ip"
   deregistration_delay          = 30
-  load_balancing_algorithm_type = "round_robin"
+  load_balancing_algorithm_type = var.name == "weblogic" && var.env_name == "prod" ? "least_outstanding_requests" : "round_robin"
   tags                          = var.tags
 
   stickiness {
