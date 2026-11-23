@@ -1,3 +1,28 @@
+resource "aws_cloudwatch_log_group" "ecs_cadt" {
+  name              = "/ecs/create-a-derived-table"
+  retention_in_days = 14
+}
+
+data "aws_iam_policy_document" "ecs_logging" {
+  statement {
+    effect = "Allow"
+    principals {
+      type = "Service"
+      identifiers = ["ecs.amazonaws.com"]
+    }
+    actions = [
+      "logs:PutLogEvents",
+      "logs:CreateLogStream",
+    ]
+    resources = ["${aws_cloudwatch_log_group.ecs_cadt.arn}:*"]
+  }
+}
+
+resource "aws_cloudwatch_log_resource_policy" "ecs_cadt" {
+  policy_name = "datasync-logs-policy"
+  policy_document = data.aws_iam_policy_document.ecs_logging.json
+}
+
 resource "aws_ecs_task_definition" "create_a_derived_table" {
   family                   = "create-a-derived-table"
   requires_compatibilities = ["FARGATE"]
@@ -15,8 +40,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
       logConfiguration : {
         logDriver = "awslogs",
         options = {
-          awslogs-create-group  = "true",
-          awslogs-group         = "/ecs/create-a-derived-table",
+          awslogs-group         = aws_cloudwatch_log_group.ecs_cadt.name,
           awslogs-region        = data.aws_region.current.name,
           awslogs-stream-prefix = "ecs"
       } }
@@ -147,7 +171,8 @@ data "aws_iam_policy_document" "cadt_api_trigger" {
     effect  = "Allow"
     actions = ["apigateway:POST"]
     resources = [
-      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_request_id}/methods/POST"
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_request_id}/methods/POST",
+      "${aws_api_gateway_rest_api.ops_api.arn}/resources/${aws_api_gateway_resource.ops_api["cadt"].id}/methods/POST",
     ]
   }
   statement {
@@ -167,7 +192,8 @@ data "aws_iam_policy_document" "cadt_api_trigger" {
       "apigateway:POST"
     ]
     resources = [
-      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_execution_id_id}/methods/GET"
+      "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_execution_id_id}/methods/GET",
+      "${aws_api_gateway_rest_api.ops_api.arn}/resources/${aws_api_gateway_resource.ops_api_execution["cadt"].id}/methods/GET",
     ]
   }
 }

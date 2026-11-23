@@ -4,6 +4,7 @@ locals {
   environment_configurations = {
     development = {
       litellm_version                    = "1.106.5"
+      litellm_gemini_live_defer_setup    = true
       litellm_entra_client_secret_expiry = "05-05-2027"
       ai_gateway_hostname                = "development.ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
@@ -137,10 +138,11 @@ locals {
       aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type                     = "cache.t4g.medium"
 
-      ai_gateway_egress_policy_enabled = false
+      ai_gateway_egress_policy_enabled = true
     }
     production = {
       litellm_version                    = "1.106.5"
+      litellm_gemini_live_defer_setup    = true
       litellm_entra_client_secret_expiry = "08-05-2027"
       ai_gateway_hostname                = "ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
@@ -157,6 +159,8 @@ locals {
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
         "35.176.93.186/32", # GlobalProtect (Alpha)
+        "51.140.138.86/32", # HMCTS VPN
+        "51.145.115.21/32", # HMCTS VPN
         # Sites
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC

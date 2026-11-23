@@ -5,6 +5,7 @@
       "clamav_ec2_instance_type": "c5d.large",
       "clamav_instance_role": "clamav",
       "lb_access_logs_retention_days": 90,
+      "s3_access_logs_retention_days": 90,
       "athena_results_retention_days": 30
     }
   }

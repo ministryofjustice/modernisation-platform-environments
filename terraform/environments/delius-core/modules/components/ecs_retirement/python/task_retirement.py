@@ -80,7 +80,6 @@ def service_message_markup(resources, env, event):
     '''
     This logic will parse the service task event message
     '''
-
     def detect_environment_from_cluster(cluster_name):
         cluster_name = cluster_name.lower()
         if "-prod-" in cluster_name:
@@ -134,6 +133,7 @@ def service_message_markup(resources, env, event):
     attachments = []
 
     for env_name, services in env_groups.items():
+
         service_list = ""
         for cluster, svc in services:
             service_list += f"• Cluster: _{cluster}_    |   Service: _{svc}_\n"
@@ -202,6 +202,17 @@ def lambda_handler(event, context):
             raise 'Environment variable ' + var + ' not set'
 
     env = os.environ['ENVIRONMENT']
+
+    # need this function for only prod now and later we can use for other envs.
+    # just comment out the if condition to enable for other envs.
+
+    if env not in ['prod']:
+        logger.info(f"Skipping Slack notification for environment: {env} as its not Prod!")
+        return {
+            'statusCode': 200,
+            'body': json.dumps(f"Skipped Slack notification for environment: {env}")
+        }
+    
     slack_token = get_slack_token(os.environ['SLACK_TOKEN'])
     slack_channel = os.environ['SLACK_CHANNEL']
 

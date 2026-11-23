@@ -118,6 +118,17 @@ resource "aws_security_group_rule" "alb_managed_mp_v1_workspaces_ingress_443" {
   cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
 }
 
+# MP Workspaces (V1) - HTTP Access
+resource "aws_security_group_rule" "alb_managed_mp_v1_workspaces_ingress_80" {
+  count             = local.alb_80_enabled ? 1 : 0
+  security_group_id = aws_security_group.alb_managed.id
+  type              = "ingress"
+  description       = "HTTP - AWS Workspaces"
+  protocol          = "TCP"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
+}
 # MP Workspaces (V1) - DEV only, Managed 7002 access
 resource "aws_security_group_rule" "alb_managed_workspace_ingress_7002" {
   count             = local.environment == "development" ? 1 : 0
@@ -198,6 +209,17 @@ resource "aws_security_group_rule" "alb_managed_egress_ecs_targets" {
   protocol          = "tcp"
   from_port         = tonumber(local.application_data.accounts[local.environment].managed_ssl_port)
   to_port           = tonumber(local.application_data.accounts[local.environment].managed_ssl_port)
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+}
+
+resource "aws_security_group_rule" "alb_managed_egress_managed_http_lb" {
+  count = local.alb_80_enabled ? 1 : 0
+  security_group_id = aws_security_group.alb_managed.id
+  type              = "egress"
+  description       = "Egress to Application Load Balancer on port 80"
+  protocol          = "tcp"
+  from_port         = 80
+  to_port           = 80
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
@@ -417,4 +439,21 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_db_ingress_1521" {
   from_port         = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
   to_port           = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
   cidr_ipv4         = local.application_data.accounts[local.environment].oem.oem_db_platform_cidr
+}
+
+resource "aws_security_group" "alb_http_managed" {
+  count = local.alb_80_enabled ? 1 : 0
+  name        = "${local.application_data.accounts[local.environment].app_name}_alb_http_managed"
+  description = "Controls Traffic for SOA Managed Application Load Balancer"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "soa_managed_nlb_managed_http_alb" {
+    count = local.alb_80_enabled ? 1 : 0
+    security_group_id = aws_security_group.alb_http_managed[count.index].id
+    description = "managed nlb to managed alb"
+    ip_protocol = "TCP"
+    from_port   = 80
+    to_port     = 80
+    referenced_security_group_id =aws_security_group.alb_managed.id
 }

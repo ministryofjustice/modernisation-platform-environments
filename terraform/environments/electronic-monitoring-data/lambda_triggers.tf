@@ -334,6 +334,29 @@ resource "aws_lambda_permission" "mdss_reconciler_allow_eventbridge" {
 }
 
 #-----------------------------------------------------------------------------------
+# Schedule MDSS received-files reconciler (every 5 minutes)
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "mdss_received_files_reconciler_schedule" {
+  name                = "mdss_received_files_reconciler_schedule"
+  description         = "Runs the MDSS received-files reconciler to backstop missed scan events"
+  schedule_expression = "rate(5 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "mdss_received_files_reconciler_target" {
+  rule = aws_cloudwatch_event_rule.mdss_received_files_reconciler_schedule.name
+  arn  = module.mdss_received_files_reconciler.lambda_function_arn
+}
+
+resource "aws_lambda_permission" "mdss_received_files_reconciler_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridgeMdssReceivedFilesReconciler"
+  action        = "lambda:InvokeFunction"
+  function_name = module.mdss_received_files_reconciler.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.mdss_received_files_reconciler_schedule.arn
+}
+
+#-----------------------------------------------------------------------------------
 # Create p1 exports
 #-----------------------------------------------------------------------------------
 
@@ -734,7 +757,7 @@ resource "aws_cloudwatch_event_rule" "ac_readiness_cadt_completion" {
   )
 
   event_pattern = jsonencode({
-    source      = ["aws.ecs"]
+    source        = ["aws.ecs"]
     "detail-type" = ["ECS Task State Change"]
 
     detail = {
@@ -1101,3 +1124,37 @@ resource "aws_cloudwatch_event_target" "dlt_iceberg_maintenance" {
 
   depends_on = [aws_iam_role_policy.dlt_iceberg_maintenance_start]
 }
+
+# daily trigger for cadt
+
+module "daily_cadt_eventbridge" {
+  source = "terraform-aws-modules/eventbridge/aws"
+
+  create_bus = false
+
+  rules = {
+    crons = {
+      description         = "Every morning at 3am"
+      schedule_expression = "cron(0 3 * * ? *)"
+    }
+  }
+
+  targets = {
+    crons = [
+      {
+        name  = "trigger-cadt-lambda"
+        arn   = module.trigger_cadt_daily_run.lambda_function_arn
+        input = jsonencode({ "job" : "cron-by-rate" })
+      }
+    ]
+  }
+}
+
+resource "aws_lambda_permission" "allow_cadt_trigger_eventbridge" {
+  statement_id  = "AllowcadtExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = module.trigger_cadt_daily_run.lambda_function_arn
+  principal     = "events.amazonaws.com"
+  source_arn    = module.daily_cadt_eventbridge.eventbridge_rule_arns.crons
+}
+

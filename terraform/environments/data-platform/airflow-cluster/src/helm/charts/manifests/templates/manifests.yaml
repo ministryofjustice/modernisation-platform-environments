@@ -1,4 +1,0 @@
-{{- range $name, $manifest := .Values.manifests }}
----
-{{ toYaml $manifest }}
-{{- end }}

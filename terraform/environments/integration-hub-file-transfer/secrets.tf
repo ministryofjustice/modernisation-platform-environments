@@ -66,6 +66,6 @@ module "secrets_transfer_host_key" {
 
 data "aws_secretsmanager_secret_version" "transfer_host_key" {
   secret_id = module.secrets_transfer_host_key.secret_id
-
-  depends_on = [module.secrets_transfer_host_key]
+  # Wait for the initial version without deferring reads for unrelated module updates.
+  version_stage = module.secrets_transfer_host_key.secret_version_id != null ? "AWSCURRENT" : null
 }

@@ -35,7 +35,7 @@ locals {
   root_process_steps = concat(local.root_core_steps, local.notify_enabled ? [local.root_notify_step] : [])
 
   root_notify_step = {
-    # Runs only if build_app_infra succeeded; a failed child fails the root.
+    # Runs only if prototype_deployment succeeded; a failed child fails the root.
     # Skipped when both confirmations are disabled.
     name               = "notify_user"
     type               = "step_function"

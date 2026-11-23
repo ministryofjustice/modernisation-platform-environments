@@ -783,6 +783,41 @@ module "mdss_load_redrive_controller" {
 }
 
 #-----------------------------------------------------------------------------------
+# MDSS received-files reconciler (scheduled scan backstop)
+#-----------------------------------------------------------------------------------
+
+module "mdss_received_files_reconciler" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "mdss_received_files_reconciler"
+  image_name                     = "mdss_received_files_reconciler"
+  handler                        = "mdss_received_files_reconciler.handler"
+  role_name                      = aws_iam_role.mdss_received_files_reconciler.name
+  role_arn                       = aws_iam_role.mdss_received_files_reconciler.arn
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    ENVIRONMENT_NAME              = local.environment_shorthand
+    RECEIVED_FILES_BUCKET         = module.s3-received-files-bucket.bucket.id
+    SCAN_QUEUE_URL                = module.virus_scan_file_sqs.sqs_queue.id
+    MDSS_RECEIVED_MANIFEST_BUCKET = module.s3-metadata-bucket.bucket.id
+    MDSS_RECEIVED_MANIFEST_PREFIX = "mdss-received-manifest/current"
+    MDSS_PREFIX                   = "allied/mdss/"
+    MIN_OBJECT_AGE_MINUTES        = "20"
+    REDRIVE_COOLDOWN_MINUTES      = "10"
+    MAX_REDRIVE_ATTEMPTS          = "2"
+  }
+}
+
+#-----------------------------------------------------------------------------------
 # Create P1 Export
 #-----------------------------------------------------------------------------------
 
@@ -1720,4 +1755,24 @@ module "register_athena" {
     aws_lakeformation_permissions.api_int_db_level_perms,
     aws_lakeformation_permissions.api_int_table_level_perms,
   ]
+}
+
+module "trigger_cadt_daily_run" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "trigger_cadt_daily_run"
+  image_name                     = "trigger_cadt_daily_run"
+  role_name                      = module.trigger_cadt_daily_run_iam_role.name
+  role_arn                       = module.trigger_cadt_daily_run_iam_role.arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    TRIGGER_CADT_URL = "https://${module.trigger_cadt_api.api_gateway_id}.execute-api.${data.aws_region.current.name}.amazonaws.com/request/execute"
+  }
 }

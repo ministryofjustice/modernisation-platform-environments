@@ -68,7 +68,7 @@ module "weblogic" {
   log_error_pattern = "FATAL"
   log_error_threshold_config = {
     critical = {
-      threshold = 50
+      threshold = 150
       period    = 300
     }
   }
@@ -308,4 +308,17 @@ module "ecs_nightly_restart_weblogic" {
   cluster_name = module.ecs.ecs_cluster_arn
   service_arn  = local.weblogic_service_arn
   task_count   = data.aws_ssm_parameter.weblogic_task_count.value
+}
+
+module "xsiam_cloudwatch_logs"  {
+  count  = var.enable_xsiam_cloudwatch_logs ? 1 : 0
+  source = "../components/xsiam"
+
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+
+  env_name         = var.env_name
+  app_name         = "weblogic"
+  log_group_names  = ["delius-core-${var.env_name}-weblogic", "delius-core-${var.env_name}-weblogic-access-logs"]
 }

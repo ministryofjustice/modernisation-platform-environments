@@ -208,6 +208,36 @@ resource "aws_cloudwatch_metric_alarm" "web_ui_errors" {
   depends_on = [aws_cloudwatch_log_metric_filter.web_ui_errors]
 }
 
+# The environment wipe stops Builder (web UI) and Forge while it clears their data,
+# which takes them off the web UI load balancer. Mute the alarms that this trips
+# between 00:00 and 04:00 UK time. Alarms are still evaluated during the window; if
+# one is still in ALARM when the window ends, its actions run then.
+resource "aws_cloudwatch_alarm_mute_rule" "wipe_window" {
+  count = local.wipe_create && local.wipe_enabled ? 1 : 0
+
+  name        = "${local.application_name}-${local.environment}-wipe-window"
+  description = "Mutes the Builder and Forge alarms during the overnight environment wipe."
+  tags        = local.tags
+
+  rule {
+    schedule {
+      expression = "cron(0 0 * * *)"
+      duration   = "PT4H"
+      timezone   = "Europe/London"
+    }
+  }
+
+  mute_targets {
+    alarm_names = concat(
+      [
+        aws_cloudwatch_metric_alarm.web_ui_running_tasks.alarm_name,
+        aws_cloudwatch_metric_alarm.alb_unhealthy_hosts["web-ui"].alarm_name,
+      ],
+      [for key, alarm in aws_cloudwatch_metric_alarm.alb : alarm.alarm_name if local.alb_alarms[key].alb == "web-ui"],
+    )
+  }
+}
+
 # ---------- ECS clusters (web UI and prototypes) ----------
 # Prototype services are created at runtime, so cluster events cover them rather than
 # per-service metrics.

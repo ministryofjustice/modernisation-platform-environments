@@ -507,6 +507,15 @@ models:
       location: "eu"
       generally_available: false
       environments_available: ["development", "production"]
+    gemini-3-5-transcribe-live:
+      model_id: "gemini-3.5-transcribe-live"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.5 Transcribe Live"
+      model_location: "European Union"
+      location: "eu"
+      mode: "realtime"
+      generally_available: false
+      environments_available: ["development", "production"]
     gemini-3-6-flash:
       model_id: "gemini-3.6-flash"
       model_family: "Google Gemini"
@@ -582,10 +591,64 @@ models:
       generally_available: false
       environments_available: ["development", "test", "preproduction", "production"]
   openai:
-    gpt-5-5-cyber-preview:
-      model_id: "gpt-5.5-cyber-preview"
+    gpt-5-6-cyber:
+      model_id: "gpt-5.6-cyber"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.5 Cyber Preview"
+      model_name: "OpenAI GPT 5.6 Cyber"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-5-6-sol:
+      model_id: "gpt-5.6-sol"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.6 Sol"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-6-sol:
+      model_id: "gpt-6-sol"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 6 Sol"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-6-1-sol:
+      model_id: "gpt-6.1-sol"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 6.1 Sol"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-6-luna:
+      model_id: "gpt-6-luna"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 6 Luna"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-6-1-terra:
+      model_id: "gpt-6.1-terra"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 6.1 Terra"
+      model_location: "Global"
+      model_provider: "OpenAI"
+      generally_available: false
+      environments_available: ["development", "production"]
+      health_check_mode: "responses"
+    gpt-6-astra:
+      model_id: "gpt-6-astra"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 6 Astra"
       model_location: "Global"
       model_provider: "OpenAI"
       generally_available: false

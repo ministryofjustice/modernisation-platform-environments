@@ -43,6 +43,12 @@ locals {
         velero                 = "12.1.0"
       }
 
+      /* Ingress NGINX */
+      ingress_nginx_controller_image = {
+        tag    = "v1.15.16-nginx.1.27"
+        digest = "sha256:fd4f9d94b5ec5297dbeba6e915b0e50e779d4fe816bfe8d95a36dc63d5504739"
+      }
+
       /* Velero */
       velero_aws_plugin_version = "v1.14.0"
 
@@ -102,6 +108,12 @@ locals {
         velero                 = "12.1.0"
       }
 
+      /* Ingress NGINX */
+      ingress_nginx_controller_image = {
+        tag    = "v1.15.16-nginx.1.27"
+        digest = "sha256:fd4f9d94b5ec5297dbeba6e915b0e50e779d4fe816bfe8d95a36dc63d5504739"
+      }
+
       /* Velero */
       velero_aws_plugin_version = "v1.14.0"
 
@@ -122,6 +134,13 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
+      eks_public_access_cidrs = [
+        "128.77.75.64/26", # Prisma Corporate
+        "20.58.27.30/32",  # GitHub Runner (octo-production)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+      ]
       eks_cluster_version = "1.36"
       eks_node_version    = "1.64.0-ad9d4847"
       eks_cluster_addon_versions = {
@@ -149,6 +168,12 @@ locals {
         kube_prometheus_stack  = "88.3.0"
         kyverno                = "3.8.1"
         velero                 = "12.1.0"
+      }
+
+      /* Ingress NGINX */
+      ingress_nginx_controller_image = {
+        tag    = "v1.15.16-nginx.1.27"
+        digest = "sha256:fd4f9d94b5ec5297dbeba6e915b0e50e779d4fe816bfe8d95a36dc63d5504739"
       }
 
       /* Velero */
