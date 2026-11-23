@@ -3,6 +3,8 @@ locals {
 
   environment_configurations = {
     development = {
+      # Optionally set a private image tag independently of the Helm chart version.
+      # litellm_image_tag = "v1.110.2-hotfix"
       litellm_version                      = "1.110.2"
       litellm_registry_credentials_enabled = true
       litellm_private_registry_enabled     = true
