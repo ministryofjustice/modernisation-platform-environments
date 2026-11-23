@@ -63,6 +63,7 @@ data "aws_iam_policy_document" "dms_events_topic" {
         aws_cloudwatch_event_rule.dms_task_events.arn,
         aws_cloudwatch_event_rule.dms_task_events_by_category.arn,
         aws_cloudwatch_event_rule.dms_instance_events.arn,
+        aws_cloudwatch_event_rule.dms_alarms.arn,
       ]
     }
   }
@@ -175,4 +176,63 @@ resource "aws_cloudwatch_event_target" "dms_instance_events" {
 "<message>"
 TEMPLATE
   }
+}
+
+# CloudWatch alarms reach Slack via EventBridge (not alarm_actions) so they get readable text and reuse the topic's existing permissions
+resource "aws_cloudwatch_event_rule" "dms_alarms" {
+  name        = "${var.db}-dms-alarms"
+  description = "CloudWatch alarms for ${var.db} entering ALARM state"
+
+  event_pattern = jsonencode({
+    source        = ["aws.cloudwatch"]
+    "detail-type" = ["CloudWatch Alarm State Change"]
+    resources     = [{ prefix = "arn:aws:cloudwatch:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:alarm:${var.db}-" }]
+    detail = {
+      state = { value = ["ALARM"] }
+    }
+  })
+
+  tags = var.tags
+}
+
+resource "aws_cloudwatch_event_target" "dms_alarms" {
+  rule      = aws_cloudwatch_event_rule.dms_alarms.name
+  target_id = "DMSAlarmToSNS"
+  arn       = aws_sns_topic.dms_events.arn
+
+  input_transformer {
+    input_paths = {
+      alarm       = "$.detail.alarmName"
+      description = "$.detail.configuration.description"
+      reason      = "$.detail.state.reason"
+    }
+    input_template = <<TEMPLATE
+"🚨 <alarm>"
+"<description>"
+"<reason>"
+TEMPLATE
+  }
+}
+
+# Audit trail of every DMS event; the shared log resource policy lives in the calling environment
+#trivy:ignore:AVD-AWS-0017 CMK not used here
+resource "aws_cloudwatch_log_group" "dms_events" {
+  #checkov:skip=CKV_AWS_158:KMS not used here
+  #checkov:skip=CKV_AWS_338:Retention set via variable
+  name              = "/aws/events/dms/${var.db}"
+  retention_in_days = var.dms_events_log_retention_days
+
+  tags = var.tags
+}
+
+resource "aws_cloudwatch_event_target" "dms_events_to_logs" {
+  for_each = {
+    task_events             = aws_cloudwatch_event_rule.dms_task_events.name
+    task_events_by_category = aws_cloudwatch_event_rule.dms_task_events_by_category.name
+    instance_events         = aws_cloudwatch_event_rule.dms_instance_events.name
+  }
+
+  rule      = each.value
+  target_id = "DMSEventsToLogs"
+  arn       = aws_cloudwatch_log_group.dms_events.arn
 }
