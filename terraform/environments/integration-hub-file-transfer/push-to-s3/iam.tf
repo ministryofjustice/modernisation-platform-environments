@@ -1,3 +1,11 @@
+data "aws_s3_bucket" "clean" {
+  bucket = local.clean_bucket_name
+}
+
+data "aws_kms_key" "clean" {
+  key_id = local.clean_kms_key_alias
+}
+
 data "aws_iam_policy_document" "delivery" {
   for_each = local.push_to_s3_entries
 

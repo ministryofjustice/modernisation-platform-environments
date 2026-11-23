@@ -1,29 +1,3 @@
-# data "template_file" "launch-template-main" {
-#   template = file("${path.module}/templates/user-data-main.sh")
-#   vars = {
-#     cluster_name       = "${local.first_cluster_name}"
-#     efs_id             = "test"
-#     deploy_environment = local.environment
-#   }
-# }
-
-data "template_file" "launch-template-main-updated" {
-  template = file("${path.module}/templates/user-data-mainone.sh")
-  vars = {
-    cluster_name       = "${local.first_cluster_name}"
-    deploy_environment = local.environment
-  }
-}
-# efs_id             = aws_efs_file_system.oia-storage.id
-
-data "template_file" "launch-template-additional" {
-  template = file("${path.module}/templates/user-data-additional.sh")
-  vars = {
-    cluster_name       = "${local.second_cluster_name}"
-    deploy_environment = local.environment
-  }
-}
-
 resource "aws_launch_template" "ec2_launch_template_main" {
   name_prefix   = local.first_cluster_name
   image_id      = local.application_data.accounts[local.environment].ami_image_id
@@ -53,7 +27,10 @@ resource "aws_launch_template" "ec2_launch_template_main" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template-main-updated.rendered)
+  user_data = base64encode(templatefile("${path.module}/templates/user-data-mainone.sh", {
+    cluster_name       = local.first_cluster_name
+    deploy_environment = local.environment
+  }))
 
   tag_specifications {
     resource_type = "instance"
@@ -92,11 +69,18 @@ resource "aws_autoscaling_group" "main_cluster_scaling_group" {
     value               = "${local.first_cluster_name}-ecs-instance"
     propagate_at_launch = true
   }
+  # ECS adds this tag automatically once the capacity provider is attached;
+  # declaring it here stops Terraform from stripping it back out on every apply.
+  tag {
+    key                 = "AmazonECSManaged"
+    value               = ""
+    propagate_at_launch = true
+  }
 }
 
 resource "aws_launch_template" "ec2_launch_template_additional" {
   name_prefix   = local.second_cluster_name
-  image_id      = local.application_data.accounts[local.environment].ami_image_id
+  image_id      = local.application_data.accounts[local.environment].conn_saa_ami_image_id
   instance_type = local.application_data.accounts[local.environment].ec2_instance_type
   ebs_optimized = true
 
@@ -123,7 +107,10 @@ resource "aws_launch_template" "ec2_launch_template_additional" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template-additional.rendered)
+  user_data = base64encode(templatefile("${path.module}/templates/user-data-additional.sh", {
+    cluster_name       = local.second_cluster_name
+    deploy_environment = local.environment
+  }))
 
   tag_specifications {
     resource_type = "instance"
@@ -160,6 +147,13 @@ resource "aws_autoscaling_group" "additional_cluster_scaling_group" {
   tag {
     key                 = "Name"
     value               = "${local.second_cluster_name}-ecs-instance"
+    propagate_at_launch = true
+  }
+  # ECS adds this tag automatically once the capacity provider is attached;
+  # declaring it here stops Terraform from stripping it back out on every apply.
+  tag {
+    key                 = "AmazonECSManaged"
+    value               = ""
     propagate_at_launch = true
   }
 }

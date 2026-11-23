@@ -1,12 +1,61 @@
 {
   "accounts": {
     "development": {
+      "builder_auth_mode": "alb",
+      "alb_group_authorization_enabled": true,
+      "hosted_zone_name": "ai-builder-dev.modernisation-platform.service.justice.gov.uk",
       "builder_hostname": "ai-builder-dev.modernisation-platform.service.justice.gov.uk",
-      "forge_hostname": "forge.ai-builder-dev.modernisation-platform.service.justice.gov.uk"
+      "forge_hostname": "forge.ai-builder-dev.modernisation-platform.service.justice.gov.uk",
+      "forge_single_url_enabled": true,
+      "forge_base_path": "/forge-app",
+      "forge_upstream_port": 3000,
+      "forge_public_endpoint_enabled": false,
+      "forge_embedded_entra_enabled": false,
+      "builder_task_cpu": 512,
+      "builder_task_memory": 1024,
+      "forge_task_cpu": 2048,
+      "forge_task_memory": 8192,
+      "forge_max_builds_in_memory": 200,
+      "forge_design_check_concurrency": 3,
+      "forge_design_check_queue_timeout_ms": 120000
+    },
+    "test": {
+      "builder_auth_mode": "alb",
+      "alb_group_authorization_enabled": true,
+      "hosted_zone_name": "ai-builder-test.modernisation-platform.service.justice.gov.uk",
+      "builder_hostname": "ai-builder-test.modernisation-platform.service.justice.gov.uk",
+      "forge_hostname": "forge.ai-builder-test.modernisation-platform.service.justice.gov.uk",
+      "forge_single_url_enabled": true,
+      "forge_base_path": "/forge-app",
+      "forge_upstream_port": 3000,
+      "forge_public_endpoint_enabled": false,
+      "forge_embedded_entra_enabled": false,
+      "builder_task_cpu": 512,
+      "builder_task_memory": 1024,
+      "forge_task_cpu": 2048,
+      "forge_task_memory": 8192,
+      "forge_max_builds_in_memory": 200,
+      "forge_design_check_concurrency": 3,
+      "forge_design_check_queue_timeout_ms": 120000
     },
     "production": {
+      "builder_auth_mode": "alb",
+      "alb_group_authorization_enabled": true,
+      "hosted_zone_name": "ai-builder.modernisation-platform.service.justice.gov.uk",
       "builder_hostname": "ai-builder.modernisation-platform.service.justice.gov.uk",
-      "forge_hostname": "forge.ai-builder.modernisation-platform.service.justice.gov.uk"
+      "forge_hostname": "forge.ai-builder.modernisation-platform.service.justice.gov.uk",
+      "forge_single_url_enabled": true,
+      "forge_base_path": "/forge-app",
+      "forge_upstream_port": 3000,
+      "forge_public_endpoint_enabled": false,
+      "forge_embedded_entra_enabled": false,
+      "builder_task_cpu": 2048,
+      "builder_task_memory": 4096,
+      "forge_task_cpu": 2048,
+      "forge_task_memory": 8192,
+      "forge_max_builds_in_memory": 200,
+      "forge_design_check_concurrency": 3,
+      "forge_design_check_queue_timeout_ms": 120000
     }
   }
 }

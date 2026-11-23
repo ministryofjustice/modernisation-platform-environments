@@ -40,6 +40,24 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
   referenced_security_group_id = aws_security_group.ecs_service.id
 }
 
+# The ALB's authenticate-oidc action calls the IdP itself after the user
+# signs in: Entra's token endpoint and Microsoft Graph's userinfo endpoint.
+# Without outbound 443 from the ALB the listener returns a 500 once login
+# completes. Security groups cannot allow by hostname, so this is a broad
+# HTTPS rule. Only created for accounts where the ALB owns sign-in
+# (builder_auth_mode = "alb"); in-app accounts do the token exchange from
+# the container instead.
+resource "aws_vpc_security_group_egress_rule" "alb_to_idp" {
+  count = local.oidc_wired_count
+
+  security_group_id = aws_security_group.alb.id
+  description       = "HTTPS to Entra token and userinfo endpoints for the authenticate-oidc listener action"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
 # ---------- UI ECS service security group ----------
 
 resource "aws_security_group" "ecs_service" {

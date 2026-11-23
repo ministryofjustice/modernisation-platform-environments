@@ -20,9 +20,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.5"
-      transfer_image_version = "0.0.27"
-      notify_image_version   = "0.0.28"
+      scan_image_version     = "0.2.6"
+      transfer_image_version = "0.0.28"
+      notify_image_version   = "0.0.29"
 
       /* Target Buckets */
       target_buckets = [
@@ -95,9 +95,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.4"
-      transfer_image_version = "0.0.26"
-      notify_image_version   = "0.0.27"
+      scan_image_version     = "0.2.6"
+      transfer_image_version = "0.0.28"
+      notify_image_version   = "0.0.29"
 
       /* Target Buckets */
       target_buckets = [
@@ -105,7 +105,8 @@ locals {
         "mojap-data-production-shared-services-client-team-gov-29148",
         "cloud-platform-623c2bd763adf52b51a0c0cee5c1ec72",
         "property-datahub-landing-production",
-        "ccms-ebs-production-bc-inbound-mp"
+        "ccms-ebs-production-bc-inbound-mp",
+        "alpha-hmpps-bt-pin-historic-data"
       ]
       datasync_target_buckets     = ["mojap-land"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-production"]

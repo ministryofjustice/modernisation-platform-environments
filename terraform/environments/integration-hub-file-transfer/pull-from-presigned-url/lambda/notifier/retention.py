@@ -1,13 +1,17 @@
 """Retain an immutable clean version before notifying. Never issue download URLs."""
+import unicodedata
+from urllib.parse import quote
+
 RETENTION_SECONDS = 7 * 86400
 PART_SIZE = 512 * 1024 * 1024
 
 
-def destination_key(pickup_id, data, route):
+def destination_key(pickup_id, data, route, original_name=None):
     # One isolated directory per recipient and execution; never overwrite another
     # transfer with the same original filename. Strip control characters in labels.
-    filename = data["object"]["key"].rsplit("/", 1)[-1]
-    filename = "".join(c for c in filename if ord(c) >= 32 and ord(c) != 127)
+    filename = original_name if isinstance(original_name, str) and original_name.strip() else data["object"]["key"]
+    filename = filename.replace("\\", "/").rsplit("/", 1)[-1]
+    filename = "".join(c for c in filename if not unicodedata.category(c).startswith("C")).strip()
     if filename in ("", ".", ".."):
         filename = "download"
     prefix = f"{route['recipient_id']}/{pickup_id}/"
@@ -29,25 +33,30 @@ class Retainer:
         version = data["object"].get("versionId")
         if not isinstance(version, str) or version in ("", "null"):
             raise ValueError("An immutable clean version is required")
-        key = destination_key(pickup_id, data, route)
         receipt_key = {"id": "pickup:" + pickup_id}
         previous = self.table.get_item(Key=receipt_key, ConsistentRead=True).get("Item")
         if previous:
             # Notification retries keep the same version and collection deadline.
             if (previous["recipientId"] != route["recipient_id"] or previous["source"] != data["object"]
-                    or previous["bucket"] != self.bucket or previous["key"] != key):
+                    or previous["bucket"] != self.bucket
+                    or not previous["key"].startswith(f"{route['recipient_id']}/{pickup_id}/")
+                    or "/" in previous["key"][len(f"{route['recipient_id']}/{pickup_id}/"):]
+                    or previous["key"].rsplit("/", 1)[-1] in ("", ".", "..")):
                 raise ValueError("Receipt binding mismatch")
             if previous["collectUntil"] <= now:
                 raise ValueError("Pickup expired")
             return previous
         obj = data["object"]
         source = {"Bucket": obj["bucket"], "Key": obj["key"], "VersionId": obj["versionId"]}
-        size = self.s3.head_object(**source)["ContentLength"]
+        head = self.s3.head_object(**source)
+        size = head["ContentLength"]
+        key = destination_key(pickup_id, data, route, head.get("Metadata", {}).get("original-file-name"))
+        filename = key.rsplit("/", 1)[-1]
         if size != obj["sizeBytes"]:
             raise ValueError("Source size mismatch")
         dest = {"Bucket": self.bucket, "Key": key,
                 "ServerSideEncryption": "aws:kms", "SSEKMSKeyId": self.kms_key,
-                "ContentType": "application/octet-stream", "ContentDisposition": "attachment"}
+                "ContentType": "application/octet-stream", "ContentDisposition": "attachment; filename*=UTF-8''" + quote(filename, safe="")}
         if size <= 5 * 1000**3:
             response = self.s3.copy_object(**dest, CopySource=source, MetadataDirective="REPLACE",
                                            TaggingDirective="REPLACE")

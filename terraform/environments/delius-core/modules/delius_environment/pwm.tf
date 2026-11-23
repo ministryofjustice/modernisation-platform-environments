@@ -49,7 +49,7 @@ module "pwm" {
   microservice_lb                    = aws_lb.delius_core_ancillary
   microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
 
-  alb_listener_rule_host_header = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
+  alb_listener_rule_host_header = null
 
   platform_vars = var.platform_vars
 
@@ -84,17 +84,20 @@ module "pwm" {
   }
 
   container_secrets_env_specific = try(var.delius_microservice_configs.pwm.container_secrets_env_specific, {})
-
-  container_vars_default = {
-    "CONFIG_XML_BASE64" = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
-      ldap_host_url      = "ldap://${module.ldap_ecs.nlb_service_r53_record}:${var.ldap_config.port}"
-      ldap_user          = nonsensitive(aws_ssm_parameter.ldap_principal.arn)
-      pwm_url            = "https://pwm.${var.env_name}.${var.account_config.dns_suffix}"
-      email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
-      email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
-    })),
-    "JAVA_OPTS" = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
-  }
+  
+  container_vars_default = merge(
+    {
+      "CONFIG_XML_BASE64" = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
+        ldap_host_url      = "ldap://${module.ldap_ecs.nlb_service_r53_record}:${var.ldap_config.port}"
+        ldap_user          = nonsensitive(aws_ssm_parameter.ldap_principal.arn)
+        pwm_url            = "https://pwm.${var.env_name}.${var.account_config.dns_suffix}"
+        email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
+        email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
+      }))
+      "JAVA_OPTS" = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
+    },
+    var.env_name != "prod" ? { "JAVA_TOOL_OPTIONS" = "-XX:-UseBASE64Intrinsics"} : {}
+  )
   container_vars_env_specific = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
 
   ignore_changes_service_task_definition = true
@@ -107,10 +110,6 @@ module "pwm" {
   log_error_pattern = "ERROR"
 
   log_error_threshold_config = {
-    warning = {
-      threshold = 10
-      period    = 60
-    }
     critical = {
       threshold = 20
       period    = 180
@@ -126,6 +125,67 @@ module "pwm" {
   enable_platform_backups = var.enable_platform_backups
 }
 
+resource "aws_lb_listener_rule" "ancillary_listener_rule" {
+  listener_arn = aws_lb_listener.ancillary_https.arn
+  priority     = 10
+
+  condition {
+    host_header {
+      values = [
+        var.env_name == "prod" ? "password-reset.probation.service.justice.gov.uk" : "password-reset.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "pwm.${var.env_name}.${var.account_config.dns_suffix}"
+      ]
+    }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = module.pwm.target_group_arn
+  }
+}
+
+#############
+### Certs ###
+#############
+resource "aws_acm_certificate" "pwm_legacy" {
+  count = var.env_name != "prod" ? 1 : 0
+
+  domain_name       = "password-reset.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_listener_certificate" "pwm_legacy" {
+  count = var.env_name != "prod" ? 1 : 0
+
+  listener_arn    = aws_lb_listener.ancillary_https.arn
+  certificate_arn = aws_acm_certificate.pwm_legacy[0].arn
+}
+
+resource "aws_acm_certificate" "pwm_legacy_prod" {
+  count = var.env_name == "prod" ? 1 : 0
+
+  domain_name       = "password-reset.probation.service.justice.gov.uk"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_listener_certificate" "pwm_legacy_prod" {
+  count = var.env_name == "prod" ? 1 : 0
+
+  listener_arn    = aws_lb_listener.ancillary_https.arn
+  certificate_arn = aws_acm_certificate.pwm_legacy_prod[0].arn
+}
+
+#############
+#### SSM ####
+#############
 resource "aws_ssm_parameter" "security_key" {
   #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = "/${var.env_name}/pwm/security_key"
@@ -142,8 +202,7 @@ resource "random_id" "security_key" {
 
 #############
 # SES
-#############"
-
+#############
 resource "aws_ses_domain_identity" "pwm" {
   domain = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
 }
@@ -193,7 +252,6 @@ resource "aws_route53_record" "pwm_amazonses_dmarc_record" {
 #####################
 # SES SMTP User
 #####################
-
 resource "aws_iam_user" "pwm_ses_smtp_user" {
   #checkov:skip=CKV_AWS_273: "SES SMTP authentication requires IAM user credentials; no human access is granted"
   name = "${var.env_name}-pwm-smtp-user"

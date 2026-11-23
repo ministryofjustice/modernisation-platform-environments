@@ -1,13 +1,3 @@
-moved {
-  from = module.container_definition
-  to   = module.container_definition[0]
-}
-
-moved {
-  from = module.ecs_service
-  to   = module.ecs_service[0]
-}
-
 module "container_definition" {
   count = var.create_service ? 1 : 0
 

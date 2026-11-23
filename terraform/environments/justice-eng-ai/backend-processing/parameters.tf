@@ -70,13 +70,31 @@ resource "aws_iam_role_policy" "backend_processing_cicd" {
           "ecs:RegisterTaskDefinition",
           "ecs:TagResource",
         ]
-        Resource = "arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${local.script_runner_task_definition_family}:*"
+        Resource = concat(
+          [
+            for family in local.script_runner_task_definition_families :
+            "arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${family}:*"
+          ],
+          local.wipe_create ? local.wipe_task_definition_arns : [],
+          local.expiry_create ? local.expiry_task_definition_arns : [],
+        )
       },
       {
-        Sid      = "PassScriptRunnerTaskRoles"
+        # Lets the image build skip the optional wipe and expiry families where they do not exist.
+        Sid      = "ListTaskDefinitions"
         Effect   = "Allow"
-        Action   = ["iam:PassRole"]
-        Resource = [aws_iam_role.script_runner_ecs_execution.arn, aws_iam_role.script_runner_ecs_task.arn]
+        Action   = ["ecs:ListTaskDefinitions"]
+        Resource = "*"
+      },
+      {
+        Sid    = "PassScriptRunnerTaskRoles"
+        Effect = "Allow"
+        Action = ["iam:PassRole"]
+        Resource = concat(
+          [aws_iam_role.script_runner_ecs_execution.arn, aws_iam_role.script_runner_ecs_task.arn],
+          aws_iam_role.wipe_environment_task[*].arn,
+          aws_iam_role.expire_prototypes_task[*].arn,
+        )
       }
     ]
   })

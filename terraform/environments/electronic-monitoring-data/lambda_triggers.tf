@@ -39,7 +39,7 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
     filter_prefix = "allied/mdss"
   }
   queue {
-    queue_arn     = module.process_fms_metadata_sqs.sqs_queue.arn
+    queue_arn     = module.fms_raw_file_formatter_sqs.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".JSON"
     filter_prefix = "serco/fms"
@@ -58,10 +58,10 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
   }
 }
 
-module "process_fms_metadata_sqs" {
+module "fms_raw_file_formatter_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.fms_expected_file_processor.lambda_function_name
+  lambda_function_name = module.fms_raw_file_formatter.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
@@ -213,6 +213,20 @@ module "fms_fan_out_event_queue" {
   maximum_concurrency  = 100
   max_receive_count    = local.load_sqs_max_receive_count
 }
+# ----------------------------------------------
+# Register Athena event queue
+# Do not create the Register Athena trigger in production.
+# ----------------------------------------------
+module "register_athena_event_queue" {
+  count = local.is-production ? 0 : 1
+
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.register_athena[0].lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 2
+  max_receive_count    = local.load_sqs_max_receive_count
+}
 
 resource "aws_s3_bucket_notification" "load_mdss_event" {
   bucket = module.s3-raw-formatted-data-bucket.bucket.id
@@ -236,7 +250,26 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     filter_prefix = "serco/fms/validation_rejected"
   }
 
-  depends_on = [module.load_mdss_event_queue, module.load_fms_event_queue]
+  dynamic "queue" {
+    for_each = local.is-production ? {} : {
+      person_record = "person_record/"
+      cemo          = "cemo/"
+    }
+
+    iterator = trigger
+
+    content {
+      queue_arn     = module.register_athena_event_queue[0].sqs_queue.arn
+      events        = ["s3:ObjectCreated:*"]
+      filter_prefix = trigger.value
+    }
+  }
+
+  depends_on = [
+    module.load_mdss_event_queue,
+    module.load_fms_event_queue,
+    module.register_athena_event_queue,
+  ]
 }
 
 # ----------------------------------------------
@@ -298,6 +331,29 @@ resource "aws_lambda_permission" "mdss_reconciler_allow_eventbridge" {
   function_name = module.mdss_load_redrive_controller[0].lambda_function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.mdss_reconciler_schedule[0].arn
+}
+
+#-----------------------------------------------------------------------------------
+# Schedule MDSS received-files reconciler (every 5 minutes)
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "mdss_received_files_reconciler_schedule" {
+  name                = "mdss_received_files_reconciler_schedule"
+  description         = "Runs the MDSS received-files reconciler to backstop missed scan events"
+  schedule_expression = "rate(5 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "mdss_received_files_reconciler_target" {
+  rule = aws_cloudwatch_event_rule.mdss_received_files_reconciler_schedule.name
+  arn  = module.mdss_received_files_reconciler.lambda_function_arn
+}
+
+resource "aws_lambda_permission" "mdss_received_files_reconciler_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridgeMdssReceivedFilesReconciler"
+  action        = "lambda:InvokeFunction"
+  function_name = module.mdss_received_files_reconciler.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.mdss_received_files_reconciler_schedule.arn
 }
 
 #-----------------------------------------------------------------------------------
@@ -446,6 +502,19 @@ resource "aws_lambda_permission" "allow_eventbridge_emdi_position" {
   source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
 }
 
+# Keep scheduled AC and EMDI merge events from building an async backlog.
+resource "aws_lambda_function_event_invoke_config" "merge_ac_position" {
+  function_name                = module.merge_ac_position[0].lambda_function_name
+  maximum_event_age_in_seconds = 300
+  maximum_retry_attempts       = 2
+}
+
+resource "aws_lambda_function_event_invoke_config" "merge_emdi_position" {
+  function_name                = module.merge_emdi_position[0].lambda_function_name
+  maximum_event_age_in_seconds = 300
+  maximum_retry_attempts       = 2
+}
+
 # --------------------------------------------------------
 # update_p1_export
 # --------------------------------------------------------
@@ -524,6 +593,50 @@ resource "aws_lambda_event_source_mapping" "live_feed_incident_events" {
 
   depends_on = [
     aws_iam_role_policy_attachment.live_feed_incident_manager_attach,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# CloudWatch alarm confirmation queue
+# Delay human notifications while CloudWatch confirms the alarm is persistent.
+# ------------------------------------------------------------------------------
+
+resource "aws_sqs_queue" "cloudwatch_alarm_debounce_dlq" {
+  name                      = "cloudwatch-alarm-debounce-dlq"
+  message_retention_seconds = 1209600
+  sqs_managed_sse_enabled   = true
+}
+
+resource "aws_sqs_queue" "cloudwatch_alarm_debounce" {
+  name                       = "cloudwatch-alarm-debounce"
+  visibility_timeout_seconds = 365
+  message_retention_seconds  = 86400
+  sqs_managed_sse_enabled    = true
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+resource "aws_sqs_queue_redrive_allow_policy" "cloudwatch_alarm_debounce" {
+  queue_url = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.id
+
+  redrive_allow_policy = jsonencode({
+    redrivePermission = "byQueue"
+    sourceQueueArns = [
+      aws_sqs_queue.cloudwatch_alarm_debounce.arn,
+    ]
+  })
+}
+
+resource "aws_lambda_event_source_mapping" "cloudwatch_alarm_debounce" {
+  event_source_arn = aws_sqs_queue.cloudwatch_alarm_debounce.arn
+  function_name    = module.cloudwatch_alarm_threader.lambda_function_name
+  batch_size       = 1
+
+  depends_on = [
+    aws_iam_role_policy_attachment.cloudwatch_alarm_threader_attach,
   ]
 }
 
@@ -628,22 +741,123 @@ resource "aws_lambda_permission" "allow_eventbridge_specials_remediation" {
 }
 
 # ------------------------------------------------------------------------------
+# AC morning readiness
+# Track CADT completion and evaluate readiness every five minutes each morning.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "ac_readiness_cadt_completion" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "ac_readiness_cadt_completion"
+
+  description = (
+    "Records successful or failed CADT completion for AC morning readiness"
+  )
+
+  event_pattern = jsonencode({
+    source        = ["aws.ecs"]
+    "detail-type" = ["ECS Task State Change"]
+
+    detail = {
+      clusterArn = [aws_ecs_cluster.cadt.arn]
+      lastStatus = ["STOPPED"]
+      taskDefinitionArn = [
+        {
+          prefix = (
+            "arn:aws:ecs:${data.aws_region.current.name}:${local.env_account_id}:task-definition/${aws_ecs_task_definition.create_a_derived_table.family}:"
+          )
+        },
+      ]
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "ac_readiness_cadt_completion" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  rule = aws_cloudwatch_event_rule.ac_readiness_cadt_completion[0].name
+  arn  = module.merge_redrive_planner.lambda_function_arn
+
+  input_transformer {
+    input_paths = {
+      task_arn = "$.detail.taskArn"
+    }
+
+    input_template = <<-EOT
+      {"action":"record_cadt_completion","task_arn":<task_arn>}
+    EOT
+  }
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_ac_readiness_cadt_completion" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  statement_id  = "AllowEventBridgeAcReadinessCadtCompletion"
+  action        = "lambda:InvokeFunction"
+  function_name = module.merge_redrive_planner.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.ac_readiness_cadt_completion[0].arn
+}
+
+resource "aws_scheduler_schedule" "ac_morning_readiness" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "ac_morning_readiness"
+
+  description = (
+    "Checks AC morning readiness every five minutes from 03:00 to 11:55"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(0/5 3-11 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.merge_redrive_planner.lambda_function_arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      action = "run_ac_morning_readiness"
+    })
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+  ]
+}
+
+# ------------------------------------------------------------------------------
 # Rolling downstream position reconciliation
+# Run each consumer every four hours through its existing merge orchestration.
 # ------------------------------------------------------------------------------
 
 locals {
   downstream_reconciliation_rolling_schedules = tomap({
     staged = {
       consumer            = "STAGED"
-      schedule_expression = "cron(0,30 * * * ? *)"
+      schedule_expression = "cron(0 0/4 * * ? *)"
+      state_machine_arn   = module.merge_into_mdss_staged_position.arn
     }
     ac = {
       consumer            = "AC"
-      schedule_expression = "cron(10,40 * * * ? *)"
+      schedule_expression = "cron(10 0/4 * * ? *)"
+      state_machine_arn   = module.merge_into_mdss_ac_position.arn
     }
     emdi = {
       consumer            = "EMDI"
-      schedule_expression = "cron(20,50 * * * ? *)"
+      schedule_expression = "cron(20 0/4 * * ? *)"
+      state_machine_arn   = module.merge_into_emdi_position.arn
     }
   })
 }
@@ -657,7 +871,7 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
 
   name = "downstream_reconciliation_${each.key}_rolling"
 
-  description = "Runs ${each.value.consumer} downstream position reconciliation every 30 minutes"
+  description = "Runs ${each.value.consumer} downstream position reconciliation every 4 hours"
 
   flexible_time_window {
     mode = "OFF"
@@ -666,15 +880,164 @@ resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
   schedule_expression = each.value.schedule_expression
 
   target {
-    arn      = aws_sfn_state_machine.downstream_reconciliation.arn
+    arn      = each.value.state_machine_arn
     role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
 
     input = jsonencode({
-      consumer = each.value.consumer
-      mode     = "rolling"
+      mode = "rolling"
     })
   }
+
+  depends_on = [
+    aws_lakeformation_permissions.merge_redrive_planner_database_access,
+    aws_lakeformation_permissions.merge_redrive_planner_table_access,
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+  ]
 }
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation Lake Formation permission repair
+# Temporarily reapply grants on a schedule until CADT runs through ECS.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_lf_grants = [
+    {
+      database             = "acquisitive_crime${local.dbt_suffix}"
+      principal_arn        = aws_iam_role.merge_redrive_planner.arn
+      database_permissions = ["DESCRIBE"]
+      tables = [
+        "position",
+        "device_activations",
+      ]
+      table_permissions = [
+        "SELECT",
+        "DESCRIBE",
+      ]
+    },
+    {
+      database             = "data_insights${local.dbt_suffix}"
+      principal_arn        = aws_iam_role.merge_redrive_planner.arn
+      database_permissions = ["DESCRIBE"]
+      tables = [
+        "position",
+        "device_activations",
+      ]
+      table_permissions = [
+        "SELECT",
+        "DESCRIBE",
+      ]
+    },
+  ]
+}
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_lf_permissions" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_lf_permissions"
+
+  description = (
+    "Temporarily reapplies reconciliation Lake Formation permissions each morning"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(0/15 6-7 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.lake_formation_permission_granter.lambda_function_arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      fail_on_missing = false
+      grants          = local.downstream_reconciliation_lf_grants
+    })
+  }
+
+  depends_on = [
+    aws_lakeformation_data_lake_settings.settings,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Historical assurance audit
+# Trigger at midnight and let the planner defer around higher-priority workloads.
+# ------------------------------------------------------------------------------
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_audit" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_audit_midnight"
+
+  description = (
+    "Starts the downstream historical assurance audit at midnight"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(0 0 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.merge_redrive_planner.lambda_function_arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      action = "launch_historical_audit"
+    })
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+    module.downstream_reconciliation_audit,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation status publisher
+# Refresh low-cost operational metrics without running Athena queries.
+# ------------------------------------------------------------------------------
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_status" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_status"
+
+  description = (
+    "Publishes current downstream reconciliation status every five minutes"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = "rate(5 minutes)"
+
+  target {
+    arn      = module.merge_redrive_planner.lambda_function_arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      action = "publish_reconciliation_status"
+    })
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.merge_redrive_planner,
+  ]
+}
+
 
 # ------------------------------------------------------------------------------
 # Rota channel notifier schedule
@@ -761,3 +1124,37 @@ resource "aws_cloudwatch_event_target" "dlt_iceberg_maintenance" {
 
   depends_on = [aws_iam_role_policy.dlt_iceberg_maintenance_start]
 }
+
+# daily trigger for cadt
+
+module "daily_cadt_eventbridge" {
+  source = "terraform-aws-modules/eventbridge/aws"
+
+  create_bus = false
+
+  rules = {
+    crons = {
+      description         = "Every morning at 3am"
+      schedule_expression = "cron(0 3 * * ? *)"
+    }
+  }
+
+  targets = {
+    crons = [
+      {
+        name  = "trigger-cadt-lambda"
+        arn   = module.trigger_cadt_daily_run.lambda_function_arn
+        input = jsonencode({ "job" : "cron-by-rate" })
+      }
+    ]
+  }
+}
+
+resource "aws_lambda_permission" "allow_cadt_trigger_eventbridge" {
+  statement_id  = "AllowcadtExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = module.trigger_cadt_daily_run.lambda_function_arn
+  principal     = "events.amazonaws.com"
+  source_arn    = module.daily_cadt_eventbridge.eventbridge_rule_arns.crons
+}
+

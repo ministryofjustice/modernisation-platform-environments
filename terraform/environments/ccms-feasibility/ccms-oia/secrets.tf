@@ -6,12 +6,14 @@ resource "aws_secretsmanager_secret" "opahub" {
 resource "aws_secretsmanager_secret_version" "opahub" {
   secret_id = aws_secretsmanager_secret.opahub.id
   secret_string = jsonencode({
-    opahub_password = ""
-    db_user         = ""
-    db_password     = ""
-    wl_user         = ""
-    wl_password     = ""
-    secret_key      = ""
+    opahub_password     = ""
+    db_user             = ""
+    db_password         = ""
+    wl_user             = ""
+    wl_password         = ""
+    secret_key          = ""
+    keystore_password   = ""
+    truststore_password = ""
   })
 
   lifecycle {

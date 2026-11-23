@@ -3,7 +3,7 @@
 ###
 ### Provides HTTPS access to LinOTP
 ### self-service MFA enrollment portal
-### Access restricted to Global Protect Alpha VPN
+### Access restricted to Global Protect Alpha and Prisma VPNs
 ##############################################
 
 ##############################################
@@ -34,9 +34,9 @@ resource "aws_security_group_rule" "radius_alb_https_from_vpn" {
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = local.global_protect_alpha_vpn_cidrs
+  cidr_blocks       = local.radius_portal_vpn_cidrs
   security_group_id = aws_security_group.radius_alb.id
-  description       = "HTTPS from Global Protect Alpha VPN"
+  description       = "HTTPS from Global Protect Alpha and Prisma VPNs"
 }
 
 resource "aws_security_group_rule" "radius_alb_http_from_vpn" {
@@ -45,9 +45,9 @@ resource "aws_security_group_rule" "radius_alb_http_from_vpn" {
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = local.global_protect_alpha_vpn_cidrs
+  cidr_blocks       = local.radius_portal_vpn_cidrs
   security_group_id = aws_security_group.radius_alb.id
-  description       = "HTTP from Global Protect Alpha VPN (redirects to HTTPS)"
+  description       = "HTTP from Global Protect Alpha and Prisma VPNs (redirects to HTTPS)"
 }
 
 # Egress rule for ECS LinOTP tasks

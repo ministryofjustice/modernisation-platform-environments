@@ -24,6 +24,20 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/kubernetes"
     }
+    # Needed only to destroy resources still in state that were created by
+    # the EKS/Karpenter modules (OIDC thumbprint, time_sleep, null_resource).
+    null = {
+      version = "~> 3.0"
+      source  = "hashicorp/null"
+    }
+    time = {
+      version = "~> 0.9"
+      source  = "hashicorp/time"
+    }
+    tls = {
+      version = "~> 4.0"
+      source  = "hashicorp/tls"
+    }
   }
   required_version = "~> 1.0"
 }

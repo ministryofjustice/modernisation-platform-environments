@@ -4,6 +4,9 @@ set -o pipefail
 
 exec > /tmp/userdata.log 2>&1
 
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
+
 yum install -y wget unzip vsftpd jq
 dnf install -y git gcc libstdc++-devel automake libtool fuse3 fuse3-devel curl-devel openssl-devel make libxml2-devel gcc-c++
 

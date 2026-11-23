@@ -1,7 +1,7 @@
 module "lambda_custom_idp_layer" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.13.0"
 
   architectures   = ["arm64"]
   create_function = false
@@ -9,10 +9,10 @@ module "lambda_custom_idp_layer" {
 
   layer_name          = "${local.application_name}-custom-idp"
   description         = "Shared code for the AWS Transfer custom identity provider"
-  compatible_runtimes = ["python3.12"]
+  compatible_runtimes = ["python3.14"]
   source_path         = "lambda/custom-idp/layer"
 
-  trigger_on_package_timestamp = false
+  ignore_source_code_hash = true
 
   tags = local.tags
 }
@@ -20,20 +20,20 @@ module "lambda_custom_idp_layer" {
 module "lambda_custom_idp" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.13.0"
 
   function_name                  = "${local.application_name}-custom-idp"
   architectures                  = ["arm64"]
   description                    = "Authenticates AWS Transfer users with Secrets Manager"
   handler                        = "app.lambda_handler"
+  ignore_source_code_hash        = true
   layers                         = [module.lambda_custom_idp_layer.lambda_layer_arn]
   memory_size                    = 256
   reserved_concurrent_executions = 5
-  runtime                        = "python3.12"
+  runtime                        = "python3.14"
   source_path                    = "lambda/custom-idp/idp_handler"
   timeout                        = 30
   tracing_mode                   = "Active"
-  trigger_on_package_timestamp   = false
 
   environment_variables = {
     LOGLEVEL                = local.custom_idp_configuration.log_level

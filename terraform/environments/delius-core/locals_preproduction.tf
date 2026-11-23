@@ -12,7 +12,7 @@ locals {
     migration_environment_short_name       = "pre-prod"
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/preprod/ec2-user.pub")
-    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
+    homepage_path                          = "/NDelius-war/delius/JSP/homepage.xhtml"
     has_mis_environment                    = false
   }
 
@@ -28,7 +28,7 @@ locals {
     port                        = 389
     tls_port                    = 636
     desired_count               = 1
-    log_retention               = 0
+    log_retention               = 7
   }
 
 
@@ -61,13 +61,13 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 3000
+        iops       = 8000
         throughput = 700
         type       = "gp3"
         total_size = 10000
       }
       flash = {
-        iops       = 3000
+        iops       = 8000
         throughput = 700
         type       = "gp3"
         total_size = 6000
@@ -107,7 +107,7 @@ locals {
     }
 
     ldap = {
-      image_tag        = "6.2.4-latest"
+      image_tag        = "6.9.4-latest"
       container_port   = 389
       slapd_log_level  = "conns,config,stats,stats2"
       container_cpu    = 16384

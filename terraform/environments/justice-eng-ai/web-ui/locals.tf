@@ -7,6 +7,12 @@ locals {
   # Per-environment hostnames come from application_variables.json (see
   # local.application_data in platform_locals.tf) so dev and prod stay
   # distinct without hardcoding environment logic here.
+  # Builder task size is set per environment in web-ui/application_variables.json
+  # (not the one in the parent directory). There is no fallback, so a missing key
+  # fails the plan. The pair must be a valid Fargate cpu/memory combination.
+  builder_task_cpu    = local.application_data.accounts[local.environment].builder_task_cpu
+  builder_task_memory = local.application_data.accounts[local.environment].builder_task_memory
+
   builder_hostname = var.builder_hostname != "" ? var.builder_hostname : local.application_data.accounts[local.environment].builder_hostname
 
   # var.forge_package_s3_bucket stays an explicit override (and keeps the
@@ -16,6 +22,8 @@ locals {
   # try() guards against backend-processing not having been applied with
   # its staging_bucket_name output yet -- remove once it has been.
   forge_package_s3_bucket = var.forge_package_s3_bucket != "" ? var.forge_package_s3_bucket : try(data.terraform_remote_state.backend_processing.outputs.staging_bucket_name, "")
+
+  build_review_table_name = try(data.terraform_remote_state.backend_processing.outputs.build_details_table_name, "${local.application_name}-build-details")
 
   # Private subnets for ECS/EFS, sourced from the shared-VPC lookups
   # defined in platform_data.tf (data.aws_vpc.shared et al).

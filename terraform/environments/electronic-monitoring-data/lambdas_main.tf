@@ -241,56 +241,6 @@ module "calculate_checksum" {
 
 }
 
-#-----------------------------------------------------------------------------------
-# DMS Validation Lambdas
-#-----------------------------------------------------------------------------------
-module "dms_retrieve_metadata" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-
-  source                  = "./modules/lambdas"
-  is_image                = true
-  function_name           = "dms_retrieve_metadata"
-  role_name               = aws_iam_role.dms_validation_lambda_role[0].name
-  role_arn                = aws_iam_role.dms_validation_lambda_role[0].arn
-  handler                 = "dms_retrieve_metadata.handler"
-  memory_size             = 10240
-  timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-
-  environment_variables = {
-    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
-  }
-
-  security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-}
-
-
-module "dms_validation" {
-  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
-
-  source                  = "./modules/lambdas"
-  is_image                = true
-  function_name           = "dms_validation"
-  role_name               = aws_iam_role.dms_validation_lambda_role[0].name
-  role_arn                = aws_iam_role.dms_validation_lambda_role[0].arn
-  handler                 = "dms_validation.handler"
-  memory_size             = 10240
-  timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-
-  environment_variables = {
-    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
-    SECRET_NAME   = aws_secretsmanager_secret.db_password[0].name
-    USER          = aws_db_instance.database_2022[0].username
-    SERVER_NAME   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
-  }
-
-  security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-}
 
 #-----------------------------------------------------------------------------------
 # Process FMS metadata
@@ -517,7 +467,7 @@ module "data_cutback" {
 }
 
 #-----------------------------------------------------------------------------------
-# MDSS daily failure digest Lambda
+# Daily Live Feed Handover
 #-----------------------------------------------------------------------------------
 
 module "live_feed_daily_handover" {
@@ -534,14 +484,19 @@ module "live_feed_daily_handover" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
-
   environment_variables = {
     SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
     ENVIRONMENT    = local.environment_shorthand
     NAMESPACE      = "EMDS/MDSS"
     LOOKBACK_HOURS = "24"
+
+    GITHUB_SECRET_ARN = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER      = "moj-analytical-services"
+    GITHUB_REPOSITORY = "dmet-em"
+
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
 
     LOAD_MDSS_QUEUE_NAME = module.load_mdss_event_queue.sqs_queue.name
     LOAD_FMS_QUEUE_NAME  = module.load_fms_event_queue.sqs_queue.name
@@ -567,10 +522,38 @@ module "live_feed_daily_handover" {
     PROCESS_FMS_METADATA_FUNCTION_NAME = module.fms_expected_file_processor.lambda_function_name
     FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.fms_raw_file_formatter.lambda_function_name
 
+    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+
+    GITHUB_SECRET_ARN = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER      = "moj-analytical-services"
+    GITHUB_REPOSITORY = "dmet-em"
+
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
+
+    MDSS_DASHBOARD_NAME = (
+      "mdss-ops-${local.environment_shorthand}"
+    )
+
+    FMS_DASHBOARD_NAME = (
+      "fms-ops-${local.environment_shorthand}"
+    )
+
+    LANDING_DASHBOARD_NAME = (
+      "landing-ops-${local.environment_shorthand}"
+    )
+
+    DOWNSTREAM_RECONCILIATION_DASHBOARD_NAME = (
+      "downstream-reconciliation-ops-${local.environment_shorthand}"
+    )
+
     LAMBDAS_PRODUCTION_RUN_URL = "https://github.com/ministryofjustice/electronic-monitoring-data-lambda-functions/actions/workflows/push-to-ecr.yaml"
     CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
     ROTA_GUIDE_URL             = "https://jubilant-adventure-g65j3om.pages.github.io/hmpps/electronic_monitoring/data_engineering_guides/rota_duties/"
     EARS_SARS_TALLY_URL        = "https://justiceuk.sharepoint.com/:x:/r/sites/EMExpansionProgrammeteam/_layouts/15/doc2.aspx?sourcedoc=%7B25644699-3837-4A02-9C09-020EF0ECA744%7D&file=Monthly%20Tally%20of%20EARs%20and%20SARs.xlsx&action=default&mobileredirect=true"
+    OPEN_PRS_URL               = "https://github.com/ministryofjustice/electronic-monitoring-data/pulls"
   }
 }
 
@@ -683,6 +666,15 @@ module "cloudwatch_alarm_threader" {
     ENABLE_CUSTOM_ACTIONS = "false"
     INCIDENT_QUEUE_URL    = aws_sqs_queue.live_feed_incident_events.id
 
+    DEBOUNCE_QUEUE_URL = aws_sqs_queue.cloudwatch_alarm_debounce.id
+    DEBOUNCE_SECONDS   = tostring(local.alarm_debounce_seconds)
+    DEBOUNCE_BYPASS_ALARM_NAMES = jsonencode(
+      local.alarm_debounce_bypass_names
+    )
+
+    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+
     GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
       aws_sfn_state_machine.staging_db_janitor.arn
     )
@@ -787,6 +779,41 @@ module "mdss_load_redrive_controller" {
     AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
     AUTO_REDRIVE_TRANSIENT_MAX_ATTEMPTS     = "2"
     AUTO_REDRIVE_UNKNOWN_MAX_ATTEMPTS       = "1"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# MDSS received-files reconciler (scheduled scan backstop)
+#-----------------------------------------------------------------------------------
+
+module "mdss_received_files_reconciler" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "mdss_received_files_reconciler"
+  image_name                     = "mdss_received_files_reconciler"
+  handler                        = "mdss_received_files_reconciler.handler"
+  role_name                      = aws_iam_role.mdss_received_files_reconciler.name
+  role_arn                       = aws_iam_role.mdss_received_files_reconciler.arn
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    ENVIRONMENT_NAME              = local.environment_shorthand
+    RECEIVED_FILES_BUCKET         = module.s3-received-files-bucket.bucket.id
+    SCAN_QUEUE_URL                = module.virus_scan_file_sqs.sqs_queue.id
+    MDSS_RECEIVED_MANIFEST_BUCKET = module.s3-metadata-bucket.bucket.id
+    MDSS_RECEIVED_MANIFEST_PREFIX = "mdss-received-manifest/current"
+    MDSS_PREFIX                   = "allied/mdss/"
+    MIN_OBJECT_AGE_MINUTES        = "20"
+    REDRIVE_COOLDOWN_MINUTES      = "10"
+    MAX_REDRIVE_ATTEMPTS          = "2"
   }
 }
 
@@ -1144,10 +1171,10 @@ module "trigger_cadt" {
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   environment_variables = {
-    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
-    TASK_DEFINITION_ARN = aws_ecs_task_definition.create_a_derived_table.arn
-    SUBNET_IDS          = jsonencode(data.aws_subnets.shared-private.ids)
-    SECURITY_GROUPS     = jsonencode([aws_security_group.gdpr_batch_sg[0].id])
+    CLUSTER_NAME           = aws_ecs_cluster.cadt.name
+    TASK_DEFINITION_FAMILY = "create-a-derived-table"
+    SUBNET_IDS             = jsonencode(data.aws_subnets.shared-private.ids)
+    SECURITY_GROUPS        = jsonencode([aws_security_group.gdpr_batch_sg[0].id])
   }
 }
 
@@ -1184,7 +1211,6 @@ locals {
     PLV2QS6 = "lucy-astley-jones"
     PREPU2L = "mrixson-moj"
     PY6LVCP = "gwionap"
-    PO9DYMA = "georgewk92"
   }
 }
 
@@ -1245,8 +1271,9 @@ module "live_feed_incident_manager" {
     GITHUB_PROJECT_DONE_OPTION     = "✅ Done"
     GITHUB_PROJECT_PRIORITY_OPTION = "🚨 Urgent"
 
-    PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
-    PAGERDUTY_TIME_ZONE   = "Europe/London"
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
     PAGERDUTY_TO_GITHUB = jsonencode(
       local.live_feed_pagerduty_to_github
     )
@@ -1266,7 +1293,7 @@ module "live_feed_incident_manager" {
 # Trigger cpr integration
 #-----------------------------------------------------------------------------------
 
-module "trigger_cpr_integration" {
+module "trigger_api_integration" {
   count                   = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
@@ -1282,7 +1309,8 @@ module "trigger_cpr_integration" {
   subnet_ids              = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    API_BASE_URL = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
+    API_BASE_URL     = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
+    ENVIRONMENT_NAME = local.environment_shorthand
   }
 }
 
@@ -1320,8 +1348,9 @@ module "rota_personal_digest" {
     GITHUB_OWNER      = "moj-analytical-services"
     GITHUB_REPOSITORY = "dmet-em"
 
-    PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
-    PAGERDUTY_TIME_ZONE   = "Europe/London"
+    PAGERDUTY_SCHEDULE_ID      = local.em_active_rota_schedule.id
+    PAGERDUTY_SCHEDULE_VERSION = local.em_active_rota_schedule.version
+    PAGERDUTY_TIME_ZONE        = "Europe/London"
     PAGERDUTY_TO_GITHUB = jsonencode(
       local.live_feed_pagerduty_to_github
     )
@@ -1411,20 +1440,20 @@ module "live_feed_specials_remediator" {
 }
 
 # ------------------------------------------------------------------------------
-# Downstream position reconciliation
+# Lake Formation permission granter
+# Apply reusable database and table grants through AWS managed service APIs.
 # ------------------------------------------------------------------------------
 
-module "merge_redrive_planner" {
+module "lake_formation_permission_granter" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "merge_redrive_planner"
-  image_name                     = "merge_redrive_planner"
-  role_name                      = aws_iam_role.merge_redrive_planner.name
-  role_arn                       = aws_iam_role.merge_redrive_planner.arn
-  handler                        = "merge_redrive_planner.handler"
-  memory_size                    = 1024
-  timeout                        = 900
-  reserved_concurrent_executions = 2
+  function_name                  = "lake_formation_permission_granter"
+  role_name                      = aws_iam_role.lake_formation_permission_granter.name
+  role_arn                       = aws_iam_role.lake_formation_permission_granter.arn
+  handler                        = "lake_formation_permission_granter.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
   cloudwatch_retention_days      = 7
 
   core_shared_services_id = local.environment_management.account_ids[
@@ -1437,28 +1466,91 @@ module "merge_redrive_planner" {
     )
   )
 
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
+  environment_variables = {
+    CATALOG_ID              = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME        = local.environment_shorthand
+    POWERTOOLS_LOG_LEVEL    = "INFO"
+    POWERTOOLS_SERVICE_NAME = "lake-formation-permission-granter"
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation
+# Planner uses AWS managed service APIs and does not require private VPC access.
+# ------------------------------------------------------------------------------
+
+module "merge_redrive_planner" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_redrive_planner"
+  image_name                     = "merge_redrive_planner"
+  role_name                      = aws_iam_role.merge_redrive_planner.name
+  role_arn                       = aws_iam_role.merge_redrive_planner.arn
+  handler                        = "merge_redrive_planner.handler"
+  memory_size                    = 1024
+  timeout                        = 900
+  reserved_concurrent_executions = 6
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
 
   environment_variables = {
     POWERTOOLS_LOG_LEVEL = "INFO"
 
-    ENVIRONMENT_NAME            = local.environment_shorthand
-    ATHENA_RESULTS_BUCKET       = module.s3-athena-bucket.bucket.id
-    ATHENA_WORKGROUP            = aws_athena_workgroup.downstream_reconciliation.name
-    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
-    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
-    SNS_TOPIC_ARN               = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT_NAME             = local.environment_shorthand
+    ATHENA_RESULTS_BUCKET        = module.s3-athena-bucket.bucket.id
+    ATHENA_WORKGROUP             = aws_athena_workgroup.downstream_reconciliation.name
+    RECONCILIATION_STATE_BUCKET  = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX  = "downstream-reconciliation"
+    RECONCILIATION_CONTROL_TABLE = aws_dynamodb_table.downstream_reconciliation_control.name
+    SNS_TOPIC_ARN                = aws_sns_topic.emds_alerts.arn
 
-    POSITION_LOOKBACK_HOURS            = "24"
-    ACTIVATION_LOOKBACK_HOURS          = "24"
-    RECONCILIATION_STALE_MINUTES       = "30"
-    MAX_AUTOMATIC_REPLAY_ROWS_PER_DATE = "50000"
-    MAX_AUTOMATIC_REPLAY_ROWS          = "250000"
-    MAX_AUTOMATIC_REPLAY_DATES         = "20"
-    MAX_REPLAY_ROWS_PER_CHUNK          = "50000"
-    MAX_AUTOMATIC_REPLAY_CHUNKS        = "20"
-    ATHENA_MAX_POLL_SECONDS            = "840"
+    AUDIT_STATE_MACHINE_ARN = (
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:downstream-reconciliation-audit"
+    )
+
+    CADT_ECS_CLUSTER_NAME = aws_ecs_cluster.cadt.name
+    CADT_ECS_TASK_FAMILY  = aws_ecs_task_definition.create_a_derived_table.family
+
+    STAGED_RECONCILIATION_STATE_MACHINE_ARN = (
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:merge_into_mdss_staged_position"
+    )
+    AC_RECONCILIATION_STATE_MACHINE_ARN = (
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:merge_into_ac_position"
+    )
+    EMDI_RECONCILIATION_STATE_MACHINE_ARN = (
+      "arn:aws:states:${data.aws_region.current.name}:${local.env_account_id}:stateMachine:merge_into_emdi_position"
+    )
+
+    POSITION_LOOKBACK_HOURS              = "24"
+    ACTIVATION_LOOKBACK_HOURS            = "24"
+    RECONCILIATION_STALE_MINUTES         = "30"
+    MAX_AUTOMATIC_REPLAY_ROWS_PER_DATE   = "50000"
+    MAX_AUTOMATIC_REPLAY_ROWS            = "250000"
+    MAX_AUTOMATIC_REPLAY_DATES           = "20"
+    MAX_REPLAY_ROWS_PER_CHUNK            = "250000"
+    MAX_AUTOMATIC_REPLAY_CHUNKS          = "20"
+    ROLLING_REVIEW_THRESHOLD_ROWS        = "2000000"
+    HISTORICAL_REVIEW_THRESHOLD_ROWS     = "2000000"
+    ROLLING_RECOVERY_EXIT_ROWS           = "250000"
+    MAX_ROLLING_ITERATIONS_PER_EXECUTION = "20"
+    RECOVERY_LEASE_SECONDS               = "1800"
+    ATHENA_MAX_POLL_SECONDS              = "840"
+
+    AUDIT_DEEP_DAYS_PER_RUN     = "7"
+    AUDIT_ROLLING_GUARD_MINUTES = "20"
+    ROLLING_INTERVAL_HOURS      = "4"
+    STAGED_ROLLING_MINUTE       = "0"
+    AC_ROLLING_MINUTE           = "10"
+    EMDI_ROLLING_MINUTE         = "20"
   }
 }
 
@@ -1486,9 +1578,11 @@ module "merge_redrive_approval" {
   )
 
   environment_variables = {
-    ENVIRONMENT_NAME            = local.environment_shorthand
-    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
-    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+    ENVIRONMENT_NAME             = local.environment_shorthand
+    RECONCILIATION_STATE_BUCKET  = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX  = "downstream-reconciliation"
+    RECONCILIATION_CONTROL_TABLE = aws_dynamodb_table.downstream_reconciliation_control.name
+    RECOVERY_LEASE_SECONDS       = "1800"
   }
 }
 
@@ -1633,4 +1727,52 @@ module "poll_dlt_iceberg_maintenance" {
   }
 
   depends_on = [aws_iam_role_policy.poll_dlt_iceberg_maintenance]
+}
+
+module "register_athena" {
+  count                          = local.is-production ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "register_athena"
+  image_name                     = "register_athena"
+  role_name                      = aws_iam_role.register_athena[0].name
+  role_arn                       = aws_iam_role.register_athena[0].arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    ENVIRONMENT_NAME     = local.env_name
+    RAW_FORMATTED_BUCKET = "s3://${module.s3-raw-formatted-data-bucket.bucket.id}"
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.register_athena,
+    aws_lakeformation_permissions.api_int_db_level_perms,
+    aws_lakeformation_permissions.api_int_table_level_perms,
+  ]
+}
+
+module "trigger_cadt_daily_run" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "trigger_cadt_daily_run"
+  image_name                     = "trigger_cadt_daily_run"
+  role_name                      = module.trigger_cadt_daily_run_iam_role.name
+  role_arn                       = module.trigger_cadt_daily_run_iam_role.arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    TRIGGER_CADT_URL = "https://${module.trigger_cadt_api.api_gateway_id}.execute-api.${data.aws_region.current.name}.amazonaws.com/request/execute"
+  }
 }

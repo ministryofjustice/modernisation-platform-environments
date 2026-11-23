@@ -4,12 +4,11 @@ replicaCount: 1
 image:
   repository: ${imageRepository}
   tag: ${imageTag}
-
-%{ if imagePullSecret != "" ~}
+%{ if imagePullSecretEnabled ~}
 imagePullSecrets:
-  - name: ${imagePullSecret}
-
+  - name: litellm-enterprise-pull
 %{ endif ~}
+
 nameOverride: "litellm-admin"
 
 service:
@@ -78,6 +77,7 @@ proxy_config:
       s3_path: litellm-audit
     cache: false
     require_auth_for_metrics_endpoint: false
+    store_prompts_in_spend_logs: false
     callbacks: ["prometheus"]
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
@@ -148,6 +148,14 @@ volumes:
             path: google-identity-token
             audience: ${googleWorkloadIdentityAudience}
             expirationSeconds: 3600
+  - name: openai-workload-identity-token
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: openai-identity-token
+            audience: ${openaiWorkloadIdentityAudience}
+            expirationSeconds: 3600
 
 volumeMounts:
   - name: ui
@@ -167,6 +175,9 @@ volumeMounts:
   - name: google-workload-identity-token
     mountPath: /var/run/secrets/sts.googleapis.com
     readOnly: true
+  - name: openai-workload-identity-token
+    mountPath: /var/run/secrets/api.openai.com
+    readOnly: true
 
 extraInitContainers:
   - name: setup-ui
@@ -181,7 +192,16 @@ extraInitContainers:
         else
           proxy_dir=$(python -c 'import importlib.util; from pathlib import Path; print(Path(importlib.util.find_spec("litellm").origin).parent / "proxy")')
           cp -R "$proxy_dir/_experimental/out/." /app/var/litellm/ui/
+%{~ if imagePullSecretEnabled }
+          # The enterprise image does not ship the default logos, so copy them only when present.
+          for logo in logo.jpg logo_dark.png; do
+            if [ -f "$proxy_dir/$logo" ]; then
+              cp "$proxy_dir/$logo" /app/var/litellm/assets/
+            fi
+          done
+%{~ else }
           cp "$proxy_dir/logo.jpg" "$proxy_dir/logo_dark.png" /app/var/litellm/assets/
+%{~ endif }
         fi
     volumeMounts:
       - name: ui
@@ -199,6 +219,8 @@ extraInitContainers:
       seccompProfile:
         type: RuntimeDefault
 
+# The chart sets DISABLE_SCHEMA_UPDATE when this job is enabled; keep it out of envVars
+# to avoid duplicate names that can cause Helm upgrade patch ordering failures.
 migrationJob:
   enabled: true
   hooks:
@@ -220,12 +242,12 @@ envVars: {
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
     LITELLM_MODE: "PRODUCTION",
-    DISABLE_SCHEMA_UPDATE: "True",
     LITELLM_UI_API_DOC_BASE_URL: "https://${proxyHostname}",
     LITELLM_UI_PATH: "/app/var/litellm/ui",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
+    TMPDIR: "/app/cache",
     XDG_CACHE_HOME: "/app/cache",
     IAM_TOKEN_DB_AUTH: "True",
     DATABASE_USER: "${databaseUsername}",
@@ -234,5 +256,8 @@ envVars: {
     AZURE_CLIENT_ID: "${microsoft_foundry_client_id}",
     AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token",
     AZURE_AD_TOKEN: "oidc/azure/",
-    GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/iamcredentials.googleapis.com/credentials/credentials.json"
+    GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/iamcredentials.googleapis.com/credentials/credentials.json",
+    OPENAI_IDENTITY_PROVIDER_ID: "${openai_identity_provider_id}",
+    OPENAI_SERVICE_ACCOUNT_ID: "${openai_service_account_id}",
+    OPENAI_IDENTITY_TOKEN_FILE: "/var/run/secrets/api.openai.com/openai-identity-token"
 }

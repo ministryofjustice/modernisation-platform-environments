@@ -1,3 +1,13 @@
+data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+
+data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+}
+
 module "sns_pagerduty_high_priority" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sns/aws"

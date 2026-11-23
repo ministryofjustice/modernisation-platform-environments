@@ -19,8 +19,8 @@ data "aws_identitystore_group" "observability_platform_admins" {
   }
 }
 
-data "aws_identitystore_group" "all_identity_centre_teams" {
-  for_each = { for team in local.all_identity_centre_teams : team => team }
+data "aws_identitystore_group" "amg_identity_centre_teams" {
+  for_each = { for team in local.amg_identity_centre_teams : team => team }
 
   provider = aws.sso-readonly
 
@@ -42,4 +42,19 @@ data "aws_secretsmanager_secret_version" "github_app_installation_id" {
 
 data "aws_secretsmanager_secret_version" "github_app_private_key" {
   secret_id = "grafana/data-sources/github-app-private-key"
+}
+
+
+data "aws_secretsmanager_secret_version" "grafana_cloud_access_policy_token" {
+  secret_id = "grafana-cloud/terraform-access-policy-token"
+}
+
+data "aws_secretsmanager_secret_version" "grafana_cloud_github_oauth_client_id" {
+  secret_id  = aws_secretsmanager_secret.grafana_cloud_github_oauth_client_id.id
+  depends_on = [aws_secretsmanager_secret_version.grafana_cloud_github_oauth_client_id]
+}
+
+data "aws_secretsmanager_secret_version" "grafana_cloud_github_oauth_client_secret" {
+  secret_id  = aws_secretsmanager_secret.grafana_cloud_github_oauth_client_secret.id
+  depends_on = [aws_secretsmanager_secret_version.grafana_cloud_github_oauth_client_secret]
 }

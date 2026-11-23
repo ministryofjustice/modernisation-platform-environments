@@ -1,5 +1,9 @@
 module "file_uploads_bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4f72896323ec7f06e293f1f75732549b3248f841"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=0294b1a1303028f91707fdc67f1e4bba63d34ea6"
+
+  manage_log_bucket_policy = false
+  log_buckets              = var.access_log_destination
+  log_prefix               = "file-uploads/"
 
   bucket_prefix       = "file-uploads"
   bucket_namespace    = "account-regional"
@@ -17,7 +21,11 @@ module "file_uploads_bucket" {
 }
 
 module "processed_file_uploads_bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4f72896323ec7f06e293f1f75732549b3248f841"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=0294b1a1303028f91707fdc67f1e4bba63d34ea6"
+
+  manage_log_bucket_policy = false
+  log_buckets              = var.access_log_destination
+  log_prefix               = "processed-file-uploads/"
 
   bucket_prefix       = "processed-file-uploads"
   bucket_namespace    = "account-regional"
@@ -85,15 +93,16 @@ module "process_uploads_lambda" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22" # v8.8.1
 
 
-  function_name      = "process-file-upload"
-  description        = "Lambda function to process file uploads"
-  handler            = "process_uploads.lambda_handler"
-  runtime            = "python3.14"
-  architectures      = ["arm64"]
-  timeout            = 30
-  memory_size        = 4096
-  policy_json        = data.aws_iam_policy_document.process_uploads_lambda_policy.json
-  attach_policy_json = true
+  function_name              = "process-file-upload"
+  description                = "Lambda function to process file uploads"
+  handler                    = "process_uploads.lambda_handler"
+  runtime                    = "python3.14"
+  architectures              = ["arm64"]
+  timeout                    = 30
+  memory_size                = 4096
+  policy_json                = data.aws_iam_policy_document.process_uploads_lambda_policy.json
+  attach_policy_json         = true
+  cloudwatch_logs_kms_key_id = var.kms_key_arn
 
   source_path = "${path.module}/process_uploads.py"
 

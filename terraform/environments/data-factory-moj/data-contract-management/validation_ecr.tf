@@ -23,6 +23,13 @@ resource "aws_ecr_repository" "schema_validation" {
       )
       error_message = "The AWS deployment account must match the selected Terraform workspace."
     }
+    precondition {
+      condition = (
+        length(local.validation_deployments) == 0 ||
+        local.registration_enabled
+      )
+      error_message = "Schema validation requires the existing schema-registration deployment and contract registry."
+    }
   }
 }
 

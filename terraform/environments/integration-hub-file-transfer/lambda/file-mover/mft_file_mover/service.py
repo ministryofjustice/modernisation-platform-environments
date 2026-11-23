@@ -4,7 +4,6 @@ from decimal import Decimal
 
 from mft_file_mover.events import EVENT_SOURCE, parse_file_mover_event
 from mft_file_mover.model import select_route
-from mft_file_mover.s3_copy import SCAN_STATUS_TAG_KEY
 
 
 class OperationInProgress(RuntimeError):
@@ -80,7 +79,7 @@ class FileMoverService:
                     {"ignored_receipt": True},
                 )
 
-        destination, item = self._destination(operation_event, item, owner, snapshot)
+        destination, item = self._destination(operation_event, item, owner)
         token = self.copy_engine.copy_token(
             operation_event, self.operation, destination.bucket
         )
@@ -146,26 +145,13 @@ class FileMoverService:
             item = self._complete(item, owner)
         return item
 
-    def _destination(self, operation_event, item, owner, snapshot):
+    def _destination(self, operation_event, item, owner):
         if self.operation == "STAGE":
             return self.config.destinations["processing"], item
         if "route" in item:
             return self.config.destinations[item["route"]], item
-        # The destination is decided by the scan result in the event, not by the actual S3 tag.
-        # The tag is only used to detect a mismatch with the event.
-        # The tag can appear after the adapter checked it, so re-check the exact tag being copied.
-        # A present tag that differs from the event fails closed to investigation.
-        matches_tag = operation_event.scan_result_status_matches_tag and not any(
-            tag["Key"] == SCAN_STATUS_TAG_KEY
-            and tag["Value"] != operation_event.scan_result_status
-            for tag in snapshot.tags
-        )
-        route = select_route(operation_event.scan_result_status, matches_tag)
-        item = self.store.update_fields(
-            item,
-            owner,
-            {"route": route, "route_scan_result_status_matches_tag": matches_tag},
-        )
+        route = select_route(operation_event.scan_result_status)
+        item = self.store.update_fields(item, owner, {"route": route})
         return self.config.destinations[route], item
 
     def _completion_event(self, item):
@@ -207,10 +193,6 @@ class FileMoverService:
                 "destinationObject": destination_object,
                 "route": item["route"],
                 "scanResultStatus": item["scan_result_status"],
-                "scanResultStatusMatchesTag": item.get(
-                    "route_scan_result_status_matches_tag",
-                    item["scan_result_status_matches_tag"],
-                ),
                 "sourceDeleted": True,
             }
         return (

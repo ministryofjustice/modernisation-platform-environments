@@ -1,8 +1,21 @@
 {
   "Comment": "TriggerCreateADerivedTable",
-  "StartAt": "${environment != "development" ? "WaitUntil11pm" : "Lambda Invoke"}",
+  "StartAt": "${environment == "production" ? "CheckFullRefresh" : "Lambda Invoke"}",
   "States": {
-    %{ if environment != "development" }
+    %{ if environment == "production" }
+    "CheckFullRefresh": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Next": "WaitUntil11pm",
+          "Condition": "{% $states.input.full_refresh = 'true' %}"
+        },
+        {
+          "Next": "Lambda Invoke",
+          "Condition": "{% $states.input.full_refresh = 'false' %}"
+        }
+      ]
+    },
     "WaitUntil11pm": {
       "Type": "Wait",
       "Timestamp": "{% $substringBefore($now(), 'T') & 'T23:00:00Z' %}",
@@ -50,6 +63,29 @@
         },
         {
           "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "GrantLakeFormationPermissions"
+    },
+    "GrantLakeFormationPermissions": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Arguments": {
+        "Payload": ${lf_permission_grants},
+        "FunctionName": "${grant_lf_permissions}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
           "IntervalSeconds": 5,
           "MaxAttempts": 3,
           "BackoffRate": 2,

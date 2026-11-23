@@ -1,5 +1,13 @@
 locals {
-  environment_configuration = local.environment_configurations[local.environment]
+  environment_configuration            = local.environment_configurations[local.environment]
+  litellm_registry_credentials_enabled = try(local.environment_configuration.litellm_registry_credentials_enabled, false)
+  litellm_private_registry_enabled     = try(local.environment_configuration.litellm_private_registry_enabled, false)
+
+  # Read only the registry hostname; never load the Docker pull credentials into Terraform state.
+  litellm_enterprise_registry_hostname = local.litellm_private_registry_enabled ? jsondecode(data.aws_secretsmanager_secret_version.litellm_enterprise_registry_hostname[0].secret_string)["registry_hostname"] : ""
+  litellm_image_repository             = local.litellm_private_registry_enabled ? "${local.litellm_enterprise_registry_hostname}/litellm/enterprise/litellm" : try(local.environment_configuration.litellm_image_repository, "ghcr.io/berriai/litellm-non_root")
+  litellm_image_tag                    = try(local.environment_configuration.litellm_image_tag, local.litellm_private_registry_enabled ? "v${local.environment_configuration.litellm_version}" : local.environment_configuration.litellm_version)
+  litellm_registry_hostname_valid      = nonsensitive(can(regex("^[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)+$", local.litellm_enterprise_registry_hostname)))
 
   litellm_master_key = "sk-${random_password.litellm_secret_key.result}" # "sk-" prefix is required by LiteLLM
   proxy_admin_emails = [
@@ -25,10 +33,28 @@ locals {
     }
   }
 
+  # Bedrock models eligible for batch inference: same-account only (batch inference for
+  # cross-account models, i.e. those with aws_account_name set, is out of scope for now)
+  # and explicitly opted in via `batch_available: true` in configuration.yml.
+  ai_gateway_bedrock_batch_models = {
+    for model_key, model in try(local.ai_gateway_models_filtered.amazon_bedrock, {}) :
+    model_key => model
+    if try(model.batch_available, false) && !can(model.aws_account_name) && local.ai_gateway_batch_storage != null
+  }
+
   # RDS
   has_reader = contains(keys(local.environment_configuration.aurora_instances), "reader")
   # checkov:skip=CKV_SECRET_6: Dummy placeholder for IAM auth flow, not a real secret
   dummy_password = "iam-auth-dummy-password"
+
+  # OpenAI workload identity federation
+  openai_identity_provider_id = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["identity_provider_id"]
+  openai_service_account_id   = jsondecode(data.aws_secretsmanager_secret_version.openai_ai_gateway.secret_string)["service_account_id"]
+  # Must match the Audience configured on the OpenAI Workload Identity Provider exactly, otherwise the
+  # projected token fails subject token verification before any mapping is resolved.
+  openai_workload_identity_audience = "https://api.openai.com/v1"
+  openai_identity_token_directory   = "/var/run/secrets/api.openai.com"
+  openai_identity_token_file        = "${local.openai_identity_token_directory}/openai-identity-token"
 
   # Google workload identity federation (used by LiteLLM to call Google Gemini Enterprise Agent Platform)
   google_cloud_project_name         = jsondecode(data.aws_secretsmanager_secret_version.google_cloud_ai_gateway.secret_string)["project_name"]

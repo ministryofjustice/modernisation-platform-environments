@@ -7,6 +7,7 @@ module "mwaa_kms" {
 
   aliases               = ["mwaa/default"]
   enable_default_policy = true
+
   key_statements = [
     {
       # https://docs.aws.amazon.com/mwaa/latest/userguide/custom-keys-certs.html#custom-keys-certs-grant-policies-attach

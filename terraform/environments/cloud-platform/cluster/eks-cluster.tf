@@ -37,7 +37,7 @@ module "eks" {
 
   authentication_mode = "API_AND_CONFIG_MAP"
 
-  access_entries = {
+  access_entries = merge({
     ## Cloud Platform Platform Engineer access to cluster
     sso-platform-engineer-admin = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
@@ -50,12 +50,13 @@ module "eks" {
         }
       }
     }
-    ## MP Environments Actions (github-actions-plan) access to cluster
+    ## MP Environments Actions (github-actions-plan) read-only access to cluster.
+    ## Plans run PR-authored code, so this role must not have write access.
     github-actions-plan = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan"
       policy_associations = {
-        eks-admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+        eks-view = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminViewPolicy"
           access_scope = {
             type = "cluster"
           }
@@ -74,7 +75,8 @@ module "eks" {
         }
       }
     }
-    ## CP GitHub actions access to cluster
+    }, local.cluster_environment == "development_cluster" ? {
+    ## CP GitHub actions access to development cluster only
     cpgha-administrator = {
       principal_arn = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-development"]}:role/github-actions-development-cluster"
       policy_associations = {
@@ -86,7 +88,7 @@ module "eks" {
         }
       }
     }
-  }
+  } : {})
 
   # Hardcode the KMS principals otherwise they fall back to current identity
   kms_key_administrators = [

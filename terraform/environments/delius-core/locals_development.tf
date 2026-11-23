@@ -13,7 +13,7 @@ locals {
     migration_environment_short_name       = "mis-dev"
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/dev/ec2-user.pub")
-    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
+    homepage_path                          = "/NDelius-war/delius/JSP/homepage.xhtml"
     has_mis_environment                    = true
   }
 
@@ -102,7 +102,7 @@ locals {
     }
 
     ldap = {
-      image_tag        = "6.4.3-20916932939-1"
+      image_tag        = "6.9.4-44518512182-1"
       container_port   = 389
       slapd_log_level  = "stats"
       container_cpu    = 512
@@ -158,5 +158,17 @@ locals {
     object_lock_days             = 3
     expire_current_after_days    = 80
     expire_noncurrent_after_days = 10
+  }
+
+  aws_health_lambda_configuration_development = {
+    enabled               = local.is-development
+    aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
+    rule_name             = "ForwardAllHealthEvents"
+  }
+
+  aws_securityhub_lambda_configuration_development = {
+    enabled                    = local.is-development
+    aws_securityhub_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:securityhub-finding-issue-generator-lambda"
+    rule_name                  = "ForwardAllSecurityHubFindings"
   }
 }

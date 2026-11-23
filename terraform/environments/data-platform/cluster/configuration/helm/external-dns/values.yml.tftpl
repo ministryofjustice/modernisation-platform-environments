@@ -1,6 +1,15 @@
 ---
 txtOwnerId: ${txt_owner_id}
 
+%{ if enable_compatibility_settings ~}
+# Chart 1.23.0+ requires an explicit policy; keep the previous default
+policy: upsert-only
+
+# ExternalDNS 0.22+ defaults to external-dns.kubernetes.io/ with no fallback;
+# keep the alpha prefix used by the shared services Gateway annotations
+annotationPrefix: external-dns.alpha.kubernetes.io/
+
+%{ endif ~}
 sources:
   - service
   - ingress

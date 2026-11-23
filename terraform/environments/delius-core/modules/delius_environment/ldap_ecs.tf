@@ -73,10 +73,6 @@ module "ldap_ecs" {
 
   log_error_pattern = "%${join("|", local.ldap_formatted_error_codes)}%"
   log_error_threshold_config = {
-    warning = {
-      threshold = 25
-      period    = 300
-    }
     critical = {
       threshold = 50
       period    = 300

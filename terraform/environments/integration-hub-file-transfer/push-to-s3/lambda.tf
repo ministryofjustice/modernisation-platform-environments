@@ -1,7 +1,15 @@
+data "aws_kms_key" "secrets" {
+  key_id = local.secrets_kms_key_alias
+}
+
+data "aws_kms_key" "logs" {
+  key_id = local.logs_kms_key_alias
+}
+
 module "lambda_file_mover" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.13.0"
 
   architectures                     = ["arm64"]
   attach_tracing_policy             = true
@@ -13,7 +21,7 @@ module "lambda_file_mover" {
   ignore_source_code_hash           = true
   memory_size                       = 512
   role_name                         = local.lambda_role_name
-  runtime                           = "python3.12"
+  runtime                           = "python3.14"
   source_path = [{
     path             = "${path.module}/lambda/push-to-s3-writer"
     pip_requirements = true
@@ -132,7 +140,7 @@ resource "aws_lambda_event_source_mapping" "push_to_s3" {
 module "lambda_dlq_reporter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.9.0"
+  version = "8.13.0"
 
   architectures                     = ["arm64"]
   attach_tracing_policy             = true
@@ -144,7 +152,7 @@ module "lambda_dlq_reporter" {
   ignore_source_code_hash           = true
   memory_size                       = 256
   role_name                         = "${local.application_name}-${local.component_name}-dlq"
-  runtime                           = "python3.12"
+  runtime                           = "python3.14"
   source_path = [{
     path             = "${path.module}/lambda/push-to-s3-writer"
     pip_requirements = true

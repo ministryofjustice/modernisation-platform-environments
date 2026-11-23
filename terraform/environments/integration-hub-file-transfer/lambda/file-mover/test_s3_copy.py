@@ -202,17 +202,15 @@ class S3CopyEngineTest(unittest.TestCase):
         )
         self.assertIn({"Key": "Classification", "Value": "OFFICIAL"}, snapshot.tags)
 
-    def test_route_keeps_an_existing_scan_status_tag(self):
+    def test_route_replaces_an_existing_scan_status_tag_with_the_event_value(self):
         tags = [{"Key": "GuardDutyMalwareScanStatus", "Value": "THREATS_FOUND"}]
 
         snapshot = self._inspect("ROUTE", tags)
 
-        self.assertEqual(snapshot.tags, tags)
-
-    def test_stage_does_not_add_a_scan_status_tag(self):
-        snapshot = self._inspect("STAGE", [], scan_result_status=None)
-
-        self.assertEqual(snapshot.tags, [])
+        self.assertEqual(
+            snapshot.tags,
+            [{"Key": "GuardDutyMalwareScanStatus", "Value": "NO_THREATS_FOUND"}],
+        )
 
     def test_verification_failure_prevents_exact_source_deletion(self):
         copied = {

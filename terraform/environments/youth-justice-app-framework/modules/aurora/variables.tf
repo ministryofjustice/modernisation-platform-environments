@@ -245,3 +245,9 @@ variable "proxy_connection_borrow_timeout" {
   type        = number
   default     = 120
 }
+
+variable "cluster_kms_key_id" {
+  description = "The ARN of the KMS key used to encrypt the cluster storage. Only takes effect when the cluster is created; leave null for existing clusters"
+  type        = string
+  default     = null
+}

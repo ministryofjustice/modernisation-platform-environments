@@ -10,6 +10,11 @@ variable "planner_function_arn" {
   default = ""
 }
 
+variable "reconciliation_state_prefix_arn" {
+  type    = string
+  default = ""
+}
+
 variable "reconciliation_consumer" {
   type    = string
   default = ""

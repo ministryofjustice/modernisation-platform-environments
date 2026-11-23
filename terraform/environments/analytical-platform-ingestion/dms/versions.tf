@@ -1,7 +1,8 @@
 terraform {
   required_providers {
     aws = {
-      version = "~> 6.46"
+      # 6.69.0 regression: "bufio.Scanner: token too long" on >64KB API bodies (hashicorp/terraform-provider-aws#50472)
+      version = "~> 6.46, != 6.69.0"
       source  = "hashicorp/aws"
     }
     dns = {

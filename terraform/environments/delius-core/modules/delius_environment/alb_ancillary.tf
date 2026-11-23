@@ -65,7 +65,6 @@ resource "aws_lb" "delius_core_ancillary" {
   drop_invalid_header_fields = true
 }
 
-
 resource "aws_lb_listener" "ancillary_https" {
   load_balancer_arn = aws_lb.delius_core_ancillary.id
   port              = 443

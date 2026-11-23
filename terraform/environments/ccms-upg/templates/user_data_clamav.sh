@@ -2,6 +2,9 @@
 
 exec > /tmp/userdata.log 2>&1
 
+dnf update -y ca-certificates --releasever 2023.12.20261026
+update-ca-trust
+
 yum install -y wget unzip vsftpd jq s3fs-fuse
 
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm

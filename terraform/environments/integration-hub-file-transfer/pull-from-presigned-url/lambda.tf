@@ -1,18 +1,37 @@
+data "aws_kms_key" "logs" {
+  key_id = "alias/logs/${local.application_name}-${local.environment}"
+}
+
+data "aws_kms_key" "secrets" {
+  key_id = "alias/secrets/${local.application_name}-${local.environment}"
+}
+
+data "aws_secretsmanager_secret" "dispatch" {
+  for_each = local.recipients
+  name     = "${local.application_name}/file-dispatch/${each.value.prefix}"
+
+  lifecycle {
+    precondition {
+      condition     = contains(keys(module.dispatch_configuration.entries), each.value.prefix)
+      error_message = "Each pickup prefix must have an existing shared dispatch entry; deploy its secret from root first."
+    }
+  }
+}
+
 module "lambda_notifier" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source        = "terraform-aws-modules/lambda/aws"
-  version       = "8.9.0"
+  version       = "8.13.0"
   function_name = local.pattern_name
   role_name     = local.pattern_name
   description   = "Notify recipients in Slack with an authenticated file-transfer portal link"
-  runtime       = "python3.12"
+  runtime       = "python3.14"
   architectures = ["arm64"]
   handler       = "handler.lambda_handler"
   source_path   = [{ path = "${path.module}/lambda/notifier", patterns = ["!tests/.*", "!.*__pycache__/.*"] }]
   # Match the other delivery components: the content-derived package filename
   # tracks code changes without comparing rebuilt ZIP bytes during apply.
   ignore_source_code_hash           = true
-  trigger_on_package_timestamp      = false
   timeout                           = 900
   memory_size                       = 512
   cloudwatch_logs_retention_in_days = 90

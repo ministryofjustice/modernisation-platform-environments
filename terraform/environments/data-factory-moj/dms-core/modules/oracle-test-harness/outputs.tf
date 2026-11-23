@@ -62,3 +62,8 @@ output "rotation_lambda_function_arn" {
   description = "ARN of the Lambda function that rotates the Oracle DMS source credential."
   value       = aws_lambda_function.rotation.arn
 }
+
+output "dms_source_secret_kms_key_arn" {
+  description = "ARN of the KMS key used to encrypt the DMS source authentication secret."
+  value       = aws_secretsmanager_secret.dms_source.kms_key_id
+}

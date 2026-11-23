@@ -193,7 +193,7 @@ locals {
       alarm_description   = "The FTPS ACM certificate will expire in 30 days or less"
       comparison_operator = "LessThanOrEqualToThreshold"
       dimensions = {
-        CertificateArn = aws_acm_certificate.ftps.arn
+        CertificateArn = module.acm_ftps.acm_certificate_arn
       }
       evaluation_periods = 1
       metric_name        = "DaysToExpiry"
@@ -206,7 +206,7 @@ locals {
       alarm_description   = "The FTPS ACM certificate will expire in 7 days or less"
       comparison_operator = "LessThanOrEqualToThreshold"
       dimensions = {
-        CertificateArn = aws_acm_certificate.ftps.arn
+        CertificateArn = module.acm_ftps.acm_certificate_arn
       }
       evaluation_periods = 1
       metric_name        = "DaysToExpiry"

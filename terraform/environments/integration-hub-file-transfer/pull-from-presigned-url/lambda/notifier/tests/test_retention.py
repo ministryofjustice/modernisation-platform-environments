@@ -23,7 +23,7 @@ class RetentionTests(unittest.TestCase):
         self.assertEqual(args["MetadataDirective"], "REPLACE")
         self.assertEqual(args["TaggingDirective"], "REPLACE")
         self.assertNotIn("Tagging", args)
-        self.assertEqual(args["ContentDisposition"], "attachment")
+        self.assertEqual(args["ContentDisposition"], "attachment; filename*=UTF-8''file.txt")
 
     def test_retry_reuses_receipt_without_copy_or_retention_extension(self):
         first = self.retainer.prepare("id", self.data, self.route, 100)
@@ -47,6 +47,26 @@ class RetentionTests(unittest.TestCase):
         with self.assertRaises(ValueError): self.retainer.prepare("id", self.data, self.route, 100)
         self.table.put_item.assert_not_called()
 
+    def test_original_metadata_names_pickup_and_download(self):
+        self.s3.head_object.return_value = {"ContentLength": 5, "Metadata": {"original-file-name": "monthly report.csv"}}
+        result = self.retainer.prepare("id", self.data, self.route, 100)
+        self.assertEqual("team/id/monthly report.csv", result["key"])
+        self.assertEqual("attachment; filename*=UTF-8''monthly%20report.csv",
+                         self.s3.copy_object.call_args.kwargs["ContentDisposition"])
+
+    def test_original_filename_strips_paths_controls_and_bidi(self):
+        self.assertEqual("team/id/report.txt", destination_key("id", self.data, self.route, "C:\\private\\report\r\n\u202e.txt"))
+        self.assertEqual("team/id/download", destination_key("id", self.data, self.route, "../../.."))
+
+    def test_old_receipt_is_preserved_when_metadata_is_available(self):
+        first = self.retainer.prepare("id", self.data, self.route, 100)
+        self.table.get_item.return_value = {"Item": first}
+        self.s3.reset_mock()
+        self.s3.head_object.return_value = {"ContentLength": 5, "Metadata": {"original-file-name": "report.txt"}}
+        self.assertEqual(first, self.retainer.prepare("id", self.data, self.route, 200))
+        self.s3.head_object.assert_not_called()
+        self.s3.copy_object.assert_not_called()
+
     def prepare_large(self):
         size = 6 * 1024**3 + 1
         self.data["object"]["sizeBytes"] = size
@@ -65,6 +85,14 @@ class RetentionTests(unittest.TestCase):
         self.assertEqual(calls[-1].kwargs["CopySourceRange"], f"bytes={size-1}-{size-1}")
         self.assertTrue(all(call.kwargs["CopySource"]["VersionId"] == "clean-v1" for call in calls))
         self.assertEqual(result["versionId"], "large-v1")
+
+    def test_large_copy_also_uses_original_name(self):
+        self.prepare_large()
+        self.s3.head_object.return_value["Metadata"] = {"original-file-name": "large-report.csv"}
+        result = self.retainer.prepare("id", self.data, self.route, 100)
+        self.assertEqual("team/id/large-report.csv", result["key"])
+        self.assertEqual("attachment; filename*=UTF-8''large-report.csv",
+                         self.s3.create_multipart_upload.call_args.kwargs["ContentDisposition"])
 
     def test_failed_or_timed_out_multipart_aborts_without_receipt(self):
         self.prepare_large()

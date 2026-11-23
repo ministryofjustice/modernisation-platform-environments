@@ -13,7 +13,7 @@ locals {
     migration_environment_short_name       = "test"
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/test/ec2-user.pub")
-    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
+    homepage_path                          = "/NDelius-war/delius/JSP/homepage.xhtml"
     has_mis_environment                    = false
   }
 
@@ -110,7 +110,7 @@ locals {
     }
 
     ldap = {
-      image_tag        = "6.2.4-latest"
+      image_tag        = "6.10.1-44522887123-1"
       container_port   = 389
       slapd_log_level  = "conns,config,stats,stats2"
       container_cpu    = 2048
@@ -158,5 +158,11 @@ locals {
     object_lock_days             = 0
     expire_current_after_days    = 80
     expire_noncurrent_after_days = 10
+  }
+
+  aws_health_lambda_configuration_test = {
+    enabled               = local.is-test
+    aws_health_lambda_arn = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["platform-operations-production"]}:function:github-project-issue-generator-trigger"
+    rule_name             = "ForwardAllHealthEvents"
   }
 }

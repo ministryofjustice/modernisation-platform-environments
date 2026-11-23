@@ -34,7 +34,7 @@ provider "aws" {
   default_tags { tags = local.tags }
 }
 
-# AWS provider for network services to enable dns entries for certificate validation to be created
+# Keep available until Terraform removes the old validation record from state.
 provider "aws" {
   alias  = "core-network-services"
   region = "eu-west-2"

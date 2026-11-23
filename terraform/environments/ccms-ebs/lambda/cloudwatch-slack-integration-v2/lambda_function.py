@@ -599,23 +599,29 @@ def build_cert(details: dict) -> Payload:
     except (TypeError, ValueError):
         days_to_expiry = days_raw  # keep "Unknown" / unexpected as-is
     common_name = cert_info.get("CommonName", "Unknown")
-    expiry_date = format_expiry_date(details.get("time"), days_to_expiry)
+    # The CCMS EBS keystore expiry check also sends the exact expiry date and where the certificate lives;
+    # ACM events don't have these fields, so their expiry date is derived from the event time
+    expiry_date = cert_info.get("ExpiryDate") or format_expiry_date(details.get("time"), days_to_expiry)
+    environment = cert_info.get("Environment")
     emoji = ":rotating_light:"
+    prefix = f"ENV: {environment}. " if environment else ""
     if expiry_date:
-        header = f"{emoji} *Certificate {common_name} is expiring on {expiry_date}.*"
+        header = f"{emoji} *{prefix}Certificate {common_name} is expiring on {expiry_date}.*"
     else:
-        header = f"{emoji} *Certificate {common_name} is expiring soon.*"
+        header = f"{emoji} *{prefix}Certificate {common_name} is expiring soon.*"
+
+    lines = [f" • *Common Name:* {common_name}"]
+    if cert_info.get("SubjectName"):
+        lines.append(f" • *Subject Name:* {cert_info['SubjectName']}")
+    lines.append(f" • *Days to Expiry:* {days_to_expiry}")
+    for label, key in (("Server", "Server"), ("Location", "Location")):
+        if cert_info.get(key):
+            lines.append(f" • *{label}:* {cert_info[key]}")
 
     return {
         "blocks": [
             {"type": "section", "text": {"type": "mrkdwn", "text": header}},
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": (f"*Details*\n • *Days to Expiry:* {days_to_expiry}\n • *Common Name:* {common_name}"),
-                },
-            },
+            {"type": "section", "text": {"type": "mrkdwn", "text": "*Details*\n" + "\n".join(lines)}},
         ]
     }
 

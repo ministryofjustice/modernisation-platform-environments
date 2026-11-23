@@ -120,6 +120,20 @@ data "aws_iam_policy_document" "ecs_task_execution_secrets" {
       ]
     }
   }
+
+  dynamic "statement" {
+    for_each = local.forge_single_url_enabled ? [1] : []
+    content {
+      sid    = "ReadForgeProxyToken"
+      effect = "Allow"
+      actions = [
+        "secretsmanager:GetSecretValue",
+      ]
+      resources = [
+        aws_secretsmanager_secret.forge_proxy_token[0].arn,
+      ]
+    }
+  }
 }
 
 resource "aws_iam_role_policy" "ecs_task_execution_secrets" {

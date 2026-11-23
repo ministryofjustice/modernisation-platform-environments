@@ -99,6 +99,15 @@ resource "aws_db_parameter_group" "appdbparametergroup19_new" {
     value = "10"
   }
 
+  # Writes audit records to OS files so they reach the exported "audit" CloudWatch log,
+  # which feeds the failed DB logon alarm (see cloudwatch-security-audit.tf).
+  # Static parameter: takes effect after the next reboot.
+  parameter {
+    name         = "audit_trail"
+    value        = "OS"
+    apply_method = "pending-reboot"
+  }
+
   tags = merge(
     local.tags,
     {

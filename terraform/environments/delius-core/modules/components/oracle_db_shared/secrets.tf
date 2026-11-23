@@ -8,11 +8,6 @@ resource "aws_secretsmanager_secret" "database_dba_passwords" {
   tags        = var.tags
 }
 
-moved {
-  from = aws_secretsmanager_secret.delius_core_dba_passwords
-  to   = aws_secretsmanager_secret.database_dba_passwords
-}
-
 data "aws_iam_policy_document" "database_dba_passwords" {
   #checkov:skip=CKV_AWS_108 "ignore"
   #checkov:skip=CKV_AWS_356 "ignore"
@@ -40,11 +35,6 @@ resource "aws_secretsmanager_secret" "database_application_passwords" {
   description = "Application Users Credentials"
   kms_key_id  = var.account_config.kms_keys.general_shared
   tags        = var.tags
-}
-
-moved {
-  from = aws_secretsmanager_secret.delius_core_application_passwords
-  to   = aws_secretsmanager_secret.database_application_passwords
 }
 
 # Probation Integration Secrets

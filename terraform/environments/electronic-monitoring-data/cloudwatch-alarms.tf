@@ -146,6 +146,29 @@ resource "aws_cloudwatch_metric_alarm" "sqs_dlq_has_messages" {
   ]
 }
 
+resource "aws_cloudwatch_metric_alarm" "fms_audit_write_failed" {
+  alarm_name        = "fms_audit_write_failed"
+  alarm_description = "Triggered when load_fms cannot write FMS validation audit data"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  # Use EventBridge -> cloudwatch_alarm_threader -> SNS custom notifications.
+  # Disable direct alarm actions to avoid duplicate Slack messages.
+  actions_enabled = false
+
+  metric_name = "FmsAuditWriteFailedCount"
+  namespace   = "EMDS/FMS"
+  period      = 300
+  statistic   = "Sum"
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
 resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   count               = 1
   alarm_name          = "mdss_reconciler_errors"
@@ -165,6 +188,52 @@ resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   dimensions = {
     FunctionName = module.mdss_load_redrive_controller[0].lambda_function_name
   }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "mdss_received_files_reconciler_errors" {
+  alarm_name        = "mdss_received_files_reconciler_errors"
+  alarm_description = "Triggered when the MDSS received-files reconciler records errors"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "Errors"
+  namespace   = "AWS/Lambda"
+  period      = 60
+  statistic   = "Sum"
+
+  dimensions = {
+    FunctionName = module.mdss_received_files_reconciler.lambda_function_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "mdss_received_files_reconcile_exhausted" {
+  alarm_name        = "mdss_received_files_reconcile_exhausted"
+  alarm_description = "Triggered when stale MDSS received files reach the automatic redrive limit"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "MdssReceivedReconcilerSkippedMaxRedrivesCount"
+  namespace   = "EMDS/MDSS"
+  period      = 300
+  statistic   = "Maximum"
 
   alarm_actions = [
     aws_sns_topic.emds_alerts.arn
@@ -373,6 +442,38 @@ resource "aws_cloudwatch_metric_alarm" "live_feed_incident_events_dlq" {
 }
 
 # ------------------------------------------------------------------------------
+# Alarm notification confirmation DLQ
+# Notify directly if delayed alarm confirmation cannot recover.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "cloudwatch_alarm_debounce_dlq" {
+  alarm_name = "cloudwatch_alarm_debounce_dlq_has_messages"
+
+  alarm_description = (
+    "Triggered when CloudWatch alarm confirmations reach the DLQ"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+  actions_enabled     = true
+
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+  period      = 60
+  statistic   = "Maximum"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.cloudwatch_alarm_debounce_dlq.name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
 # Downstream specials remediation guard
 # ------------------------------------------------------------------------------
 
@@ -484,6 +585,293 @@ resource "aws_cloudwatch_metric_alarm" "specials_guard_lambda_errors" {
   dimensions = {
     FunctionName = module.live_feed_specials_remediator.lambda_function_name
   }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation Lake Formation permission repair
+# Alert only when automatic permission repair fails.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_lf_permission_repair_failed" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  alarm_name = "downstream_reconciliation_lf_permission_repair_failed"
+
+  alarm_description = (
+    "Triggered when automatic Lake Formation permission repair fails"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  # Use EventBridge -> cloudwatch_alarm_threader -> incident automation.
+  # Disable direct alarm actions to avoid duplicate Slack messages.
+  actions_enabled = false
+
+  metric_name = "PermissionRepairFailed"
+  namespace   = "EM/LakeFormationPermissions"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Downstream reconciliation workflow failures
+# Surface planner, replay, verification and dependency failures in Slack.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_state_machines = tomap({
+    staged = {
+      consumer = "STAGED"
+      arn      = module.merge_into_mdss_staged_position.arn
+    }
+    ac = {
+      consumer = "AC"
+      arn      = module.merge_into_mdss_ac_position.arn
+    }
+    emdi = {
+      consumer = "EMDI"
+      arn      = module.merge_into_emdi_position.arn
+    }
+  })
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_execution_failed" {
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_state_machines
+    : tomap({})
+  )
+
+  alarm_name = "downstream_reconciliation_${each.key}_execution_failed"
+
+  alarm_description = (
+    "Triggered when ${each.value.consumer} downstream reconciliation fails"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "ExecutionsFailed"
+  namespace   = "AWS/States"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    StateMachineArn = each.value.arn
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+# ------------------------------------------------------------------------------
+# Downstream reconciliation assurance health
+# Provide dashboard-only clean, unhealthy and unknown assurance indicators.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_assurance_consumers = toset([
+    "STAGED",
+    "AC",
+    "EMDI",
+  ])
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_assurance_not_clean" {
+  for_each = local.downstream_reconciliation_assurance_consumers
+
+  alarm_name = (
+    "downstream_reconciliation_${lower(each.value)}_assurance_not_clean"
+  )
+
+  alarm_description = (
+    "${each.value} latest reconciliation assurance is not clean"
+  )
+
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 1
+  treat_missing_data  = "missing"
+
+  actions_enabled = false
+
+  metric_name = "ReconciliationAssuranceClean"
+  namespace   = "EM/DownstreamReconciliation"
+  period      = 300
+  statistic   = "Minimum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+    Consumer    = each.value
+    Mode        = "status"
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Downstream historical assurance
+# Alert when an audit finds gaps, becomes stale, or the audit workflow fails.
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_audit_consumers = toset([
+    "AC",
+    "EMDI",
+  ])
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_gaps" {
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_audit_consumers
+    : toset([])
+  )
+
+  alarm_name = (
+    "downstream_reconciliation_${lower(each.value)}_historical_audit_gaps"
+  )
+
+  alarm_description = (
+    "Triggered when ${each.value} historical assurance finds missing positions"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "HistoricalAuditMissingPositions"
+  namespace   = "EM/DownstreamReconciliation"
+  period      = 300
+  statistic   = "Maximum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+    Consumer    = each.value
+    Mode        = "status"
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_stale" {
+  for_each = (
+    local.is-preproduction || local.is-production
+    ? local.downstream_reconciliation_audit_consumers
+    : toset([])
+  )
+
+  alarm_name = (
+    "downstream_reconciliation_${lower(each.value)}_historical_audit_stale"
+  )
+
+  alarm_description = (
+    "Triggered when ${each.value} historical assurance is over 48 hours old"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 48
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "HistoricalAuditAgeHours"
+  namespace   = "EM/DownstreamReconciliation"
+  period      = 300
+  statistic   = "Maximum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+    Consumer    = each.value
+    Mode        = "status"
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_execution_failed" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  alarm_name = "downstream_reconciliation_historical_audit_execution_failed"
+
+  alarm_description = (
+    "Triggered when the downstream historical assurance workflow fails"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "ExecutionsFailed"
+  namespace   = "AWS/States"
+  period      = 300
+  statistic   = "Sum"
+
+  dimensions = {
+    StateMachineArn = module.downstream_reconciliation_audit.arn
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
+
+
+resource "aws_cloudwatch_log_metric_filter" "cadt_task_failed" {
+  name           = "cadt-task-failed"
+  log_group_name = aws_cloudwatch_log_group.ecs_cadt.name
+  pattern        = "Dataset Check Failed"
+
+  metric_transformation {
+    name      = "CadtTaskFailureCount"
+    namespace = "EMDS/ECS"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "cadt_task_failed" {
+  alarm_name          = "cadt-ecs-task-failed"
+  alarm_description   = "ECS task for create-a-derived-table (CADT) has failed. Check logs at https://eu-west-2.console.aws.amazon.com/cloudwatch/home?region=eu-west-2#logsV2:log-groups/log-group/$252Fecs$252Fcreate-a-derived-table"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  metric_name         = "CadtTaskFailureCount"
+  namespace           = "EMDS/ECS"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 1
+  treat_missing_data  = "notBreaching"
 
   alarm_actions = [
     aws_sns_topic.emds_alerts.arn,

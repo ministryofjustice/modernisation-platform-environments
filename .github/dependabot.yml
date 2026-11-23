@@ -184,7 +184,9 @@ updates:
     directories:
       - "terraform/environments/ccms-feasibility"
       - "terraform/environments/ccms-feasibility/ccms-ebs"
+      - "terraform/environments/ccms-feasibility/ccms-ebs-fin"
       - "terraform/environments/ccms-feasibility/ccms-edrms"
+      - "terraform/environments/ccms-feasibility/ccms-file-transfer"
       - "terraform/environments/ccms-feasibility/ccms-oia"
       - "terraform/environments/ccms-feasibility/ccms-pui"
       - "terraform/environments/ccms-feasibility/ccms-soa"
@@ -244,18 +246,6 @@ updates:
       interval: "daily"
     groups:
       ccms-upg:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 50
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "terraform"
-    directories:
-      - "terraform/environments/cdpt-chaps"
-    schedule:
-      interval: "daily"
-    groups:
-      cdpt-chaps:
         patterns:
           - "*"
     open-pull-requests-limit: 50
@@ -475,6 +465,9 @@ updates:
       - "terraform/environments/data-factory-moj/dms-core/modules/dms-test-harness"
       - "terraform/environments/data-factory-moj/dms-core/modules/oracle-test-harness"
       - "terraform/environments/data-factory-moj/genesys-data-ingestion"
+      - "terraform/environments/data-factory-moj/ingestion-artifacts"
+      - "terraform/environments/data-factory-moj/ingestion-registry"
+      - "terraform/environments/data-factory-moj/service-ingestion"
       - "terraform/environments/data-factory-moj/streaming-poc"
       - "terraform/environments/data-factory-moj/streaming-poc-devops"
       - "terraform/environments/data-factory-moj/streaming-poc-maf"
@@ -498,7 +491,6 @@ updates:
       - "terraform/environments/data-platform/ai-gateway"
       - "terraform/environments/data-platform/airflow"
       - "terraform/environments/data-platform/airflow-cluster"
-      - "terraform/environments/data-platform/airflow-cluster/modules/kubernetes/namespace"
       - "terraform/environments/data-platform/app"
       - "terraform/environments/data-platform/cluster"
       - "terraform/environments/data-platform/cluster/modules/kubernetes/namespace"
@@ -581,6 +573,7 @@ updates:
       - "terraform/environments/delius-core/modules/components/ldap/circuit_breaker"
       - "terraform/environments/delius-core/modules/components/oracle_db_instance"
       - "terraform/environments/delius-core/modules/components/oracle_db_shared"
+      - "terraform/environments/delius-core/modules/components/xsiam"
       - "terraform/environments/delius-core/modules/delius_environment"
       - "terraform/environments/delius-core/modules/helpers/delius_microservice"
       - "terraform/environments/delius-core/modules/helpers/ebs_volume"
@@ -650,9 +643,13 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/developer-experience"
+      - "terraform/environments/developer-experience/app"
       - "terraform/environments/developer-experience/auth0-event-stream"
+      - "terraform/environments/developer-experience/dns"
       - "terraform/environments/developer-experience/github-audit-log-stream"
+      - "terraform/environments/developer-experience/github-backup"
       - "terraform/environments/developer-experience/github-management"
+      - "terraform/environments/developer-experience/github-sts"
     schedule:
       interval: "daily"
     groups:
@@ -736,7 +733,6 @@ updates:
       - "terraform/environments/electronic-monitoring-data/modules/ap_airflow_iam_role"
       - "terraform/environments/electronic-monitoring-data/modules/ap_airflow_load_data_iam_role"
       - "terraform/environments/electronic-monitoring-data/modules/api_step_function"
-      - "terraform/environments/electronic-monitoring-data/modules/dms"
       - "terraform/environments/electronic-monitoring-data/modules/export_bucket_presigned_url"
       - "terraform/environments/electronic-monitoring-data/modules/export_bucket_push"
       - "terraform/environments/electronic-monitoring-data/modules/glue_table_optimiser"
@@ -879,8 +875,8 @@ updates:
       - "terraform/environments/integration-hub/api-hosting-platform"
       - "terraform/environments/integration-hub/api-platform"
       - "terraform/environments/integration-hub/downstream-mock-api"
-      - "terraform/environments/integration-hub/downstream-mock-api/modules/service"
       - "terraform/environments/integration-hub/events-platform"
+      - "terraform/environments/integration-hub/iac"
       - "terraform/environments/integration-hub/managed-file-transfer"
     schedule:
       interval: "daily"
@@ -896,8 +892,6 @@ updates:
       - "terraform/environments/integration-hub-api"
       - "terraform/environments/integration-hub-api/benefit-checker-api"
       - "terraform/environments/integration-hub-api/file-transfer-api"
-      - "terraform/environments/integration-hub-api/modules/file-transfer-api"
-      - "terraform/environments/integration-hub-api/modules/integration-hub-file-transfer-api"
     schedule:
       interval: "daily"
     groups:
@@ -910,6 +904,10 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/integration-hub-events"
+      - "terraform/environments/integration-hub-events/api"
+      - "terraform/environments/integration-hub-events/api-client-lib"
+      - "terraform/environments/integration-hub-events/event-subscriber-admin-ui"
+      - "terraform/environments/integration-hub-events/kafka"
     schedule:
       interval: "daily"
     groups:
@@ -926,6 +924,7 @@ updates:
       - "terraform/environments/integration-hub-file-transfer/pull-from-presigned-url"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3"
       - "terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup"
+      - "terraform/environments/integration-hub-file-transfer/push-to-sftp"
       - "terraform/environments/integration-hub-file-transfer/test-harness"
     schedule:
       interval: "daily"
@@ -1233,15 +1232,20 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/observability-platform"
-      - "terraform/environments/observability-platform/modules/grafana/amazon-prometheus-query-source"
-      - "terraform/environments/observability-platform/modules/grafana/athena-source"
-      - "terraform/environments/observability-platform/modules/grafana/cloudwatch-source"
-      - "terraform/environments/observability-platform/modules/grafana/contact-point/pagerduty"
-      - "terraform/environments/observability-platform/modules/grafana/contact-point/slack"
-      - "terraform/environments/observability-platform/modules/grafana/team"
-      - "terraform/environments/observability-platform/modules/grafana/xray-source"
+      - "terraform/environments/observability-platform/modules/amazon-managed-grafana/amazon-prometheus-query-source"
+      - "terraform/environments/observability-platform/modules/amazon-managed-grafana/athena-source"
+      - "terraform/environments/observability-platform/modules/amazon-managed-grafana/cloudwatch-source"
+      - "terraform/environments/observability-platform/modules/amazon-managed-grafana/contact-point/pagerduty"
+      - "terraform/environments/observability-platform/modules/amazon-managed-grafana/contact-point/slack"
+      - "terraform/environments/observability-platform/modules/amazon-managed-grafana/team"
+      - "terraform/environments/observability-platform/modules/amazon-managed-grafana/xray-source"
+      - "terraform/environments/observability-platform/modules/grafana-cloud/account-ownership"
+      - "terraform/environments/observability-platform/modules/grafana-cloud/aws-account-data-sources"
+      - "terraform/environments/observability-platform/modules/grafana-cloud/team"
+      - "terraform/environments/observability-platform/modules/grafana-cloud/tenant-configuration"
       - "terraform/environments/observability-platform/modules/observability-platform/tenant-configuration"
       - "terraform/environments/observability-platform/modules/prometheus/iam-role"
+      - "terraform/environments/observability-platform/tests/pdc-rotation"
     schedule:
       interval: "daily"
     groups:
@@ -1526,6 +1530,9 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/modules/acm_certificate"
+      - "terraform/modules/aws_health_lambda"
+      - "terraform/modules/aws_lambda_event_forwarding"
+      - "terraform/modules/aws_securityhub_lambda"
       - "terraform/modules/baseline"
       - "terraform/modules/baseline_presets"
       - "terraform/modules/cloudwatch_dashboard"

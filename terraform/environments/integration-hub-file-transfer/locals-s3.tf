@@ -51,6 +51,10 @@ locals {
       ]
     }
 
+    preproduction = {
+      default = []
+    }
+
     production = {
       default = [
         {
@@ -77,6 +81,11 @@ locals {
 
     test = {
       default = local.s3_bucket_lifecycle_defaults.test.default
+      buckets = {}
+    }
+
+    preproduction = {
+      default = local.s3_bucket_lifecycle_defaults.preproduction.default
       buckets = {}
     }
 

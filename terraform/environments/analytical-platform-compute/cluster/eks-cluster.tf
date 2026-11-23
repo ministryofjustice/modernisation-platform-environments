@@ -11,8 +11,9 @@ module "eks" {
   name               = local.eks_cluster_name
   kubernetes_version = local.environment_configuration.eks_cluster_version
 
-  endpoint_private_access = true
-  endpoint_public_access  = true
+  endpoint_private_access      = true
+  endpoint_public_access       = true
+  endpoint_public_access_cidrs = try(local.environment_configuration.eks_public_access_cidrs, ["0.0.0.0/0"])
 
   vpc_id                   = data.aws_vpc.apc.id
   control_plane_subnet_ids = data.aws_subnets.apc_intra.ids

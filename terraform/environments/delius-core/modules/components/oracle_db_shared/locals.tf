@@ -15,64 +15,111 @@ locals {
 
   oracle_statistics_map = {
     "poc" = {
-      #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
-      #       "target_environment" = "test"
+      targets = []
     },
     "dev" = {
-      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
-      "target_environment" = "test"
+      targets = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids["delius-core-test"]
+          environment = "test"
+        }
+      ]
     },
     "test" = {
-      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
-      "source_environment" = "dev"
+      sources = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids["delius-core-development"]
+          environment = "dev"
+        }
+      ]
     },
     "stage" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      sources = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+          environment = "prod"
+        }
+      ]
     },
     "preprod" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      sources = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+          environment = "prod"
+        }
+      ]
     },
     "prod" = {
-      #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
-      #       "source_environment" = "preprod"
+      #       sources = [
+      #         {
+      #           account_id  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
+      #           environment = "preprod"
+      #         }
+      #       ]
     },
     "training" = {
-
+      targets = []
     }
   }
 
   # The RAT Capture Map defines which environments can supply RAT Captures with
   # which other environments.
-  # The target account is where an environment allows its cature files to be copied.
-  # The source account is where an environment may fetch its capture files from
+  # targets: environments allowed to pull this environment's RAT captures
+  # sources: environments whose RAT captures this environment may pull from
   # Note that live-like environments should not share RAT captures with non-live like
   # environments as capture files may contain sensitive data
   oracle_rat_capture_map = {
     "dev" = {
-      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
-      "target_environment" = "test"
-      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
-      "source_environment" = "test"
+      targets = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids["delius-core-test"]
+          environment = "test"
+        }
+      ]
+      sources = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids["delius-core-test"]
+          environment = "test"
+        }
+      ]
     },
     "test" = {
-      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
-      "target_environment" = "dev"
-      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
-      "source_environment" = "dev"
+      targets = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids["delius-core-development"]
+          environment = "dev"
+        }
+      ]
+      sources = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids["delius-core-development"]
+          environment = "dev"
+        }
+      ]
     },
     "stage" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      sources = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+          environment = "prod"
+        }
+      ]
     },
     "preprod" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      sources = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids["delius-core-production"]
+          environment = "prod"
+        }
+      ]
     },
     "prod" = {
-      #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
-      #       "source_environment" = "preprod"
+      #       sources = [
+      #         {
+      #           account_id  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
+      #           environment = "preprod"
+      #         }
+      #       ]
     },
     "training" = {
 
@@ -81,30 +128,56 @@ locals {
 
   oracle_duplicate_map = {
     "poc" = {
-      #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
-      #       "target_environment" = "test"
+      targets = []
+      sources = []
     },
     "dev" = {
-      #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
-      #       "target_environment" = "test"
+      targets = []
+      sources = []
     }
     "test" = {
-      "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
-      "source_environment" = "dev"
+      targets = []
+      sources = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids[join("-", [var.account_info.application_name, "development"])]
+          environment = "dev"
+        }
+      ]
     },
     "stage" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      targets = []
+      sources = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids[join("-", [var.account_info.application_name, "production"])]
+          environment = "prod"
+        }
+      ]
     },
     "preprod" = {
-      # "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-production"]
-      # "target_environment" = "prod"
+      targets = []
+      sources = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids[join("-", [var.account_info.application_name, "production"])]
+          environment = "prod"
+        }
+      ]
     },
     "prod" = {
-      #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
-      #       "source_environment" = "preprod"
+      targets = [
+        {
+          account_id  = var.platform_vars.environment_management.account_ids[join("-", [var.account_info.application_name, "preproduction"])]
+          environment = "stage"
+        },
+        {
+          account_id  = var.platform_vars.environment_management.account_ids[join("-", [var.account_info.application_name, "preproduction"])]
+          environment = "preprod"
+        }
+      ]
+      sources = []
     },
     "training" = {
+      targets = []
+      sources = []
     }
   }
 

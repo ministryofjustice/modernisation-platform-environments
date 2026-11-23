@@ -46,6 +46,7 @@ jobs:
     needs: strategy
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     permissions:
+      pull-requests: write
       id-token: write
       contents: read
     strategy:
@@ -55,7 +56,7 @@ jobs:
     with:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
-      action: "${{ matrix.action }}"
+      action: "${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && matrix.action || 'plan' }}"
       component: "${{ matrix.component }}" # If your strategy workflow also outputs "matrix.component"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
@@ -64,6 +65,7 @@ jobs:
   destroy-development:
     if: inputs.action == 'destroy'
     permissions:
+      pull-requests: write
       id-token: write
       contents: read
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml

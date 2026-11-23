@@ -14,6 +14,19 @@ locals {
     {}
   ) : {}
 
+  registration_contract_prefixes = local.registration_enabled ? toset(flatten([
+    for source in values(local.generation_sources) : [
+      for table_name in source.table_names :
+      "${trim(source.contract_object_prefix, "/")}/${table_name}/"
+    ]
+  ])) : toset([])
+
+  validation_deployments = local.contract_management_enabled ? lookup(
+    var.validation_deployments_by_environment,
+    local.environment,
+    {}
+  ) : {}
+
   registration_image_uri = lookup(
     var.registration_image_uris,
     local.environment,

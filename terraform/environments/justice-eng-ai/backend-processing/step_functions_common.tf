@@ -1,4 +1,6 @@
 locals {
+  step_function_retry_attempts = try(local.application_data.accounts[local.environment].step_function_retry_attempts, 3)
+
   step_functions_child_state_machine_arns = [
     "arn:${data.aws_partition.current.partition}:states:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${local.application_name}-*"
   ]
@@ -27,10 +29,17 @@ resource "aws_iam_role" "step_functions_common" {
 
 data "aws_iam_policy_document" "step_functions_common" {
   statement {
-    sid       = "RunScriptRunnerTasks"
-    effect    = "Allow"
-    actions   = ["ecs:RunTask"]
-    resources = ["arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${local.script_runner_task_definition_family}:*"]
+    sid     = "RunScriptRunnerTasks"
+    effect  = "Allow"
+    actions = ["ecs:RunTask"]
+    resources = concat(
+      [
+        for family in local.script_runner_task_definition_families :
+        "arn:${data.aws_partition.current.partition}:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${family}:*"
+      ],
+      local.wipe_create ? local.wipe_task_definition_arns : [],
+      local.expiry_create ? local.expiry_task_definition_arns : [],
+    )
 
     condition {
       test     = "ArnEquals"
@@ -51,10 +60,14 @@ data "aws_iam_policy_document" "step_functions_common" {
     sid     = "PassScriptRunnerRoles"
     effect  = "Allow"
     actions = ["iam:PassRole"]
-    resources = [
-      aws_iam_role.script_runner_ecs_execution.arn,
-      aws_iam_role.script_runner_ecs_task.arn,
-    ]
+    resources = concat(
+      [
+        aws_iam_role.script_runner_ecs_execution.arn,
+        aws_iam_role.script_runner_ecs_task.arn,
+      ],
+      aws_iam_role.wipe_environment_task[*].arn,
+      aws_iam_role.expire_prototypes_task[*].arn,
+    )
   }
 
   statement {
@@ -160,6 +173,34 @@ data "aws_iam_policy_document" "step_functions_common" {
   }
 
   statement {
+    sid       = "ReadWriteBuildEvents"
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem"]
+    resources = [aws_dynamodb_table.build_review.arn]
+  }
+
+  statement {
+    sid       = "ResumePausedExecutions"
+    effect    = "Allow"
+    actions   = ["states:SendTaskSuccess", "states:SendTaskFailure"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "PublishJobCompletion"
+    effect    = "Allow"
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.job_completion.arn]
+  }
+
+  statement {
+    sid       = "UseJobCompletionKey"
+    effect    = "Allow"
+    actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
+    resources = [aws_kms_key.job_completion.arn]
+  }
+
+  statement {
     sid       = "StartChildStateMachines"
     effect    = "Allow"
     actions   = ["states:StartExecution"]
@@ -243,7 +284,7 @@ data "aws_iam_policy_document" "script_runner_common" {
   }
 
   statement {
-    sid    = "PushPrototypeImagesToSharedRepository"
+    sid    = "PushPrototypeImagesToAccountRepository"
     effect = "Allow"
     actions = [
       "ecr:BatchCheckLayerAvailability",
@@ -252,7 +293,7 @@ data "aws_iam_policy_document" "script_runner_common" {
       "ecr:CompleteLayerUpload",
       "ecr:PutImage",
     ]
-    resources = ["arn:${data.aws_partition.current.partition}:ecr:${data.aws_region.current.region}:${local.environment_management.account_ids["core-shared-services-production"]}:repository/${local.application_data.accounts[local.environment].ecr_repository_name}"]
+    resources = [aws_ecr_repository.user_applications.arn]
   }
 }
 

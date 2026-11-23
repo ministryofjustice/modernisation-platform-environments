@@ -62,3 +62,8 @@ output "credential_sync_failure_queue" {
     url  = aws_sqs_queue.credential_sync_failures.url
   }
 }
+
+output "dms_source_secret_kms_key_arn" {
+  description = "ARN of the KMS key used to encrypt the DMS source authentication secret."
+  value       = aws_secretsmanager_secret.dms_source.kms_key_id
+}

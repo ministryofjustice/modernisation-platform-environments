@@ -12,7 +12,7 @@ locals {
     migration_environment_short_name       = "stage"
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/stage/ec2-user.pub")
-    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
+    homepage_path                          = "/NDelius-war/delius/JSP/homepage.xhtml"
     has_mis_environment                    = true
   }
 
@@ -28,7 +28,7 @@ locals {
     port                        = 389
     tls_port                    = 636
     desired_count               = 1
-    log_retention               = 0
+    log_retention               = 7
   }
 
 
@@ -107,7 +107,7 @@ locals {
     }
 
     ldap = {
-      image_tag        = "6.2.3-latest"
+      image_tag        = "6.10.1-latest"
       container_port   = 389
       slapd_log_level  = "conns,config,stats,stats2"
       container_cpu    = 8192

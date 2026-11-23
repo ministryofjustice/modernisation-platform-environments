@@ -13,12 +13,12 @@
     "portMappings": [
       {
         "containerPort": ${server_port}
-      }
-    ],
-    "mountPoints": [
+      },
       {
-        "containerPath": "/opa",
-        "sourceVolume": "opa_volume"
+        "containerPort": ${ssl_port}
+      },
+      {
+        "containerPort": ${health_check_port}
       }
     ],
     "essential": true,
@@ -49,7 +49,11 @@
       },
       {
         "name": "ADMINISTRATION_PORT_ENABLED",
-        "value": "false"
+        "value": "true"
+      },
+      {
+        "name": "ADMINISTRATION_PORT",
+        "value": "${health_check_port}"
       },
       {
         "name": "CREATE_DATABASE",
@@ -80,6 +84,14 @@
       {
         "name": "WL_USER",
         "valueFrom": "${wl_user}"
+      },
+      {
+        "name": "KEYSTORE_PASSWORD",
+        "valueFrom": "${keystore_password}"
+      },
+      {
+        "name": "TRUSTSTORE_PASSWORD",
+        "valueFrom": "${truststore_password}"
       }
     ]
   }

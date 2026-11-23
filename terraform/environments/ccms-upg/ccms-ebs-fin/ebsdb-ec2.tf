@@ -38,20 +38,20 @@ resource "aws_volume_attachment" "ebsdb_swap" {
   instance_id = module.oracle_ebs_db.instance_id
 }
 
-resource "aws_ebs_volume" "ebsdb_u01" {
+resource "aws_ebs_volume" "ebsdb_techst" {
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_u01
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_techst
   type              = "gp3"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-u01", device-name = "/dev/sdi" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-techst", device-name = "/dev/sdi" })
 }
 
-resource "aws_volume_attachment" "ebsdb_u01" {
+resource "aws_volume_attachment" "ebsdb_techst" {
   device_name = "/dev/sdi"
-  volume_id   = aws_ebs_volume.ebsdb_u01.id
+  volume_id   = aws_ebs_volume.ebsdb_techst.id
   instance_id = module.oracle_ebs_db.instance_id
 }
 
@@ -75,6 +75,7 @@ resource "aws_volume_attachment" "ebsdb_arch" {
 resource "aws_ebs_volume" "ebsdb_dbf01" {
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
+  snapshot_id       = try(local.application_data.accounts[local.environment].ebs_snapshot_ebsdb_dbf01, null)
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf01
   type              = "gp3"
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf01
@@ -92,6 +93,7 @@ resource "aws_volume_attachment" "ebsdb_dbf01" {
 resource "aws_ebs_volume" "ebsdb_dbf02" {
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
+  snapshot_id       = try(local.application_data.accounts[local.environment].ebs_snapshot_ebsdb_dbf02, null)
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf02
   type              = "gp3"
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf02
@@ -109,6 +111,7 @@ resource "aws_volume_attachment" "ebsdb_dbf02" {
 resource "aws_ebs_volume" "ebsdb_dbf03" {
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
+  snapshot_id       = try(local.application_data.accounts[local.environment].ebs_snapshot_ebsdb_dbf03, null)
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf03
   type              = "gp3"
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf03
@@ -126,6 +129,7 @@ resource "aws_volume_attachment" "ebsdb_dbf03" {
 resource "aws_ebs_volume" "ebsdb_dbf04" {
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
+  snapshot_id       = try(local.application_data.accounts[local.environment].ebs_snapshot_ebsdb_dbf04, null)
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf04
   type              = "gp3"
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf04
@@ -143,6 +147,7 @@ resource "aws_volume_attachment" "ebsdb_dbf04" {
 resource "aws_ebs_volume" "ebsdb_redoA" {
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
+  snapshot_id       = try(local.application_data.accounts[local.environment].ebs_snapshot_ebsdb_redoA, null)
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoA
   type              = "gp3"
   iops              = 3000
@@ -177,6 +182,7 @@ resource "aws_volume_attachment" "ebsdb_backup" {
 resource "aws_ebs_volume" "ebsdb_redoB" {
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
+  snapshot_id       = try(local.application_data.accounts[local.environment].ebs_snapshot_ebsdb_redoB, null)
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoB
   type              = "gp3"
   iops              = 3000

@@ -24,12 +24,13 @@ module "bastion_linux" {
   log_glacier_days     = 60  # days before moving to Glacier
   log_expiry_days      = 180 # days before log expiration
   # bastion
-  allow_ssh_commands = false
-  app_name           = var.networking[0].application
-  business_unit      = local.vpc_name
-  subnet_set         = local.subnet_set
-  environment        = local.environment
-  region             = "eu-west-2"
+  allow_ssh_commands      = false
+  app_name                = var.networking[0].application
+  business_unit           = local.vpc_name
+  subnet_set              = local.subnet_set
+  environment             = local.environment
+  region                  = "eu-west-2"
+  extra_user_data_content = "dnf update -y ca-certificates --releasever 2023.12.20261026 && update-ca-trust"
   # Autoscaling
   autoscaling_cron = local.crontab
 

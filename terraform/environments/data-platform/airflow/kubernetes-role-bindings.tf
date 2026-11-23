@@ -65,3 +65,20 @@ resource "kubernetes_role_binding_v1" "mwaa_serviceaccount_management" {
     name      = "mwaa-serviceaccount-management"
   }
 }
+
+resource "kubernetes_role_binding_v1" "mwaa_external_secrets" {
+  metadata {
+    name      = "mwaa-external-secrets"
+    namespace = kubernetes_namespace_v1.mwaa.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role_v1.mwaa_external_secrets.metadata[0].name
+  }
+  subject {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Group"
+    name      = "mwaa-external-secrets"
+  }
+}

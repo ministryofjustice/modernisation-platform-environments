@@ -17,7 +17,7 @@ variable "enable_starter_pack" {
 variable "enable_amp_adot" {
   type        = bool
   default     = false
-  description = "Deploy AMP workspace + ADOT collector pipeline (Option A). Must be explicitly enabled."
+  description = "Deploy AMP workspace + ADOT collector pipeline (Option A). Must be explicitly enabled, BU clusters are instead enabled via amp_enabled in business-units.json."
 }
 
 variable "enable_cloudwatch_observability" {

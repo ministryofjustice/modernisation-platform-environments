@@ -55,7 +55,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsalb_internal_443_dom1_dev
 
 # MP Workspaces (V1) - DEV only, EBS Apps HTTPS access
 resource "aws_security_group_rule" "ingress_traffic_ebsalb_internal_443_mp_v1_workspaces" {
-  count             = local.environment == "development" ? 1 : 0
+  count             = local.environment == "development" || local.environment == "test" ? 1 : 0
   security_group_id = aws_security_group.sg_ebsapps_internal_alb.id
   type              = "ingress"
   description       = "HTTPS from MP Workspaces (V1) - DEV only"
