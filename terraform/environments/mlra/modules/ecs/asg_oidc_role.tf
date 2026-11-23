@@ -14,7 +14,7 @@ locals {
 module "github_actions_asg_oidc_role" {
   source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
   github_repositories = ["ministryofjustice/laa-mlra-application"]
-  subject_claim       = "repo:ministryofjustice/laa-mlra-application:environment:${local.environment}"
+  subject_claim       = "environment:${local.environment}"
   role_name           = "${local.application_name}-asg-manage-oidc"
   policy_arns         = []
   policy_jsons        = [data.aws_iam_policy_document.github_actions_asg_oidc_policy.json]
