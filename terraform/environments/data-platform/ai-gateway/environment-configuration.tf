@@ -216,7 +216,7 @@ locals {
       aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type                     = "cache.t4g.medium"
 
-      ai_gateway_egress_policy_enabled = false
+      ai_gateway_egress_policy_enabled = true
     }
   }
 }

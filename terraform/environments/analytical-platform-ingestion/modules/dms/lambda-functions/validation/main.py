@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 from pprint import pformat
 from typing import Optional
-from urllib.parse import unquote_plus
+from urllib.parse import quote, unquote_plus
 
 import boto3
 import s3fs
@@ -79,6 +79,32 @@ def move_object(bucket_to: str, bucket_from: str, key: str, mutable: bool=False)
 
     client.copy_object(**copy_params)
     client.delete_object(Bucket=bucket_from, Key=key)
+    return copy_params["Key"]
+
+
+def publish_validation_failure(key: str, fail_bucket: str, failed_key: str, errors: list[str]):
+    """Publishes a validation failure alert to the pipeline's SNS topic.
+    Alerting problems are logged rather than raised so the file move is never undone.
+    """
+    topic_arn = os.getenv("ALERTS_TOPIC_ARN")
+    if not topic_arn:
+        return
+
+    location = (
+        f"https://s3.console.aws.amazon.com/s3/object/{fail_bucket}"
+        f"?prefix={quote(failed_key)}"
+    )
+    lines = [
+        f"❌ {os.getenv('SOURCE_DB', 'dms')}: VALIDATION FAILED",
+        f"File: {key}",
+        f"Moved to: {location}",
+    ]
+    lines += [f"Reason: {error}" for error in errors]
+
+    try:
+        boto3.client("sns").publish(TopicArn=topic_arn, Message="\n".join(lines))
+    except Exception:  # pylint: disable=broad-exception-caught
+        logger.exception("Failed to publish validation failure alert")
 
 
 def strip_data_type(data_type: str) -> str:
@@ -218,70 +244,16 @@ class FileValidator:
             self.errors.append(error)
 
     def execute(self):
-        """Combines FileValidator methods to validate the file extracted by AWS DMS and
-        populates the payload with error messages (if any) before sending to Slack.
-        Moves the validated file to to the pass or fail bucket depending on the result
-        of the validation.
+        """Combines FileValidator methods to validate the file extracted by AWS DMS.
+        Moves the validated file to the pass or fail bucket depending on the result
+        of the validation, and publishes an alert for failures.
         """
-        # client = boto3.client("secretsmanager")
-        # secrets = client.get_secret_value(SecretId=os.getenv("SLACK_SECRET_KEY"))
-        # secrets = json.loads(secrets.get("SecretString"))
-        # url = secrets.get("webhook_url")
-        # channel = secrets.get("channel")
-
         self._validate_file(path=f"{self.bucket_from}/{self.key}")
         if self.errors:
-            # TODO: Implement the slack notifications - commented out for now
-            # event_time = datetime.utcnow().isoformat(sep=" ", timespec="milliseconds")
-            # location = (
-            #    f"https://s3.console.aws.amazon.com/s3/buckets/"
-            #    f"{self.fail_bucket}/{self.key}"
-            # )
-            # payload = {
-            #    "channel": channel,
-            #    "text": "",
-            #    "username": "AWS Lambda",
-            #    "icon_emoji": ":lambda:",
-            #    "blocks": [
-            #        {
-            #            "type": "header",
-            #            "text": {
-            #                "type": "plain_text",
-            #                "text": "Failure – A file has failed validation",
-            #                "emoji": True,
-            #            },
-            #        },
-            #        {
-            #            "type": "section",
-            #            "text": {
-            #                "type": "mrkdwn",
-            #                "text": (
-            #                    f"*Event Time:* {event_time}\n"
-            #                    f"*File Moved To:* {location}"
-            #                ),
-            #            },
-            #        },
-            #    ],
-            # }
-
             logger.error(f"{self.key} failed validation with errors: {pformat(self.errors, indent=2)}")
             self.bucket_to = self.fail_bucket
-            move_object(self.bucket_to, self.bucket_from, self.key)
-
-            # More slack notification code
-            # for error in self.errors:
-            #    logger.info(
-            #        f"VALIDATION ERROR\n"
-            #        f"File {self.key} failed validation\r"
-            #        f"File moved to {location}\r"
-            #        f"Reason for failure: {error}"
-            #    )
-            #    payload["blocks"][1]["text"]["text"] += f"\n*Failure Reason:* {error}"
-
-            # encoded_payload = json.dumps(payload).encode("utf-8")
-            # http.request(
-            #    method="POST", url=url, body=encoded_payload
-            # )
+            failed_key = move_object(self.bucket_to, self.bucket_from, self.key)
+            publish_validation_failure(self.key, self.fail_bucket, failed_key, self.errors)
         else:
             move_object(self.bucket_to, self.bucket_from, self.key, self.valid_files_mutable)
 
