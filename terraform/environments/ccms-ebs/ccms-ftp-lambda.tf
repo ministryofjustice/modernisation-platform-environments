@@ -463,8 +463,9 @@ module "LAA-ftp-xerox-ccms-outbound" {
   vpc_id                       = data.aws_vpc.shared.id
   subnet_ids                   = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   ftp_transfer_type            = "SFTP_UPLOAD"
+  ftp_file_remove              = "NO"
   ftp_local_path               = "CCMS_PRD_DST/Outbound/"
-  ftp_remote_path              = lower(local.environment) == "production" ? "/Production/outbound/CCMS/" : "/~/laa-ccms-outbound-${local.environment}-mp/outbound-lambda-runs/"
+  ftp_remote_path              = lower(local.environment) == "production" ? "/Production/outbound/CCMS/" : "/"
   ftp_file_types               = "zip"
   ftp_bucket                   = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   env                          = local.environment
