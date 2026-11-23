@@ -3,10 +3,14 @@ locals {
 
   environment_configurations = {
     development = {
-      litellm_version                    = "1.106.5"
-      litellm_gemini_live_defer_setup    = true
-      litellm_entra_client_secret_expiry = "05-05-2027"
-      ai_gateway_hostname                = "development.ai-gateway.justice.gov.uk"
+      # Optionally set a private image tag independently of the Helm chart version.
+      # litellm_image_tag = "v1.110.2-hotfix"
+      litellm_version                      = "1.110.2"
+      litellm_registry_credentials_enabled = true
+      litellm_private_registry_enabled     = true
+      litellm_gemini_live_defer_setup      = true
+      litellm_entra_client_secret_expiry   = "05-05-2027"
+      ai_gateway_hostname                  = "development.ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
         input_bucket_name  = "alpha-airflow-aigw-example-input"
         output_bucket_name = "alpha-airflow-aigw-example-output"
