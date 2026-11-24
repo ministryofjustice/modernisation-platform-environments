@@ -198,13 +198,11 @@ Uploading credentials does not invoke the Lambda or enable rotation.
 
 ## Dependencies before activation
 
-- Merge and deploy MPE PR
+- Confirm the merged tenant-module update in MPE PR
   [#20602](https://github.com/ministryofjustice/modernisation-platform-environments/pull/20602)
-  before activation. It updates the tenant module pin to a release that adds
-  `grafana-pdc-agent-restarter`; the development
-  accounts were previously updated from that branch, but the change is not yet
-  on `main`. Verify the merged module version is deployed to Sprinkler
-  development. Do not edit that PR as part of this pilot.
+  has been deployed before activation. It updates the tenant module pin to a
+  release that adds `grafana-pdc-agent-restarter`. Verify the merged module
+  version is deployed to Sprinkler development.
 - The main deployments in run `45418300030` succeeded in both environments.
   The pilot code still requires its own reviewed main-branch plan and apply.
 - Confirm the released image can be pulled by Lambda from the cross-account ECR

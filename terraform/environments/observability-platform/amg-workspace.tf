@@ -105,7 +105,7 @@ resource "grafana_notification_policy" "root" {
 
 /* Prometheus Source */
 resource "grafana_data_source" "observability_platform_prometheus" {
-  type       = "prometheus"
+  type       = local.environment_configuration_amg.prometheus_data_source_type
   name       = "observability-platform-prometheus"
   url        = module.managed_prometheus.workspace_prometheus_endpoint
   is_default = true
