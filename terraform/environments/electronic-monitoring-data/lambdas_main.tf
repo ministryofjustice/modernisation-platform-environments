@@ -1349,7 +1349,7 @@ module "live_feed_incident_manager" {
 #-----------------------------------------------------------------------------------
 
 module "trigger_api_integration" {
-  count                   = 1
+  count                   = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "trigger_cpr_job"
@@ -1828,6 +1828,6 @@ module "trigger_cadt_daily_run" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    TRIGGER_CADT_URL = "https://${module.trigger_cadt_api.api_gateway_id}.execute-api.${data.aws_region.current.name}.amazonaws.com/request/execute"
+    TRIGGER_CADT_URL = "https://${aws_api_gateway_rest_api.ops_api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/v1/cadt"
   }
 }

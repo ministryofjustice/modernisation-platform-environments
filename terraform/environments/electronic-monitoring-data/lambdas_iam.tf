@@ -4711,7 +4711,7 @@ resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
 # ------------------------------------------------------------
 
 module "trigger_cadt_daily_run_iam_role" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+ source  = "terraform-aws-modules/iam/aws//modules/iam-role"
 
   name = "trigger_cadt_daily_run"
 
@@ -4737,13 +4737,18 @@ module "trigger_cadt_daily_run_iam_role" {
 }
 
 data "aws_iam_policy_document" "trigger_cadt_daily_run_iam_role" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.cadt_policy_document.json
+  ]
+
   statement {
     effect = "Allow"
     actions = [
       "execute-api:Invoke"
     ]
     resources = [
-      "${module.trigger_cadt_api.api_gateway_arn}/*"
+      "${module.trigger_cadt_api.api_gateway_arn}/*",
+      "${aws_api_gateway_rest_api.ops_api.execution_arn}/v1/POST/cadt",
     ]
   }
 }
@@ -4751,6 +4756,6 @@ data "aws_iam_policy_document" "trigger_cadt_daily_run_iam_role" {
 
 resource "aws_iam_policy" "trigger_cadt_daily_run_iam_policy" {
   name   = "trigger_cadt_daily_run_iam_policy"
-  policy = data.aws_iam_policy_document.cadt_policy_document.json
+  policy = data.aws_iam_policy_document.trigger_cadt_daily_run_iam_role.json
 }
 
