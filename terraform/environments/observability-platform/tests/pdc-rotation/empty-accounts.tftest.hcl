@@ -1,4 +1,10 @@
-mock_provider "aws" {}
+mock_provider "aws" {
+  mock_data "aws_iam_policy_document" {
+    defaults = {
+      json = "{\"Version\":\"2012-10-17\",\"Statement\":[]}"
+    }
+  }
+}
 mock_provider "grafana" {
   alias = "cloud"
 }
@@ -18,6 +24,7 @@ run "no_pdc_accounts" {
     condition = (
       length(aws_secretsmanager_secret.gc_pdc_token) == 0 &&
       length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
+      length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
       length(local.gc_pdc_rotation_tags) == 0 &&
       length(module.grafana_pdc_token_rotator) == 0 &&
       length(aws_sns_topic.gc_pdc_failure_alerts) == 1
@@ -31,12 +38,22 @@ run "production_has_no_development_ecr_parameter" {
 
   variables {
     environment = "production"
-    accounts    = {}
+    accounts = {
+      production-observability-a = { pdc_enabled = true }
+      production-observability-b = { pdc_enabled = true }
+    }
   }
 
   assert {
     condition = (
       length(aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri) == 0 &&
+      length(grafana_cloud_private_data_source_connect_network_token.account) == 2 &&
+      length(aws_secretsmanager_secret_version.gc_pdc_token) == 2 &&
+      length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
+      toset(keys(local.gc_pdc_token_accounts)) == toset([
+        "production-observability-a",
+        "production-observability-b",
+      ]) &&
       length(aws_sns_topic.gc_pdc_failure_alerts) == 0 &&
       length(module.gc_pdc_failure_chatbot) == 0 &&
       length(module.grafana_pdc_token_rotator) == 0 &&

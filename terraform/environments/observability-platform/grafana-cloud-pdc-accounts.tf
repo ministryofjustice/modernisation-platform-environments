@@ -48,7 +48,7 @@ resource "grafana_cloud_private_data_source_connect_network" "account" {
 }
 
 resource "grafana_cloud_private_data_source_connect_network_token" "account" {
-  for_each = local.gc_pdc_accounts
+  for_each = local.gc_pdc_token_accounts
   provider = grafana.cloud
 
   name           = "${local.gc_pdc_network_names[each.key]}-agent"
@@ -118,7 +118,7 @@ resource "aws_kms_alias" "gc_pdc_token" {
 }
 
 resource "aws_secretsmanager_secret" "gc_pdc_token" {
-  #checkov:skip=CKV2_AWS_57:Automatic rotation awaits the tested PDC rotator; see docs/grafana-cloud/pdc-token-rotation.md
+  #checkov:skip=CKV2_AWS_57:Only the Sprinkler development pilot is rotated; other accounts retain Terraform bootstrap. See docs/grafana-cloud/pdc-token-rotation.md
   for_each = local.gc_pdc_accounts
 
   name       = "grafana-cloud/pdc/${each.value}"
@@ -127,13 +127,41 @@ resource "aws_secretsmanager_secret" "gc_pdc_token" {
 }
 
 resource "aws_secretsmanager_secret_version" "gc_pdc_token" {
-  for_each = local.gc_pdc_accounts
+  for_each = local.gc_pdc_token_accounts
 
   secret_id     = aws_secretsmanager_secret.gc_pdc_token[each.key].id
   secret_string = grafana_cloud_private_data_source_connect_network_token.account[each.key].token
 
   lifecycle {
     prevent_destroy = true
+  }
+}
+
+# Move only the pilot instances to singleton addresses so removed blocks can forget them
+# without affecting the other for_each instances.
+moved {
+  from = grafana_cloud_private_data_source_connect_network_token.account["sprinkler-development"]
+  to   = grafana_cloud_private_data_source_connect_network_token.pilot_handoff
+}
+
+removed {
+  from = grafana_cloud_private_data_source_connect_network_token.pilot_handoff
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+moved {
+  from = aws_secretsmanager_secret_version.gc_pdc_token["sprinkler-development"]
+  to   = aws_secretsmanager_secret_version.pilot_handoff
+}
+
+removed {
+  from = aws_secretsmanager_secret_version.pilot_handoff
+
+  lifecycle {
+    destroy = false
   }
 }
 
