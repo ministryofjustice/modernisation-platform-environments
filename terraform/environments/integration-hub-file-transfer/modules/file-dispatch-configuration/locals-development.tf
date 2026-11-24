@@ -26,12 +26,12 @@ locals {
         action = {
           name = "push-to-sftp"
           push_to_sftp = {
-            hostname           = "sftp.test.file-transfer.service.justice.gov.uk"
-            port               = 22
-            username           = "development.file-transfer.service.justice.gov.uk"
-            destination_prefix = "dms1981/"
+            hostname                = "sftp.test.file-transfer.service.justice.gov.uk"
+            port                    = 22
+            username                = "dms1981@development.file-transfer.service.justice.gov.uk"
+            destination_prefix      = ""
             host_public_keys        = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA50Zlk/twXrQJL/+boIvxSW69PKtrMli88LaQuJ6bTh"]
-            destination_cidr_blocks = ["16.61.173.34/32"]
+            destination_cidr_blocks = ["13.41.214.181/32"]
           }
         }
         notifications = {

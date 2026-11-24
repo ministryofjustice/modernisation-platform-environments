@@ -29,9 +29,10 @@ locals {
   egress_rules = merge(
     {
       "https-interface-endpoints" = {
-        name                         = "${local.pattern_name}-interface-endpoints-https"
-        description                  = "HTTPS to shared VPC interface endpoints"
-        referenced_security_group_id = data.aws_security_group.shared_interface_endpoints.id
+        name        = "${local.pattern_name}-interface-endpoints-https"
+        description = "HTTPS to shared VPC interface endpoints"
+        # AWS returns cross-account SG references as "<owner-account-id>/<sg-id>".
+        referenced_security_group_id = "${local.environment_management.account_ids[local.provider_name]}/${data.aws_security_group.shared_interface_endpoints.id}"
         ip_protocol                  = "tcp"
         from_port                    = 443
         to_port                      = 443
