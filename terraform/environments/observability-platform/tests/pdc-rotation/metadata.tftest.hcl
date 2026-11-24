@@ -22,6 +22,9 @@ mock_provider "aws" {
   mock_resource "aws_kms_key" {
     defaults = { arn = "arn:aws:kms:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:key/12345678-1234-1234-1234-abcdefabcdef" }
   }
+  mock_resource "aws_sns_topic" {
+    defaults = { arn = "arn:aws:sns:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:grafana-pdc-rotation-failures-development" }
+  }
   mock_resource "aws_ssm_parameter" {}
 }
 
@@ -91,9 +94,28 @@ run "central_metadata_without_activation" {
       length(module.grafana_pdc_token_rotator) == 0 &&
       length(aws_dynamodb_table.gc_pdc_rotation_state) == 0 &&
       length(aws_cloudwatch_metric_alarm.gc_pdc_rotator_errors) == 0 &&
-      length(aws_cloudwatch_event_target.gc_pdc_rotation_failed) == 0
+      length(aws_cloudwatch_event_target.gc_pdc_rotation_failed) == 0 &&
+      length(aws_sns_topic.gc_pdc_failure_alerts) == 1 &&
+      length(module.gc_pdc_failure_chatbot) == 1
     )
-    error_message = "Preserve bootstrap tokens and opt-in behaviour; do not deploy the rotator or alerts without a configured image."
+    error_message = "Keep the rotator dormant while deploying the configured development alert destination independently."
+  }
+
+  assert {
+    condition = (
+      local.gc_pdc_failure_alerts.this.slack_channel_id == "C06ALD6LX55" &&
+      aws_sns_topic.gc_pdc_failure_alerts["this"].name == "grafana-pdc-rotation-failures-development" &&
+      aws_sns_topic.gc_pdc_failure_alerts["this"].kms_master_key_id == aws_kms_key.gc_pdc_failure_alerts["this"].arn &&
+      jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[0].Condition.StringEquals["aws:SourceAccount"] == data.aws_caller_identity.current.account_id &&
+      jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[0].Condition.ArnEquals["aws:SourceArn"] == local.gc_pdc_failure_alarm_arn &&
+      jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[1].Condition.StringEquals["aws:SourceAccount"] == data.aws_caller_identity.current.account_id &&
+      jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[1].Condition.ArnEquals["aws:SourceArn"] == local.gc_pdc_failure_rule_arn &&
+      one([for statement in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : statement if statement.Sid == "AllowCloudWatchAlarmToUseKey"]).Condition.StringEquals["aws:SourceAccount"] == data.aws_caller_identity.current.account_id &&
+      one([for statement in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : statement if statement.Sid == "AllowCloudWatchAlarmToUseKey"]).Condition.ArnEquals["aws:SourceArn"] == local.gc_pdc_failure_alarm_arn &&
+      one([for statement in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : statement if statement.Sid == "AllowEventBridgeRuleToUseKey"]).Condition.StringEquals["aws:SourceAccount"] == data.aws_caller_identity.current.account_id &&
+      one([for statement in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : statement if statement.Sid == "AllowEventBridgeRuleToUseKey"]).Condition.ArnEquals["aws:SourceArn"] == local.gc_pdc_failure_rule_arn
+    )
+    error_message = "Configure encrypted Slack delivery with CloudWatch and EventBridge access scoped to their source ARNs."
   }
 }
 
@@ -106,7 +128,6 @@ run "prepared_runtime_permissions" {
       image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-credential-ABCDEF"
       credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
-      failure_topic_arn                  = "arn:aws:sns:eu-west-2:${format("%012d", 4)}:test-pdc-failures"
       stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
       stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
     }
@@ -167,8 +188,8 @@ run "prepared_runtime_permissions" {
 
   assert {
     condition = (
-      aws_cloudwatch_metric_alarm.gc_pdc_rotator_errors["this"].alarm_actions == toset([var.rotator.failure_topic_arn]) &&
-      aws_cloudwatch_event_target.gc_pdc_rotation_failed["this"].arn == var.rotator.failure_topic_arn &&
+      aws_cloudwatch_metric_alarm.gc_pdc_rotator_errors["this"].alarm_actions == toset([aws_sns_topic.gc_pdc_failure_alerts["this"].arn]) &&
+      aws_cloudwatch_event_target.gc_pdc_rotation_failed["this"].arn == aws_sns_topic.gc_pdc_failure_alerts["this"].arn &&
       jsondecode(aws_cloudwatch_event_rule.gc_pdc_rotation_failed["this"].event_pattern).detail.eventName == ["RotationFailed"]
     )
     error_message = "Alert on both Lambda errors and Secrets Manager rotation failures."
@@ -183,30 +204,12 @@ run "reject_cross_account_credential" {
       image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 9)}:secret:test-pdc-credential-ABCDEF"
       credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
-      failure_topic_arn                  = "arn:aws:sns:eu-west-2:${format("%012d", 4)}:test-pdc-failures"
       stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
       stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
     }
   }
 
   expect_failures = [aws_iam_policy.gc_pdc_rotator["this"]]
-}
-
-run "reject_wrong_region_failure_destination" {
-  command = plan
-
-  variables {
-    rotator = {
-      image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-credential-ABCDEF"
-      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
-      failure_topic_arn                  = "arn:aws:sns:eu-west-1:${format("%012d", 4)}:test-pdc-failures"
-      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
-      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
-    }
-  }
-
-  expect_failures = [aws_cloudwatch_metric_alarm.gc_pdc_rotator_errors["this"]]
 }
 
 run "reject_out_of_region_stack_query_key" {
@@ -217,7 +220,6 @@ run "reject_out_of_region_stack_query_key" {
       image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-credential-ABCDEF"
       credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
-      failure_topic_arn                  = "arn:aws:sns:eu-west-2:${format("%012d", 4)}:test-pdc-failures"
       stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
       stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-1:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
     }
