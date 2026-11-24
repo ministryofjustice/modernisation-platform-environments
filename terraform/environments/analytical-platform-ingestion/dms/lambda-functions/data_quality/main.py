@@ -111,6 +111,8 @@ def format_time(value: Optional[datetime]) -> str:
 
 
 def format_minutes(minutes: float) -> str:
+    if minutes < 1:
+        return "<1m"
     hours, mins = divmod(round(minutes), 60)
     return f"{hours}h{mins:02d}m" if hours else f"{mins}m"
 
@@ -292,19 +294,20 @@ def send_digest():
 
         duration_history = history[f"{pipeline}{DURATION_KEY}"]
         rows_history = history[f"{pipeline}{TOTAL_ROWS_KEY}"]
-        usual_duration = (
-            f" (usual {format_minutes(statistics.median(duration_history))})"
-            if len(duration_history) >= MIN_HISTORY_RUNS else ""
-        )
-        usual_rows = (
-            f" (usual {statistics.median(rows_history):,.0f})"
-            if len(rows_history) >= MIN_HISTORY_RUNS else ""
-        )
+        usual_duration = usual_rows = ""
+        if len(duration_history) >= MIN_HISTORY_RUNS:
+            median = statistics.median(duration_history)
+            change = f", {format_percent_change(duration, median)}" if median else ""
+            usual_duration = f" (usual {format_minutes(median)}{change})"
+        if len(rows_history) >= MIN_HISTORY_RUNS:
+            median = statistics.median(rows_history)
+            change = f", {format_percent_change(rows, median)}" if median else ""
+            usual_rows = f" (usual {median:,.0f}{change})"
         finished = f"{finished_at.astimezone(timezone.utc):%H:%M} UTC" if finished_at else "today"
 
         line = (
             f"{'⚠️' if issues else '✅'} {pipeline}: finished {finished} in {format_minutes(duration)}{usual_duration}, "
-            f"{rows:,.0f} rows{usual_rows}, {len(tables)} tables"
+            f"{rows:,.0f} rows{usual_rows}, {len(tables)} table{'' if len(tables) == 1 else 's'}"
         )
         if issues:
             line += f", {issues:.0f} issue(s) alerted"

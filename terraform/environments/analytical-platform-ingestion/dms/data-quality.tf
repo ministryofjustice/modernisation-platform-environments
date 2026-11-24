@@ -23,8 +23,7 @@ locals {
     }
   }
 
-  # Dev 13:00 is a temporary same-day test; set back to "09:00" before merging
-  dms_data_quality_digest_time = local.environment == "development" ? "13:00" : "09:00"
+  dms_data_quality_digest_time = "09:00"
   dms_data_quality_task_arns   = [for pipeline in local.dms_data_quality_pipelines : pipeline.task_arn]
 }
 

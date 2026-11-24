@@ -93,5 +93,37 @@ class TestCheckRun(unittest.TestCase):
         put_metrics.assert_called_once()
 
 
+class TestDigest(unittest.TestCase):
+    @mock.patch.object(main, "publish")
+    @mock.patch.object(main, "metric_values")
+    @mock.patch.object(main, "table_statistics")
+    @mock.patch.object(main, "describe_task")
+    @mock.patch.object(main, "today_start", return_value=TODAY)
+    def test_shows_usual_with_percent_change(self, _, describe_task, table_statistics, metric_values, publish):
+        describe_task.return_value = {
+            **task(),
+            "ReplicationTaskStats": {
+                "StartDate": datetime(2026, 11, 25, 0, 30, tzinfo=timezone.utc),
+                "FullLoadStartDate": datetime(2026, 11, 25, 0, 30, tzinfo=timezone.utc),
+                "FullLoadFinishDate": datetime(2026, 11, 25, 1, 0, tzinfo=timezone.utc),
+            },
+        }
+        table_statistics.return_value = [{"SchemaName": "dbo", "TableName": "A", "FullLoadRows": 900}]
+        metric_values.side_effect = [
+            {
+                f"tariff-production{main.DURATION_KEY}": [20, 20, 20],
+                f"tariff-production{main.TOTAL_ROWS_KEY}": [1000, 1000, 1000],
+            },
+            {"tariff-production": []},
+        ]
+
+        main.send_digest()
+
+        self.assertIn(
+            "✅ tariff-production: finished 01:00 UTC in 30m (usual 20m, +50%), 900 rows (usual 1,000, -10%), 1 table",
+            publish.call_args[0][0],
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
