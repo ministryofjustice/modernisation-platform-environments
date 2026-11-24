@@ -16,11 +16,7 @@ variable "environment" {
 
 variable "rotator" {
   type = object({
-    image_uri                          = string
-    credential_secret_arn              = string
-    credential_kms_key_arn             = string
-    stack_query_credential_secret_arn  = string
-    stack_query_credential_kms_key_arn = string
+    image_digest = string
   })
   default = null
 }

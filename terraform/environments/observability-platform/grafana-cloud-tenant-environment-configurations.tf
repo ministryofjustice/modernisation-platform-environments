@@ -23,8 +23,10 @@ locals {
   environment_configuration_gc = local.environment_configurations_gc[local.environment]
   environment_configurations_gc = {
     development = {
-      # Alerts can be tested independently; rotation remains disabled until its prerequisites exist.
-      pdc_token_rotator = null
+      # Deploy prerequisites only; Secrets Manager rotation remains disabled.
+      pdc_token_rotator = {
+        image_digest = "sha256:4c6c3ae52a2bb17e8e0e4703d533f4253c2df9fa6b9dffd1deabf6e4262208b3"
+      }
       pdc_failure_alerts = {
         slack_channel_id = "C06ALD6LX55"
       }
