@@ -134,7 +134,7 @@ environment:
       external_dns: "1.23.0"
       external_secrets: "2.15.0"
       fluent_bit: "0.2.0"
-      karpenter: "1.15.2"
+      karpenter: "1.15.3"
       keda: "2.21.1"
       kube_prometheus_stack: "93.4.0"
       kyverno: "3.9.0"
