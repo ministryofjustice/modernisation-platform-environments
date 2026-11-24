@@ -94,6 +94,14 @@ resource "aws_iam_role_policy" "glue_access_dms" {
           "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/*",
           "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/*/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+        ]
+        Resource = [aws_kms_key.data_lake_kms_key.arn]
       }
     ]
   })
