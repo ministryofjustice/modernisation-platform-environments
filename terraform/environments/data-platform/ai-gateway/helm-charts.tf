@@ -62,8 +62,9 @@ resource "helm_release" "litellm_admin" {
         openaiWorkloadIdentityAudience = local.openai_workload_identity_audience
 
         # LiteLLM
-        masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
-        masterkeySecretKey  = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        masterkeySecretName       = kubernetes_secret_v1.litellm_master_key.metadata[0].name
+        masterkeySecretKey        = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        disableEnvCredentialLogin = local.litellm_disable_env_credential_login
         environmentSecrets = [
           "litellm-license",
           "litellm-entra-id",
@@ -138,8 +139,9 @@ resource "helm_release" "litellm" {
         databaseUsername          = module.ai_gateway_aurora.cluster_master_username
 
         # LiteLLM
-        masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
-        masterkeySecretKey  = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        masterkeySecretName       = kubernetes_secret_v1.litellm_master_key.metadata[0].name
+        masterkeySecretKey        = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        disableEnvCredentialLogin = local.litellm_disable_env_credential_login
         environmentSecrets = [
           "litellm-license",
           "litellm-entra-id",

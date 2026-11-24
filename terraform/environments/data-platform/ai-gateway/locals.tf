@@ -2,6 +2,7 @@ locals {
   environment_configuration            = local.environment_configurations[local.environment]
   litellm_registry_credentials_enabled = try(local.environment_configuration.litellm_registry_credentials_enabled, false)
   litellm_private_registry_enabled     = try(local.environment_configuration.litellm_private_registry_enabled, false)
+  litellm_disable_env_credential_login = contains(["development", "test", "preproduction"], local.environment)
 
   # Read only the registry hostname; never load the Docker pull credentials into Terraform state.
   litellm_enterprise_registry_hostname = local.litellm_private_registry_enabled ? jsondecode(data.aws_secretsmanager_secret_version.litellm_enterprise_registry_hostname[0].secret_string)["registry_hostname"] : ""
