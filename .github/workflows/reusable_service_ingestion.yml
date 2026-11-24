@@ -126,7 +126,7 @@ jobs:
 
       - name: Prepare ingestion deployment
         id: prepare
-        uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/actions/prepare-service-ingestion@2054179ef9c6209b312b934370c9f131c0faa6e4 # Pinned commit (no matching release tag)
+        uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/actions/prepare-service-ingestion@7b92d70e62e928296bf9efa3d780111ee59004ba # Pinned commit (no matching release tag)
         with:
           repository-token: ${{ github.token }}
           runtime-reference: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
@@ -268,7 +268,7 @@ jobs:
           }
 
       - name: Prepare matching ingestion deployment
-        uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/actions/prepare-service-ingestion@2054179ef9c6209b312b934370c9f131c0faa6e4 # Pinned commit (no matching release tag)
+        uses: ministryofjustice/terraform-aws-moj-data-factory-modules/.github/actions/prepare-service-ingestion@7b92d70e62e928296bf9efa3d780111ee59004ba # Pinned commit (no matching release tag)
         with:
           repository-token: ${{ github.token }}
           runtime-reference: ${{ secrets.DMS_DEVELOPMENT_RUNTIME_REFERENCE }}
