@@ -23,8 +23,13 @@ locals {
   environment_configuration_gc = local.environment_configurations_gc[local.environment]
   environment_configurations_gc = {
     development = {
-      # Set only after a released image, dedicated credential and alert destination are available.
-      pdc_token_rotator = null
+      # Deploy prerequisites only; Secrets Manager rotation remains disabled.
+      pdc_token_rotator = {
+        image_digest = "sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa"
+      }
+      pdc_failure_alerts = {
+        slack_channel_id = "C06ALD6LX55"
+      }
       tenant_configuration = {
         "observability-platform" = {
           github_team = "observability-platform"
@@ -48,6 +53,7 @@ locals {
     }
     production = {
       pdc_token_rotator    = null
+      pdc_failure_alerts   = null
       tenant_configuration = {}
     }
   }

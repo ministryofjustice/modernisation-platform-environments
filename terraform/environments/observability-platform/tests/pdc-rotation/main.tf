@@ -16,14 +16,17 @@ variable "environment" {
 
 variable "rotator" {
   type = object({
-    image_uri                          = string
-    credential_secret_arn              = string
-    credential_kms_key_arn             = string
-    stack_query_credential_secret_arn  = string
-    stack_query_credential_kms_key_arn = string
-    failure_topic_arn                  = string
+    image_digest = string
   })
   default = null
+}
+
+variable "failure_alerts" {
+  type = object({
+    slack_channel_id = string
+  })
+  default  = { slack_channel_id = "C06ALD6LX55" }
+  nullable = true
 }
 
 locals {
@@ -42,7 +45,8 @@ locals {
     }
   }
   environment_configuration_gc = {
-    pdc_token_rotator = var.rotator
+    pdc_token_rotator  = var.rotator
+    pdc_failure_alerts = var.environment == "development" ? var.failure_alerts : null
   }
 }
 

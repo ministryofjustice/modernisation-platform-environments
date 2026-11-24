@@ -104,10 +104,10 @@ resource "aws_lb" "managed" {
 }
 
 resource "aws_lb" "http_redirect_managed_alb" {
-  count = local.alb_80_enabled ? 1 : 0
-  name               = "${local.application_data.accounts[local.environment].app_name}-managed-api-http-lb"
-  internal           = true
-  load_balancer_type = "application"
+  count                      = local.alb_80_enabled ? 1 : 0
+  name                       = "${local.application_data.accounts[local.environment].app_name}-managed-api-http-lb"
+  internal                   = true
+  load_balancer_type         = "application"
   subnets                    = data.aws_subnets.shared-private.ids
   security_groups            = [aws_security_group.alb_http_managed[count.index].id]
   enable_deletion_protection = true
@@ -126,7 +126,7 @@ resource "aws_lb" "http_redirect_managed_alb" {
 }
 
 resource "aws_lb_listener" "alb_managed_http_listener" {
-  count = local.alb_80_enabled ? 1 : 0
+  count             = local.alb_80_enabled ? 1 : 0
   load_balancer_arn = aws_lb.http_redirect_managed_alb[count.index].arn
   port              = 80
   protocol          = "HTTP"
@@ -172,7 +172,7 @@ resource "aws_lb_target_group" "managed_https" {
 }
 
 resource "aws_lb_target_group" "managed_alb_http" {
-  count = local.alb_80_enabled ? 1 : 0
+  count                = local.alb_80_enabled ? 1 : 0
   name                 = "${local.application_data.accounts[local.environment].app_name}-managed-http-alb-tg"
   port                 = 80
   protocol             = "TCP"
@@ -181,30 +181,30 @@ resource "aws_lb_target_group" "managed_alb_http" {
   deregistration_delay = 30
 
   health_check {
-    protocol = "HTTP"
-    path     = "/"
-    port     = 80
-    matcher  = "200,301"
-    interval = 30
+    protocol            = "HTTP"
+    path                = "/"
+    port                = 80
+    matcher             = "200,301"
+    interval            = 30
     timeout             = 5
     healthy_threshold   = 3
     unhealthy_threshold = 3
   }
 
-  depends_on = [ aws_lb.http_redirect_managed_alb ]
+  depends_on = [aws_lb.http_redirect_managed_alb]
 }
 
 resource "aws_lb_target_group_attachment" "nlb_to_alb_target_group_attachment" {
-  count = local.alb_80_enabled ? 1 : 0
+  count            = local.alb_80_enabled ? 1 : 0
   target_group_arn = aws_lb_target_group.managed_alb_http[count.index].arn
   target_id        = aws_lb.http_redirect_managed_alb[count.index].arn
   port             = 80
 
-  depends_on = [ aws_lb_target_group.managed_alb_http ]
+  depends_on = [aws_lb_target_group.managed_alb_http]
 }
 
 resource "aws_lb_listener" "managed80" {
-  count = local.alb_80_enabled ? 1 : 0
+  count             = local.alb_80_enabled ? 1 : 0
   load_balancer_arn = aws_lb.managed.id
   port              = 80
   protocol          = "TCP"

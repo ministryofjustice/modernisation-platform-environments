@@ -5,10 +5,15 @@ Tracks [ministryofjustice/observability-platform#338](https://github.com/ministr
 ## Current safe boundary
 
 Rotation is **not enabled**. Terraform still creates the initial token and writes
-the plain token to the existing central secret. Both environments leave
-`pdc_token_rotator = null`, so no Lambda, journal, IAM policy, alarms, rotation invocation
-or expiry is deployed by this preparation. Existing tokens remain valid, and
-new opted-in accounts retain the current bootstrap behaviour.
+the plain token to the existing central secret. Development configures
+`pdc_token_rotator` with the released image digest, deploying the Lambda, journal,
+scoped IAM policy, alarms, empty credential secrets and token-less Grafana
+identities. There is no rotation configuration, schedule or automatic invocation.
+The Lambda remains dormant until a later reviewed pilot. Development also deploys
+the failure SNS topic and Slack delivery. Production keeps
+`pdc_token_rotator = null` and has no configured failure destination.
+Existing tokens remain valid, and new opted-in
+accounts retain the current bootstrap behaviour.
 The secret names, per-account networks, KMS policies and tenant read permissions
 are unchanged.
 
@@ -17,8 +22,10 @@ replacement and account removal. This is intentional: replacing a Grafana token
 revokes it before ECS agents can read its replacement. Offboarding therefore
 requires an explicitly reviewed change to these protections.
 
-Terraform still holds token values in state until the handoff below. Do not claim
-that adding metadata enables rotation or removes credentials from state.
+Terraform still holds the existing tenant PDC token values in state until the
+handoff below. The two new rotator credential values are never generated, read,
+supplied as inputs or exposed as outputs by Terraform; it owns only their empty
+secrets, keys and Grafana identities.
 
 ## Rotation contract
 
@@ -55,47 +62,87 @@ derives the tenant role ARN from the account ID.
 ## Dormant Lambda deployment
 
 The dedicated repository is
-`ministryofjustice/observability-platform-grafana-pdc-token-rotator`. An image
-release is not yet available. There is deliberately no guessed ECR URI or
-placeholder version that a deployment might try to pull.
+`ministryofjustice/observability-platform-grafana-pdc-token-rotator`. The
+deployable image is released as `v0.1.0-alpha.2`, with digest
+`sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa`.
+Development pins this digest, not the mutable tag. The earlier `v0.1.0-alpha.1`
+artifact was a manifest list rejected by Lambda and is not deployable; do not use
+its digest.
 
 The development environment publishes the repository URI as an SSM `String`
 parameter at
 `/observability-platform/grafana-pdc-token-rotator/ecr-repository-uri`. It
 constructs the URI in `eu-west-2` from the core shared services production
 account ID in `environment_management` and the repository name. This parameter
-is development-only; it does not deploy the image or activate rotation.
+is development-only. The Lambda image URI uses the same derived registry and
+repository, followed by `@` and the configured digest. No account ID is hard-coded.
 
-Once the dependencies below are met, `pdc_token_rotator` in the relevant
-environment configuration can be set to an object containing:
+The environment configuration's optional `pdc_failure_alerts` object declares
+the Slack destination; in development its `slack_channel_id` is
+`C06ALD6LX55`. Terraform creates a KMS-encrypted SNS topic named
+`grafana-pdc-rotation-failures-development` and an Amazon Q Developer (AWS
+Chatbot) Slack channel configuration subscribed to it. CloudWatch alarm and
+EventBridge publish permissions are restricted to their respective alert/rule
+ARNs and this AWS account. This is notification-only: the channel configuration
+uses the required CloudWatch read-only guardrail and has no managed policies
+attached to its channel role. Production keeps `pdc_failure_alerts = null`.
+
+Before applying the development Terraform configuration, complete this
+one-time manual prerequisite: authorise the MoJ Slack workspace in **Amazon Q
+Developer in chat applications** in the Observability Platform development AWS
+account, then run `/invite @Amazon Q` in the Slack channel. The channel
+configuration cannot be created until both steps are complete.
+
+Verify delivery after applying by sending a test message from the Amazon Q
+Developer console to the configured channel, then publishing a test message to
+the SNS topic (its ARN is visible in the SNS console). Confirm both messages
+arrive in `#observability-platform-development-alerts`.
+
+The optional `pdc_token_rotator` configuration contains only:
 
 | Field | Required value |
 | --- | --- |
-| `image_uri` | Actual released ECR image URI, preferably pinned by digest |
-| `credential_secret_arn` | Dedicated Cloud API credential secret in this account/region |
-| `credential_kms_key_arn` | Customer-managed KMS key encrypting that credential |
-| `stack_query_credential_secret_arn` | Separate read-only stack service-account token secret in this account/region |
-| `stack_query_credential_kms_key_arn` | Customer-managed KMS key encrypting the stack query credential |
-| `failure_topic_arn` | Operational SNS topic in this account/region |
+| `image_digest` | Released image digest, validated as `sha256:` followed by 64 lowercase hexadecimal characters |
+
+Terraform creates `grafana-cloud/pdc-token-rotator/management-token` and
+`grafana-cloud/pdc-token-rotator/stack-query-token` in the current environment's
+AWS account and region, each with its own rotation-enabled customer-managed key.
+The aliases are `alias/grafana-cloud-pdc-token-rotator-management-token` and
+`alias/grafana-cloud-pdc-token-rotator-stack-query-token`. These are separate from
+the tenant `grafana-cloud/pdc/<account ID>` secrets. No secret-version resource is
+created for these credentials. The Lambda may only read the credential values
+and decrypt each with its own key through Secrets Manager and that secret's
+encryption context.
+
+Terraform also creates the stack-scoped Cloud access policy
+`pdc-token-rotator-development`, with exactly `accesspolicies:read` and
+`accesspolicies:write`, and the stack service account
+`pdc-token-rotator-query-development`. Grafana provider `3.25.9` supports role
+`None` and `grafana_data_source_permission_item`: the service account has no
+basic-role access and receives only `Query` on `grafanacloud-usage`. The
+permission item is non-authoritative and preserves other permissions on that
+provisioned data source. The Cloud service-account ID includes the stack slug;
+the permission item uses only its numeric service-account portion.
+Terraform creates no tokens for either identity.
 
 This deploys the Lambda using the existing module/version, exact execution role
 name, scoped IAM permissions, per-secret Secrets Manager invocation permissions,
 Lambda error alarm and a Secrets Manager `RotationFailed` EventBridge target.
+The alarm and EventBridge target use the SNS topic created from
+`pdc_failure_alerts`; no SNS ARN needs to be supplied.
 Initial reserved concurrency is one to serialise rotation invocations.
 The Lambda uses a central DynamoDB table (`ROTATION_STATE_TABLE_NAME`) to resume
 interrupted rotations. The journal stores progress and version/deployment
 identifiers, not credentials. It has point-in-time recovery and deletion
 protection; retain it across runtime changes and review retention before
 activation. Do not remove it while any rotation could still be retried.
-The topic's owning configuration must permit EventBridge `sns:Publish` from the
-rule ARN (and CloudWatch alarm delivery); this configuration does not overwrite
-an existing topic policy. Confirm its subscriptions and delivery.
+The SNS topic policy created with `pdc_failure_alerts` permits EventBridge and
+CloudWatch delivery from only this account's rotation-failure rule and alarm.
+Confirm the Chatbot subscription and delivery before activation.
 
-Store each credential as a plain token. Lambda receives only the management and
-stack query secret ARNs through `GRAFANA_API_CREDENTIAL_SECRET_ARN` and
-`GRAFANA_STACK_QUERY_CREDENTIAL_SECRET_ARN`. Provision the query token separately
-for a dedicated Viewer/read-only service account in the target stack. Do not
-generate or read its value in Terraform, where it could enter state. Use the
+Lambda receives only the management and stack query secret ARNs through
+`GRAFANA_API_CREDENTIAL_SECRET_ARN` and
+`GRAFANA_STACK_QUERY_CREDENTIAL_SECRET_ARN`. Use the
 stack URL passed in `GRAFANA_STACK_URL` and confirm during the pilot that
 `GRAFANA_USAGE_DATASOURCE_UID` (`grafanacloud-usage`) resolves to the usage data
 source and that the credential can query it. Cadence comes from secret metadata.
@@ -107,17 +154,56 @@ promotion. Confirm scrape and ingestion lag before choosing the runtime's metric
 freshness, settling and stability settings.
 Setting this object does **not** enable secret rotation or perform state handoff.
 
+## Manual credentials after apply
+
+1. In the Grafana Cloud portal, locate the Terraform-created
+   `pdc-token-rotator-development` access policy in the stack's Cloud region
+   (`prod-gb-south-1`) and add an **expiring** token. Retain the policy's exact
+   scopes and stack realm; do not reuse Terraform's Cloud credential. This token
+   is used to list and create PDC tokens through `https://grafana.com/api/v1/tokens`,
+   never to delete them.
+2. In the development stack's service-account settings, create a token for
+   `pdc-token-rotator-query-development`. Do not widen its role or permissions.
+   It queries
+   `/api/datasources/proxy/uid/grafanacloud-usage/api/v1/query` for
+   `grafanacloud_grafana_pdc_connected_agents`.
+3. Using authenticated AWS credentials for Observability Platform development,
+   put each token into its corresponding secret. Prepare protected local files
+   containing **only the token string**, with no JSON, quotes or trailing newline.
+   Keep files outside the repository, restrict permissions to the owner, and
+   delete them securely after upload. Using files avoids putting literal tokens
+   in shell history:
+
+   ```shell
+   aws secretsmanager put-secret-value \
+     --region eu-west-2 \
+     --secret-id grafana-cloud/pdc-token-rotator/management-token \
+     --secret-string file:///secure/path/management-token
+
+   aws secretsmanager put-secret-value \
+     --region eu-west-2 \
+     --secret-id grafana-cloud/pdc-token-rotator/stack-query-token \
+     --secret-string file:///secure/path/stack-query-token
+   ```
+
+   Each call creates `AWSCURRENT` in its previously empty secret. Do not pass
+   these values to Terraform or use a Terraform secret-version data source.
+
+The management token's **own expiry and renewal are manual** for now. Record its
+expiry and arrange renewal before it expires; issue its replacement through the
+Cloud portal and update the same secret. Renew the query token manually too if
+it has an expiry. Neither credential is rotated by the PDC rotator.
+Uploading credentials does not invoke the Lambda or enable rotation.
+
 ## Dependencies before activation
 
-- A released rotator image and approved ECR repository/access. The dormant wiring
-  follows the existing `grafana_api_key_rotator` deployment pattern (Lambda module
-  `7.20.1`, container image reference in the environment configuration).
-- A dedicated Grafana credential, its central secret ARN, required KMS access and
-  an agreed credential rotation process. Confirm the
-  `accesspolicies:read`/`write` scope and organisation-wide implications;
-  do not silently reuse Terraform's credential. The initial runtime contract
-  uses expiry rather than token deletion, so do not grant deletion scope until
-  its cleanup implementation is reviewed.
+- Confirm the released image can be pulled by Lambda from the cross-account ECR
+  repository, including its repository policy. The dormant wiring follows the
+  existing Lambda module `7.20.1` deployment pattern.
+- Apply the development prerequisites, upload both credentials above, verify the
+  scope/realm and the usage query, and agree manual credential renewal ownership.
+  The initial runtime contract uses expiry rather than token deletion; do not
+  grant deletion scope until its cleanup implementation is reviewed.
 - A tenant module release with `grafana-pdc-agent-restarter`, trusted only by the
   agreed central Lambda execution role. The dormant wiring grants that execution
   role `sts:AssumeRole` only on opted-in accounts' restarter roles, with secret
@@ -135,8 +221,8 @@ Setting this object does **not** enable secret rotation or perform state handoff
   or metric permissions before extending the tenant role.
 - A bounded restart/verification/rollback sequence within Lambda's 15-minute
   limit, including retry idempotency and concurrent invocation handling.
-- An operational notification destination. Wire Lambda error alarms and Secrets
-  Manager `RotationFailed` events to it before activation, and verify delivery.
+- A configured `pdc_failure_alerts` destination in the environment. Confirm
+  both SNS and Amazon Q delivery before activation.
 
 The future Secrets Manager invocation permission must restrict
 `secretsmanager.amazonaws.com` to this AWS account and these secrets. Configure
@@ -224,7 +310,8 @@ temporary root, initialises without a backend, validates, then runs Terraform
 tests with mocked providers. Registry/module downloads require network access;
 no AWS or Grafana credentials, live backend or real API calls are used. It checks
 per-account metadata, expiry/schedule consistency, opt-in and empty-account
-behaviour, dormant deployment, scoped runtime permissions and failure alert
-wiring. A separate negative test confirms that token destruction protection
+behaviour, dormant deployment, separate credential keys/secrets, least-privilege
+Grafana identities, digest validation, scoped runtime permissions and failure
+alert wiring. A separate negative test confirms that token destruction protection
 rejects disabling accounts. It is not a full environment plan or an end-to-end
 rotation test.

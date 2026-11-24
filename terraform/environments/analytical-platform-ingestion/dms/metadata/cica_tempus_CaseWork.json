@@ -54,10 +54,6 @@
     },
     {
       "object_name": "dbo.CaseTrimDocuments",
-      "column_name": "DocumentSentTo"
-    },
-    {
-      "object_name": "dbo.CaseTrimDocuments",
       "column_name": "EventRaised"
     },
     {
@@ -67,10 +63,6 @@
     {
       "object_name": "dbo.CaseTrimDocuments",
       "column_name": "FullDocumentURL"
-    },
-    {
-      "object_name": "dbo.CaseTrimDocuments",
-      "column_name": "IVB_ID"
     },
     {
       "object_name": "dbo.CaseTrimDocuments",

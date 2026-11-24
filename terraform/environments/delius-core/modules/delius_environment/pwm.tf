@@ -1,7 +1,3 @@
-locals {
-  pwm_migrated_envs = ["dev", "test", "stage", "preprod", "prod"]
-}
-
 module "pwm" {
   source = "../helpers/delius_microservice"
 
@@ -53,7 +49,7 @@ module "pwm" {
   microservice_lb                    = aws_lb.delius_core_ancillary
   microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
 
-  alb_listener_rule_host_header = !contains(local.pwm_migrated_envs, var.env_name) ? "pwm.${var.env_name}.${var.account_config.dns_suffix}" : null
+  alb_listener_rule_host_header = null
 
   platform_vars = var.platform_vars
 
@@ -88,7 +84,7 @@ module "pwm" {
   }
 
   container_secrets_env_specific = try(var.delius_microservice_configs.pwm.container_secrets_env_specific, {})
-  
+
   container_vars_default = merge(
     {
       "CONFIG_XML_BASE64" = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {
@@ -98,9 +94,9 @@ module "pwm" {
         email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
         email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
       }))
-      "JAVA_OPTS" = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
-    },
-    var.env_name != "prod" ? { "JAVA_TOOL_OPTIONS" = "-XX:-UseBASE64Intrinsics"} : {}
+      "JAVA_OPTS"         = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
+      "JAVA_TOOL_OPTIONS" = "-XX:-UseBASE64Intrinsics"
+    }
   )
   container_vars_env_specific = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
 
@@ -130,7 +126,6 @@ module "pwm" {
 }
 
 resource "aws_lb_listener_rule" "ancillary_listener_rule" {
-  count        = contains(local.pwm_migrated_envs, var.env_name) ? 1 : 0
   listener_arn = aws_lb_listener.ancillary_https.arn
   priority     = 10
 
