@@ -159,7 +159,7 @@ run "prepared_runtime_permissions" {
 
   variables {
     rotator = {
-      image_digest = "sha256:4c6c3ae52a2bb17e8e0e4703d533f4253c2df9fa6b9dffd1deabf6e4262208b3"
+      image_digest = "sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa"
     }
   }
 
@@ -286,7 +286,7 @@ run "reject_unpinned_image" {
 
   variables {
     rotator = {
-      image_digest = "v0.1.0-alpha.1"
+      image_digest = "not-a-digest"
     }
   }
 
@@ -298,7 +298,7 @@ run "reject_missing_failure_destination" {
 
   variables {
     rotator = {
-      image_digest = "sha256:4c6c3ae52a2bb17e8e0e4703d533f4253c2df9fa6b9dffd1deabf6e4262208b3"
+      image_digest = "sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa"
     }
     failure_alerts = null
   }
@@ -313,7 +313,7 @@ run "reject_rotator_without_pdc_accounts" {
   variables {
     accounts = {}
     rotator = {
-      image_digest = "sha256:4c6c3ae52a2bb17e8e0e4703d533f4253c2df9fa6b9dffd1deabf6e4262208b3"
+      image_digest = "sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa"
     }
   }
 

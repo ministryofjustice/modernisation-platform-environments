@@ -62,10 +62,12 @@ derives the tenant role ARN from the account ID.
 ## Dormant Lambda deployment
 
 The dedicated repository is
-`ministryofjustice/observability-platform-grafana-pdc-token-rotator`. The image is
-released as `v0.1.0-alpha.1`, with digest
-`sha256:4c6c3ae52a2bb17e8e0e4703d533f4253c2df9fa6b9dffd1deabf6e4262208b3`.
-Development pins this digest, not the mutable tag.
+`ministryofjustice/observability-platform-grafana-pdc-token-rotator`. The
+deployable image is released as `v0.1.0-alpha.2`, with digest
+`sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa`.
+Development pins this digest, not the mutable tag. The earlier `v0.1.0-alpha.1`
+artifact was a manifest list rejected by Lambda and is not deployable; do not use
+its digest.
 
 The development environment publishes the repository URI as an SSM `String`
 parameter at
