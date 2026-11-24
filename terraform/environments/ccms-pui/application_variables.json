@@ -17,7 +17,7 @@
       "container_memory": "7168",
       "instance_role_clamav": "clamav",
       "ec2_instance_type_clamav": "c5d.large",
-      "clamav_ami_id": "ami-0025d32238be8ce55",
+      "clamav_ami_id": "ami-05855828e1e2be542",
       "spring_profiles_active": "prod",
       "aws_endpoint": "http://ccms-pui-docs-development",
       "ccms_s3_documents": "ccms-pui-docs-development",
