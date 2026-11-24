@@ -2,7 +2,24 @@ locals {
   pdc_rotation_interval_days = 90
   pdc_token_grace_days       = 7
 
-  # Use these rules when the tested rotation Lambda is available. Do not enable rotation yet.
+  # Bootstrap every account except the Sprinkler development pilot, which is handed off below.
+  gc_pdc_token_accounts = {
+    for account_name, account_id in local.gc_pdc_accounts :
+    account_name => account_id
+    if !(local.environment == "development" && account_name == "sprinkler-development")
+  }
+
+  # The first rotation is enabled only with the development rotator deployment.
+  gc_pdc_rotation_pilot_accounts = {
+    for account_name, account_id in local.gc_pdc_accounts :
+    account_name => account_id
+    if(
+      local.environment == "development" &&
+      account_name == "sprinkler-development" &&
+      local.environment_configuration_gc.pdc_token_rotator != null
+    )
+  }
+
   pdc_rotation_rules = {
     automatically_after_days = local.pdc_rotation_interval_days
   }
@@ -27,4 +44,18 @@ locals {
       "pdc:ecs-service"       = "grafana-pdc-agent"
     }
   }
+}
+
+resource "aws_secretsmanager_secret_rotation" "gc_pdc_token" {
+  for_each = local.gc_pdc_rotation_pilot_accounts
+
+  secret_id           = aws_secretsmanager_secret.gc_pdc_token[each.key].id
+  rotation_lambda_arn = module.grafana_pdc_token_rotator["this"].lambda_function_arn
+  rotate_immediately  = true
+
+  rotation_rules {
+    automatically_after_days = local.pdc_rotation_rules.automatically_after_days
+  }
+
+  depends_on = [module.grafana_pdc_token_rotator]
 }

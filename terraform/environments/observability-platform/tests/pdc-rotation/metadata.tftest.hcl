@@ -26,6 +26,11 @@ mock_provider "aws" {
     defaults = { arn = "arn:aws:sns:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:grafana-pdc-rotation-failures-development" }
   }
   mock_resource "aws_ssm_parameter" {}
+  mock_resource "aws_lambda_function" {
+    defaults = {
+      arn = "arn:aws:lambda:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:function:grafana-pdc-token-rotator"
+    }
+  }
 }
 
 mock_provider "grafana" {
@@ -118,8 +123,10 @@ run "central_metadata_without_activation" {
   assert {
     condition = (
       !contains(keys(aws_secretsmanager_secret.gc_pdc_token), "disabled-development") &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 2 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 2 &&
+      toset(keys(local.gc_pdc_token_accounts)) == toset(["cooker-development"]) &&
+      length(grafana_cloud_private_data_source_connect_network_token.account) == 1 &&
+      length(aws_secretsmanager_secret_version.gc_pdc_token) == 1 &&
+      length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
       length(module.grafana_pdc_token_rotator) == 0 &&
       length(aws_dynamodb_table.gc_pdc_rotation_state) == 0 &&
       length(aws_cloudwatch_metric_alarm.gc_pdc_rotator_errors) == 0 &&
@@ -233,10 +240,16 @@ run "prepared_runtime_permissions" {
           one([for s in jsondecode(aws_kms_key.gc_pdc_rotator_credential[name].policy).Statement : s if s.Sid == "AllowRotatorToDecryptCredential"]).Condition.ArnLike["kms:EncryptionContext:SecretARN"] == "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:${secret.name}-??????"
         )
       ]) &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 2 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 2
+      toset(keys(local.gc_pdc_token_accounts)) == toset(["cooker-development"]) &&
+      length(aws_secretsmanager_secret_version.gc_pdc_token) == 1 &&
+      length(grafana_cloud_private_data_source_connect_network_token.account) == 1 &&
+      toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development"]) &&
+      aws_secretsmanager_secret_rotation.gc_pdc_token["sprinkler-development"].secret_id == aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].id &&
+      aws_secretsmanager_secret_rotation.gc_pdc_token["sprinkler-development"].rotation_lambda_arn == module.grafana_pdc_token_rotator["this"].lambda_function_arn &&
+      aws_secretsmanager_secret_rotation.gc_pdc_token["sprinkler-development"].rotate_immediately &&
+      one(aws_secretsmanager_secret_rotation.gc_pdc_token["sprinkler-development"].rotation_rules).automatically_after_days == local.pdc_rotation_rules.automatically_after_days
     )
-    error_message = "Create distinct credential secrets and keys outside the tenant namespace, with decryption restricted to the rotator and each secret."
+    error_message = "Keep the pilot's original token unmanaged only in development, preserve Cooker bootstrap, and enable immediate rotation only for Sprinkler development."
   }
 
   assert {
@@ -278,6 +291,31 @@ run "prepared_runtime_permissions" {
       jsondecode(aws_cloudwatch_event_rule.gc_pdc_rotation_failed["this"].event_pattern).detail.eventName == ["RotationFailed"]
     )
     error_message = "Alert on both Lambda errors and Secrets Manager rotation failures."
+  }
+}
+
+run "new_account_bootstrap_remains_enabled" {
+  command = plan
+
+  variables {
+    accounts = {
+      sprinkler-development = { pdc_enabled = true }
+      cooker-development    = { pdc_enabled = true }
+      new-development       = { pdc_enabled = true }
+    }
+  }
+
+  assert {
+    condition = (
+      toset(keys(local.gc_pdc_token_accounts)) == toset([
+        "cooker-development",
+        "new-development",
+      ]) &&
+      length(grafana_cloud_private_data_source_connect_network_token.account) == 2 &&
+      length(aws_secretsmanager_secret_version.gc_pdc_token) == 2 &&
+      length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0
+    )
+    error_message = "New non-pilot accounts must retain Terraform token bootstrap while only Sprinkler development is handed off."
   }
 }
 
