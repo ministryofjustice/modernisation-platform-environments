@@ -76,8 +76,8 @@ the Slack destination; in development its `slack_channel_id` is
 Chatbot) Slack channel configuration subscribed to it. CloudWatch alarm and
 EventBridge publish permissions are restricted to their respective alert/rule
 ARNs and this AWS account. This is notification-only: the channel configuration
-has no guardrail policies or additional channel permissions. Production keeps
-`pdc_failure_alerts = null`.
+uses the required CloudWatch read-only guardrail and has no managed policies
+attached to its channel role. Production keeps `pdc_failure_alerts = null`.
 
 Before applying the development Terraform configuration, complete this
 one-time manual prerequisite: authorise the MoJ Slack workspace in **Amazon Q

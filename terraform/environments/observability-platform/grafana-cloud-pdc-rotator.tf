@@ -158,7 +158,7 @@ module "gc_pdc_failure_chatbot" {
   slack_channel_id    = each.value.slack_channel_id
   slack_team_id       = "T02DYEB3A"
   sns_topic_arns      = [aws_sns_topic.gc_pdc_failure_alerts[each.key].arn]
-  guardrail_policies  = []
+  guardrail_policies  = ["arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess"]
   managed_policy_arns = []
 
   tags             = local.tags
