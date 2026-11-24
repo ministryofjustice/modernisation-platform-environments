@@ -105,11 +105,12 @@ locals {
         ]
       }
       tags = {
-        ami         = "base_ol_8_5"
-        backup      = "false" # disable mod platform backup since we use our own policies
-        os-type     = "Linux"
-        component   = "data"
-        server-type = "csr-db"
+        ami           = "base_ol_8_5"
+        backup        = "false" # disable mod platform backup since we use our own policies
+        os-type       = "Linux"
+        component     = "data"
+        "Patch Group" = "patchgroup1"
+        server-type   = "csr-db"
       }
     }
 
