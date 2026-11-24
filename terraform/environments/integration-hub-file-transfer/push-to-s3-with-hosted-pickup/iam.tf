@@ -82,7 +82,7 @@ data "aws_iam_policy_document" "mover" {
 module "iam_role_mover" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.2"
+  version = "6.11.0"
 
   for_each = local.hosted_pickup_entries
 
@@ -112,7 +112,7 @@ module "iam_role_mover" {
 module "iam_policy_mover" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.8.2"
+  version = "6.11.0"
 
   for_each = local.hosted_pickup_entries
 
@@ -189,7 +189,7 @@ data "aws_iam_policy_document" "customer_pickup" {
 module "iam_role_customer_pickup" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.2"
+  version = "6.11.0"
 
   for_each = local.hosted_pickup_entries
 
@@ -216,7 +216,7 @@ module "iam_role_customer_pickup" {
 module "iam_policy_customer_pickup" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.8.2"
+  version = "6.11.0"
 
   for_each = local.hosted_pickup_entries
 

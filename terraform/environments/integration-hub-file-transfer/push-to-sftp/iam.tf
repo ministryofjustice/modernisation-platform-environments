@@ -74,7 +74,7 @@ data "aws_iam_policy_document" "delivery" {
 module "iam_policy_delivery" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.8.2"
+  version = "6.11.0"
 
   for_each = local.push_to_sftp_entries
 
@@ -88,7 +88,7 @@ module "iam_policy_delivery" {
 module "iam_role_delivery" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.2"
+  version = "6.11.0"
 
   for_each = local.push_to_sftp_entries
 
@@ -156,7 +156,7 @@ data "aws_iam_policy_document" "public_key_reader" {
 module "iam_policy_public_key_reader" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.8.2"
+  version = "6.11.0"
 
   for_each = local.push_to_sftp_entries
 
@@ -218,7 +218,7 @@ data "aws_iam_policy_document" "key_custodian" {
 module "iam_policy_key_custodian" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.8.2"
+  version = "6.11.0"
 
   for_each = local.push_to_sftp_entries
 
