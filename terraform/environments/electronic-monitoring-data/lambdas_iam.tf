@@ -20,7 +20,7 @@ locals {
   dlt_iceberg_maintenance_databases = [
     "allied_mdss${local.db_suffix}",
     "serco_fms${local.db_suffix}",
-    "allied_gems${local.db_suffix}"
+    #"allied_gems${local.db_suffix}"
   ]
 
   dlt_iceberg_maintenance_table_prefixes = toset([
