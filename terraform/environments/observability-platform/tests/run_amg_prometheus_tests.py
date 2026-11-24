@@ -61,7 +61,13 @@ run "development_uses_amg_migrated_plugin" {
     condition = (
       grafana_data_source.observability_platform_prometheus.type == "grafana-amazonprometheus-datasource" &&
       grafana_data_source.observability_platform_prometheus.is_default &&
-      jsondecode(grafana_data_source.observability_platform_prometheus.json_data_encoded).sigV4Auth
+      jsondecode(grafana_data_source.observability_platform_prometheus.json_data_encoded) == {
+        httpMethod                  = "POST"
+        sigV4Auth                   = true
+        sigV4AuthType               = "ec2_iam_role"
+        sigV4Region                 = "eu-west-2"
+        "prometheus-type-migration" = true
+      }
     )
     error_message = "Development must use the migrated AMG plugin with default SigV4 settings."
   }
@@ -74,7 +80,12 @@ run "production_retains_prometheus" {
     condition = (
       grafana_data_source.observability_platform_prometheus.type == "prometheus" &&
       grafana_data_source.observability_platform_prometheus.is_default &&
-      jsondecode(grafana_data_source.observability_platform_prometheus.json_data_encoded).sigV4Auth
+      jsondecode(grafana_data_source.observability_platform_prometheus.json_data_encoded) == {
+        httpMethod    = "POST"
+        sigV4Auth     = true
+        sigV4AuthType = "ec2_iam_role"
+        sigV4Region   = "eu-west-2"
+      }
     )
     error_message = "Production must retain the existing default Prometheus data source."
   }
