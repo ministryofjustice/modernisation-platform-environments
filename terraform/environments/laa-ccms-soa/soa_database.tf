@@ -76,8 +76,8 @@ resource "aws_db_instance" "soa_db" {
   storage_encrypted                     = true
   license_model                         = "bring-your-own-license"
   iam_database_authentication_enabled   = false
-  performance_insights_enabled          = true
-  performance_insights_retention_period = 7
+  performance_insights_enabled          = local.environment == "preproduction" ? true : false
+  performance_insights_retention_period = local.environment == "preproduction" ? 7 : []
 
   vpc_security_group_ids = [
     aws_security_group.soa_db.id
