@@ -175,7 +175,7 @@
       "admin_ec2_instance_type": "m5.xlarge",
       "admin_ec2_desired_capacity": "1",
       "admin_container_cpu": "4096",
-      "admin_container_memory": "20480",
+      "admin_container_memory": "15360",
       "admin_app_count": "1",
       "admin_wl_mem_args": " -Xms12g -Xmx14g",
       "tds_db_endpoint": "ccms-edrms-tds-db.ctq0yam409t6.eu-west-2.rds.amazonaws.com",
