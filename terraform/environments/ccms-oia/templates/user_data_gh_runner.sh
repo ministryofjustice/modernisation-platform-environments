@@ -7,8 +7,6 @@ dnf update -y
 dnf install -y perl-Digest-SHA icu curl tar
 dnf update -y ca-certificates --releasever 2023.12.20261026
 update-ca-trust
-#corretto cve in wiz
-dnf upgrade --releasever=latest 'java-17-amazon-corretto*' -y
 # Create directory for GitHub Actions runner
 mkdir -p /home/ec2-user/actions-runner
 cd /home/ec2-user/actions-runner
@@ -34,3 +32,5 @@ dnf install -y git git-lfs
 
 # Install Java
 dnf install -y java-17-amazon-corretto java-17-amazon-corretto-devel
+#corretto cve in wiz
+dnf upgrade --releasever=latest 'java-17-amazon-corretto*' -y
