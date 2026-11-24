@@ -293,13 +293,19 @@ automatic. Production has no pilot handoff or rotation configuration.
 1. Complete every preflight above, record the existing Sprinkler token ID and
    current secret version ID securely, and agree the maintenance window. Never
    retrieve or print secret values.
-2. Deploy only the reviewed revision from `main`. Before activation, wait for or
-   cancel every in-flight or queued Observability Platform deployment from an
-   older revision and discard stale saved plans. The shared workflow serialises
-   applies by environment/component and the S3 backend uses a lockfile; these
-   do not make a stale plan safe to apply later. If the deployment queue cannot
-   be fenced or its revision confirmed, do not activate.
-3. Generate and review a fresh plan for each environment from that revision.
+2. Before opening the PR, confirm the GitHub Environment approval gate and who
+   can approve the development deployment. The Observability Platform workflow
+   can apply development from the PR branch as well as from `main`: do not
+   approve a PR-branch apply of this change. Only the reviewed main-branch
+   deployment may activate the pilot.
+3. Coordinate merging the PR with the agreed maintenance window if a push to
+   `main` can auto-apply. Before activation, wait for or cancel every in-flight
+   or queued Observability Platform deployment from an older revision and
+   discard stale saved plans. The shared workflow serialises applies by
+   environment/component and the S3 backend uses a lockfile; these do not make
+   a stale plan safe to apply later. If the deployment queue cannot be fenced
+   or its revision confirmed, do not activate.
+4. Generate and review a fresh plan for each environment from that revision.
    Development must show only these PDC changes:
    - The Sprinkler development token and secret-version instances move to their
      singleton handoff addresses and are then forgotten, explicitly **not
@@ -313,14 +319,14 @@ automatic. Production has no pilot handoff or rotation configuration.
    Production must have no PDC handoff, rotation, or rotator changes. Stop if
    there is any unexpected change, destroy/replacement, missing state move, or
    unexplained drift. Do not approve a stale plan.
-4. Apply the reviewed development plan only inside the agreed window, with
+5. Apply the reviewed development plan only inside the agreed window, with
    operators watching the apply and rotation. `rotate_immediately = true` means
    creating the rotation configuration starts the complete first rotation
    during this apply. Do **not** make a second `aws secretsmanager rotate-secret`
    call. The `automatically_after_days` rule from
    `local.pdc_rotation_rules` schedules later rotations; no separate
    EventBridge schedule is used.
-5. If apply or rotation outcome is ambiguous, stop other applies and do not
+6. If apply or rotation outcome is ambiguous, stop other applies and do not
    reintroduce the old resource configuration or blindly reapply. Check fresh
    Terraform state/plan, `describe-secret` version stages, Lambda logs, the
    DynamoDB journal and the alarm first. A failed apply may have enabled
@@ -368,14 +374,25 @@ invocation may still be running. Do not revoke the original token on failure.
 
 ### Post-success cleanup
 
-Keep the original Terraform-created Sprinkler token valid through the full
-seven-day grace period after successful replacement-agent verification. Then
-delete that original token by its securely recorded Grafana token ID through
-the approved Grafana administration path; it has no expiry, and the rotator
-does not delete it. Never select a token by name alone. Retain the old secret
-version and `AWSPREVIOUS` as required by the recovery policy. Historical
-Terraform state versions, backups and plans may still contain the original
-token value and must follow the existing sensitive-state retention controls.
+Seven days after successful replacement-agent verification is the earliest
+cleanup review, not authority to revoke. Before revoking the original
+Terraform-created token, verify by its recorded Grafana token ID and secret
+version that the secret version is not labelled `AWSCURRENT`, no rotation or
+rollback is in flight, and the token is no longer needed for recovery. Check
+explicitly whether its secret version is still `AWSPREVIOUS` and whether it is
+needed for rollback. An `AWSPREVIOUS` label does not preserve fallback
+capability after its Grafana token is revoked. If the original is still the
+only viable rollback token, defer revocation until an alternative recovery path
+is verified and approved.
+
+Only after that review and explicit operational approval, revoke the original
+token through the approved Grafana administration path; the token has no
+expiry, and the rotator does not delete it. Never select a token by name alone.
+Retain secret versions and staging labels according to the recovery policy,
+without treating a label as proof that a revoked Grafana token remains usable.
+Historical Terraform state versions, backups and plans may still contain the
+original token value and must follow the existing sensitive-state retention
+controls.
 
 Do not enable production rotation as part of this pilot. Production activation
 requires a separate review and successful development evidence for scheduled
