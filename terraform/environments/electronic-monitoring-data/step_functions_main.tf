@@ -415,7 +415,7 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
 }
 
 # ------------------------------------------
-# Trigger cadt Step function
+# Trigger cadt step function
 # ------------------------------------------
 
 module "trigger_cadt_step_function" {

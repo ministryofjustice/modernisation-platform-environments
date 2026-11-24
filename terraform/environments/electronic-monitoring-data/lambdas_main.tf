@@ -186,6 +186,25 @@ module "mdss_raw_file_stager" {
   }
 }
 
+module "gems_raw_file_stager" {
+  source                         = "./modules/lambdas"
+  function_name                  = "gems_raw_file_stager"
+  image_name                     = "copy_data"
+  is_image                       = true
+  role_name                      = aws_iam_role.copy_mdss_data.name
+  role_arn                       = aws_iam_role.copy_mdss_data.arn
+  memory_size                    = 1024
+  timeout                        = 900
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  reserved_concurrent_executions = 1000
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    DESTINATION_BUCKET = module.s3-raw-formatted-data-bucket.bucket.id
+  }
+}
+
 #-----------------------------------------------------------------------------------
 # Clean after MDSS load
 #-----------------------------------------------------------------------------------
@@ -328,6 +347,42 @@ module "load_mdss_lambda" {
     STUCK_STARTED_MINUTES                   = "60"
     AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
     AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# dlt load gems
+#-----------------------------------------------------------------------------------
+
+
+module "load_gems_lambda" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_gems"
+  role_name                      = aws_iam_role.load_gems.name
+  role_arn                       = aws_iam_role.load_gems.arn
+  handler                        = "load_gems.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 500
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    ATHENA_QUERY_BUCKET     = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER          = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET          = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME        = local.environment_shorthand
+    CLEANUP_QUEUE_URL       = aws_sqs_queue.clean_dlt_load_queue.id
+    SNS_TOPIC_ARN           = aws_sns_topic.emds_alerts.arn
+    MAX_RECEIVE_COUNT       = tostring(local.load_sqs_max_receive_count)
+    SCHEMA_BUCKET           = module.s3-metadata-bucket.bucket.id
+    SCHEMA_PATH             = "schemas/allied/gems/",
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
 }
 
@@ -1294,7 +1349,7 @@ module "live_feed_incident_manager" {
 #-----------------------------------------------------------------------------------
 
 module "trigger_api_integration" {
-  count                   = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  count                   = 1
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "trigger_cpr_job"

@@ -50,12 +50,13 @@ module "eks" {
         }
       }
     }
-    ## MP Environments Actions (github-actions-plan) access to cluster
+    ## MP Environments Actions (github-actions-plan) read-only access to cluster.
+    ## Plans run PR-authored code, so this role must not have write access.
     github-actions-plan = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan"
       policy_associations = {
-        eks-admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+        eks-view = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminViewPolicy"
           access_scope = {
             type = "cluster"
           }

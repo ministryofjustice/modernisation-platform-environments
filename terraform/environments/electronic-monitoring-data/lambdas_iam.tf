@@ -19,7 +19,8 @@ locals {
 
   dlt_iceberg_maintenance_databases = [
     "allied_mdss${local.db_suffix}",
-    "serco_fms${local.db_suffix}"
+    "serco_fms${local.db_suffix}",
+    "allied_gems${local.db_suffix}"
   ]
 
   dlt_iceberg_maintenance_table_prefixes = toset([
@@ -896,6 +897,172 @@ module "share_db_with_mdss_lambda_role" {
 resource "aws_lakeformation_permissions" "add_create_db" {
   permissions      = ["CREATE_DATABASE", "DROP"]
   principal        = aws_iam_role.load_mdss.arn
+  catalog_resource = true
+}
+
+#-----------------------------------------------------------------------------------
+# Load GEMS Data IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "load_gems_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/allied_gems${local.db_suffix}_pipeline/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/allied/gems/validation_rejected/*",
+      "${module.s3-metadata-bucket.bucket.arn}/schemas/allied/gems*",
+
+    ]
+  }
+  statement {
+    sid    = "S3GetPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:GetObjectTagging",
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+    ]
+    resources = [
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/allied/gems*"
+    ]
+  }
+  statement {
+    sid    = "S3ListingPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-raw-formatted-data-bucket.bucket.arn,
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      module.s3-metadata-bucket.bucket.arn
+    ]
+  }
+  statement {
+    sid    = "AthenaPermissionsForLoadData"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForLoad"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowCleanupQueueAccess"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+    ]
+    resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
+  }
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+  statement {
+    sid    = "AllowLambdaToUseKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "load_gems" {
+  name               = "load_gems_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "load_gems_lambda_role_policy" {
+  name   = "load_gems_lambda_policy"
+  policy = data.aws_iam_policy_document.load_gems_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "load_gems_output_lambda_policy_attachment" {
+  role       = aws_iam_role.load_gems.name
+  policy_arn = aws_iam_policy.load_gems_lambda_role_policy.arn
+}
+
+module "share_db_with_gems_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(["allied_gems${local.db_suffix}"])
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.load_gems.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+}
+
+resource "aws_lakeformation_permissions" "gems_add_create_db" {
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_gems.arn
   catalog_resource = true
 }
 
@@ -3199,6 +3366,17 @@ module "trigger_cpr_job_iam_role" {
   }
 }
 
+data "aws_iam_policy_document" "trigger_cpr" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+    resources = [module.cpr_api_trigger.secret_arn]
+  }
+}
+
 # ------------------------------------------------------------------------------
 # IAM role and policy for the rota personal digest Lambda
 # ------------------------------------------------------------------------------
@@ -4533,7 +4711,7 @@ resource "aws_lakeformation_permissions" "api_int_table_level_perms" {
 # ------------------------------------------------------------
 
 module "trigger_cadt_daily_run_iam_role" {
- source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
 
   name = "trigger_cadt_daily_run"
 

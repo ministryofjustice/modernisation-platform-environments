@@ -20,6 +20,7 @@
 /terraform/environments/ccms-edrms @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility @ministryofjustice/laa-ccms-feasibility @ministryofjustice/laa-dba @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-ebs @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-feasibility/ccms-ebs-fin @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-pui @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-oia @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-soa @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
@@ -46,7 +47,7 @@
 /terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-cwa-developer @ministryofjustice/laa-pcuam @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/azure-aws-sso-modernisation-platform-new-starters @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-access @ministryofjustice/azure-aws-sso-csr-application-support @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform-audit @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/modernisation-platform
-/terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/dts-nfd @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-corporate @ministryofjustice/corporate-data-factory-admins @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-corporate/people @ministryofjustice/corporate-data-factory-admins @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-laa @ministryofjustice/laa-data-factory-engineering @ministryofjustice/modernisation-platform
@@ -63,9 +64,9 @@
 /terraform/environments/data-factory-moj/ingestion-registry @ministryofjustice/probation-de @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/ingestion-artifacts @ministryofjustice/probation-de @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/service-ingestion @ministryofjustice/probation-de @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform-factory-one @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform-factory-two @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform-governance @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform-factory-one @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/azure-aws-sso-jdp-factory-one-owners @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform-factory-two @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/azure-aws-sso-jdp-factory-two-owners @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform-governance @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/azure-aws-sso-jdp-governance-admins @ministryofjustice/data-platform-engineering @ministryofjustice/data-platform-proserve-engineers @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/delius-alfresco @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core-training @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform

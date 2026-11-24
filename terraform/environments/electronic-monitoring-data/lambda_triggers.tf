@@ -39,6 +39,12 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
     filter_prefix = "allied/mdss"
   }
   queue {
+    queue_arn     = module.copy_gems_data_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".jsonl"
+    filter_prefix = "allied/gems"
+  }
+  queue {
     queue_arn     = module.fms_raw_file_formatter_sqs.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".JSON"
@@ -69,6 +75,13 @@ module "copy_mdss_data_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
   lambda_function_name = module.mdss_raw_file_stager.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+}
+
+module "copy_gems_data_sqs" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-data-bucket.bucket
+  lambda_function_name = module.gems_raw_file_stager.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
@@ -196,6 +209,15 @@ module "load_mdss_event_queue" {
   max_receive_count    = local.load_mdss_sqs_max_receive_count
 }
 
+module "load_gems_event_queue" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.load_gems_lambda.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 100
+  max_receive_count    = local.load_sqs_max_receive_count
+}
+
 module "load_fms_event_queue" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
@@ -235,6 +257,13 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     queue_arn     = module.load_mdss_event_queue.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "allied/mdss/"
+    filter_suffix = ".jsonl"
+  }
+
+  queue {
+    queue_arn     = module.load_gems_event_queue.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "allied/gems/"
     filter_suffix = ".jsonl"
   }
 
@@ -1134,8 +1163,8 @@ module "daily_cadt_eventbridge" {
 
   rules = {
     crons = {
-      description         = "Every morning at 5am"
-      schedule_expression = "cron(0 5 * * ? *)"
+      description         = "Every morning at 3am"
+      schedule_expression = "cron(0 3 * * ? *)"
     }
   }
 

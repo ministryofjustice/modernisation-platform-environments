@@ -134,3 +134,9 @@ variable "enable_autoscaling_schedule" {
   type        = bool
   default     = false
 }
+
+variable "enable_xsiam_cloudwatch_logs" {
+  description = "Enable/disable the creation of Firehose stream to send Weblogic access logs to XSIAM"
+  type        = bool
+  default     = false
+}
