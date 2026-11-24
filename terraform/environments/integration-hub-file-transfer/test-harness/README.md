@@ -13,14 +13,14 @@ themselves. Its resources are created only in the test environment.
 ## Architecture
 
 1. A GitHub Actions job assumes the harness role and uploads a non-sensitive
-	fixture to a route-specific prefix in the incoming bucket.
+ fixture to a route-specific prefix in the incoming bucket.
 2. The parent file-transfer pipeline processes the uploaded object version.
-	Only a positive clean malware scan permits clean-file dispatch.
+ Only a positive clean malware scan permits clean-file dispatch.
 3. Shared dispatch configuration selects the action or notification for that
-	source prefix. The corresponding service component delivers or retains the
-	clean file using its own execution role.
+ source prefix. The corresponding service component delivers or retains the
+ clean file using its own execution role.
 4. The test uses the harness role to inspect the result within its permitted
-	destination prefix.
+ destination prefix.
 
 | Component | Responsibility |
 | --- | --- |

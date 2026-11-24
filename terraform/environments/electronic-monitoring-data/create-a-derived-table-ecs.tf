@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "ecs_logging" {
   statement {
     effect = "Allow"
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = ["ecs.amazonaws.com"]
     }
     actions = [
@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "ecs_logging" {
 }
 
 resource "aws_cloudwatch_log_resource_policy" "ecs_cadt" {
-  policy_name = "datasync-logs-policy"
+  policy_name     = "datasync-logs-policy"
   policy_document = data.aws_iam_policy_document.ecs_logging.json
 }
 

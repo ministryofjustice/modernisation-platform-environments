@@ -31,11 +31,11 @@ module "bastion_linux" {
     dnf update -y ca-certificates --releasever 2023.12.20261028
     update-ca-trust
   EOT
-  app_name           = var.networking[0].application
-  business_unit      = local.vpc_name
-  subnet_set         = local.subnet_set
-  environment        = local.environment
-  region             = "eu-west-2"
+  app_name                = var.networking[0].application
+  business_unit           = local.vpc_name
+  subnet_set              = local.subnet_set
+  environment             = local.environment
+  region                  = "eu-west-2"
   # Autoscaling
   autoscaling_cron = local.crontab
 
