@@ -247,6 +247,10 @@ envVars: {
     LITELLM_MIGRATION_DIR: "/app/migrations",
     LITELLM_MODE: "PRODUCTION",
     LITELLM_UI_API_DOC_BASE_URL: "https://${proxyHostname}",
+%{ if gatewayUrlEnabled ~}
+    # LLM routes are disabled on this deployment, so point the UI playground at the API deployment (LiteLLM v1.110+).
+    LITELLM_GATEWAY_URL: "https://${proxyHostname}",
+%{ endif ~}
     LITELLM_UI_PATH: "/app/var/litellm/ui",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
