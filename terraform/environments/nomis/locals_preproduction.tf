@@ -322,9 +322,9 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description         = "PreProduction NOMIS MIS and Audit database"
           instance-scheduling = "skip-scheduling"
-          misload-dbname      = "PPMIS"
+          misload-dbname      = "PPMISG"
           nomis-environment   = "preprod"
-          oracle-sids         = "PPMIS PPCNMAUD"
+          oracle-sids         = "PPMISG PPCAUDG"
           update-ssm-agent    = "patchgroup2"
         })
       })
@@ -598,6 +598,8 @@ locals {
       "/oracle/database/PPTRDAT"  = local.secretsmanager_secrets.db
       "/oracle/database/PPCNMAUD" = local.secretsmanager_secrets.db
       "/oracle/database/PPMIS"    = local.secretsmanager_secrets.db_mis
+      "/oracle/database/PPCAUDG"  = local.secretsmanager_secrets.db
+      "/oracle/database/PPMISG"   = local.secretsmanager_secrets.db_mis
     }
   }
 }
