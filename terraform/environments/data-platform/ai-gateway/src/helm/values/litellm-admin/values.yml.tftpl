@@ -61,6 +61,10 @@ proxy_config:
     master_key: os.environ/PROXY_MASTER_KEY
     proxy_admin_email: "${proxyAdminEmail}"
     ui_access_mode: "admin_only"
+%{ if disableEnvCredentialLogin ~}
+    # Admins sign in through Entra SSO; block the shared admin/master-key UI login. API access with the master key is unaffected.
+    disable_env_credential_login: true
+%{ endif ~}
     proxy_batch_write_at: 60
     database_connection_pool_limit: 10
   litellm_settings:
