@@ -84,7 +84,7 @@ module "pwm" {
   }
 
   container_secrets_env_specific = try(var.delius_microservice_configs.pwm.container_secrets_env_specific, {})
-  
+
   container_vars_default = merge(
     {
       "CONFIG_XML_BASE64" = base64encode(templatefile("${path.module}/templates/PwmConfiguration.xml.tpl", {

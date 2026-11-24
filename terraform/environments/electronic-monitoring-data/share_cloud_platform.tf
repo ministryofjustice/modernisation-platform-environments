@@ -285,9 +285,9 @@ module "emd_test_tags_role" {
 data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
   count = local.is-preproduction || local.is-production ? 1 : 0
   statement {
-    sid       = "AllowAccessToTriggerUpdateP1API"
-    effect    = "Allow"
-    actions   = ["execute-api:Invoke"]
+    sid     = "AllowAccessToTriggerUpdateP1API"
+    effect  = "Allow"
+    actions = ["execute-api:Invoke"]
     resources = [
       "${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*",
       "${aws_api_gateway_rest_api.ops_api.execution_arn}/*/POST/add",
