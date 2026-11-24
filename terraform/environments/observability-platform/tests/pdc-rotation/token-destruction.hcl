@@ -25,6 +25,10 @@ mock_provider "grafana" {
   alias = "cloud"
 }
 
+mock_provider "grafana" {
+  alias = "stack"
+}
+
 run "bootstrap_tokens" {
   command = apply
 }

@@ -32,6 +32,35 @@ mock_provider "grafana" {
   alias = "cloud"
 }
 
+mock_provider "grafana" {
+  alias = "stack"
+}
+
+override_resource {
+  target = grafana_cloud_stack_service_account.gc_pdc_rotator_query["this"]
+  values = { id = "mojobservabilitydevelopment:678" }
+}
+
+override_resource {
+  target = aws_secretsmanager_secret.gc_pdc_rotator_credential["management-token"]
+  values = { arn = "arn:aws:secretsmanager:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:secret:grafana-cloud/pdc-token-rotator/management-token-ABCDEF" }
+}
+
+override_resource {
+  target = aws_secretsmanager_secret.gc_pdc_rotator_credential["stack-query-token"]
+  values = { arn = "arn:aws:secretsmanager:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:secret:grafana-cloud/pdc-token-rotator/stack-query-token-ABCDEF" }
+}
+
+override_resource {
+  target = aws_kms_key.gc_pdc_rotator_credential["management-token"]
+  values = { arn = "arn:aws:kms:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:key/87654321-4321-4321-4321-fedcbafedcba" }
+}
+
+override_resource {
+  target = aws_kms_key.gc_pdc_rotator_credential["stack-query-token"]
+  values = { arn = "arn:aws:kms:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:key/12345678-4321-4321-4321-fedcbafedcba" }
+}
+
 override_resource {
   target = grafana_cloud_stack.observability_platform
   values = {
@@ -95,6 +124,11 @@ run "central_metadata_without_activation" {
       length(aws_dynamodb_table.gc_pdc_rotation_state) == 0 &&
       length(aws_cloudwatch_metric_alarm.gc_pdc_rotator_errors) == 0 &&
       length(aws_cloudwatch_event_target.gc_pdc_rotation_failed) == 0 &&
+      length(aws_secretsmanager_secret.gc_pdc_rotator_credential) == 0 &&
+      length(aws_kms_key.gc_pdc_rotator_credential) == 0 &&
+      length(grafana_cloud_access_policy.gc_pdc_rotator) == 0 &&
+      length(grafana_cloud_stack_service_account.gc_pdc_rotator_query) == 0 &&
+      length(grafana_data_source_permission_item.gc_pdc_rotator_query) == 0 &&
       length(aws_sns_topic.gc_pdc_failure_alerts) == 1 &&
       length(module.gc_pdc_failure_chatbot) == 1
     )
@@ -125,11 +159,7 @@ run "prepared_runtime_permissions" {
 
   variables {
     rotator = {
-      image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-credential-ABCDEF"
-      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
-      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
-      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
+      image_digest = "sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa"
     }
   }
 
@@ -139,22 +169,34 @@ run "prepared_runtime_permissions" {
         "arn:aws:iam::${format("%012d", 1)}:role/grafana-pdc-agent-restarter",
         "arn:aws:iam::${format("%012d", 2)}:role/grafana-pdc-agent-restarter",
       ]) &&
-      one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "ReadGrafanaCredential"]) == [var.rotator.credential_secret_arn] &&
+      one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "ReadGrafanaCredential"]) == [aws_secretsmanager_secret.gc_pdc_rotator_credential["management-token"].arn] &&
+      one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s if s.Sid == "DecryptGrafanaCredential"]) == {
+        Sid      = "DecryptGrafanaCredential"
+        Effect   = "Allow"
+        Action   = ["kms:Decrypt"]
+        Resource = [aws_kms_key.gc_pdc_rotator_credential["management-token"].arn]
+        Condition = {
+          StringEquals = {
+            "kms:ViaService"                  = "secretsmanager.eu-west-2.amazonaws.com"
+            "kms:EncryptionContext:SecretARN" = aws_secretsmanager_secret.gc_pdc_rotator_credential["management-token"].arn
+          }
+        }
+      } &&
       one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s if s.Sid == "ReadStackQueryCredential"]) == {
         Sid      = "ReadStackQueryCredential"
         Effect   = "Allow"
         Action   = ["secretsmanager:GetSecretValue"]
-        Resource = [var.rotator.stack_query_credential_secret_arn]
+        Resource = [aws_secretsmanager_secret.gc_pdc_rotator_credential["stack-query-token"].arn]
       } &&
       one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s if s.Sid == "DecryptStackQueryCredential"]) == {
         Sid      = "DecryptStackQueryCredential"
         Effect   = "Allow"
         Action   = ["kms:Decrypt"]
-        Resource = [var.rotator.stack_query_credential_kms_key_arn]
+        Resource = [aws_kms_key.gc_pdc_rotator_credential["stack-query-token"].arn]
         Condition = {
           StringEquals = {
             "kms:ViaService"                  = "secretsmanager.eu-west-2.amazonaws.com"
-            "kms:EncryptionContext:SecretARN" = var.rotator.stack_query_credential_secret_arn
+            "kms:EncryptionContext:SecretARN" = aws_secretsmanager_secret.gc_pdc_rotator_credential["stack-query-token"].arn
           }
         }
       }
@@ -166,10 +208,53 @@ run "prepared_runtime_permissions" {
     condition = (
       local.gc_pdc_rotator_environment.this.GRAFANA_STACK_URL == grafana_cloud_stack.observability_platform.url &&
       local.gc_pdc_rotator_environment.this.GRAFANA_USAGE_DATASOURCE_UID == "grafanacloud-usage" &&
-      local.gc_pdc_rotator_environment.this.GRAFANA_STACK_QUERY_CREDENTIAL_SECRET_ARN == var.rotator.stack_query_credential_secret_arn &&
-      local.gc_pdc_rotator_environment.this.GRAFANA_API_CREDENTIAL_SECRET_ARN == var.rotator.credential_secret_arn
+      local.gc_pdc_rotator_environment.this.GRAFANA_STACK_QUERY_CREDENTIAL_SECRET_ARN == aws_secretsmanager_secret.gc_pdc_rotator_credential["stack-query-token"].arn &&
+      local.gc_pdc_rotator_environment.this.GRAFANA_API_CREDENTIAL_SECRET_ARN == aws_secretsmanager_secret.gc_pdc_rotator_credential["management-token"].arn
     )
     error_message = "Use the managed stack URL and the separate query and management secret references."
+  }
+
+  assert {
+    condition = (
+      length(aws_secretsmanager_secret.gc_pdc_rotator_credential) == 2 &&
+      length(aws_kms_key.gc_pdc_rotator_credential) == 2 &&
+      aws_secretsmanager_secret.gc_pdc_rotator_credential["management-token"].arn != aws_secretsmanager_secret.gc_pdc_rotator_credential["stack-query-token"].arn &&
+      aws_kms_key.gc_pdc_rotator_credential["management-token"].arn != aws_kms_key.gc_pdc_rotator_credential["stack-query-token"].arn &&
+      alltrue([
+        for name, secret in aws_secretsmanager_secret.gc_pdc_rotator_credential : (
+          secret.name == "grafana-cloud/pdc-token-rotator/${name}" &&
+          secret.kms_key_id == aws_kms_key.gc_pdc_rotator_credential[name].arn &&
+          aws_kms_alias.gc_pdc_rotator_credential[name].name == "alias/grafana-cloud-pdc-token-rotator-${name}" &&
+          aws_kms_alias.gc_pdc_rotator_credential[name].target_key_id == aws_kms_key.gc_pdc_rotator_credential[name].key_id &&
+          aws_kms_key.gc_pdc_rotator_credential[name].enable_key_rotation &&
+          one([for s in jsondecode(aws_kms_key.gc_pdc_rotator_credential[name].policy).Statement : s if s.Sid == "AllowRotatorToDecryptCredential"]).Action == ["kms:Decrypt"] &&
+          one([for s in jsondecode(aws_kms_key.gc_pdc_rotator_credential[name].policy).Statement : s if s.Sid == "AllowRotatorToDecryptCredential"]).Condition.ArnEquals["aws:PrincipalArn"] == "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/grafana-pdc-token-rotator" &&
+          one([for s in jsondecode(aws_kms_key.gc_pdc_rotator_credential[name].policy).Statement : s if s.Sid == "AllowRotatorToDecryptCredential"]).Condition.StringEquals["kms:ViaService"] == "secretsmanager.eu-west-2.amazonaws.com" &&
+          one([for s in jsondecode(aws_kms_key.gc_pdc_rotator_credential[name].policy).Statement : s if s.Sid == "AllowRotatorToDecryptCredential"]).Condition.ArnLike["kms:EncryptionContext:SecretARN"] == "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:${secret.name}-??????"
+        )
+      ]) &&
+      length(aws_secretsmanager_secret_version.gc_pdc_token) == 2 &&
+      length(grafana_cloud_private_data_source_connect_network_token.account) == 2
+    )
+    error_message = "Create distinct credential secrets and keys outside the tenant namespace, with decryption restricted to the rotator and each secret."
+  }
+
+  assert {
+    condition = (
+      grafana_cloud_access_policy.gc_pdc_rotator["this"].name == "pdc-token-rotator-development" &&
+      grafana_cloud_access_policy.gc_pdc_rotator["this"].region == grafana_cloud_stack.observability_platform.region_slug &&
+      grafana_cloud_access_policy.gc_pdc_rotator["this"].scopes == toset(["accesspolicies:read", "accesspolicies:write"]) &&
+      one(grafana_cloud_access_policy.gc_pdc_rotator["this"].realm).type == "stack" &&
+      one(grafana_cloud_access_policy.gc_pdc_rotator["this"].realm).identifier == grafana_cloud_stack.observability_platform.id &&
+      grafana_cloud_stack_service_account.gc_pdc_rotator_query["this"].role == "None" &&
+      grafana_cloud_stack_service_account.gc_pdc_rotator_query["this"].stack_slug == grafana_cloud_stack.observability_platform.slug &&
+      grafana_data_source_permission_item.gc_pdc_rotator_query["this"].datasource_uid == "grafanacloud-usage" &&
+      grafana_data_source_permission_item.gc_pdc_rotator_query["this"].permission == "Query" &&
+      grafana_data_source_permission_item.gc_pdc_rotator_query["this"].user == "678" &&
+      grafana_data_source_permission_item.gc_pdc_rotator_query["this"].role == null &&
+      grafana_data_source_permission_item.gc_pdc_rotator_query["this"].team == null
+    )
+    error_message = "Grant only stack-scoped policy management and a single usage-query permission to the role-None service account."
   }
 
   assert {
@@ -196,32 +281,39 @@ run "prepared_runtime_permissions" {
   }
 }
 
-run "reject_cross_account_credential" {
+run "reject_unpinned_image" {
   command = plan
 
   variables {
     rotator = {
-      image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 9)}:secret:test-pdc-credential-ABCDEF"
-      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
-      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
-      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
+      image_digest = "not-a-digest"
     }
   }
 
   expect_failures = [aws_iam_policy.gc_pdc_rotator["this"]]
 }
 
-run "reject_out_of_region_stack_query_key" {
+run "reject_missing_failure_destination" {
   command = plan
 
   variables {
     rotator = {
-      image_uri                          = "${format("%012d", 4)}.dkr.ecr.eu-west-2.amazonaws.com/test-pdc-rotator@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      credential_secret_arn              = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-credential-ABCDEF"
-      credential_kms_key_arn             = "arn:aws:kms:eu-west-2:${format("%012d", 4)}:key/87654321-4321-4321-4321-fedcbafedcba"
-      stack_query_credential_secret_arn  = "arn:aws:secretsmanager:eu-west-2:${format("%012d", 4)}:secret:test-pdc-stack-query-ABCDEF"
-      stack_query_credential_kms_key_arn = "arn:aws:kms:eu-west-1:${format("%012d", 4)}:key/12345678-4321-4321-4321-fedcbafedcba"
+      image_digest = "sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa"
+    }
+    failure_alerts = null
+  }
+
+  expect_failures = [aws_cloudwatch_metric_alarm.gc_pdc_rotator_errors["this"], aws_cloudwatch_event_target.gc_pdc_rotation_failed["this"]]
+}
+
+run "reject_rotator_without_pdc_accounts" {
+  state_key = "empty_rotator"
+  command   = plan
+
+  variables {
+    accounts = {}
+    rotator = {
+      image_digest = "sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa"
     }
   }
 
