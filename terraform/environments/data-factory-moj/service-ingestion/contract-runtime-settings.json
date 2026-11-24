@@ -26,9 +26,7 @@
         "automatically_accept_compatible": false
       }
     },
-    "authorised_reviewers": [
-      "fred83200@digital.justice.gov.uk"
-    ],
+    "authorised_reviewers": ["fred83200@digital.justice.gov.uk"],
     "execution_policy": {
       "Version": "2012-10-17",
       "Statement": [
@@ -47,19 +45,14 @@
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "dynamodb:GetItem",
-            "dynamodb:Query"
-          ],
+          "Action": ["dynamodb:GetItem", "dynamodb:Query"],
           "Resource": [
             "arn:aws:dynamodb:eu-west-2:110695445580:table/data-factory-moj-development-contracts-contracts"
           ]
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "lambda:InvokeFunction"
-          ],
+          "Action": ["lambda:InvokeFunction"],
           "Resource": [
             "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-gen-oracle-test:3",
             "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-val-oracle-test:2",
@@ -73,10 +66,7 @@
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "s3:GetObject",
-            "s3:GetObjectVersion"
-          ],
+          "Action": ["s3:GetObject", "s3:GetObjectVersion"],
           "Resource": [
             "arn:aws:s3:::data-factory-moj-development-ingestion-config-110695445580/services/sandbox-oracle/*",
             "arn:aws:s3:::data-factory-moj-development-contracts-110695445580/candidates/*",
@@ -87,18 +77,14 @@
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "s3:PutObject"
-          ],
+          "Action": ["s3:PutObject"],
           "Resource": [
             "arn:aws:s3:::data-factory-moj-development-contracts-110695445580/sandbox-oracle/*"
           ]
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "kms:Decrypt"
-          ],
+          "Action": ["kms:Decrypt"],
           "Resource": [
             "arn:aws:kms:eu-west-2:110695445580:key/ef8c1a75-ce5a-4f62-b5e9-47b1251d89e0",
             "arn:aws:kms:eu-west-2:110695445580:key/645bbf6b-fb7c-433f-8981-7a35598dd798"
@@ -119,9 +105,7 @@
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "kms:GenerateDataKey"
-          ],
+          "Action": ["kms:GenerateDataKey"],
           "Resource": [
             "arn:aws:kms:eu-west-2:110695445580:key/645bbf6b-fb7c-433f-8981-7a35598dd798"
           ]
@@ -156,9 +140,7 @@
         "automatically_accept_compatible": false
       }
     },
-    "authorised_reviewers": [
-      "fred83200@digital.justice.gov.uk"
-    ],
+    "authorised_reviewers": ["fred83200@digital.justice.gov.uk"],
     "execution_policy": {
       "Version": "2012-10-17",
       "Statement": [
@@ -177,19 +159,14 @@
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "dynamodb:GetItem",
-            "dynamodb:Query"
-          ],
+          "Action": ["dynamodb:GetItem", "dynamodb:Query"],
           "Resource": [
             "arn:aws:dynamodb:eu-west-2:110695445580:table/data-factory-moj-development-contracts-contracts"
           ]
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "lambda:InvokeFunction"
-          ],
+          "Action": ["lambda:InvokeFunction"],
           "Resource": [
             "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-gen-postgres-test:3",
             "arn:aws:lambda:eu-west-2:110695445580:function:df-moj-development-val-postgres-test:2",
@@ -203,10 +180,7 @@
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "s3:GetObject",
-            "s3:GetObjectVersion"
-          ],
+          "Action": ["s3:GetObject", "s3:GetObjectVersion"],
           "Resource": [
             "arn:aws:s3:::data-factory-moj-development-ingestion-config-110695445580/services/sandbox-postgres/*",
             "arn:aws:s3:::data-factory-moj-development-contracts-110695445580/candidates/*",
@@ -217,18 +191,14 @@
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "s3:PutObject"
-          ],
+          "Action": ["s3:PutObject"],
           "Resource": [
             "arn:aws:s3:::data-factory-moj-development-contracts-110695445580/sandbox-postgres/*"
           ]
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "kms:Decrypt"
-          ],
+          "Action": ["kms:Decrypt"],
           "Resource": [
             "arn:aws:kms:eu-west-2:110695445580:key/ef8c1a75-ce5a-4f62-b5e9-47b1251d89e0",
             "arn:aws:kms:eu-west-2:110695445580:key/645bbf6b-fb7c-433f-8981-7a35598dd798"
@@ -249,9 +219,7 @@
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "kms:GenerateDataKey"
-          ],
+          "Action": ["kms:GenerateDataKey"],
           "Resource": [
             "arn:aws:kms:eu-west-2:110695445580:key/645bbf6b-fb7c-433f-8981-7a35598dd798"
           ]

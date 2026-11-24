@@ -1,8 +1,16 @@
 locals {
-  # Null in both environments until the image, credential and notification destination exist.
+  # Keep the rotator dormant until its image and credentials are available.
   gc_pdc_rotator_deployments = local.environment_configuration_gc.pdc_token_rotator == null ? {} : {
     this = local.environment_configuration_gc.pdc_token_rotator
   }
+
+  gc_pdc_failure_alerts = local.environment_configuration_gc.pdc_failure_alerts == null ? {} : {
+    this = local.environment_configuration_gc.pdc_failure_alerts
+  }
+  gc_pdc_failure_topic_name = "grafana-pdc-rotation-failures-${local.environment}"
+  gc_pdc_failure_topic_arn  = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.gc_pdc_failure_topic_name}"
+  gc_pdc_failure_alarm_arn  = "arn:aws:cloudwatch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alarm:${local.gc_pdc_rotator_role_name}-errors"
+  gc_pdc_failure_rule_arn   = "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/${local.gc_pdc_rotator_role_name}-rotation-failed"
 
   gc_pdc_usage_datasource_uid = "grafanacloud-usage"
   gc_pdc_rotator_environment = {
@@ -14,6 +22,147 @@ locals {
       ROTATION_STATE_TABLE_NAME                 = aws_dynamodb_table.gc_pdc_rotation_state[key].name
     }
   }
+}
+
+resource "aws_kms_key" "gc_pdc_failure_alerts" {
+  for_each = local.gc_pdc_failure_alerts
+
+  description         = "Encrypts Grafana Cloud PDC rotation failure alerts"
+  enable_key_rotation = true
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowAccountRootFullAccess"
+        Effect    = "Allow"
+        Action    = "kms:*"
+        Resource  = "*"
+        Principal = { AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root" }
+      },
+      {
+        Sid    = "AllowSnsUseOfKeyForThisTopic"
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:Encrypt",
+          "kms:GenerateDataKey*",
+          "kms:ReEncrypt*",
+        ]
+        Resource  = "*"
+        Principal = { Service = "sns.amazonaws.com" }
+        Condition = {
+          StringEquals = {
+            "kms:EncryptionContext:aws:sns:topicArn" = local.gc_pdc_failure_topic_arn
+            "kms:ViaService"                         = "sns.${data.aws_region.current.name}.amazonaws.com"
+          }
+        }
+      },
+      {
+        Sid       = "AllowCloudWatchAlarmToUseKey"
+        Effect    = "Allow"
+        Action    = ["kms:Decrypt", "kms:GenerateDataKey"]
+        Resource  = "*"
+        Principal = { Service = "cloudwatch.amazonaws.com" }
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+          ArnEquals = {
+            "aws:SourceArn" = local.gc_pdc_failure_alarm_arn
+          }
+        }
+      },
+      {
+        Sid       = "AllowEventBridgeRuleToUseKey"
+        Effect    = "Allow"
+        Action    = ["kms:Decrypt", "kms:GenerateDataKey"]
+        Resource  = "*"
+        Principal = { Service = "events.amazonaws.com" }
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+          ArnEquals = {
+            "aws:SourceArn" = local.gc_pdc_failure_rule_arn
+          }
+        }
+      },
+    ]
+  })
+
+  tags = local.tags
+}
+
+resource "aws_sns_topic" "gc_pdc_failure_alerts" {
+  for_each = local.gc_pdc_failure_alerts
+
+  name              = local.gc_pdc_failure_topic_name
+  kms_master_key_id = aws_kms_key.gc_pdc_failure_alerts[each.key].arn
+  tags              = local.tags
+}
+
+resource "aws_sns_topic_policy" "gc_pdc_failure_alerts" {
+  for_each = local.gc_pdc_failure_alerts
+
+  arn = aws_sns_topic.gc_pdc_failure_alerts[each.key].arn
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowCloudWatchAlarmToPublish"
+        Effect    = "Allow"
+        Action    = "sns:Publish"
+        Resource  = aws_sns_topic.gc_pdc_failure_alerts[each.key].arn
+        Principal = { Service = "cloudwatch.amazonaws.com" }
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+          ArnEquals = {
+            "aws:SourceArn" = local.gc_pdc_failure_alarm_arn
+          }
+        }
+      },
+      {
+        Sid       = "AllowEventBridgeRuleToPublish"
+        Effect    = "Allow"
+        Action    = "sns:Publish"
+        Resource  = aws_sns_topic.gc_pdc_failure_alerts[each.key].arn
+        Principal = { Service = "events.amazonaws.com" }
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+          ArnEquals = {
+            "aws:SourceArn" = local.gc_pdc_failure_rule_arn
+          }
+        }
+      },
+      {
+        Sid       = "AllowChatbotToSubscribe"
+        Effect    = "Allow"
+        Action    = ["sns:Receive", "sns:Subscribe"]
+        Resource  = aws_sns_topic.gc_pdc_failure_alerts[each.key].arn
+        Principal = { Service = "chatbot.amazonaws.com" }
+      },
+    ]
+  })
+}
+
+module "gc_pdc_failure_chatbot" {
+  for_each = local.gc_pdc_failure_alerts
+
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=ec27e1bdd428db4b0441c2b2d1276d712278b55f"
+
+  slack_channel_id    = each.value.slack_channel_id
+  slack_team_id       = "T02DYEB3A"
+  sns_topic_arns      = [aws_sns_topic.gc_pdc_failure_alerts[each.key].arn]
+  guardrail_policies  = ["arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess"]
+  managed_policy_arns = []
+
+  tags             = local.tags
+  application_name = "grafana-pdc-token-rotation"
 }
 
 resource "aws_ssm_parameter" "gc_pdc_rotator_ecr_repository_uri" {
@@ -203,14 +352,20 @@ resource "aws_cloudwatch_metric_alarm" "gc_pdc_rotator_errors" {
   threshold           = 0
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
-  alarm_actions       = [each.value.failure_topic_arn]
+  alarm_actions       = [try(aws_sns_topic.gc_pdc_failure_alerts["this"].arn, "")]
   dimensions = {
     FunctionName = module.grafana_pdc_token_rotator[each.key].lambda_function_name
   }
 
   lifecycle {
     precondition {
-      condition     = can(regex("^arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:", each.value.failure_topic_arn))
+      condition = (
+        length(local.gc_pdc_failure_alerts) == 1 &&
+        can(regex(
+          "^arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:",
+          try(aws_sns_topic.gc_pdc_failure_alerts["this"].arn, "")
+        ))
+      )
       error_message = "PDC rotation requires an operational SNS failure destination in this account and region."
     }
   }
@@ -236,5 +391,18 @@ resource "aws_cloudwatch_event_target" "gc_pdc_rotation_failed" {
 
   rule      = aws_cloudwatch_event_rule.gc_pdc_rotation_failed[each.key].name
   target_id = "notify-rotation-failure"
-  arn       = each.value.failure_topic_arn
+  arn       = try(aws_sns_topic.gc_pdc_failure_alerts["this"].arn, "")
+
+  lifecycle {
+    precondition {
+      condition = (
+        length(local.gc_pdc_failure_alerts) == 1 &&
+        can(regex(
+          "^arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:",
+          try(aws_sns_topic.gc_pdc_failure_alerts["this"].arn, "")
+        ))
+      )
+      error_message = "PDC rotation requires an operational SNS failure destination in this account and region."
+    }
+  }
 }

@@ -122,7 +122,7 @@ resource "aws_vpc_security_group_egress_rule" "lambda_cp_to_secretsmanager" {
   referenced_security_group_id = tolist(data.aws_vpc_endpoint.secretsmanager.security_group_ids)[0]
   from_port                    = 443
   to_port                      = 443
-  ip_protocol                     = "tcp"
+  ip_protocol                  = "tcp"
 }
 
 resource "aws_security_group" "lambda_gov_notify_access" {
