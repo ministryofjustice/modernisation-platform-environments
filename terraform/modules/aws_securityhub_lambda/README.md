@@ -10,8 +10,8 @@ ignored finding descriptions can be configured through SSM.
 
 Issues are added to the organisation project identified by
 `github_project_number`, and its single-select `Source` field is set to
-`github_issue_source` (default: `Support`). The configured option must exist. 
-The trust policy lives in the target repository and must be updated separately, 
+`github_issue_source` (default: `Support`). The configured option must exist.
+The trust policy lives in the target repository and must be updated separately,
 and the app must have access to the project.
 
 The Lambda accepts findings only when `UpdatedAt` is between `CreatedAt` and

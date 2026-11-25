@@ -97,13 +97,13 @@ resource "aws_ssm_parameter" "aws_health_lambda" {
 }
 
 module "aws_health_lambda" {
-  count                             = local.enable_aws_health_lambda ? 1 : 0
-  source                            = "../../modules/aws_health_lambda"
-  aws_account_id                    = data.aws_caller_identity.current.id
-  aws_accounts_parameter_name       = aws_ssm_parameter.aws_health_lambda["accounts"].name
-  github_project_number             = aws_ssm_parameter.aws_health_lambda["github_project_number"].value
-  github_repo                       = "platform-operations"
-  ignore_findings_parameter_name    = aws_ssm_parameter.aws_health_lambda["ignore_findings"].name
+  count                          = local.enable_aws_health_lambda ? 1 : 0
+  source                         = "../../modules/aws_health_lambda"
+  aws_account_id                 = data.aws_caller_identity.current.id
+  aws_accounts_parameter_name    = aws_ssm_parameter.aws_health_lambda["accounts"].name
+  github_project_number          = aws_ssm_parameter.aws_health_lambda["github_project_number"].value
+  github_repo                    = "platform-operations"
+  ignore_findings_parameter_name = aws_ssm_parameter.aws_health_lambda["ignore_findings"].name
 }
 
 resource "aws_ssm_parameter" "aws_securityhub_lambda" {
