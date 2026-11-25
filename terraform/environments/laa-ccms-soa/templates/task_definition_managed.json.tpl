@@ -97,7 +97,7 @@
         "value": "${wl_mem_args}"
       },
       {
-        "name": "JAVA_OPTIONS",
+        "name": "JAVA_OPTION",
         "value": "-Djava.security.egd=file:/dev/./urandom"
       },
       {
