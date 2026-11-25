@@ -63,6 +63,12 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
               "ApproximateNumberOfMessagesVisible",
               ".",
               local.live_feed_dlq_names.process_landing_bucket_files_mdss_specials
+            ],
+            [
+              ".",
+              "ApproximateNumberOfMessagesVisible",
+              ".",
+              local.live_feed_dlq_names.process_landing_bucket_files_gems_general
             ]
           ]
         }
