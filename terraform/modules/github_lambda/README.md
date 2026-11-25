@@ -61,6 +61,8 @@ Note: The ${IDENTITY} in the filename above must match the identity value you ha
 
 The EventBridge scheduler will now trigger the Lambda function on the schedule you have defined in your `locals_environment.tf` file.
 
+Before dispatching, the Lambda checks the workflow's state. If the workflow is disabled manually or due to inactivity, it logs `Workflow X is currently disabled, exiting...` and exits successfully without dispatching it. Other GitHub API failures still raise an error.
+
 If you wish you test this before your scheduled build, you can trigger the Lambda manually from the AWS Console - ensure that you provide the following JSON when triggering a test event:
 
 ```
@@ -73,4 +75,3 @@ If you wish you test this before your scheduled build, you can trigger the Lambd
 ```
 
 This will trigger the relevant Github Action workflow for your repository.
-
