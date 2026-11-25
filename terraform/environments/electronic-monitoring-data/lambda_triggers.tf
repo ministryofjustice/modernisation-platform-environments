@@ -240,7 +240,7 @@ module "fms_fan_out_event_queue" {
 # Do not create the Register Athena trigger in production.
 # ----------------------------------------------
 module "register_athena_event_queue" {
-  count = local.is-production ? 0 : 1
+  count = 1
 
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
