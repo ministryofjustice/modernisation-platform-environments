@@ -5,6 +5,14 @@ locals {
     maintenance_message = "Preprod is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
   }
 
+  aws_health_lambda_configuration_preproduction = {
+    enabled = false
+  }
+
+  aws_securityhub_lambda_configuration_preproduction = {
+    enabled = false
+  }
+
   baseline_presets_preproduction = {
     options = {
       db_backup_object_lock_days          = 14
@@ -286,6 +294,41 @@ locals {
         })
       })
 
+      preprod-nomis-db-3-a = merge(local.ec2_instances.db, {
+        cloudwatch_metric_alarms = merge(
+          local.cloudwatch_metric_alarms.db,
+          local.cloudwatch_metric_alarms.db_connected,
+          local.cloudwatch_metric_alarms.db_textfile_metric_not_updated,
+        )
+        config = merge(local.ec2_instances.db.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
+            "Ec2PreprodDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.ec2_instances.db.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 512 }
+        })
+        ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
+          data  = { total_size = 5000 }
+          flash = { total_size = 1000 }
+        })
+        instance = merge(local.ec2_instances.db.instance, {
+          disable_api_termination = true
+          instance_type           = "r6i.2xlarge"
+        })
+        tags = merge(local.ec2_instances.db.tags, {
+          description         = "PreProduction NOMIS MIS and Audit database"
+          instance-scheduling = "skip-scheduling"
+          misload-dbname      = "PPMISG"
+          nomis-environment   = "preprod"
+          oracle-sids         = "PPMISG PPCAUDG"
+          update-ssm-agent    = "patchgroup2"
+        })
+      })
+
       preprod-nomis-xtag-a = merge(local.ec2_instances.xtag, {
         cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.xtag
         config = merge(local.ec2_instances.xtag.config, {
@@ -555,6 +598,8 @@ locals {
       "/oracle/database/PPTRDAT"  = local.secretsmanager_secrets.db
       "/oracle/database/PPCNMAUD" = local.secretsmanager_secrets.db
       "/oracle/database/PPMIS"    = local.secretsmanager_secrets.db_mis
+      "/oracle/database/PPCAUDG"  = local.secretsmanager_secrets.db
+      "/oracle/database/PPMISG"   = local.secretsmanager_secrets.db_mis
     }
   }
 }

@@ -70,18 +70,98 @@ locals {
     region            = local.application_data.accounts[local.environment].region
     app_db_url        = "${aws_route53_record.apex-db.fqdn}:1521:APEX"
     app_debug_enabled = local.application_data.accounts[local.environment].app_debug_enabled
-    # Note that the following secret is created manually on Parameter Store
-    db_secret_arn = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
+    db_secret_arn     = local.db_secret_arn
   })
+
+  # ECS task definition consumes this ARN via task_definition.json.
+  db_secret_arn = data.aws_secretsmanager_secret.app_apex_dbpassword_tad.arn
 
   env_account_id       = local.environment_management.account_ids[terraform.workspace]
   app_db_password_name = "APP_APEX_DBPASSWORD_TAD"
   db_hostname          = "db.${local.application_name}"
 
+  lambda_source_hashes = [
+    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  ]
+
+  oracle_lambda_source_hashes = [
+    for f in fileset("./lambda/oracle_log_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/oracle_log_slack_integration/${f}"))
+  ]
+
+  lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
+
   backup_schedule_tags       = local.environment == "production" ? { "snapshot-35-day-retention" = "yes" } : null
   database-instance-userdata = <<EOF
 #!/bin/bash
 cd /tmp
+B=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+S=/etc/pki/ca-trust/source
+
+if command -v openssl >/dev/null 2>&1; then
+  echo "openssl is available."
+else
+  echo "openssl is not available, exiting."
+  exit 1
+fi
+
+if [[ ! -f $B ]]; then
+  echo "Not found: $B, exiting."
+  exit 1
+fi
+
+if [[ -d "$S/blacklist" ]]; then
+  L=$S/blacklist
+  V="a"
+elif [[ -d "$S/blocklist" ]]; then
+  L=$S/blocklist
+  V="o"
+else
+  echo "ERROR: no blacklist/blocklist directory under $S" >&2
+  echo "You need to create that directory manually:" >&2
+  echo "$S/blacklist on old Linux distributions (based on RH 7.9)." >&2
+  echo "$S/blocklist on newer Linux distributions." >&2
+  echo "Then run the script again." >&2
+  exit 1
+fi
+echo "Using $L"
+
+D=$(mktemp -d)
+cd "$D"
+csplit -s -z -f cert- "$B" '/-----BEGIN TRUSTED CERTIFICATE-----/' '{*}'
+
+for f in cert-*; do
+  echo -n "Processing: $f ... "
+  O=$(openssl x509 -noout -subject -in "$f"  2>/dev/null |grep -iP 'CN=\K(?:aaa|emsign|emudhra)')
+  if [[ -n $O ]]; then
+    echo "dirty."
+    F=$(openssl x509 -in "$f" -noout -fingerprint -sha256 |cut -d= -f2 | tr -d :)
+    N=$(grep -oP 'CN=\K[^,]+' <<< $O |tr \\040 \\137)
+    openssl x509 -in "$f" -out "$L/$N-$F.pem"
+    echo "Extracted and added to the block list: $(openssl x509 -in "$f" -noout -subject)"
+  else
+    echo "clean."
+  fi
+done
+
+echo
+ls -l $L |grep '\.pem'
+echo
+
+for f in $L/*.pem; do
+  echo -n "$(basename $f): "
+  openssl x509 -in "$f" -noout -subject 2>/dev/null
+done
+
+echo -e "\nRunning extraction.\n"
+update-ca-trust extract
+echo "Run these commands now:"
+echo "trust list --filter=bl$${V}cklist"
+echo "curl https://dv-g3b-emudhra.we-have-a-problem.com/"
+echo
+
+cd / && rm -rf "$D"
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent

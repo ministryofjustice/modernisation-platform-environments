@@ -22,9 +22,9 @@ data "aws_subnets" "shared-private" {
   }
 }
 
-resource "aws_autoscaling_group" "cluster-scaling-group" {
+resource "aws_autoscaling_group" "cluster-scaling-group-al2023" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
-  name                  = "${var.app_name}-cluster-scaling-group"
+  name_prefix           = "${var.app_name}-ec2-al2023-"
   desired_capacity      = var.ec2_desired_capacity
   max_size              = var.ec2_max_size
   min_size              = var.ec2_min_size
@@ -54,13 +54,13 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   ]
 
   launch_template {
-    id      = aws_launch_template.ec2-launch-template.id
+    id      = aws_launch_template.ec2-launch-template-al2023.id
     version = "$Latest"
   }
 
   tag {
     key                 = "Name"
-    value               = "${var.app_name}-cluster-scaling-group"
+    value               = "${var.app_name}-cluster-scaling-group-al2023"
     propagate_at_launch = true
   }
 
@@ -140,14 +140,19 @@ resource "aws_security_group_rule" "mlra_to_maatdb_sg_rule_outbound" {
   source_security_group_id = var.maatdb_rds_sec_group_id
 }
 
-# always use the recommended ECS optimized linux 2 base image; used to obtain its AMI ID
-data "aws_ssm_parameter" "ecs_optimized_ami_1" {
-  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
+# always use the recommended ECS optimized linux 2023 base image; used to obtain its AMI ID
+data "aws_ssm_parameter" "ecs_optimized_ami_al2023" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
 }
 
 # if the AMI is used elsewhere it can be obtained here
 output "ami_id" {
-  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_1.value)["image_id"]
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
+  sensitive = true
+}
+
+output "ami_id_al2023" {
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   sensitive = true
 }
 
@@ -156,11 +161,11 @@ output "ami_id" {
 # so that the autoscaling group creates new ones using the new launch template
 
 #tfsec:ignore:AVD-AWS-0130:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-resource "aws_launch_template" "ec2-launch-template" {
+resource "aws_launch_template" "ec2-launch-template-al2023" {
   #checkov:skip=CKV_AWS_79:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_341:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  name_prefix            = "${var.app_name}-ec2-launch-template"
-  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_1.value)["image_id"]
+  name_prefix            = "${var.app_name}-ec2-al2023-"
+  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   instance_type          = var.instance_type
   key_name               = var.key_name
   ebs_optimized          = true
@@ -196,7 +201,7 @@ resource "aws_launch_template" "ec2-launch-template" {
     }
   }
 
-  user_data = var.user_data
+  user_data = var.user_data_al2023
 
   tag_specifications {
     resource_type = "instance"
@@ -398,7 +403,7 @@ resource "aws_ecs_service" "ecs_service" {
   desired_count   = var.app_count
 
   capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.mlra.name
+    capacity_provider = aws_ecs_capacity_provider.mlra-al2023.name
     weight            = 1
   }
 
@@ -652,11 +657,11 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
   }
 }
 
-resource "aws_ecs_capacity_provider" "mlra" {
-  name = "${var.app_name}-${var.environment}-capacity-provider"
+resource "aws_ecs_capacity_provider" "mlra-al2023" {
+  name = "${var.app_name}-${var.environment}-capacity-provider-al2023"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
+    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group-al2023.arn
     managed_termination_protection = "ENABLED"
 
     managed_scaling {
@@ -671,6 +676,7 @@ resource "aws_ecs_capacity_provider" "mlra" {
 resource "aws_ecs_cluster_capacity_providers" "mlra" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
 
-  capacity_providers = [aws_ecs_capacity_provider.mlra.name]
+  capacity_providers = [
+    aws_ecs_capacity_provider.mlra-al2023.name
+  ]
 }
-

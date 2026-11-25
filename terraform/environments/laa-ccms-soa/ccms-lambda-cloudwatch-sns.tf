@@ -39,7 +39,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.cloudwatch_sns.function_name}:*"
+        Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.cloudwatch_sns.function_name}:*"
       },
       {
         Effect = "Allow"
@@ -151,4 +151,12 @@ resource "aws_lambda_permission" "allow_sns_invoke_soa_rds" {
   function_name = aws_lambda_function.cloudwatch_sns.function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.soa_maintenance_topic.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_sns.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.certificate_expiration_warning.arn
 }

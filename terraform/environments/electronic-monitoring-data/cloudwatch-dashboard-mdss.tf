@@ -88,8 +88,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           stat   = "Sum"
           period = 60
           metrics = [
-            ["AWS/Lambda", "Errors", "FunctionName", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed")],
-            [".", "Throttles", ".", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed")]
+            ["AWS/Lambda", "Errors", "FunctionName", try(module.mdss_load_redrive_controller[0].lambda_function_name, "mdss_reconciler_not_deployed")],
+            [".", "Throttles", ".", try(module.mdss_load_redrive_controller[0].lambda_function_name, "mdss_reconciler_not_deployed")]
           ]
         }
       },
@@ -104,8 +104,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           period = 300
           metrics = [
-            ["AWS/Lambda", "Duration", "FunctionName", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed"), { stat = "p95" }],
-            [".", "Invocations", ".", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed"), { stat = "Sum" }]
+            ["AWS/Lambda", "Duration", "FunctionName", try(module.mdss_load_redrive_controller[0].lambda_function_name, "mdss_reconciler_not_deployed"), { stat = "p95" }],
+            [".", "Invocations", ".", try(module.mdss_load_redrive_controller[0].lambda_function_name, "mdss_reconciler_not_deployed"), { stat = "Sum" }]
           ]
         }
       },
@@ -125,6 +125,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | filter message.event = "MDSS_FILE_FAIL"
             | stats
                 latest(@timestamp) as ts,
+                latest(@logStream) as log_stream,
                 max(message.attempt) as max_attempt,
                 latest(message.max_receive_count) as max_receive_count,
                 latest(message.error_type) as error_type,
@@ -148,7 +149,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
-            SOURCE '${try(module.mdss_reconciler[0].cloudwatch_log_group.name, "/aws/lambda/mdss_reconciler_not_deployed")}'
+            SOURCE '${try(module.mdss_load_redrive_controller[0].cloudwatch_log_group.name, "/aws/lambda/mdss_reconciler_not_deployed")}'
             | filter message.event = "MDSS_RECONCILE_COMPLETE"
             | fields
                 @timestamp,
@@ -272,6 +273,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | filter message.event = "MDSS_FILE_RETRY"
             | stats
                 latest(@timestamp) as ts,
+                latest(@logStream) as log_stream,
                 max(message.attempt) as attempt,
                 latest(message.max_receive_count) as max_receive_count,
                 latest(message.error_type) as error_type,
@@ -328,6 +330,79 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | sort failed_final desc, ok_after_retry desc, avg_attempt_success desc
             | limit 50
           EOT
+        }
+      },
+      {
+        type   = "metric",
+        x      = 0,
+        y      = 70,
+        width  = 12,
+        height = 6,
+        properties = {
+          title  = "Received-files reconciliation activity"
+          region = "eu-west-2"
+          period = 300
+          metrics = [
+            ["EMDS/MDSS", "MdssReceivedReconcilerStaleCount", { stat = "Maximum" }],
+            [".", "MdssReceivedReconcilerRedrivenCount", { stat = "Sum" }],
+            [".", "MdssReceivedReconcilerSkippedMaxRedrivesCount", { stat = "Maximum" }]
+          ]
+        }
+      },
+      {
+        type   = "metric",
+        x      = 12,
+        y      = 70,
+        width  = 12,
+        height = 6,
+        properties = {
+          title  = "Received-files reconciler age / errors"
+          region = "eu-west-2"
+          period = 300
+          metrics = [
+            ["EMDS/MDSS", "MdssReceivedReconcilerOldestStaleAgeSeconds", { stat = "Maximum" }],
+            ["AWS/Lambda", "Errors", "FunctionName", module.mdss_received_files_reconciler.lambda_function_name, { stat = "Sum", yAxis = "right" }]
+          ]
+        }
+      },
+      {
+        type   = "log",
+        x      = 0,
+        y      = 76,
+        width  = 24,
+        height = 8,
+        properties = {
+          title  = "Received-files automatic redrive summary"
+          region = "eu-west-2"
+          view   = "table"
+          query  = <<-EOT
+            SOURCE '${module.mdss_received_files_reconciler.cloudwatch_log_group.name}'
+            | filter message.event = "MDSS_RECEIVED_RECONCILE_COMPLETE"
+            | fields
+                @timestamp,
+                message.scanned,
+                message.stale,
+                message.redriven,
+                message.skipped_cooldown,
+                message.skipped_max_redrives,
+                message.oldest_stale_age_seconds
+            | sort @timestamp desc
+            | limit 100
+          EOT
+        }
+      },
+      {
+        type   = "alarm",
+        x      = 0,
+        y      = 84,
+        width  = 24,
+        height = 6,
+        properties = {
+          title = "Received-files reconciliation alarms"
+          alarms = [
+            aws_cloudwatch_metric_alarm.mdss_received_files_reconciler_errors.arn,
+            aws_cloudwatch_metric_alarm.mdss_received_files_reconcile_exhausted.arn
+          ]
         }
       }
     ]

@@ -6,13 +6,14 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "21.10.1"
+  version = "21.30.2"
 
   name               = local.eks_cluster_name
   kubernetes_version = local.environment_configuration.eks_cluster_version
 
-  endpoint_private_access = true
-  endpoint_public_access  = true
+  endpoint_private_access      = true
+  endpoint_public_access       = true
+  endpoint_public_access_cidrs = try(local.environment_configuration.eks_public_access_cidrs, ["0.0.0.0/0"])
 
   vpc_id                   = data.aws_vpc.apc.id
   control_plane_subnet_ids = data.aws_subnets.apc_intra.ids
@@ -286,13 +287,13 @@ module "karpenter" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "21.10.1"
+  version = "21.30.2"
 
   cluster_name = module.eks.cluster_name
 
   create_pod_identity_association = true
 
-  namespace = kubernetes_namespace.karpenter.metadata[0].name
+  namespace = kubernetes_namespace_v1.karpenter.metadata[0].name
 
   queue_name                = "${module.eks.cluster_name}-karpenter"
   queue_kms_master_key_id   = module.karpenter_sqs_kms.key_arn

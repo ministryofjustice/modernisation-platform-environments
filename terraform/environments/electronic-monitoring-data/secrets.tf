@@ -83,6 +83,8 @@ module "cross_account_details" {
     fms_ho_kms_id        = ""
     fms_specials_bucket  = ""
     fms_specials_kms_id  = ""
+    gems_general_bucket  = ""
+    gems_general_kms_id  = ""
     mdss_general_bucket  = ""
     mdss_general_kms_id  = ""
     mdss_specials_bucket = ""
@@ -91,6 +93,119 @@ module "cross_account_details" {
     mdss_ho_kms_id       = ""
     account_id           = ""
   })
+
+  tags = local.tags
+}
+
+module "entra_app_details" {
+  count  = local.is-test ? 0 : 1
+  source = "terraform-aws-modules/secrets-manager/aws"
+
+  name_prefix             = "entra_app_details"
+  description             = "details for the entra app"
+  recovery_window_in_days = 30
+
+  create_policy       = true
+  block_public_policy = true
+  policy_statements = {
+    read = {
+      sid = "AllowAccountRead"
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${local.env_account_id}:root"]
+      }]
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["*"]
+    }
+  }
+
+  ignore_secret_changes = true
+  secret_string = jsonencode({
+    tenant_id     = ""
+    client_id     = ""
+    client_secret = ""
+  })
+
+  tags = local.tags
+}
+
+data "aws_secretsmanager_secret_version" "entra_app_details" {
+  count     = local.is-test ? 0 : 1
+  secret_id = module.entra_app_details[0].secret_id
+}
+
+module "gov_notify_details" {
+  count  = local.is-test ? 0 : 1
+  source = "terraform-aws-modules/secrets-manager/aws"
+
+  name_prefix             = "gov_notify_details"
+  description             = "Keys for gov notify."
+  recovery_window_in_days = 30
+
+  create_policy       = true
+  block_public_policy = true
+  policy_statements = {
+    read = {
+      sid = "AllowAccountRead"
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${local.env_account_id}:root"]
+      }]
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["*"]
+    }
+  }
+
+  ignore_secret_changes = true
+  secret_string = jsonencode({
+    api_key          = ""
+    ear_sar_template = ""
+    reply_key        = ""
+    emails           = ""
+  })
+
+  tags = local.tags
+}
+
+data "aws_secretsmanager_secret_version" "gov_notify_details" {
+  count     = local.is-test ? 0 : 1
+  secret_id = module.gov_notify_details[0].secret_id
+}
+
+module "cpr_api_trigger" {
+  source = "terraform-aws-modules/secrets-manager/aws"
+
+  name        = "cpr/trigger-pipeline/key"
+  description = "API key for CPR"
+
+  create_secret_version = false
+
+  create_policy       = true
+  block_public_policy = true
+  policy_statements = {
+    lambda = {
+      sid = "LambdaReadWrite"
+      principals = [{
+        type        = "AWS"
+        identifiers = [module.trigger_cpr_job_iam_role.arn]
+      }]
+      actions = [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue",
+      ]
+      resources = ["*"]
+    }
+    read = {
+      sid = "AllowAccountRead"
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      }]
+      actions   = ["secretsmanager:DescribeSecret"]
+      resources = ["*"]
+    }
+  }
+
 
   tags = local.tags
 }

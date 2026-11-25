@@ -73,6 +73,7 @@ resource "aws_lambda_function" "waf_maintenance" {
 }
 
 # EventBridge schedule to trigger Lambda
+
 resource "aws_scheduler_schedule" "waf_allow_schedule" {
   name       = "waf-allow-schedule"
   group_name = "default"

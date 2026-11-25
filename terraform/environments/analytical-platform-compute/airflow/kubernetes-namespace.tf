@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "airflow" {
+resource "kubernetes_namespace_v1" "airflow" {
   metadata {
     name = "airflow"
     labels = {
@@ -8,7 +8,7 @@ resource "kubernetes_namespace" "airflow" {
   }
 }
 
-resource "kubernetes_namespace" "mwaa" {
+resource "kubernetes_namespace_v1" "mwaa" {
   metadata {
     name = "mwaa"
     labels = {

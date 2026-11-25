@@ -28,6 +28,12 @@ variable "engine_version" {
   default     = null
 }
 
+variable "replica_engine_version" {
+  type        = string
+  description = "Read replica RDS Engine Version. You should upgrade this before engine_version when upgrading database version."
+  default     = null
+}
+
 variable "license_model" {
   type        = string
   description = "License Model"

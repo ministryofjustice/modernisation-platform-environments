@@ -4,6 +4,7 @@ data "aws_iam_policy_document" "validation_lambda_function" {
   statement {
     actions = [
       "s3:PutObject",
+      "s3:PutObjectTagging",
       "s3:ListBucket"
     ]
 
@@ -25,9 +26,11 @@ data "aws_iam_policy_document" "validation_lambda_function" {
     ]
   }
 
+  # CopyObject carries source tags across, so tagged objects need the tagging permissions too
   statement {
     actions = [
       "s3:GetObject",
+      "s3:GetObjectTagging",
       "s3:DeleteObject"
     ]
 
@@ -36,16 +39,32 @@ data "aws_iam_policy_document" "validation_lambda_function" {
       "${aws_s3_bucket.landing.arn}/*"
     ]
   }
+
+  statement {
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.dms_events.arn]
+  }
+
+  statement {
+    actions = [
+      "kms:GenerateDataKey*",
+      "kms:Decrypt"
+    ]
+    resources = [module.sns_kms.key_arn]
+  }
 }
 
 module "validation_lambda_function" {
   # Commit hash for v7.20.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=84dfbfddf9483bc56afa0aff516177c03652f0c7"
 
+  # Each module instance builds identical source; without this, parallel builds race on the same zip filename
+  hash_extra = var.db
+
   function_name           = "${var.db}-validation"
   description             = "Lambda to validate DMS data output"
   handler                 = "main.handler"
-  runtime                 = "python3.12"
+  runtime                 = "python3.14"
   timeout                 = 60
   architectures           = ["x86_64"]
   build_in_docker         = false
@@ -63,7 +82,8 @@ module "validation_lambda_function" {
     FAIL_BUCKET         = aws_s3_bucket.invalid.bucket
     METADATA_BUCKET     = aws_s3_bucket.validation_metadata.bucket
     METADATA_PATH       = ""
-    SLACK_SECRET_KEY    = "" # TODO: Handle properly
+    ALERTS_TOPIC_ARN    = aws_sns_topic.dms_events.arn
+    SOURCE_DB           = var.db
     VALID_FILES_MUTABLE = var.valid_files_mutable
   }
 

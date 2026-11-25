@@ -6,7 +6,11 @@ terraform {
     }
     grafana = {
       source  = "grafana/grafana"
-      version = "~> 3.0"
+      version = "~> 3.25.9"
+    }
+    github = {
+      version = "~> 6.0"
+      source  = "integrations/github"
     }
     http = {
       version = "~> 3.0"

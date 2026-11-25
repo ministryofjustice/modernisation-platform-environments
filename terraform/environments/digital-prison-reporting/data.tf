@@ -75,24 +75,6 @@ data "aws_secretsmanager_secret_version" "ndelius" {
   depends_on = [aws_secretsmanager_secret.ndelius[0]]
 }
 
-# Source nDelius Secrets
-data "aws_secretsmanager_secret" "ndmis" {
-  count = local.is_non_prod ? 1 : 0
-
-  name = aws_secretsmanager_secret.ndmis[0].id
-
-  depends_on = [aws_secretsmanager_secret_version.ndmis[0]]
-}
-
-data "aws_secretsmanager_secret_version" "ndmis" {
-  count = local.is_non_prod ? 1 : 0
-
-  secret_id = data.aws_secretsmanager_secret.ndmis[0].id
-
-  depends_on = [aws_secretsmanager_secret.ndmis[0]]
-}
-
-
 # Source DataMart Secrets
 data "aws_secretsmanager_secret" "datamart" {
   name = aws_secretsmanager_secret.redshift.id
@@ -121,23 +103,6 @@ data "aws_secretsmanager_secret_version" "dps" {
 
   depends_on = [aws_secretsmanager_secret.dps]
 }
-
-# Source Probation Secrets
-data "aws_secretsmanager_secret" "probation" {
-  for_each = toset(local.probation_domains_list)
-  name     = "external/${local.project}-${each.value}-source-secrets"
-
-  depends_on = [aws_secretsmanager_secret_version.probation]
-}
-
-data "aws_secretsmanager_secret_version" "probation" {
-  for_each = toset(local.probation_domains_list)
-
-  secret_id = data.aws_secretsmanager_secret.probation[each.value].id
-
-  depends_on = [aws_secretsmanager_secret.probation]
-}
-
 
 # DPR Secret
 data "aws_secretsmanager_secret" "test_db" {

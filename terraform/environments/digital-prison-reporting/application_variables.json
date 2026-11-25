@@ -30,8 +30,8 @@
       "setup_redshift": true,
       "setup_dms_instance": true,
       "enable_dms_replication_task": true,
-      "enable_domain_builder_lambda": true,
-      "enable_dbuilder_flyway_lambda": true,
+      "enable_domain_builder_lambda": false,
+      "enable_dbuilder_flyway_lambda": false,
       "enable_scheduled_dataset_lambda": true,
       "enable_generate_dataset_lambda": true,
       "enable_multiphase_query_lambda": true,
@@ -42,12 +42,14 @@
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "scheduled_file_transfer_use_default_parallelism": "false",
       "scheduled_file_transfer_parallelism": 128,
-      "enable_domain_builder_rds": true,
+      "enable_domain_builder_rds": false,
       "domain_builder_rds_parameter_group": "default.postgres14",
+      "domain_builder_rds_engine_version": "14.24",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": true,
       "include_dbuilder_gw_vpclink": false,
-      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_serverless_gw": false,
       "enable_dbuilder_apikey": true,
       "enable_slack_alerts": true,
       "enable_pagerduty_alerts": false,
@@ -60,11 +62,21 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-test-domain": {
+          "share_with_cloud_platform": false,
+          "create_glue_connection": true
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
         "dps-basm",
+        "dps-book-vid-link",
         "dps-inc-reporting",
         "dps-csip",
         "dps-alerts",
@@ -72,7 +84,8 @@
         "dps-locations",
         "dps-calc-rel-date",
         "dps-incentives",
-        "dps-non-associations",
+        "dps-non-assoc",
+        "dps-pinphone",
         "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-testing",
@@ -86,7 +99,13 @@
         "dps-san",
         "dps-cvl",
         "dps-adjudications",
-        "dps-acc-pro-custody"
+        "dps-acc-pro-custody",
+        "dps-offences",
+        "dps-visits",
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-prisoner-prop",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -189,23 +208,27 @@
             {
               "glue_database": "curated_prisons_history_dev_dbt",
               "glue_tables": ["*"]
-            },
-            {
-              "glue_database": "staged_prisons_history_dev_dbt",
-              "glue_tables": ["*"]
             }
           ]
         }
       ],
       "redshift_table_expiry_days": 7,
+      "reporting_app_irsa_role_names": {
+        "prisons": "cloud-platform-irsa-aab1a0074cd15a74-live",
+        "probation": "cloud-platform-irsa-a525aa481a663772-live"
+      },
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
-      "enable_probation_discovery_node": true,
+      "enable_probation_discovery_node": false,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": true,
         "create_replica": true,
         "engine": "postgres",
-        "engine_version": "18.1",
+        "engine_version": "18",
+        "replica_engine_version": "18",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -220,7 +243,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.15",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -262,8 +285,8 @@
       "setup_redshift": true,
       "setup_dms_instance": true,
       "enable_dms_replication_task": true,
-      "enable_domain_builder_lambda": true,
-      "enable_dbuilder_flyway_lambda": true,
+      "enable_domain_builder_lambda": false,
+      "enable_dbuilder_flyway_lambda": false,
       "enable_scheduled_dataset_lambda": true,
       "enable_generate_dataset_lambda": true,
       "enable_multiphase_query_lambda": true,
@@ -274,12 +297,14 @@
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "scheduled_file_transfer_use_default_parallelism": "false",
       "scheduled_file_transfer_parallelism": 128,
-      "enable_domain_builder_rds": true,
+      "enable_domain_builder_rds": false,
       "domain_builder_rds_parameter_group": "default.postgres14",
+      "domain_builder_rds_engine_version": "14.24",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": true,
       "include_dbuilder_gw_vpclink": false,
-      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_serverless_gw": false,
       "enable_dbuilder_apikey": true,
       "enable_slack_alerts": true,
       "enable_pagerduty_alerts": false,
@@ -292,17 +317,24 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
+        "dps-book-vid-link",
         "dps-basm",
         "dps-inc-reporting",
         "dps-csip",
         "dps-alerts",
         "dps-use-of-force",
         "dps-incentives",
-        "dps-non-associations",
+        "dps-non-assoc",
+        "dps-pinphone",
         "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-locations",
@@ -316,7 +348,13 @@
         "dps-san",
         "dps-cvl",
         "dps-adjudications",
-        "dps-acc-pro-custody"
+        "dps-acc-pro-custody",
+        "dps-offences",
+        "dps-visits",
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-prisoner-prop",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -405,14 +443,22 @@
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
+      "reporting_app_irsa_role_names": {
+        "prisons": "cloud-platform-irsa-c67c125c17f8f34b-live",
+        "probation": "cloud-platform-irsa-c059a9b678a6347d-live"
+      },
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
       "enable_probation_discovery_node": false,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": true,
         "create_replica": true,
         "engine": "postgres",
-        "engine_version": "16.11",
+        "engine_version": "16.15",
+        "replica_engine_version": "16",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -427,7 +473,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.15",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -469,8 +515,8 @@
       "setup_redshift": true,
       "setup_dms_instance": true,
       "enable_dms_replication_task": true,
-      "enable_domain_builder_lambda": true,
-      "enable_dbuilder_flyway_lambda": true,
+      "enable_domain_builder_lambda": false,
+      "enable_dbuilder_flyway_lambda": false,
       "enable_scheduled_dataset_lambda": true,
       "enable_generate_dataset_lambda": true,
       "enable_multiphase_query_lambda": true,
@@ -481,12 +527,14 @@
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "scheduled_file_transfer_use_default_parallelism": "false",
       "scheduled_file_transfer_parallelism": 128,
-      "enable_domain_builder_rds": true,
+      "enable_domain_builder_rds": false,
       "domain_builder_rds_parameter_group": "default.postgres14",
+      "domain_builder_rds_engine_version": "14.24",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": true,
       "include_dbuilder_gw_vpclink": false,
-      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_serverless_gw": false,
       "enable_dbuilder_apikey": true,
       "enable_slack_alerts": true,
       "enable_pagerduty_alerts": true,
@@ -501,17 +549,24 @@
       "setup_redshift_schedule": true,
       "enable_redshift_health_check": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
         "dps-basm",
+        "dps-book-vid-link",
         "dps-inc-reporting",
         "dps-csip",
         "dps-alerts",
         "dps-use-of-force",
         "dps-incentives",
-        "dps-non-associations",
+        "dps-non-assoc",
+        "dps-pinphone",
         "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-locations",
@@ -525,7 +580,13 @@
         "dps-san",
         "dps-cvl",
         "dps-adjudications",
-        "dps-acc-pro-custody"
+        "dps-acc-pro-custody",
+        "dps-offences",
+        "dps-visits",
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-prisoner-prop",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -622,10 +683,6 @@
           "data_locations": ["dpr-structured-historical-preproduction"],
           "resource_shares": [
             {
-              "glue_database": "staged_prisons_history_preprod_dbt",
-              "glue_tables": ["*"]
-            },
-            {
               "glue_database": "curated_prisons_history_preprod_dbt",
               "glue_tables": ["*"]
             }
@@ -633,14 +690,22 @@
         }
       ],
       "redshift_table_expiry_days": 7,
+      "reporting_app_irsa_role_names": {
+        "prisons": "cloud-platform-irsa-a37c09a6599464a7-live",
+        "probation": "cloud-platform-irsa-5b33e8326ac304c0-live"
+      },
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": false,
       "enable_probation_discovery_node": false,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": false,
         "create_replica": false,
         "engine": "postgres",
-        "engine_version": "16.11",
+        "engine_version": "16",
+        "replica_engine_version": "16",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -655,7 +720,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.15",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -697,8 +762,8 @@
       "setup_redshift": true,
       "setup_dms_instance": true,
       "enable_dms_replication_task": true,
-      "enable_domain_builder_lambda": true,
-      "enable_dbuilder_flyway_lambda": true,
+      "enable_domain_builder_lambda": false,
+      "enable_dbuilder_flyway_lambda": false,
       "enable_scheduled_dataset_lambda": false,
       "enable_generate_dataset_lambda": false,
       "enable_multiphase_query_lambda": false,
@@ -709,12 +774,14 @@
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "scheduled_file_transfer_use_default_parallelism": "false",
       "scheduled_file_transfer_parallelism": 128,
-      "enable_domain_builder_rds": true,
+      "enable_domain_builder_rds": false,
       "domain_builder_rds_parameter_group": "default.postgres15",
+      "domain_builder_rds_engine_version": "15.19",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": true,
       "include_dbuilder_gw_vpclink": false,
-      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_serverless_gw": false,
       "enable_dbuilder_apikey": true,
       "enable_slack_alerts": true,
       "enable_pagerduty_alerts": false,
@@ -727,17 +794,24 @@
       "setup_scheduled_action_iam_role": false,
       "setup_redshift_schedule": false,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
         "dps-basm",
+        "dps-book-vid-link",
         "dps-inc-reporting",
         "dps-csip",
         "dps-alerts",
         "dps-use-of-force",
         "dps-incentives",
-        "dps-non-associations",
+        "dps-non-assoc",
+        "dps-pinphone",
         "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-locations",
@@ -751,7 +825,13 @@
         "dps-san",
         "dps-cvl",
         "dps-adjudications",
-        "dps-acc-pro-custody"
+        "dps-acc-pro-custody",
+        "dps-offences",
+        "dps-visits",
+        "dps-body-scans",
+        "dps-prisoner-property",
+        "dps-prisoner-prop",
+        "dps-csra"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -848,10 +928,6 @@
           "data_locations": ["dpr-structured-historical-production"],
           "resource_shares": [
             {
-              "glue_database": "staged_prisons_history",
-              "glue_tables": ["*"]
-            },
-            {
               "glue_database": "curated_prisons_history",
               "glue_tables": ["*"]
             },
@@ -867,14 +943,22 @@
         }
       ],
       "redshift_table_expiry_days": 1,
+      "reporting_app_irsa_role_names": {
+        "prisons": "cloud-platform-irsa-3ad2418b7222e329-live",
+        "probation": "cloud-platform-irsa-b37dede5f38efbc7-live"
+      },
       "enable_s3_data_migrate_lambda": false,
       "create_postgres_load_generator_job": false,
       "enable_probation_discovery_node": false,
+      "dpr_ods_db": {
+        "engine_version": "16.15"
+      },
       "dpr_rds_db": {
         "enable": false,
         "create_replica": false,
         "engine": "postgres",
-        "engine_version": "16.11",
+        "engine_version": "16",
+        "replica_engine_version": "16",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -889,7 +973,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.15",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",

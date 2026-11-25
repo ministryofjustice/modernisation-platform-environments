@@ -1,4 +1,5 @@
 #S3 bucket to store source metadata
+# adding comment to trigger terraform
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "validation_metadata" {
   #checkov:skip=CKV_AWS_18:Logging not needed
@@ -124,7 +125,7 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
       test     = "StringLike"
       variable = "kms:ViaService"
       values = [
-        "secretsmanager.${data.aws_region.current.name}.amazonaws.com",
+        "secretsmanager.${data.aws_region.current.region}.amazonaws.com",
       ]
     }
   }
@@ -176,10 +177,13 @@ module "metadata_generator" {
   # Commit hash for v7.20.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=84dfbfddf9483bc56afa0aff516177c03652f0c7"
 
+  # Each module instance builds identical source; without this, parallel builds race on the same zip filename
+  hash_extra = var.db
+
   function_name           = "${var.db}-metadata-generator"
   description             = "Lambda to generate metadata for ${var.db} DMS data output"
   handler                 = "main.handler"
-  runtime                 = "python3.12"
+  runtime                 = "python3.14"
   memory_size             = 512
   timeout                 = 60
   architectures           = ["x86_64"]
@@ -223,7 +227,7 @@ module "metadata_generator" {
   source_path = [{
     path = "${path.module}/lambda-functions/metadata_generator/"
     commands = [
-      "pip3.12 install --platform=manylinux2014_x86_64 --only-binary=:all: --no-compile --target=. -r requirements.txt",
+      "python3.14 -m pip install --platform=manylinux2014_x86_64 --only-binary=:all: --no-compile --target=. -r requirements.txt",
       "rm -rf pyarrow/tests numpy/tests *.dist-info", # Exclude tests and dist-info directories from the deployment package
       ":zip",
     ]

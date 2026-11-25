@@ -3,7 +3,8 @@ controller:
   image:
     registry: cgr.dev
     image: justice.gov.uk/ingress-nginx-controller
-    digest: ""
+    tag: ${controller_image_tag}
+    digest: ${controller_image_digest}
   replicaCount: 3
   ingressClassResource:
     name: default

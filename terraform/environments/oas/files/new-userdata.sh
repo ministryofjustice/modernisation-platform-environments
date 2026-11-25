@@ -6,6 +6,45 @@ exec 2>&1
 # Create marker file to prove userdata started
 echo "Userdata started at $(date)" > /tmp/userdata_started
 
+# STB-5230: distrust the eMudhra/emSign and Comodo AAA root CAs.
+# This host is Oracle Linux 8, so update the package from Oracle's repos (the
+# 2026.2.92 build already drops most emSign roots) and then blocklist any
+# emSign/eMudhra/AAA root the vendor still ships as trusted, such as
+# "emSign Root CA - G1". The blocklist step is idempotent and runs in a
+# subshell so an early exit cannot skip the rest of the user data.
+yum update -y ca-certificates
+(
+  B=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+  S=/etc/pki/ca-trust/source
+  if [ ! -f "$B" ]; then
+    echo "CA bundle $B not found, skipping eMudhra blocklist"
+    exit 0
+  fi
+  # OL8 ships the distrust directory as "blacklist"; newer releases call it
+  # "blocklist". Use whichever exists, creating "blocklist" as a last resort.
+  if [ -d "$S/blacklist" ]; then
+    L=$S/blacklist
+  else
+    L=$S/blocklist
+    mkdir -p "$L"
+  fi
+  D=$(mktemp -d)
+  cd "$D" || exit 0
+  csplit -s -z -f cert- "$B" '/-----BEGIN TRUSTED CERTIFICATE-----/' '{*}'
+  for f in cert-*; do
+    SUBJ=$(openssl x509 -noout -subject -nameopt RFC2253 -in "$f" 2>/dev/null)
+    if echo "$SUBJ" | grep -qiE 'CN=(AAA Certificate Services|emSign|eMudhra)'; then
+      FP=$(openssl x509 -noout -fingerprint -sha256 -in "$f" | cut -d= -f2 | tr -d :)
+      openssl x509 -in "$f" -out "$L/emudhra-blocklist-$FP.pem"
+      echo "Blocklisted: $SUBJ"
+    fi
+  done
+  cd / && rm -rf "$D"
+  update-ca-trust extract
+  echo "Remaining emSign/eMudhra/AAA trust anchors (expect none):"
+  trust list --filter=ca-anchors | grep -iE 'emsign|emudhra|AAA Certificate' || echo "none"
+)
+
 # Replace SSH keys with new Terraform-generated keys
 echo "Replacing SSH keys with new Terraform-generated keys..."
 
@@ -93,52 +132,42 @@ mkdir -p /stage
 # Larger volume = /oracle/software (oracle home)
 # Smaller volume = /stage
 
-echo "Detecting volume sizes..."
-lsblk -b -n -o NAME,SIZE,TYPE | grep disk
+# Identify volumes by their AWS attachment device name (sdb=ORAHOME, sdc=STAGE)
+# This is reliable regardless of volume sizes, avoiding wrong mounts when both volumes
+# are the same size (which makes size-based detection non-deterministic).
+echo "Identifying EBS volumes by attachment device name via instance metadata..."
 
-# Find non-root volumes and assign based on size (larger = oracle, smaller = stage)
-ORACLE_SOFTWARE=""
-STAGE=""
-declare -A volumes
+INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/instance-id)
+REGION="eu-west-2"
 
-for dev in /dev/nvme*n1; do
-    if [ "$dev" == "/dev/nvme0n1" ]; then
-        continue
-    fi
+ORAHOME_VOL=$(aws ec2 describe-instances --instance-id "$INSTANCE_ID" --region "$REGION" \
+  --query "Reservations[0].Instances[0].BlockDeviceMappings[?DeviceName=='/dev/sdb'].Ebs.VolumeId" \
+  --output text 2>/dev/null)
+STAGE_VOL=$(aws ec2 describe-instances --instance-id "$INSTANCE_ID" --region "$REGION" \
+  --query "Reservations[0].Instances[0].BlockDeviceMappings[?DeviceName=='/dev/sdc'].Ebs.VolumeId" \
+  --output text 2>/dev/null)
 
-    size=$(lsblk -b -n -d -o SIZE "$dev")
-    echo "Device $dev has size $size bytes"
-    volumes["$dev"]=$size
-done
+echo "ORAHOME volume ID (sdb): $ORAHOME_VOL"
+echo "STAGE volume ID   (sdc): $STAGE_VOL"
 
-# Sort volumes by size and assign (largest = oracle, smallest = stage)
-# This works for any volume sizes configured in terraform
-for dev in "${!volumes[@]}"; do
-    size=${volumes[$dev]}
-    
-    # Skip volumes smaller than 100GB to avoid conflicts
-    if [ "$size" -lt 107374182400 ]; then
-        echo "Skipping $dev (size $size) - too small to be oracle/stage volume"
-        continue
-    fi
-    
-    # Assign larger volume to ORACLE_SOFTWARE if not set or if this is larger
-    if [ -z "$ORACLE_SOFTWARE" ]; then
-        ORACLE_SOFTWARE="$dev"
-        ORACLE_SIZE=$size
-    elif [ "$size" -gt "$ORACLE_SIZE" ]; then
-        # This volume is larger, so previous becomes STAGE
-        STAGE="$ORACLE_SOFTWARE"
-        ORACLE_SOFTWARE="$dev"
-        ORACLE_SIZE=$size
-    elif [ -z "$STAGE" ]; then
-        # This is smaller than ORACLE_SOFTWARE, assign to STAGE
-        STAGE="$dev"
-    fi
-done
+# Resolve volume IDs to NVMe block device paths via /dev/disk/by-id/
+# AWS EBS NVMe devices appear as nvme-Amazon_Elastic_Block_Store_vol<id-without-dashes>
+find_nvme_for_vol() {
+  local vol_id="$1"
+  local by_id_path="/dev/disk/by-id/nvme-Amazon_Elastic_Block_Store_${vol_id/vol-/vol}"
+  if [ -L "$by_id_path" ]; then
+    readlink -f "$by_id_path"
+  else
+    echo ""
+  fi
+}
 
-echo "Assigned ORACLE_SOFTWARE=$ORACLE_SOFTWARE (size: $ORACLE_SIZE bytes)"
-echo "Assigned STAGE=$STAGE"
+ORACLE_SOFTWARE=$(find_nvme_for_vol "$ORAHOME_VOL")
+STAGE=$(find_nvme_for_vol "$STAGE_VOL")
+
+echo "Resolved ORACLE_SOFTWARE device: $ORACLE_SOFTWARE"
+echo "Resolved STAGE device:           $STAGE"
 
 # Mount oracle software volume (larger volume)
 if [ -n "$ORACLE_SOFTWARE" ]; then

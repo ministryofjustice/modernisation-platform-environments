@@ -359,6 +359,52 @@ module "s3-athena-bucket" {
   tags = local.tags
 }
 
+
+# ----------------------------------
+# Observability Platform Athena query results
+# ----------------------------------
+
+module "s3-observability-athena-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
+
+  bucket_prefix = (
+    "grafana-athena-query-results-${local.environment_shorthand}-"
+  )
+  versioning_enabled = true
+
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  replication_enabled = false
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 1
+      }
+
+      noncurrent_version_expiration = {
+        days = 1
+      }
+    }
+  ]
+
+  tags = local.tags
+}
+
 # ----------------------------------
 # Unzipped Data Store and log bucket
 # ----------------------------------
@@ -598,18 +644,8 @@ module "s3-data-bucket" {
         days = 10000
       }
 
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
       noncurrent_version_expiration = {
-        days = 365
+        days = 35
       }
     }
   ]
@@ -1259,23 +1295,58 @@ module "s3-create-a-derived-table-bucket" {
         }
       ]
 
-      expiration = {
-        days = 1000
+
+      noncurrent_version_expiration = {
+        days = 35
+      }
+    }
+  ]
+
+  tags = local.tags
+}
+
+# Backup  of the staging prefix in cadt bucket
+module "s3-create-a-derived-table-back-up-bucket-staging" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
+
+  bucket_name        = "${local.bucket_prefix}-cadt-backup-staging"
+  versioning_enabled = false
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
       }
 
-      noncurrent_version_transition = [
+      transition = [
         {
           days          = 30
           storage_class = "STANDARD_IA"
           }, {
-          days          = 90
+          days          = 60
           storage_class = "GLACIER"
         }
       ]
-
-      noncurrent_version_expiration = {
-        days = 365
-      }
     }
   ]
 
@@ -1663,4 +1734,48 @@ module "s3-macie-results-bucket" {
   ]
 
   tags = local.tags
+}
+
+
+# ------------------------------------------------
+# Allied GEMS set up
+# ------------------------------------------------
+
+module "s3-gems-general-landing-bucket" {
+  count  = local.is-test || local.is-development ? 1 : 0
+  source = "./modules/landing_bucket/"
+
+  data_feed  = "gems"
+  order_type = "general"
+
+  core_shared_services_id  = local.environment_management.account_ids["core-shared-services-production"]
+  local_bucket_prefix      = local.bucket_prefix
+  local_tags               = local.tags
+  logging_bucket           = module.s3-logging-bucket
+  production_dev           = local.environment_shorthand
+  received_files_bucket_id = module.s3-received-files-bucket.bucket.id
+  security_group_ids       = [aws_security_group.lambda_generic.id]
+  subnet_ids               = data.aws_subnets.shared-public.ids
+  cross_account            = local.is-development || local.is-preproduction
+  cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  metadata_bucket          = module.s3-metadata-bucket.bucket.arn
+
+  providers = {
+    aws = aws
+  }
+}
+
+module "s3-gems-general-landing-bucket-iam-user" {
+  count  = local.is-test || local.is-development ? 1 : 0
+  source = "./modules/landing_bucket_iam_user_access/"
+
+  data_feed  = "gems"
+  order_type = "general"
+
+  landing_bucket_arn        = module.s3-gems-general-landing-bucket[0].bucket_arn
+  local_bucket_prefix       = local.bucket_prefix
+  local_tags                = local.tags
+  rotation_lambda           = module.rotate_iam_key
+  rotation_lambda_role_name = aws_iam_role.rotate_iam_keys.name
 }

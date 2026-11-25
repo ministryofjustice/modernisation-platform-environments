@@ -1,0 +1,17 @@
+{
+  "accounts": {
+    "development": {
+      "ccms-ebs-db-ai-1-ip": "10.26.60.168",
+      "ccms-ebs-db-ai-2-ip": "10.26.60.205"
+    },
+    "test": {
+      "example_var": "test-data"
+    },
+    "preproduction": {
+      "example_var": "preproduction-data"
+    },
+    "production": {
+      "example_var": "production-data"
+    }
+  }
+}

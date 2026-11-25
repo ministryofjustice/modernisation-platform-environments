@@ -7,7 +7,7 @@ locals {
 }
 
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v6.1.0"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -24,11 +24,18 @@ module "bastion_linux" {
   log_expiry_days      = 180 # days before log expiration
   # bastion
   allow_ssh_commands = false
-  app_name           = var.networking[0].application
-  business_unit      = local.vpc_name
-  subnet_set         = local.subnet_set
-  environment        = local.environment
-  region             = "eu-west-2"
+  # STB-5230: distrust the eMudhra/emSign and Comodo AAA root CAs. AL2023 stays
+  # on the AMI's release version, so pull ca-certificates from the release that
+  # ships the fix (ALAS2023-2026-3337) instead of waiting for an AMI refresh.
+  extra_user_data_content = <<-EOT
+    dnf update -y ca-certificates --releasever 2023.12.20261028
+    update-ca-trust
+  EOT
+  app_name                = var.networking[0].application
+  business_unit           = local.vpc_name
+  subnet_set              = local.subnet_set
+  environment             = local.environment
+  region                  = "eu-west-2"
   # Autoscaling
   autoscaling_cron = local.crontab
 

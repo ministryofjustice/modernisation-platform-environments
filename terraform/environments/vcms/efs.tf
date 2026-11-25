@@ -4,8 +4,11 @@ resource "aws_efs_file_system" "vcms" {
   creation_token                  = "vcms-${local.environment}"
   encrypted                       = true
   kms_key_id                      = local.account_config.kms_keys.general_shared
-  throughput_mode                 = "bursting"
+  throughput_mode                 = local.app_config.efs_throughput_mode
   provisioned_throughput_in_mibps = null
+  protection {
+    replication_overwrite = "DISABLED"
+  }
 
   tags = local.tags
 }
