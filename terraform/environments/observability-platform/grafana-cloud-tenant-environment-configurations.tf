@@ -23,9 +23,9 @@ locals {
   environment_configuration_gc = local.environment_configurations_gc[local.environment]
   environment_configurations_gc = {
     development = {
-      # Deploy prerequisites only; Secrets Manager rotation remains disabled.
       pdc_token_rotator = {
-        image_digest = "sha256:7e357f00e83b9c88a320034e0ba7f5ac2cbc7887485b4e1554e1e457fe5d7f8f"
+        image_digest      = "sha256:7e357f00e83b9c88a320034e0ba7f5ac2cbc7887485b4e1554e1e457fe5d7f8f"
+        bootstrap_enabled = false # alpha.4 supports rotation, not first issuance.
       }
       pdc_failure_alerts = {
         slack_channel_id = "C06ALD6LX55"

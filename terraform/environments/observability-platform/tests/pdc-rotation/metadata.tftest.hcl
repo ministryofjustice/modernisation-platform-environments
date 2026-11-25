@@ -52,6 +52,11 @@ override_resource {
 }
 
 override_resource {
+  target = aws_secretsmanager_secret.gc_pdc_token["new-development"]
+  values = { arn = "arn:aws:secretsmanager:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:secret:grafana-cloud/pdc/@MOCK_NEW_ACCOUNT@-ABCDEF" }
+}
+
+override_resource {
   target = aws_secretsmanager_secret.gc_pdc_rotator_credential["stack-query-token"]
   values = { arn = "arn:aws:secretsmanager:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:secret:grafana-cloud/pdc-token-rotator/stack-query-token-ABCDEF" }
 }
@@ -123,9 +128,9 @@ run "central_metadata_without_activation" {
   assert {
     condition = (
       !contains(keys(aws_secretsmanager_secret.gc_pdc_token), "disabled-development") &&
-      toset(keys(local.gc_pdc_token_accounts)) == toset(["cooker-development"]) &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 1 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 1 &&
+      length(terraform_data.gc_pdc_bootstrap) == 0 &&
+      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
+      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
       length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
       length(module.grafana_pdc_token_rotator) == 0 &&
       length(aws_dynamodb_table.gc_pdc_rotation_state) == 0 &&
@@ -240,16 +245,18 @@ run "prepared_runtime_permissions" {
           one([for s in jsondecode(aws_kms_key.gc_pdc_rotator_credential[name].policy).Statement : s if s.Sid == "AllowRotatorToDecryptCredential"]).Condition.ArnLike["kms:EncryptionContext:SecretARN"] == "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:${secret.name}-??????"
         )
       ]) &&
-      toset(keys(local.gc_pdc_token_accounts)) == toset(["cooker-development"]) &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 1 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 1 &&
-      toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development"]) &&
-      aws_secretsmanager_secret_rotation.gc_pdc_token["sprinkler-development"].secret_id == aws_secretsmanager_secret.gc_pdc_token["sprinkler-development"].id &&
-      aws_secretsmanager_secret_rotation.gc_pdc_token["sprinkler-development"].rotation_lambda_arn == module.grafana_pdc_token_rotator["this"].lambda_function_arn &&
-      aws_secretsmanager_secret_rotation.gc_pdc_token["sprinkler-development"].rotate_immediately &&
-      one(aws_secretsmanager_secret_rotation.gc_pdc_token["sprinkler-development"].rotation_rules).automatically_after_days == local.pdc_rotation_rules.automatically_after_days
+      length(terraform_data.gc_pdc_bootstrap) == 0 &&
+      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
+      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
+      toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"]) &&
+      alltrue([for name, rotation in aws_secretsmanager_secret_rotation.gc_pdc_token : (
+        rotation.secret_id == aws_secretsmanager_secret.gc_pdc_token[name].id &&
+        rotation.rotation_lambda_arn == module.grafana_pdc_token_rotator["this"].lambda_function_arn &&
+        rotation.rotate_immediately && one(rotation.rotation_rules).automatically_after_days == 90 &&
+        !contains(keys(aws_secretsmanager_secret.gc_pdc_token[name].tags), "pdc:bootstrap")
+      )])
     )
-    error_message = "Keep the pilot's original token unmanaged only in development, preserve Cooker bootstrap, and enable immediate rotation only for Sprinkler development."
+    error_message = "Hand off both seeded development accounts; neither must be tagged or invoked for first issuance."
   }
 
   assert {
@@ -294,10 +301,14 @@ run "prepared_runtime_permissions" {
   }
 }
 
-run "new_account_bootstrap_remains_enabled" {
+run "new_account_without_capable_image_fails_closed" {
   command = plan
 
   variables {
+    rotator = {
+      image_digest      = "sha256:7e357f00e83b9c88a320034e0ba7f5ac2cbc7887485b4e1554e1e457fe5d7f8f"
+      bootstrap_enabled = false
+    }
     accounts = {
       sprinkler-development = { pdc_enabled = true }
       cooker-development    = { pdc_enabled = true }
@@ -305,18 +316,7 @@ run "new_account_bootstrap_remains_enabled" {
     }
   }
 
-  assert {
-    condition = (
-      toset(keys(local.gc_pdc_token_accounts)) == toset([
-        "cooker-development",
-        "new-development",
-      ]) &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 2 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 2 &&
-      length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0
-    )
-    error_message = "New non-pilot accounts must retain Terraform token bootstrap while only Sprinkler development is handed off."
-  }
+  expect_failures = [terraform_data.gc_pdc_bootstrap["new-development"]]
 }
 
 run "reject_unpinned_image" {
@@ -344,16 +344,91 @@ run "reject_missing_failure_destination" {
   expect_failures = [aws_cloudwatch_metric_alarm.gc_pdc_rotator_errors["this"], aws_cloudwatch_event_target.gc_pdc_rotation_failed["this"]]
 }
 
-run "reject_rotator_without_pdc_accounts" {
+run "production_common_runtime_without_pdc_accounts" {
   state_key = "empty_rotator"
-  command   = plan
+  command   = apply
 
   variables {
-    accounts = {}
+    environment = "production"
+    accounts    = {}
     rotator = {
-      image_digest = "sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa"
+      image_digest      = "sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa"
+      bootstrap_enabled = true
     }
   }
 
-  expect_failures = [aws_iam_policy.gc_pdc_rotator["this"]]
+  assert {
+    condition = (
+      toset([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Sid]) ==
+      toset(["ReadGrafanaCredential", "ReadStackQueryCredential", "DecryptGrafanaCredential", "DecryptStackQueryCredential", "ManageRotationJournal"]) &&
+      alltrue([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : length(s.Resource) > 0 && !contains(s.Resource, "*")]) &&
+      length(module.grafana_pdc_token_rotator) == 1 && length(aws_secretsmanager_secret.gc_pdc_rotator_credential) == 2 &&
+      length(aws_dynamodb_table.gc_pdc_rotation_state) == 1 && length(aws_cloudwatch_metric_alarm.gc_pdc_rotator_errors) == 1 &&
+      length(aws_cloudwatch_event_target.gc_pdc_rotation_failed) == 1 && length(module.gc_pdc_failure_chatbot) == 1 &&
+      length(aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri) == 0 &&
+      length(grafana_cloud_private_data_source_connect_network.account) == 0 &&
+      length(aws_kms_key.gc_pdc_token) == 0 && length(aws_secretsmanager_secret.gc_pdc_token) == 0 &&
+      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
+      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 && length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
+      length(aws_lambda_permission.gc_pdc_bootstrap) == 0 && length(terraform_data.gc_pdc_bootstrap) == 0
+    )
+    error_message = "Common production resources must need neither a tenant nor wildcard/empty tenant grants."
+  }
+}
+
+run "new_opt_in_first_issuance_only" {
+  state_key = "bootstrap"
+  command   = apply
+
+  variables {
+    accounts = {
+      sprinkler-development = { pdc_enabled = true }
+      cooker-development    = { pdc_enabled = true }
+      new-development       = { pdc_enabled = true }
+    }
+
+    rotator = {
+      image_digest      = "sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa"
+      bootstrap_enabled = true
+    }
+  }
+
+  assert {
+    condition = (
+      toset(keys(terraform_data.gc_pdc_bootstrap)) == toset(["new-development"]) &&
+      aws_secretsmanager_secret.gc_pdc_token["new-development"].tags["pdc:bootstrap"] == "true" &&
+      alltrue([for k in ["sprinkler-development", "cooker-development"] : !contains(keys(aws_secretsmanager_secret.gc_pdc_token[k].tags), "pdc:bootstrap")]) &&
+      contains(one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "RotatePdcSecrets"]), aws_secretsmanager_secret.gc_pdc_token["new-development"].arn) &&
+      !contains(keys(local.gc_pdc_restarter_role_arns), "new-development") &&
+      aws_lambda_permission.gc_pdc_bootstrap["this"].action == "lambda:InvokeFunction" &&
+      aws_lambda_permission.gc_pdc_bootstrap["this"].function_name == module.grafana_pdc_token_rotator["this"].lambda_function_arn &&
+      aws_lambda_permission.gc_pdc_bootstrap["this"].principal == "arn:aws:iam::@MOCK_PLATFORM_ACCOUNT@:role/github-actions-apply" &&
+      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 && length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
+      !contains(keys(aws_secretsmanager_secret_rotation.gc_pdc_token), "new-development")
+    )
+    error_message = "New accounts get one bootstrap action, scoped access, no Terraform token/version and no premature schedule."
+  }
+}
+
+run "image_update_after_first_issuance" {
+  state_key = "bootstrap"
+  command   = apply
+
+  variables {
+    accounts = {
+      sprinkler-development = { pdc_enabled = true }
+      cooker-development    = { pdc_enabled = true }
+      new-development       = { pdc_enabled = true }
+    }
+    rotator = {
+      image_digest      = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      bootstrap_enabled = true
+    }
+    simulate_enrolment = true
+  }
+
+  assert {
+    condition     = terraform_data.gc_pdc_bootstrap["new-development"].id == run.new_opt_in_first_issuance_only.marker_id
+    error_message = "Image upgrades and downstream enrolment must preserve the completed bootstrap marker."
+  }
 }

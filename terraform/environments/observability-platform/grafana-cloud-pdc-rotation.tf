@@ -2,22 +2,18 @@ locals {
   pdc_rotation_interval_days = 90
   pdc_token_grace_days       = 7
 
-  # Bootstrap every account except the Sprinkler development pilot, which is handed off below.
-  gc_pdc_token_accounts = {
+  # These accounts already have working tokens. Never send either through first issuance.
+  gc_pdc_seeded_accounts = local.environment == "development" ? toset(["sprinkler-development", "cooker-development"]) : toset([])
+  gc_pdc_bootstrap_accounts = {
     for account_name, account_id in local.gc_pdc_accounts :
-    account_name => account_id
-    if !(local.environment == "development" && account_name == "sprinkler-development")
+    account_name => account_id if !contains(local.gc_pdc_seeded_accounts, account_name)
   }
 
-  # The first rotation is enabled only with the development rotator deployment.
-  gc_pdc_rotation_pilot_accounts = {
+  # New accounts will enrol separately, only after their tenant agents are connected.
+  gc_pdc_rotation_accounts = {
     for account_name, account_id in local.gc_pdc_accounts :
     account_name => account_id
-    if(
-      local.environment == "development" &&
-      account_name == "sprinkler-development" &&
-      local.environment_configuration_gc.pdc_token_rotator != null
-    )
+    if contains(local.gc_pdc_seeded_accounts, account_name) && local.environment_configuration_gc.pdc_token_rotator != null
   }
 
   pdc_rotation_rules = {
@@ -28,12 +24,12 @@ locals {
 
   gc_pdc_rotator_role_name = "grafana-pdc-token-rotator"
   gc_pdc_restarter_role_arns = {
-    for account_name, account_id in local.gc_pdc_accounts :
+    for account_name, account_id in local.gc_pdc_rotation_accounts :
     account_name => "arn:aws:iam::${account_id}:role/grafana-pdc-agent-restarter"
   }
 
   gc_pdc_rotation_tags = {
-    for account_name, account_id in local.gc_pdc_accounts : account_name => {
+    for account_name, account_id in local.gc_pdc_accounts : account_name => merge({
       "pdc:tenant-account-id" = account_id
       "pdc:access-policy-id"  = grafana_cloud_private_data_source_connect_network.account[account_name].pdc_network_id
       "pdc:region"            = grafana_cloud_private_data_source_connect_network.account[account_name].region
@@ -42,12 +38,12 @@ locals {
       "pdc:ecs-region"        = data.aws_region.current.name
       "pdc:ecs-cluster"       = "grafana-pdc-agent"
       "pdc:ecs-service"       = "grafana-pdc-agent"
-    }
+    }, contains(keys(local.gc_pdc_bootstrap_accounts), account_name) ? { "pdc:bootstrap" = "true" } : {})
   }
 }
 
 resource "aws_secretsmanager_secret_rotation" "gc_pdc_token" {
-  for_each = local.gc_pdc_rotation_pilot_accounts
+  for_each = local.gc_pdc_rotation_accounts
 
   secret_id           = aws_secretsmanager_secret.gc_pdc_token[each.key].id
   rotation_lambda_arn = module.grafana_pdc_token_rotator["this"].lambda_function_arn

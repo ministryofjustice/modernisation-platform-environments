@@ -29,7 +29,7 @@ mock_provider "grafana" {
   alias = "stack"
 }
 
-run "bootstrap_tokens" {
+run "protected_secrets" {
   command = apply
 }
 

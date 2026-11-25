@@ -297,7 +297,8 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
   description = "Rotate central PDC secrets and assume only opted-in tenant restart roles"
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
+    # Omit tenant-only statements at zero opt-ins; AWS rejects an empty Resource list.
+    Statement = [for statement in [
       {
         Sid    = "RotatePdcSecrets"
         Effect = "Allow"
@@ -370,14 +371,10 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
         Action   = ["dynamodb:GetItem", "dynamodb:PutItem"]
         Resource = [aws_dynamodb_table.gc_pdc_rotation_state[each.key].arn]
       },
-    ]
+    ] : statement if length(statement.Resource) > 0]
   })
 
   lifecycle {
-    precondition {
-      condition     = length(local.gc_pdc_accounts) > 0
-      error_message = "Configure the PDC rotator only in an environment with opted-in PDC accounts."
-    }
     precondition {
       condition     = can(regex("^sha256:[0-9a-f]{64}$", each.value.image_digest))
       error_message = "The PDC rotator image must be pinned to a sha256 digest."
@@ -418,7 +415,7 @@ module "grafana_pdc_token_rotator" {
       principal      = "secretsmanager.amazonaws.com"
       source_account = data.aws_caller_identity.current.account_id
       source_arn     = secret.arn
-    }
+    } if contains(keys(local.gc_pdc_rotation_accounts), account_name)
   }
 }
 

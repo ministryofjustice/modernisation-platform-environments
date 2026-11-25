@@ -4,33 +4,59 @@ Tracks [ministryofjustice/observability-platform#338](https://github.com/ministr
 
 ## Current safe boundary
 
-The deployed baseline is still dormant: development has the Lambda, journal,
-scoped IAM policy, alarms, credential secrets, token-less Grafana identities and
-failure SNS/Slack delivery, but no tenant-secret rotation schedule. The reviewed
-pilot configuration will enable rotation only for Sprinkler development. Its
-first rotation starts during the approved Terraform apply; until that change is
-deployed, existing tokens remain valid and managed as before. Cooker development
-and production remain unchanged, and all non-pilot accounts retain Terraform's
-first-token bootstrap behaviour. Production keeps `pdc_token_rotator = null`.
-The secret names, per-account networks, KMS policies and tenant read permissions
-are unchanged.
+Sprinkler development has completed an alpha.4 rotation and reconnection and
+previously demonstrated rollback. Keep its existing schedule and agents running.
+Cooker development already has a working `AWSCURRENT`; the configuration below
+prepares its non-destructive handoff and first rotation at the next reviewed
+development apply. Do **not** bootstrap either account.
 
-Managed token and secret-version resources block destruction, including
-replacement and account removal. This is intentional: replacing a Grafana token
-revokes it before ECS agents can read its replacement. The pilot instances are
-the exception: they are explicitly moved and forgotten without destruction.
-Offboarding other accounts still requires an explicitly reviewed change to
-these protections.
+Production still has `tenant_configuration = {}`, no image and no alert
+destination. A later reviewed stable image and production alert configuration
+can deploy the common Lambda, journal, credential metadata and monitoring with
+zero tenants. There are no empty or wildcard tenant IAM grants, tenant secrets,
+schedules or invocations in that state. Confirm ECR pull access, production
+credential custody/renewal and end-to-end alert delivery before onboarding.
+An earlier protected production apply with plugin/AMG `EDITOR` drift is not a
+production PDC deployment or approval.
 
-Terraform still holds the existing tenant PDC token values in state until the
-handoff below. The two new rotator credential values are never generated, read,
-supplied as inputs or exposed as outputs by Terraform; it owns only their empty
-secrets, keys and Grafana identities.
+## First issuance for a new opt-in
+
+Keep `bootstrap_enabled = false` until a verified compatible image is released.
+Alpha.4 cannot issue the first token; a new opt-in fails its Terraform precondition
+instead of falling back to a Terraform-generated token. The bootstrap implementation
+in [ministryofjustice/observability-platform-grafana-pdc-token-rotator#11](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/pull/11)
+is a runtime dependency, not a deployable digest.
+
+1. Use a genuinely new account and network/access policy, with **no** Grafana
+   token history in that policy/region (including expired tokens). Terraform
+   creates only the network, CMK, protected secret and cross-account policies;
+   it tags the empty secret `pdc:bootstrap=true` alongside the rotation tags.
+   No legacy token or secret-version resource may match. For live development
+   proof use an authorised third account, never a cleared Sprinkler/Cooker secret.
+2. On creation only, `terraform_data.gc_pdc_bootstrap` invokes the central
+   Lambda synchronously: `{"Step":"bootstrapSecret","SecretId":"<full secret ARN>"}`.
+   The apply runner needs Python 3, AWS CLI v2 and `lambda:InvokeFunction` on
+   that function; the helper uses the runner credentials. Success is HTTP 200,
+   no `FunctionError`, JSON `null`. No response, token or request ID is emitted
+   or stored in state. The runtime checks all version history, claims issuance
+   in its journal and guards the first `AWSCURRENT`; it does not contact ECS or
+   query metrics. On ambiguous issuance stop and inspect metadata/journal. Do
+   not taint the marker, recreate it, rerun an old plan or issue another token.
+3. After confirmed first issuance the team deploys the existing tenant module
+   with `grafana_cloud.pdc_agent.enabled = true`; ECS reads the central secret.
+   Keep the completed marker at its address. No image, enrolment or destroy
+   trigger replays it. There is deliberately **no** new-account schedule yet.
+   The next stage must enrol automatically only after positive stable ECS count
+   and fresh, sustained matching network evidence. Delayed deployment must not
+   test or rotate an unconnected service; monitor seed expiry from issuance
+   (97 days), alert before the rollback margin is consumed, and escalate an
+   expired seed rather than bootstrapping again. Do not enable general opt-ins
+   until this enrolment and expiry handling are available.
 
 ## Rotation contract
 
 `grafana-cloud-pdc-rotation.tf` defines the rotation interval and grace period
-together as code locals. `local.pdc_rotation_rules` supplies the pilot's Secrets
+together as code locals. `local.pdc_rotation_rules` supplies the seeded accounts' Secrets
 Manager `rotation_rules`; `local.pdc_token_lifetime_days` derives each new
 token's expiry period from the same settings. These are not module inputs or
 outputs.
@@ -60,7 +86,7 @@ The confirmed role contract is
 `arn:aws:iam::<tenant-account-id>:role/grafana-pdc-agent-restarter`. The runtime
 derives the tenant role ARN from the account ID.
 
-## Dormant Lambda deployment
+## Shared Lambda deployment
 
 The dedicated repository is
 `ministryofjustice/observability-platform-grafana-pdc-token-rotator`. The
@@ -104,6 +130,7 @@ The optional `pdc_token_rotator` configuration contains only:
 | Field | Required value |
 | --- | --- |
 | `image_digest` | Released image digest, validated as `sha256:` followed by 64 lowercase hexadecimal characters |
+| `bootstrap_enabled` | Enable only with a released first-issuance implementation; false on the existing development image |
 
 Terraform creates `grafana-cloud/pdc-token-rotator/management-token` and
 `grafana-cloud/pdc-token-rotator/stack-query-token` in the current environment's
@@ -144,7 +171,7 @@ Confirm the Chatbot subscription and delivery before activation.
 Lambda receives only the management and stack query secret ARNs through
 `GRAFANA_API_CREDENTIAL_SECRET_ARN` and
 `GRAFANA_STACK_QUERY_CREDENTIAL_SECRET_ARN`. Use the
-stack URL passed in `GRAFANA_STACK_URL` and confirm during the pilot that
+stack URL passed in `GRAFANA_STACK_URL` and confirm before activation that
 `GRAFANA_USAGE_DATASOURCE_UID` (`grafanacloud-usage`) resolves to the usage data
 source and that the credential can query it. Cadence comes from secret metadata.
 The rotator derives the metric's `tunnelID` as `<stack ID>/<access policy ID>`
@@ -153,7 +180,7 @@ from the existing tags; no manual mapping is needed. The development pilot's
 network, tunnel and region labels. Missing or ambiguous matches fail before
 promotion. Confirm scrape and ingestion lag before choosing the runtime's metric
 freshness, settling and stability settings.
-Setting this object does **not** enable secret rotation or perform state handoff.
+With no tenants this object does not enable rotation or invoke the Lambda.
 
 ## Manual credentials after apply
 
@@ -202,19 +229,17 @@ Uploading credentials does not invoke the Lambda or enable rotation.
   [#20602](https://github.com/ministryofjustice/modernisation-platform-environments/pull/20602)
   has been deployed before activation. It updates the tenant module pin to a
   release that adds `grafana-pdc-agent-restarter`. Verify the merged module
-  version is deployed to Sprinkler development.
-- The main deployments in run `45418300030` succeeded in both environments.
-  The pilot code still requires its own reviewed main-branch plan and apply.
+  version is deployed to Cooker development before its handoff.
 - Confirm the released image can be pulled by Lambda from the cross-account ECR
-  repository, including its repository policy. The dormant wiring follows the
+  repository, including its repository policy. The rotator follows the
   existing Lambda module `7.20.1` deployment pattern.
 - Apply the development prerequisites, upload both credentials above, verify the
   scope/realm and the usage query, and agree manual credential renewal ownership.
   The initial runtime contract uses expiry rather than token deletion; do not
   grant deletion scope until its cleanup implementation is reviewed.
 - A tenant module release with `grafana-pdc-agent-restarter`, trusted only by the
-  agreed central Lambda execution role. The dormant wiring grants that execution
-  role `sts:AssumeRole` only on opted-in accounts' restarter roles, with secret
+  agreed central Lambda execution role. The execution role can assume only
+  scheduled accounts' restarter roles, with secret
   read/write/staging and KMS permissions restricted to this environment's PDC
   secrets and keys.
 - A proven token acceptance check and a reconnection signal attributable to the
@@ -222,7 +247,7 @@ Uploading credentials does not invoke the Lambda or enable rotation.
   `grafanacloud_grafana_pdc_connected_agents` for the network's `tunnelID`.
   Each network must be exclusive to one ECS agent service: the metric counts
   all connected agents on the network and must match that service's desired count.
-  Verify during the pilot that the metric is fresh enough and measures the
+  Verify that the metric is fresh enough and measures the
   replacement deployment rather than still-connected old agents.
   ECS service stability alone is insufficient: an
   unauthenticated agent can stay running and retrying. Agree any additional log
@@ -232,14 +257,14 @@ Uploading credentials does not invoke the Lambda or enable rotation.
 - A configured `pdc_failure_alerts` destination in the environment. Confirm
   both SNS and Amazon Q delivery before activation.
 
-Before scheduling the activation, securely record the existing Sprinkler
+Before scheduling the activation, securely record the existing Cooker
 Grafana token ID and the Secrets Manager version ID currently labelled
 `AWSCURRENT`. Use Grafana token metadata/portal and this metadata-only command:
 
 ```shell
 aws secretsmanager describe-secret \
   --region eu-west-2 \
-  --secret-id 'grafana-cloud/pdc/<Sprinkler-development-account-id>' \
+  --secret-id 'grafana-cloud/pdc/<Cooker-development-account-id>' \
   --query VersionIdsToStages \
   --output json
 ```
@@ -251,10 +276,10 @@ plan files and state backups as credentials.
 Check the full preflight immediately before the maintenance window:
 
 - Confirm exactly one `AWSCURRENT`, no unfinished rotation, and a working
-  read-only PDC query through the Sprinkler network.
+  read-only PDC query through the Cooker network.
 - Confirm the ECS service is `ACTIVE`, has a positive desired count, and is
   stable on its expected task definition. Confirm a single fresh
-  `grafanacloud_grafana_pdc_connected_agents` series for the Sprinkler
+  `grafanacloud_grafana_pdc_connected_agents` series for the Cooker
   `tunnelID`, with the expected stack/network/region labels and count matching
   the exclusive service's desired count. The current runtime defaults require
   metric age at most 180 seconds, then at least two post-settle samples spanning
@@ -268,34 +293,32 @@ Check the full preflight immediately before the maintenance window:
   window. A rotation run must finish or leave time for rollback before the
   current token's expiry.
 
-## Sprinkler development pilot runbook
+## Cooker development handoff runbook
 
-The change uses exact `moved` blocks from the Sprinkler development
+The change uses exact `moved` blocks from the Cooker development
 `for_each` instances to singleton handoff addresses, followed by singleton
 `removed` blocks with `destroy = false`. Terraform 1.10+ supports moving one
 `for_each` instance this way; the PDC test runner also verifies the operation
 with disposable local state and `prevent_destroy` enabled. The token and
 secret-version instances are forgotten without provider delete calls. The
-network, secret, KMS key, key alias, policies and other account tokens remain
+network, secret, KMS key, key alias, policies and Sprinkler schedule remain
 managed. Do not substitute resource-wide `removed` blocks or `terraform state
 rm`; either would lose the scope and safeguards of this handoff.
 
-The runtime cannot create the first token for an empty secret. That is not a
-problem for this pilot: Sprinkler already has an `AWSCURRENT` token. Every
-non-pilot account, including Cooker development, remains in Terraform's token
-and secret-version `for_each` resources, so new-account bootstrap remains
-automatic. Production has no pilot handoff or rotation configuration.
+Both legacy resource collections are now empty. Cooker's exact handoff is
+the only new state migration; retain the old Sprinkler moved/removed blocks.
+Secret metadata has `prevent_destroy` even after its version is forgotten.
 
 ### Review and fence the activation
 
-1. Complete every preflight above, record the existing Sprinkler token ID and
+1. Complete every preflight above, record the existing Cooker token ID and
    current secret version ID securely, and agree the maintenance window. Never
    retrieve or print secret values.
 2. Before opening the PR, confirm the GitHub Environment approval gate and who
    can approve the development deployment. The Observability Platform workflow
    can apply development from the PR branch as well as from `main`: do not
    approve a PR-branch apply of this change. Only the reviewed main-branch
-   deployment may activate the pilot.
+   deployment may activate Cooker's schedule.
 3. Coordinate merging the PR with the agreed maintenance window if a push to
    `main` can auto-apply. Before activation, wait for or cancel every in-flight
    or queued Observability Platform deployment from an older revision and
@@ -305,14 +328,14 @@ automatic. Production has no pilot handoff or rotation configuration.
    or its revision confirmed, do not activate.
 4. Generate and review a fresh plan for each environment from that revision.
    Development must show only these PDC changes:
-   - The Sprinkler development token and secret-version instances move to their
+   - The Cooker development token and secret-version instances move to their
      singleton handoff addresses and are then forgotten, explicitly **not
      destroyed** (`destroy = false`).
-   - One `aws_secretsmanager_secret_rotation.gc_pdc_token["sprinkler-development"]`
+   - One `aws_secretsmanager_secret_rotation.gc_pdc_token["cooker-development"]`
      is added, with the deployed rotator Lambda and the
      `local.pdc_rotation_rules` interval.
    - No network, secret, KMS key, key alias, policy, token replacement, or
-     Cooker change.
+     Sprinkler change.
 
    Production must have no PDC handoff, rotation, or rotator changes. Stop if
    there is any unexpected change, destroy/replacement, missing state move, or
@@ -348,7 +371,7 @@ automatic. Production has no pilot handoff or rotation configuration.
   version is retained as `AWSPREVIOUS`, the journal reaches `completed`, and
   the new ECS deployment is stable with the expected task definition and
   desired running count. Confirm fresh connected-agent samples for the
-  Sprinkler stack/network/region labels match that count after the configured
+  Cooker stack/network/region labels match that count after the configured
   settle period and across the stability period. Finally, verify a real
   private-data-source query through the network.
 
@@ -408,13 +431,12 @@ The runner copies the real PDC files and their provider constraints into a
 temporary root, initialises without a backend, validates, then runs Terraform
 tests with mocked providers. Registry/module downloads require network access;
 no AWS or Grafana credentials, live backend or real API calls are used. It checks
-per-account metadata, expiry/schedule consistency, pilot-only rotation, Cooker
-and production token/bootstrap preservation, new-account onboarding, opt-in and
-empty-account behaviour, the dormant deployment, separate credential
+per-account metadata, 90-day schedules for existing accounts, 97-day token
+lifetime, new-account bootstrap eligibility, empty-production IAM, separate credential
 keys/secrets, least-privilege Grafana identities, digest validation, scoped
-runtime permissions and failure alert wiring. A disposable local-state test
-applies the exact instance-move/`destroy = false` pattern against protected
-synthetic token and version resources, verifies zero creates/changes/destroys,
-and confirms the control account remains in state. A separate negative test
-confirms token destruction protection rejects disabling accounts. These tests
-are not an end-to-end rotation test.
+runtime permissions and failure alert wiring. A stub CLI checks the synchronous
+bootstrap request, invocation count, failure handling and non-replay across an
+image change, simulated enrolment and teardown. A disposable local-state test
+uses the checked-in migration blocks to verify exactly two Cooker forgets and
+zero deletes. A negative test confirms secret protection rejects destructive
+account disablement. These are not live issuance or reconnection tests.

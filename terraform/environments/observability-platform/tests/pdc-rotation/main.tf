@@ -16,7 +16,8 @@ variable "environment" {
 
 variable "rotator" {
   type = object({
-    image_digest = string
+    image_digest      = string
+    bootstrap_enabled = optional(bool, false)
   })
   default = null
 }
@@ -49,9 +50,24 @@ locals {
   }
   environment_configuration_gc = {
     pdc_token_rotator  = var.rotator
-    pdc_failure_alerts = var.environment == "development" ? var.failure_alerts : null
+    pdc_failure_alerts = var.failure_alerts
   }
 }
 
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
+
+# Stand-in for a future downstream enrolment action. It must not replace the first-issuance marker.
+variable "simulate_enrolment" {
+  type    = bool
+  default = false
+}
+
+resource "terraform_data" "enrolment" {
+  count = var.simulate_enrolment ? 1 : 0
+  input = terraform_data.gc_pdc_bootstrap["new-development"].id
+}
+
+output "marker_id" {
+  value = try(terraform_data.gc_pdc_bootstrap["new-development"].id, null)
+}
