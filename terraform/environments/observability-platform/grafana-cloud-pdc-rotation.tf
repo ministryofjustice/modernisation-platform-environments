@@ -9,12 +9,20 @@ locals {
     account_name => account_id if !contains(local.gc_pdc_seeded_accounts, account_name)
   }
 
-  # New accounts will enrol separately, only after their tenant agents are connected.
+  # Terraform-owned schedules: the seeded accounts, once the rotator is deployed.
   gc_pdc_rotation_accounts = {
     for account_name, account_id in local.gc_pdc_accounts :
     account_name => account_id
     if contains(local.gc_pdc_seeded_accounts, account_name) && local.environment_configuration_gc.pdc_token_rotator != null
   }
+
+  # Seam for health-gated enrolment, not wired yet. A runtime reconciler, never Terraform, will own
+  # these accounts' schedules once their agents are connected, so this set must stay disjoint from
+  # gc_pdc_rotation_accounts. Wiring it will need, for these accounts only: a per-secret
+  # secretsmanager.amazonaws.com invoke permission (source_arn and source_account), the runtime
+  # role's secretsmanager:RotateSecret on their secret ARNs and lambda:InvokeFunction on the
+  # function, and their restarter-role ARNs.
+  gc_pdc_enrolment_accounts = local.gc_pdc_bootstrap_accounts
 
   pdc_rotation_rules = {
     automatically_after_days = local.pdc_rotation_interval_days

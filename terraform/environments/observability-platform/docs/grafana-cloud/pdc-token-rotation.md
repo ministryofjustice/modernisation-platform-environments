@@ -53,6 +53,16 @@ is a runtime dependency, not a deployable digest.
    expired seed rather than bootstrapping again. Do not enable general opt-ins
    until this enrolment and expiry handling are available.
 
+   Schedule ownership is split. Terraform owns schedules, Secrets Manager
+   invocation permissions and restarter grants only for the seeded accounts in
+   `local.gc_pdc_rotation_accounts`. New opt-ins are in
+   `local.gc_pdc_enrolment_accounts`, which the future reconciler will own; a
+   precondition keeps the two sets disjoint. Wiring the reconciler will add, for
+   that set only, per-secret `secretsmanager.amazonaws.com` invoke permissions
+   restricted by `source_arn` and `source_account`, the runtime role's
+   `secretsmanager:RotateSecret` on those secrets and `lambda:InvokeFunction`
+   on the function, and their restarter-role ARNs. None of these exist yet.
+
 ## Rotation contract
 
 `grafana-cloud-pdc-rotation.tf` defines the rotation interval and grace period

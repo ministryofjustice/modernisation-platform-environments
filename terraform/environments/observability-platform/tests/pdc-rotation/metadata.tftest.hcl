@@ -249,6 +249,13 @@ run "prepared_runtime_permissions" {
       length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
       length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
       toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"]) &&
+      toset(keys(local.gc_pdc_rotation_triggers)) == toset(["sprinkler-development", "cooker-development"]) &&
+      alltrue([for name, trigger in local.gc_pdc_rotation_triggers : (
+        trigger.principal == "secretsmanager.amazonaws.com" &&
+        trigger.source_account == data.aws_caller_identity.current.account_id &&
+        trigger.source_arn == aws_secretsmanager_secret.gc_pdc_token[name].arn
+      )]) &&
+      length(local.gc_pdc_enrolment_accounts) == 0 &&
       alltrue([for name, rotation in aws_secretsmanager_secret_rotation.gc_pdc_token : (
         rotation.secret_id == aws_secretsmanager_secret.gc_pdc_token[name].id &&
         rotation.rotation_lambda_arn == module.grafana_pdc_token_rotator["this"].lambda_function_arn &&
@@ -370,7 +377,8 @@ run "production_common_runtime_without_pdc_accounts" {
       length(aws_kms_key.gc_pdc_token) == 0 && length(aws_secretsmanager_secret.gc_pdc_token) == 0 &&
       length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
       length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 && length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
-      length(aws_lambda_permission.gc_pdc_bootstrap) == 0 && length(terraform_data.gc_pdc_bootstrap) == 0
+      length(aws_lambda_permission.gc_pdc_bootstrap) == 0 && length(terraform_data.gc_pdc_bootstrap) == 0 &&
+      length(local.gc_pdc_rotation_triggers) == 0 && length(local.gc_pdc_enrolment_accounts) == 0
     )
     error_message = "Common production resources must need neither a tenant nor wildcard/empty tenant grants."
   }
@@ -407,6 +415,16 @@ run "new_opt_in_first_issuance_only" {
       !contains(keys(aws_secretsmanager_secret_rotation.gc_pdc_token), "new-development")
     )
     error_message = "New accounts get one bootstrap action, scoped access, no Terraform token/version and no premature schedule."
+  }
+
+  assert {
+    condition = (
+      toset(keys(local.gc_pdc_enrolment_accounts)) == toset(["new-development"]) &&
+      toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"]) &&
+      toset(keys(local.gc_pdc_rotation_triggers)) == toset(["sprinkler-development", "cooker-development"]) &&
+      length(setintersection(keys(local.gc_pdc_enrolment_accounts), keys(local.gc_pdc_rotation_accounts))) == 0
+    )
+    error_message = "Only the future reconciler may schedule a new opt-in; Terraform keeps only the seeded accounts' schedules and invoke permissions."
   }
 }
 

@@ -31,6 +31,15 @@ locals {
       ROTATION_STATE_TABLE_NAME                 = aws_dynamodb_table.gc_pdc_rotation_state[key].name
     }
   }
+
+  # Secrets Manager may invoke the unqualified function only for Terraform-scheduled secrets.
+  gc_pdc_rotation_triggers = {
+    for account_name in keys(local.gc_pdc_rotation_accounts) : account_name => {
+      principal      = "secretsmanager.amazonaws.com"
+      source_account = data.aws_caller_identity.current.account_id
+      source_arn     = aws_secretsmanager_secret.gc_pdc_token[account_name].arn
+    }
+  }
 }
 
 resource "aws_kms_key" "gc_pdc_rotator_credential" {
@@ -379,6 +388,11 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
       condition     = can(regex("^sha256:[0-9a-f]{64}$", each.value.image_digest))
       error_message = "The PDC rotator image must be pinned to a sha256 digest."
     }
+    # Terraform and the future enrolment reconciler must never both own an account's schedule.
+    precondition {
+      condition     = length(setintersection(keys(local.gc_pdc_rotation_accounts), keys(local.gc_pdc_enrolment_accounts))) == 0
+      error_message = "Terraform schedules only seeded accounts; new opt-ins enrol after their agents connect, never through a Terraform schedule."
+    }
   }
 }
 
@@ -410,13 +424,7 @@ module "grafana_pdc_token_rotator" {
 
   # Secrets Manager invokes the unqualified function, not an immutable published version.
   create_current_version_allowed_triggers = false
-  allowed_triggers = {
-    for account_name, secret in aws_secretsmanager_secret.gc_pdc_token : account_name => {
-      principal      = "secretsmanager.amazonaws.com"
-      source_account = data.aws_caller_identity.current.account_id
-      source_arn     = secret.arn
-    } if contains(keys(local.gc_pdc_rotation_accounts), account_name)
-  }
+  allowed_triggers                        = local.gc_pdc_rotation_triggers
 }
 
 resource "aws_cloudwatch_metric_alarm" "gc_pdc_rotator_errors" {
