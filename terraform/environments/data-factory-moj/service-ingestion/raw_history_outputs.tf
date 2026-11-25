@@ -4,5 +4,5 @@ output "raw_history_runtimes" {
 
   value = local.is-development ? (
     module.configured_ingestion[0].raw_history_runtimes
-  ) : {}
+  ) : null
 }
