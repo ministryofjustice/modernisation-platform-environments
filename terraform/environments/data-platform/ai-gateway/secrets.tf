@@ -8,7 +8,7 @@ module "litellm_license_secret" {
 }
 
 module "litellm_enterprise_registry_secret" {
-  count = local.is-development ? 1 : 0
+  count = contains(["development", "test"], local.environment) ? 1 : 0
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
@@ -25,7 +25,7 @@ module "litellm_enterprise_registry_secret" {
 }
 
 module "litellm_enterprise_registry_hostname_secret" {
-  count = local.is-development ? 1 : 0
+  count = contains(["development", "test"], local.environment) ? 1 : 0
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
