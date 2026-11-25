@@ -169,37 +169,6 @@ resource "aws_secretsmanager_secret_version" "ndelius" {
   }
 }
 
-# ndmis Source Secrets
-resource "aws_secretsmanager_secret" "ndmis" {
-  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
-  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
-  count = local.is_non_prod ? 1 : 0
-
-  name = "external/${local.project}-ndmis-source-secret"
-
-  tags = merge(
-    local.all_tags,
-    {
-      dpr-name          = "external/${local.project}-ndmis-source-secret"
-      dpr-resource-type = "Secrets"
-    }
-  )
-}
-
-# PlaceHolder Secrets
-resource "aws_secretsmanager_secret_version" "ndmis" {
-  count = local.is_non_prod ? 1 : 0
-
-  secret_id     = aws_secretsmanager_secret.ndmis[0].id
-  secret_string = jsonencode(local.ndmis_secrets_placeholder)
-
-  lifecycle {
-    ignore_changes = [secret_string, ]
-  }
-}
-
-
-
 # DPS Source Secrets
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "dps" {

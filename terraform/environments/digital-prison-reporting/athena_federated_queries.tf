@@ -24,25 +24,20 @@ locals {
   ndelius_service_name      = local.is-test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["db_name"] : ""
   connection_string_ndelius = local.is-test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndelius[0].name}}@//${local.ndelius_host}:${local.ndelius_port}/${local.ndelius_service_name}" : ""
 
-  ndmis_host              = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["endpoint"] : ""
-  ndmis_port              = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["port"] : ""
-  ndmis_service_name      = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["db_name"] : ""
-  connection_string_ndmis = local.is_non_prod ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndmis[0].name}}@//${local.ndmis_host}:${local.ndmis_port}/${local.ndmis_service_name}" : ""
-
   # The Oracle databases each connector serves in each environment. Each database has a catalog of the same name.
   # Prisons and probation have a connector each, so each can be granted to its own parent domain.
   federated_query_oracle_databases = {
     development = {
       prisons   = ["nomis", "bodmis"]
-      probation = ["ndmis"]
+      probation = []
     }
     test = {
       prisons   = ["nomis", "bodmis"]
-      probation = ["oasys", "onr", "ndelius", "ndmis"]
+      probation = ["oasys", "onr", "ndelius"]
     }
     preproduction = {
       prisons   = ["nomis", "bodmis"]
-      probation = ["ndmis"]
+      probation = []
     }
     production = {
       prisons   = ["nomis", "bodmis"]
@@ -50,14 +45,13 @@ locals {
     }
   }[local.environment]
 
-  # The secrets for oasys, onr, ndelius and ndmis only exist in some environments, so their ARNs are null elsewhere
+  # The secrets for oasys, onr and ndelius only exist in some environments, so their ARNs are null elsewhere
   federated_query_oracle_connections = {
     nomis   = { connection_string = local.connection_string_nomis, secret_arn = aws_secretsmanager_secret.nomis.arn }
     bodmis  = { connection_string = local.connection_string_bodmis, secret_arn = aws_secretsmanager_secret.bodmis.arn }
     oasys   = { connection_string = local.connection_string_oasys, secret_arn = one(aws_secretsmanager_secret.oasys[*].arn) }
     onr     = { connection_string = local.connection_string_onr, secret_arn = one(aws_secretsmanager_secret.onr[*].arn) }
     ndelius = { connection_string = local.connection_string_ndelius, secret_arn = one(aws_secretsmanager_secret.ndelius[*].arn) }
-    ndmis   = { connection_string = local.connection_string_ndmis, secret_arn = one(aws_secretsmanager_secret.ndmis[*].arn) }
   }
 }
 
@@ -192,19 +186,6 @@ resource "aws_athena_data_catalog" "ndelius_catalog" {
 
   name        = "ndelius"
   description = "nDelius Athena data catalog"
-  type        = "LAMBDA"
-
-  parameters = {
-    "function" = module.athena_federated_query_connector_oracle_probation[0].lambda_function_arn
-  }
-}
-
-# Adds an Athena data source / catalog for ndmis
-resource "aws_athena_data_catalog" "ndmis_catalog" {
-  count = contains(local.federated_query_oracle_databases.probation, "ndmis") ? 1 : 0
-
-  name        = "ndmis"
-  description = "ndmis Athena data catalog"
   type        = "LAMBDA"
 
   parameters = {
