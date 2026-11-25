@@ -25,7 +25,7 @@ locals {
     development = {
       # Deploy prerequisites only; Secrets Manager rotation remains disabled.
       pdc_token_rotator = {
-        image_digest = "sha256:7ca46d60335d76ad808650339b2a143609d0b75e10f41f20462e940396305b9c"
+        image_digest = "sha256:7e357f00e83b9c88a320034e0ba7f5ac2cbc7887485b4e1554e1e457fe5d7f8f"
       }
       pdc_failure_alerts = {
         slack_channel_id = "C06ALD6LX55"
