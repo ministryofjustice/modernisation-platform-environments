@@ -159,6 +159,28 @@ resource "grafana_team_external_group" "bu" {
 }
 
 #------------------------------------------------------------------------------
+# Workspace login — IdC groups must hold a workspace role to sign in at all
+#
+# Team sync does not grant login. Every BU group gets the Viewer role; what
+# they can then see, query or edit is set by the data-source and folder
+# permissions below, which grant nothing to the built-in basic roles. Dashboard
+# authoring on non-live comes from the folder Edit permission (bu_permission),
+# so the workspace Editor role is not needed.
+#------------------------------------------------------------------------------
+
+resource "aws_grafana_role_association" "bu" {
+  count = local.manage_grafana_objects ? 1 : 0
+
+  role = "VIEWER"
+  group_ids = distinct(flatten([
+    for bu in values(local.grafana_bus) : [
+      for name in bu.idc_group_names : local.idc_group_id_by_name[name]
+    ]
+  ]))
+  workspace_id = aws_grafana_workspace.this[0].id
+}
+
+#------------------------------------------------------------------------------
 # Per-BU AMP data source
 #
 # AMG v12+ uses the dedicated Amazon Managed Service for Prometheus plugin;
