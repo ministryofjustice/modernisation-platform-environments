@@ -312,7 +312,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 512 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 4000 }
+          data  = { total_size = 5000 }
           flash = { total_size = 1000 }
         })
         instance = merge(local.ec2_instances.db.instance, {
@@ -322,9 +322,9 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description         = "PreProduction NOMIS MIS and Audit database"
           instance-scheduling = "skip-scheduling"
-          misload-dbname      = "PPMIS"
+          misload-dbname      = "PPMISG"
           nomis-environment   = "preprod"
-          oracle-sids         = "PPMIS PPCNMAUD"
+          oracle-sids         = "PPMISG PPCAUDG"
           update-ssm-agent    = "patchgroup2"
         })
       })
@@ -598,6 +598,8 @@ locals {
       "/oracle/database/PPTRDAT"  = local.secretsmanager_secrets.db
       "/oracle/database/PPCNMAUD" = local.secretsmanager_secrets.db
       "/oracle/database/PPMIS"    = local.secretsmanager_secrets.db_mis
+      "/oracle/database/PPCAUDG"  = local.secretsmanager_secrets.db
+      "/oracle/database/PPMISG"   = local.secretsmanager_secrets.db_mis
     }
   }
 }

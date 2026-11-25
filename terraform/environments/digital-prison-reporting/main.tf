@@ -65,9 +65,7 @@ module "glue_hive_table_creation_job" {
     "--dpr.aws.region"            = local.account_region
     "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id,
     "--dpr.raw.archive.s3.path"   = "s3://${module.s3_raw_archive_bucket.bucket_id}"
-    "--dpr.structured.s3.path"    = "s3://${module.s3_structured_bucket.bucket_id}"
     "--dpr.curated.s3.path"       = "s3://${module.s3_curated_bucket.bucket_id}"
-    "--dpr.structured.database"   = module.glue_structured_zone_database.db_name
     "--dpr.curated.database"      = module.glue_curated_zone_database.db_name
     "--dpr.contract.registryName" = module.s3_schema_registry_bucket.bucket_id
     "--dpr.schema.cache.max.size" = local.hive_table_creation_job_schema_cache_max_size
@@ -76,11 +74,9 @@ module "glue_hive_table_creation_job" {
 
   depends_on = [
     module.s3_raw_archive_bucket.bucket_id,
-    module.s3_structured_bucket.bucket_id,
     module.s3_curated_bucket.bucket_id,
     module.s3_glue_job_bucket.bucket_id,
     module.glue_raw_archive_database.db_name,
-    module.glue_structured_zone_database.db_name,
     module.glue_curated_zone_database.db_name,
     module.glue_prisons_database.db_name,
     module.glue_registry_avro.registry_name
@@ -196,7 +192,6 @@ module "glue_switch_reporting_hive_data_location_job" {
 
   depends_on = [
     module.s3_raw_archive_bucket.bucket_id,
-    module.s3_structured_bucket.bucket_id,
     module.s3_curated_bucket.bucket_id,
     module.s3_glue_job_bucket.bucket_id,
     module.glue_prisons_database.db_name,
@@ -213,7 +208,7 @@ module "glue_s3_data_deletion_job" {
   short_name                    = "${local.project}-s3-data-deletion-job"
   command_type                  = "glueetl"
   glue_version                  = local.glue_job_version
-  description                   = "Deletes s3 data belonging to a configured domain from specified bucket.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.file.deletion.buckets: (Required) comma separated set of s3 buckets from which to delete data from e.g dpr-raw-zone-<env>,dpr-structured-zone-<env>"
+  description                   = "Deletes s3 data belonging to a configured domain from specified bucket.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.file.deletion.buckets: (Required) comma separated set of s3 buckets from which to delete data from e.g dpr-raw-zone-<env>"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-s3-data-deletion-${local.env}/"
@@ -254,7 +249,6 @@ module "glue_s3_data_deletion_job" {
   depends_on = [
     module.s3_raw_bucket.bucket_id,
     module.s3_raw_archive_bucket.bucket_id,
-    module.s3_structured_bucket.bucket_id,
     module.s3_curated_bucket.bucket_id,
     module.s3_temp_reload_bucket.bucket_id
   ]
@@ -515,25 +509,6 @@ module "s3_raw_bucket" {
     local.all_tags,
     {
       dpr-name          = "${local.project}-raw-zone-${local.env}"
-      dpr-resource-type = "S3 Bucket"
-      dpr-jira          = "DPR-108"
-    }
-  )
-}
-
-# S3 Structured
-module "s3_structured_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-structured-zone-${local.env}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false # For SQS Queue
-  enable_lifecycle          = true
-
-  tags = merge(
-    local.all_tags,
-    {
-      dpr-name          = "${local.project}-structured-zone-${local.env}"
       dpr-resource-type = "S3 Bucket"
       dpr-jira          = "DPR-108"
     }
@@ -820,16 +795,6 @@ module "glue_raw_archive_probation_database" {
   create_db      = local.create_db
   name           = "raw_archive_probation"
   description    = "Glue Data Catalog - Raw Archive Probation"
-  aws_account_id = local.account_id
-  aws_region     = local.account_region
-}
-
-# Glue Database Catalog for Data Domain
-module "glue_structured_zone_database" {
-  source         = "./modules/glue_database"
-  create_db      = local.create_db
-  name           = "structured"
-  description    = "Glue Data Catalog - Structured Zone"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }

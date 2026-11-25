@@ -39,7 +39,9 @@ locals {
           }
         }
       }
-      grafana_version                 = "12.4"
+      grafana_version = "12.4"
+      # AMG 12.4 migrated the default AMP source to the Amazon Prometheus plugin.
+      prometheus_data_source_type     = "grafana-amazonprometheus-datasource"
       grafana_api_key_rotator_version = "1.2.3"
     }
     production = {
@@ -620,6 +622,7 @@ locals {
         }
       }
       grafana_version                 = "10.4"
+      prometheus_data_source_type     = "prometheus"
       grafana_api_key_rotator_version = "1.0.10"
     }
   }

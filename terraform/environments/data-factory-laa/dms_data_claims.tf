@@ -94,6 +94,14 @@ resource "aws_iam_role_policy" "glue_access_dms" {
           "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/*",
           "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/*/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+        ]
+        Resource = [aws_kms_key.data_lake_kms_key.arn]
       }
     ]
   })
@@ -102,7 +110,7 @@ resource "aws_iam_role_policy" "glue_access_dms" {
 
 module "data_claims_dms" {
   count                    = local.is-test || local.is-preproduction ? 1 : 0
-  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=11bb66893d776c41ecc1c799effdb6f8633e702d"
+  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=f002ad98e57520a4a94805fbef073d75afad128e"
   vpc_id                   = data.aws_vpc.shared.id
   environment              = local.environment
   manage_dms_service_roles = false

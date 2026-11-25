@@ -115,6 +115,6 @@ module "process_uploads_lambda" {
 
   layers = [
     # TODO: Uses layer from AWS Account. Consider using a data source to pull latest version (and add delay to help prevent supply chain attacks)
-    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python314-Arm64:11"
+    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python314-Arm64:12"
   ]
 }

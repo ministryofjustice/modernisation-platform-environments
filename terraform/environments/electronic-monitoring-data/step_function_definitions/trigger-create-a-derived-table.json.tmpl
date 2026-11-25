@@ -8,11 +8,11 @@
       "Choices": [
         {
           "Next": "WaitUntil11pm",
-          "Condition": "{% $states.input.full_refresh = 'true' %}"
+          "Condition": "{% $states.input.full_refresh = true %}"
         },
         {
           "Next": "Lambda Invoke",
-          "Condition": "{% $states.input.full_refresh = 'false' %}"
+          "Condition": "{% $states.input.full_refresh = false %}"
         }
       ]
     },

@@ -1,9 +1,14 @@
 module "configured_ingestion" {
   count = local.is-development ? 1 : 0
 
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/database-migration-service/modules/configured-ingestion?ref=9706851536239db1769c3dfcfe3d9653d7d65800"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/database-migration-service/modules/configured-ingestion?ref=7b92d70e62e928296bf9efa3d780111ee59004ba"
 
   name_prefix = "dfmoj-ingestion"
+
+  raw_batch_handoffs = local.is-development ? jsondecode(
+    file("${path.module}/raw-batch-handoffs.json")
+  ) : {}
+
 
   compiled_artifacts = try(var.deployment.compiled_artifacts, {})
   contract_catalogs  = try(var.deployment.contract_catalogs, {})
