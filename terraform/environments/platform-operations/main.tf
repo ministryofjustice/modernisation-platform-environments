@@ -142,5 +142,4 @@ module "aws_securityhub_lambda" {
   github_project_number                      = aws_ssm_parameter.aws_securityhub_lambda["github_project_number"].value
   github_repo                                = "platform-operations"
   securityhub_ignore_findings_parameter_name = aws_ssm_parameter.aws_securityhub_lambda["ignore_findings"].name
-  depends_on                                 = [aws_ssm_parameter.aws_securityhub_lambda]
 }
