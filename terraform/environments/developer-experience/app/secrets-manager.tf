@@ -60,3 +60,21 @@ module "notify_secret" {
     { "credential-expiration" = "none" }
   )
 }
+
+module "sentry_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f3d3da1c801816563080065c5f37f212c8dee444" # v2.2.0
+
+  name       = "${local.component_name}/sentry"
+  kms_key_id = module.kms_key.key_arn
+
+  secret_string = jsonencode({
+    dsn = "CHANGEME"
+  })
+
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "none" }
+  )
+}

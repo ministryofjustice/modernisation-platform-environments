@@ -68,24 +68,24 @@ module "github_workflow_scheduler" {
   github_workflows           = local.github_actions_lambda_environment_specific.github_workflows
 }
 
-resource "aws_ssm_parameter" "aws_health_lambda_accounts" {
-  count       = local.enable_aws_health_lambda ? 1 : 0
-  name        = "health_lambda_accounts"
-  description = "AWS Health Lambda accounts"
-  type        = "SecureString"
-  value       = "TO_BE_UPDATED"
+resource "aws_ssm_parameter" "aws_health_lambda" {
+  for_each = local.enable_aws_health_lambda ? {
+    accounts = {
+      name        = "health_lambda_accounts"
+      description = "AWS Health Lambda accounts"
+    }
+    ignore_findings = {
+      name        = "health_lambda_ignore_findings"
+      description = "AWS Health Lambda ignore findings"
+    }
+    github_project_number = {
+      name        = "health_lambda_github_project_number"
+      description = "AWS Health Lambda GitHub project number"
+    }
+  } : {}
 
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
-resource "aws_ssm_parameter" "aws_health_lambda_ignore_findings" {
-  count       = local.enable_aws_health_lambda ? 1 : 0
-  name        = "health_lambda_ignore_findings"
-  description = "AWS Health Lambda ignore findings"
+  name        = each.value.name
+  description = each.value.description
   type        = "SecureString"
   value       = "TO_BE_UPDATED"
 
@@ -100,9 +100,10 @@ module "aws_health_lambda" {
   count                          = local.enable_aws_health_lambda ? 1 : 0
   source                         = "../../modules/aws_health_lambda"
   aws_account_id                 = data.aws_caller_identity.current.id
-  aws_accounts_parameter_name    = aws_ssm_parameter.aws_health_lambda_accounts[count.index].name
+  aws_accounts_parameter_name    = aws_ssm_parameter.aws_health_lambda["accounts"].name
+  github_project_number          = aws_ssm_parameter.aws_health_lambda["github_project_number"].value
   github_repo                    = "platform-operations"
-  ignore_findings_parameter_name = aws_ssm_parameter.aws_health_lambda_ignore_findings[count.index].name
+  ignore_findings_parameter_name = aws_ssm_parameter.aws_health_lambda["ignore_findings"].name
 }
 
 resource "aws_ssm_parameter" "aws_securityhub_lambda" {
@@ -114,6 +115,10 @@ resource "aws_ssm_parameter" "aws_securityhub_lambda" {
     ignore_findings = {
       name        = "securityhub_lambda_ignore_findings"
       description = "AWS SecurityHub Lambda ignore findings"
+    }
+    github_project_number = {
+      name        = "securityhub_lambda_github_project_number"
+      description = "AWS SecurityHub Lambda GitHub project number"
     }
   } : {}
 
@@ -134,7 +139,7 @@ module "aws_securityhub_lambda" {
   source                                     = "../../modules/aws_securityhub_lambda"
   aws_account_id                             = data.aws_caller_identity.current.id
   aws_accounts_parameter_name                = aws_ssm_parameter.aws_securityhub_lambda["accounts"].name
+  github_project_number                      = aws_ssm_parameter.aws_securityhub_lambda["github_project_number"].value
   github_repo                                = "platform-operations"
   securityhub_ignore_findings_parameter_name = aws_ssm_parameter.aws_securityhub_lambda["ignore_findings"].name
-  depends_on                                 = [aws_ssm_parameter.aws_securityhub_lambda]
 }

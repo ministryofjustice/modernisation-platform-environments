@@ -13,7 +13,7 @@ locals {
     }
     (local.tempus.SPPProcessPlatform.short_resource_name) = {
       task_arn       = module.cica_dms_tempus_dms_implementation["SPPProcessPlatform"].dms_full_load_task_arn
-      deadline       = "04:30"
+      deadline       = "06:00"
       exclude_tables = []
     }
     (local.tempus.SPPFinishedJobs.short_resource_name) = {
@@ -146,7 +146,7 @@ module "dms_data_quality_lambda" {
   handler         = "main.handler"
   runtime         = "python3.14"
   memory_size     = 256
-  timeout         = 120
+  timeout         = 420
   architectures   = ["x86_64"]
   build_in_docker = false
   source_path     = "${path.module}/lambda-functions/data_quality/main.py"
