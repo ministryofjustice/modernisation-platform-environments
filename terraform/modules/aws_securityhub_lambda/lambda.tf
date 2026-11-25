@@ -25,7 +25,9 @@ resource "aws_lambda_function" "securityhub_finding_issue" {
   environment {
     variables = {
       GITHUB_IDENTITY                = var.github_identity
+      GITHUB_ISSUE_SOURCE            = var.github_issue_source
       GITHUB_ORG                     = var.github_org
+      GITHUB_PROJECT_NUMBER          = tostring(var.github_project_number)
       GITHUB_REPO                    = var.github_repo
       IGNORE_FINDINGS                = data.aws_ssm_parameter.securityhub_ignore_findings.value
       FINDING_SEVERITY_LABELS        = jsonencode(var.finding_severity_labels)

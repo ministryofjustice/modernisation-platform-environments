@@ -131,17 +131,113 @@ def build_github_issue(event):
     }
 
 
-def create_github_issue(github_org, github_token, repo, issue):
+def github_headers(github_token):
+    return {
+        "Authorization": "Bearer " + github_token,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+
+def github_graphql(github_token, query, variables):
+    try:
+        response = requests.post(
+            "https://api.github.com/graphql",
+            headers=github_headers(github_token),
+            json={"query": query, "variables": variables},
+            timeout=10,
+        )
+        response.raise_for_status()
+    except requests.RequestException as error:
+        logger.error("GitHub Projects API request failed: %s", error)
+        raise RuntimeError("GitHub Projects API request failed") from error
+
+    try:
+        payload = response.json()
+    except ValueError as error:
+        logger.error("GitHub Projects API response was not valid JSON")
+        raise RuntimeError("GitHub Projects API response was not valid JSON") from error
+    if (
+        not isinstance(payload, dict)
+        or payload.get("errors")
+        or not isinstance(payload.get("data"), dict)
+    ):
+        logger.error("GitHub Projects API returned errors: %s", payload)
+        raise RuntimeError("GitHub Projects API returned errors or invalid data")
+    return payload["data"]
+
+
+def get_github_project_source(github_org, github_token, project_number, source):
+    data = github_graphql(
+        github_token,
+        """
+        query($org: String!, $number: Int!) {
+          organization(login: $org) {
+            projectV2(number: $number) {
+              id
+              field(name: "Source") {
+                ... on ProjectV2SingleSelectField { id options { id name } }
+              }
+            }
+          }
+        }
+        """,
+        {"org": github_org, "number": project_number},
+    )
+    organization = data.get("organization") or {}
+    project = organization.get("projectV2") or {}
+    field = project.get("field") or {}
+    option = next(
+        (item for item in field.get("options", []) if item.get("name") == source), None
+    )
+    if not project.get("id") or not field.get("id") or not option or not option.get("id"):
+        logger.error("GitHub project %s has no Source option %r", project_number, source)
+        raise RuntimeError(f"GitHub project {project_number} has no Source option {source!r}")
+    return project["id"], field["id"], option["id"]
+
+
+def add_issue_to_github_project(github_token, issue_id, project_id, field_id, option_id):
+    data = github_graphql(
+        github_token,
+        """
+        mutation($project: ID!, $issue: ID!) {
+          addProjectV2ItemById(input: {projectId: $project, contentId: $issue}) {
+            item { id }
+          }
+        }
+        """,
+        {"project": project_id, "issue": issue_id},
+    )
+    item = (data.get("addProjectV2ItemById") or {}).get("item") or {}
+    if not item.get("id"):
+        raise RuntimeError("GitHub Projects API did not return a project item ID")
+    data = github_graphql(
+        github_token,
+        """
+        mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+          updateProjectV2ItemFieldValue(input: {
+            projectId: $project, itemId: $item, fieldId: $field,
+            value: {singleSelectOptionId: $option}
+          }) { projectV2Item { id } }
+        }
+        """,
+        {"project": project_id, "item": item["id"], "field": field_id, "option": option_id},
+    )
+    updated = (data.get("updateProjectV2ItemFieldValue") or {}).get("projectV2Item") or {}
+    if updated.get("id") != item["id"]:
+        raise RuntimeError("GitHub Projects API did not confirm the Source update")
+
+
+def create_github_issue(github_org, github_token, repo, issue, project_number, source):
+    project_id, field_id, option_id = get_github_project_source(
+        github_org, github_token, project_number, source
+    )
     url = f"https://api.github.com/repos/{github_org}/{repo}/issues"
 
     try:
         response = requests.post(
             url,
-            headers={
-                "Authorization": f"Bearer {github_token}",
-                "Accept": "application/vnd.github+json",
-                "X-GitHub-Api-Version": "2022-11-28",
-            },
+            headers=github_headers(github_token),
             json=issue,
             timeout=10,
         )
@@ -159,7 +255,18 @@ def create_github_issue(github_org, github_token, repo, issue):
     except requests.RequestException as e:
         raise RuntimeError(f"GitHub issue creation request failed: {e}") from e
 
-    return response.json()
+    created_issue = response.json()
+    try:
+        add_issue_to_github_project(
+            github_token, created_issue["node_id"], project_id, field_id, option_id
+        )
+    except (RuntimeError, KeyError) as error:
+        message = (
+            f"Created GitHub issue {created_issue.get('html_url', 'unknown')} but failed to set its project Source"
+        )
+        logger.error("%s; manual reconciliation may be required", message)
+        raise RuntimeError(message) from error
+    return created_issue
 
 
 def lambda_handler(event, context):
@@ -214,13 +321,29 @@ def lambda_handler(event, context):
     github_org = event.get("github_org") or os.getenv("GITHUB_ORG")
     identity = event.get("identity") or os.getenv("GITHUB_IDENTITY")
     repo = event.get("repo") or os.getenv("GITHUB_REPO")
+    project_number_raw = os.getenv("GITHUB_PROJECT_NUMBER")
+    source = os.getenv("GITHUB_ISSUE_SOURCE", "Support")
     signing_algorithm = event.get("signing_algorithm") or os.getenv(
         "WEB_IDENTITY_SIGNING_ALGORITHM", "RS256"
     )
 
-    for var in ["audience", "github_org", "identity", "repo"]:
-        if not locals()[var]:
-            raise ValueError(f"Missing required parameter: '{var}'")
+    for name, value in (
+        ("audience", audience),
+        ("github_org", github_org),
+        ("identity", identity),
+        ("repo", repo),
+        ("github_project_number", project_number_raw),
+        ("github_issue_source", source.strip()),
+    ):
+        if not value:
+            raise ValueError(f"Missing required parameter: '{name}'")
+
+    try:
+        project_number = int(project_number_raw)
+    except ValueError as error:
+        raise ValueError("GITHUB_PROJECT_NUMBER must be a positive integer") from error
+    if project_number <= 0:
+        raise ValueError("GITHUB_PROJECT_NUMBER must be a positive integer")
 
     try:
         duration_seconds = int(duration_seconds_raw)
@@ -252,6 +375,8 @@ def lambda_handler(event, context):
         github_token=github_token,
         repo=repo,
         issue=issue,
+        project_number=project_number,
+        source=source,
     )
 
     return {

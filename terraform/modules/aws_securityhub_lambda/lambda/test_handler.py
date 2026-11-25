@@ -19,6 +19,15 @@ with patch.object(boto3, "client"):
     spec.loader.exec_module(handler)
 
 
+def issue_resources(finding):
+    body = handler.build_github_issue(finding)["body"]
+    return json.loads(body.split("```json\n", 1)[1].split("\n```", 1)[0])
+
+
+def json_response(data, status=200):
+    return Mock(status_code=status, json=Mock(return_value=data))
+
+
 class HandlerTests(unittest.TestCase):
     def setUp(self):
         environment = patch.dict(
@@ -34,6 +43,7 @@ class HandlerTests(unittest.TestCase):
                 "GITHUB_ORG": "org",
                 "GITHUB_IDENTITY": "securityhub",
                 "GITHUB_REPO": "repo",
+                "GITHUB_PROJECT_NUMBER": "1",
             },
             clear=True,
         )
@@ -108,7 +118,7 @@ class HandlerTests(unittest.TestCase):
     @patch.object(handler, "create_github_issue", return_value={"number": 1, "html_url": "https://example/issues/1"})
     @patch.object(handler, "get_github_token", return_value="github-token")
     @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
-    def test_configured_grace_period_filters_each_finding(self, web, token, create):
+    def test_configured_grace_period_filters_each_finding(self, _web, _token, create):
         os.environ["FINDING_GRACE_PERIOD"] = "30"
         self.event["detail"]["findings"] = [
             {**self.finding, "Id": "within-window", "UpdatedAt": "2026-11-13T09:30:00Z"},
@@ -141,6 +151,84 @@ class HandlerTests(unittest.TestCase):
         ):
             self.assertIn(value, issue["body"])
 
+    @patch.object(handler, "create_github_issue", return_value={"number": 1, "html_url": "https://example/1"})
+    @patch.object(handler, "get_github_token", return_value="token")
+    @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
+    def test_issue_source_defaults_and_can_be_configured(self, _web, _token, create):
+        for configured, expected in ((None, "Support"), ("Incident", "Incident")):
+            with self.subTest(configured=configured), patch.dict(os.environ):
+                if configured is None:
+                    os.environ.pop("GITHUB_ISSUE_SOURCE", None)
+                else:
+                    os.environ["GITHUB_ISSUE_SOURCE"] = configured
+                handler.lambda_handler(self.event, None)
+                self.assertEqual(create.call_args.kwargs["source"], expected)
+                self.assertEqual(create.call_args.kwargs["project_number"], 1)
+
+    @patch.object(handler, "github_graphql")
+    def test_project_source_lookup_uses_configured_option(self, graphql):
+        graphql.return_value = {"organization": {"projectV2": {
+            "id": "project", "field": {"id": "field", "options": [
+                {"id": "support", "name": "Support"},
+                {"id": "incident", "name": "Incident"},
+            ]}
+        }}}
+        self.assertEqual(
+            handler.get_github_project_source("org", "token", 1, "Incident"),
+            ("project", "field", "incident"),
+        )
+        self.assertEqual(graphql.call_args.args[2], {"org": "org", "number": 1})
+        with self.assertLogs(handler.logger, level="ERROR"):
+            with self.assertRaisesRegex(RuntimeError, "no Source option"):
+                handler.get_github_project_source("org", "token", 1, "Missing")
+
+    @patch.object(handler.requests, "post")
+    @patch.object(handler, "get_github_project_source", side_effect=RuntimeError("Project unavailable"))
+    def test_project_configuration_failure_does_not_create_issue(self, _get_source, post):
+        with self.assertRaisesRegex(RuntimeError, "Project unavailable"):
+            handler.create_github_issue("org", "token", "repo", {}, 1, "Support")
+        post.assert_not_called()
+
+    @patch.object(handler.requests, "post")
+    def test_graphql_errors_and_invalid_responses_fail_explicitly(self, post):
+        for response in (
+            json_response({"errors": [{"message": "Forbidden"}]}),
+            json_response({"data": None}),
+            Mock(status_code=200, json=Mock(side_effect=ValueError("Invalid JSON"))),
+        ):
+            with self.subTest(response=response):
+                post.return_value = response
+                with self.assertLogs(handler.logger, level="ERROR"):
+                    with self.assertRaises(RuntimeError):
+                        handler.github_graphql("token", "query", {})
+        post.side_effect = requests.Timeout("Timeout")
+        with self.assertLogs(handler.logger, level="ERROR"):
+            with self.assertRaisesRegex(RuntimeError, "request failed"):
+                handler.github_graphql("token", "query", {})
+
+    @patch.object(handler, "github_graphql")
+    def test_project_mutations_require_confirmed_item_and_update(self, graphql):
+        for responses in (
+            [{"addProjectV2ItemById": {"item": None}}],
+            [{"addProjectV2ItemById": {"item": {"id": "item"}}},
+             {"updateProjectV2ItemFieldValue": {"projectV2Item": None}}],
+        ):
+            with self.subTest(responses=responses):
+                graphql.side_effect = responses
+                with self.assertRaises(RuntimeError):
+                    handler.add_issue_to_github_project("token", "issue", "project", "field", "option")
+
+    @patch.object(handler, "add_issue_to_github_project", side_effect=RuntimeError("Forbidden"))
+    @patch.object(handler, "get_github_project_source", return_value=("project", "field", "option"))
+    @patch.object(handler.requests, "post")
+    def test_project_failure_identifies_the_already_created_issue(self, post, _get_source, _add_item):
+        post.return_value = json_response({
+            "node_id": "issue", "number": 42, "html_url": "https://example/42"
+        }, status=201)
+        with self.assertLogs(handler.logger, level="ERROR"):
+            with self.assertRaisesRegex(RuntimeError, "https://example/42"):
+                handler.create_github_issue("org", "token", "repo", {}, 1, "Support")
+
     def test_resources_exclude_tags_and_details_without_mutating_finding(self):
         self.finding["Resources"] = [
             {
@@ -157,11 +245,8 @@ class HandlerTests(unittest.TestCase):
         ]
         original = copy.deepcopy(self.finding)
 
-        body = handler.build_github_issue(self.finding)["body"]
-        resources = json.loads(body.split("```json\n", 1)[1].split("\n```", 1)[0])
-
         self.assertEqual(
-            resources,
+            issue_resources(self.finding),
             [
                 {
                     key: value
@@ -175,15 +260,12 @@ class HandlerTests(unittest.TestCase):
 
     def test_resource_exclusions_use_configured_keys(self):
         with patch.dict(os.environ, {"RESOURCE_KEYS_TO_EXCLUDE": '["Id"]'}):
-            body = handler.build_github_issue(self.finding)["body"]
-
-        resources = json.loads(body.split("```json\n", 1)[1].split("\n```", 1)[0])
+            resources = issue_resources(self.finding)
         self.assertEqual(resources, [{"Type": "AwsS3Bucket"}])
 
     def test_empty_resource_exclusions_preserve_all_resource_keys(self):
         with patch.dict(os.environ, {"RESOURCE_KEYS_TO_EXCLUDE": "[]"}):
-            body = handler.build_github_issue(self.finding)["body"]
-        resources = json.loads(body.split("```json\n", 1)[1].split("\n```", 1)[0])
+            resources = issue_resources(self.finding)
         self.assertEqual(resources, self.finding["Resources"])
 
     def test_invalid_resource_exclusions_are_logged_and_rejected(self):
@@ -213,9 +295,9 @@ class HandlerTests(unittest.TestCase):
     def test_resource_exclusions_default_to_tags_and_details(self):
         os.environ.pop("RESOURCE_KEYS_TO_EXCLUDE")
         self.finding["Resources"][0].update({"Tags": {}, "Details": {}})
-        body = handler.build_github_issue(self.finding)["body"]
-        resources = json.loads(body.split("```json\n", 1)[1].split("\n```", 1)[0])
-        self.assertEqual(resources, [{"Type": "AwsS3Bucket", "Id": "bucket-name"}])
+        self.assertEqual(
+            issue_resources(self.finding), [{"Type": "AwsS3Bucket", "Id": "bucket-name"}]
+        )
 
     def test_finding_arns_display_only_the_final_identifier(self):
         cases = {
@@ -341,17 +423,21 @@ class HandlerTests(unittest.TestCase):
         )
 
     @patch.object(handler.requests, "post")
-    def test_create_issue_uses_exchanged_github_token(self, post):
-        post.return_value = Mock(
-            status_code=201,
-            json=Mock(return_value={"number": 42, "html_url": "https://example/42"}),
+    @patch.object(handler, "add_issue_to_github_project")
+    @patch.object(handler, "get_github_project_source", return_value=("project", "field", "option"))
+    def test_create_issue_uses_exchanged_github_token(self, get_source, add_item, post):
+        post.return_value = json_response(
+            {"number": 42, "html_url": "https://example/42", "node_id": "issue"},
+            status=201,
         )
 
         result = handler.create_github_issue(
-            "org", "github-token", "repo", handler.build_github_issue(self.finding)
+            "org", "github-token", "repo", handler.build_github_issue(self.finding), 1, "Support"
         )
 
         self.assertEqual(result["number"], 42)
+        get_source.assert_called_once_with("org", "github-token", 1, "Support")
+        add_item.assert_called_once_with("github-token", "issue", "project", "field", "option")
         self.assertEqual(
             post.call_args.kwargs["headers"]["Authorization"],
             "Bearer " + "github-token",
@@ -399,35 +485,15 @@ class HandlerTests(unittest.TestCase):
         self.assertIn("Skipping ignored Security Hub finding", "\n".join(logs.output))
         get_web_token.assert_not_called()
 
-    def test_invalid_event_shape_fails_explicitly(self):
-        for event in ([], {}, {"detail": {"findings": {}}}):
-            with self.subTest(event=event):
-                with self.assertRaises(ValueError):
-                    handler.lambda_handler(event, None)
-
-    @patch.object(handler, "create_github_issue")
-    @patch.object(handler, "get_github_token", return_value="github-token")
-    @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
-    def test_matching_finding_calls_github_issue_creation(
-        self, get_web_token, get_github_token, create_issue
-    ):
-        create_issue.return_value = {"number": 42, "html_url": "https://example/42"}
-
-        result = handler.lambda_handler(self.event, None)
-
-        self.assertEqual(result["statusCode"], 200)
-        create_issue.assert_called_once()
-        get_web_token.assert_called_once()
-        get_github_token.assert_called_once()
-
     @patch.object(handler.requests, "post")
-    def test_github_issue_api_errors_are_reported(self, post):
+    @patch.object(handler, "get_github_project_source", return_value=("project", "field", "option"))
+    def test_github_issue_api_errors_are_reported(self, _get_source, post):
         post.return_value = Mock(status_code=403, text="Forbidden")
         post.return_value.raise_for_status.side_effect = requests.HTTPError("Forbidden")
 
         with self.assertRaisesRegex(RuntimeError, "GitHub issue creation request failed"):
             handler.create_github_issue(
-                "org", "github-token", "repo", handler.build_github_issue(self.finding)
+                "org", "github-token", "repo", handler.build_github_issue(self.finding), 1, "Support"
             )
 
     @patch.object(handler, "sts")
@@ -460,9 +526,7 @@ class HandlerTests(unittest.TestCase):
 
     @patch.object(handler.requests, "get")
     def test_token_exchange_encodes_scope_and_identity(self, get):
-        get.return_value = Mock(
-            status_code=200, json=Mock(return_value={"token": "github-token"})
-        )
+        get.return_value = json_response({"token": "github-token"})
         self.assertEqual(
             handler.get_github_token(
                 "octo-sts-example.dev", "org", "alerts & issues", "repo name", "web-token"
@@ -509,9 +573,7 @@ class HandlerTests(unittest.TestCase):
         )
         for payload in payloads:
             with self.subTest(payload=payload):
-                get.return_value = Mock(
-                    status_code=200, json=Mock(return_value=payload)
-                )
+                get.return_value = json_response(payload)
                 with self.assertLogs(handler.logger, level="ERROR"):
                     with self.assertRaisesRegex(RuntimeError, "valid token"):
                         handler.get_github_token(
@@ -527,22 +589,24 @@ class HandlerTests(unittest.TestCase):
         self.assertIs(raised.exception.__cause__, error)
 
     @patch.object(handler.requests, "post")
-    def test_issue_creation_network_errors_preserve_cause(self, post):
+    @patch.object(handler, "get_github_project_source", return_value=("project", "field", "option"))
+    def test_issue_creation_network_errors_preserve_cause(self, _get_source, post):
         for error in (requests.Timeout("Timeout"), requests.ConnectionError("Offline")):
             with self.subTest(error=type(error).__name__):
                 post.side_effect = error
                 with self.assertRaisesRegex(RuntimeError, "request failed") as raised:
-                    handler.create_github_issue("org", "github-token", "repo", {})
+                    handler.create_github_issue("org", "github-token", "repo", {}, 1, "Support")
                 self.assertIs(raised.exception.__cause__, error)
 
     @patch.object(handler.requests, "post")
-    def test_issue_creation_rejects_unexpected_success_status(self, post):
+    @patch.object(handler, "get_github_project_source", return_value=("project", "field", "option"))
+    def test_issue_creation_rejects_unexpected_success_status(self, _get_source, post):
         for status in (200, 202, 204):
             with self.subTest(status=status):
                 post.return_value = Mock(status_code=status, text="Unexpected response")
                 with self.assertLogs(handler.logger, level="ERROR"):
                     with self.assertRaisesRegex(RuntimeError, f"unexpected status: {status}"):
-                        handler.create_github_issue("org", "github-token", "repo", {})
+                        handler.create_github_issue("org", "github-token", "repo", {}, 1, "Support")
 
     def test_string_sets_deduplicate_without_changing_case(self):
         with patch.dict(os.environ, {"RESOURCE_KEYS_TO_EXCLUDE": '["Tags", "Tags", "tags"]'}):
@@ -608,8 +672,7 @@ class HandlerTests(unittest.TestCase):
     def test_exclusions_apply_only_to_top_level_resource_keys(self):
         self.finding["Resources"][0]["Owner"] = {"Tags": {"preserved": "value"}}
         self.finding["Resources"][0]["Tags"] = {"removed": "value"}
-        body = handler.build_github_issue(self.finding)["body"]
-        resources = json.loads(body.split("```json\n", 1)[1].split("\n```", 1)[0])
+        resources = issue_resources(self.finding)
         self.assertNotIn("Tags", resources[0])
         self.assertEqual(resources[0]["Owner"], {"Tags": {"preserved": "value"}})
 
@@ -620,7 +683,8 @@ class HandlerTests(unittest.TestCase):
         for event in (
             None, "text", [], {}, {"detail": None}, {"detail": []},
             {"detail": {}}, {"detail": {"findings": None}},
-            {"detail": {"findings": "text"}}, {"detail": {"findings": [None]}},
+            {"detail": {"findings": {}}}, {"detail": {"findings": "text"}},
+            {"detail": {"findings": [None]}},
             {"detail": {"findings": [self.finding, []]}},
         ):
             with self.subTest(event=event):
@@ -652,10 +716,13 @@ class HandlerTests(unittest.TestCase):
             ("WEB_IDENTITY_DURATION_SECONDS", "59", "between 60 and 600"),
             ("WEB_IDENTITY_DURATION_SECONDS", "601", "between 60 and 600"),
             ("WEB_IDENTITY_SIGNING_ALGORITHM", "ES384", "must be RS256"),
+            ("GITHUB_PROJECT_NUMBER", "abc", "positive integer"),
+            ("GITHUB_PROJECT_NUMBER", "0", "positive integer"),
+            ("GITHUB_ISSUE_SOURCE", " ", "Missing required parameter"),
         ]
         cases.extend(
             (name, "", "Missing required parameter")
-            for name in ("WEB_IDENTITY_AUDIENCE", "GITHUB_ORG", "GITHUB_IDENTITY", "GITHUB_REPO")
+            for name in ("WEB_IDENTITY_AUDIENCE", "GITHUB_ORG", "GITHUB_IDENTITY", "GITHUB_REPO", "GITHUB_PROJECT_NUMBER")
         )
         for name, value, message in cases:
             with self.subTest(name=name, value=value):
@@ -672,7 +739,7 @@ class HandlerTests(unittest.TestCase):
     )
     @patch.object(handler, "get_github_token", return_value="github-token")
     @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
-    def test_duration_boundaries_and_defaults(self, web, token, create):
+    def test_duration_boundaries_and_defaults(self, web, _token, _create):
         for duration in ("60", "600", None):
             with self.subTest(duration=duration):
                 web.reset_mock()
@@ -696,7 +763,7 @@ class HandlerTests(unittest.TestCase):
     @patch.object(handler, "get_github_token", return_value="github-token")
     @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
     def test_ignore_matching_is_case_sensitive_and_requires_description(
-        self, web, token, create
+        self, _web, _token, create
     ):
         os.environ["IGNORE_FINDINGS"] = '{"test-account": "PUBLIC ACCESS"}'
         for description in ("A resource allows public access.", None, "", []):
@@ -712,7 +779,7 @@ class HandlerTests(unittest.TestCase):
     )
     @patch.object(handler, "get_github_token", return_value="github-token")
     @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
-    def test_mixed_ignored_and_matching_batch_preserves_input(self, web, token, create):
+    def test_mixed_ignored_and_matching_batch_preserves_input(self, _web, _token, create):
         os.environ["IGNORE_FINDINGS"] = '{"test-account": "public access"}'
         self.event["detail"]["findings"].append(
             {**copy.deepcopy(self.finding), "Description": "Different description"}
@@ -748,7 +815,7 @@ class HandlerTests(unittest.TestCase):
     @patch.object(handler, "get_github_token", return_value="github-token")
     @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
     def test_partial_batch_failure_propagates_and_stops_remaining_issues(
-        self, web, token, create
+        self, _web, _token, create
     ):
         self.event["detail"]["findings"] = [copy.deepcopy(self.finding) for _ in range(3)]
         error = RuntimeError("GitHub unavailable")
@@ -768,13 +835,23 @@ class HandlerTests(unittest.TestCase):
         sts.get_web_identity_token.return_value = {
             "WebIdentityToken": "web-token", "Expiration": "expiry"
         }
-        get.return_value = Mock(
-            status_code=200, json=Mock(return_value={"token": "github-token"})
-        )
-        post.return_value = Mock(
-            status_code=201,
-            json=Mock(return_value={"number": 42, "html_url": "https://example/42"}),
-        )
+        get.return_value = json_response({"token": "github-token"})
+        post.side_effect = [
+            json_response({"data": {"organization": {
+                "projectV2": {"id": "project", "field": {
+                    "id": "field", "options": [{"id": "option", "name": "Support"}]
+                }}
+            }}}),
+            json_response({
+                "number": 42, "html_url": "https://example/42", "node_id": "issue"
+            }, status=201),
+            json_response({"data": {
+                "addProjectV2ItemById": {"item": {"id": "item"}}
+            }}),
+            json_response({"data": {
+                "updateProjectV2ItemFieldValue": {"projectV2Item": {"id": "item"}}
+            }}),
+        ]
         original = copy.deepcopy(self.event)
 
         result = handler.lambda_handler(self.event, None)
@@ -789,17 +866,26 @@ class HandlerTests(unittest.TestCase):
         )
         sts.get_web_identity_token.assert_called_once()
         get.assert_called_once()
-        post.assert_called_once()
+        self.assertEqual(post.call_count, 4)
         self.assertEqual(
             get.call_args.kwargs["headers"]["Authorization"], "Bearer " + "web-token"
         )
         self.assertEqual(
-            post.call_args.kwargs["headers"]["Authorization"], "Bearer " + "github-token"
+            post.call_args_list[1].kwargs["headers"]["Authorization"], "Bearer " + "github-token"
         )
         self.assertEqual(
-            post.call_args.kwargs["json"],
+            post.call_args_list[0].kwargs["headers"],
+            post.call_args_list[1].kwargs["headers"],
+        )
+        self.assertEqual(
+            post.call_args_list[1].kwargs["json"],
             handler.build_github_issue(self.finding),
         )
+        self.assertEqual(post.call_args_list[0].kwargs["json"]["variables"], {"org": "org", "number": 1})
+        self.assertEqual(post.call_args_list[2].kwargs["json"]["variables"], {"project": "project", "issue": "issue"})
+        self.assertEqual(post.call_args_list[3].kwargs["json"]["variables"], {
+            "project": "project", "item": "item", "field": "field", "option": "option"
+        })
         self.assertEqual(self.event, original)
 
     @patch.object(handler, "create_github_issue")
@@ -821,7 +907,7 @@ class HandlerTests(unittest.TestCase):
     @patch.object(handler, "create_github_issue")
     @patch.object(handler, "get_github_token", return_value="github-token")
     @patch.object(handler, "get_web_identity_token", return_value=("web-token", None))
-    def test_each_configured_severity_can_create_an_issue(self, web, token, create):
+    def test_each_configured_severity_can_create_an_issue(self, _web, _token, create):
         create.return_value = {"number": 42, "html_url": "https://example/42"}
         for severity in ("INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"):
             with self.subTest(severity=severity):

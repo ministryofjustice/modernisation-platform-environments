@@ -25,7 +25,9 @@ resource "aws_lambda_function" "github_workflow_trigger" {
   environment {
     variables = {
       GITHUB_IDENTITY                = var.github_identity
+      GITHUB_ISSUE_SOURCE            = var.github_issue_source
       GITHUB_ORG                     = var.github_org
+      GITHUB_PROJECT_NUMBER          = tostring(var.github_project_number)
       GITHUB_REPO                    = var.github_repo
       IGNORE_FINDINGS                = data.aws_ssm_parameter.ignore_findings.value
       WEB_IDENTITY_AUDIENCE          = var.web_identity_audience
