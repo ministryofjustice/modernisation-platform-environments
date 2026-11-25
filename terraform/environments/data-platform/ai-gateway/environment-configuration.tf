@@ -63,9 +63,13 @@ locals {
       ai_gateway_egress_policy_enabled = true
     }
     test = {
-      litellm_version                    = "1.106.5"
-      litellm_entra_client_secret_expiry = "17-04-2027"
-      ai_gateway_hostname                = "test.ai-gateway.justice.gov.uk"
+      # Optionally set a private image tag independently of the Helm chart version.
+      # litellm_image_tag = "v1.110.2-hotfix"
+      litellm_version                      = "1.110.2"
+      litellm_registry_credentials_enabled = true
+      litellm_private_registry_enabled     = true
+      litellm_entra_client_secret_expiry   = "17-04-2027"
+      ai_gateway_hostname                  = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
