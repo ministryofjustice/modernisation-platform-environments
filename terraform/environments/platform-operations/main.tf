@@ -97,12 +97,12 @@ resource "aws_ssm_parameter" "aws_health_lambda_ignore_findings" {
 }
 
 module "aws_health_lambda" {
-  count                          = local.enable_aws_health_lambda ? 1 : 0
-  source                         = "../../modules/aws_health_lambda"
-  aws_account_id                 = data.aws_caller_identity.current.id
-  aws_accounts_parameter_name    = aws_ssm_parameter.aws_health_lambda_accounts[count.index].name
-  github_repo                    = "platform-operations"
-  ignore_findings_parameter_name = aws_ssm_parameter.aws_health_lambda_ignore_findings[count.index].name
+  count                             = local.enable_aws_health_lambda ? 1 : 0
+  source                            = "../../modules/aws_health_lambda"
+  aws_account_id                    = data.aws_caller_identity.current.id
+  aws_accounts_parameter_name       = aws_ssm_parameter.aws_health_lambda_accounts[count.index].name
+  github_repo                       = "platform-operations"
+  ignore_findings_parameter_name    = aws_ssm_parameter.aws_health_lambda_ignore_findings[count.index].name
 }
 
 resource "aws_ssm_parameter" "aws_securityhub_lambda" {
@@ -114,6 +114,10 @@ resource "aws_ssm_parameter" "aws_securityhub_lambda" {
     ignore_findings = {
       name        = "securityhub_lambda_ignore_findings"
       description = "AWS SecurityHub Lambda ignore findings"
+    }
+    github_project_id = {
+      name        = "securityhub_lambda_github_project_id"
+      description = "AWS SecurityHub Lambda GitHub project ID"
     }
   } : {}
 
@@ -134,6 +138,7 @@ module "aws_securityhub_lambda" {
   source                                     = "../../modules/aws_securityhub_lambda"
   aws_account_id                             = data.aws_caller_identity.current.id
   aws_accounts_parameter_name                = aws_ssm_parameter.aws_securityhub_lambda["accounts"].name
+  github_project_number                      = aws_ssm_parameter.aws_securityhub_lambda["github_project_id"].name
   github_repo                                = "platform-operations"
   securityhub_ignore_findings_parameter_name = aws_ssm_parameter.aws_securityhub_lambda["ignore_findings"].name
   depends_on                                 = [aws_ssm_parameter.aws_securityhub_lambda]
