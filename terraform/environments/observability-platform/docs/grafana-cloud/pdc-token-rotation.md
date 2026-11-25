@@ -64,8 +64,8 @@ derives the tenant role ARN from the account ID.
 
 The dedicated repository is
 `ministryofjustice/observability-platform-grafana-pdc-token-rotator`. The
-deployable image is released as `v0.1.0-alpha.2`, with digest
-`sha256:e37d2133c21fae8db1345c653d181f33c85cd2e6ff4c2e4c86d2a0046d8c98fa`.
+deployable image is released as `v0.1.0-alpha.3`, with digest
+`sha256:7ca46d60335d76ad808650339b2a143609d0b75e10f41f20462e940396305b9c`.
 Development pins this digest, not the mutable tag. The earlier `v0.1.0-alpha.1`
 artifact was a manifest list rejected by Lambda and is not deployable; do not use
 its digest.
