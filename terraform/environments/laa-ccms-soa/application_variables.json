@@ -205,7 +205,7 @@
       "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed",
       "managed_ssl_port": "7002",
       "managed_app_count": "1",
-      "managed_container_version": "af78b21cf62f5867ea69434a0607bbb6427e0860",
+      "managed_container_version": "0.0.18-CVE-2026-91403",
       "managed_wl_mem_args": "-Xms8192m -Xmx12288m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80 -XX:+AlwaysPreTouch",
       "managed_hostname": "ccms-soa-managed",
       "efs_performance_mode": "generalPurpose",
