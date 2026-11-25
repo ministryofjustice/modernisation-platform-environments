@@ -3,7 +3,7 @@ module "ecr" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/ecr/aws"
-  version = "3.2.0"
+  version = "3.2.1"
 
   create_repository = false
 
