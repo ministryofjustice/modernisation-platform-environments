@@ -16,6 +16,8 @@ from contextlib import ExitStack
 from typing import Any
 
 import paramiko
+from paramiko.file import BufferedFile
+from paramiko.sftp import CMD_CLOSE
 from paramiko.ssh_exception import IncompatiblePeer, MessageOrderError
 
 from mft_writer.config import json_object
@@ -154,6 +156,21 @@ def checked_directory(client: Any, root: str, relative: str, context: Any, *, cr
     return current
 
 
+def _acknowledge_close(remote_file: Any, context: Any) -> None:
+    """Close a real Paramiko SFTPFile while propagating server CLOSE failures.
+
+    Paramiko 4.0.0 suppresses OSError and EOFError inside SFTPFile._close(),
+    which can mask failed remote commits on S3-backed servers in direct mode.
+    """
+    ensure_time(context, "SFTP close")
+    if not isinstance(remote_file, paramiko.SFTPFile) or remote_file._closed:
+        return
+    if remote_file.pipelined:
+        remote_file.sftp._finish_responses(remote_file)
+    BufferedFile.close(remote_file)
+    remote_file.sftp._request(CMD_CLOSE, remote_file.handle)
+
+
 def _stream_to_handle(remote_file: Any, body: Any, source_size: int, context: Any) -> int:
     size = 0
     with remote_file:
@@ -167,6 +184,7 @@ def _stream_to_handle(remote_file: Any, body: Any, source_size: int, context: An
                 raise InvalidMessage("source object exceeds its recorded size")
             ensure_time(context, "SFTP write")
             remote_file.write(chunk)
+        _acknowledge_close(remote_file, context)
     return size
 
 
@@ -177,15 +195,18 @@ def upload_stream(client: Any, body: Any, source_size: int, route: Mapping[str, 
     base = checked_directory(client, root, route["destination"]["destination_prefix"].rstrip("/"), context, create=False)
     directory = checked_directory(client, base, posixpath.dirname(route["relative_key"]), context, create=True)
     final = posixpath.join(directory, posixpath.basename(route["relative_key"]))
+    direct_mode = route["destination"].get("write_mode", "posix") == "direct"
     try:
         attributes = client.lstat(final)
     except OSError as error:
-        if error.errno != errno.ENOENT:
+        # Write-only SFTP dropboxes in direct mode may deny LSTAT on the destination path.
+        allowed_errnos = {errno.ENOENT, errno.EACCES, errno.EPERM} if direct_mode else {errno.ENOENT}
+        if error.errno not in allowed_errnos:
             raise
     else:
         if not stat.S_ISREG(attributes.st_mode):
             raise InvalidMessage("remote destination is not a regular, non-symlink file")
-    if route["destination"].get("write_mode", "posix") == "direct":
+    if direct_mode:
         ensure_time(context, "SFTP direct upload")
         remote_file = client.open(final, "wb")
         size = _stream_to_handle(remote_file, body, source_size, context)

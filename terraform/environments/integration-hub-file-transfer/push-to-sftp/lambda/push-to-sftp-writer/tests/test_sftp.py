@@ -73,6 +73,54 @@ def test_direct_write_failures_raise_without_removing_destination(client, route,
     client.remove.assert_not_called()
 
 
+def test_direct_write_tolerates_permission_denied_on_final_lstat(client, route):
+    direct_route = {**route, "destination": {**route["destination"], "write_mode": "direct"}}
+
+    def lstat(path):
+        if path.endswith("file.csv"):
+            raise PermissionError(errno.EACCES, "permission denied")
+        return SimpleNamespace(st_mode=stat.S_IFDIR | 0o700)
+
+    client.lstat.side_effect = lstat
+    assert sftp.upload_stream(client, io.BytesIO(b"abc"), 3, direct_route, None) == 3
+    client.open.assert_called_once_with("/home/delivery/incoming/nested/file.csv", "wb")
+
+    with pytest.raises(PermissionError):
+        sftp.upload_stream(client, io.BytesIO(b"abc"), 3, route, None)
+
+
+@pytest.mark.parametrize("close_error", [None, OSError("commit failed"), EOFError("connection lost")])
+def test_real_paramiko_sftp_file_propagates_close_failures(client, route, close_error):
+    import paramiko
+    from paramiko.sftp import CMD_CLOSE, CMD_STATUS
+
+    direct_route = {**route, "destination": {**route["destination"], "write_mode": "direct"}}
+    fake_sftp = Mock()
+    close_calls = []
+
+    def request(cmd, *args):
+        if cmd == CMD_CLOSE:
+            close_calls.append(args)
+            if close_error is not None:
+                raise close_error
+            return (CMD_STATUS, Mock())
+        raise AssertionError(f"unexpected SFTP command {cmd}")
+
+    fake_sftp._async_request.return_value = 1
+    fake_sftp._read_response.return_value = (CMD_STATUS, Mock())
+    fake_sftp._request.side_effect = request
+    remote = paramiko.SFTPFile(fake_sftp, b"handle-1", "wb")
+    client.open.return_value = remote
+
+    if close_error is None:
+        assert sftp.upload_stream(client, io.BytesIO(b"abc"), 3, direct_route, None) == 3
+    else:
+        with pytest.raises(type(close_error)):
+            sftp.upload_stream(client, io.BytesIO(b"abc"), 3, direct_route, None)
+    assert close_calls == [(b"handle-1",)]
+    assert remote._closed is True
+
+
 @pytest.mark.parametrize("failure", ["write", "size", "rename", "close"])
 def test_failed_upload_is_not_success(client, route, failure):
     if failure == "write":

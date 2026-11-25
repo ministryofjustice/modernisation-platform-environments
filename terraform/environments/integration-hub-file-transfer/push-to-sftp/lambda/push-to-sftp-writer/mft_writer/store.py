@@ -179,6 +179,58 @@ class ActionStore:
         )
         return response["Attributes"]
 
+    def release_action_lease(self, action_id: str, owner_token: str) -> None:
+        try:
+            self.table.update_item(
+                Key={"id": action_id},
+                UpdateExpression="SET leaseUntil = :released",
+                ConditionExpression="#state = :progress AND ownerToken = :owner",
+                ExpressionAttributeNames={"#state": "state"},
+                ExpressionAttributeValues={
+                    ":released": 0,
+                    ":progress": "IN_PROGRESS",
+                    ":owner": owner_token,
+                },
+                ReturnValues="NONE",
+            )
+        except Exception as error:
+            if not _conditional_failure(error):
+                raise
+
+    def acquire_destination_lock(
+        self, lock_id: str, owner_token: str, *, now: int, lease_seconds: int
+    ) -> None:
+        self._ensure_time("DynamoDB.PutItem destination-lock")
+        try:
+            self.table.put_item(
+                Item={
+                    "id": lock_id,
+                    "state": "DESTINATION_LOCK",
+                    "ownerToken": owner_token,
+                    "leaseUntil": now + lease_seconds,
+                    "expiration": now + lease_seconds,
+                },
+                ConditionExpression="attribute_not_exists(id) OR leaseUntil <= :now",
+                ExpressionAttributeValues={":now": now},
+            )
+        except Exception as error:
+            if _conditional_failure(error):
+                raise RuntimeError(
+                    "another direct upload is active for this destination path"
+                ) from error
+            raise
+
+    def release_destination_lock(self, lock_id: str, owner_token: str) -> None:
+        try:
+            self.table.delete_item(
+                Key={"id": lock_id},
+                ConditionExpression="ownerToken = :owner",
+                ExpressionAttributeValues={":owner": owner_token},
+            )
+        except Exception as error:
+            if not _conditional_failure(error):
+                raise
+
     def mark_failed(
         self,
         item: Mapping[str, Any],

@@ -33,16 +33,34 @@ class FakeTable:
         assert ConsistentRead is True
         return {"Item": copy.deepcopy(self.items[Key["id"]])} if Key["id"] in self.items else {}
 
-    def put_item(self, Item, ConditionExpression):
-        assert ConditionExpression == "attribute_not_exists(id)"
-        if Item["id"] in self.items:
-            raise ClientError({"Error": {"Code": "ConditionalCheckFailedException"}}, "PutItem")
+    def put_item(self, Item, ConditionExpression, ExpressionAttributeValues=None):
+        existing = self.items.get(Item["id"])
+        if ConditionExpression == "attribute_not_exists(id)":
+            if existing is not None:
+                raise ClientError({"Error": {"Code": "ConditionalCheckFailedException"}}, "PutItem")
+        elif ConditionExpression == "attribute_not_exists(id) OR leaseUntil <= :now":
+            if existing is not None and existing["leaseUntil"] > ExpressionAttributeValues[":now"]:
+                raise ClientError({"Error": {"Code": "ConditionalCheckFailedException"}}, "PutItem")
+        else:
+            raise AssertionError(f"unexpected ConditionExpression {ConditionExpression}")
         self.items[Item["id"]] = copy.deepcopy(Item)
+
+    def delete_item(self, Key, ConditionExpression, ExpressionAttributeValues):
+        assert ConditionExpression == "ownerToken = :owner"
+        existing = self.items.get(Key["id"])
+        if existing is None or existing.get("ownerToken") != ExpressionAttributeValues[":owner"]:
+            raise ClientError({"Error": {"Code": "ConditionalCheckFailedException"}}, "DeleteItem")
+        del self.items[Key["id"]]
 
     def update_item(self, Key, UpdateExpression, ConditionExpression, ExpressionAttributeValues,
                     ReturnValues, ExpressionAttributeNames=None):
         item = self.items[Key["id"]]
         values = ExpressionAttributeValues
+        if UpdateExpression == "SET leaseUntil = :released":
+            if item["state"] != values[":progress"] or item.get("ownerToken") != values[":owner"]:
+                raise ClientError({"Error": {"Code": "ConditionalCheckFailedException"}}, "UpdateItem")
+            item["leaseUntil"] = values[":released"]
+            return {}
         valid = item["fingerprint"] == values[":fingerprint"]
         if "leaseUntil <= :now" in ConditionExpression:
             valid &= item["state"] == values[":state"] and item["leaseUntil"] <= values[":now"]
@@ -185,6 +203,51 @@ def test_dispatch_version_mismatch_prevents_side_effects(setup):
         worker.process_writer_record(setup.record, setup.config, setup.services, None)
     assert not setup.services.table.items
     setup.services.clients_for_role.assert_not_called()
+
+
+def test_direct_mode_serialises_concurrent_uploads_to_same_destination(setup):
+    setup.config.destinations[SECRET_PREFIX]["write_mode"] = "direct"
+    setup.services.secrets.get_secret_value.return_value["SecretString"] = json.dumps(
+        {"action": {"name": "push-to-sftp", "push_to_sftp": setup.config.destinations[SECRET_PREFIX]}}
+    )
+    second_event = copy.deepcopy(setup.event)
+    second_action_id = "c2e5f8d3-0184-4fe5-a676-b5d42d65ce80"
+    second_event["detail"]["metadata"]["idempotencyKey"] = f"action-request:{second_action_id}"
+    second_event["detail"]["data"]["actionExecutionId"] = second_action_id
+    second_event["detail"]["data"]["object"]["versionId"] = "source-v2"
+    second_record = {
+        **setup.record,
+        "messageId": "message-2",
+        "body": json.dumps({"Type": "Notification", "Message": json.dumps(second_event)}),
+    }
+
+    contended = []
+
+    def transfer_while_second_arrives(*_args):
+        if not contended:
+            contended.append(True)
+            with pytest.raises(RuntimeError, match="another direct upload is active"):
+                worker.process_writer_record(second_record, setup.config, setup.services, None)
+        return 3
+
+    setup.transfer.side_effect = transfer_while_second_arrives
+    assert worker.process_writer_record(setup.record, setup.config, setup.services, None) == "copied"
+    # Lock was released when the first upload finished, so the second upload can now proceed.
+    assert not any(key.startswith("destination-lock:") for key in setup.services.table.items)
+    assert worker.process_writer_record(second_record, setup.config, setup.services, None) == "copied"
+    assert not any(key.startswith("destination-lock:") for key in setup.services.table.items)
+    assert setup.transfer.call_count == 2
+
+
+def test_direct_mode_releases_destination_lock_on_transfer_failure(setup):
+    setup.config.destinations[SECRET_PREFIX]["write_mode"] = "direct"
+    setup.services.secrets.get_secret_value.return_value["SecretString"] = json.dumps(
+        {"action": {"name": "push-to-sftp", "push_to_sftp": setup.config.destinations[SECRET_PREFIX]}}
+    )
+    setup.transfer.side_effect = OSError("remote write failed")
+    with pytest.raises(OSError):
+        worker.process_writer_record(setup.record, setup.config, setup.services, None)
+    assert not any(key.startswith("destination-lock:") for key in setup.services.table.items)
 
 
 @pytest.mark.parametrize("wrapped", [False, True])
