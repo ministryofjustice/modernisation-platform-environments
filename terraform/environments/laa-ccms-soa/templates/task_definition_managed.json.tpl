@@ -98,7 +98,7 @@
       },
       {
         "name": "JAVA_OPTIONS",
-        "value": "-Djava.security.egd=file:/dev/./urandom -Dweblogic.management.server=t3s://${admin_host}:7002"
+        "value": "-Djava.security.egd=file:/dev/./urandom"
       },
       {
         "name": "TZ",
