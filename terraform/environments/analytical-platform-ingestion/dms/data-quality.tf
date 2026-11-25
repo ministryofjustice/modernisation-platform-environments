@@ -13,7 +13,7 @@ locals {
     }
     (local.tempus.SPPProcessPlatform.short_resource_name) = {
       task_arn       = module.cica_dms_tempus_dms_implementation["SPPProcessPlatform"].dms_full_load_task_arn
-      deadline       = "04:30"
+      deadline       = "06:00"
       exclude_tables = []
     }
     (local.tempus.SPPFinishedJobs.short_resource_name) = {
@@ -23,7 +23,8 @@ locals {
     }
   }
 
-  dms_data_quality_digest_time = "09:00"
+  # Dev 11:00 is a temporary same-day test; set back to "09:00" before merging
+  dms_data_quality_digest_time = local.environment == "development" ? "11:00" : "09:00"
   dms_data_quality_task_arns   = [for pipeline in local.dms_data_quality_pipelines : pipeline.task_arn]
 }
 
@@ -146,7 +147,7 @@ module "dms_data_quality_lambda" {
   handler         = "main.handler"
   runtime         = "python3.14"
   memory_size     = 256
-  timeout         = 120
+  timeout         = 420
   architectures   = ["x86_64"]
   build_in_docker = false
   source_path     = "${path.module}/lambda-functions/data_quality/main.py"

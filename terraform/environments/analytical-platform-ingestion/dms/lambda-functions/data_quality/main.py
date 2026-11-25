@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import statistics
+import time
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -23,6 +24,9 @@ HISTORY_DAYS = 7
 MIN_HISTORY_RUNS = 3
 FINISHED_REASON = "FULL_LOAD_ONLY_FINISHED"
 COMPLETED_TABLE_STATE = "Table completed"
+LOADING_TABLE_STATES = {"Before load", "Full load", "Table is being reloaded"}
+SETTLE_ATTEMPTS = 10
+SETTLE_WAIT_SECONDS = 30
 RUNNING_STATUSES = {"starting", "running", "stopping"}
 DURATION_KEY = "__duration__"
 TOTAL_ROWS_KEY = "__total_rows__"
@@ -140,6 +144,18 @@ def table_statistics(task_arn: str) -> list[dict]:
         kwargs["Marker"] = page["Marker"]
 
 
+def settled_table_statistics(task_arn: str) -> list[dict]:
+    """Table statistics can lag the task's stop event, so wait until no table still shows as loading."""
+    for attempt in range(1, SETTLE_ATTEMPTS + 1):
+        tables = table_statistics(task_arn)
+        loading = [t["TableName"] for t in tables if t.get("TableState") in LOADING_TABLE_STATES]
+        if not loading or attempt == SETTLE_ATTEMPTS:
+            return tables
+        logger.info("Attempt %s: tables still loading %s, waiting %ss", attempt, loading, SETTLE_WAIT_SECONDS)
+        time.sleep(SETTLE_WAIT_SECONDS)
+    return tables
+
+
 def load_minutes(task: dict) -> float:
     stats = task.get("ReplicationTaskStats", {})
     start, finish = stats.get("FullLoadStartDate"), stats.get("FullLoadFinishDate")
@@ -203,8 +219,8 @@ def publish(lines: list[str]):
 
 def check_run(pipeline: str):
     config = PIPELINES[pipeline]
+    tables = settled_table_statistics(config["task_arn"])
     task = describe_task(config["task_arn"])
-    tables = table_statistics(config["task_arn"])
     duration = load_minutes(task)
     rows_by_table = {f"{t['SchemaName']}.{t['TableName']}": t.get("FullLoadRows", 0) for t in tables}
     total_rows = sum(rows_by_table.values())
@@ -261,56 +277,95 @@ def check_deadline(pipeline: str):
         publish([f"⏰ {pipeline}: NOT FINISHED BY {config['deadline']} UTC", detail])
 
 
+def table_name(table: dict) -> str:
+    return f"{table['SchemaName']}.{table['TableName']}"
+
+
+def usual_suffix(value: float, history: list[float], formatter) -> str:
+    if len(history) < MIN_HISTORY_RUNS:
+        return ""
+    usual = statistics.median(history)
+    change = f", {format_percent_change(value, usual)}" if usual else ""
+    return f" (usual {formatter(usual)}{change})"
+
+
+def format_count(value: float) -> str:
+    return f"{value:,.0f}"
+
+
+def pipeline_summary(pipeline: str, config: dict, task: dict, tables: list[dict], history: dict, today: datetime) -> list[str]:
+    header = f"{pipeline} ({task.get('ReplicationTaskIdentifier', 'unknown task')})"
+    state, detail = run_status(task, today)
+    if state == "missing":
+        return [f"❌ {header}", detail]
+
+    excluded = {table.lower() for table in config.get("exclude_tables", [])}
+    problems = 0
+    table_lines = []
+    for table in sorted(tables, key=table_name):
+        name = table_name(table)
+        rows = table.get("FullLoadRows", 0)
+        rows_history = history.get(f"{pipeline}|{name}", [])
+        parts = [f"{rows:,.0f} rows{usual_suffix(rows, rows_history, format_count)}"]
+
+        table_state = table.get("TableState", "unknown state")
+        ended = table.get("FullLoadEndTime")
+        if table_state == COMPLETED_TABLE_STATE:
+            parts.append(f"done {ended.astimezone(timezone.utc):%H:%M} UTC" if ended else "done")
+        elif state == "running" and table_state in LOADING_TABLE_STATES:
+            parts.append(f"⏳ {table_state}")
+        else:
+            parts.append(f"🚫 {table_state}")
+            problems += 1
+
+        if state == "finished" and name.lower() not in excluded and row_drop_baseline(rows, rows_history) is not None:
+            parts.append("📉 row drop")
+            problems += 1
+        table_lines.append(f"    • {name}: {', '.join(parts)}")
+
+    if state == "running":
+        return [f"⏳ {header}", detail] + table_lines
+    if state == "failed":
+        return [f"❌ {header}", detail] + table_lines
+
+    duration = load_minutes(task)
+    duration_history = history.get(f"{pipeline}|{DURATION_KEY}", [])
+    if duration_overrun_baseline(duration, duration_history) is not None:
+        problems += 1
+    total_rows = sum(t.get("FullLoadRows", 0) for t in tables)
+    finished_at = task.get("ReplicationTaskStats", {}).get("FullLoadFinishDate")
+    finished = f"{finished_at.astimezone(timezone.utc):%H:%M} UTC" if finished_at else "today"
+    return [
+        f"{'⚠️' if problems else '✅'} {header}",
+        f"Finished {finished} in {format_minutes(duration)}{usual_suffix(duration, duration_history, format_minutes)}, "
+        f"{total_rows:,.0f} rows{usual_suffix(total_rows, history.get(f'{pipeline}|{TOTAL_ROWS_KEY}', []), format_count)}, "
+        f"{len(tables)} table{'' if len(tables) == 1 else 's'}",
+    ] + table_lines
+
+
 def send_digest():
-    now = datetime.now(timezone.utc)
-    today = today_start(now)
+    today = today_start()
     pipelines = sorted(PIPELINES.items(), key=lambda item: (item[1]["deadline"], item[0]))
+    tasks = {pipeline: describe_task(config["task_arn"]) for pipeline, config in pipelines}
+    tables = {
+        pipeline: table_statistics(config["task_arn"])
+        for pipeline, config in pipelines
+        if run_status(tasks[pipeline], today)[0] != "missing"
+    }
 
     history_queries = {}
     for pipeline, _ in pipelines:
-        history_queries[f"{pipeline}{DURATION_KEY}"] = ("LoadDurationMinutes", {"Pipeline": pipeline})
-        history_queries[f"{pipeline}{TOTAL_ROWS_KEY}"] = ("TotalRowsLoaded", {"Pipeline": pipeline})
+        history_queries[f"{pipeline}|{DURATION_KEY}"] = ("LoadDurationMinutes", {"Pipeline": pipeline})
+        history_queries[f"{pipeline}|{TOTAL_ROWS_KEY}"] = ("TotalRowsLoaded", {"Pipeline": pipeline})
+        for table in tables.get(pipeline, []):
+            history_queries[f"{pipeline}|{table_name(table)}"] = (
+                "RowsLoaded", {"Pipeline": pipeline, "Table": table_name(table)}
+            )
     history = metric_values(history_queries, today - timedelta(days=HISTORY_DAYS), today)
-    issues_today = metric_values(
-        {pipeline: ("IssuesFound", {"Pipeline": pipeline}) for pipeline, _ in pipelines}, today, now
-    )
 
     lines = [f"📋 DMS daily summary {today:%Y-%m-%d}"]
     for pipeline, config in pipelines:
-        task = describe_task(config["task_arn"])
-        state, detail = run_status(task, today)
-        if state == "running":
-            lines.append(f"⏳ {pipeline}: {detail}")
-            continue
-        if state != "finished":
-            lines.append(f"❌ {pipeline}: {detail}")
-            continue
-
-        tables = table_statistics(config["task_arn"])
-        rows = sum(t.get("FullLoadRows", 0) for t in tables)
-        duration = load_minutes(task)
-        finished_at = task.get("ReplicationTaskStats", {}).get("FullLoadFinishDate")
-        issues = max(issues_today[pipeline], default=0)
-
-        duration_history = history[f"{pipeline}{DURATION_KEY}"]
-        rows_history = history[f"{pipeline}{TOTAL_ROWS_KEY}"]
-        usual_duration = usual_rows = ""
-        if len(duration_history) >= MIN_HISTORY_RUNS:
-            median = statistics.median(duration_history)
-            change = f", {format_percent_change(duration, median)}" if median else ""
-            usual_duration = f" (usual {format_minutes(median)}{change})"
-        if len(rows_history) >= MIN_HISTORY_RUNS:
-            median = statistics.median(rows_history)
-            change = f", {format_percent_change(rows, median)}" if median else ""
-            usual_rows = f" (usual {median:,.0f}{change})"
-        finished = f"{finished_at.astimezone(timezone.utc):%H:%M} UTC" if finished_at else "today"
-
-        line = (
-            f"{'⚠️' if issues else '✅'} {pipeline}: finished {finished} in {format_minutes(duration)}{usual_duration}, "
-            f"{rows:,.0f} rows{usual_rows}, {len(tables)} table{'' if len(tables) == 1 else 's'}"
-        )
-        if issues:
-            line += f", {issues:.0f} issue(s) alerted"
-        lines.append(line)
+        lines.append("")
+        lines += pipeline_summary(pipeline, config, tasks[pipeline], tables.get(pipeline, []), history, today)
 
     publish(lines)
