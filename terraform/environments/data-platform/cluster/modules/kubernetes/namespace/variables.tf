@@ -13,4 +13,8 @@ variable "workload" {
 variable "pod_security_mode" {
   type    = string
   default = null
+  validation {
+    condition     = var.pod_security_mode == null || contains(["privileged", "baseline", "restricted"], var.pod_security_mode)
+    error_message = "pod_security_mode must be one of: privileged, baseline, restricted (or null to omit the label)"
+  }
 }

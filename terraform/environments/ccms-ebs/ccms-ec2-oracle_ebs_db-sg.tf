@@ -375,13 +375,3 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_to_ebsdb" {
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
 }
-
-resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_to_ebsdb_tls" {
-  count                        = local.ssogen_enabled ? 1 : 0
-  security_group_id            = aws_security_group.ec2_sg_ebsdb.id
-  description                  = "Allow ssogen ec2 instances to access ebs db"
-  from_port                    = local.application_data.accounts[local.environment].tg_db_ssl_port
-  to_port                      = local.application_data.accounts[local.environment].tg_db_ssl_port
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
-}

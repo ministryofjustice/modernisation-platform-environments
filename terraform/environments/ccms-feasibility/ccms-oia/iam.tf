@@ -127,12 +127,12 @@ resource "aws_iam_policy" "connector_s3" {
     Statement = [
       {
         Effect   = "Allow"
-        Action   = ["s3:ListBucket", "s3:GetBucketLocation"]
+        Action   = ["s3:ListBucket", "s3:GetBucketLocation", "s3:GetBucketVersioning"]
         Resource = aws_s3_bucket.connector_docs.arn
       },
       {
         Effect   = "Allow"
-        Action   = ["s3:GetObject", "s3:PutObject", "s3:PutObjectAcl"]
+        Action   = ["s3:GetObject", "s3:GetObjectVersion", "s3:PutObject", "s3:PutObjectAcl"]
         Resource = "${aws_s3_bucket.connector_docs.arn}/*"
       },
     ]

@@ -1,3 +1,8 @@
+# Shared S3 server access logs bucket, managed in ccms-feasibility root
+data "aws_s3_bucket" "s3_access_logs" {
+  bucket = "${local.application_name}-s3-access-logs"
+}
+
 module "s3_dbbackup" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
@@ -21,7 +26,7 @@ module "s3_dbbackup" {
         }
       },
       {
-        Sid       = "RestrictToTLSRequestsOnly"
+        Sid       = "DenyTLSOlderThan12"
         Effect    = "Deny"
         Principal = "*"
         Action    = "s3:*"
@@ -30,8 +35,7 @@ module "s3_dbbackup" {
           "${module.s3_dbbackup.bucket.arn}/*",
         ]
         Condition = {
-          Bool            = { "aws:SecureTransport" = "false" }
-          NumericLessThan = { "aws:TLSVersion" = "1.2" }
+          NumericLessThan = { "s3:TlsVersion" = "1.2" }
         }
       },
     ]
@@ -70,4 +74,16 @@ module "s3_dbbackup" {
   tags = merge(local.tags, {
     Name = "${local.component_name}-${local.env_label}-dbbackup"
   })
+}
+
+resource "aws_s3_bucket_logging" "s3_dbbackup" {
+  bucket        = module.s3_dbbackup.bucket.id
+  target_bucket = data.aws_s3_bucket.s3_access_logs.id
+  target_prefix = "${module.s3_dbbackup.bucket.id}/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
 }

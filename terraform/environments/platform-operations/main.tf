@@ -60,6 +60,7 @@ module "baseline" {
 }
 
 module "github_workflow_scheduler" {
+  count                      = local.enable_github_workflow_scheduler ? 1 : 0
   source                     = "../../modules/github_lambda"
   aws_account_id             = data.aws_caller_identity.current.id
   enable_outbound_federation = local.github_actions_lambda_environment_specific.enable_outbound_federation

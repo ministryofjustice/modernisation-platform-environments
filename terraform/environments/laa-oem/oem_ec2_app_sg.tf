@@ -173,6 +173,19 @@ resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_https_internet"
   }
 }
 
+resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_efs_2049" {
+  security_group_id            = aws_security_group.oem_app_security_group.id
+  description                  = "Allow NFS from app servers to the app EFS"
+  ip_protocol                  = "tcp"
+  from_port                    = 2049
+  to_port                      = 2049
+  referenced_security_group_id = aws_security_group.oem_app_efs_sg.id
+
+  tags = {
+    Name = "Allow NFS from app servers to the app EFS"
+  }
+}
+
 # INGRESS
 resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_22_22_cidr_1" {
   security_group_id = aws_security_group.oem_app_security_group.id

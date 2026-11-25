@@ -83,6 +83,8 @@ module "cross_account_details" {
     fms_ho_kms_id        = ""
     fms_specials_bucket  = ""
     fms_specials_kms_id  = ""
+    gems_general_bucket  = ""
+    gems_general_kms_id  = ""
     mdss_general_bucket  = ""
     mdss_general_kms_id  = ""
     mdss_specials_bucket = ""
@@ -168,4 +170,42 @@ module "gov_notify_details" {
 data "aws_secretsmanager_secret_version" "gov_notify_details" {
   count     = local.is-test ? 0 : 1
   secret_id = module.gov_notify_details[0].secret_id
+}
+
+module "cpr_api_trigger" {
+  source = "terraform-aws-modules/secrets-manager/aws"
+
+  name        = "cpr/trigger-pipeline/key"
+  description = "API key for CPR"
+
+  create_secret_version = false
+
+  create_policy       = true
+  block_public_policy = true
+  policy_statements = {
+    lambda = {
+      sid = "LambdaReadWrite"
+      principals = [{
+        type        = "AWS"
+        identifiers = [module.trigger_cpr_job_iam_role.arn]
+      }]
+      actions = [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue",
+      ]
+      resources = ["*"]
+    }
+    read = {
+      sid = "AllowAccountRead"
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      }]
+      actions   = ["secretsmanager:DescribeSecret"]
+      resources = ["*"]
+    }
+  }
+
+
+  tags = local.tags
 }

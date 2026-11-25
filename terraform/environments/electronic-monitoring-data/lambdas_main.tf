@@ -186,6 +186,25 @@ module "mdss_raw_file_stager" {
   }
 }
 
+module "gems_raw_file_stager" {
+  source                         = "./modules/lambdas"
+  function_name                  = "gems_raw_file_stager"
+  image_name                     = "copy_data"
+  is_image                       = true
+  role_name                      = aws_iam_role.copy_mdss_data.name
+  role_arn                       = aws_iam_role.copy_mdss_data.arn
+  memory_size                    = 1024
+  timeout                        = 900
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  reserved_concurrent_executions = 1000
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    DESTINATION_BUCKET = module.s3-raw-formatted-data-bucket.bucket.id
+  }
+}
+
 #-----------------------------------------------------------------------------------
 # Clean after MDSS load
 #-----------------------------------------------------------------------------------
@@ -328,6 +347,42 @@ module "load_mdss_lambda" {
     STUCK_STARTED_MINUTES                   = "60"
     AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
     AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# dlt load gems
+#-----------------------------------------------------------------------------------
+
+
+module "load_gems_lambda" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_gems"
+  role_name                      = aws_iam_role.load_gems.name
+  role_arn                       = aws_iam_role.load_gems.arn
+  handler                        = "load_gems.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 500
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    ATHENA_QUERY_BUCKET     = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER          = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET          = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME        = local.environment_shorthand
+    CLEANUP_QUEUE_URL       = aws_sqs_queue.clean_dlt_load_queue.id
+    SNS_TOPIC_ARN           = aws_sns_topic.emds_alerts.arn
+    MAX_RECEIVE_COUNT       = tostring(local.load_sqs_max_receive_count)
+    SCHEMA_BUCKET           = module.s3-metadata-bucket.bucket.id
+    SCHEMA_PATH             = "schemas/allied/gems/",
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
 }
 
@@ -779,6 +834,41 @@ module "mdss_load_redrive_controller" {
     AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
     AUTO_REDRIVE_TRANSIENT_MAX_ATTEMPTS     = "2"
     AUTO_REDRIVE_UNKNOWN_MAX_ATTEMPTS       = "1"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# MDSS received-files reconciler (scheduled scan backstop)
+#-----------------------------------------------------------------------------------
+
+module "mdss_received_files_reconciler" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "mdss_received_files_reconciler"
+  image_name                     = "mdss_received_files_reconciler"
+  handler                        = "mdss_received_files_reconciler.handler"
+  role_name                      = aws_iam_role.mdss_received_files_reconciler.name
+  role_arn                       = aws_iam_role.mdss_received_files_reconciler.arn
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    ENVIRONMENT_NAME              = local.environment_shorthand
+    RECEIVED_FILES_BUCKET         = module.s3-received-files-bucket.bucket.id
+    SCAN_QUEUE_URL                = module.virus_scan_file_sqs.sqs_queue.id
+    MDSS_RECEIVED_MANIFEST_BUCKET = module.s3-metadata-bucket.bucket.id
+    MDSS_RECEIVED_MANIFEST_PREFIX = "mdss-received-manifest/current"
+    MDSS_PREFIX                   = "allied/mdss/"
+    MIN_OBJECT_AGE_MINUTES        = "20"
+    REDRIVE_COOLDOWN_MINUTES      = "10"
+    MAX_REDRIVE_ATTEMPTS          = "2"
   }
 }
 
@@ -1259,7 +1349,7 @@ module "live_feed_incident_manager" {
 #-----------------------------------------------------------------------------------
 
 module "trigger_api_integration" {
-  count                   = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  count                   = 1
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "trigger_cpr_job"
@@ -1274,7 +1364,7 @@ module "trigger_api_integration" {
   subnet_ids              = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    API_BASE_URL     = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
+    API_BASE_URL     = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk"
     ENVIRONMENT_NAME = local.environment_shorthand
   }
 }
@@ -1401,6 +1491,41 @@ module "live_feed_specials_remediator" {
     POWERTOOLS_LOG_LEVEL  = "INFO"
     REMEDIATION_BUCKET    = module.s3-logging-bucket.bucket.id
     REMEDIATION_PREFIX    = local.specials_remediation_prefix
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Lake Formation permission granter
+# Apply reusable database and table grants through AWS managed service APIs.
+# ------------------------------------------------------------------------------
+
+module "lake_formation_permission_granter" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "lake_formation_permission_granter"
+  role_name                      = aws_iam_role.lake_formation_permission_granter.name
+  role_arn                       = aws_iam_role.lake_formation_permission_granter.arn
+  handler                        = "lake_formation_permission_granter.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    CATALOG_ID              = data.aws_caller_identity.current.account_id
+    ENVIRONMENT_NAME        = local.environment_shorthand
+    POWERTOOLS_LOG_LEVEL    = "INFO"
+    POWERTOOLS_SERVICE_NAME = "lake-formation-permission-granter"
   }
 }
 
@@ -1685,4 +1810,24 @@ module "register_athena" {
     aws_lakeformation_permissions.api_int_db_level_perms,
     aws_lakeformation_permissions.api_int_table_level_perms,
   ]
+}
+
+module "trigger_cadt_daily_run" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "trigger_cadt_daily_run"
+  image_name                     = "trigger_cadt_daily_run"
+  role_name                      = module.trigger_cadt_daily_run_iam_role.name
+  role_arn                       = module.trigger_cadt_daily_run_iam_role.arn
+  memory_size                    = 1024
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    TRIGGER_CADT_URL = "https://${module.trigger_cadt_api.api_gateway_id}.execute-api.${data.aws_region.current.name}.amazonaws.com/request/execute"
+  }
 }

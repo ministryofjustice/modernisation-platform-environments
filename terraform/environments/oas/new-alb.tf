@@ -15,6 +15,36 @@ locals {
     "10.26.130.0/23"     # MP non-prod Workspaces
   ]
 
+  # STB-5072: AVD PoC hosts - development only
+  avd_poc_cidr_blocks = [
+    "10.192.65.27/32", # AVD PoC host
+    "10.192.65.14/32"  # AVD PoC host
+  ]
+
+  avd_poc_ingress_rules = {
+    "lb_ingress_443_avd_poc" = {
+      description = "Loadbalancer ingress rule for HTTPS from AVD PoC hosts"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = local.avd_poc_cidr_blocks
+    }
+    "lb_ingress_9501_avd_poc" = {
+      description = "Loadbalancer ingress rule for HTTPS 9501 (Console/EM) from AVD PoC hosts"
+      from_port   = 9501
+      to_port     = 9501
+      protocol    = "tcp"
+      cidr_blocks = local.avd_poc_cidr_blocks
+    }
+    "lb_ingress_9503_avd_poc" = {
+      description = "Loadbalancer ingress rule for HTTPS 9503 (Analytics/DV) from AVD PoC hosts"
+      from_port   = 9503
+      to_port     = 9503
+      protocol    = "tcp"
+      cidr_blocks = local.avd_poc_cidr_blocks
+    }
+  }
+
   loadbalancer_ingress_rules = {
     "lb_ingress_443" = {
       description = "Loadbalancer ingress rule for HTTPS from MOJO devices, LZ Shared-Service Workspaces and OAS EC2 Instance"
@@ -80,7 +110,10 @@ resource "aws_security_group" "lb_security_group" {
 }
 
 resource "aws_security_group_rule" "lb_ingress_rules" {
-  for_each = contains(["preproduction", "development"], local.environment) ? local.loadbalancer_ingress_rules : {}
+  for_each = contains(["preproduction", "development"], local.environment) ? merge(
+    local.loadbalancer_ingress_rules,
+    local.environment == "development" ? local.avd_poc_ingress_rules : {}
+  ) : {}
 
   security_group_id = aws_security_group.lb_security_group[0].id
   type              = "ingress"

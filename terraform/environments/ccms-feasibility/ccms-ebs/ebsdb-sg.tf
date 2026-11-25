@@ -35,6 +35,24 @@ resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_pui" {
   referenced_security_group_id = data.aws_security_group.pui_ecs_tasks.id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_connector" {
+  security_group_id            = aws_security_group.ebsdb.id
+  description                  = "Oracle Net listener from the ccms-oia Connector ECS tasks"
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1522
+  referenced_security_group_id = data.aws_security_group.connector_ecs_tasks.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_fin_transfer" {
+  security_group_id            = aws_security_group.ebsdb.id
+  description                  = "Oracle Net listener from the ccms-file-transfer Financial Transfers API ECS tasks"
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1522
+  referenced_security_group_id = data.aws_security_group.fin_transfer_ecs_tasks.id
+}
+
 resource "aws_vpc_security_group_ingress_rule" "ebsdb_from_soa_managed" {
   security_group_id            = aws_security_group.ebsdb.id
   description                  = "Oracle Net listener from the ccms-soa managed ECS tasks"
@@ -120,6 +138,18 @@ resource "aws_vpc_security_group_egress_rule" "ebsdb_to_clamav" {
 data "aws_security_group" "pui_ecs_tasks" {
   vpc_id = data.aws_vpc.shared.id
   name   = "ccms-pui-${local.env_label}-ecs-tasks-sg"
+}
+
+# Connector ECS task SG, managed in the ccms-feasibility/ccms-oia stack
+data "aws_security_group" "connector_ecs_tasks" {
+  vpc_id = data.aws_vpc.shared.id
+  name   = "ccms-connector-${local.env_label}-ecs-tasks-sg"
+}
+
+# Financial Transfers API ECS task SG, managed in the ccms-feasibility/ccms-file-transfer stack
+data "aws_security_group" "fin_transfer_ecs_tasks" {
+  vpc_id = data.aws_vpc.shared.id
+  name   = "ccms-fin-transfer-${local.env_label}-ecs-tasks-sg"
 }
 
 # SOA managed ECS task SG, managed in the ccms-feasibility/ccms-soa stack

@@ -74,6 +74,18 @@ module "s3_inbound" {
   })
 }
 
+resource "aws_s3_bucket_logging" "s3_inbound" {
+  bucket        = module.s3_inbound.bucket.id
+  target_bucket = data.aws_s3_bucket.s3_access_logs.id
+  target_prefix = "${module.s3_inbound.bucket.id}/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
 module "s3_outbound" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
@@ -126,6 +138,18 @@ module "s3_outbound" {
   })
 }
 
+resource "aws_s3_bucket_logging" "s3_outbound" {
+  bucket        = module.s3_outbound.bucket.id
+  target_bucket = data.aws_s3_bucket.s3_access_logs.id
+  target_prefix = "${module.s3_outbound.bucket.id}/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
 module "s3_ftp_lambda" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
@@ -176,4 +200,16 @@ module "s3_ftp_lambda" {
   tags = merge(local.tags, {
     Name = "${local.application_name}-ftp-lambda"
   })
+}
+
+resource "aws_s3_bucket_logging" "s3_ftp_lambda" {
+  bucket        = module.s3_ftp_lambda.bucket.id
+  target_bucket = data.aws_s3_bucket.s3_access_logs.id
+  target_prefix = "${module.s3_ftp_lambda.bucket.id}/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
 }

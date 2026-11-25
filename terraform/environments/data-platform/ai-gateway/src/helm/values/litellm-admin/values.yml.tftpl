@@ -4,12 +4,11 @@ replicaCount: 1
 image:
   repository: ${imageRepository}
   tag: ${imageTag}
-
-%{ if imagePullSecret != "" ~}
+%{ if imagePullSecretEnabled ~}
 imagePullSecrets:
-  - name: ${imagePullSecret}
-
+  - name: litellm-enterprise-pull
 %{ endif ~}
+
 nameOverride: "litellm-admin"
 
 service:
@@ -62,6 +61,10 @@ proxy_config:
     master_key: os.environ/PROXY_MASTER_KEY
     proxy_admin_email: "${proxyAdminEmail}"
     ui_access_mode: "admin_only"
+%{ if disableEnvCredentialLogin ~}
+    # Admins sign in through Entra SSO; block the shared admin/master-key UI login. API access with the master key is unaffected.
+    disable_env_credential_login: true
+%{ endif ~}
     proxy_batch_write_at: 60
     database_connection_pool_limit: 10
   litellm_settings:
@@ -193,7 +196,16 @@ extraInitContainers:
         else
           proxy_dir=$(python -c 'import importlib.util; from pathlib import Path; print(Path(importlib.util.find_spec("litellm").origin).parent / "proxy")')
           cp -R "$proxy_dir/_experimental/out/." /app/var/litellm/ui/
+%{~ if imagePullSecretEnabled }
+          # The enterprise image does not ship the default logos, so copy them only when present.
+          for logo in logo.jpg logo_dark.png; do
+            if [ -f "$proxy_dir/$logo" ]; then
+              cp "$proxy_dir/$logo" /app/var/litellm/assets/
+            fi
+          done
+%{~ else }
           cp "$proxy_dir/logo.jpg" "$proxy_dir/logo_dark.png" /app/var/litellm/assets/
+%{~ endif }
         fi
     volumeMounts:
       - name: ui
@@ -235,10 +247,15 @@ envVars: {
     LITELLM_MIGRATION_DIR: "/app/migrations",
     LITELLM_MODE: "PRODUCTION",
     LITELLM_UI_API_DOC_BASE_URL: "https://${proxyHostname}",
+%{ if gatewayUrlEnabled ~}
+    # LLM routes are disabled on this deployment, so point the UI playground at the API deployment (LiteLLM v1.110+).
+    LITELLM_GATEWAY_URL: "https://${proxyHostname}",
+%{ endif ~}
     LITELLM_UI_PATH: "/app/var/litellm/ui",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
-    REDIS_SSL: "True",${temporaryDirectory != "" ? "\n    TMPDIR: \"${temporaryDirectory}\"," : ""}
+    REDIS_SSL: "True",
+    TMPDIR: "/app/cache",
     XDG_CACHE_HOME: "/app/cache",
     IAM_TOKEN_DB_AUTH: "True",
     DATABASE_USER: "${databaseUsername}",

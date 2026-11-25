@@ -3,10 +3,14 @@ locals {
 
   environment_configurations = {
     development = {
-      litellm_version                    = "1.106.5"
-      litellm_tmpdir                     = "/app/cache"
-      litellm_entra_client_secret_expiry = "05-05-2027"
-      ai_gateway_hostname                = "development.ai-gateway.justice.gov.uk"
+      # Optionally set a private image tag independently of the Helm chart version.
+      # litellm_image_tag = "v1.110.2-hotfix"
+      litellm_version                      = "1.110.2"
+      litellm_registry_credentials_enabled = true
+      litellm_private_registry_enabled     = true
+      litellm_gemini_live_defer_setup      = true
+      litellm_entra_client_secret_expiry   = "05-05-2027"
+      ai_gateway_hostname                  = "development.ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
         input_bucket_name  = "alpha-airflow-aigw-example-input"
         output_bucket_name = "alpha-airflow-aigw-example-output"
@@ -56,11 +60,10 @@ locals {
       }
       elasticache_node_type = "cache.t4g.medium"
 
-      ai_gateway_egress_policy_enabled = false
+      ai_gateway_egress_policy_enabled = true
     }
     test = {
       litellm_version                    = "1.106.5"
-      litellm_tmpdir                     = "/app/cache"
       litellm_entra_client_secret_expiry = "17-04-2027"
       ai_gateway_hostname                = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
@@ -100,11 +103,10 @@ locals {
       }
       elasticache_node_type = "cache.t4g.medium"
 
-      ai_gateway_egress_policy_enabled = false
+      ai_gateway_egress_policy_enabled = true
     }
     preproduction = {
       litellm_version                    = "1.106.5"
-      litellm_tmpdir                     = "/app/cache"
       litellm_entra_client_secret_expiry = "08-05-2027"
       ai_gateway_hostname                = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
@@ -140,14 +142,12 @@ locals {
       aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type                     = "cache.t4g.medium"
 
-      ai_gateway_egress_policy_enabled = false
+      ai_gateway_egress_policy_enabled = true
     }
     production = {
-      litellm_version                    = "1.104.0"
+      litellm_version                    = "1.106.5"
+      litellm_gemini_live_defer_setup    = true
       litellm_entra_client_secret_expiry = "08-05-2027"
-      litellm_image_repository           = "docker.io/litellmenterprise/litellm"
-      litellm_image_tag                  = "1.104.1-enterprise"
-      litellm_image_pull_secret          = "litellm-enterprise-pull"
       ai_gateway_hostname                = "ai-gateway.justice.gov.uk"
       ai_gateway_batch_storage = {
         input_bucket_name = "alpha-bold-pilot-rr-families"
@@ -163,6 +163,8 @@ locals {
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
         "35.176.93.186/32", # GlobalProtect (Alpha)
+        "51.140.138.86/32", # HMCTS VPN
+        "51.145.115.21/32", # HMCTS VPN
         # Sites
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
@@ -216,7 +218,7 @@ locals {
       aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type                     = "cache.t4g.medium"
 
-      ai_gateway_egress_policy_enabled = false
+      ai_gateway_egress_policy_enabled = true
     }
   }
 }

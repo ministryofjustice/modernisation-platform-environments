@@ -69,3 +69,19 @@ module "cica_dms_tempus_database_credentials" {
 
   tags = local.tags
 }
+
+module "cica_dms_slack_webhook" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "2.1.0"
+
+  name       = "ingestion/dms/slack-webhook"
+  kms_key_id = module.cica_dms_credentials_kms.key_arn
+
+  ignore_secret_changes = true
+  secret_string         = "CHANGEME"
+
+  tags = local.tags
+}
