@@ -2,6 +2,19 @@
 
 data "aws_caller_identity" "current" {}
 
+# Resolve the latest Amazon Linux 2023 AMI from the AWS-managed SSM public parameter.
+# Only fetched when ami_image_id is left empty (the default), allowing per-environment
+# pinning by setting ami_image_id explicitly in application_variables.json.
+data "aws_ssm_parameter" "al2023_ami" {
+  count = var.ami_image_id == "" ? 1 : 0
+  name  = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+}
+
+locals {
+  # Use the explicitly supplied AMI when set; otherwise fall back to the latest AL2023.
+  resolved_ami = var.ami_image_id != "" ? var.ami_image_id : data.aws_ssm_parameter.al2023_ami[0].value
+}
+
 data "template_file" "user_data" {
   template = file("${path.module}/scripts/bootstrap_apps.sh")
 
@@ -91,7 +104,7 @@ resource "aws_launch_template" "ec2_template" {
     name = "${var.name}-profile"
   }
 
-  image_id                             = var.ami_image_id
+  image_id                             = local.resolved_ami
   instance_initiated_shutdown_behavior = var.ec2_terminate_behavior
   instance_type                        = var.ec2_instance_type
   key_name                             = aws_key_pair.ec2-user.key_name
@@ -120,7 +133,11 @@ resource "aws_launch_template" "ec2_template" {
 
   tag_specifications {
     resource_type = "instance"
-    tags          = var.tags
+    # Merge the "Patch Group" tag so SSM Patch Manager can target instances
+    # via the patch baseline defined in ssm_patch.tf.
+    tags = merge(var.tags, {
+      "Patch Group" = "${var.name}-patch-group"
+    })
   }
 
   user_data = base64encode(data.template_file.user_data.rendered)

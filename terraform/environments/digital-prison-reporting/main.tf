@@ -841,16 +841,23 @@ module "glue_reconciliation_database" {
 
 # Ec2
 module "ec2_bastion_host" {
-  source                      = "./modules/ec2"
-  name                        = "${local.project}-ec2-bastion-host-${local.env}"
-  description                 = "EC2 bastion instance for accessing the private network"
-  vpc                         = data.aws_vpc.shared.id
-  cidr                        = [data.aws_vpc.shared.cidr_block]
-  subnet_ids                  = data.aws_subnet.private_subnets_b.id
-  ec2_instance_type           = local.instance_type
-  ami_image_id                = local.image_id
-  aws_region                  = local.account_region
-  ec2_terminate_behavior      = "terminate"
+  source      = "./modules/ec2"
+  name        = "${local.project}-ec2-bastion-host-${local.env}"
+  description = "EC2 bastion instance for accessing the private network"
+  vpc         = data.aws_vpc.shared.id
+  cidr        = [data.aws_vpc.shared.cidr_block]
+  subnet_ids  = data.aws_subnet.private_subnets_b.id
+
+  ec2_instance_type = local.instance_type
+
+  # ami_image_id: leave empty ("") to auto-resolve the latest Amazon Linux 2023
+  # AMI from the AWS SSM public parameter store on every terraform apply.
+  # Set to a specific AMI ID in application_variables.json to pin a version.
+  ami_image_id = local.image_id
+
+  aws_region             = local.account_region
+  ec2_terminate_behavior = "terminate"
+
   associate_public_ip_address = false
   static_private_ip           = "10.26.24.201" # Used for Dev as a Secondary IP
   ebs_optimized               = true
@@ -864,6 +871,10 @@ module "ec2_bastion_host" {
   account = local.account_id
   env     = local.env
 
+  # S3 bucket for SSM Patch Manager operation logs (uses an existing bucket with
+  # an isolated prefix so no additional bucket resource is needed).
+  patch_logs_s3_bucket = module.s3_working_bucket.bucket_id
+
   ec2_sec_rules_source_sec_group = {
     "NOMIS_FROM_GLUE" = {
       "from_port"                = local.nomis_port,
@@ -872,7 +883,6 @@ module "ec2_bastion_host" {
       "source_security_group_id" = aws_security_group.glue_job_connection_sg.id
     }
   }
-
 
   tags = merge(
     local.all_tags,

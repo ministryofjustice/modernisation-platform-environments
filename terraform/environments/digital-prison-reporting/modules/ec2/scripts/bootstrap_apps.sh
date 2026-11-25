@@ -36,8 +36,37 @@ chmod 440 /etc/sudoers.d/ssm-user
 
 echo "assumeyes=1" >> /etc/yum.conf
 
-# Update all packages
+# Update all packages on first boot (full update)
 sudo yum -y update
+
+# ---------------------------------------------------------------------------
+# Enable automatic security updates
+# ---------------------------------------------------------------------------
+# AL2023 uses dnf-automatic; this applies *security-only* patches daily
+# between planned ASG refresh cycles (which apply full AMI updates).
+# Fall back gracefully if dnf-automatic is unavailable (e.g. AL2 image).
+if command -v dnf &> /dev/null; then
+  dnf install -y dnf-automatic || true
+
+  # Apply security updates automatically; leave other upgrades for the
+  # maintenance window (AWS-RunPatchBaseline / SSM Patch Manager).
+  if [ -f /etc/dnf/automatic.conf ]; then
+    sed -i 's/^upgrade_type = default/upgrade_type = security/' /etc/dnf/automatic.conf
+    sed -i 's/^apply_updates = no/apply_updates = yes/' /etc/dnf/automatic.conf
+  fi
+
+  systemctl enable --now dnf-automatic.timer || true
+  echo "dnf-automatic enabled for automatic security updates"
+else
+  # Amazon Linux 2 fallback: enable yum-cron for security updates
+  yum install -y yum-cron || true
+  if [ -f /etc/yum/yum-cron.conf ]; then
+    sed -i 's/^update_cmd = default/update_cmd = security/' /etc/yum/yum-cron.conf
+    sed -i 's/^apply_updates = no/apply_updates = yes/' /etc/yum/yum-cron.conf
+  fi
+  systemctl enable --now yum-cron || true
+  echo "yum-cron enabled for automatic security updates"
+fi
 
 # Setup YUM install Kinesis Agent
 sudo yum -y install wget unzip jq
