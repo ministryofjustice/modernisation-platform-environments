@@ -172,40 +172,58 @@ data "aws_secretsmanager_secret_version" "gov_notify_details" {
   secret_id = module.gov_notify_details[0].secret_id
 }
 
-module "cpr_api_trigger" {
-  source = "terraform-aws-modules/secrets-manager/aws"
-
+resource "aws_secretsmanager_secret" "cpr_api_trigger" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name        = "cpr/trigger-pipeline/key"
   description = "API key for CPR"
 
-  create_secret_version = false
-
-  create_policy       = true
-  block_public_policy = true
-  policy_statements = {
-    lambda = {
-      sid = "LambdaReadWrite"
-      principals = [{
-        type        = "AWS"
-        identifiers = [module.trigger_cpr_job_iam_role.arn]
-      }]
-      actions = [
-        "secretsmanager:DescribeSecret",
-        "secretsmanager:GetSecretValue",
-      ]
-      resources = ["*"]
-    }
-    read = {
-      sid = "AllowAccountRead"
-      principals = [{
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-      }]
-      actions   = ["secretsmanager:DescribeSecret"]
-      resources = ["*"]
-    }
-  }
-
-
   tags = local.tags
+}
+
+data "aws_iam_policy_document" "cpr_api_trigger" {
+  statement {
+    sid = "LambdaReadWrite"
+    principals {
+      type        = "AWS"
+      identifiers = [module.trigger_cpr_job_iam_role.arn]
+    }
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid = "AllowAccountRead"
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+      ]
+    }
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+resource "aws_secretsmanager_secret_policy" "cpr_api_trigger" {
+  secret_arn          = aws_secretsmanager_secret.cpr_api_trigger.arn
+  policy              = data.aws_iam_policy_document.cpr_api_trigger.json
+  block_public_policy = true
+}
+
+moved {
+  from = module.cpr_api_trigger.aws_secretsmanager_secret.this[0]
+  to   = aws_secretsmanager_secret.cpr_api_trigger
+}
+
+moved {
+  from = module.cpr_api_trigger.aws_secretsmanager_secret_policy.this[0]
+  to   = aws_secretsmanager_secret_policy.cpr_api_trigger
 }
