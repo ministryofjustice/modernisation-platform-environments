@@ -168,19 +168,91 @@ class HandlerTests(unittest.TestCase):
     @patch.object(handler, "github_graphql")
     def test_project_source_lookup_uses_configured_option(self, graphql):
         graphql.return_value = {"organization": {"projectV2": {
-            "id": "project", "field": {"id": "field", "options": [
+            "id": "project", "fields": {"nodes": [{"id": "field", "name": "🪧 Source", "options": [
                 {"id": "support", "name": "Support"},
                 {"id": "incident", "name": "Incident"},
-            ]}
+            ]}]}
         }}}
         self.assertEqual(
             handler.get_github_project_source("org", "token", 1, "Incident"),
             ("project", "field", "incident"),
         )
-        self.assertEqual(graphql.call_args.args[2], {"org": "org", "number": 1})
+        self.assertEqual(graphql.call_args.args[2], {"org": "org", "number": 1, "first": 30})
+        self.assertIn("... on ProjectV2SingleSelectField", graphql.call_args.args[1])
+        self.assertIn("fields(first: $first", graphql.call_args.args[1])
+        for size in ("1", "50", "100"):
+            with self.subTest(page_size=size), patch.dict(os.environ, {"GITHUB_PROJECT_FIELDS_PAGE_SIZE": size}):
+                handler.get_github_project_source("org", "token", 1, "Incident")
+                self.assertEqual(graphql.call_args.args[2]["first"], int(size))
         with self.assertLogs(handler.logger, level="ERROR"):
             with self.assertRaisesRegex(RuntimeError, "no Source option"):
                 handler.get_github_project_source("org", "token", 1, "Missing")
+
+    @patch.object(handler, "github_graphql")
+    def test_source_field_matching_requires_one_match_across_all_pages(self, graphql):
+        field = {"id": "field", "name": "🪧 Source", "options": [
+            {"id": "option", "name": "🎧 Support"}
+        ]}
+        for nodes, expected_count in (([], 0), ([field, {**field, "name": "Original Source"}], 2)):
+            with self.subTest(count=expected_count):
+                graphql.return_value = {"organization": {"projectV2": {
+                    "id": "project", "fields": {"nodes": nodes}
+                }}}
+                with self.assertLogs(handler.logger, level="ERROR"):
+                    with self.assertRaisesRegex(RuntimeError, f"found {expected_count}"):
+                        handler.get_github_project_source("org", "token", 1, "🎧 Support")
+
+        graphql.side_effect = [
+            {"organization": {"projectV2": {"id": "project", "fields": {
+                "nodes": [{}, None, {"name": "Resources"}, {"name": "Source system"}, {"name": "source"}],
+                "pageInfo": {"hasNextPage": True, "endCursor": "next"}
+            }}}},
+            {"organization": {"projectV2": {"id": "project", "fields": {
+                "nodes": [field], "pageInfo": {"hasNextPage": False}
+            }}}},
+        ]
+        self.assertEqual(
+            handler.get_github_project_source("org", "token", 1, "🎧 Support"),
+            ("project", "field", "option"),
+        )
+        self.assertEqual(graphql.call_args.args[2]["after"], "next")
+
+    @patch.object(handler, "github_graphql")
+    def test_source_option_suffix_matching(self, graphql):
+        for names, expected in (
+            (["Support"], "0"),
+            (["🎧 Support", "support", "Support team"], "0"),
+            (["Other Support"], "0"),
+            (["support", "Support team"], None),
+            (["Support", "🎧 Support"], None),
+        ):
+            with self.subTest(names=names):
+                graphql.return_value = {"organization": {"projectV2": {
+                    "id": "project", "fields": {"nodes": [{
+                        "id": "field", "name": "Source", "options": [
+                            {"id": str(index), "name": name}
+                            for index, name in enumerate(names)
+                        ]
+                    }]}
+                }}}
+                if expected is None:
+                    with self.assertLogs(handler.logger, level="ERROR"):
+                        with self.assertRaises(RuntimeError):
+                            handler.get_github_project_source("org", "token", 1, "Support")
+                else:
+                    self.assertEqual(
+                        handler.get_github_project_source("org", "token", 1, "Support"),
+                        ("project", "field", expected),
+                    )
+
+    @patch.object(handler, "github_graphql")
+    def test_invalid_project_fields_page_size_is_rejected(self, graphql):
+        for size in ("", "abc", "1.5", "0", "-1", "101"):
+            with self.subTest(page_size=size), patch.dict(os.environ, {"GITHUB_PROJECT_FIELDS_PAGE_SIZE": size}):
+                with self.assertLogs(handler.logger, level="ERROR"):
+                    with self.assertRaisesRegex(ValueError, "GITHUB_PROJECT_FIELDS_PAGE_SIZE"):
+                        handler.get_github_project_source("org", "token", 1, "Support")
+        graphql.assert_not_called()
 
     @patch.object(handler.requests, "post")
     @patch.object(handler, "get_github_project_source", side_effect=RuntimeError("Project unavailable"))
@@ -838,9 +910,9 @@ class HandlerTests(unittest.TestCase):
         get.return_value = json_response({"token": "github-token"})
         post.side_effect = [
             json_response({"data": {"organization": {
-                "projectV2": {"id": "project", "field": {
-                    "id": "field", "options": [{"id": "option", "name": "Support"}]
-                }}
+                "projectV2": {"id": "project", "fields": {"nodes": [{
+                    "id": "field", "name": "Source", "options": [{"id": "option", "name": "🎧 Support"}]
+                }]}}
             }}}),
             json_response({
                 "number": 42, "html_url": "https://example/42", "node_id": "issue"
@@ -881,7 +953,7 @@ class HandlerTests(unittest.TestCase):
             post.call_args_list[1].kwargs["json"],
             handler.build_github_issue(self.finding),
         )
-        self.assertEqual(post.call_args_list[0].kwargs["json"]["variables"], {"org": "org", "number": 1})
+        self.assertEqual(post.call_args_list[0].kwargs["json"]["variables"], {"org": "org", "number": 1, "first": 30})
         self.assertEqual(post.call_args_list[2].kwargs["json"]["variables"], {"project": "project", "issue": "issue"})
         self.assertEqual(post.call_args_list[3].kwargs["json"]["variables"], {
             "project": "project", "item": "item", "field": "field", "option": "option"

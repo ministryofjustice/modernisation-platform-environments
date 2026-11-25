@@ -41,8 +41,19 @@ variable "github_project_number" {
   }
 }
 
+variable "github_project_fields_page_size" {
+  description = "Number of GitHub project fields requested per API page"
+  type        = number
+  default     = 30
+
+  validation {
+    condition     = try(var.github_project_fields_page_size >= 1 && var.github_project_fields_page_size <= 100 && floor(var.github_project_fields_page_size) == var.github_project_fields_page_size, false)
+    error_message = "github_project_fields_page_size must be a whole number between 1 and 100."
+  }
+}
+
 variable "github_issue_source" {
-  description = "The Source single-select option to set on the GitHub project item"
+  description = "The case-sensitive suffix of the Source single-select option to set on the GitHub project item"
   type        = string
   default     = "Support"
 
