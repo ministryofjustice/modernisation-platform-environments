@@ -4127,6 +4127,22 @@ data "aws_iam_policy_document" "merge_redrive_planner_policy_document" {
   }
 
   statement {
+    sid    = "DescribeReconciliationExecutions"
+    effect = "Allow"
+
+    actions = [
+      "states:DescribeExecution",
+    ]
+
+    resources = [
+      "${replace(module.merge_into_mdss_staged_position.arn, ":stateMachine:", ":execution:")}:*",
+      "${replace(module.merge_into_mdss_ac_position.arn, ":stateMachine:", ":execution:")}:*",
+      "${replace(module.merge_into_emdi_position.arn, ":stateMachine:", ":execution:")}:*",
+      "${replace(module.downstream_reconciliation_audit.arn, ":stateMachine:", ":execution:")}:*",
+    ]
+  }
+
+  statement {
     sid    = "StartHistoricalAssuranceAudit"
     effect = "Allow"
 
