@@ -133,9 +133,10 @@ resource "terraform_data" "delivery_configuration" {
         try(entry.action.push_to_sftp.port, 22) >= 1 &&
         try(entry.action.push_to_sftp.port, 22) <= 65535 &&
         floor(try(entry.action.push_to_sftp.port, 22)) == try(entry.action.push_to_sftp.port, 22) &&
+        contains(["posix", "direct"], try(entry.action.push_to_sftp.write_mode, "posix")) &&
         length(entry.action.push_to_sftp.host_public_keys) > 0
       ])
-      error_message = "SFTP requires explicit IPv4 recipient CIDRs (not /0), a valid integer TCP port and trusted host public keys."
+      error_message = "SFTP requires explicit IPv4 recipient CIDRs (not /0), a valid integer TCP port, write_mode ('posix' or 'direct') and trusted host public keys."
     }
   }
 }

@@ -11,6 +11,7 @@ from mft_writer.errors import InvalidMessage
 
 IDEMPOTENCY_SECONDS = 7 * 24 * 60 * 60
 TERMINAL_SECONDS = IDEMPOTENCY_SECONDS
+VALID_WRITE_MODES = frozenset({"posix", "direct"})
 
 
 def json_object(raw: str, label: str) -> dict[str, Any]:
@@ -54,9 +55,18 @@ def safe_relative_path(path: str, *, directory: bool = False) -> str:
 
 
 def normalise_destination(value: Mapping[str, Any]) -> dict[str, Any]:
-    expected = {"hostname", "port", "username", "destination_prefix", "host_public_keys", "destination_cidr_blocks"}
+    expected = {
+        "hostname",
+        "port",
+        "username",
+        "destination_prefix",
+        "host_public_keys",
+        "destination_cidr_blocks",
+        "write_mode",
+    }
     destination = dict(value)
     destination.setdefault("port", 22)
+    destination.setdefault("write_mode", "posix")
     if set(destination) != expected:
         raise InvalidMessage("SFTP destination fields are invalid")
     hostname = destination["hostname"]
@@ -67,6 +77,8 @@ def normalise_destination(value: Mapping[str, Any]) -> dict[str, Any]:
         raise InvalidMessage("SFTP username is invalid")
     if type(destination["port"]) is not int or not 1 <= destination["port"] <= 65535:
         raise InvalidMessage("SFTP port is invalid")
+    if not isinstance(destination["write_mode"], str) or destination["write_mode"] not in VALID_WRITE_MODES:
+        raise InvalidMessage("SFTP write_mode must be 'posix' or 'direct'")
     safe_relative_path(destination["destination_prefix"], directory=True)
     keys = destination["host_public_keys"]
     if not isinstance(keys, list) or not keys or any(not isinstance(key, str) or len(key.split()) != 2 for key in keys):

@@ -19,6 +19,12 @@ locals {
 
   sftp_destinations_by_secret = {
     for entry_id, secret_arn_prefix in local.push_to_sftp_secret_arn_prefixes :
-    secret_arn_prefix => merge({ port = 22 }, local.push_to_sftp_entries[entry_id].action.push_to_sftp)
+    secret_arn_prefix => merge(
+      {
+        port       = 22
+        write_mode = "posix"
+      },
+      local.push_to_sftp_entries[entry_id].action.push_to_sftp,
+    )
   }
 }

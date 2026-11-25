@@ -154,6 +154,22 @@ def checked_directory(client: Any, root: str, relative: str, context: Any, *, cr
     return current
 
 
+def _stream_to_handle(remote_file: Any, body: Any, source_size: int, context: Any) -> int:
+    size = 0
+    with remote_file:
+        while True:
+            ensure_time(context, "SFTP streaming")
+            chunk = body.read(CHUNK_BYTES)
+            if not chunk:
+                break
+            size += len(chunk)
+            if size > source_size:
+                raise InvalidMessage("source object exceeds its recorded size")
+            ensure_time(context, "SFTP write")
+            remote_file.write(chunk)
+    return size
+
+
 def upload_stream(client: Any, body: Any, source_size: int, route: Mapping[str, Any], context: Any) -> int:
     root = client.normalize(".")
     if not isinstance(root, str) or not root.startswith("/") or posixpath.normpath(root) != root:
@@ -169,6 +185,13 @@ def upload_stream(client: Any, body: Any, source_size: int, route: Mapping[str, 
     else:
         if not stat.S_ISREG(attributes.st_mode):
             raise InvalidMessage("remote destination is not a regular, non-symlink file")
+    if route["destination"].get("write_mode", "posix") == "direct":
+        ensure_time(context, "SFTP direct upload")
+        remote_file = client.open(final, "wb")
+        size = _stream_to_handle(remote_file, body, source_size, context)
+        if size != source_size:
+            raise InvalidMessage("uploaded file size does not match the exact source version")
+        return size
     temporary = posixpath.join(directory, f".mft-{uuid.uuid4().hex}.part")
     created = False
     renamed = False
@@ -176,18 +199,7 @@ def upload_stream(client: Any, body: Any, source_size: int, route: Mapping[str, 
         ensure_time(context, "SFTP temporary upload")
         remote_file = client.open(temporary, "wx")
         created = True
-        size = 0
-        with remote_file:
-            while True:
-                ensure_time(context, "SFTP streaming")
-                chunk = body.read(CHUNK_BYTES)
-                if not chunk:
-                    break
-                size += len(chunk)
-                if size > source_size:
-                    raise InvalidMessage("source object exceeds its recorded size")
-                ensure_time(context, "SFTP write")
-                remote_file.write(chunk)
+        size = _stream_to_handle(remote_file, body, source_size, context)
         ensure_time(context, "SFTP uploaded-file verification")
         if size != source_size or client.stat(temporary).st_size != source_size:
             raise InvalidMessage("uploaded file size does not match the exact source version")

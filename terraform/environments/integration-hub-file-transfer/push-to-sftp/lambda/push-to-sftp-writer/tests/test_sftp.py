@@ -44,6 +44,35 @@ def test_stream_then_atomic_overwrite(client, route):
     client.remove.assert_not_called()
 
 
+def test_direct_write_streams_to_final_path_without_temp_file_or_rename(client, route):
+    direct_route = {**route, "destination": {**route["destination"], "write_mode": "direct"}}
+    assert sftp.upload_stream(client, io.BytesIO(b"abc"), 3, direct_route, None) == 3
+    client.open.assert_called_once_with("/home/delivery/incoming/nested/file.csv", "wb")
+    client.open.return_value.write.assert_called_once_with(b"abc")
+    client.stat.assert_not_called()
+    client.posix_rename.assert_not_called()
+    client.rename.assert_not_called()
+    client.remove.assert_not_called()
+
+
+@pytest.mark.parametrize("failure", ["write", "short", "oversize", "close"])
+def test_direct_write_failures_raise_without_removing_destination(client, route, failure):
+    direct_route = {**route, "destination": {**route["destination"], "write_mode": "direct"}}
+    payload = b"abc"
+    if failure == "write":
+        client.open.return_value.write.side_effect = OSError("write failed")
+    elif failure == "short":
+        payload = b"ab"
+    elif failure == "oversize":
+        payload = b"abcd"
+    else:
+        client.open.return_value.__exit__.side_effect = OSError("close failed")
+    with pytest.raises((OSError, InvalidMessage)):
+        sftp.upload_stream(client, io.BytesIO(payload), 3, direct_route, None)
+    client.posix_rename.assert_not_called()
+    client.remove.assert_not_called()
+
+
 @pytest.mark.parametrize("failure", ["write", "size", "rename", "close"])
 def test_failed_upload_is_not_success(client, route, failure):
     if failure == "write":

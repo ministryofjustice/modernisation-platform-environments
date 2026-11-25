@@ -7,7 +7,7 @@ This component sends clean files from S3 to a recipient's SFTP server. It runs i
 1. Deploy the parent file-transfer component first. This component looks up its event bus, clean bucket, KMS keys and PagerDuty topics.
 2. Add a `push-to-sftp` action to the shared [file-dispatch configuration](../modules/file-dispatch-configuration/README.md#action-configuration), then deploy the parent and this component. For an existing dispatch secret, update its action in Secrets Manager through the approved operator process: Terraform ignores subsequent changes to the secret value.
 3. Terraform generates a unique per-route ED25519 client keypair via an ephemeral `tls_private_key` resource and seeds `sftp-keys/<entry>/private` (JSON containing `private_key`) and `sftp-keys/<entry>/public` (OpenSSH public key) using write-only secret versions (`secret_string_wo`), so key material is never stored in Terraform plan or state files. Using a distinct keypair per route prevents a misconfigured destination from silently authenticating against another recipient and isolates key rotation.
-4. Read the public key from `sftp-keys/<entry>/public` (accessible to `modernisation-platform-developer` SSO sign-ins via the secret and KMS policies, or via the `public_key_reader` policy) and ask the recipient to install it. Verify the server host keys through a separate channel, agree the allowed IPv4 CIDRs and check that the destination directory exists. The server must support exclusive temporary-file creation and POSIX overwrite rename.
+4. Read the public key from `sftp-keys/<entry>/public` (accessible to `modernisation-platform-developer` SSO sign-ins via the secret and KMS policies, or via the `public_key_reader` policy) and ask the recipient to install it. Verify the server host keys through a separate channel, agree the allowed IPv4 CIDRs and check that the destination directory exists. By default (`write_mode = "posix"`), the server must support exclusive temporary-file creation and POSIX overwrite rename; for S3-backed AWS Transfer Family or write-only SFTP dropboxes that cannot rename temporary files, explicitly configure `write_mode = "direct"` on that route.
 5. Test with a non-sensitive file. Check both the file on the recipient's server and the completion event before sending service files.
 
 Subsequent Terraform runs do not overwrite the secrets while `secret_string_wo_version` is unchanged (`ignore_secret_changes = true`). For coordinated zero-downtime key rotation, use the `key_custodian` policy to update the secrets out of band rather than bumping `secret_string_wo_version` before the recipient installs the replacement public key. Do not put private keys or passphrases in Terraform, events or logs.
@@ -32,7 +32,7 @@ Check that the shared VPC has the following endpoints. This component does not c
 
 For the interface endpoints, check private DNS and allow inbound TCP/443 from the writer in the endpoint security groups. Check endpoint policies and network ACLs too. For the gateway endpoints, check the routes: security-group rules alone do not create them. Gateway endpoints use regional service IP addresses rather than subnet network interfaces, so the writer also needs the prefix-list rules.
 
-Check DNS and the route to the recipient's SFTP server before testing a delivery.
+Check DNS and the route to the recipient's SFTP server before testing a delivery. In Modernisation Platform shared VPCs, also verify that the shared private-subnet Network ACL (`platforms-<environment>-general-private`) allows outbound traffic on the recipient's SFTP port (TCP/22 is blocked by default unless explicitly permitted in `ministryofjustice/modernisation-platform`) and that the recipient allows the shared NAT Gateway egress IPs for the source environment.
 
 Only IPv4 is supported. Every IPv4 address returned by DNS must be within the recipient's configured CIDRs. If any address is outside those ranges, the writer does not connect.
 
@@ -54,8 +54,12 @@ The writer handles one message at a time, with a 900-second timeout and a maximu
 The reporter does not start another record with 30 seconds or less remaining, or another DynamoDB or EventBridge call with 15 seconds or less remaining. Its AWS clients use a two-second connection timeout, a three-second read timeout and two total attempts. Unfinished and unstarted records are returned for retry; earlier successful records are acknowledged. Powertools emits
 `ReporterRecordDeferred` and a warning for deadline deferrals, separately from processing failures. Deferral does not mean delivery failed, and existing leases and checkpoints remain in place.
 
-The writer reads the exact clean S3 object version and streams it to a temporary file on the SFTP server. It checks the byte count, then renames the temporary file over the destination. The destination path combines the configured destination prefix with the source key relative to its authorised source prefix. The clean S3 object is retained under the parent component's lifecycle policy; the
-recipient manages retention on their server.
+The writer reads the exact clean S3 object version and streams it in 32 KiB chunks to the SFTP server:
+
+- **`write_mode = "posix"` (default):** streams to a temporary `.mft-<uuid>.part` file (`wx`), checks the remote byte count via `stat`, and renames the temporary file over the destination using `posix-rename@openssh.com`. On failure before rename, it attempts to remove the temporary file.
+- **`write_mode = "direct"`:** streams directly to the final destination path (`wb`) without creating a temporary file, calling post-close `stat`, or renaming. Use this for S3-backed AWS Transfer Family and write-only dropboxes. Because there is no atomic rename, an interrupted upload may leave a partial file at the final path until a retry overwrites it.
+
+The destination path combines the configured destination prefix with the source key relative to its authorised source prefix. The clean S3 object is retained under the parent component's lifecycle policy; the recipient manages retention on their server.
 
 The writer checks its 90-second reserve before reading or writing each 32 KiB chunk and before the final SFTP checks and rename. DynamoDB and completion-publication calls require more than 45 seconds remaining, allowing a checkpointed upload to defer publication without reconnecting. Writer AWS clients retain five-second connection and 15-second read timeouts with two total attempts. The SFTP
 connection timeout remains ten seconds and its I/O timeout remains 15 seconds.
