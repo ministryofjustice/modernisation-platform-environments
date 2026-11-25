@@ -110,7 +110,7 @@ resource "aws_iam_role_policy" "glue_access_dms" {
 
 module "data_claims_dms" {
   count                    = local.is-test || local.is-preproduction ? 1 : 0
-  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=f002ad98e57520a4a94805fbef073d75afad128e"
+  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=209610e6907e34acde13886599506a411b5e3c2f"
   vpc_id                   = data.aws_vpc.shared.id
   environment              = local.environment
   manage_dms_service_roles = false
@@ -127,8 +127,7 @@ module "data_claims_dms" {
     subnet_ids              = data.aws_subnets.shared-private.ids
     allocated_storage       = 100
     availability_zone       = data.aws_availability_zones.available.names[0]
-    # TODO: Fix module to allow 3.6.1
-    engine_version             = "3.5.4"
+    engine_version             = "3.6.1"
     kms_key_arn                = aws_kms_key.data_lake_kms_key.arn
     multi_az                   = false
     replication_instance_class = "dms.r6i.2xlarge"
