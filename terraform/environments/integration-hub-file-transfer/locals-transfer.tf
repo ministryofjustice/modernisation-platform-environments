@@ -16,15 +16,6 @@ locals {
   # Passwords are deliberately not configured here. Populate the password field
   # directly in the generated Secrets Manager secret when password access is needed.
   transfer_server_users = {
-    "dms1981@development.file-transfer.service.justice.gov.uk" = {
-      environments         = ["test"]
-      server_id_allow_list = []
-      cidr_blocks          = ["13.43.9.198/32", "13.42.163.245/32", "18.132.208.127/32"]
-      ssh_public_keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILHJMNkcGKrpJpPPSRS9v4MXgjpOs5LWDP//0z5yo3UQ"
-      ]
-    }
-
     dms1981 = {
       environments         = ["development"]
       server_id_allow_list = []
