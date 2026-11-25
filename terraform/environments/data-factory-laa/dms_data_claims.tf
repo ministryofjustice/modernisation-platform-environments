@@ -133,6 +133,7 @@ module "data_claims_dms" {
     replication_instance_class = "dms.r6i.2xlarge"
     inbound_cidr               = "192.0.2.0/32" # TODO: Not needed
     apply_immediately          = true
+    allow_major_version_upgrade = true
   }
 
   dms_source = {
