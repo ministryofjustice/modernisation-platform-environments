@@ -21,7 +21,7 @@ jobs:
       issues: write
       pull-requests: write
       security-events: write
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/reusable-code-quality.yml@8ceafd4b54147bc4f423e434bacd7ac281e89ab2 # v6.4.1
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/reusable-code-quality.yml@95a3313033d7a4e8c8c651140b8eec3c93dfeb21 # v6.5.2
     with:
       validate_all_codebase: ${{ github.event_name == 'schedule' && 'true' || 'false' }}
       apply_fixes: ${{ github.event_name == 'schedule' }}
