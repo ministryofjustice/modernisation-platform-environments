@@ -5,7 +5,7 @@ module "actions_runners_github_app_apc_self_hosted_runners_secret" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.1.0"
+  version = "2.2.0"
 
   name        = "actions-runners/app/apc-self-hosted-runners"
   description = "https://github.com/organizations/moj-analytical-services/settings/apps/analytical-platform-runners"
@@ -38,7 +38,7 @@ module "actions_runners_github_app_mojas_registration_secret" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.1.0"
+  version = "2.2.0"
 
   name        = "actions-runners/app/apc-self-hosted-runners-mojas-registration"
   description = "GitHub App (moj-analytical-services org) - runner registration (Administration: RW)"
@@ -71,7 +71,7 @@ module "actions_runners_github_app_moj_registration_secret" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.1.0"
+  version = "2.2.0"
 
   name        = "actions-runners/app/apc-self-hosted-runners-moj-registration"
   description = "GitHub App (ministryofjustice org) - data-catalogue runner registration (Administration: RW)"

@@ -2,7 +2,7 @@ module "mlflow_bucket" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=65413ddedcd584e8e7601bc72792a827ec773c23" # v5.18.0
 
   bucket = "mojap-compute-${local.environment}-mlflow"
 
