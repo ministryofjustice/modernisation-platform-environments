@@ -96,11 +96,26 @@ resource "aws_ssm_parameter" "aws_health_lambda_ignore_findings" {
   }
 }
 
+resource "aws_ssm_parameter" "aws_health_lambda_github_project_id" {
+  count       = local.enable_aws_health_lambda ? 1 : 0
+  name        = "health_lambda_github_project_id"
+  description = "AWS Health Lambda GitHub project ID"
+  type        = "SecureString"
+  value       = "TO_BE_UPDATED"
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
 module "aws_health_lambda" {
   count                             = local.enable_aws_health_lambda ? 1 : 0
   source                            = "../../modules/aws_health_lambda"
   aws_account_id                    = data.aws_caller_identity.current.id
   aws_accounts_parameter_name       = aws_ssm_parameter.aws_health_lambda_accounts[count.index].name
+  github_project_number             = aws_ssm_parameter.aws_health_lambda_github_project_id[count.index].name
   github_repo                       = "platform-operations"
   ignore_findings_parameter_name    = aws_ssm_parameter.aws_health_lambda_ignore_findings[count.index].name
 }
