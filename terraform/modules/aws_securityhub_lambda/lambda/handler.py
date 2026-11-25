@@ -232,28 +232,65 @@ def github_graphql(github_token, query, variables):
 
 
 def get_github_project_source(github_org, github_token, project_number, source):
-    data = github_graphql(
-        github_token,
-        """
-        query($org: String!, $number: Int!) {
+    message = "GITHUB_PROJECT_FIELDS_PAGE_SIZE must be a whole number between 1 and 100"
+    try:
+        page_size = int(os.getenv("GITHUB_PROJECT_FIELDS_PAGE_SIZE", "30"))
+    except ValueError as error:
+        logger.error(message)
+        raise ValueError(message) from error
+    if not 1 <= page_size <= 100:
+        logger.error(message)
+        raise ValueError(message)
+    query = """
+        query($org: String!, $number: Int!, $first: Int!, $after: String) {
           organization(login: $org) {
             projectV2(number: $number) {
               id
-              field(name: "Source") {
-                ... on ProjectV2SingleSelectField { id options { id name } }
+              fields(first: $first, after: $after) {
+                nodes {
+                  ... on ProjectV2SingleSelectField { id name options { id name } }
+                }
+                pageInfo { hasNextPage endCursor }
               }
             }
           }
         }
-        """,
-        {"org": github_org, "number": project_number},
-    )
-    organization = data.get("organization") or {}
-    project = organization.get("projectV2") or {}
-    field = project.get("field") or {}
-    option = next(
-        (item for item in field.get("options", []) if item.get("name") == source), None
-    )
+        """
+    variables = {"org": github_org, "number": project_number, "first": page_size}
+    matches = []
+    while True:
+        data = github_graphql(github_token, query, variables)
+        project = (data.get("organization") or {}).get("projectV2") or {}
+        fields = project.get("fields") or {}
+        matches.extend(
+            field for field in fields.get("nodes", [])
+            if field and field.get("name", "").endswith("Source")
+        )
+        page_info = fields.get("pageInfo") or {}
+        if not page_info.get("hasNextPage"):
+            break
+        cursor = page_info.get("endCursor")
+        if not cursor or cursor == variables.get("after"):
+            raise RuntimeError("GitHub Projects API returned an invalid fields cursor")
+        variables = {**variables, "after": cursor}
+
+    if len(matches) != 1:
+        message = (
+            f"GitHub project {project_number} must have exactly one single-select "
+            f"field ending with 'Source'; found {len(matches)}"
+        )
+        logger.error(message)
+        raise RuntimeError(message)
+    field = matches[0]
+    options = [
+        item for item in field.get("options", [])
+        if item.get("name", "").endswith(source)
+    ]
+    if len(options) > 1:
+        message = f"GitHub project {project_number} has multiple Source options ending with {source!r}"
+        logger.error(message)
+        raise RuntimeError(message)
+    option = options[0] if options else None
     if not project.get("id") or not field.get("id") or not option or not option.get("id"):
         logger.error("GitHub project %s has no Source option %r", project_number, source)
         raise RuntimeError(f"GitHub project {project_number} has no Source option {source!r}")
