@@ -4621,7 +4621,7 @@ resource "aws_iam_role" "register_athena" {
 }
 
 data "aws_iam_policy_document" "register_athena_policy_document" {
-  count = local.is-production ? 0 : 1
+  count = 1
   statement {
     sid       = "ListS3Bucket"
     effect    = "Allow"
