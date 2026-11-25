@@ -127,8 +127,7 @@ module "data_claims_dms" {
     subnet_ids              = data.aws_subnets.shared-private.ids
     allocated_storage       = 100
     availability_zone       = data.aws_availability_zones.available.names[0]
-    # TODO: Fix module to allow 3.6.1
-    engine_version             = "3.5.4"
+    engine_version             = "3.6.1"
     kms_key_arn                = aws_kms_key.data_lake_kms_key.arn
     multi_az                   = false
     replication_instance_class = "dms.r6i.2xlarge"
