@@ -49,13 +49,11 @@ It targets the development Grafana Cloud stack and
 `observability-platform-development`, adding the module's Grafana access roles,
 PDC agents and restarter role without changing Example's existing resources.
 
-This is prepared configuration, not a deployment instruction. Central bootstrap
-and automatic enrolment support must ship before applying the
-`example-development` PDC opt-in in Observability Platform. Alpha.4's
-`bootstrap_enabled = false` gate must remain until a compatible release is
-available. Confirm successful first-token issuance into the central secret
-before applying this tenant module; ECS reads the token from that secret, so
-there is no manual token step. See the
+Apply the central `example-development` opt-in in Observability Platform and
+confirm successful first issuance into the central secret **before** deploying
+this tenant module. ECS reads that secret; no team member creates or copies a
+token. The central hourly check waits for stable, connected agents before it
+requests native rotation. See the
 [central rollout runbook](../observability-platform/docs/grafana-cloud/pdc-token-rotation.md).
 
 The agent uses the module defaults for general private subnets, PrivateLink and
