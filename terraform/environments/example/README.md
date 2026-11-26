@@ -39,6 +39,32 @@ Modernisation Platform
 
 ## Optional
 
+### Grafana Cloud PDC - observability_platform.tf
+
+The v3.1.0 Observability Platform tenant module is pinned to
+`03f883d6c4994539447243e3186f41e3922ab482`, matching Sprinkler. It is enabled only in
+the `example-development` workspace, using `local.is-development`; Example's
+test, preproduction and production workspaces create none of its resources.
+It targets the development Grafana Cloud stack and
+`observability-platform-development`, adding the module's Grafana access roles,
+PDC agents and restarter role without changing Example's existing resources.
+
+This is prepared configuration, not a deployment instruction. Central bootstrap
+and automatic enrolment support must ship before applying the
+`example-development` PDC opt-in in Observability Platform. Alpha.4's
+`bootstrap_enabled = false` gate must remain until a compatible release is
+available. Confirm successful first-token issuance into the central secret
+before applying this tenant module; ECS reads the token from that secret, so
+there is no manual token step. See the
+[central rollout runbook](../observability-platform/docs/grafana-cloud/pdc-token-rotation.md).
+
+The agent uses the module defaults for general private subnets, PrivateLink and
+replica count. Check that the shared subnets and Grafana PDC PrivateLink endpoints
+are available before deployment. No private data-source targets or additional
+allowlist entries are configured here. Identify an actual Example target and
+configure its connectivity separately before testing a private query; do not
+copy another tenant's targets.
+
 ### EC2 - ec2.tf
 
 The EC2 code requires security groups to be used which are created prior to the EC2 service. To ensure this happens there is a step in the code (depends_on) which ensures that is complete before the EC2 is built. In general, the security group is built very quickly so this causes no delay.
