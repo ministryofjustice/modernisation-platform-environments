@@ -123,10 +123,10 @@ module "data_claims_dms" {
   validation_sqs_kms_key_arn = aws_kms_key.data_lake_kms_key.arn
 
   dms_replication_instance = {
-    replication_instance_id = "data-claims"
-    subnet_ids              = data.aws_subnets.shared-private.ids
-    allocated_storage       = 100
-    availability_zone       = data.aws_availability_zones.available.names[0]
+    replication_instance_id    = "data-claims"
+    subnet_ids                 = data.aws_subnets.shared-private.ids
+    allocated_storage          = 100
+    availability_zone          = data.aws_availability_zones.available.names[0]
     engine_version             = "3.6.1"
     kms_key_arn                = aws_kms_key.data_lake_kms_key.arn
     multi_az                   = false
