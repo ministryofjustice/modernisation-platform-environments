@@ -157,13 +157,17 @@ Review the development plan against the applied state:
 calls only `DeleteAccessPolicy(region, id)`; it does not delete tokens individually.
 The [API reference](https://grafana.com/docs/grafana-cloud/learn-and-build/developer-resources/api-reference/cloud-api/)
 documents a successful policy deletion but does not guarantee what happens to
-existing tokens on that call. Confirm the behaviour for policies with issued
-tokens with Grafana before apply. After apply verify that the three policy IDs
-are gone and their token IDs are no longer active in the correct organisation
-and region. If a delete is rejected, the outcome is ambiguous, or a token
-remains active, stop and reconcile the partial apply. Any necessary revocation
-requires a separately approved Grafana operation by token ID. Forgetting or
-deleting an AWS secret does **not** revoke a Grafana token.
+existing tokens on that call. So, **before apply**, an operator deletes only the
+tokens under the three retired development networks, by the recorded token IDs
+(no agent ever used them). Leave the networks for Terraform to delete. Then
+check that each of those policies lists no tokens. Deleting the tokens does not
+change the plan, because Terraform does not manage them. It also does not affect
+the hourly enrolment checks, which read only AWS metadata, the journal, ECS and
+metrics. Do not delete a network by hand. Its provider read treats a missing
+policy as already gone, which would quietly shrink the reviewed plan. After apply,
+verify that the three policy IDs are gone. If a delete is rejected or its outcome
+is ambiguous, stop and reconcile the partial apply. Forgetting or deleting an AWS
+secret does **not** revoke a Grafana token.
 
 ### Manual AWS cleanup after the handoff
 
