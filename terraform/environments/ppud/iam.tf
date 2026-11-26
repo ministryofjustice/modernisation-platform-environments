@@ -74,18 +74,18 @@ resource "aws_iam_policy_attachment" "ec2_describe_instances" {
   policy_arn = aws_iam_policy.ec2_describe_instances.arn
 }
 
-resource "aws_iam_policy_attachment" "cloudtrail_lookupevents" {
-  depends_on = [aws_iam_policy.cloudtrail_lookupevents]
-  name       = "cloudtrail-lookupevents-attachment"
+resource "aws_iam_policy_attachment" "cloudtrail_searchevents" {
+  depends_on = [aws_iam_policy.cloudtrail_searchevents]
+  name       = "cloudtrail-searchevents-attachment"
   roles      = [aws_iam_role.ec2_iam_role.id]
-  policy_arn = aws_iam_policy.cloudtrail_lookupevents.arn
+  policy_arn = aws_iam_policy.cloudtrail_searchevents.arn
 }
 
-resource "aws_iam_policy_attachment" "config_getresourceconfighistory" {
-  depends_on = [aws_iam_policy.config_getresourceconfighistory]
-  name       = "config-getresourceconfighistory-attachment"
+resource "aws_iam_policy_attachment" "config_searchconfigresources" {
+  depends_on = [aws_iam_policy.config_config_searchconfigresources]
+  name       = "config-config_searchconfigresources-attachment"
   roles      = [aws_iam_role.ec2_iam_role.id]
-  policy_arn = aws_iam_policy.config_getresourceconfighistory.arn
+  policy_arn = aws_iam_policy.config_config_searchconfigresources.arn
 }
 
 resource "aws_iam_policy_attachment" "CloudWatchAgentAdminPolicy" {
@@ -168,13 +168,19 @@ resource "aws_iam_policy" "ec2_describe_instances" {
 # IAM Policy for Cloudtrail LookupEvents
 ########################################
 
-resource "aws_iam_policy" "cloudtrail_lookupevents" {
-  name        = "cloudtrail-lookupevents"
+resource "aws_iam_policy" "cloudtrail_searchevents" {
+  name        = "cloudtrail-searchevents"
   description = "Allow EC2 instances to search for cloudtrail events"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [{
-      "Action" : ["cloudtrail:lookupevents"]
+      "Action" : [
+        "cloudtrail:LookupEvents",
+        "cloudtrail:ListTrails",
+        "cloudtrail:GetTrail",
+        "cloudtrail:GetTrailStatus",
+        "cloudtrail:DescribeTrails"
+        ]
       "Effect" : "Allow",
       "Resource" : [
         "*"
@@ -187,13 +193,22 @@ resource "aws_iam_policy" "cloudtrail_lookupevents" {
 # IAM Policy for Config Get Resource History
 ############################################
 
-resource "aws_iam_policy" "config_getresourceconfighistory" {
-  name        = "config-getresourceconfighistory"
-  description = "Allow EC2 instances to search resource config history"
+resource "aws_iam_policy" "config_searchconfigresources" {
+  name        = "config-searchconfigresources"
+  description = "Allow EC2 instances to search config resource history"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [{
-      "Action" : ["config:getresourceconfighistory"]
+      "Action" : [
+        "config:GetResourceConfigHistory",
+        "config:BatchGetResourceConfig",
+        "config:ListDiscoveredResources",
+        "config:GetDiscoveredResourceCounts",
+        "config:SelectResourceConfig",
+        "config:SelectAggregateResourceConfig",
+        "config:ListAggregateDiscoveredResources",
+        "config:GetAggregateResourceConfig"
+        ]
       "Effect" : "Allow",
       "Resource" : [
         "*"
