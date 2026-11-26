@@ -209,7 +209,7 @@ resource "aws_transfer_web_app" "this" {
   identity_provider_details {
     identity_center_config {
       instance_arn = tolist(data.aws_ssoadmin_instances.this[count.index].arns) [0]
-      role         = module.transfer_family[count.index].output.transfer_iam_role_arn
+      role         = module.transfer_family[count.index].transfer_iam_role_arn
     }
   }
 
