@@ -1,0 +1,52 @@
+{
+  "sandbox-postgres": {
+    "configuration_store": {
+      "bucket_name": "data-factory-moj-development-ingestion-config-110695445580",
+      "bucket_owner": "110695445580",
+      "prefix": "components/raw-history/development/sandbox-postgres/",
+      "kms_key_arn": "arn:aws:kms:eu-west-2:110695445580:key/ef8c1a75-ce5a-4f62-b5e9-47b1251d89e0"
+    },
+    "history_bucket": {
+      "bucket_name": "dms-core-test-eb1dcbbb2e1c0b8f304c652dd8",
+      "bucket_owner": "110695445580",
+      "kms_key_arn": "arn:aws:kms:eu-west-2:374269020027:key/4342fa0e-fefa-4994-a1f8-b46cdea3ffb1"
+    },
+    "operations_kms_key_arn": "arn:aws:kms:eu-west-2:110695445580:key/a1d0c432-5563-4b74-b463-bd0f4458fdd8",
+    "max_batch_bytes": 8388608,
+    "deletion_protection_enabled": true,
+    "tables": [
+      {
+        "schema_name": "public",
+        "table_name": "dms_integration_test",
+        "profile": "standard",
+        "history_prefix": "raw-history/development/sandbox-postgres/dms_test/public/dms_integration_test/",
+        "landings": [
+          {
+            "bucket_name": "dms-core-test-eb1dcbbb2e1c0b8f304c652dd8",
+            "bucket_owner": "110695445580",
+            "prefix": "configured-ingestion/development/sandbox-postgres/dms_test/integration/sandbox-v2/",
+            "kms_key_arns": [
+              "arn:aws:kms:eu-west-2:374269020027:key/4342fa0e-fefa-4994-a1f8-b46cdea3ffb1"
+            ]
+          }
+        ],
+        "manifest_location": {
+          "bucket_name": "data-factory-moj-development-ingestion-config-110695445580",
+          "bucket_owner": "110695445580",
+          "prefix": "raw-batches/development/sandbox-postgres/",
+          "kms_key_arns": [
+            "arn:aws:kms:eu-west-2:110695445580:key/ef8c1a75-ce5a-4f62-b5e9-47b1251d89e0"
+          ]
+        },
+        "contract_location": {
+          "bucket_name": "data-factory-moj-development-contracts-110695445580",
+          "bucket_owner": "110695445580",
+          "prefix": "sandbox-postgres/dms_test/public/dms_integration_test/",
+          "kms_key_arns": [
+            "arn:aws:kms:eu-west-2:110695445580:key/645bbf6b-fb7c-433f-8981-7a35598dd798"
+          ]
+        }
+      }
+    ]
+  }
+}

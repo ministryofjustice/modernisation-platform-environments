@@ -59,23 +59,25 @@ resource "aws_db_option_group" "soa_oracle_19" {
 }
 
 resource "aws_db_instance" "soa_db" {
-  identifier                          = "soa-db"
-  allocated_storage                   = local.application_data.accounts[local.environment].soa_db_storage_gb
-  iops                                = local.application_data.accounts[local.environment].soa_db_iops
-  auto_minor_version_upgrade          = local.application_data.accounts[local.environment].soa_db_minor_version_upgrade_allowed
-  storage_type                        = "gp3"
-  engine                              = "oracle-ee"
-  engine_version                      = local.application_data.accounts[local.environment].soa_db_version
-  instance_class                      = local.application_data.accounts[local.environment].soa_db_instance_type
-  multi_az                            = local.application_data.accounts[local.environment].soa_db_deploy_to_multi_azs
-  db_name                             = "SOADB"
-  username                            = local.application_data.accounts[local.environment].soa_db_user
-  password                            = data.aws_secretsmanager_secret_version.soa_password.secret_string
-  port                                = "1521"
-  kms_key_id                          = data.aws_kms_key.rds_shared.arn
-  storage_encrypted                   = true
-  license_model                       = "bring-your-own-license"
-  iam_database_authentication_enabled = false
+  identifier                            = "soa-db"
+  allocated_storage                     = local.application_data.accounts[local.environment].soa_db_storage_gb
+  iops                                  = local.application_data.accounts[local.environment].soa_db_iops
+  auto_minor_version_upgrade            = local.application_data.accounts[local.environment].soa_db_minor_version_upgrade_allowed
+  storage_type                          = "gp3"
+  engine                                = "oracle-ee"
+  engine_version                        = local.application_data.accounts[local.environment].soa_db_version
+  instance_class                        = local.application_data.accounts[local.environment].soa_db_instance_type
+  multi_az                              = local.application_data.accounts[local.environment].soa_db_deploy_to_multi_azs
+  db_name                               = "SOADB"
+  username                              = local.application_data.accounts[local.environment].soa_db_user
+  password                              = data.aws_secretsmanager_secret_version.soa_password.secret_string
+  port                                  = "1521"
+  kms_key_id                            = data.aws_kms_key.rds_shared.arn
+  storage_encrypted                     = true
+  license_model                         = "bring-your-own-license"
+  iam_database_authentication_enabled   = false
+  performance_insights_enabled          = local.environment == "preproduction" ? true : false
+  performance_insights_retention_period = local.environment == "preproduction" ? 7 : null
 
   vpc_security_group_ids = [
     aws_security_group.soa_db.id

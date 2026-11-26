@@ -40,6 +40,10 @@ locals {
       queue_name = local.live_feed_dlq_names.process_landing_bucket_files_mdss_specials
     }
 
+    process_landing_bucket_files_gems_general_dlq = {
+      queue_name = local.live_feed_dlq_names.process_landing_bucket_files_gems_general
+    }
+
     scan_dlq = {
       queue_name = local.live_feed_dlq_names.scan
     }
@@ -188,6 +192,52 @@ resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   dimensions = {
     FunctionName = module.mdss_load_redrive_controller[0].lambda_function_name
   }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "mdss_received_files_reconciler_errors" {
+  alarm_name        = "mdss_received_files_reconciler_errors"
+  alarm_description = "Triggered when the MDSS received-files reconciler records errors"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "Errors"
+  namespace   = "AWS/Lambda"
+  period      = 60
+  statistic   = "Sum"
+
+  dimensions = {
+    FunctionName = module.mdss_received_files_reconciler.lambda_function_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "mdss_received_files_reconcile_exhausted" {
+  alarm_name        = "mdss_received_files_reconcile_exhausted"
+  alarm_description = "Triggered when stale MDSS received files reach the automatic redrive limit"
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "MdssReceivedReconcilerSkippedMaxRedrivesCount"
+  namespace   = "EMDS/MDSS"
+  period      = 300
+  statistic   = "Maximum"
 
   alarm_actions = [
     aws_sns_topic.emds_alerts.arn
@@ -805,7 +855,7 @@ resource "aws_cloudwatch_metric_alarm" "downstream_reconciliation_audit_executio
 
 resource "aws_cloudwatch_log_metric_filter" "cadt_task_failed" {
   name           = "cadt-task-failed"
-  log_group_name = "/ecs/create-a-derived-table"
+  log_group_name = aws_cloudwatch_log_group.ecs_cadt.name
   pattern        = "Dataset Check Failed"
 
   metric_transformation {

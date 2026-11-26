@@ -7,6 +7,36 @@ module "litellm_license_secret" {
   ignore_secret_changes = true
 }
 
+module "litellm_enterprise_registry_secret" {
+  count = contains(["development", "test"], local.environment) ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name = "${local.component_name}/litellm-enterprise-registry"
+
+  secret_string = jsonencode({
+    client_id     = "CHANGEME"
+    client_secret = "CHANGEME"
+    token_url     = "CHANGEME"
+    registry_url  = "CHANGEME"
+    telemetry_url = "CHANGEME"
+  })
+  ignore_secret_changes = true
+}
+
+module "litellm_enterprise_registry_hostname_secret" {
+  count = contains(["development", "test"], local.environment) ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name = "${local.component_name}/litellm-enterprise-registry-hostname"
+
+  secret_string = jsonencode({
+    registry_hostname = "CHANGEME"
+  })
+  ignore_secret_changes = true
+}
+
 module "litellm_salt_key_secret" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 

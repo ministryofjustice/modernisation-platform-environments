@@ -8,6 +8,8 @@ locals {
     process_landing_bucket_files_mdss_ho       = "-process_landing_bucket_files_mdss_ho-dlq"
     process_landing_bucket_files_mdss_specials = "-process_landing_bucket_files_mdss_specials-dlq"
 
+    process_landing_bucket_files_gems_general = "-process_landing_bucket_files_gems_general-dlq"
+
     scan                   = "-scan-dlq"
     process_fms_metadata   = "-process_fms_metadata-dlq"
     push_data_export_to_p1 = "-push_data_export_to_p1-dlq"
@@ -102,6 +104,21 @@ locals {
         local.live_feed_dlq_names.process_landing_bucket_files_mdss_specials
       )
       log_group_name = "/aws/lambda/process_landing_bucket_files_mdss_specials"
+    }
+
+    (aws_cloudwatch_metric_alarm.sqs_dlq_has_messages[
+      "process_landing_bucket_files_gems_general_dlq"
+      ].alarm_name) = {
+      feed       = "gems"
+      order_type = "general"
+      source_queue_name = trimsuffix(
+        local.live_feed_dlq_names.process_landing_bucket_files_gems_general,
+        "-dlq"
+      )
+      dlq_queue_name = (
+        local.live_feed_dlq_names.process_landing_bucket_files_gems_general
+      )
+      log_group_name = "/aws/lambda/process_landing_bucket_files_gems_general"
     }
   }
 

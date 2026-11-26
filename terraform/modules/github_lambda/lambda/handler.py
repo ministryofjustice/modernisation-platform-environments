@@ -76,8 +76,29 @@ def trigger_github_workflow_dispatch(
 ):
     url = (
         f"https://api.github.com/repos/{github_org}/{repo}"
-        f"/actions/workflows/{workflow}/dispatches"
+        f"/actions/workflows/{workflow}"
     )
+    headers = {
+        "Authorization": f"Bearer {github_token}",
+        "Accept": "application/vnd.github+json",
+    }
+
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        if response.status_code != 200:
+            logger.error(
+                "GitHub workflow lookup failed. status=%s url=%s body=%s",
+                response.status_code,
+                url,
+                response.text,
+            )
+        response.raise_for_status()
+    except requests.RequestException as e:
+        raise RuntimeError(f"GitHub workflow lookup request failed: {e}") from e
+
+    if response.json()["state"] in {"disabled_manually", "disabled_inactivity"}:
+        logger.info("Workflow %s is currently disabled, exiting...", workflow)
+        return False
 
     payload = {"ref": ref}
     if isinstance(inputs, dict) and inputs:
@@ -85,11 +106,8 @@ def trigger_github_workflow_dispatch(
 
     try:
         response = requests.post(
-            url,
-            headers={
-                "Authorization": f"Bearer {github_token}",
-                "Accept": "application/vnd.github+json",
-            },
+            f"{url}/dispatches",
+            headers=headers,
             json=payload,
             timeout=10,
         )
@@ -103,6 +121,8 @@ def trigger_github_workflow_dispatch(
         response.raise_for_status()
     except requests.RequestException as e:
         raise RuntimeError(f"GitHub workflow dispatch request failed: {e}")
+
+    return True
 
 
 def lambda_handler(event, context):
@@ -152,7 +172,7 @@ def lambda_handler(event, context):
         web_identity_token=web_identity_token,
     )
 
-    trigger_github_workflow_dispatch(
+    dispatched = trigger_github_workflow_dispatch(
         github_org=github_org,
         github_token=github_token,
         ref=ref,
@@ -160,6 +180,14 @@ def lambda_handler(event, context):
         workflow=workflow,
         inputs=inputs,
     )
+
+    if not dispatched:
+        return {
+            "statusCode": 200,
+            "body": json.dumps(
+                {"message": f"Workflow {workflow} is currently disabled, exiting..."}
+            ),
+        }
 
     return {
         "statusCode": 200,

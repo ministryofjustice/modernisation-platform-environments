@@ -21,7 +21,7 @@ variable "github_org" {
 }
 
 variable "github_identity" {
-  description = "The Octo STS identity configured in the target repository with issues: write permission"
+  description = "The Octo STS identity configured with issues: write and organization_projects: write permissions"
   type        = string
   default     = "platops_github_issue_identifier"
 }
@@ -29,6 +29,38 @@ variable "github_identity" {
 variable "github_repo" {
   description = "The name of the GitHub repository where AWS Health issues are created"
   type        = string
+}
+
+variable "github_project_number" {
+  description = "The number of the GitHub organisation project receiving AWS Health issues"
+  type        = number
+
+  validation {
+    condition     = try(var.github_project_number > 0 && floor(var.github_project_number) == var.github_project_number, false)
+    error_message = "github_project_number must be a positive whole number."
+  }
+}
+
+variable "github_project_fields_page_size" {
+  description = "Number of GitHub project fields requested per API page"
+  type        = number
+  default     = 30
+
+  validation {
+    condition     = try(var.github_project_fields_page_size >= 1 && var.github_project_fields_page_size <= 100 && floor(var.github_project_fields_page_size) == var.github_project_fields_page_size, false)
+    error_message = "github_project_fields_page_size must be a whole number between 1 and 100."
+  }
+}
+
+variable "github_issue_source" {
+  description = "The case-sensitive suffix of the Source single-select option to set on the GitHub project item"
+  type        = string
+  default     = "Support"
+
+  validation {
+    condition     = try(length(trimspace(var.github_issue_source)) > 0, false)
+    error_message = "github_issue_source must be non-empty."
+  }
 }
 
 variable "ignore_findings_parameter_name" {

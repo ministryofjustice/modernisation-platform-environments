@@ -414,9 +414,9 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
   })
 }
 
-# ------------------------------------------
-# Trigger cadt Step function
-# ------------------------------------------
+# --------------------------------------------
+# Trigger create-a-derived-table step function
+# --------------------------------------------
 
 module "trigger_cadt_step_function" {
   source       = "./modules/step_function"

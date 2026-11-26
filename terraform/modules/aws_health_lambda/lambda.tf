@@ -24,13 +24,16 @@ resource "aws_lambda_function" "github_workflow_trigger" {
 
   environment {
     variables = {
-      GITHUB_IDENTITY                = var.github_identity
-      GITHUB_ORG                     = var.github_org
-      GITHUB_REPO                    = var.github_repo
-      IGNORE_FINDINGS                = data.aws_ssm_parameter.ignore_findings.value
-      WEB_IDENTITY_AUDIENCE          = var.web_identity_audience
-      WEB_IDENTITY_DURATION_SECONDS  = var.web_identity_duration_seconds
-      WEB_IDENTITY_SIGNING_ALGORITHM = var.web_identity_signing_algorithm
+      GITHUB_IDENTITY                 = var.github_identity
+      GITHUB_PROJECT_FIELDS_PAGE_SIZE = tostring(var.github_project_fields_page_size)
+      GITHUB_ISSUE_SOURCE             = var.github_issue_source
+      GITHUB_ORG                      = var.github_org
+      GITHUB_PROJECT_NUMBER           = tostring(var.github_project_number)
+      GITHUB_REPO                     = var.github_repo
+      IGNORE_FINDINGS                 = data.aws_ssm_parameter.ignore_findings.value
+      WEB_IDENTITY_AUDIENCE           = var.web_identity_audience
+      WEB_IDENTITY_DURATION_SECONDS   = var.web_identity_duration_seconds
+      WEB_IDENTITY_SIGNING_ALGORITHM  = var.web_identity_signing_algorithm
     }
   }
 

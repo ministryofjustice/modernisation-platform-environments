@@ -5,7 +5,12 @@ locals {
 
   test_writer_function_arn = "arn:aws:lambda:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:function:${local.application_name}-push-to-s3"
 
-  test_dispatch_secret_arn = "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}/file-dispatch/${local.incoming_prefix}-??????"
+  test_hosted_pickup_function_arn = "arn:aws:lambda:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:function:${local.application_name}-push-to-s3-with-hosted-pickup"
+
+  test_dispatch_secret_arns = [
+    for prefix in local.incoming_prefixes :
+    "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}/file-dispatch/${prefix}-??????"
+  ]
 
   test_harness_trust_policy_documents = data.aws_iam_policy_document.test_harness_trust[*].json
 }

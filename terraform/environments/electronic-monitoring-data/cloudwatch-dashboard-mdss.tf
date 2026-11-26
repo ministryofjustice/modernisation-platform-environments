@@ -331,6 +331,79 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | limit 50
           EOT
         }
+      },
+      {
+        type   = "metric",
+        x      = 0,
+        y      = 70,
+        width  = 12,
+        height = 6,
+        properties = {
+          title  = "Received-files reconciliation activity"
+          region = "eu-west-2"
+          period = 300
+          metrics = [
+            ["EMDS/MDSS", "MdssReceivedReconcilerStaleCount", { stat = "Maximum" }],
+            [".", "MdssReceivedReconcilerRedrivenCount", { stat = "Sum" }],
+            [".", "MdssReceivedReconcilerSkippedMaxRedrivesCount", { stat = "Maximum" }]
+          ]
+        }
+      },
+      {
+        type   = "metric",
+        x      = 12,
+        y      = 70,
+        width  = 12,
+        height = 6,
+        properties = {
+          title  = "Received-files reconciler age / errors"
+          region = "eu-west-2"
+          period = 300
+          metrics = [
+            ["EMDS/MDSS", "MdssReceivedReconcilerOldestStaleAgeSeconds", { stat = "Maximum" }],
+            ["AWS/Lambda", "Errors", "FunctionName", module.mdss_received_files_reconciler.lambda_function_name, { stat = "Sum", yAxis = "right" }]
+          ]
+        }
+      },
+      {
+        type   = "log",
+        x      = 0,
+        y      = 76,
+        width  = 24,
+        height = 8,
+        properties = {
+          title  = "Received-files automatic redrive summary"
+          region = "eu-west-2"
+          view   = "table"
+          query  = <<-EOT
+            SOURCE '${module.mdss_received_files_reconciler.cloudwatch_log_group.name}'
+            | filter message.event = "MDSS_RECEIVED_RECONCILE_COMPLETE"
+            | fields
+                @timestamp,
+                message.scanned,
+                message.stale,
+                message.redriven,
+                message.skipped_cooldown,
+                message.skipped_max_redrives,
+                message.oldest_stale_age_seconds
+            | sort @timestamp desc
+            | limit 100
+          EOT
+        }
+      },
+      {
+        type   = "alarm",
+        x      = 0,
+        y      = 84,
+        width  = 24,
+        height = 6,
+        properties = {
+          title = "Received-files reconciliation alarms"
+          alarms = [
+            aws_cloudwatch_metric_alarm.mdss_received_files_reconciler_errors.arn,
+            aws_cloudwatch_metric_alarm.mdss_received_files_reconcile_exhausted.arn
+          ]
+        }
       }
     ]
   })
