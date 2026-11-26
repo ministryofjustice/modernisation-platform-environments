@@ -21,10 +21,39 @@ production PDC deployment or approval.
 
 ## First issuance for a new opt-in
 
-Development enables `bootstrap_enabled` for alpha.6. `example-development`
-is its only first-issuance account. Do not deploy Example's tenant module until
-central bootstrap succeeds. Example has no production opt-in or configured private
-query target; configure a real target separately before query acceptance.
+Development enables `bootstrap_enabled` for alpha.6. Its first-issuance accounts
+are `example-development` and Cloud Platform batch 1:
+`cloud-platform-{development,preproduction,nonlive,live}`. The `cloud-platform`
+tenant rolls out in three batches of four accounts:
+
+| Batch | Accounts |
+|-------|----------|
+| 1 | `cloud-platform-{development,preproduction,nonlive,live}` |
+| 2 | `container-platform-{octo,laa,hmpps,cd}-nonlive` |
+| 3 | `container-platform-{octo,laa,hmpps,cd}-live` |
+
+Add a batch's accounts to the tenant, with `pdc_enabled = true`, only after
+every earlier account's enrolment completes. Until then they have no tenant
+resources (no `grafana-cloud` role), so they get no CloudWatch data source
+either. Keep the membership in step with the tenant module's workspace allowlist
+in `terraform/environments/cloud-platform/network/observability_platform.tf`.
+
+Readiness gate for each batch:
+
+1. Do not apply while any Sprinkler, Cooker or Example rotation step is in
+   flight, and reconcile (approve or cancel) any older queued development run
+   first. Never approve an older apply after a newer one.
+2. After the central apply, confirm each new account's bootstrap journal is
+   `completed` and `grafana-cloud/pdc/<account ID>` has a single initial version
+   labelled only `AWSCURRENT`. Check version metadata only; do not retrieve the
+   token.
+3. Only then deploy agents, one account at a time. Wait for that account's
+   enrolment to reach `enrolled` (its first rotation completed) before deploying
+   the next. Prolonged pending enrolment raises the Errors alarm (default one
+   day).
+
+Example has no production opt-in or configured private query target; configure
+a real target separately before query acceptance.
 
 1. Use a genuinely new account and network/access policy, with **no** Grafana
    token history in that policy/region (including expired tokens). Terraform
@@ -62,6 +91,13 @@ runs. It waits 10, 20, 40, then up to fourteen 60-second intervals (15 minutes
 when recognised. A `FunctionError`, read timeout, unrecognised error or invalid
 response stops the helper without another attempt. CLI exit 254 alone does
 not identify throttling.
+
+An apply that adds several opt-ins at once (Cloud Platform batch 1 adds four)
+starts their bootstrap invocations in parallel, up to Terraform's
+default parallelism of 10. They share the single slot with each other, seeded
+rotations and hourly enrolment ticks, so most wait inside the helper's retry
+budget. If an invocation runs long, others can exhaust that budget; handle each
+failed marker as below.
 
 Before allowing another apply, let any in-flight invocation finish. Check the
 seeded rotation journal, Lambda `Throttles` and `ConcurrentExecutions`, and
@@ -385,10 +421,12 @@ Secret metadata has `prevent_destroy` even after its version is forgotten.
    - No replacement of Cooker's network, secret, key, alias or token, and no
      change to Sprinkler's schedule.
 
-   If the revision also onboards Example, review the development image pin,
-   Example's new network and protected secret, first-issuance marker, scoped
-   permissions, readiness rule/target and delivery alarm. There must be **no**
-   Terraform token, secret version or native rotation schedule for Example.
+   If the revision also onboards new opt-ins (Example or a Cloud Platform
+   batch), review for each new account its network and protected secret,
+   first-issuance marker, scoped permissions, readiness rule/target and delivery
+   alarm. There must be **no** Terraform-managed token, secret version or native
+   rotation schedule for them, and the development image pin and existing
+   accounts' resources must be unchanged.
 
    Production must have no PDC handoff, rotation, or rotator changes. Stop if
    there is any unexpected change, destroy/replacement, missing state move, or
