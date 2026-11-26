@@ -56,65 +56,6 @@ resource "aws_cloudwatch_dashboard" "gems_ops" {
       },
 
       # --------------------------
-      # format_json_gems_data lambda health
-      # --------------------------
-      {
-        type   = "metric"
-        x      = 0
-        y      = 18
-        width  = 12
-        height = 6
-        properties = {
-          title  = "Lambda: format_json_gems_data Errors / Throttles"
-          region = "eu-west-2"
-          stat   = "Sum"
-          period = 60
-          metrics = [
-            [
-              "AWS/Lambda",
-              "Errors",
-              "FunctionName",
-              module.gems_raw_file_formatter.lambda_function_name
-            ],
-            [
-              ".",
-              "Throttles",
-              ".",
-              module.gems_raw_file_formatter.lambda_function_name
-            ]
-          ]
-        }
-      },
-      {
-        type   = "metric"
-        x      = 12
-        y      = 18
-        width  = 12
-        height = 6
-        properties = {
-          title  = "Lambda: format_json_gems_data Duration (p95) + Invocations"
-          region = "eu-west-2"
-          period = 60
-          metrics = [
-            [
-              "AWS/Lambda",
-              "Duration",
-              "FunctionName",
-              module.gems_raw_file_formatter.lambda_function_name,
-              { stat = "p95" }
-            ],
-            [
-              ".",
-              "Invocations",
-              ".",
-              module.gems_raw_file_formatter.lambda_function_name,
-              { stat = "Sum" }
-            ]
-          ]
-        }
-      },
-
-      # --------------------------
       # load_gems lambda health
       # --------------------------
       {
