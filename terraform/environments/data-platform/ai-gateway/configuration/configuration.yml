@@ -540,6 +540,15 @@ models:
       location: "eu"
       generally_available: false
       environments_available: ["development", "production"]
+    gemini-4-neon:
+      model_id: "gemini-4-neon"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 4 Neon"
+      model_location: "European Union"
+      location: "eu"
+      force_vertex_location: true
+      generally_available: false
+      environments_available: ["development"]
   microsoft_foundry:
     # OpenAI
     gpt-5-4:

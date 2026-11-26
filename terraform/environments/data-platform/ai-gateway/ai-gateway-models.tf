@@ -77,9 +77,9 @@ resource "litellm_model" "google_gemini_enterprise_agent_platform" {
   mode                = try(each.value.mode, null)
 
   # vertex_credentials is deliberately omitted; the pod's GOOGLE_APPLICATION_CREDENTIALS (WIF) is used instead
-  # Realtime also needs the EU location in the Vertex WebSocket setup model path.
-  vertex_project  = local.google_cloud_project_name
-  vertex_location = each.value.location == "eu" && try(each.value.mode, null) != "realtime" ? null : each.value.location
+  vertex_project = local.google_cloud_project_name
+  # Neon may lack LiteLLM region metadata, so set its EU request path explicitly instead of relying on inference.
+  vertex_location = each.value.location == "eu" && try(each.value.mode, null) != "realtime" && !try(each.value.force_vertex_location, false) ? null : each.value.location
   model_api_base  = each.value.location == "eu" ? "https://aiplatform.eu.rep.googleapis.com" : null
 
   additional_litellm_params = {
