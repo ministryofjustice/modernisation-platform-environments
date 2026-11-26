@@ -48,6 +48,7 @@ resource "aws_iam_role" "this" {
   for_each = var.iam_roles
 
   name               = each.key
+  path               = each.value.path
   assume_role_policy = data.aws_iam_policy_document.assume_role[each.key].json
 
   tags = merge(local.tags, each.value.tags, {

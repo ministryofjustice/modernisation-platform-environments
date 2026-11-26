@@ -653,6 +653,7 @@ variable "iam_roles" {
         values   = list(string)
       })), [])
     }))
+    path               = optional(string, "/")
     policy_attachments = optional(list(string), [])
     tags               = optional(map(string), {})
   }))
