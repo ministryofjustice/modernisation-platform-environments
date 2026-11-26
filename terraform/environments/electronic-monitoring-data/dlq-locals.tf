@@ -8,7 +8,7 @@ locals {
     process_landing_bucket_files_mdss_ho       = "-process_landing_bucket_files_mdss_ho-dlq"
     process_landing_bucket_files_mdss_specials = "-process_landing_bucket_files_mdss_specials-dlq"
 
-    process_landing_bucket_files_gems_general  = "-process_landing_bucket_files_gems_general-dlq"
+    process_landing_bucket_files_gems_general = "-process_landing_bucket_files_gems_general-dlq"
 
     scan                   = "-scan-dlq"
     process_fms_metadata   = "-process_fms_metadata-dlq"
