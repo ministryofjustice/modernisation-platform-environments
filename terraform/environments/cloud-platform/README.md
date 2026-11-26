@@ -112,7 +112,8 @@ in batches, and agents are deployed one account at a time:
 | 2 | `container-platform-{octo,laa,hmpps,cd}-nonlive` |
 | 3 | `container-platform-{octo,laa,hmpps,cd}-live` |
 
-Start the next batch only when every earlier account has completed enrolment.
+Start the next batch only when every earlier account's enrolment is `enrolled`
+(its first rotation has completed).
 Each batch needs an OP change enabling PDC and CloudWatch for its accounts. The
 `container-platform-*` network applies run on merge without an approval gate, so
 for batches 2 and 3 add **one account per CP3 change** to `pdc_tenant_workspaces`,
@@ -162,7 +163,7 @@ this tenant rollout a no-op in the eight inactive network workspaces.
    `cloud-platform-*` network apply at a time, or merge one `container-platform-*`
    account's change at a time. For each account, confirm three running tasks
    and connected agents in its Grafana PDC network. Wait for its enrolment to
-   reach `completed` (first rotation done, agents reconnected) before approving
+   reach `enrolled` (first rotation done, agents reconnected) before approving
    the next account. Check the agent logs and image retrieval if tasks do not
    start. Pending enrolment alerts after one day, so do not leave bootstrapped
    accounts without agents.
