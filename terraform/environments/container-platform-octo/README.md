@@ -39,6 +39,33 @@ Modernisation Platform
 
 ## Optional
 
+### Grafana Cloud private data source connect (PDC)
+
+`observability_platform.tf` deploys the tenant module's Grafana access roles and
+PDC agents for the **development** Grafana Cloud stack in `container-platform-octo-nonlive`
+only. `container-platform-octo-live` creates no resources.
+
+Apply the central Octo nonlive opt-in first. Before deploying the agents, confirm
+that the bootstrap journal is `completed` and the central secret has a single
+`AWSCURRENT` version. ECS reads the token from that secret; do not copy it. See
+the [central rollout runbook](../observability-platform/docs/grafana-cloud/pdc-token-rotation.md).
+
+The agents run in the CP3 VPC's `SubnetType=Private` subnets, not its Transit
+Gateway attachment subnets or the stub VPC in this folder. From those private
+subnets, verify that both names below resolve to the
+[shared hub endpoints](https://github.com/ministryofjustice/modernisation-platform/pull/14437)
+through the `centralised-endpoints` Route 53 Profile:
+
+| Endpoint | Private DNS name | Connectivity check |
+| --- | --- | --- |
+| PDC API | `private-datasource-connect-api.eu-west-2.vpce.grafana.net` | Verify TLS on TCP 443 |
+| PDC gateway | `private-datasource-connect.eu-west-2.vpce.grafana.net` | Connect on TCP 22 |
+
+Fargate relies on CP3 egress via the Transit Gateway to pull
+`docker.io/grafana/pdc-agent`; confirm the pull works before deploying. No private
+data-source targets are configured. Identify a target and configure its connectivity
+before testing a private query.
+
 ### **Other URLs:**
 
 <!--  If you can, provide links to the service’s monitoring dashboard(s), health checks, documentation (ideally describing how to run/work with the service), and main GitHub repository. -->
