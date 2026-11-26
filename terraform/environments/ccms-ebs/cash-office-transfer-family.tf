@@ -145,7 +145,7 @@ resource "aws_cloudfront_distribution" "transfer_family" {
   http_version    = "http2" # Automatically supports http/2, http/1.1, and http/1.0
   aliases         = ["${local.application_data.accounts[local.environment].cash_office_upload_hostname}.${trim(data.aws_route53_zone.external.name, ".")}"]
   origin {
-    domain_name = local.application_data.accounts[local.environment].cash_web_app_url
+    domain_name = local.environment == "test" ? aws_transfer_web_app.this.web_app_id : local.application_data.accounts[local.environment].cash_web_app_url
     origin_id   = "transfer-family"
 
     custom_origin_config {
@@ -201,4 +201,35 @@ resource "aws_wafv2_web_acl_logging_configuration" "transfer_family_waf_logging"
 
   log_destination_configs = [aws_cloudwatch_log_group.transfer_family_waf_logs[0].arn]
   resource_arn            = aws_wafv2_web_acl.transfer_family[0].arn
+}
+
+resource "aws_transfer_web_app" "this" {
+  count = local.environment == "test" ? 1 : 0
+
+  identity_provider_details {
+    identity_center_config {
+      instance_arn = tolist(data.aws_ssoadmin_instances.this[count.index].arns) [0]
+      role         = local.application_data.accounts[local.environment].cash_web_app_url
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-transfer-family-web-app", local.application_name, local.environment)) }
+  )
+}
+
+data "aws_ssoadmin_instances" "this" {
+  count = local.environment == "test" ? 1 : 0
+}
+
+data "aws_identitystore_group" "transfer_users" {
+  count = local.environment == "test" ? 1 : 0
+  identity_store_id = data.aws_ssoadmin_instances.this[count.index].identity_store_ids[0]
+
+  alternate_identifier {
+    unique_attribute {
+      attribute_path  = "DisplayName"
+      attribute_value = "azure-aws-sso-laa-ccms-ebs-s3-cashoffice-testers"
+    }
+  }
 }
