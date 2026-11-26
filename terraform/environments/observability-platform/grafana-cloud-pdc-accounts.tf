@@ -48,7 +48,8 @@ resource "grafana_cloud_private_data_source_connect_network" "account" {
 }
 
 resource "grafana_cloud_private_data_source_connect_network_token" "account" {
-  for_each = local.gc_pdc_token_accounts
+  # Both legacy instances have exact handoffs below. Keep the destruction guard for unexpected state.
+  for_each = {}
   provider = grafana.cloud
 
   name           = "${local.gc_pdc_network_names[each.key]}-agent"
@@ -118,16 +119,21 @@ resource "aws_kms_alias" "gc_pdc_token" {
 }
 
 resource "aws_secretsmanager_secret" "gc_pdc_token" {
-  #checkov:skip=CKV2_AWS_57:Only the Sprinkler development pilot is rotated; other accounts retain Terraform bootstrap. See docs/grafana-cloud/pdc-token-rotation.md
+  #checkov:skip=CKV2_AWS_57:First issuance precedes tenant agent deployment and health-gated enrolment. See docs/grafana-cloud/pdc-token-rotation.md
   for_each = local.gc_pdc_accounts
 
   name       = "grafana-cloud/pdc/${each.value}"
   kms_key_id = aws_kms_key.gc_pdc_token[each.key].arn
   tags       = local.gc_pdc_rotation_tags[each.key]
+
+  lifecycle {
+    # Handoff removes the legacy token's indirect protection against destructive offboarding.
+    prevent_destroy = true
+  }
 }
 
 resource "aws_secretsmanager_secret_version" "gc_pdc_token" {
-  for_each = local.gc_pdc_token_accounts
+  for_each = {}
 
   secret_id     = aws_secretsmanager_secret.gc_pdc_token[each.key].id
   secret_string = grafana_cloud_private_data_source_connect_network_token.account[each.key].token
@@ -137,8 +143,7 @@ resource "aws_secretsmanager_secret_version" "gc_pdc_token" {
   }
 }
 
-# Move only the pilot instances to singleton addresses so removed blocks can forget them
-# without affecting the other for_each instances.
+# Move each legacy instance separately: forgetting one must never revoke its working token.
 moved {
   from = grafana_cloud_private_data_source_connect_network_token.account["sprinkler-development"]
   to   = grafana_cloud_private_data_source_connect_network_token.pilot_handoff
@@ -159,6 +164,32 @@ moved {
 
 removed {
   from = aws_secretsmanager_secret_version.pilot_handoff
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+moved {
+  from = grafana_cloud_private_data_source_connect_network_token.account["cooker-development"]
+  to   = grafana_cloud_private_data_source_connect_network_token.cooker_handoff
+}
+
+removed {
+  from = grafana_cloud_private_data_source_connect_network_token.cooker_handoff
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+moved {
+  from = aws_secretsmanager_secret_version.gc_pdc_token["cooker-development"]
+  to   = aws_secretsmanager_secret_version.cooker_handoff
+}
+
+removed {
+  from = aws_secretsmanager_secret_version.cooker_handoff
 
   lifecycle {
     destroy = false
