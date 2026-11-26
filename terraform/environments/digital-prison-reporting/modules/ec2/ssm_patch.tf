@@ -135,8 +135,7 @@ resource "aws_ssm_maintenance_window_task" "patch_bastion" {
 # Runs one hour before the maintenance window so compliance status is current.
 # ---------------------------------------------------------------------------
 resource "aws_ssm_association" "bastion_patch_scan" {
-  name        = "AWS-RunPatchBaseline"
-  description = "Weekly compliance scan for bastion EC2 patch baseline"
+  name = "AWS-RunPatchBaseline"
 
   targets {
     key    = "tag:Patch Group"
