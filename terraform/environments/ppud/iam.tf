@@ -82,7 +82,7 @@ resource "aws_iam_policy_attachment" "cloudtrail_searchevents" {
 }
 
 resource "aws_iam_policy_attachment" "config_searchconfigresources" {
-  depends_on = [aws_iam_policy.config_config_searchconfigresources]
+  depends_on = [aws_iam_policy.config_configsearchconfigresources]
   name       = "config-config_searchconfigresources-attachment"
   roles      = [aws_iam_role.ec2_iam_role.id]
   policy_arn = aws_iam_policy.config_config_searchconfigresources.arn
