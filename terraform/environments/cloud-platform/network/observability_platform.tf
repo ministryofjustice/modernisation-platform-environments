@@ -1,9 +1,8 @@
 locals {
-  # PDC agents are enabled in batches because the central token rotator bootstraps and enrols
-  # one account at a time. Keep this list identical to the accounts with `pdc_enabled = true` in
-  # the development Observability Platform tenant configuration. Add the next batch only after
-  # every account here has completed enrolment (see ../README.md).
-  pdc_agent_workspaces = [
+  # Gate the whole tenant module: inactive workspaces must not create IAM roles either.
+  # Keep this list aligned with CP3 accounts with pdc_enabled in the development OP config.
+  # Retain activated accounts and add later accounts one at a time (see ../README.md).
+  pdc_tenant_workspaces = [
     "cloud-platform-development",
     "cloud-platform-preproduction",
     "cloud-platform-nonlive",
@@ -11,9 +10,10 @@ locals {
   ]
 }
 
-# Every CP3 account gets the tenant roles for its CloudWatch data source. PDC agents need the
-# account's central token secret to be bootstrapped first.
+# Each activated account needs its central token secret bootstrapped before deployment.
 module "observability_platform_tenant" {
+  count = contains(local.pdc_tenant_workspaces, terraform.workspace) ? 1 : 0
+
   source = "github.com/ministryofjustice/terraform-aws-observability-platform-tenant?ref=03f883d6c4994539447243e3186f41e3922ab482" # v3.1.0
 
   observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
@@ -21,7 +21,7 @@ module "observability_platform_tenant" {
   grafana_cloud = {
     stack = "development"
     pdc_agent = {
-      enabled = contains(local.pdc_agent_workspaces, terraform.workspace)
+      enabled = true
       # CP3 owns its subnets; the module's default *-general-private-* lookup does not apply.
       subnet_ids = module.cluster_vpc.private_subnets
       allowed_targets = [
@@ -31,4 +31,10 @@ module "observability_platform_tenant" {
   }
 
   tags = local.tags
+}
+
+# Preserve any existing active-workspace tenant resources when introducing the module gate.
+moved {
+  from = module.observability_platform_tenant
+  to   = module.observability_platform_tenant[0]
 }

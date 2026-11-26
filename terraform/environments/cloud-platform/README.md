@@ -69,19 +69,27 @@ Modernisation Platform
 
 ### Grafana Cloud Private Data Source Connect
 
-The `network` component deploys one Observability Platform tenant module per
-account, using the **development** Grafana Cloud stack, in all twelve CP3
+The `network` component stages one Observability Platform tenant module per
+account, using the **development** Grafana Cloud stack, for all twelve CP3
 workspaces: `cloud-platform-{development,preproduction,nonlive,live}` and
 `container-platform-{octo,laa,hmpps,cd}-{nonlive,live}`. This includes the live
 accounts. Do not deploy the tenant module from another component in these
 accounts: its IAM roles, ECS cluster and service have fixed account-wide names.
 
-Every account gets the module's `observability-platform` and `grafana-cloud` IAM
-roles; the development stack's CloudWatch data sources use `grafana-cloud`.
-PDC agents are enabled only for the workspaces in `local.pdc_agent_workspaces`
+The **whole module** is instantiated only for workspaces in `local.pdc_tenant_workspaces`
 ([`network/observability_platform.tf`](network/observability_platform.tf)), which
-must match the accounts with `pdc_enabled = true` in the development
+must match the activated CP3 accounts with `pdc_enabled = true` in the development
 [OP tenant configuration](../observability-platform/grafana-cloud-tenant-environment-configurations.tf).
+Inactive accounts create no tenant IAM roles, policy attachments or PDC resources.
+Only activated accounts get the `observability-platform` and `grafana-cloud` roles
+and their CloudWatch data sources. Defer inactive accounts' OP data sources until
+their promotion so they do not reference missing roles.
+
+The module's `moved` block preserves existing resources in active workspaces when
+adding its count index. Keep activated workspaces in the allowlist: removing one
+would destroy its tenant resources. If an inactive workspace already has tenant
+resources in state, stop and reconcile its ownership before deployment rather
+than approving a destroy. Never import resources owned by another component.
 
 The PDC service runs the module's default three Fargate tasks in
 `module.cluster_vpc.private_subnets`, not the Transit Gateway attachment or pod
@@ -105,16 +113,19 @@ in batches, and agents are deployed one account at a time:
 | 3 | `container-platform-{octo,laa,hmpps,cd}-live` |
 
 Start the next batch only when every earlier account has completed enrolment.
-Each batch needs one OP change enabling PDC for its accounts. The
+Each batch needs an OP change enabling PDC and CloudWatch for its accounts. The
 `container-platform-*` network applies run on merge without an approval gate, so
-for batches 2 and 3 add **one account per CP3 change** to `pdc_agent_workspaces`.
+for batches 2 and 3 add **one account per CP3 change** to `pdc_tenant_workspaces`,
+retaining all previously activated accounts. Confirm the other inactive
+workspaces have zero tenant creates, updates or destroys in every promotion PR.
 
 #### Apply order
 
-The OP and CP3 workflows run independently, and each queues its applies behind
-GitHub environment approvals. These gates therefore apply to **apply approvals
-as well as merges**. Never approve an older run's apply after a newer run for the
-same environment.
+The OP and CP3 workflows run independently. OP and `cloud-platform-*` applies
+require GitHub environment approval; the eight `container-platform-*` network
+applies do not. These gates therefore apply to **apply approvals as well as
+merges**. Never approve an older run's apply after a newer run for the same
+environment.
 
 | Account | Workflow | Network apply environment | Approval |
 | --- | --- | --- | --- |
@@ -124,8 +135,9 @@ same environment.
 
 Outside development, each account's network job runs after its root job. An
 apply job only runs when its plan has changes. Any merge under
-`terraform/environments/cloud-platform/` therefore applies network changes to
-every `container-platform-*` account immediately.
+`terraform/environments/cloud-platform/` can therefore apply network changes to
+every `container-platform-*` account immediately. The whole-module gate keeps
+this tenant rollout a no-op in the eight inactive network workspaces.
 
 1. Confirm the shared endpoint hub from
    [ministryofjustice/modernisation-platform#14437](https://github.com/ministryofjustice/modernisation-platform/pull/14437)
