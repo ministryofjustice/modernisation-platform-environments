@@ -21,19 +21,10 @@ production PDC deployment or approval.
 
 ## First issuance for a new opt-in
 
-Keep `bootstrap_enabled = false` until a verified compatible image is released.
-Alpha.4 cannot issue the first token; a new opt-in fails its Terraform precondition
-instead of falling back to a Terraform-generated token. The bootstrap implementation
-in [ministryofjustice/observability-platform-grafana-pdc-token-rotator#11](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/pull/11)
-is a runtime dependency, not a deployable digest.
-
-The prepared `example-development` opt-in is a separate follow-on to stage one,
-not authority to deploy it. Its development plan deliberately fails the
-bootstrap-capability precondition on alpha.4. Ship a released bootstrap-capable
-image and automatic enrolment support before applying this opt-in; do not bypass
-the gate or create a token/version in Terraform. Confirm first issuance before
-deploying Example's tenant agents. Example has no production opt-in or configured
-private query target; configure a real target separately before query acceptance.
+Development enables `bootstrap_enabled` for alpha.5. `example-development`
+is its only first-issuance account. Do not deploy Example's tenant module until
+central bootstrap succeeds. Example has no production opt-in or configured private
+query target; configure a real target separately before query acceptance.
 
 1. Use a genuinely new account and network/access policy, with **no** Grafana
    token history in that policy/region (including expired tokens). Terraform
@@ -53,23 +44,29 @@ private query target; configure a real target separately before query acceptance
 3. After confirmed first issuance the team deploys the existing tenant module
    with `grafana_cloud.pdc_agent.enabled = true`; ECS reads the central secret.
    Keep the completed marker at its address. No image, enrolment or destroy
-   trigger replays it. There is deliberately **no** new-account schedule yet.
-   The next stage must enrol automatically only after positive stable ECS count
-   and fresh, sustained matching network evidence. Delayed deployment must not
-   test or rotate an unconnected service; monitor seed expiry from issuance
-   (97 days), alert before the rollback margin is consumed, and escalate an
-   expired seed rather than bootstrapping again. Do not enable general opt-ins
-   until this enrolment and expiry handling are available.
+   trigger replays it.
+4. After bootstrap, EventBridge invokes the unqualified rotator hourly with
+   `{"Step":"enrolRotation","SecretId":"<full secret ARN>"}`. This is a
+   readiness check, not a token request. It stays `pending` until one stable
+   ECS deployment and a fresh, sustained matching Grafana network count confirm
+   that the expected agents are connected. The runtime then requests the first
+   rotation and its native 90-day schedule (`rotation_requested`). `enrolled`
+   means that first rotation completed, not just that a schedule exists.
+   `superseded` means another invocation won the journal update. Further ticks
+   do not reset the schedule or reissue the seed.
 
-   Schedule ownership is split. Terraform owns schedules, Secrets Manager
-   invocation permissions and restarter grants only for the seeded accounts in
-   `local.gc_pdc_rotation_accounts`. New opt-ins are in
-   `local.gc_pdc_enrolment_accounts`, which the future reconciler will own; a
-   precondition keeps the two sets disjoint. Wiring the reconciler will add, for
-   that set only, per-secret `secretsmanager.amazonaws.com` invoke permissions
-   restricted by `source_arn` and `source_account`, the runtime role's
-   `secretsmanager:RotateSecret` on those secrets and `lambda:InvokeFunction`
-   on the function, and their restarter-role ARNs. None of these exist yet.
+The function's Errors alarm covers enrolment failures, including prolonged
+pending (default one day) and approaching seed expiry (default 14 days).
+The per-rule `AWS/Events` `FailedInvocations` alarm covers delivery failures
+that never reached Lambda. Both notify the existing encrypted SNS destination.
+Check the journal and AWS/Grafana metadata on alerts; never re-bootstrap an
+expired seed or retry an ambiguous rotation request manually.
+
+Terraform still owns Sprinkler's and Cooker's rotation schedules. For
+bootstrap accounts only, the runtime can call `RotateSecret` on their exact
+ARNs with its own unqualified function and assume the tenant restarter roles.
+Lambda permissions restrict EventBridge to the corresponding rule and Secrets
+Manager to the corresponding secret and source account.
 
 ## Rotation contract
 
@@ -93,6 +90,9 @@ an integration contract for the deployed rotator runtime:
 | `pdc:ecs-cluster` | `grafana-pdc-agent` |
 | `pdc:ecs-service` | `grafana-pdc-agent` |
 
+Bootstrapped accounts also get `pdc:bootstrap=true` and
+`pdc:rotation-interval-days=90`; both are absent on seeded accounts.
+
 The Lambda must read and validate these settings rather than hard-code another
 cadence. Shortening an interval or changing expiry settings must not change the
 expiry of the currently deployed token. If PDC is enabled in a different AWS
@@ -108,9 +108,11 @@ derives the tenant role ARN from the account ID.
 
 The dedicated repository is
 `ministryofjustice/observability-platform-grafana-pdc-token-rotator`. The
-deployable image is released as `v0.1.0-alpha.4`, with digest
-`sha256:7e357f00e83b9c88a320034e0ba7f5ac2cbc7887485b4e1554e1e457fe5d7f8f`.
-Development pins this digest, not the mutable tag. The earlier `v0.1.0-alpha.1`
+development image is [v0.1.0-alpha.5](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/releases/tag/v0.1.0-alpha.5).
+The [publish job](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/actions/runs/45796808459/job/139830638025)
+verified and signed the single image manifest
+`sha256:27e4bf02bf8468756f1da72fd3d5a4490a3caca84bc1de3f0b36f12810b19d2b`.
+Development pins this digest, not the tag. The earlier `v0.1.0-alpha.1`
 artifact was a manifest list rejected by Lambda and is not deployable; do not use
 its digest.
 
@@ -148,7 +150,7 @@ The optional `pdc_token_rotator` configuration contains only:
 | Field | Required value |
 | --- | --- |
 | `image_digest` | Released image digest, validated as `sha256:` followed by 64 lowercase hexadecimal characters |
-| `bootstrap_enabled` | Enable only with a released first-issuance implementation; false on the existing development image |
+| `bootstrap_enabled` | Enables first issuance and hourly enrolment only for new accounts; requires a compatible pinned image |
 
 Terraform creates `grafana-cloud/pdc-token-rotator/management-token` and
 `grafana-cloud/pdc-token-rotator/stack-query-token` in the current environment's
@@ -183,7 +185,8 @@ identifiers, not credentials. It has point-in-time recovery and deletion
 protection; retain it across runtime changes and review retention before
 activation. Do not remove it while any rotation could still be retried.
 The SNS topic policy created with `pdc_failure_alerts` permits EventBridge and
-CloudWatch delivery from only this account's rotation-failure rule and alarm.
+CloudWatch delivery from only this account's rotation-failure rule, function
+Errors alarm and per-tenant tick delivery alarms.
 Confirm the Chatbot subscription and delivery before activation.
 
 Lambda receives only the management and stack query secret ARNs through
@@ -257,7 +260,7 @@ Uploading credentials does not invoke the Lambda or enable rotation.
   grant deletion scope until its cleanup implementation is reviewed.
 - A tenant module release with `grafana-pdc-agent-restarter`, trusted only by the
   agreed central Lambda execution role. The execution role can assume only
-  scheduled accounts' restarter roles, with secret
+  scheduled and enrolment-eligible accounts' restarter roles, with secret
   read/write/staging and KMS permissions restricted to this environment's PDC
   secrets and keys.
 - A proven token acceptance check and a reconnection signal attributable to the
@@ -345,15 +348,20 @@ Secret metadata has `prevent_destroy` even after its version is forgotten.
    a stale plan safe to apply later. If the deployment queue cannot be fenced
    or its revision confirmed, do not activate.
 4. Generate and review a fresh plan for each environment from that revision.
-   Development must show only these PDC changes:
+   For Cooker's handoff, development must show:
    - The Cooker development token and secret-version instances move to their
      singleton handoff addresses and are then forgotten, explicitly **not
      destroyed** (`destroy = false`).
    - One `aws_secretsmanager_secret_rotation.gc_pdc_token["cooker-development"]`
      is added, with the deployed rotator Lambda and the
      `local.pdc_rotation_rules` interval.
-   - No network, secret, KMS key, key alias, policy, token replacement, or
-     Sprinkler change.
+   - No replacement of Cooker's network, secret, key, alias or token, and no
+     change to Sprinkler's schedule.
+
+   If the revision also onboards Example, review the development image pin,
+   Example's new network and protected secret, first-issuance marker, scoped
+   permissions, readiness rule/target and delivery alarm. There must be **no**
+   Terraform token, secret version or native rotation schedule for Example.
 
    Production must have no PDC handoff, rotation, or rotator changes. Stop if
    there is any unexpected change, destroy/replacement, missing state move, or
@@ -452,9 +460,10 @@ no AWS or Grafana credentials, live backend or real API calls are used. It check
 per-account metadata, 90-day schedules for existing accounts, 97-day token
 lifetime, new-account bootstrap eligibility, empty-production IAM, separate credential
 keys/secrets, least-privilege Grafana identities, digest validation, scoped
-runtime permissions and failure alert wiring. A stub CLI checks the synchronous
+runtime permissions, hourly enrolment payload and separate delivery and runtime
+alarms. A stub CLI checks the synchronous
 bootstrap request, invocation count, failure handling and non-replay across an
-image change, simulated enrolment and teardown. A disposable local-state test
+image change, tick target replacement and teardown. A disposable local-state test
 uses the checked-in migration blocks to verify exactly two Cooker forgets and
 zero deletes. A negative test confirms secret protection rejects destructive
 account disablement. These are not live issuance or reconnection tests.

@@ -11,6 +11,13 @@ locals {
   gc_pdc_failure_topic_arn  = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.gc_pdc_failure_topic_name}"
   gc_pdc_failure_alarm_arn  = "arn:aws:cloudwatch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alarm:${local.gc_pdc_rotator_role_name}-errors"
   gc_pdc_failure_rule_arn   = "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/${local.gc_pdc_rotator_role_name}-rotation-failed"
+  gc_pdc_failure_alarm_arns = concat([local.gc_pdc_failure_alarm_arn], [
+    for name in values(local.gc_pdc_enrolment_delivery_alarm_names) :
+    "arn:aws:cloudwatch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alarm:${name}"
+  ])
+
+  # The function depends on this role's policy. Derive its exact unqualified ARN without a cycle.
+  gc_pdc_function_arn = "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${local.gc_pdc_rotator_role_name}"
 
   gc_pdc_usage_datasource_uid = "grafanacloud-usage"
   gc_pdc_rotator_ecr_repository_uri = format(
@@ -32,7 +39,7 @@ locals {
     }
   }
 
-  # Secrets Manager may invoke the unqualified function only for Terraform-scheduled secrets.
+  # Seeded accounts keep their existing permission addresses; enrolment permissions follow bootstrap.
   gc_pdc_rotation_triggers = {
     for account_name in keys(local.gc_pdc_rotation_accounts) : account_name => {
       principal      = "secretsmanager.amazonaws.com"
@@ -176,7 +183,7 @@ resource "aws_kms_key" "gc_pdc_failure_alerts" {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
           ArnEquals = {
-            "aws:SourceArn" = local.gc_pdc_failure_alarm_arn
+            "aws:SourceArn" = local.gc_pdc_failure_alarm_arns
           }
         }
       },
@@ -227,7 +234,7 @@ resource "aws_sns_topic_policy" "gc_pdc_failure_alerts" {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
           ArnEquals = {
-            "aws:SourceArn" = local.gc_pdc_failure_alarm_arn
+            "aws:SourceArn" = local.gc_pdc_failure_alarm_arns
           }
         }
       },
@@ -369,6 +376,21 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
         }
       },
       {
+        Sid      = "EnrolBootstrappedSecrets"
+        Effect   = "Allow"
+        Action   = ["secretsmanager:RotateSecret"]
+        Resource = [for name in keys(local.gc_pdc_enrolment_accounts) : aws_secretsmanager_secret.gc_pdc_token[name].arn]
+        Condition = {
+          ArnEquals = { "secretsmanager:RotationLambdaARN" = local.gc_pdc_function_arn }
+        }
+      },
+      {
+        Sid      = "InvokeEnrolmentRotationFunction"
+        Effect   = "Allow"
+        Action   = ["lambda:InvokeFunction"]
+        Resource = length(local.gc_pdc_enrolment_accounts) > 0 ? [local.gc_pdc_function_arn] : []
+      },
+      {
         Sid      = "AssumeTenantRestarters"
         Effect   = "Allow"
         Action   = ["sts:AssumeRole"]
@@ -388,7 +410,7 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
       condition     = can(regex("^sha256:[0-9a-f]{64}$", each.value.image_digest))
       error_message = "The PDC rotator image must be pinned to a sha256 digest."
     }
-    # Terraform and the future enrolment reconciler must never both own an account's schedule.
+    # Terraform and the enrolment reconciler must never both own an account's schedule.
     precondition {
       condition     = length(setintersection(keys(local.gc_pdc_rotation_accounts), keys(local.gc_pdc_enrolment_accounts))) == 0
       error_message = "Terraform schedules only seeded accounts; new opt-ins enrol after their agents connect, never through a Terraform schedule."

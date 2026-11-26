@@ -144,9 +144,10 @@ token: the next reviewed handoff forgets its legacy token/version without
 revoking it and starts its own 90-day rotation. Neither account uses bootstrap.
 For a brand-new opt-in, the central apply must first issue `AWSCURRENT` through
 the bootstrap-capable Lambda; the tenant then deploys its existing agent module.
-No team member supplies a token. This path is gated off on alpha.4; automatic
-enrolment after agents connect is a separate change. Do not onboard new accounts
-on the strength of this stage alone. See the [PDC rollout runbook](pdc-token-rotation.md).
+No team member supplies a token. Development configures alpha.5 for Example:
+after bootstrap, an hourly readiness check enrols its secret in 90-day rotation
+only when stable ECS agents are connected to the expected Grafana network.
+Production has no opt-ins or enrolment ticks. See the [PDC rollout runbook](pdc-token-rotation.md).
 
 Grafana Cloud management API calls, browser access and alert notifications
 go over public HTTPS.

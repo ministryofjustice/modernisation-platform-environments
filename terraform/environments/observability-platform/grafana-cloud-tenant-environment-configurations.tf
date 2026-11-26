@@ -24,8 +24,8 @@ locals {
   environment_configurations_gc = {
     development = {
       pdc_token_rotator = {
-        image_digest      = "sha256:7e357f00e83b9c88a320034e0ba7f5ac2cbc7887485b4e1554e1e457fe5d7f8f"
-        bootstrap_enabled = false # alpha.4 supports rotation, not first issuance.
+        image_digest      = "sha256:27e4bf02bf8468756f1da72fd3d5a4490a3caca84bc1de3f0b36f12810b19d2b" # v0.1.0-alpha.5
+        bootstrap_enabled = true
       }
       pdc_failure_alerts = {
         slack_channel_id = "C06ALD6LX55"
@@ -47,7 +47,7 @@ locals {
             "cooker-development" = {
               pdc_enabled = true
             }
-            # Prepared only: bootstrap and automatic enrolment support must ship before this opt-in.
+            # Bootstrap centrally before deploying the Example agents.
             "example-development" = {
               pdc_enabled = true
             }

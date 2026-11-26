@@ -24,6 +24,35 @@ def write_test_fixture(source, destination):
     )
 
 
+def check_enrolment_order(directory, environment):
+    graph = subprocess.check_output(["terraform", "graph"], cwd=directory, env=environment, text=True)
+    edges = re.findall(r'"([^"]+)" -> "([^"]+)"', graph)
+
+    def prerequisites(resource):
+        return {dep for node, dep in edges if node == resource}
+
+    def precedes(first, last):
+        pending = [last]
+        seen = set()
+        while pending:
+            node = pending.pop()
+            if node == first:
+                return True
+            seen.add(node)
+            pending.extend(prerequisites(node) - seen)
+        return False
+
+    bootstrap = "terraform_data.gc_pdc_bootstrap"
+    rule = "aws_cloudwatch_event_rule.gc_pdc_enrolment"
+    target = "aws_cloudwatch_event_target.gc_pdc_enrolment"
+    event_permission = "aws_lambda_permission.gc_pdc_enrolment_tick"
+    rotation_permission = "aws_lambda_permission.gc_pdc_enrolment_rotation"
+    for first, last in [(bootstrap, rule), (rule, event_permission), (event_permission, target), (rotation_permission, target)]:
+        if not precedes(first, last):
+            raise SystemExit(f"Missing enrolment dependency: {first} must precede {last}.")
+    print("Terraform orders first issuance before the rule, and both invoke permissions before the target.")
+
+
 def run_declarative_handoff_test(environment):
     """Exercise the real migration blocks against built-in resources and disposable local state."""
     accounts_file = (ROOT / "grafana-cloud-pdc-accounts.tf").read_text(encoding="utf-8")
@@ -116,6 +145,7 @@ def run():
             "grafana-cloud-stack.tf",
             "grafana-cloud-pdc-accounts.tf",
             "grafana-cloud-pdc-bootstrap.tf",
+            "grafana-cloud-pdc-enrolment.tf",
             "grafana-cloud-pdc-rotation.tf",
             "grafana-cloud-pdc-rotator.tf",
         ):
@@ -173,10 +203,11 @@ def run():
             if arguments[0] != "init":
                 print(result.stdout)
 
+        check_enrolment_order(directory, environment)
         # terraform test also destroys its disposable resources: removal must not invoke again.
         if not calls.exists() or calls.read_text().splitlines() != ["invoke"]:
-            raise SystemExit("Expected exactly one synchronous bootstrap across creation, re-apply, image/enrolment change and teardown.")
-        print("Exactly one bootstrap invocation; no replay on image/enrolment change or removal.")
+            raise SystemExit("Expected exactly one synchronous bootstrap across creation, image update, tick target replacement and teardown.")
+        print("Exactly one bootstrap invocation; no replay on image update, tick target replacement or removal.")
         for case, diagnostic in (
             ("function", "Lambda failed"),
             ("transport", "AWS CLI exit 1"),
