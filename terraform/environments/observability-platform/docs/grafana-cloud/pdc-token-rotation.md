@@ -21,7 +21,7 @@ production PDC deployment or approval.
 
 ## First issuance for a new opt-in
 
-Development enables `bootstrap_enabled` for alpha.5. `example-development`
+Development enables `bootstrap_enabled` for alpha.6. `example-development`
 is its only first-issuance account. Do not deploy Example's tenant module until
 central bootstrap succeeds. Example has no production opt-in or configured private
 query target; configure a real target separately before query acceptance.
@@ -133,13 +133,15 @@ derives the tenant role ARN from the account ID.
 
 The dedicated repository is
 `ministryofjustice/observability-platform-grafana-pdc-token-rotator`. The
-development image is [v0.1.0-alpha.5](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/releases/tag/v0.1.0-alpha.5).
-The [publish job](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/actions/runs/45796808459/job/139830638025)
+development image is [v0.1.0-alpha.6](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/releases/tag/v0.1.0-alpha.6).
+The [publish job](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/actions/runs/45822655850/job/139919808939)
 verified and signed the single image manifest
-`sha256:27e4bf02bf8468756f1da72fd3d5a4490a3caca84bc1de3f0b36f12810b19d2b`.
-Development pins this digest, not the tag. The earlier `v0.1.0-alpha.1`
-artifact was a manifest list rejected by Lambda and is not deployable; do not use
-its digest.
+`sha256:e5f367b6af986020ff291b095f7ef0a44f56c7c7acd241fbaaae9484c81884c2`.
+Development pins this digest, not the tag. Do not use alpha.5 for bootstrap:
+it rejected the `AWSCURRENT` label that Secrets Manager automatically adds to a
+secret's first version, so it failed after storing the candidate. Alpha.6
+resumes from that journalled state. The earlier `v0.1.0-alpha.1` artifact was a
+manifest list rejected by Lambda and is not deployable; do not use its digest.
 
 The development environment publishes the repository URI as an SSM `String`
 parameter at

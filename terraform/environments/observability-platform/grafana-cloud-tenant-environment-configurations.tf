@@ -24,7 +24,7 @@ locals {
   environment_configurations_gc = {
     development = {
       pdc_token_rotator = {
-        image_digest      = "sha256:27e4bf02bf8468756f1da72fd3d5a4490a3caca84bc1de3f0b36f12810b19d2b" # v0.1.0-alpha.5
+        image_digest      = "sha256:e5f367b6af986020ff291b095f7ef0a44f56c7c7acd241fbaaae9484c81884c2" # v0.1.0-alpha.6
         bootstrap_enabled = true
       }
       pdc_failure_alerts = {
