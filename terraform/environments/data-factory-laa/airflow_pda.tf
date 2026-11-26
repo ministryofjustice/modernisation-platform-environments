@@ -1,11 +1,21 @@
 locals {
-  airflow_pda_enabled = contains(["development", "test"], local.environment)
+  # role exists in laa-test only; the test workspace trusts the development airflow cluster
+  airflow_pda_enabled = local.environment == "test"
 
-  # Condition-key prefix derived from the provider ARN, e.g. oidc.eks.eu-west-2.amazonaws.com/id/<id>
+  # condition-key prefix derived from the provider arn, e.g. oidc.eks.eu-west-2.amazonaws.com/id/<id>
   airflow_pda_oidc_issuer = element(split("oidc-provider/", module.airflow_oidc.oidc_arn), 1)
 
   airflow_pda_glue_arn_prefix = "arn:aws:glue:${local.current_account_region}:${local.current_account_id}"
+
+  # athena workgroup; must use managed query results so the role needs no s3 access
+  airflow_pda_workgroup = "primary"
+
+  airflow_pda_source_database = "data_claims"
+  airflow_pda_source_table    = "submission"
+  airflow_pda_target_database = "pda_raw"
 }
+
+# trust: only the pda workflow's service account on the airflow compute cluster
 
 data "aws_iam_policy_document" "airflow_pda_trust" {
   statement {
@@ -51,27 +61,7 @@ data "aws_iam_policy_document" "airflow_pda_permissions" {
       "athena:StopQueryExecution",
       "athena:GetWorkGroup",
     ]
-    resources = [aws_athena_workgroup.laa.arn]
-  }
-
-  # The laa workgroup writes query results to S3 using the caller's credentials
-  statement {
-    sid       = "AthenaQueryResultsBucket"
-    effect    = "Allow"
-    actions   = ["s3:GetBucketLocation", "s3:ListBucket"]
-    resources = [module.data_lake_buckets["aws-athena-query-results"].bucket.arn]
-  }
-
-  statement {
-    sid    = "AthenaQueryResultsObjects"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:AbortMultipartUpload",
-      "s3:ListMultipartUploadParts",
-    ]
-    resources = ["${module.data_lake_buckets["aws-athena-query-results"].bucket.arn}/athena-results/*"]
+    resources = ["arn:aws:athena:${local.current_account_region}:${local.current_account_id}:workgroup/${local.airflow_pda_workgroup}"]
   }
 
   statement {
@@ -84,20 +74,21 @@ data "aws_iam_policy_document" "airflow_pda_permissions" {
     ]
     resources = [
       "${local.airflow_pda_glue_arn_prefix}:catalog",
-      "${local.airflow_pda_glue_arn_prefix}:database/*",
-      "${local.airflow_pda_glue_arn_prefix}:table/*/*",
+      "${local.airflow_pda_glue_arn_prefix}:database/${local.airflow_pda_source_database}",
+      "${local.airflow_pda_glue_arn_prefix}:database/${local.airflow_pda_target_database}",
+      "${local.airflow_pda_glue_arn_prefix}:table/${local.airflow_pda_source_database}/${local.airflow_pda_source_table}",
+      "${local.airflow_pda_glue_arn_prefix}:table/${local.airflow_pda_target_database}/*",
     ]
   }
 
-  # Athena INSERT into an Iceberg table commits by updating the table's metadata location in Glue
   statement {
     sid     = "GlueCommitIcebergDestination"
     effect  = "Allow"
     actions = ["glue:UpdateTable"]
     resources = [
       "${local.airflow_pda_glue_arn_prefix}:catalog",
-      "${local.airflow_pda_glue_arn_prefix}:database/*",
-      "${local.airflow_pda_glue_arn_prefix}:table/*/*",
+      "${local.airflow_pda_glue_arn_prefix}:database/${local.airflow_pda_target_database}",
+      "${local.airflow_pda_glue_arn_prefix}:table/${local.airflow_pda_target_database}/*",
     ]
   }
 
@@ -110,7 +101,6 @@ data "aws_iam_policy_document" "airflow_pda_permissions" {
     resources = ["*"]
   }
 
-  # Data lake key encrypts the Glue Data Catalog and Athena query results
   statement {
     sid       = "DataLakeKmsKey"
     effect    = "Allow"
@@ -127,6 +117,7 @@ resource "aws_iam_role_policy" "airflow_pda_permissions" {
   policy = data.aws_iam_policy_document.airflow_pda_permissions.json
 }
 
+# lake formation: source, read office codes from data_claims.submission
 resource "aws_lakeformation_permissions" "airflow_pda_source_database" {
   count = local.airflow_pda_enabled ? 1 : 0
 
@@ -134,7 +125,7 @@ resource "aws_lakeformation_permissions" "airflow_pda_source_database" {
   permissions = ["DESCRIBE"]
 
   database {
-    name = "data_claims"
+    name = local.airflow_pda_source_database
   }
 }
 
@@ -145,10 +136,12 @@ resource "aws_lakeformation_permissions" "airflow_pda_source_table" {
   permissions = ["SELECT", "DESCRIBE"]
 
   table {
-    database_name = "data_claims"
-    name          = "submission"
+    database_name = local.airflow_pda_source_database
+    name          = local.airflow_pda_source_table
   }
 }
+
+# lake formation: destination, see pda_raw and insert into its tables
 
 resource "aws_lakeformation_permissions" "airflow_pda_destination_database" {
   count = local.airflow_pda_enabled ? 1 : 0
@@ -157,7 +150,22 @@ resource "aws_lakeformation_permissions" "airflow_pda_destination_database" {
   permissions = ["DESCRIBE"]
 
   database {
-    name = "pda-raw"
+    name = local.airflow_pda_target_database
+  }
+
+  depends_on = [module.databases]
+}
+
+# wildcard covers all current and future tables in pda_raw
+resource "aws_lakeformation_permissions" "airflow_pda_destination_tables" {
+  count = local.airflow_pda_enabled ? 1 : 0
+
+  principal   = aws_iam_role.airflow_pda[0].arn
+  permissions = ["SELECT", "INSERT", "DESCRIBE"]
+
+  table {
+    database_name = local.airflow_pda_target_database
+    wildcard      = true
   }
 
   depends_on = [module.databases]
