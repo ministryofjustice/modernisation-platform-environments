@@ -189,3 +189,27 @@ resource "aws_cloudwatch_metric_alarm" "ec2_stop_alarm" {
   alarm_actions     = [var.topic]
   ok_actions        = [var.topic]
 }
+
+resource "aws_cloudwatch_metric_alarm" "clamav_process_alarm" {
+  count                     = var.monitor_clamav ? 1 : 0
+  alarm_name                = "${var.short_env}-${local.name}-clamav-process-alarm"
+  comparison_operator       = "LessThanThreshold"
+  datapoints_to_alarm       = 2
+  evaluation_periods        = 2
+  metric_name               = "clamd_process_count"
+  namespace                 = "Custom/ClamAV"
+  period                    = 60
+  statistic                 = "Minimum"
+  threshold                 = 1
+  treat_missing_data        = "notBreaching"
+  alarm_description         = "This alarm will trigger when the clamav process is not running."
+  insufficient_data_actions = [var.topic]
+  alarm_actions             = [var.topic]
+  ok_actions                = [var.topic]
+
+  dimensions = {
+    InstanceId = var.instanceId
+    exe        = "clamd"
+    pid_finder = "native"
+  }
+}
