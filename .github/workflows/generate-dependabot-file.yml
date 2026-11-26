@@ -51,7 +51,7 @@ jobs:
         run: bash ./scripts/git-setup.sh
 
       - name: Commit and Create PR with Signed Commit
-        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@3f8a13c910165b946dd6ada1f4763c2af74ab12a # v6.4.0
+        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@ea15671788544f7084e1b0733622c5d4cae66da7 # v6.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_title: "Automated Update: Dependabot File"
