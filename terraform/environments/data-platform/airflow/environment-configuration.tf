@@ -30,6 +30,9 @@ locals {
       mwaa_bucket_workflow_access = {
         "asset-partition-demo" = [
           "airflow-dp-test-data-platform-example-partition-lander",
+          "airflow-dp-test-data-platform-example-partition-producer",
+          "airflow-dp-test-data-platform-example-partition-hourly",
+          "airflow-dp-test-data-platform-example-partition-daily",
         ]
       }
       # <<< TEMPORARY (Airflow 3 asset partition demo): END
