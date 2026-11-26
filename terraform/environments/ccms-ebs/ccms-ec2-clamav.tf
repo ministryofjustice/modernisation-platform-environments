@@ -24,7 +24,7 @@ resource "aws_instance" "ec2_clamav" {
     templatefile("./templates/ec2_user_data_clamav.sh", {
       hostname = "clamav",
       clamav_cloudwatch_config = templatefile(
-        "${path.module}/templates/clamav_cloudwatch_config.json",
+        "${path.module}/templates/cw_agent_config_clamav.json",
         {
           clamav_log_group_name = aws_cloudwatch_log_group.groups["cwagent-clamav-logs"].name
       })
