@@ -15,7 +15,10 @@ module "compliance_role" {
       ]
       principals = [{
             type = "AWS"
-            identifiers = [try(one(data.aws_iam_roles.mod_plat_roles.arns))]
+            identifiers = [
+              try(one(data.aws_iam_roles.mod_plat_roles.arns)),
+              "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-16bc158615e59e2a-live",
+            ]
         },]
     }
   }
@@ -129,16 +132,6 @@ resource "aws_lakeformation_permissions" "em_compliance_db_access" {
   }
 }
 
-resource "aws_lakeformation_permissions" "em_compliance_tb_access" {
-  count = local.compliance_accounts
-  principal   = module.compliance_role[0].arn
-  permissions = ["DESCRIBE"]
-  table {
-    database_name = "staged_mdss${local.dbt_suffix}"
-    name          = "event"
-  }
-}
-
 resource "aws_lakeformation_data_cells_filter" "compliance_data_filter" {
   count = local.compliance_accounts
   table_data {
@@ -165,7 +158,7 @@ resource "aws_lakeformation_permissions" "em_compliance_s3_access" {
 resource "aws_lakeformation_permissions" "em_compliance_row_access" {
   count = local.compliance_accounts
   principal   = module.compliance_role[0].arn
-  permissions = ["DESCRIBE", "SELECT"]
+  permissions = ["SELECT"]
   data_cells_filter {
     database_name    = "staged_mdss${local.dbt_suffix}"
     name             = "filter-for-staged_mdss${local.dbt_suffix}-event-table"
