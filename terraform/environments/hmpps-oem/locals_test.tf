@@ -248,6 +248,33 @@ locals {
       }
     }
 
+    iam_policies = {
+      CloudWatchCrossAccountAccess = {
+        description = "Allows CloudWatch to assume sharing roles in other accounts"
+        statements = [{
+          effect    = "Allow"
+          actions   = ["sts:AssumeRole"]
+          resources = ["arn:aws:iam::*:role/CloudWatch-CrossAccountSharingRole"]
+        }]
+      }
+    }
+
+    iam_roles = {
+      ServiceRoleForCloudWatchCrossAccountV2 = {
+        path = "/service-role/"
+
+        assume_role_policy = [{
+          effect  = "Allow"
+          actions = ["sts:AssumeRole"]
+          principals = {
+            type        = "Service"
+            identifiers = ["cloudwatch-crossaccount.amazonaws.com"]
+          }
+        }]
+        policy_attachments = ["CloudWatchCrossAccountAccess"]
+      }
+    }
+
     route53_zones = {
       "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
         records = [
