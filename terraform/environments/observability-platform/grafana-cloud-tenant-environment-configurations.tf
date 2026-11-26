@@ -53,21 +53,11 @@ locals {
             }
           }
         }
-        # Cloud Platform (CP3) accounts. There is no github_team: the cloud-platform team already
-        # queries these accounts through grafana-cloud-platform-access.tf. The rotator has one
-        # concurrency slot, so accounts join in batches. Batch 1 is the four cloud-platform-*
-        # accounts. Batch 2 (container-platform-{octo,laa,hmpps,cd}-nonlive) and then batch 3
-        # (container-platform-{octo,laa,hmpps,cd}-live) are added, with pdc_enabled = true, only
-        # after every earlier account's enrolment completes. Apply this and confirm each new
-        # secret's bootstrap journal is completed with a sole AWSCURRENT version before deploying
-        # that account's tenant module. Membership must match the tenant module's workspace
-        # allowlist in terraform/environments/cloud-platform/network/observability_platform.tf.
+        # Other CP3 accounts belong in the future production stack, not this one.
+        # The cloud-platform team already has query access via grafana-cloud-platform-access.tf.
         "cloud-platform" = {
           aws_accounts = {
-            "cloud-platform-development"   = { pdc_enabled = true }
-            "cloud-platform-preproduction" = { pdc_enabled = true }
-            "cloud-platform-nonlive"       = { pdc_enabled = true }
-            "cloud-platform-live"          = { pdc_enabled = true }
+            "cloud-platform-development" = { pdc_enabled = true }
           }
         }
       }

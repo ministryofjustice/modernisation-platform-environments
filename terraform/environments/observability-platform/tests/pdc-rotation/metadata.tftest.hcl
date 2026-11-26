@@ -19,6 +19,9 @@ mock_provider "aws" {
   mock_resource "aws_secretsmanager_secret" {
     defaults = { arn = "arn:aws:secretsmanager:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:secret:grafana-cloud/pdc/mock-ABCDEF" }
   }
+  mock_resource "aws_cloudwatch_event_rule" {
+    defaults = { arn = "arn:aws:events:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:rule/mock" }
+  }
   mock_resource "aws_kms_key" {
     defaults = { arn = "arn:aws:kms:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:key/12345678-1234-1234-1234-abcdefabcdef" }
   }
@@ -347,9 +350,6 @@ run "development_first_issuance_accounts_use_readiness_enrolment" {
         ] : toset(names) == toset([
           "example-development",
           "cloud-platform-development",
-          "cloud-platform-preproduction",
-          "cloud-platform-nonlive",
-          "cloud-platform-live",
       ])]) &&
       alltrue([for name in keys(terraform_data.gc_pdc_bootstrap) : (
         aws_secretsmanager_secret.gc_pdc_token[name].tags["pdc:bootstrap"] == "true" &&
@@ -357,13 +357,13 @@ run "development_first_issuance_accounts_use_readiness_enrolment" {
         aws_secretsmanager_secret.gc_pdc_token[name].tags["pdc:token-ttl-seconds"] == tostring(97 * 86400) &&
         local.gc_pdc_restarter_role_arns[name] == "arn:aws:iam::${local.all_account_ids[name]}:role/grafana-pdc-agent-restarter"
       )]) &&
-      length(local.gc_pdc_restarter_role_arns) == 7 &&
+      length(local.gc_pdc_restarter_role_arns) == 4 &&
       length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
       length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
       length(aws_lambda_permission.gc_pdc_bootstrap) == 1 &&
       toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"])
     )
-    error_message = "Only Example and Cloud Platform batch 1 get first issuance and readiness ticks; Sprinkler and Cooker must keep their native Terraform schedules."
+    error_message = "Only Example and cloud-platform-development get first issuance and readiness ticks; Sprinkler and Cooker must keep their native Terraform schedules."
   }
 
   assert {
@@ -376,9 +376,6 @@ run "development_first_issuance_accounts_use_readiness_enrolment" {
         "cooker-development",
         "example-development",
         "cloud-platform-development",
-        "cloud-platform-preproduction",
-        "cloud-platform-nonlive",
-        "cloud-platform-live",
     ])])
     error_message = "Each opted-in account must have its own network, protected secret, KMS key and alias, and scoped policies."
   }

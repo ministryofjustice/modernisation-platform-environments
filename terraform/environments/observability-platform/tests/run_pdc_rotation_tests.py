@@ -217,6 +217,71 @@ resource "terraform_data" "retained_metadata" {
         print("Exactly two Cooker state forgets, zero destroys; metadata and Sprinkler schedule retained.")
 
 
+def check_cp3_handoff(directory, environment):
+    """Plan from the previously applied tenant; only mock providers and the AWS stub are used."""
+    handoff = "grafana-cloud-pdc-cp3-handoff.tf"
+    previous = directory / "before_cp3_handoff"
+    previous.mkdir()
+    shutil.copyfile(FIXTURE / "cp3-data-sources.tf", directory / "cp3-data-sources.tf")
+    shutil.copytree(ROOT / "modules/grafana-cloud/aws-account-data-sources", directory / "aws-account-data-sources")
+    for path in [*directory.glob("*.tf"), directory / "contrib", directory / "aws-account-data-sources"]:
+        if path.name != handoff:
+            (previous / path.name).symlink_to(path)
+    shutil.copytree(directory / "configuration", previous / "configuration")
+    (previous / "configuration" / "accounts_override.tf").write_text("""
+module "grafana_cloud_tenant_configuration" {
+  tenants = merge(local.environment_configuration_gc.tenant_configuration, {
+    cloud-platform = { aws_accounts = { for stage in ["development", "preproduction", "nonlive", "live"] :
+      "cloud-platform-${stage}" => { pdc_enabled = true } } }
+  })
+}
+""")
+    # Use the same provider mocks as the metadata suite, in a separate disposable state.
+    tests = directory / "handoff-tests"
+    tests.mkdir()
+    mocks = (directory / "tests/metadata.tftest.hcl").read_text().split('\nrun "', 1)[0]
+    (tests / "cp3.tftest.hcl").write_text(mocks + (FIXTURE / "cp3-handoff.hcl").read_text())
+    calls = directory / "handoff-invocations"
+    env = environment | {
+        "PDC_TEST_INVOCATIONS": str(calls),
+        "EXPECTED_SECRET_ARN": f"arn:aws:secretsmanager:eu-west-2:{4:012d}:secret:grafana-cloud/pdc/mock-ABCDEF",
+    }
+    subprocess.run(["terraform", "init", "-backend=false", "-test-directory=handoff-tests", "-no-color"],
+                   cwd=directory, env=env, check=True, stdout=subprocess.DEVNULL)
+    run = subprocess.run(["terraform", "test", "-test-directory=handoff-tests", "-json", "-verbose"],
+                         cwd=directory, env=env, text=True, capture_output=True)
+    events = [json.loads(line) for line in run.stdout.splitlines()]
+    if run.returncode:
+        raise SystemExit(run.stderr + "\n".join(e["@message"] for e in events if e["type"] == "diagnostic"))
+    plan, = [e["test_plan"] for e in events if e["type"] == "test_plan"]
+    actual = {
+        (r.get("previous_address"), r["address"]): r["change"]["actions"]
+        for r in plan["resource_changes"] if r["mode"] == "managed" and r["change"]["actions"] != ["no-op"]
+    }
+    expected = {(None, f'{resource}["this"]'): ["update"] for resource in (
+        "aws_iam_policy.gc_pdc_rotator", "aws_kms_key.gc_pdc_failure_alerts", "aws_sns_topic_policy.gc_pdc_failure_alerts",
+    )}
+    for stage in ("preproduction", "nonlive", "live"):
+        key = f'["cloud-platform-{stage}"]'
+        for resource in ("aws_secretsmanager_secret", "aws_kms_key"):
+            expected[(f"{resource}.gc_pdc_token{key}", f"{resource}.cp3_{stage}_handoff")] = ["forget"]
+        for resource in (
+            "grafana_cloud_private_data_source_connect_network.account", "aws_kms_alias.gc_pdc_token",
+            "aws_secretsmanager_secret_policy.gc_pdc_token", "terraform_data.gc_pdc_bootstrap",
+            "aws_cloudwatch_event_rule.gc_pdc_enrolment", "aws_cloudwatch_event_target.gc_pdc_enrolment",
+            "aws_lambda_permission.gc_pdc_enrolment_tick", "aws_lambda_permission.gc_pdc_enrolment_rotation",
+            "aws_cloudwatch_metric_alarm.gc_pdc_enrolment_delivery",
+        ):
+            expected[(None, resource + key)] = ["delete"]
+        for resource in ("grafana_data_source.cloudwatch[0]", 'grafana_data_source_permission.this["cloudwatch"]'):
+            expected[(None, f"module.grafana_cloud_aws_data_sources{key}.{resource}")] = ["delete"]
+    if actual != expected:
+        raise SystemExit(f"Unexpected managed changes in CP3 handoff: {actual}")
+    if calls.read_text().splitlines() != ["invoke"] * 5:
+        raise SystemExit("Expected bootstrap only for Example and the four original CP3 accounts, never on teardown.")
+    print("CP3 handoff: 6 exact secret/key forgets, 33 scoped deletes, 3 shared policy updates; no other managed changes.")
+
+
 def run():
     # Copy production files, not a second implementation. Never initialise the live backend.
     with tempfile.TemporaryDirectory(prefix="pdc-rotation-tests-") as temporary:
@@ -225,6 +290,7 @@ def run():
             "versions.tf",
             "grafana-cloud-stack.tf",
             "grafana-cloud-pdc-accounts.tf",
+            "grafana-cloud-pdc-cp3-handoff.tf",
             "grafana-cloud-pdc-bootstrap.tf",
             "grafana-cloud-pdc-enrolment.tf",
             "grafana-cloud-pdc-rotation.tf",
@@ -320,6 +386,7 @@ def run():
             raise SystemExit("Expected destructive account disablement to be blocked.")
         print("Destructive account disablement blocked by secret protection.")
         run_declarative_handoff_test(environment)
+        check_cp3_handoff(directory, environment)
 
 
 if __name__ == "__main__":
