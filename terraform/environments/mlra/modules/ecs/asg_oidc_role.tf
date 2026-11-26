@@ -5,20 +5,14 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-locals {
-  application_name = var.app_name
-  tags             = var.tags_common
-  environment      = var.environment
-}
-
 module "github_actions_asg_oidc_role" {
   source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
   github_repositories = ["ministryofjustice/laa-mlra-application"]
-  subject_claim       = "environment:${local.environment}"
-  role_name           = "${local.application_name}-asg-manage-oidc"
+  subject_claim       = "environment:${var.environment}"
+  role_name           = "${var.app_name}-asg-manage-oidc"
   policy_arns         = []
   policy_jsons        = [data.aws_iam_policy_document.github_actions_asg_oidc_policy.json]
-  tags                = merge({ "Name" = "${local.application_name}-asg-manage-oidc" }, local.tags)
+  tags                = merge({ "Name" = "${var.app_name}-asg-manage-oidc" }, var.tags_common)
 }
 
 data "aws_iam_policy_document" "github_actions_asg_oidc_policy" {
@@ -28,14 +22,14 @@ data "aws_iam_policy_document" "github_actions_asg_oidc_policy" {
     sid       = "UpdateMlraAsg"
     effect    = "Allow"
     actions   = ["autoscaling:UpdateAutoScalingGroup"]
-    resources = ["arn:aws:autoscaling:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:autoScalingGroup:*:autoScalingGroupName/${local.application_name}-ec2-*"]
+    resources = ["arn:aws:autoscaling:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:autoScalingGroup:*:autoScalingGroupName/${var.app_name}-ec2-*"]
   }
 
   statement {
     sid       = "ReleaseMlraAsgProtection"
     effect    = "Allow"
     actions   = ["autoscaling:SetInstanceProtection"]
-    resources = ["arn:aws:autoscaling:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:autoScalingGroup:*:autoScalingGroupName/${local.application_name}-ec2-*"]
+    resources = ["arn:aws:autoscaling:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:autoScalingGroup:*:autoScalingGroupName/${var.app_name}-ec2-*"]
   }
 
   statement {
@@ -43,8 +37,8 @@ data "aws_iam_policy_document" "github_actions_asg_oidc_policy" {
     effect  = "Allow"
     actions = ["ecs:DescribeClusters", "ecs:DescribeServices", "ecs:UpdateService"]
     resources = [
-      "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${local.application_name}",
-      "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:service/${local.application_name}/*"
+      "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.app_name}",
+      "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:service/${var.app_name}/*"
     ]
   }
 

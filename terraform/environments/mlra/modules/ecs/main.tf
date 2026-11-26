@@ -28,7 +28,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group-al2023" {
   desired_capacity      = var.ec2_desired_capacity
   max_size              = var.ec2_max_size
   min_size              = var.ec2_min_size
-  protect_from_scale_in = false
+  protect_from_scale_in = true
   metrics_granularity   = "1Minute"
   enabled_metrics = [
     "GroupMinSize",
@@ -662,7 +662,7 @@ resource "aws_ecs_capacity_provider" "mlra-al2023" {
 
   auto_scaling_group_provider {
     auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group-al2023.arn
-    managed_termination_protection = "DISABLED"
+    managed_termination_protection = "ENABLED"
 
     managed_scaling {
       # maximum_scaling_step_size = 1000
