@@ -326,6 +326,31 @@ run "new_account_without_capable_image_fails_closed" {
   expect_failures = [terraform_data.gc_pdc_bootstrap["new-development"]]
 }
 
+run "example_opt_in_waits_for_bootstrap_release" {
+  command = plan
+
+  variables {
+    use_environment_configuration = true
+  }
+
+  expect_failures = [terraform_data.gc_pdc_bootstrap["example-development"]]
+
+  assert {
+    condition = (
+      toset(keys(local.gc_pdc_bootstrap_accounts)) == toset(["example-development"]) &&
+      toset(keys(local.gc_pdc_enrolment_accounts)) == toset(["example-development"]) &&
+      aws_secretsmanager_secret.gc_pdc_token["example-development"].tags["pdc:bootstrap"] == "true" &&
+      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
+      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
+      length(aws_lambda_permission.gc_pdc_bootstrap) == 0 &&
+      toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"]) &&
+      !contains(keys(local.gc_pdc_rotation_triggers), "example-development") &&
+      !contains(keys(local.gc_pdc_restarter_role_arns), "example-development")
+    )
+    error_message = "The checked-in Example opt-in must wait for bootstrap support, without Terraform token values, premature rotation or changes to the seeded accounts."
+  }
+}
+
 run "reject_unpinned_image" {
   command = plan
 

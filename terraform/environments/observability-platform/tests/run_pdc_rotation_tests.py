@@ -122,6 +122,16 @@ def run():
             shutil.copyfile(ROOT / name, directory / name)
         for name in ("main.tf", "providers.tf"):
             shutil.copyfile(FIXTURE / name, directory / name)
+        configuration = directory / "configuration"
+        shutil.copytree(FIXTURE / "configuration", configuration)
+        shutil.copyfile(
+            ROOT / "grafana-cloud-tenant-environment-configurations.tf",
+            configuration / "grafana-cloud-tenant-environment-configurations.tf",
+        )
+        shutil.copytree(
+            ROOT / "modules" / "grafana-cloud" / "tenant-configuration",
+            configuration / "modules" / "grafana-cloud" / "tenant-configuration",
+        )
         helper = directory / "contrib" / "bootstrap-pdc-secret.py"
         helper.parent.mkdir()
         shutil.copyfile(ROOT / "contrib" / helper.name, helper)

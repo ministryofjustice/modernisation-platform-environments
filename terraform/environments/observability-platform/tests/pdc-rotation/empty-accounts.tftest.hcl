@@ -37,9 +37,8 @@ run "production_has_no_development_ecr_parameter" {
   command = plan
 
   variables {
-    environment    = "production"
-    accounts       = {}
-    failure_alerts = null
+    environment                   = "production"
+    use_environment_configuration = true
   }
 
   assert {

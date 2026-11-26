@@ -47,6 +47,10 @@ locals {
             "cooker-development" = {
               pdc_enabled = true
             }
+            # Prepared only: bootstrap and automatic enrolment support must ship before this opt-in.
+            "example-development" = {
+              pdc_enabled = true
+            }
           }
         }
       }

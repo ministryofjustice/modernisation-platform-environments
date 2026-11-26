@@ -14,6 +14,17 @@ variable "environment" {
   default = "development"
 }
 
+variable "use_environment_configuration" {
+  type    = bool
+  default = false
+}
+
+module "checked_in_configuration" {
+  source = "./configuration"
+
+  environment = var.environment
+}
+
 variable "rotator" {
   type = object({
     image_digest      = string
@@ -34,7 +45,7 @@ locals {
   environment      = var.environment
   application_name = "observability-platform"
   tags             = { application = "observability-platform" }
-  gc_accounts      = var.accounts
+  gc_accounts      = var.use_environment_configuration ? module.checked_in_configuration.pdc_accounts : var.accounts
   all_account_ids = {
     sprinkler-development      = format("%012d", 1)
     cooker-development         = format("%012d", 2)
@@ -42,6 +53,7 @@ locals {
     production-observability-a = format("%012d", 6)
     production-observability-b = format("%012d", 7)
     new-development            = format("%012d", 8)
+    example-development        = format("%012d", 9)
   }
   environment_management = {
     account_ids = {
@@ -49,8 +61,8 @@ locals {
     }
   }
   environment_configuration_gc = {
-    pdc_token_rotator  = var.rotator
-    pdc_failure_alerts = var.failure_alerts
+    pdc_token_rotator  = var.use_environment_configuration ? module.checked_in_configuration.rotator : var.rotator
+    pdc_failure_alerts = var.use_environment_configuration ? module.checked_in_configuration.failure_alerts : var.failure_alerts
   }
 }
 

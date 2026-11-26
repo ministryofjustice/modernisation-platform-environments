@@ -27,6 +27,14 @@ instead of falling back to a Terraform-generated token. The bootstrap implementa
 in [ministryofjustice/observability-platform-grafana-pdc-token-rotator#11](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/pull/11)
 is a runtime dependency, not a deployable digest.
 
+The prepared `example-development` opt-in is a separate follow-on to stage one,
+not authority to deploy it. Its development plan deliberately fails the
+bootstrap-capability precondition on alpha.4. Ship a released bootstrap-capable
+image and automatic enrolment support before applying this opt-in; do not bypass
+the gate or create a token/version in Terraform. Confirm first issuance before
+deploying Example's tenant agents. Example has no production opt-in or configured
+private query target; configure a real target separately before query acceptance.
+
 1. Use a genuinely new account and network/access policy, with **no** Grafana
    token history in that policy/region (including expired tokens). Terraform
    creates only the network, CMK, protected secret and cross-account policies;
