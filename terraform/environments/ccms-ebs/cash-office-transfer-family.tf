@@ -209,7 +209,7 @@ resource "aws_transfer_web_app" "this" {
   identity_provider_details {
     identity_center_config {
       instance_arn = tolist(data.aws_ssoadmin_instances.this[count.index].arns) [0]
-      role         = local.application_data.accounts[local.environment].cash_web_app_url
+      role         = local.application_data.accounts[local.environment].cash_office_role
     }
   }
 
