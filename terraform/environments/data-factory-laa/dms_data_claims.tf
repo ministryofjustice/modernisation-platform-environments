@@ -110,7 +110,7 @@ resource "aws_iam_role_policy" "glue_access_dms" {
 
 module "data_claims_dms" {
   count                    = local.is-test || local.is-preproduction ? 1 : 0
-  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=209610e6907e34acde13886599506a411b5e3c2f"
+  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=f643dd1bcd4db3ccccce16708ca7ff6da1d9e8be"
   vpc_id                   = data.aws_vpc.shared.id
   environment              = local.environment
   manage_dms_service_roles = false
@@ -133,6 +133,7 @@ module "data_claims_dms" {
     replication_instance_class = "dms.r6i.2xlarge"
     inbound_cidr               = "192.0.2.0/32" # TODO: Not needed
     apply_immediately          = true
+    allow_major_version_upgrade = true
   }
 
   dms_source = {
