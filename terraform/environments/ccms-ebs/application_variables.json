@@ -631,6 +631,9 @@
     },
     "cwagent-var-log-secure": {
       "retention_days": 90
+    },
+    "cwagent-clamav-logs": {
+      "retention_days": 90
     }
   },
   "ssogen_cw_log_groups": {

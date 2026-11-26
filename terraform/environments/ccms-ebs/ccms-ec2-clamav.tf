@@ -20,9 +20,16 @@ resource "aws_instance" "ec2_clamav" {
     ]
   }
   #  user_data_replace_on_change = false
-  user_data = base64encode(templatefile("./templates/ec2_user_data_clamav.sh", {
-    hostname = "clamav"
-  }))
+  user_data = base64encode(
+    templatefile("./templates/ec2_user_data_clamav.sh", {
+      hostname = "clamav",
+      clamav_cloudwatch_config = templatefile(
+        "${path.module}/templates/clamav_cloudwatch_config.json",
+        {
+          clamav_log_group_name = aws_cloudwatch_log_group.groups["cwagent-clamav-logs"].name
+      })
+      }
+  ))
 
   metadata_options {
     http_endpoint = "enabled"
@@ -68,14 +75,15 @@ resource "aws_instance" "ec2_clamav" {
 module "cw-clamav-ec2" {
   source = "./modules/cw-ec2"
 
-  short_env    = local.application_data.accounts[local.environment].short_env
-  name         = "ec2-clamav"
-  topic        = aws_sns_topic.cw_alerts.arn
-  instanceId   = aws_instance.ec2_clamav.id
-  imageId      = local.application_data.accounts[local.environment].clamav_ami_id
-  instanceType = local.application_data.accounts[local.environment].ec2_instance_type_clamav
-  fileSystem   = "xfs"       # Linux root filesystem
-  rootDevice   = "nvme0n1p1" # ClamAV uses different instance family
+  short_env      = local.application_data.accounts[local.environment].short_env
+  name           = "ec2-clamav"
+  topic          = aws_sns_topic.cw_alerts.arn
+  instanceId     = aws_instance.ec2_clamav.id
+  imageId        = local.application_data.accounts[local.environment].clamav_ami_id
+  instanceType   = local.application_data.accounts[local.environment].ec2_instance_type_clamav
+  fileSystem     = "xfs"       # Linux root filesystem
+  rootDevice     = "nvme0n1p1" # ClamAV uses different instance family
+  monitor_clamav = true
 
   cpu_eval_periods = local.application_data.cloudwatch_ec2.cpu.eval_periods
   cpu_datapoints   = local.application_data.cloudwatch_ec2.cpu.eval_periods
