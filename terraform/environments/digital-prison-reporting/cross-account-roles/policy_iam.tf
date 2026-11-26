@@ -21,9 +21,7 @@ data "aws_iam_policy_document" "glue_catalog_delete_table_versions" {
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/curated",
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/curated/*",
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/raw",
-      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/raw/*",
-      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/structured",
-      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/structured/*"
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/raw/*"
     ]
   }
 }

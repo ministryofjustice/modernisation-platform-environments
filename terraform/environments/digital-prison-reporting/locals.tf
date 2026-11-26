@@ -427,16 +427,6 @@ locals {
     port     = "0"
   }
 
-  # ndmis Secrets PlaceHolder
-  ndmis_secrets_placeholder = {
-    db_name  = "ndmis"
-    password = "placeholder"
-    user     = "placeholder"
-    username = "placeholder"
-    endpoint = "0.0.0.0"
-    port     = "0"
-  }
-
   # DPS Secrets PlaceHolder
   dps_domains_list = local.application_data.accounts[local.environment].dps_domains
   dps_secrets_placeholder = {
