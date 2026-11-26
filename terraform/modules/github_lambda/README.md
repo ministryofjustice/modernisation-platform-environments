@@ -1,6 +1,6 @@
 # Github Lambda Module
 
-### Overview
+## Overview
 This module provisions the components required in order to trigger Github Actions workflows in a target ministryofjustice repository
 on a schedule.
 
@@ -14,11 +14,11 @@ cases where the schedule can appear to be completely ignored.  This module provi
 
 This module works in combination with [OCTO STS](https://edu.chainguard.dev/open-source/octo-sts/overview/) to establish connectivity with the target github repository.
 
-### Usage
+## Usage
 
 Below you will see the minimal configuration you require within your `main.tf` file (for the subdirectory that calls this module):
 
-```
+```hcl
 module "github_workflow_scheduler" {
   source                      = "../../modules/github_lambda"
   aws_account_id              = data.aws_caller_identity.current.id
@@ -29,7 +29,7 @@ module "github_workflow_scheduler" {
 
 Then in the relevant `locals_environment.tf` file, create a github_workflows locals configuration similar to the following:
 
-```
+```hcl
 github_workflows = {
     my-workflow-daily-trigger = {
       identity  = "platform-operations"
@@ -44,15 +44,15 @@ github_workflows = {
   }
 ```
 
-Once you have Terraform applied this configuration, you will need to create a `.github/chainguard/${IDENTITY}.sts.yaml` in the relevant github repository (or repositories) containing the Github Actions workflow(s), as per step one [here](https://developer-portal.service.justice.gov.uk/github/github-authentication-for-automated-workloads#:~:text=Use%20Octo%20STS%20for%20cross%2Drepository%20access).
+Once you have Terraform applied this configuration, you will need to create a `.github/chainguard/${IDENTITY}.sts.yaml` in the relevant github repository (or repositories) containing the Github Actions workflow(s), as per step one of the [Octo STS cross-repository access guidance](https://developer-portal.service.justice.gov.uk/github/github-authentication-for-automated-workloads#:~:text=Use%20Octo%20STS%20for%20cross%2Drepository%20access).
 
 Supply the following:
 - Issuer: This should match the [Outbound Identity Federation](https://aws.amazon.com/identity/federation/outbound-federation/) Token Issuer URL in your account (see Account Settings under IAM in the console if you cannot find it)  
-- Subject: This should match the ARN of the IAM role created for the lambda [here](./iam.tf#L162-L165))
+- Subject: This should match the ARN of the [IAM role created for the Lambda](./iam.tf#L162-L165).
 
 Ensure that you also give
 
-```
+```yaml
 permissions:
   actions: write
 ```
@@ -61,9 +61,11 @@ Note: The ${IDENTITY} in the filename above must match the identity value you ha
 
 The EventBridge scheduler will now trigger the Lambda function on the schedule you have defined in your `locals_environment.tf` file.
 
+Before dispatching, the Lambda checks the workflow's state. If the workflow is disabled manually or due to inactivity, it logs `Workflow X is currently disabled, exiting...` and exits successfully without dispatching it. Other GitHub API failures still raise an error.
+
 If you wish you test this before your scheduled build, you can trigger the Lambda manually from the AWS Console - ensure that you provide the following JSON when triggering a test event:
 
-```
+```json
 {
   "identity": "identitynamegoeshere",
   "repo": "reponamegoeshere",
@@ -73,4 +75,3 @@ If you wish you test this before your scheduled build, you can trigger the Lambd
 ```
 
 This will trigger the relevant Github Action workflow for your repository.
-
