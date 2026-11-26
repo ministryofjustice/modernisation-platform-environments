@@ -93,35 +93,69 @@ class TestCheckRun(unittest.TestCase):
         put_metrics.assert_called_once()
 
 
+class TestSettledTableStatistics(unittest.TestCase):
+    @mock.patch.object(main.time, "sleep")
+    @mock.patch.object(main, "table_statistics")
+    def test_waits_until_tables_complete(self, table_statistics, sleep):
+        loading = [{"SchemaName": "dbo", "TableName": "VARIABLE", "TableState": "Full load"}]
+        done = [{"SchemaName": "dbo", "TableName": "VARIABLE", "TableState": "Table completed"}]
+        table_statistics.side_effect = [loading, loading, done]
+
+        self.assertEqual(main.settled_table_statistics("arn:task"), done)
+        self.assertEqual(sleep.call_count, 2)
+
+    @mock.patch.object(main.time, "sleep")
+    @mock.patch.object(main, "table_statistics")
+    def test_gives_up_after_max_attempts(self, table_statistics, sleep):
+        loading = [{"SchemaName": "dbo", "TableName": "VARIABLE", "TableState": "Full load"}]
+        table_statistics.return_value = loading
+
+        self.assertEqual(main.settled_table_statistics("arn:task"), loading)
+        self.assertEqual(table_statistics.call_count, main.SETTLE_ATTEMPTS)
+
+
 class TestDigest(unittest.TestCase):
     @mock.patch.object(main, "publish")
     @mock.patch.object(main, "metric_values")
     @mock.patch.object(main, "table_statistics")
     @mock.patch.object(main, "describe_task")
     @mock.patch.object(main, "today_start", return_value=TODAY)
-    def test_shows_usual_with_percent_change(self, _, describe_task, table_statistics, metric_values, publish):
+    def test_lists_tables_under_task(self, _, describe_task, table_statistics, metric_values, publish):
         describe_task.return_value = {
             **task(),
+            "ReplicationTaskIdentifier": "cica-ap-tariff-production-full-load",
             "ReplicationTaskStats": {
                 "StartDate": datetime(2026, 11, 25, 0, 30, tzinfo=timezone.utc),
                 "FullLoadStartDate": datetime(2026, 11, 25, 0, 30, tzinfo=timezone.utc),
                 "FullLoadFinishDate": datetime(2026, 11, 25, 1, 0, tzinfo=timezone.utc),
             },
         }
-        table_statistics.return_value = [{"SchemaName": "dbo", "TableName": "A", "FullLoadRows": 900}]
-        metric_values.side_effect = [
+        table_statistics.return_value = [
             {
-                f"tariff-production{main.DURATION_KEY}": [20, 20, 20],
-                f"tariff-production{main.TOTAL_ROWS_KEY}": [1000, 1000, 1000],
+                "SchemaName": "dbo", "TableName": "A", "FullLoadRows": 900, "TableState": "Table completed",
+                "FullLoadEndTime": datetime(2026, 11, 25, 0, 45, tzinfo=timezone.utc),
             },
-            {"tariff-production": []},
+            {"SchemaName": "dbo", "TableName": "B", "FullLoadRows": 0, "TableState": "Table error"},
         ]
+        metric_values.return_value = {
+            f"tariff-production|{main.DURATION_KEY}": [20, 20, 20],
+            f"tariff-production|{main.TOTAL_ROWS_KEY}": [1000, 1000, 1000],
+            "tariff-production|dbo.A": [1000, 1000, 1000],
+            "tariff-production|dbo.B": [],
+        }
 
         main.send_digest()
 
-        self.assertIn(
-            "✅ tariff-production: finished 01:00 UTC in 30m (usual 20m, +50%), 900 rows (usual 1,000, -10%), 1 table",
+        self.assertEqual(
             publish.call_args[0][0],
+            [
+                "📋 DMS daily summary 2026-11-25",
+                "",
+                "⚠️ tariff-production (cica-ap-tariff-production-full-load)",
+                "Finished 01:00 UTC in 30m (usual 20m, +50%), 900 rows (usual 1,000, -10%), 2 tables",
+                "    • dbo.A: 900 rows (usual 1,000, -10%), done 00:45 UTC",
+                "    • dbo.B: 0 rows, 🚫 Table error",
+            ],
         )
 
 

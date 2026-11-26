@@ -24,7 +24,8 @@ module "cloud_platform_eso_iam_role" {
       resources = [
         module.github_app_secret.secret_arn,
         module.entra_app_secret.secret_arn,
-        module.notify_secret.secret_arn
+        module.notify_secret.secret_arn,
+        module.sentry_secret.secret_arn
       ]
     }
   }

@@ -40,6 +40,10 @@ locals {
       queue_name = local.live_feed_dlq_names.process_landing_bucket_files_mdss_specials
     }
 
+    process_landing_bucket_files_gems_general_dlq = {
+      queue_name = local.live_feed_dlq_names.process_landing_bucket_files_gems_general
+    }
+
     scan_dlq = {
       queue_name = local.live_feed_dlq_names.scan
     }

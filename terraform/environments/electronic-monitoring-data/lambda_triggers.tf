@@ -240,7 +240,7 @@ module "fms_fan_out_event_queue" {
 # Do not create the Register Athena trigger in production.
 # ----------------------------------------------
 module "register_athena_event_queue" {
-  count = local.is-production ? 0 : 1
+  count = 1
 
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
@@ -501,7 +501,7 @@ resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_position" 
 
 # target merge_ac_position
 resource "aws_cloudwatch_event_target" "merge_ac_position" {
-  count = 1
+  count = 0
   rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
   arn   = module.merge_ac_position[0].lambda_function_arn
 }
