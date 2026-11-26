@@ -4,7 +4,7 @@
 
 data "aws_iam_policy_document" "airflow_assume_role_policy" {
   statement {
-    actions = ["sts:AssumeRole"]
+    actions = ["sts:AssumeRoleWithWebIdentity"]
 
     principals {
       type        = "Federated"
