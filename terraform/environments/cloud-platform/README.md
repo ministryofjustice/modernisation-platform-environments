@@ -91,23 +91,25 @@ The OP and CP3 workflows run independently. Development PRs can queue an apply
 behind a GitHub environment approval, so the order below applies to **apply
 approvals as well as merges**:
 
-1. Apply the development [OP tenant configuration](../observability-platform/grafana-cloud-tenant-environment-configurations.tf)
-   with `pdc_enabled = true` for all twelve accounts. Confirm each
-   `grafana-cloud/pdc/<account ID>` secret in `observability-platform-development`
-   has an `AWSCURRENT` version using metadata only; do not retrieve the token.
-   Follow the [PDC token lifecycle runbook](../observability-platform/docs/grafana-cloud/pdc-token-rotation.md)
-   for the active bootstrap and rotation process.
-2. Confirm the shared endpoint hub from
+1. Confirm the shared endpoint hub from
    [ministryofjustice/modernisation-platform#14437](https://github.com/ministryofjustice/modernisation-platform/pull/14437)
    and its DNS-name correction are deployed. From CP3 private subnets,
    `pdc-grafana-datasources-api.eu-west-2.vpce.grafana.net` and
    `pdc-grafana-datasources.eu-west-2.vpce.grafana.net` must resolve to the hub
    endpoints and accept TCP 443 and 22 respectively. CP3 already associates
    the hub's Route 53 Profile and routes `10.20.240.0/20` through the Transit Gateway.
+2. Apply the development [OP tenant configuration](../observability-platform/grafana-cloud-tenant-environment-configurations.tf)
+   with `pdc_enabled = true` for all twelve accounts. That apply bootstraps each
+   `grafana-cloud/pdc/<account ID>` secret in `observability-platform-development`
+   through the central token rotator. Before continuing, confirm for every account
+   the completed bootstrap journal, an `AWSCURRENT` version (metadata only; do not
+   retrieve the token), and the enrolment rule, target, permissions and delivery
+   alarm, as described in the [PDC token lifecycle runbook](../observability-platform/docs/grafana-cloud/pdc-token-rotation.md).
 3. Only then approve a `cloud-platform-development-network` apply or merge the
-   CP3 network change. Confirm three running tasks per account and connected
-   agents in each Grafana PDC network. Check the agent logs and image retrieval
-   if tasks do not start.
+   CP3 network change. Do this promptly: enrolment stays pending until the
+   agents connect and alerts after one day. Confirm three running tasks per
+   account and connected agents in each Grafana PDC network. Check the agent
+   logs and image retrieval if tasks do not start.
 
 ### **Restrictions on access:**
 
