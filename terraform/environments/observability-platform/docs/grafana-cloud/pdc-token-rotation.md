@@ -21,10 +21,15 @@ production PDC deployment or approval.
 
 ## First issuance for a new opt-in
 
-Development enables `bootstrap_enabled` for alpha.6. `example-development`
-is its only first-issuance account. Do not deploy Example's tenant module until
-central bootstrap succeeds. Example has no production opt-in or configured private
-query target; configure a real target separately before query acceptance.
+Development enables `bootstrap_enabled` for alpha.6. Its first-issuance accounts
+are `example-development` and `container-platform-octo-nonlive`. Apply the central
+opt-in before deploying either account's agents. For Octo, confirm its bootstrap
+journal is `completed` and `grafana-cloud/pdc/<Octo nonlive account ID>` has a
+sole `AWSCURRENT` version before merging or approving the apply of the Octo tenant
+PR. Check version metadata only; do not retrieve the token.
+
+Example has no production opt-in or configured private query target; configure
+a real target separately before query acceptance.
 
 1. Use a genuinely new account and network/access policy, with **no** Grafana
    token history in that policy/region (including expired tokens). Terraform
@@ -385,10 +390,11 @@ Secret metadata has `prevent_destroy` even after its version is forgotten.
    - No replacement of Cooker's network, secret, key, alias or token, and no
      change to Sprinkler's schedule.
 
-   If the revision also onboards Example, review the development image pin,
-   Example's new network and protected secret, first-issuance marker, scoped
-   permissions, readiness rule/target and delivery alarm. There must be **no**
-   Terraform token, secret version or native rotation schedule for Example.
+   For a new first-issuance account, review its network and protected secret,
+   first-issuance marker, scoped permissions, readiness rule/target and delivery
+   alarm. There must be **no** Terraform-managed token, secret version or native
+   rotation schedule for the new account. The Octo opt-in must leave the development
+   image pin and existing accounts' resources unchanged.
 
    Production must have no PDC handoff, rotation, or rotator changes. Stop if
    there is any unexpected change, destroy/replacement, missing state move, or

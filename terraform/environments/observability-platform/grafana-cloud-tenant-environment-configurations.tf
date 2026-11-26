@@ -51,6 +51,10 @@ locals {
             "example-development" = {
               pdc_enabled = true
             }
+            # Bootstrap centrally before deploying the Octo agents.
+            "container-platform-octo-nonlive" = {
+              pdc_enabled = true
+            }
           }
         }
       }
