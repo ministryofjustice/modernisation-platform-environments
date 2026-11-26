@@ -327,14 +327,14 @@ locals {
     }
     start_malware_scanner2 = {
       environments = ["production"]
-      schedule     = "cron(30 19 ? * 2#4 *)"
-      description  = "Trigger Lambda at 19:30 every 4th Tuesday of the month / Temporary amended from 3#4 to 2#4 for December patching." 
+      schedule     = "cron(30 19 ? * 3#3 *)"
+      description  = "Trigger Lambda at 19:30 every 4th Tuesday of the month / Temporary amended from 3#4 to 3#3 for December patching." 
       timezone     = "Europe/London"
     }
     stop_malware_scanner2 = {
       environments = ["production"]
-      schedule     = "cron(0 8 ? * 2#5 *)"
-      description  = "Trigger Lambda at 08:00 every 4th Wednesday of the month / Temporary amended to 2#5 for December patching - to be set at 3#5 afterwards"
+      schedule     = "cron(0 8 ? * 4#3 *)"
+      description  = "Trigger Lambda at 08:00 every 4th Wednesday of the month / Temporary amended to 4#3 for December patching - to be set at 4#4 afterwards"
       timezone     = "Europe/London"
     }
     disk_info_report = {
