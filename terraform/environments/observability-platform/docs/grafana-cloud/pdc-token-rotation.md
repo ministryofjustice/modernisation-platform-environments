@@ -39,8 +39,7 @@ query target; configure a real target separately before query acceptance.
    no `FunctionError`, JSON `null`. No response, token or request ID is emitted
    or stored in state. The runtime checks all version history, claims issuance
    in its journal and guards the first `AWSCURRENT`; it does not contact ECS or
-   query metrics. On ambiguous issuance stop and inspect metadata/journal. Do
-   not taint the marker, recreate it, rerun an old plan or issue another token.
+   query metrics.
 3. After confirmed first issuance the team deploys the existing tenant module
    with `grafana_cloud.pdc_agent.enabled = true`; ECS reads the central secret.
    Keep the completed marker at its address. No image, enrolment or destroy
@@ -54,6 +53,32 @@ query target; configure a real target separately before query acceptance.
    means that first rotation completed, not just that a schedule exists.
    `superseded` means another invocation won the journal update. Further ticks
    do not reset the schedule or reissue the seed.
+
+**If bootstrap fails:** the shared Lambda has one concurrency slot. A seeded
+tenant's immediate rotation can occupy it. The helper retries only a Lambda
+Invoke `TooManyRequestsException`, which rejects the request before the handler
+runs. It waits 10, 20, 40, then up to fourteen 60-second intervals (15 minutes
+10 seconds of backoff in total). Other service errors report only their code
+when recognised. A `FunctionError`, read timeout, unrecognised error or invalid
+response stops the helper without another attempt. CLI exit 254 alone does
+not identify throttling.
+
+Before allowing another apply, let any in-flight invocation finish. Check the
+seeded rotation journal, Lambda `Throttles` and `ConcurrentExecutions`, and
+Invoke data events if recorded. Check the new secret's version IDs and stages
+(not values), its bootstrap journal and the Grafana policy's token history. If
+issuance is ambiguous, stop and reconcile: never clear the claim, reseed the
+secret, manually taint the marker or rerun an old plan. For `AccessDeniedException`,
+check the apply runner's invoke permission on the exact function.
+
+A failed create provisioner normally leaves a tainted `terraform_data` marker.
+After reconciliation, review a **fresh** plan: replacing that marker invokes
+bootstrap again; it must not replace the secret or any issued token. A matching
+completed journal and sole initial `AWSCURRENT` are a runtime no-op before
+enrolment. After a successful apply, confirm the completed journal,
+`AWSCURRENT`, enrolment rule, target, permissions and delivery alarm before
+deploying the tenant agents. A retained, successful marker is not replayed by
+an ordinary apply; state loss or explicit replacement is not an ordinary apply.
 
 The function's Errors alarm covers enrolment failures, including prolonged
 pending (default one day) and approaching seed expiry (default 14 days).
@@ -462,8 +487,9 @@ lifetime, new-account bootstrap eligibility, empty-production IAM, separate cred
 keys/secrets, least-privilege Grafana identities, digest validation, scoped
 runtime permissions, hourly enrolment payload and separate delivery and runtime
 alarms. A stub CLI checks the synchronous
-bootstrap request, invocation count, failure handling and non-replay across an
-image change, tick target replacement and teardown. A disposable local-state test
-uses the checked-in migration blocks to verify exactly two Cooker forgets and
-zero deletes. A negative test confirms secret protection rejects destructive
+bootstrap request, throttle-only backoff and redaction, and non-replay across
+an image change, tick target replacement and teardown. Disposable local-state
+tests verify failed marker replacement, no replay after success, and exactly
+two Cooker forgets with zero deletes using the checked-in migration blocks.
+A negative test confirms secret protection rejects destructive
 account disablement. These are not live issuance or reconnection tests.

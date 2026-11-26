@@ -1,13 +1,16 @@
 """Validate the real PDC Terraform files using isolated, mocked Terraform tests."""
 
+from contextlib import redirect_stderr, redirect_stdout
+import io
 import json
 import os
 from pathlib import Path
 import re
+import runpy
 import shutil
 import subprocess
-import sys
 import tempfile
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,6 +54,84 @@ def check_enrolment_order(directory, environment):
         if not precedes(first, last):
             raise SystemExit(f"Missing enrolment dependency: {first} must precede {last}.")
     print("Terraform orders first issuance before the rule, and both invoke permissions before the target.")
+
+
+def check_bootstrap_retries(helper, environment):
+    main = runpy.run_path(str(helper))["main"]
+    calls = Path(environment["PDC_TEST_INVOCATIONS"])
+    backoff = [10, 20, 40] + [60] * 14
+    for case, delays, error in (
+        ("throttle,legacy-throttle,success", backoff[:2], None),
+        ("throttle", backoff, "TooManyRequestsException); retry limit reached"),
+        ("throttle,function", backoff[:1], "Lambda failed"),
+        ("denied", [], "AccessDeniedException"),
+        ("unsafe-code", [], "AWS CLI exit 254"),
+        ("unknown-format", [], "AWS CLI exit 254"),
+        ("read-timeout", [], "AWS CLI exit 255"),
+        ("transport", [], "AWS CLI exit 255"),
+        ("function", [], "Lambda failed"),
+        ("non-null", [], "Unexpected PDC bootstrap response"),
+    ):
+        calls.write_text("")
+        output = io.StringIO()
+        failure = None
+        with (
+            patch.dict(os.environ, environment | {"PDC_TEST_RESPONSE": case}),
+            patch("time.sleep") as sleep,
+            redirect_stdout(output), redirect_stderr(output),
+        ):
+            try:
+                main()
+            except SystemExit as exc:
+                failure = str(exc)
+        if (error is None and failure is not None) or (error is not None and error not in (failure or "")):
+            raise SystemExit(f"Unexpected result for bootstrap stub case: {case}.")
+        if [call.args for call in sleep.call_args_list] != [(delay,) for delay in delays] or calls.read_text().splitlines() != ["invoke"] * (1 + len(delays)):
+            raise SystemExit(f"Unexpected attempts or backoff for bootstrap stub case: {case}.")
+        if any(private in output.getvalue() + (failure or "") for private in ("DO-NOT-EMIT", "arn:", f"{4:012d}")):
+            raise SystemExit(f"Leaked bootstrap diagnostic in stub case: {case}.")
+    print("Only Invoke throttles retry: throttle-then-success, bounded exhaustion and redacted non-retryable failures verified.")
+
+
+def check_bootstrap_recovery(directory, environment):
+    # Exercise Terraform's create-time provisioner failure semantics without a provider or remote state.
+    root = directory / "recovery"
+    root.mkdir()
+    (root / "main.tf").write_text("""
+resource "terraform_data" "gc_pdc_bootstrap" {
+  for_each = toset(["new-development"])
+  provisioner "local-exec" {
+    command = "python3 ../contrib/bootstrap-pdc-secret.py"
+  }
+}
+""")
+    calls = root / "invocations"
+    env = environment | {"TF_DATA_DIR": str(root / ".terraform"), "PDC_TEST_INVOCATIONS": str(calls)}
+
+    def terraform(*args, case="success", check=True):
+        return subprocess.run(
+            ["terraform", *args], cwd=root, env=env | {"PDC_TEST_RESPONSE": case},
+            capture_output=True, text=True, check=check,
+        )
+
+    terraform("init", "-backend=false")
+    failure = terraform("apply", "-auto-approve", "-no-color", case="denied", check=False)
+    if failure.returncode == 0 or "AccessDeniedException" not in failure.stdout + failure.stderr:
+        raise SystemExit("Expected a failed bootstrap create provisioner in disposable state.")
+    terraform("plan", "-out=tfplan")
+    change, = json.loads(terraform("show", "-json", "tfplan").stdout)["resource_changes"]
+    if not (
+        change["address"] == 'terraform_data.gc_pdc_bootstrap["new-development"]'
+        and change.get("action_reason") == "replace_because_tainted"
+        and change["change"]["actions"] == ["delete", "create"]
+    ):
+        raise SystemExit("Expected replacement of only the tainted bootstrap marker.")
+    terraform("apply", "tfplan")
+    terraform("plan", "-detailed-exitcode")
+    terraform("apply", "-auto-approve")
+    if calls.read_text().splitlines() != ["invoke", "invoke"]:
+        raise SystemExit("Expected one failed invoke, one recovery invoke and no replay on re-apply.")
+    print("Failed bootstrap taints its local marker; the next plan replaces it, then a successful re-apply does not replay.")
 
 
 def run_declarative_handoff_test(environment):
@@ -208,22 +289,12 @@ def run():
         if not calls.exists() or calls.read_text().splitlines() != ["invoke"]:
             raise SystemExit("Expected exactly one synchronous bootstrap across creation, image update, tick target replacement and teardown.")
         print("Exactly one bootstrap invocation; no replay on image update, tick target replacement or removal.")
-        for case, diagnostic in (
-            ("function", "Lambda failed"),
-            ("transport", "AWS CLI exit 1"),
-            ("non-null", "Unexpected PDC bootstrap response"),
-        ):
-            result = subprocess.run(
-                [sys.executable, str(helper)], capture_output=True, text=True, check=False,
-                env=environment | {
-                    "PDC_FUNCTION_ARN": environment["EXPECTED_FUNCTION_ARN"],
-                    "PDC_SECRET_ARN": environment["EXPECTED_SECRET_ARN"],
-                    "PDC_TEST_RESPONSE": case,
-                },
-            )
-            if result.returncode == 0 or diagnostic not in result.stderr or "DO-NOT-EMIT" in result.stdout + result.stderr:
-                raise SystemExit(f"Expected a redacted, nonzero exit for the {case} bootstrap response.")
-        print("Bootstrap rejects function, transport and non-null responses without emitting the payload.")
+        bootstrap_environment = environment | {
+            "PDC_FUNCTION_ARN": environment["EXPECTED_FUNCTION_ARN"],
+            "PDC_SECRET_ARN": environment["EXPECTED_SECRET_ARN"],
+        }
+        check_bootstrap_retries(helper, bootstrap_environment)
+        check_bootstrap_recovery(directory, bootstrap_environment)
 
         # Lifecycle destruction errors cannot be captured by Terraform's expect_failures.
         write_test_fixture(
