@@ -145,7 +145,7 @@ resource "aws_cloudfront_distribution" "transfer_family" {
   http_version    = "http2" # Automatically supports http/2, http/1.1, and http/1.0
   aliases         = ["${local.application_data.accounts[local.environment].cash_office_upload_hostname}.${trim(data.aws_route53_zone.external.name, ".")}"]
   origin {
-    domain_name = local.environment == "test" ? aws_transfer_web_app.this.web_app_id : local.application_data.accounts[local.environment].cash_web_app_url
+    domain_name = local.environment == "test" ? aws_transfer_web_app.this[count.index].web_app_id : local.application_data.accounts[local.environment].cash_web_app_url
     origin_id   = "transfer-family"
 
     custom_origin_config {
