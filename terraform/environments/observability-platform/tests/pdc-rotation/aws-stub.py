@@ -24,7 +24,7 @@ with log.open("a", encoding="utf-8") as calls:
 
 sequence = os.environ.get("PDC_TEST_RESPONSE", "success").split(",")
 case = sequence[min(attempt, len(sequence) - 1)]
-private = f"DO-NOT-EMIT {os.environ['EXPECTED_SECRET_ARN']}"
+private = "DO-NOT-EMIT arn:example:test:region:000000000004:fixture"
 throttle = f"An error occurred (TooManyRequestsException) when calling the Invoke operation (reached max retries: 0): {private}"
 if case in ("throttle", "legacy-throttle"):
     print(f"\naws: [ERROR]: {throttle}\n\nAdditional error details:\nmessage: {private}" if case == "throttle" else throttle, file=sys.stderr)
