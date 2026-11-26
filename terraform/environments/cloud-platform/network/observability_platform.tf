@@ -1,25 +1,37 @@
 locals {
-  # Gate the whole tenant module: inactive workspaces must not create IAM roles either.
-  # Keep this list aligned with CP3 accounts with pdc_enabled in the development OP config.
-  # Retain activated accounts and add later accounts one at a time (see ../README.md).
-  pdc_tenant_workspaces = [
-    "cloud-platform-development",
-    "cloud-platform-preproduction",
-    "cloud-platform-nonlive",
-    "cloud-platform-live",
-  ]
+  # Grafana Cloud stack for every CP3 network workspace. The Observability Platform account is derived from the stack,
+  # so an account's token secret, restarter trust and stack always come from the same environment.
+  # Production-stack accounts stay disabled until Observability Platform production supports PDC; then enable one
+  # account per pull request, and never disable an enabled account (see ../README.md).
+  pdc_tenant_workspaces = {
+    cloud-platform-development       = { stack = "development", enabled = true }
+    cloud-platform-preproduction     = { stack = "production", enabled = false }
+    cloud-platform-nonlive           = { stack = "production", enabled = false }
+    cloud-platform-live              = { stack = "production", enabled = false }
+    container-platform-octo-nonlive  = { stack = "production", enabled = false }
+    container-platform-octo-live     = { stack = "production", enabled = false }
+    container-platform-laa-nonlive   = { stack = "production", enabled = false }
+    container-platform-laa-live      = { stack = "production", enabled = false }
+    container-platform-hmpps-nonlive = { stack = "production", enabled = false }
+    container-platform-hmpps-live    = { stack = "production", enabled = false }
+    container-platform-cd-nonlive    = { stack = "production", enabled = false }
+    container-platform-cd-live       = { stack = "production", enabled = false }
+  }
+
+  pdc_tenant = local.pdc_tenant_workspaces[terraform.workspace]
 }
 
-# Each activated account needs its central token secret bootstrapped before deployment.
+# Gate the whole tenant module: disabled workspaces must not create IAM roles either.
+# Each enabled account needs its central token secret bootstrapped before deployment.
 module "observability_platform_tenant" {
-  count = contains(local.pdc_tenant_workspaces, terraform.workspace) ? 1 : 0
+  count = local.pdc_tenant.enabled ? 1 : 0
 
   source = "github.com/ministryofjustice/terraform-aws-observability-platform-tenant?ref=03f883d6c4994539447243e3186f41e3922ab482" # v3.1.0
 
-  observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
+  observability_platform_account_id = local.environment_management.account_ids["observability-platform-${local.pdc_tenant.stack}"]
 
   grafana_cloud = {
-    stack = "development"
+    stack = local.pdc_tenant.stack
     pdc_agent = {
       enabled = true
       # CP3 owns its subnets; the module's default *-general-private-* lookup does not apply.
@@ -33,7 +45,7 @@ module "observability_platform_tenant" {
   tags = local.tags
 }
 
-# Preserve any existing active-workspace tenant resources when introducing the module gate.
+# Preserve any existing enabled-workspace tenant resources when introducing the module gate.
 moved {
   from = module.observability_platform_tenant
   to   = module.observability_platform_tenant[0]
