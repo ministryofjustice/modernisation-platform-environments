@@ -17,6 +17,20 @@ data "aws_iam_policy_document" "github_actions_asg_oidc_policy" {
     resources = ["arn:aws:autoscaling:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:autoScalingGroup:*:autoScalingGroupName/${local.application_name}-ec2-*"]
   }
 
+  statement {
+    sid    = "ManageMaatEcsService"
+    effect = "Allow"
+    actions = [
+      "ecs:DescribeClusters",
+      "ecs:DescribeServices",
+      "ecs:UpdateService"
+    ]
+    resources = [
+      "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${local.application_name}-ecs-cluster",
+      "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:service/${local.application_name}-ecs-cluster/${local.application_name}-ecs-service"
+    ]
+  }
+
   # Describe actions do not support resource-level permissions
   statement {
     sid       = "DescribeAsg"
