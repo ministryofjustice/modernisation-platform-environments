@@ -87,8 +87,9 @@ APIs and image retrieval, so `allowed_targets` is additive, not a restrictive
 data-source allowlist. Existing Transit Gateway egress provides the Docker Hub
 image-pull path.
 
-Deploy in this order; the OP and CP3 workflows do not enforce cross-account
-ordering:
+The OP and CP3 workflows run independently. Development PRs can queue an apply
+behind a GitHub environment approval, so the order below applies to **apply
+approvals as well as merges**:
 
 1. Apply the development [OP tenant configuration](../observability-platform/grafana-cloud-tenant-environment-configurations.tf)
    with `pdc_enabled = true` for all twelve accounts. Confirm each
@@ -103,9 +104,10 @@ ordering:
    `pdc-grafana-datasources.eu-west-2.vpce.grafana.net` must resolve to the hub
    endpoints and accept TCP 443 and 22 respectively. CP3 already associates
    the hub's Route 53 Profile and routes `10.20.240.0/20` through the Transit Gateway.
-3. Deploy the CP3 `network` components, then confirm three running tasks per
-   account and connected agents in each Grafana PDC network. Check the agent
-   logs and image retrieval if tasks do not start.
+3. Only then approve a `cloud-platform-development-network` apply or merge the
+   CP3 network change. Confirm three running tasks per account and connected
+   agents in each Grafana PDC network. Check the agent logs and image retrieval
+   if tasks do not start.
 
 ### **Restrictions on access:**
 
