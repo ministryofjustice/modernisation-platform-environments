@@ -280,7 +280,7 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
   }
 
   dynamic "queue" {
-    for_each = local.is-production ? {} : {
+    for_each = {
       person_record = "person_record/"
       cemo          = "cemo/"
     }
