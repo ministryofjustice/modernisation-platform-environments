@@ -56,6 +56,18 @@ locals {
     new-development                    = format("%012d", 8)
     example-development                = format("%012d", 9)
     cloud-platform-development         = format("%012d", 10)
+    # The Cloud Platform and Container Platform accounts configured for production.
+    cloud-platform-preproduction     = format("%012d", 20)
+    cloud-platform-nonlive           = format("%012d", 21)
+    cloud-platform-live              = format("%012d", 22)
+    container-platform-octo-nonlive  = format("%012d", 23)
+    container-platform-octo-live     = format("%012d", 24)
+    container-platform-laa-nonlive   = format("%012d", 25)
+    container-platform-laa-live      = format("%012d", 26)
+    container-platform-hmpps-nonlive = format("%012d", 27)
+    container-platform-hmpps-live    = format("%012d", 28)
+    container-platform-cd-nonlive    = format("%012d", 29)
+    container-platform-cd-live       = format("%012d", 30)
   }
   environment_management = {
     account_ids = {

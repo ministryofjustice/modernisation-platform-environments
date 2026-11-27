@@ -10,12 +10,17 @@ Cooker development's legacy token and secret version were forgotten without
 revocation, and it now has its own native rotation schedule. Do **not**
 bootstrap either account.
 
-Production still has `tenant_configuration = {}`, no image and no alert
-destination. A later reviewed stable image and production alert configuration
-can deploy the common Lambda, journal, credential metadata and monitoring with
-zero tenants. There are no empty or wildcard tenant IAM grants, tenant secrets,
-schedules or invocations in that state. Confirm ECR pull access, production
-credential custody/renewal and end-to-end alert delivery before onboarding.
+Production is configured with the alpha.6 image (the development digest),
+`bootstrap_enabled = true`, `pdc_failure_alerts` for Slack channel `C06RA6C52TW`
+and the `cloud-platform` tenant, whose eleven Cloud Platform and Container
+Platform accounts all set `pdc_enabled = true`. They use the production Grafana
+Cloud stack, not development. The common runtime (Lambda, journal, credential
+metadata and monitoring) must be applied **before** these accounts: first
+issuance runs in the same apply that creates each account's secret, and needs
+the rotator credentials that are uploaded by hand after the runtime exists. Apply
+the runtime alone (with `tenant_configuration = {}`, which creates no tenant IAM
+grants, secrets, schedules or invocations), then add the accounts, following
+[Production rollout](#production-rollout-for-cloud-platform-and-container-platform).
 An earlier protected production apply with plugin/AMG `EDITOR` drift is not a
 production PDC deployment or approval.
 
@@ -271,7 +276,8 @@ Chatbot) Slack channel configuration subscribed to it. CloudWatch alarm and
 EventBridge publish permissions are restricted to their respective alert/rule
 ARNs and this AWS account. This is notification-only: the channel configuration
 uses the required CloudWatch read-only guardrail and has no managed policies
-attached to its channel role. Production keeps `pdc_failure_alerts = null`.
+attached to its channel role. Production uses Slack channel `C06RA6C52TW` and
+the topic `grafana-pdc-rotation-failures-production`.
 
 Before applying the development Terraform configuration, complete this
 one-time manual prerequisite: authorise the MoJ Slack workspace in **Amazon Q
@@ -382,6 +388,113 @@ expiry and arrange renewal before it expires; issue its replacement through the
 Cloud portal and update the same secret. Renew the query token manually too if
 it has an expiry. Neither credential is rotated by the PDC rotator.
 Uploading credentials does not invoke the Lambda or enable rotation.
+
+## Production rollout for Cloud Platform and Container Platform
+
+These eleven accounts use the **production** Grafana Cloud stack (`1907875`,
+`mojobservabilityproduction`) rather than development:
+`cloud-platform-{preproduction,nonlive,live}` and
+`container-platform-{octo,laa,hmpps,cd}-{nonlive,live}`. Their tenant modules
+(v3.2.0, `enable_amazon_managed_grafana = false`, `grafana_cloud.stack =
+"production"`, `pdc_agent.enabled = true`) expect everything in this section
+to exist in Observability Platform production first.
+
+Roll it out in **two reviewed applies**. First issuance runs in the same apply
+that creates an account's secret, and it needs the rotator's management token.
+Terraform only creates the two credential secrets empty, so a single apply
+would fail at bootstrap. The first change is the common runtime (the
+`production` rotator and alerts, with `tenant_configuration = {}`); the second
+adds the `cloud-platform` tenant listing all eleven accounts with
+`pdc_enabled = true`. Do not merge or apply the second until step 5 passes.
+
+`contrib/check-pdc-readiness.sh` runs the read-only checks below with the
+shell's AWS credentials for Observability Platform production. It reads only
+resource metadata (names, states, counts, non-secret tags), never secret values
+or the journal, and exits non-zero if any check fails.
+
+1. **Authorise Slack (manual, status unknown).** In the Observability Platform
+   production AWS account, authorise the MoJ Slack workspace (`T02DYEB3A`) in
+   **Amazon Q Developer in chat applications**, then run `/invite @Amazon Q`
+   in channel `C06RA6C52TW`. The channel configuration cannot be created until
+   both are done. Check with `bash contrib/check-pdc-readiness.sh slack`: the
+   workspace line must `PASS` (the channel line warns until the first apply).
+2. **Confirm the external prerequisites (read-only).**
+   - Stack: `terraform output grafana_cloud_stack` in production (or the
+     Grafana Cloud portal) shows ID `1907875`, which the tenant module hard-codes.
+   - Image: the `observability-platform-grafana-pdc-token-rotator` repository
+     in core-shared-services-production allows this account to pull, and holds the pinned
+     digest. With read access there:
+     `aws ecr get-repository-policy --region eu-west-2 --registry-id <core-shared-services-production account ID> --repository-name observability-platform-grafana-pdc-token-rotator --query policyText --output text`
+     must list the Observability Platform production account and
+     `function:grafana-pdc-token-rotator*`.
+   - PrivateLink hub (core-network-services, `10.20.240.0/20`): with its
+     credentials,
+     `aws ec2 describe-vpc-endpoints --region eu-west-2 --filters Name=service-name,Values=com.amazonaws.vpce.eu-west-2.vpce-svc-0b12fa07b304f0d79,com.amazonaws.vpce.eu-west-2.vpce-svc-04a3bf37de7c4c8be --query 'VpcEndpoints[].[ServiceName,State]' --output text`
+     must show both the API and gateway endpoints `available`.
+3. **Apply the common runtime.** Review and apply the first change. It creates
+   the Lambda (`grafana-pdc-token-rotator`, reserved concurrency 1), the
+   `grafana-pdc-token-rotator-state` journal, the two empty credential secrets
+   with their keys, the `pdc-token-rotator-production` access policy, the
+   `pdc-token-rotator-query-production` service account, the encrypted topic
+   `grafana-pdc-rotation-failures-production`, the Amazon Q channel
+   configuration, and the Errors alarm and `RotationFailed` rule. It creates
+   no tenant resources. Verify with
+   `EXPECTED_IMAGE_DIGEST=sha256:e5f367b6af986020ff291b095f7ef0a44f56c7c7acd241fbaaae9484c81884c2 bash contrib/check-pdc-readiness.sh runtime`,
+   then send a test message from the Amazon Q Developer console and publish a
+   test message to the SNS topic; both must arrive in `C06RA6C52TW`.
+4. **Upload both rotator credentials (manual, not created yet).** Follow
+   [Manual credentials after apply](#manual-credentials-after-apply) with the
+   production names: add an **expiring** token to the
+   `pdc-token-rotator-production` access policy (region `prod-gb-south-1`), create a token
+   for the production stack's `pdc-token-rotator-query-production` service
+   account, and upload each from a protected file with `put-secret-value` to
+   `grafana-cloud/pdc-token-rotator/management-token` and
+   `grafana-cloud/pdc-token-rotator/stack-query-token` using production
+   credentials. Record both expiries and owners for manual renewal. Confirm the
+   query token can query `grafanacloud-usage`.
+5. **Check the credentials.** `bash contrib/check-pdc-readiness.sh credentials`
+   must pass for both secrets.
+6. **Apply the accounts.** Review and apply the second change. Per account it
+   creates the PDC network `mojobservabilityproduction-<account name>`, a
+   rotation-enabled key and `alias/grafana-cloud-pdc-<account name>`, the
+   protected secret `grafana-cloud/pdc/<account ID>` (tagged `pdc:bootstrap=true`),
+   secret and key policies that trust only
+   `arn:aws:iam::<account ID>:role/grafana-pdc-agent-execution`, the one-off
+   bootstrap marker, the hourly enrolment rule, target, two Lambda permissions
+   and delivery alarm, and a CloudWatch data source that assumes the account's
+   `grafana-cloud` role. The rotator policy gains each account's
+   `grafana-pdc-agent-restarter` role and secret. Production has no seeded
+   accounts, so every account bootstraps; there is no Terraform token or secret
+   version. Expect no other production changes; known plugin and AMG
+   `EDITOR` drift is outside this change, so stop on anything else.
+   The Lambda has one concurrency slot and the apply starts the bootstraps in
+   parallel, so some wait inside the helper's retry budget. If one fails, its
+   marker is tainted and the next plan replaces only that marker.
+7. **Check first issuance.**
+   `bash contrib/check-pdc-readiness.sh accounts` must show every account
+   with the production stack ID and a single `AWSCURRENT` version (a completed
+   bootstrap journal), all enrolment rules enabled with one target, and no
+   delivery alarm in `ALARM`.
+8. **Enable the agents in Cloud Platform.** Only then does each account
+   enable `pdc_agent.enabled` in its tenant module, one account at a time,
+   waiting for its enrolment to reach `enrolled` before the next (the rotator
+   has one concurrency slot).
+
+Things to expect:
+
+- Enrolment stays `pending` until an account's agents connect. The Errors alarm
+  fires once an account has been pending for 86,400 seconds, or is within 14
+  days of its 97-day seed token expiring. Accounts enabled late in a staged
+  agent rollout will therefore alert in `C06RA6C52TW` first. To avoid that,
+  list only the accounts being enabled in the second change and add the rest
+  with their agent changes. Every account must be enrolled within about 83 days of
+  its bootstrap.
+- The CloudWatch data sources for an account show unhealthy until its tenant
+  module creates the `grafana-cloud` role.
+- The management and query tokens expire and are renewed manually. The PDC
+  rotator does not rotate them.
+- Amazon Managed Prometheus data sources for the octo and hmpps accounts are
+  not configured here.
 
 ## Dependencies before activation
 
@@ -521,9 +634,11 @@ Historical Terraform state versions, backups and plans may still contain the
 original token value and must follow the existing sensitive-state retention
 controls.
 
-Do not enable production rotation as part of this pilot. Production activation
-requires a separate review and successful development evidence for scheduled
-rotation, retries, interrupted invocation recovery, rollback, and cleanup.
+Production activation is the separate, reviewed two-apply rollout in
+[Production rollout](#production-rollout-for-cloud-platform-and-container-platform),
+only for the accounts listed there. Review the development evidence for scheduled
+rotation, retries, interrupted invocation recovery, rollback, and cleanup
+before approving it.
 
 ## Focused validation
 
@@ -538,7 +653,7 @@ temporary root, initialises without a backend, validates, then runs Terraform
 tests with mocked providers. Registry/module downloads require network access;
 no AWS or Grafana credentials, live backend or real API calls are used. It checks
 per-account metadata, 90-day schedules for existing accounts, 97-day token
-lifetime, new-account bootstrap eligibility, empty-production IAM, separate credential
+lifetime, new-account bootstrap eligibility, production runtime IAM without tenants, separate credential
 keys/secrets, least-privilege Grafana identities, digest validation, scoped
 runtime permissions, hourly enrolment payload and separate delivery and runtime
 alarms. A stub CLI checks the synchronous
