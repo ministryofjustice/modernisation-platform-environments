@@ -20,6 +20,7 @@ resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
       aws_region                                = local.application_data.accounts[local.environment].aws_region
       adaptor_spring_profile                    = local.application_data.accounts[local.environment].adaptor_spring_profile
       container_version                         = local.application_data.accounts[local.environment].adaptor_container_version
+      adaptor_container_memory                  = local.application_data.accounts[local.environment].adaptor_container_memory
       client_opa12assess_means_address          = local.application_data.accounts[local.environment].client_opa12assess_means_address
       client_opa12assess_billing_address        = local.application_data.accounts[local.environment].client_opa12assess_billing_address
       logging_config                            = local.application_data.accounts[local.environment].logging_config
