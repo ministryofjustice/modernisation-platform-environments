@@ -21,8 +21,110 @@ the rotator credentials that are uploaded by hand after the runtime exists. Appl
 the runtime alone (with `tenant_configuration = {}`, which creates no tenant IAM
 grants, secrets, schedules or invocations), then add the accounts, following
 [Production rollout](#production-rollout-for-cloud-platform-and-container-platform).
-An earlier protected production apply with plugin/AMG `EDITOR` drift is not a
-production PDC deployment or approval.
+The common runtime has now been applied. The eleven-account onboarding apply
+stopped at the managed IAM policy's 6,144-character limit; use the recovery
+procedure below, not the initial empty-runtime rollout again.
+
+## Policy budgets and partial-apply recovery
+
+The rotator retains one managed IAM policy, not one policy per account:
+
+- Tenant secret operations match only the current central account/region's
+  `grafana-cloud/pdc/????????????-??????` ARN pattern. The twelve question marks
+  cover the tenant account ID, and the final six cover Secrets Manager's suffix.
+  The secret must also carry `pdc:rotator-stack-id` matching the Grafana stack.
+  Terraform adds this authorisation tag only to managed opt-ins when the rotator
+  is configured. Retired, unmanaged development secrets do not acquire it.
+  The runtime cannot change tags. Enrolment additionally requires
+  `pdc:bootstrap=true` and the exact unqualified rotation Lambda ARN.
+- Tenant KMS permissions live in each existing tenant key policy: only
+  `Decrypt`/`GenerateDataKey`, only the exact central rotator role ARN, through
+  regional Secrets Manager, with that tenant secret's exact name and generated
+  suffix as encryption context. `Resource = "*"` in a key policy means that
+  key only. The wildcard principal is constrained by `aws:PrincipalArn`; this
+  grants directly to that role's sessions, without depending on an identity
+  policy allow or requiring the role to exist when the policy is saved.
+  Explicit denies still apply. No alias-based authorisation is used, avoiding
+  [KMS alias/tag ABAC propagation delays](https://docs.aws.amazon.com/kms/latest/developerguide/abac.html).
+  Existing tenant-agent grants and key administration are unchanged.
+- `AssumeRole` matches only the fixed root-path
+  `grafana-pdc-agent-restarter` role, with
+  [`aws:ResourceAccount`](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourceaccount)
+  containing the exact seeded/enrolment account IDs. Only this compact ID list
+  grows; there is no arbitrary-account or organisation-wide grant. Tenant role
+  trust remains necessary.
+- Management and stack-query credentials retain their separate exact secret/key
+  ARNs, read/decrypt-only permissions and exact encryption contexts. Their
+  `grafana-cloud/pdc-token-rotator/` namespace cannot match the tenant pattern.
+- Enrolment has two shared Lambda permissions rather than two per account:
+  EventBridge from `rule/pdc-enrol-*`, and Secrets Manager from the tenant
+  secret pattern, both restricted to this source account and region. Seeded
+  accounts keep their existing exact permissions. The alert SNS/key policies
+  accept only this account/region's `pdc-enrol-*-delivery-failed` alarms and the
+  exact function Errors alarm; EventBridge's rotation-failure rule stays exact.
+  Empty configurations omit tenant statements and shared enrolment permissions.
+
+`python3 tests/run_pdc_rotation_tests.py` renders the actual Terraform documents
+in a disposable root, using synthetic AWS IDs and production's stack ID.
+IAM sizes exclude insignificant JSON whitespace; key/topic sizes below count
+the emitted bytes. The Lambda figure is an upper bound reconstructed from the
+actual permission arguments with maximum-length statement IDs.
+
+| Accounts | Rotator managed policy (limit 6,144) | Alert key (32,768 bytes) | SNS policy (30,720 bytes) | Lambda policy upper bound (20,480 bytes) |
+| --- | ---: | ---: | ---: | ---: |
+| 0 | 1,473 | 1,282 | 1,065 | 39 (no statements) |
+| Current 11 | 2,908 | 1,360 | 1,143 | 1,308 |
+| Synthetic 200 | 5,743 | 1,360 | 1,143 | 1,308 |
+| Synthetic 211 (200 plus the existing eleven) | 5,908 | 1,360 | 1,143 | 1,308 |
+
+The real module logging inline policy is 324 IAM-counted characters against
+the role's 10,240-character aggregate limit; the execution role has one managed
+policy attachment against the default ten. Each tenant key policy is 1,432
+emitted bytes, independently of the account count. No policy sharding, extra
+attachments or inline aggregate workaround is used. The harness also checks
+every tenant key/secret policy's size and exercises allowed actions and denied
+account, region, namespace, stack, role, encryption-context and bootstrap cases.
+These are offline authorisation regression checks, not a live AWS policy
+simulation or a functional query-token acceptance test. Re-render before
+increasing beyond the tested 211 accounts; the exact-account list is deliberately
+bounded by the managed policy quota.
+
+### Recover the failed eleven-account production apply
+
+[Run 46017964671, job 140570747684](https://github.com/ministryofjustice/modernisation-platform-environments/actions/runs/46017964671/job/140570747684)
+reported successful creation of all eleven networks, keys, aliases, protected
+secrets and secret policies, and tenant data-source resources, before
+`CreatePolicyVersion` failed. It reported no completed first-issuance marker.
+This is evidence from the apply log, not a substitute for refreshing remote
+state or checking version/journal metadata.
+
+1. Reconcile older queued runs and any in-flight rotation first. Review a
+   **fresh, full plan with refresh against current state** after this fix; do
+   not retry the old saved plan, target resources, remove state, remove
+   `prevent_destroy`, clear journals or recreate the issued/protected secrets.
+2. Expect in-place rotator IAM, tenant key-policy and secret-tag updates, plus
+   the bounded alert policies. Already-created tenant networks, keys, aliases,
+   secrets and secret policies must be retained, not replaced. Pending work
+   includes eleven first-issuance markers, hourly rules/targets/delivery alarms,
+   the bootstrap invoke permission and the two shared enrolment permissions.
+   In development the shared permissions intentionally replace the old
+   per-account permissions; no secret or bootstrap marker should be replaced.
+   Distinguish unrelated recurring GitHub/X-Ray plugin replacement, Security Hub
+   archive `null_resource` replacement and AMG `EDITOR` association drift.
+3. **Human approval of the resumed production apply can immediately issue the
+   first eleven tokens** as dependencies unblock. Do not approve it merely as
+   an IAM-only change. The already-populated protected management/query
+   credentials must be preserved; do not upload, rotate or retrieve them for
+   this recovery. Credential-version presence and alert-delivery checks were
+   reported successful; a functional query-token test was not reported.
+4. Let the apply and any invocation settle. Confirm each journal, initial
+   `AWSCURRENT` version metadata, enrolment rule/target/permissions and delivery
+   alarm before approving tenant agents. If bootstrap fails or issuance is
+   ambiguous, follow the [first-issuance reconciliation procedure](#first-issuance-for-a-new-opt-in)
+   rather than manually replaying issuance. A fresh plan is required after any failure.
+
+The fix PR stops at human review/apply: it does not merge, approve, apply,
+bootstrap, manipulate tokens or resume the held CP3 agents change.
 
 ## First issuance for a new opt-in
 
@@ -124,10 +226,11 @@ Check the journal and AWS/Grafana metadata on alerts; never re-bootstrap an
 expired seed or retry an ambiguous rotation request manually.
 
 Terraform still owns Sprinkler's and Cooker's rotation schedules. For
-bootstrap accounts only, the runtime can call `RotateSecret` on their exact
-ARNs with its own unqualified function and assume the tenant restarter roles.
-Lambda permissions restrict EventBridge to the corresponding rule and Secrets
-Manager to the corresponding secret and source account.
+bootstrap accounts only, the runtime can call `RotateSecret` on authorised
+tenant secrets with its own unqualified function and assume only the opted-in
+tenant restarter roles. Shared enrolment Lambda permissions restrict EventBridge
+and Secrets Manager to their respective rule/secret namespaces and source
+account/region; the handler continues to validate each secret's metadata.
 
 ## Retire the three CP3 accounts from development
 
@@ -319,7 +422,7 @@ the permission item uses only its numeric service-account portion.
 Terraform creates no tokens for either identity.
 
 This deploys the Lambda using the existing module/version, exact execution role
-name, scoped IAM permissions, per-secret Secrets Manager invocation permissions,
+name, scoped IAM permissions, bounded Secrets Manager invocation permissions,
 Lambda error alarm and a Secrets Manager `RotationFailed` EventBridge target.
 The alarm and EventBridge target use the SNS topic created from
 `pdc_failure_alerts`; no SNS ARN needs to be supplied.

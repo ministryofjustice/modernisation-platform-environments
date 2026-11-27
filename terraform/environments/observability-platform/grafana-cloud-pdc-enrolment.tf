@@ -15,21 +15,24 @@ resource "aws_cloudwatch_event_rule" "gc_pdc_enrolment" {
 }
 
 resource "aws_lambda_permission" "gc_pdc_enrolment_tick" {
-  for_each = aws_cloudwatch_event_rule.gc_pdc_enrolment
+  for_each = length(local.gc_pdc_enrolment_accounts) > 0 ? local.gc_pdc_rotator_deployments : {}
 
-  action        = "lambda:InvokeFunction"
-  function_name = module.grafana_pdc_token_rotator["this"].lambda_function_arn
-  principal     = "events.amazonaws.com"
-  source_arn    = each.value.arn
+  action         = "lambda:InvokeFunction"
+  function_name  = module.grafana_pdc_token_rotator["this"].lambda_function_arn
+  principal      = "events.amazonaws.com"
+  source_arn     = "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/pdc-enrol-*"
+  source_account = data.aws_caller_identity.current.account_id
+
+  depends_on = [aws_cloudwatch_event_rule.gc_pdc_enrolment]
 }
 
 resource "aws_lambda_permission" "gc_pdc_enrolment_rotation" {
-  for_each = local.gc_pdc_enrolment_accounts
+  for_each = length(local.gc_pdc_enrolment_accounts) > 0 ? local.gc_pdc_rotator_deployments : {}
 
   action         = "lambda:InvokeFunction"
   function_name  = module.grafana_pdc_token_rotator["this"].lambda_function_arn
   principal      = "secretsmanager.amazonaws.com"
-  source_arn     = aws_secretsmanager_secret.gc_pdc_token[each.key].arn
+  source_arn     = local.gc_pdc_secret_arn_pattern
   source_account = data.aws_caller_identity.current.account_id
 
   depends_on = [terraform_data.gc_pdc_bootstrap]

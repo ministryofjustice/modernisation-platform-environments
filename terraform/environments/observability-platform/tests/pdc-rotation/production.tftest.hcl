@@ -65,10 +65,11 @@ run "production_cloud_and_container_platform_accounts" {
         keys(aws_kms_key.gc_pdc_token), keys(aws_secretsmanager_secret.gc_pdc_token),
         keys(aws_secretsmanager_secret_policy.gc_pdc_token), keys(terraform_data.gc_pdc_bootstrap),
         keys(aws_cloudwatch_event_rule.gc_pdc_enrolment), keys(aws_cloudwatch_event_target.gc_pdc_enrolment),
-        keys(aws_lambda_permission.gc_pdc_enrolment_tick), keys(aws_lambda_permission.gc_pdc_enrolment_rotation),
         keys(aws_cloudwatch_metric_alarm.gc_pdc_enrolment_delivery),
       ] : toset(names) == toset(keys(local.gc_pdc_accounts))]) &&
-      length(aws_lambda_permission.gc_pdc_bootstrap) == 1
+      length(aws_lambda_permission.gc_pdc_bootstrap) == 1 &&
+      length(aws_lambda_permission.gc_pdc_enrolment_tick) == 1 &&
+      length(aws_lambda_permission.gc_pdc_enrolment_rotation) == 1
     )
     error_message = "Every production Cloud Platform and Container Platform account must get a PDC network, protected secret, first-issuance marker and readiness tick."
   }

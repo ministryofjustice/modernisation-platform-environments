@@ -46,7 +46,7 @@ locals {
   application_name = "observability-platform"
   tags             = { application = "observability-platform" }
   gc_accounts      = var.use_environment_configuration ? module.checked_in_configuration.pdc_accounts : var.accounts
-  all_account_ids = {
+  all_account_ids = merge({
     sprinkler-development              = format("%012d", 1)
     cooker-development                 = format("%012d", 2)
     disabled-development               = format("%012d", 3)
@@ -68,7 +68,7 @@ locals {
     container-platform-hmpps-live    = format("%012d", 28)
     container-platform-cd-nonlive    = format("%012d", 29)
     container-platform-cd-live       = format("%012d", 30)
-  }
+  }, { for i in range(211) : "scale-${i}" => format("%012d", 1000 + i) })
   environment_management = {
     account_ids = {
       core-shared-services-production = format("%012d", 5)

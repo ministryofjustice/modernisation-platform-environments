@@ -85,6 +85,40 @@ data "aws_iam_policy_document" "gc_pdc_token_kms" {
       values   = ["secretsmanager.${data.aws_region.current.name}.amazonaws.com"]
     }
   }
+
+  # Authorise each key locally: no growing central key list or eventually consistent alias ABAC.
+  dynamic "statement" {
+    for_each = local.gc_pdc_rotator_deployments
+    content {
+      sid       = "AllowRotatorForThisSecret"
+      effect    = "Allow"
+      actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+      resources = ["*"]
+
+      principals {
+        type        = "AWS"
+        identifiers = ["*"]
+      }
+
+      condition {
+        test     = "ArnEquals"
+        variable = "aws:PrincipalArn"
+        values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.gc_pdc_rotator_role_name}"]
+      }
+
+      condition {
+        test     = "StringEquals"
+        variable = "kms:ViaService"
+        values   = ["secretsmanager.${data.aws_region.current.name}.amazonaws.com"]
+      }
+
+      condition {
+        test     = "ArnLike"
+        variable = "kms:EncryptionContext:SecretARN"
+        values   = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:grafana-cloud/pdc/${each.value}-??????"]
+      }
+    }
+  }
 }
 
 resource "aws_kms_key" "gc_pdc_token" {
