@@ -219,7 +219,7 @@
       "soa_db_log_retention_days": "30",
       "soa_db_deploy_to_multi_azs": "false",
       "soa_db_instance_type": "db.t3.large",
-      "soa_db_storage_gb": "200",
+      "soa_db_storage_gb": "300",
       "soa_db_iops": "12000",
       "soa_db_deletion_protection": "true",
       "soa_db_minor_version_upgrade_allowed": "true",
