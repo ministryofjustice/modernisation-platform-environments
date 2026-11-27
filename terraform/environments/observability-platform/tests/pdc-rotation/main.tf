@@ -55,12 +55,7 @@ locals {
     production-observability-b         = format("%012d", 7)
     new-development                    = format("%012d", 8)
     example-development                = format("%012d", 9)
-
-    # The handoff starts from the previously applied four-account development configuration.
-    cloud-platform-development   = format("%012d", 10)
-    cloud-platform-preproduction = format("%012d", 11)
-    cloud-platform-nonlive       = format("%012d", 12)
-    cloud-platform-live          = format("%012d", 13)
+    cloud-platform-development         = format("%012d", 10)
   }
   environment_management = {
     account_ids = {
