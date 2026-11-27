@@ -19,6 +19,9 @@ mock_provider "aws" {
   mock_resource "aws_secretsmanager_secret" {
     defaults = { arn = "arn:aws:secretsmanager:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:secret:grafana-cloud/pdc/mock-ABCDEF" }
   }
+  mock_resource "aws_cloudwatch_event_rule" {
+    defaults = { arn = "arn:aws:events:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:rule/mock" }
+  }
   mock_resource "aws_kms_key" {
     defaults = { arn = "arn:aws:kms:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:key/12345678-1234-1234-1234-abcdefabcdef" }
   }
@@ -331,7 +334,7 @@ run "new_account_without_capable_image_fails_closed" {
   expect_failures = [terraform_data.gc_pdc_bootstrap["new-development"]]
 }
 
-run "example_development_uses_readiness_enrolment" {
+run "development_first_issuance_accounts_use_readiness_enrolment" {
   command = plan
 
   variables {
@@ -344,17 +347,37 @@ run "example_development_uses_readiness_enrolment" {
         keys(terraform_data.gc_pdc_bootstrap), keys(aws_cloudwatch_event_rule.gc_pdc_enrolment),
         keys(aws_cloudwatch_event_target.gc_pdc_enrolment), keys(aws_lambda_permission.gc_pdc_enrolment_tick),
         keys(aws_lambda_permission.gc_pdc_enrolment_rotation), keys(aws_cloudwatch_metric_alarm.gc_pdc_enrolment_delivery),
-      ] : toset(names) == toset(["example-development"])]) &&
-      aws_secretsmanager_secret.gc_pdc_token["example-development"].tags["pdc:bootstrap"] == "true" &&
-      aws_secretsmanager_secret.gc_pdc_token["example-development"].tags["pdc:rotation-interval-days"] == "90" &&
-      aws_secretsmanager_secret.gc_pdc_token["example-development"].tags["pdc:token-ttl-seconds"] == tostring(97 * 86400) &&
+        ] : toset(names) == toset([
+          "example-development",
+          "cloud-platform-development",
+      ])]) &&
+      alltrue([for name in keys(terraform_data.gc_pdc_bootstrap) : (
+        aws_secretsmanager_secret.gc_pdc_token[name].tags["pdc:bootstrap"] == "true" &&
+        aws_secretsmanager_secret.gc_pdc_token[name].tags["pdc:rotation-interval-days"] == "90" &&
+        aws_secretsmanager_secret.gc_pdc_token[name].tags["pdc:token-ttl-seconds"] == tostring(97 * 86400) &&
+        local.gc_pdc_restarter_role_arns[name] == "arn:aws:iam::${local.all_account_ids[name]}:role/grafana-pdc-agent-restarter"
+      )]) &&
+      length(local.gc_pdc_restarter_role_arns) == 4 &&
       length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
       length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
       length(aws_lambda_permission.gc_pdc_bootstrap) == 1 &&
-      toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"]) &&
-      local.gc_pdc_restarter_role_arns["example-development"] == "arn:aws:iam::${format("%012d", 9)}:role/grafana-pdc-agent-restarter"
+      toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"])
     )
-    error_message = "Only Example gets first issuance and a readiness tick; the seeded development accounts keep their native Terraform schedules."
+    error_message = "Only Example and cloud-platform-development get first issuance and readiness ticks; Sprinkler and Cooker must keep their native Terraform schedules."
+  }
+
+  assert {
+    condition = alltrue([for names in [
+      keys(grafana_cloud_private_data_source_connect_network.account), keys(aws_secretsmanager_secret.gc_pdc_token),
+      keys(aws_kms_key.gc_pdc_token), keys(aws_kms_alias.gc_pdc_token), keys(aws_secretsmanager_secret_policy.gc_pdc_token),
+      keys(data.aws_iam_policy_document.gc_pdc_token_kms), keys(data.aws_iam_policy_document.gc_pdc_token_secret),
+      ] : toset(names) == toset([
+        "sprinkler-development",
+        "cooker-development",
+        "example-development",
+        "cloud-platform-development",
+    ])])
+    error_message = "Each opted-in account must have its own network, protected secret, KMS key and alias, and scoped policies."
   }
 }
 

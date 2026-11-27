@@ -23,10 +23,29 @@ production PDC deployment or approval.
 
 ## First issuance for a new opt-in
 
-Development enables `bootstrap_enabled` for alpha.6. `example-development`
-is its only first-issuance account. Do not deploy Example's tenant module until
-central bootstrap succeeds. Example has no production opt-in or configured private
-query target; configure a real target separately before query acceptance.
+Development enables `bootstrap_enabled` for alpha.6. Its first-issuance accounts
+are `example-development` and `cloud-platform-development`. Only the latter
+belongs to the `cloud-platform` tenant in this stack. `cloud-platform-{preproduction,nonlive,live}`
+and `container-platform-{octo,laa,hmpps,cd}-{nonlive,live}` are planned for
+production, in a separate rollout after the production PDC rotator is ready.
+They must not get development agents or development CloudWatch data sources.
+
+Readiness gate for development:
+
+1. Do not apply while any Sprinkler, Cooker or Example rotation step is in
+   flight, and reconcile (approve or cancel) any older queued development run
+   first. Never approve an older apply after a newer one.
+2. After the central apply, confirm each new account's bootstrap journal is
+   `completed` and `grafana-cloud/pdc/<account ID>` has a single initial version
+   labelled only `AWSCURRENT`. Check version metadata only; do not retrieve the
+   token.
+3. Only then deploy agents, one account at a time. Wait for that account's
+   enrolment to reach `enrolled` (its first rotation completed) before deploying
+   the next. Prolonged pending enrolment raises the Errors alarm (default one
+   day).
+
+Example has no production opt-in or configured private query target; configure
+a real target separately before query acceptance.
 
 1. Use a genuinely new account and network/access policy, with **no** Grafana
    token history in that policy/region (including expired tokens). Terraform
@@ -65,6 +84,13 @@ when recognised. A `FunctionError`, read timeout, unrecognised error or invalid
 response stops the helper without another attempt. CLI exit 254 alone does
 not identify throttling.
 
+An apply that adds several opt-ins at once
+starts their bootstrap invocations in parallel, up to Terraform's
+default parallelism of 10. They share the single slot with each other, seeded
+rotations and hourly enrolment ticks, so most wait inside the helper's retry
+budget. If an invocation runs long, others can exhaust that budget; handle each
+failed marker as below.
+
 Before allowing another apply, let any in-flight invocation finish. Check the
 seeded rotation journal, Lambda `Throttles` and `ConcurrentExecutions`, and
 Invoke data events if recorded. Check the new secret's version IDs and stages
@@ -82,8 +108,13 @@ enrolment. After a successful apply, confirm the completed journal,
 deploying the tenant agents. A retained, successful marker is not replayed by
 an ordinary apply; state loss or explicit replacement is not an ordinary apply.
 
-The function's Errors alarm covers enrolment failures, including prolonged
-pending (default one day) and approaching seed expiry (default 14 days).
+The function's Errors alarm covers enrolment failures. On the first hourly
+check that finds the account not ready, alpha.6 records `pending_since`. On a
+subsequent check it raises an error if still pending for **at least 86,400
+seconds from `pending_since`**, or within 14 days of seed expiry. This is not
+a timer from bootstrap. One error in a 60-second period is enough for the
+shared `AWS/Lambda` Errors alarm; the precise alert time depends on tick
+delivery. See the [pinned enrolment code](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/blob/v0.1.0-alpha.6/src/pdc_rotator/enrolment.py#L218-L245).
 The per-rule `AWS/Events` `FailedInvocations` alarm covers delivery failures
 that never reached Lambda. Both notify the existing encrypted SNS destination.
 Check the journal and AWS/Grafana metadata on alerts; never re-bootstrap an
@@ -94,6 +125,113 @@ bootstrap accounts only, the runtime can call `RotateSecret` on their exact
 ARNs with its own unqualified function and assume the tenant restarter roles.
 Lambda permissions restrict EventBridge to the corresponding rule and Secrets
 Manager to the corresponding secret and source account.
+
+## Retire the three CP3 accounts from development
+
+The four-account development configuration was already applied. Retire only
+`cloud-platform-preproduction`, `cloud-platform-nonlive` and `cloud-platform-live`.
+This does not migrate tokens to production. Keep `cloud-platform-development`,
+Example, Sprinkler and Cooker running.
+
+**Before apply:** fence stale plans; confirm no agents, connected-agent traffic,
+rotation/in-flight invocation or native rotation schedule for the three accounts.
+Check each completed bootstrap journal, sole initial `AWSCURRENT` version and
+Grafana policy/token IDs using **metadata only**. Record the exact secret ARN,
+KMS key ARN, development policy ID, token ID and region in the restricted change
+record before Terraform removes aliases and networks. Never read or copy the
+token, clear journal entries or change version labels.
+
+Review the development plan against the applied state:
+
+- Six exact moves to singleton addresses followed by `forget`, not `delete`:
+  the `aws_secretsmanager_secret.gc_pdc_token` and `aws_kms_key.gc_pdc_token`
+  instances for those three accounts. Keep `prevent_destroy` on the managed
+  secrets. Do not use resource-wide removals or `terraform state rm`.
+- Per retired account: remove only its Grafana PDC network, CloudWatch data
+  source and permission, enrolment rule, target, two Lambda permissions and
+  delivery alarm, bootstrap marker, secret policy and KMS alias. The marker
+  has only a **create-time** provisioner; removing it does not invoke Lambda.
+- The rotator IAM policy, failure-alert KMS key policy and SNS topic policy
+  narrow in place. Stop on any create, replacement, other managed change or
+  change to a retained account. Production should have no handoff.
+
+**Grafana deletion gate:** the [3.25.9 provider](https://github.com/grafana/terraform-provider-grafana/blob/v3.25.9/internal/resources/cloud/resource_private_data_source_connect_network.go#L211-L220)
+calls only `DeleteAccessPolicy(region, id)`; it does not delete tokens individually.
+The [API reference](https://grafana.com/docs/grafana-cloud/learn-and-build/developer-resources/api-reference/cloud-api/)
+documents a successful policy deletion but does not guarantee what happens to
+existing tokens on that call. So, **before apply**, an operator deletes only the
+tokens under the three retired development networks, by the recorded token IDs
+(no agent ever used them). Leave the networks for Terraform to delete. Then
+check that each of those policies lists no tokens. Deleting the tokens does not
+change the plan, because Terraform does not manage them. It also does not affect
+the hourly enrolment checks, which read only AWS metadata, the journal, ECS and
+metrics. Do not delete a network by hand. Its provider read treats a missing
+policy as already gone, which would quietly shrink the reviewed plan. After apply,
+verify that the three policy IDs are gone. If a delete is rejected or its outcome
+is ambiguous, stop and reconcile the partial apply. Forgetting or deleting an AWS
+secret does **not** revoke a Grafana token.
+
+### Manual AWS cleanup after the handoff
+
+Use a reviewed operator session in **Observability Platform development**,
+`eu-west-2`, one retired account at a time. Do not run these as Terraform
+provisioners. Before the handoff, in a shell with tracing disabled, identify
+the account from the approved inventory and capture its metadata:
+
+```bash
+set -eu
+: "${AWS_PROFILE:?select the Observability Platform development profile}"
+: "${OP_DEV_ACCOUNT_ID:?set from the approved inventory}"
+: "${account:?set the retired account name}" "${tenant_id:?set its verified AWS account ID}"
+case "$account" in
+  cloud-platform-preproduction|cloud-platform-nonlive|cloud-platform-live) ;;
+  *) exit 1 ;;
+esac
+export AWS_REGION=eu-west-2 AWS_DEFAULT_REGION=eu-west-2
+test "$(aws sts get-caller-identity --query Account --output text)" = "$OP_DEV_ACCOUNT_ID"
+secret_arn=$(aws secretsmanager describe-secret --secret-id "grafana-cloud/pdc/$tenant_id" --query ARN --output text)
+key_arn=$(aws kms describe-key --key-id "alias/grafana-cloud-pdc-$account" --query KeyMetadata.Arn --output text)
+test "$(aws secretsmanager describe-secret --secret-id "$secret_arn" --query KmsKeyId --output text)" = "$key_arn"
+test "$(aws kms describe-key --key-id "$key_arn" --query KeyMetadata.Description --output text)" = "Encrypts the Grafana Cloud PDC agent token for $account"
+```
+
+After the reviewed apply, check that the six objects have left Terraform state,
+the three accounts' ticks and secret policies are gone, and the Grafana deletion
+gate above is satisfied. Using the verified ARNs from the change record (not an
+alias or a name search), recheck identity, region and the secret/key pairing.
+Schedule the **secret first**, with a 30-day recovery window:
+
+```bash
+set -eu
+case "$account" in cloud-platform-preproduction|cloud-platform-nonlive|cloud-platform-live) ;; *) exit 1 ;; esac
+test "$(aws sts get-caller-identity --query Account --output text)" = "$OP_DEV_ACCOUNT_ID"
+test "$(aws secretsmanager describe-secret --region eu-west-2 --secret-id "grafana-cloud/pdc/$tenant_id" --query ARN --output text)" = "$secret_arn"
+test "$(aws secretsmanager describe-secret --region eu-west-2 --secret-id "$secret_arn" --query KmsKeyId --output text)" = "$key_arn"
+test "$(aws kms describe-key --region eu-west-2 --key-id "$key_arn" --query KeyMetadata.Description --output text)" = "Encrypts the Grafana Cloud PDC agent token for $account"
+aws secretsmanager delete-secret --region eu-west-2 --secret-id "$secret_arn" \
+  --recovery-window-in-days 30 --query DeletionDate --output text
+```
+
+Keep the key enabled through the entire recovery window. Only after the secret
+is actually gone (`describe-secret` on that exact ARN returns
+`ResourceNotFoundException`, not access denied or a transport error), recheck
+that the dedicated key has no other consumers and match its ARN to the recorded
+pair. With separate operator confirmation schedule the key for deletion:
+
+```bash
+set -eu
+case "$account" in cloud-platform-preproduction|cloud-platform-nonlive|cloud-platform-live) ;; *) exit 1 ;; esac
+test "$(aws sts get-caller-identity --query Account --output text)" = "$OP_DEV_ACCOUNT_ID"
+test "$(aws kms describe-key --region eu-west-2 --key-id "$key_arn" --query KeyMetadata.Description --output text)" = "Encrypts the Grafana Cloud PDC agent token for $account"
+aws kms schedule-key-deletion --region eu-west-2 --key-id "$key_arn" \
+  --pending-window-in-days 30 --query DeletionDate --output text
+```
+
+Do not use force deletion. Retain the journals and the restricted audit record.
+Before configuring these instance keys in production, verify the development
+handoff is complete and retire its six move/forget pairs in a reviewed change:
+both workspaces use the same root, so a move source must not also be configured
+as a live instance in the new stack.
 
 ## Rotation contract
 
@@ -463,8 +601,8 @@ network, secret, KMS key, key alias, policies and Sprinkler schedule remain
 managed. Do not substitute resource-wide `removed` blocks or `terraform state
 rm`; either would lose the scope and safeguards of this handoff.
 
-Both legacy resource collections are now empty. Cooker's exact handoff is
-the only new state migration; retain the old Sprinkler moved/removed blocks.
+Both legacy resource collections are now empty. Retain the historical Cooker
+and Sprinkler moved/removed blocks for their tokens and versions.
 Secret metadata has `prevent_destroy` even after its version is forgotten.
 
 ### Review and fence the activation
@@ -495,10 +633,11 @@ Secret metadata has `prevent_destroy` even after its version is forgotten.
    - No replacement of Cooker's network, secret, key, alias or token, and no
      change to Sprinkler's schedule.
 
-   If the revision also onboards Example, review the development image pin,
-   Example's new network and protected secret, first-issuance marker, scoped
-   permissions, readiness rule/target and delivery alarm. There must be **no**
-   Terraform token, secret version or native rotation schedule for Example.
+   If the revision also onboards a new opt-in, review its network and protected secret,
+   first-issuance marker, scoped permissions, readiness rule/target and delivery
+   alarm. There must be **no** Terraform-managed token, secret version or native
+   rotation schedule for them, and the development image pin and existing
+   accounts' resources must be unchanged.
 
    Production must have no PDC handoff, rotation, or rotator changes. Stop if
    there is any unexpected change, destroy/replacement, missing state move, or
@@ -605,5 +744,8 @@ bootstrap request, throttle-only backoff and redaction, and non-replay across
 an image change, tick target replacement and teardown. Disposable local-state
 tests verify failed marker replacement, no replay after success, and exactly
 two Cooker forgets with zero deletes using the checked-in migration blocks.
+A separate mocked plan starts from the previously applied four-account CP3
+tenant and checks all six secret/key forgets, 33 deletes and three in-place
+policy changes by address, rejecting any change to a retained account.
 A negative test confirms secret protection rejects destructive
 account disablement. These are not live issuance or reconnection tests.
