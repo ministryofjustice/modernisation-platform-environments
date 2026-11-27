@@ -14,6 +14,19 @@ module "cica_dms_ingress_bucket" {
     enabled = true
   }
 
+  # Nightly full loads overwrite the same keys; old versions are only needed briefly (replication, recovery)
+  lifecycle_rule = [
+    {
+      id                                     = "expire-noncurrent-versions"
+      enabled                                = true
+      abort_incomplete_multipart_upload_days = 7
+
+      noncurrent_version_expiration = {
+        days = 7
+      }
+    }
+  ]
+
   replication_configuration = {}
   server_side_encryption_configuration = {
     rule = {
