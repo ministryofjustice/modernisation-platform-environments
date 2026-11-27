@@ -139,7 +139,9 @@ resource "aws_lakeformation_data_cells_filter" "compliance_data_filter" {
     name             = "filter-for-staged_mdss${local.dbt_suffix}-event-table"
     table_catalog_id = data.aws_caller_identity.current.account_id
     table_name       = "event"
-    column_wildcard {}
+    column_wildcard {
+      excluded_column_names = []
+    }
     row_filter {
       filter_expression = "device_id in (1121)"
     }
