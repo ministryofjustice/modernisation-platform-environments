@@ -6,7 +6,7 @@ cffi==2.1.1
 cryptography==50.0.2
 invoke==3.0.3
 jmespath==1.1.0
-paramiko==4.0.0
+paramiko==5.0.0
 pycparser==3.12
 PyNaCl==1.6.2
 python-dateutil==2.9.0.post0
