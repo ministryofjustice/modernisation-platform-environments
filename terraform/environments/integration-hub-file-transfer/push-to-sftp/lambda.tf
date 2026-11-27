@@ -1,9 +1,9 @@
 data "aws_kms_key" "secrets" {
-  key_id = local.secrets_kms_key_alias
+  key_id = "alias/secrets/${terraform.workspace}"
 }
 
 data "aws_kms_key" "logs" {
-  key_id = local.logs_kms_key_alias
+  key_id = "alias/logs/${terraform.workspace}"
 }
 
 module "lambda_file_mover" {
@@ -23,7 +23,7 @@ module "lambda_file_mover" {
   handler                           = "handler.lambda_handler"
   ignore_source_code_hash           = true
   memory_size                       = 512
-  role_name                         = local.lambda_role_name
+  role_name                         = local.pattern_name
   runtime                           = "python3.14"
   source_path                       = local.lambda_source_path
   hash_extra                        = "file-mover-${sha256(jsonencode(local.lambda_docker_additional_options))}"
@@ -133,9 +133,10 @@ resource "terraform_data" "delivery_configuration" {
         try(entry.action.push_to_sftp.port, 22) >= 1 &&
         try(entry.action.push_to_sftp.port, 22) <= 65535 &&
         floor(try(entry.action.push_to_sftp.port, 22)) == try(entry.action.push_to_sftp.port, 22) &&
+        contains(["posix", "direct"], try(entry.action.push_to_sftp.write_mode, "posix")) &&
         length(entry.action.push_to_sftp.host_public_keys) > 0
       ])
-      error_message = "SFTP requires explicit IPv4 recipient CIDRs (not /0), a valid integer TCP port and trusted host public keys."
+      error_message = "SFTP requires explicit IPv4 recipient CIDRs (not /0), a valid integer TCP port, write_mode ('posix' or 'direct') and trusted host public keys."
     }
   }
 }

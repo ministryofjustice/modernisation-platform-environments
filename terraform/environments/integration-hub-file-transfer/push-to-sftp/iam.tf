@@ -1,9 +1,9 @@
 data "aws_s3_bucket" "clean" {
-  bucket = "${local.application_name}-${local.environment}-clean"
+  bucket = "${terraform.workspace}-clean"
 }
 
 data "aws_kms_key" "clean" {
-  key_id = local.clean_kms_key_alias
+  key_id = "alias/s3/clean"
 }
 
 data "aws_iam_policy_document" "delivery" {
@@ -107,7 +107,7 @@ module "iam_role_delivery" {
       condition = [{
         test     = "ArnEquals"
         variable = "aws:PrincipalArn"
-        values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.lambda_role_name}"]
+        values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.pattern_name}"]
       }]
     }
   }

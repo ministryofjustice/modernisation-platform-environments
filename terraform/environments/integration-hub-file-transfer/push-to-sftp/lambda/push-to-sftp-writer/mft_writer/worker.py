@@ -64,6 +64,21 @@ def action_fingerprint(action: Mapping[str, Any], route: Mapping[str, Any], conf
     return hashlib.sha256(encoded).hexdigest()
 
 
+def destination_lock_id(route: Mapping[str, Any]) -> str:
+    destination = route["destination"]
+    target = json.dumps(
+        {
+            "hostname": destination["hostname"],
+            "port": destination["port"],
+            "username": destination["username"],
+            "destinationPath": route["destination_path"],
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return f"destination-lock:{hashlib.sha256(target).hexdigest()}"
+
+
 def action_snapshot(
     action: Mapping[str, Any], route: Mapping[str, Any], config: WriterConfig, fingerprint: str
 ) -> dict[str, Any]:
@@ -194,12 +209,42 @@ def process_writer_record(
         _publish_copied(store, services, stored, owner_token, config, context, log_fields)
         return "published"
 
-    _update_log_fields(log_fields, operation="AssumeRole")
-    ensure_time(context, "AssumeRole")
-    s3, secrets = services.clients_for_role(route["role_arn"], item["actionExecutionId"])
-    size = transfer_versioned_object(
-        s3, secrets, action["source_object"], route, context
-    )
+    lock_id = destination_lock_id(route) if route["destination"]["write_mode"] == "direct" else None
+    if lock_id is not None:
+        _update_log_fields(log_fields, operation="acquire-destination-lock")
+        try:
+            store.acquire_destination_lock(
+                lock_id,
+                owner_token,
+                now=int(datetime.now(timezone.utc).timestamp()),
+                lease_seconds=_lease_seconds(context),
+            )
+        except Exception:
+            # No upload started; release our action lease so a retry isn't blocked by leaseUntil.
+            try:
+                store.release_action_lease(item["id"], owner_token)
+            except Exception as release_error:  # noqa: BLE001
+                logger.warning(
+                    "failed to release action lease after destination lock contention",
+                    errorType=type(release_error).__name__,
+                )
+            raise
+    try:
+        _update_log_fields(log_fields, operation="AssumeRole")
+        ensure_time(context, "AssumeRole")
+        s3, secrets = services.clients_for_role(route["role_arn"], item["actionExecutionId"])
+        size = transfer_versioned_object(
+            s3, secrets, action["source_object"], route, context
+        )
+    finally:
+        if lock_id is not None:
+            try:
+                store.release_destination_lock(lock_id, owner_token)
+            except Exception as error:  # noqa: BLE001
+                logger.warning(
+                    "failed to release direct-upload destination lock",
+                    errorType=type(error).__name__,
+                )
     if size != item["sourceSizeBytes"]:
         raise InvalidMessage("source object size changed during the copy")
     now = int(datetime.now(timezone.utc).timestamp())
