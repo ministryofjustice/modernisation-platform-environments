@@ -57,7 +57,7 @@ data "aws_identitystore_groups" "all" {
   identity_store_id = tolist(data.aws_ssoadmin_instances.this[0].identity_store_ids)[0]
 }
 
-# Auth token for the kubernetes/helm providers (providers.tf).
+# Auth token for the kubernetes/helm/kubectl providers (providers.tf).
 # aws_eks_cluster_auth generates a token from the cluster name and the caller's
 # credentials; it does NOT call the EKS API to look the cluster up, so it is
 # safe on a brand-new cluster that does not exist yet.
