@@ -1,5 +1,7 @@
 import json
 import time
+import urllib.request
+import uuid
 from decimal import Decimal
 
 from mft_file_mover.events import EVENT_SOURCE, parse_file_mover_event
@@ -134,6 +136,19 @@ class FileMoverService:
                 },
             )
             event_id = self._publish(item)
+            # TEMPORARY smoke test of integration_hub_events
+            try:
+                urllib.request.urlopen(
+                    urllib.request.Request(
+                        "https://development.events-platform.service.justice.gov.uk/events/moved_file",
+                        data=json.dumps({"random": uuid.uuid4().hex}).encode(),
+                        headers={"Content-Type": "application/json"},
+                        method="POST",
+                    ),
+                    timeout=5,
+                )
+            except Exception:
+                self.logger.exception("Failed to send moved_file event")
             item = self.store.transition(
                 item,
                 owner,
