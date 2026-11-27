@@ -294,7 +294,12 @@ resource "aws_ssm_association" "patch_schedule" {
     values = ["Linux2", "Linux2023", "Ubuntu", "Windows"]
   }
 
-  schedule_expression = "cron(0 3 ? * SUN *)" # Every Sunday at 3:00 AM UTC
+  # Production: Sunday 03:00 UTC. Non-production instances are shut down overnight and at weekends,
+  # so patch on Monday morning once the instances have started
+  schedule_expression = local.is-production ? "cron(0 3 ? * SUN *)" : "cron(0 8 ? * MON *)"
+
+  # Without this, every update to the association (e.g. a schedule or target change) triggers an immediate patch run
+  apply_only_at_cron_interval = true
 
   compliance_severity = "HIGH"
   max_concurrency     = "50%"

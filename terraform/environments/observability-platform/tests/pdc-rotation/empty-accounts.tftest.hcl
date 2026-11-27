@@ -23,7 +23,6 @@ run "no_pdc_accounts" {
   assert {
     condition = (
       length(aws_secretsmanager_secret.gc_pdc_token) == 0 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
       length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
       length(local.gc_pdc_rotation_tags) == 0 &&
       length(module.grafana_pdc_token_rotator) == 0 &&

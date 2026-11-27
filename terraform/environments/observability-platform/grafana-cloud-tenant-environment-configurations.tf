@@ -53,6 +53,13 @@ locals {
             }
           }
         }
+        # Other CP3 accounts belong in the future production stack, not this one.
+        # The cloud-platform team already has query access via grafana-cloud-platform-access.tf.
+        "cloud-platform" = {
+          aws_accounts = {
+            "cloud-platform-development" = { pdc_enabled = true }
+          }
+        }
       }
     }
     production = {

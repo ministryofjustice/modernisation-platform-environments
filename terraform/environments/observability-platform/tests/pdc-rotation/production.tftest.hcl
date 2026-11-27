@@ -77,11 +77,9 @@ run "production_cloud_and_container_platform_accounts" {
     condition = (
       length(local.gc_pdc_seeded_accounts) == 0 &&
       length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
       length(aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri) == 0
     )
-    error_message = "Production has no seeded accounts, no Terraform-held tokens or secret versions and no development-only ECR parameter."
+    error_message = "Production has no seeded accounts, no Terraform-managed rotation schedules and no development-only ECR parameter."
   }
 
   assert {

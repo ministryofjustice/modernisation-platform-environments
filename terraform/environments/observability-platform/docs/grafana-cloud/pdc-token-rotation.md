@@ -6,9 +6,9 @@ Tracks [ministryofjustice/observability-platform#338](https://github.com/ministr
 
 Sprinkler development has completed an alpha.4 rotation and reconnection and
 previously demonstrated rollback. Keep its existing schedule and agents running.
-Cooker development already has a working `AWSCURRENT`; the configuration below
-prepares its non-destructive handoff and first rotation at the next reviewed
-development apply. Do **not** bootstrap either account.
+Cooker development's legacy token and secret version were forgotten without
+revocation, and it now has its own native rotation schedule. Do **not**
+bootstrap either account.
 
 Production is configured with the alpha.6 image (the development digest),
 `bootstrap_enabled = true`, `pdc_failure_alerts` for Slack channel `C06RA6C52TW`
@@ -26,16 +26,35 @@ production PDC deployment or approval.
 
 ## First issuance for a new opt-in
 
-Development enables `bootstrap_enabled` for alpha.6. `example-development`
-is its only first-issuance account. Do not deploy Example's tenant module until
-central bootstrap succeeds. Example has no production opt-in or configured private
-query target; configure a real target separately before query acceptance.
+Development enables `bootstrap_enabled` for alpha.6. Its first-issuance accounts
+are `example-development` and `cloud-platform-development`. Only the latter
+belongs to the `cloud-platform` tenant in this stack. `cloud-platform-{preproduction,nonlive,live}`
+and `container-platform-{octo,laa,hmpps,cd}-{nonlive,live}` are planned for
+production, in a separate rollout after the production PDC rotator is ready.
+They must not get development agents or development CloudWatch data sources.
+
+Readiness gate for development:
+
+1. Do not apply while any Sprinkler, Cooker or Example rotation step is in
+   flight, and reconcile (approve or cancel) any older queued development run
+   first. Never approve an older apply after a newer one.
+2. After the central apply, confirm each new account's bootstrap journal is
+   `completed` and `grafana-cloud/pdc/<account ID>` has a single initial version
+   labelled only `AWSCURRENT`. Check version metadata only; do not retrieve the
+   token.
+3. Only then deploy agents, one account at a time. Wait for that account's
+   enrolment to reach `enrolled` (its first rotation completed) before deploying
+   the next. Prolonged pending enrolment raises the Errors alarm (default one
+   day).
+
+Example has no production opt-in or configured private query target; configure
+a real target separately before query acceptance.
 
 1. Use a genuinely new account and network/access policy, with **no** Grafana
    token history in that policy/region (including expired tokens). Terraform
    creates only the network, CMK, protected secret and cross-account policies;
    it tags the empty secret `pdc:bootstrap=true` alongside the rotation tags.
-   No legacy token or secret-version resource may match. For live development
+   Terraform manages no Grafana token or secret version. For live development
    proof use an authorised third account, never a cleared Sprinkler/Cooker secret.
 2. On creation only, `terraform_data.gc_pdc_bootstrap` invokes the central
    Lambda synchronously: `{"Step":"bootstrapSecret","SecretId":"<full secret ARN>"}`.
@@ -68,6 +87,13 @@ when recognised. A `FunctionError`, read timeout, unrecognised error or invalid
 response stops the helper without another attempt. CLI exit 254 alone does
 not identify throttling.
 
+An apply that adds several opt-ins at once
+starts their bootstrap invocations in parallel, up to Terraform's
+default parallelism of 10. They share the single slot with each other, seeded
+rotations and hourly enrolment ticks, so most wait inside the helper's retry
+budget. If an invocation runs long, others can exhaust that budget; handle each
+failed marker as below.
+
 Before allowing another apply, let any in-flight invocation finish. Check the
 seeded rotation journal, Lambda `Throttles` and `ConcurrentExecutions`, and
 Invoke data events if recorded. Check the new secret's version IDs and stages
@@ -85,8 +111,13 @@ enrolment. After a successful apply, confirm the completed journal,
 deploying the tenant agents. A retained, successful marker is not replayed by
 an ordinary apply; state loss or explicit replacement is not an ordinary apply.
 
-The function's Errors alarm covers enrolment failures, including prolonged
-pending (default one day) and approaching seed expiry (default 14 days).
+The function's Errors alarm covers enrolment failures. On the first hourly
+check that finds the account not ready, alpha.6 records `pending_since`. On a
+subsequent check it raises an error if still pending for **at least 86,400
+seconds from `pending_since`**, or within 14 days of seed expiry. This is not
+a timer from bootstrap. One error in a 60-second period is enough for the
+shared `AWS/Lambda` Errors alarm; the precise alert time depends on tick
+delivery. See the [pinned enrolment code](https://github.com/ministryofjustice/observability-platform-grafana-pdc-token-rotator/blob/v0.1.0-alpha.6/src/pdc_rotator/enrolment.py#L218-L245).
 The per-rule `AWS/Events` `FailedInvocations` alarm covers delivery failures
 that never reached Lambda. Both notify the existing encrypted SNS destination.
 Check the journal and AWS/Grafana metadata on alerts; never re-bootstrap an
@@ -97,6 +128,87 @@ bootstrap accounts only, the runtime can call `RotateSecret` on their exact
 ARNs with its own unqualified function and assume the tenant restarter roles.
 Lambda permissions restrict EventBridge to the corresponding rule and Secrets
 Manager to the corresponding secret and source account.
+
+## Retire the three CP3 accounts from development
+
+`cloud-platform-preproduction`, `cloud-platform-nonlive` and `cloud-platform-live`
+have been retired from the development stack. This did not migrate tokens to
+production. For each account, Terraform deleted the Grafana PDC network,
+CloudWatch data source and permission, enrolment rule, target, two Lambda
+permissions, delivery alarm, bootstrap marker, secret policy and KMS alias. It
+forgot, but did not destroy, the `grafana-cloud/pdc/<account ID>` secret and its
+KMS key. Those six forgets have been applied in development and their `moved`
+and `removed` blocks have since been deleted, so both workspaces can configure
+these instance keys again. `cloud-platform-development`, Example, Sprinkler and
+Cooker were unchanged.
+
+**Grafana tokens:** the [3.25.9 provider](https://github.com/grafana/terraform-provider-grafana/blob/v3.25.9/internal/resources/cloud/resource_private_data_source_connect_network.go#L211-L220)
+calls only `DeleteAccessPolicy(region, id)`; it does not delete tokens individually.
+The [API reference](https://grafana.com/docs/grafana-cloud/learn-and-build/developer-resources/api-reference/cloud-api/)
+documents a successful policy deletion but does not guarantee what happens to
+existing tokens on that call. Confirm that the tokens under the three retired
+development networks were deleted by their recorded token IDs, and that the
+three policy IDs are gone. If either is not the case, reconcile it through the
+approved Grafana administration path. Forgetting or deleting an AWS secret does
+**not** revoke a Grafana token.
+
+### Manual AWS cleanup after the handoff
+
+The three secrets and KMS keys still exist in **Observability Platform
+development**, `eu-west-2`, but are no longer managed by Terraform. Delete them
+in a reviewed operator session, one retired account at a time. Do not run these
+as Terraform provisioners. Terraform has deleted the KMS aliases, so take
+`secret_arn` and `key_arn` from the restricted change record, not from an alias
+or a name search. In a shell with tracing disabled, recheck identity, region
+and the secret/key pairing:
+
+```bash
+set -eu
+: "${AWS_PROFILE:?select the Observability Platform development profile}"
+: "${OP_DEV_ACCOUNT_ID:?set from the approved inventory}"
+: "${account:?set the retired account name}" "${tenant_id:?set its verified AWS account ID}"
+: "${secret_arn:?set from the change record}" "${key_arn:?set from the change record}"
+case "$account" in
+  cloud-platform-preproduction|cloud-platform-nonlive|cloud-platform-live) ;;
+  *) exit 1 ;;
+esac
+export AWS_REGION=eu-west-2 AWS_DEFAULT_REGION=eu-west-2
+test "$(aws sts get-caller-identity --query Account --output text)" = "$OP_DEV_ACCOUNT_ID"
+test "$(aws secretsmanager describe-secret --secret-id "grafana-cloud/pdc/$tenant_id" --query ARN --output text)" = "$secret_arn"
+test "$(aws secretsmanager describe-secret --secret-id "$secret_arn" --query KmsKeyId --output text)" = "$key_arn"
+test "$(aws kms describe-key --key-id "$key_arn" --query KeyMetadata.Description --output text)" = "Encrypts the Grafana Cloud PDC agent token for $account"
+```
+
+Confirm the Grafana token checks above first. Then schedule the **secret
+first**, with a 30-day recovery window:
+
+```bash
+set -eu
+case "$account" in cloud-platform-preproduction|cloud-platform-nonlive|cloud-platform-live) ;; *) exit 1 ;; esac
+test "$(aws sts get-caller-identity --query Account --output text)" = "$OP_DEV_ACCOUNT_ID"
+test "$(aws secretsmanager describe-secret --region eu-west-2 --secret-id "grafana-cloud/pdc/$tenant_id" --query ARN --output text)" = "$secret_arn"
+test "$(aws secretsmanager describe-secret --region eu-west-2 --secret-id "$secret_arn" --query KmsKeyId --output text)" = "$key_arn"
+test "$(aws kms describe-key --region eu-west-2 --key-id "$key_arn" --query KeyMetadata.Description --output text)" = "Encrypts the Grafana Cloud PDC agent token for $account"
+aws secretsmanager delete-secret --region eu-west-2 --secret-id "$secret_arn" \
+  --recovery-window-in-days 30 --query DeletionDate --output text
+```
+
+Keep the key enabled through the entire recovery window. Only after the secret
+is actually gone (`describe-secret` on that exact ARN returns
+`ResourceNotFoundException`, not access denied or a transport error), recheck
+that the dedicated key has no other consumers and match its ARN to the recorded
+pair. With separate operator confirmation schedule the key for deletion:
+
+```bash
+set -eu
+case "$account" in cloud-platform-preproduction|cloud-platform-nonlive|cloud-platform-live) ;; *) exit 1 ;; esac
+test "$(aws sts get-caller-identity --query Account --output text)" = "$OP_DEV_ACCOUNT_ID"
+test "$(aws kms describe-key --region eu-west-2 --key-id "$key_arn" --query KeyMetadata.Description --output text)" = "Encrypts the Grafana Cloud PDC agent token for $account"
+aws kms schedule-key-deletion --region eu-west-2 --key-id "$key_arn" \
+  --pending-window-in-days 30 --query DeletionDate --output text
+```
+
+Do not use force deletion. Retain the journals and the restricted audit record.
 
 ## Rotation contract
 
@@ -389,8 +501,7 @@ Things to expect:
 - Confirm the merged tenant-module update in MPE PR
   [#20602](https://github.com/ministryofjustice/modernisation-platform-environments/pull/20602)
   has been deployed before activation. It updates the tenant module pin to a
-  release that adds `grafana-pdc-agent-restarter`. Verify the merged module
-  version is deployed to Cooker development before its handoff.
+  release that adds `grafana-pdc-agent-restarter`.
 - Confirm the released image can be pulled by Lambda from the cross-account ECR
   repository, including its repository policy. The rotator follows the
   existing Lambda module `7.20.1` deployment pattern.
@@ -454,71 +565,13 @@ Check the full preflight immediately before the maintenance window:
   window. A rotation run must finish or leave time for rollback before the
   current token's expiry.
 
-## Cooker development handoff runbook
+## Cooker development handoff
 
-The change uses exact `moved` blocks from the Cooker development
-`for_each` instances to singleton handoff addresses, followed by singleton
-`removed` blocks with `destroy = false`. Terraform 1.10+ supports moving one
-`for_each` instance this way; the PDC test runner also verifies the operation
-with disposable local state and `prevent_destroy` enabled. The token and
-secret-version instances are forgotten without provider delete calls. The
-network, secret, KMS key, key alias, policies and Sprinkler schedule remain
-managed. Do not substitute resource-wide `removed` blocks or `terraform state
-rm`; either would lose the scope and safeguards of this handoff.
-
-Both legacy resource collections are now empty. Cooker's exact handoff is
-the only new state migration; retain the old Sprinkler moved/removed blocks.
-Secret metadata has `prevent_destroy` even after its version is forgotten.
-
-### Review and fence the activation
-
-1. Complete every preflight above, record the existing Cooker token ID and
-   current secret version ID securely, and agree the maintenance window. Never
-   retrieve or print secret values.
-2. Before opening the PR, confirm the GitHub Environment approval gate and who
-   can approve the development deployment. The Observability Platform workflow
-   can apply development from the PR branch as well as from `main`: do not
-   approve a PR-branch apply of this change. Only the reviewed main-branch
-   deployment may activate Cooker's schedule.
-3. Coordinate merging the PR with the agreed maintenance window if a push to
-   `main` can auto-apply. Before activation, wait for or cancel every in-flight
-   or queued Observability Platform deployment from an older revision and
-   discard stale saved plans. The shared workflow serialises applies by
-   environment/component and the S3 backend uses a lockfile; these do not make
-   a stale plan safe to apply later. If the deployment queue cannot be fenced
-   or its revision confirmed, do not activate.
-4. Generate and review a fresh plan for each environment from that revision.
-   For Cooker's handoff, development must show:
-   - The Cooker development token and secret-version instances move to their
-     singleton handoff addresses and are then forgotten, explicitly **not
-     destroyed** (`destroy = false`).
-   - One `aws_secretsmanager_secret_rotation.gc_pdc_token["cooker-development"]`
-     is added, with the deployed rotator Lambda and the
-     `local.pdc_rotation_rules` interval.
-   - No replacement of Cooker's network, secret, key, alias or token, and no
-     change to Sprinkler's schedule.
-
-   If the revision also onboards Example, review the development image pin,
-   Example's new network and protected secret, first-issuance marker, scoped
-   permissions, readiness rule/target and delivery alarm. There must be **no**
-   Terraform token, secret version or native rotation schedule for Example.
-
-   Production must have no PDC handoff, rotation, or rotator changes. Stop if
-   there is any unexpected change, destroy/replacement, missing state move, or
-   unexplained drift. Do not approve a stale plan.
-5. Apply the reviewed development plan only inside the agreed window, with
-   operators watching the apply and rotation. `rotate_immediately = true` means
-   creating the rotation configuration starts the complete first rotation
-   during this apply. Do **not** make a second `aws secretsmanager rotate-secret`
-   call. The `automatically_after_days` rule from
-   `local.pdc_rotation_rules` schedules later rotations; no separate
-   EventBridge schedule is used.
-6. If apply or rotation outcome is ambiguous, stop other applies and do not
-   reintroduce the old resource configuration or blindly reapply. Check fresh
-   Terraform state/plan, `describe-secret` version stages, Lambda logs, the
-   DynamoDB journal and the alarm first. A failed apply may have enabled
-   rotation or started the asynchronous rotation even if the workflow did not
-   report success.
+Cooker's original Terraform-created token and secret version were forgotten
+without revocation, and its native schedule was created with
+`rotate_immediately = true`, which started its first rotation during that apply.
+Use the sections below to accept that rotation, recover from a failure and,
+later, revoke the original token. Its secret keeps `prevent_destroy`.
 
 ### Monitor and accept the first rotation
 
@@ -606,7 +659,6 @@ runtime permissions, hourly enrolment payload and separate delivery and runtime
 alarms. A stub CLI checks the synchronous
 bootstrap request, throttle-only backoff and redaction, and non-replay across
 an image change, tick target replacement and teardown. Disposable local-state
-tests verify failed marker replacement, no replay after success, and exactly
-two Cooker forgets with zero deletes using the checked-in migration blocks.
+tests verify failed marker replacement and no replay after success.
 A negative test confirms secret protection rejects destructive
 account disablement. These are not live issuance or reconnection tests.
