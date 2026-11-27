@@ -8,7 +8,7 @@ locals {
   airflow_pda_glue_arn_prefix = "arn:aws:glue:${local.current_account_region}:${local.current_account_id}"
 
   # athena workgroup; must use managed query results so the role needs no s3 access
-  airflow_pda_workgroup = "primary"
+  airflow_pda_workgroup = "laa"
 
   airflow_pda_source_database = "data-claims"
   airflow_pda_source_table    = "submission"
