@@ -42,12 +42,31 @@ resource "aws_apigatewayv2_integration" "put_events" {
   }
 }
 
+# Where the Kafka cluster is deployed, the route calls the events-to-kafka Lambda from the
+# kafka root instead of PutEvents. The PutEvents integration and the bus are kept in place.
+resource "aws_apigatewayv2_integration" "events_to_kafka" {
+  count                  = local.publish_to_kafka ? 1 : 0
+  api_id                 = module.api_gateway.api_id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = local.events_to_kafka_lambda_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_lambda_permission" "events_to_kafka" {
+  count         = local.publish_to_kafka ? 1 : 0
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = local.events_to_kafka_lambda_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${module.api_gateway.api_execution_arn}/*/*/events/*"
+}
+
 # Authentication is deliberately not configured yet; only use this in the development account.
 resource "aws_apigatewayv2_route" "publish_event" {
   #checkov:skip=CKV_AWS_309:Authorisation is deferred until the first version has been validated in development
   api_id             = module.api_gateway.api_id
   route_key          = "POST /events/{eventName}"
-  target             = "integrations/${aws_apigatewayv2_integration.put_events.id}"
+  target             = "integrations/${local.publish_to_kafka ? aws_apigatewayv2_integration.events_to_kafka[0].id : aws_apigatewayv2_integration.put_events.id}"
   authorization_type = "NONE"
 }
 
