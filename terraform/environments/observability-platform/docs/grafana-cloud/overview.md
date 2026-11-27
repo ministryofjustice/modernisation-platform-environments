@@ -144,10 +144,14 @@ token: the next reviewed handoff forgets its legacy token/version without
 revoking it and starts its own 90-day rotation. Neither account uses bootstrap.
 For a brand-new opt-in, the central apply must first issue `AWSCURRENT` through
 the bootstrap-capable Lambda; the tenant then deploys its existing agent module.
-No team member supplies a token. Development configures alpha.6 for Example:
-after bootstrap, an hourly readiness check enrols its secret in 90-day rotation
-only when stable ECS agents are connected to the expected Grafana network.
-Production has no opt-ins or enrolment ticks. See the [PDC rollout runbook](pdc-token-rotation.md).
+No team member supplies a token. Development configures alpha.6 for
+`example-development` and `cloud-platform-development`. After bootstrap,
+an hourly readiness check enrols each secret in 90-day rotation only when stable
+ECS agents are connected to that account's Grafana network. Cloud Platform
+preproduction, nonlive and live, and all eight Container Platform accounts,
+are planned for the production Grafana Cloud stack, not development.
+Production PDC has no rotator, tenants or enrolment ticks yet. See the
+[development offboarding and cleanup instructions](pdc-token-rotation.md#retire-the-three-cp3-accounts-from-development).
 
 Grafana Cloud management API calls, browser access and alert notifications
 go over public HTTPS.

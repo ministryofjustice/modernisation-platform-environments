@@ -11,6 +11,10 @@ output "pdc_accounts" {
   value = { for name, account in local.gc_accounts : name => { pdc_enabled = account.pdc_enabled } }
 }
 
+output "accounts" {
+  value = local.gc_accounts
+}
+
 output "rotator" {
   value = local.environment_configuration_gc.pdc_token_rotator
 }
