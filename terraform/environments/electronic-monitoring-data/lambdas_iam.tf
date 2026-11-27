@@ -3373,7 +3373,7 @@ data "aws_iam_policy_document" "trigger_cpr" {
       "secretsmanager:DescribeSecret",
       "secretsmanager:GetSecretValue",
     ]
-    resources = [module.cpr_api_trigger.secret_arn]
+    resources = [aws_secretsmanager_secret.cpr_api_trigger.arn]
   }
 }
 
