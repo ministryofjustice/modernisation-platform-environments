@@ -11,12 +11,15 @@ revocation, and it now has its own native rotation schedule. Do **not**
 bootstrap either account.
 
 Production is configured with the alpha.6 image (the development digest),
-`bootstrap_enabled = true` and `pdc_failure_alerts` for Slack channel
-`C06RA6C52TW`, but still has `tenant_configuration = {}`. That deploys the
-common Lambda, journal, credential metadata and monitoring with zero tenants.
-There are no empty or wildcard tenant IAM grants, tenant secrets, schedules or
-invocations in that state. The Cloud Platform and Container Platform accounts
-are added by a second, separate change, only after the manual steps in
+`bootstrap_enabled = true`, `pdc_failure_alerts` for Slack channel `C06RA6C52TW`
+and the `cloud-platform` tenant, whose eleven Cloud Platform and Container
+Platform accounts all set `pdc_enabled = true`. They use the production Grafana
+Cloud stack, not development. The common runtime (Lambda, journal, credential
+metadata and monitoring) must be applied **before** these accounts: first
+issuance runs in the same apply that creates each account's secret, and needs
+the rotator credentials that are uploaded by hand after the runtime exists. Apply
+the runtime alone (with `tenant_configuration = {}`, which creates no tenant IAM
+grants, secrets, schedules or invocations), then add the accounts, following
 [Production rollout](#production-rollout-for-cloud-platform-and-container-platform).
 An earlier protected production apply with plugin/AMG `EDITOR` drift is not a
 production PDC deployment or approval.

@@ -70,9 +70,28 @@ locals {
       pdc_failure_alerts = {
         slack_channel_id = "C06RA6C52TW"
       }
-      # Phase 1: the common runtime only. Add the production tenants after both rotator
-      # credentials have been uploaded (docs/grafana-cloud/pdc-token-rotation.md).
-      tenant_configuration = {}
+      tenant_configuration = {
+        # The Cloud Platform and Container Platform accounts that use the production Grafana Cloud
+        # stack. Each is bootstrapped centrally before its tenant module enables the PDC agent. The
+        # cloud-platform team already has query access through grafana-cloud-platform-access.tf,
+        # which maps container-platform-* accounts to it. Apply only after both rotator credentials
+        # have been uploaded (docs/grafana-cloud/pdc-token-rotation.md).
+        "cloud-platform" = {
+          aws_accounts = {
+            "cloud-platform-preproduction"     = { pdc_enabled = true }
+            "cloud-platform-nonlive"           = { pdc_enabled = true }
+            "cloud-platform-live"              = { pdc_enabled = true }
+            "container-platform-octo-nonlive"  = { pdc_enabled = true }
+            "container-platform-octo-live"     = { pdc_enabled = true }
+            "container-platform-laa-nonlive"   = { pdc_enabled = true }
+            "container-platform-laa-live"      = { pdc_enabled = true }
+            "container-platform-hmpps-nonlive" = { pdc_enabled = true }
+            "container-platform-hmpps-live"    = { pdc_enabled = true }
+            "container-platform-cd-nonlive"    = { pdc_enabled = true }
+            "container-platform-cd-live"       = { pdc_enabled = true }
+          }
+        }
+      }
     }
   }
 }
