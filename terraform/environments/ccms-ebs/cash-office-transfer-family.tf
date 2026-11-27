@@ -18,7 +18,7 @@ Until those bugs are addressed, the below resources are created manually:
 */
 
 module "transfer_family" {
-  count                         = (local.environment == "test" || local.environment == "preproduction" || local.environment == "production") ? 1 : 0
+  count                         = local.cash_office_enabled ? 1 : 0
   source                        = "./modules/transfer-family"
   aws_account_id                = data.aws_caller_identity.current.account_id
   app_name                      = local.application_name
@@ -32,15 +32,15 @@ AFTER the manual creation of a webapp/S3 grant and the input of the webapps URL.
 above are addressed, they can be included in the above module.
 */
 
-# resource "aws_route53_record" "transfer_family" {
-#   count    = local.cash_office_enabled ? 1 : 0
-#   provider = aws.core-vpc
-#   zone_id  = data.aws_route53_zone.external.zone_id
-#   name     = local.application_data.accounts[local.environment].cash_office_upload_hostname
-#   type     = "CNAME"
-#   ttl      = 300
-#   records  = [aws_cloudfront_distribution.transfer_family[0].domain_name]
-# }
+resource "aws_route53_record" "transfer_family" {
+  count    = local.cash_office_enabled ? 1 : 0
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = local.application_data.accounts[local.environment].cash_office_upload_hostname
+  type     = "CNAME"
+  ttl      = 300
+  records  = [aws_cloudfront_distribution.transfer_family[0].domain_name]
+}
 
 #--Certs need to be created in us-east-1 as they are associated with Cloudfront
 resource "aws_acm_certificate" "transfer_family" {
@@ -137,50 +137,50 @@ resource "aws_wafv2_web_acl" "transfer_family" {
   }
 }
 
-# resource "aws_cloudfront_distribution" "transfer_family" {
-#   count           = local.cash_office_enabled ? 1 : 0
-#   enabled         = true
-#   comment         = "CloudFront Distribution: cashoffice"
-#   is_ipv6_enabled = false
-#   http_version    = "http2" # Automatically supports http/2, http/1.1, and http/1.0
-#   aliases         = ["${local.application_data.accounts[local.environment].cash_office_upload_hostname}.${trim(data.aws_route53_zone.external.name, ".")}"]
-#   origin {
-#     domain_name = local.environment == "test" ? aws_transfer_web_app.this[count.index].web_app_id : local.application_data.accounts[local.environment].cash_web_app_url
-#     origin_id   = "transfer-family"
+resource "aws_cloudfront_distribution" "transfer_family" {
+  count           = local.cash_office_enabled ? 1 : 0
+  enabled         = true
+  comment         = "CloudFront Distribution: cashoffice"
+  is_ipv6_enabled = false
+  http_version    = "http2" # Automatically supports http/2, http/1.1, and http/1.0
+  aliases         = ["${local.application_data.accounts[local.environment].cash_office_upload_hostname}.${trim(data.aws_route53_zone.external.name, ".")}"]
+  origin {
+    domain_name = local.environment == "test" ? aws_transfer_web_app.this[count.index].web_app_id : local.application_data.accounts[local.environment].cash_web_app_url
+    origin_id   = "transfer-family"
 
-#     custom_origin_config {
-#       http_port              = 80
-#       https_port             = 443
-#       origin_protocol_policy = "https-only"
-#       origin_ssl_protocols   = ["TLSv1.2"]
-#     }
-#     custom_header {
-#       name  = "X-Transfer-WebApp-Custom-Domain-Template-Version"
-#       value = "2024-12-01"
-#     }
-#   }
-#   restrictions {
-#     geo_restriction {
-#       restriction_type = "none"
-#     }
-#   }
-#   default_cache_behavior {
-#     cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Caching Disabled
-#     origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac" # AllViewerExceptHostHeader
-#     target_origin_id         = "transfer-family"
-#     viewer_protocol_policy   = "redirect-to-https"
-#     allowed_methods          = ["GET", "HEAD"]
-#     cached_methods           = ["GET", "HEAD"]
-#     compress                 = true
-#   }
-#   viewer_certificate {
-#     cloudfront_default_certificate = false
-#     acm_certificate_arn            = aws_acm_certificate_validation.transfer_family[0].certificate_arn
-#     ssl_support_method             = "sni-only"
-#     minimum_protocol_version       = "TLSv1.2_2025"
-#   }
-#   web_acl_id = aws_wafv2_web_acl.transfer_family[0].arn
-# }
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+    custom_header {
+      name  = "X-Transfer-WebApp-Custom-Domain-Template-Version"
+      value = "2024-12-01"
+    }
+  }
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+  default_cache_behavior {
+    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Caching Disabled
+    origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac" # AllViewerExceptHostHeader
+    target_origin_id         = "transfer-family"
+    viewer_protocol_policy   = "redirect-to-https"
+    allowed_methods          = ["GET", "HEAD"]
+    cached_methods           = ["GET", "HEAD"]
+    compress                 = true
+  }
+  viewer_certificate {
+    cloudfront_default_certificate = false
+    acm_certificate_arn            = aws_acm_certificate_validation.transfer_family[0].certificate_arn
+    ssl_support_method             = "sni-only"
+    minimum_protocol_version       = "TLSv1.2_2025"
+  }
+  web_acl_id = aws_wafv2_web_acl.transfer_family[0].arn
+}
 
 #--WAF logging resources must be in us-east-1 as they are associated with a CLOUDFRONT-scoped WAF ACL
 #--AWS requires the log group name to start with "aws-waf-logs-"
@@ -203,20 +203,20 @@ resource "aws_wafv2_web_acl_logging_configuration" "transfer_family_waf_logging"
   resource_arn            = aws_wafv2_web_acl.transfer_family[0].arn
 }
 
-# resource "aws_transfer_web_app" "this" {
-#   count = local.environment == "test" ? 1 : 0
+resource "aws_transfer_web_app" "this" {
+  count = local.environment == "test" ? 1 : 0
 
-#   identity_provider_details {
-#     identity_center_config {
-#       instance_arn = tolist(data.aws_ssoadmin_instances.this[count.index].arns)[0]
-#       role         = module.transfer_family[count.index].transfer_iam_role_arn
-#     }
-#   }
+  identity_provider_details {
+    identity_center_config {
+      instance_arn = tolist(data.aws_ssoadmin_instances.this[count.index].arns)[0]
+      role         = module.transfer_family[count.index].transfer_iam_role_arn
+    }
+  }
 
-#   tags = merge(local.tags,
-#     { Name = lower(format("%s-%s-transfer-family-web-app", local.application_name, local.environment)) }
-#   )
-# }
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-transfer-family-web-app", local.application_name, local.environment)) }
+  )
+}
 
 data "aws_ssoadmin_instances" "this" {
   count = local.environment == "test" ? 1 : 0

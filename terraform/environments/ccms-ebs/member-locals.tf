@@ -31,7 +31,7 @@ locals {
   sftp_enabled        = contains(["development", "test", "preproduction", "production"], local.environment)
   ssogen_enabled      = contains(["development", "test", "preproduction"], local.environment)
   lambda_folder_name  = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
-  cash_office_enabled = contains(["preproduction", "production"], local.environment)
+  cash_office_enabled = contains(["test", "preproduction", "production"], local.environment)
   lambda_source_hashes_cloudwatch_slack_integration_v2 = [
     for f in fileset("./lambda/cloudwatch-slack-integration-v2", "lambda_function.py") :
     sha256(file("${path.module}/lambda/cloudwatch-slack-integration-v2/${f}"))
