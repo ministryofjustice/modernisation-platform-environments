@@ -158,6 +158,7 @@ locals {
         })
       })
 
+      # To be deleted in Dec 2026, waiting for AWS backup to age out
       dev-backuprestoretest-c = merge(local.ec2_instances.oem, {
         cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.oem.config, {
@@ -167,7 +168,7 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", label = "os" }
-          "/dev/sdb"  = { type = "gp3", label = "app", snapshot_id = "snap-0f21ed23056396836" } # /u01
+          "/dev/sdb"  = { type = "gp3", label = "app", snapshot_id = "snap-0f21ed23056396836" } # /u01 (ami-085c12c63a1132c63)
           "/dev/sdc"  = { type = "gp3", label = "app" }                                         # /u02
           "/dev/sde"  = { type = "gp3", label = "data" }                                        # DATA01
           "/dev/sdf"  = { type = "gp3", label = "data" }                                        # DATA02
