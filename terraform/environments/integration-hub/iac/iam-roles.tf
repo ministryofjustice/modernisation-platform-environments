@@ -9,7 +9,7 @@ module "iam_role_pagerduty" {
   count = local.is-production ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.2"
+  version = "6.11.1"
 
   name            = local.pagerduty_role_name
   use_name_prefix = false
