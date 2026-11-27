@@ -63,9 +63,8 @@ resource "aws_acm_certificate_validation" "transfer_family" {
 
 #--See member_locals.tf for the validation logic underpinning this resource
 resource "aws_route53_record" "validation" {
-  count           = local.cash_office_enabled ? 1 : 0
   provider        = aws.core-vpc
-  for_each        = local.transfer_family_dvo_map
+  for_each = local.cash_office_enabled == true ? local.transfer_family_dvo_map : {}
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
