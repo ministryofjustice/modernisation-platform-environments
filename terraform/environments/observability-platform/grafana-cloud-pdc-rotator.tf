@@ -11,10 +11,10 @@ locals {
   gc_pdc_failure_topic_arn  = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.gc_pdc_failure_topic_name}"
   gc_pdc_failure_alarm_arn  = "arn:aws:cloudwatch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alarm:${local.gc_pdc_rotator_role_name}-errors"
   gc_pdc_failure_rule_arn   = "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/${local.gc_pdc_rotator_role_name}-rotation-failed"
-  gc_pdc_failure_alarm_arns = concat([local.gc_pdc_failure_alarm_arn], [
-    for name in values(local.gc_pdc_enrolment_delivery_alarm_names) :
-    "arn:aws:cloudwatch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alarm:${name}"
-  ])
+  gc_pdc_failure_alarm_arns = concat([local.gc_pdc_failure_alarm_arn], length(local.gc_pdc_enrolment_accounts) > 0 ? [
+    "arn:aws:cloudwatch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alarm:pdc-enrol-*-delivery-failed"
+  ] : [])
+  gc_pdc_secret_arn_pattern = "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:grafana-cloud/pdc/????????????-??????"
 
   # The function depends on this role's policy. Derive its exact unqualified ARN without a cycle.
   gc_pdc_function_arn = "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${local.gc_pdc_rotator_role_name}"
@@ -182,7 +182,7 @@ resource "aws_kms_key" "gc_pdc_failure_alerts" {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
-          ArnEquals = {
+          ArnLike = {
             "aws:SourceArn" = local.gc_pdc_failure_alarm_arns
           }
         }
@@ -233,7 +233,7 @@ resource "aws_sns_topic_policy" "gc_pdc_failure_alerts" {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
-          ArnEquals = {
+          ArnLike = {
             "aws:SourceArn" = local.gc_pdc_failure_alarm_arns
           }
         }
@@ -325,7 +325,10 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
           "secretsmanager:PutSecretValue",
           "secretsmanager:UpdateSecretVersionStage",
         ]
-        Resource = [for secret in aws_secretsmanager_secret.gc_pdc_token : secret.arn]
+        Resource = length(local.gc_pdc_accounts) > 0 ? [local.gc_pdc_secret_arn_pattern] : []
+        Condition = {
+          StringEquals = { "secretsmanager:ResourceTag/pdc:rotator-stack-id" = grafana_cloud_stack.observability_platform.id }
+        }
       },
       {
         Sid      = "ReadGrafanaCredential"
@@ -338,18 +341,6 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
         Effect   = "Allow"
         Action   = ["secretsmanager:GetSecretValue"]
         Resource = [aws_secretsmanager_secret.gc_pdc_rotator_credential["stack-query-token"].arn]
-      },
-      {
-        Sid      = "UsePdcSecretKeys"
-        Effect   = "Allow"
-        Action   = ["kms:Decrypt", "kms:GenerateDataKey"]
-        Resource = [for key in aws_kms_key.gc_pdc_token : key.arn]
-        Condition = {
-          StringEquals = {
-            "kms:ViaService"                  = "secretsmanager.${data.aws_region.current.name}.amazonaws.com"
-            "kms:EncryptionContext:SecretARN" = [for secret in aws_secretsmanager_secret.gc_pdc_token : secret.arn]
-          }
-        }
       },
       {
         Sid      = "DecryptGrafanaCredential"
@@ -379,9 +370,13 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
         Sid      = "EnrolBootstrappedSecrets"
         Effect   = "Allow"
         Action   = ["secretsmanager:RotateSecret"]
-        Resource = [for name in keys(local.gc_pdc_enrolment_accounts) : aws_secretsmanager_secret.gc_pdc_token[name].arn]
+        Resource = length(local.gc_pdc_enrolment_accounts) > 0 ? [local.gc_pdc_secret_arn_pattern] : []
         Condition = {
           ArnEquals = { "secretsmanager:RotationLambdaARN" = local.gc_pdc_function_arn }
+          StringEquals = {
+            "secretsmanager:ResourceTag/pdc:rotator-stack-id" = grafana_cloud_stack.observability_platform.id
+            "secretsmanager:ResourceTag/pdc:bootstrap"        = "true"
+          }
         }
       },
       {
@@ -391,10 +386,14 @@ resource "aws_iam_policy" "gc_pdc_rotator" {
         Resource = length(local.gc_pdc_enrolment_accounts) > 0 ? [local.gc_pdc_function_arn] : []
       },
       {
-        Sid      = "AssumeTenantRestarters"
-        Effect   = "Allow"
-        Action   = ["sts:AssumeRole"]
-        Resource = values(local.gc_pdc_restarter_role_arns)
+        Sid    = "AssumeTenantRestarters"
+        Effect = "Allow"
+        Action = ["sts:AssumeRole"]
+        # Keep the exact opt-in boundary without repeating the role ARN for every account.
+        Resource = length(local.gc_pdc_restarter_role_arns) > 0 ? ["arn:aws:iam::*:role/grafana-pdc-agent-restarter"] : []
+        Condition = {
+          StringEquals = { "aws:ResourceAccount" = values(merge(local.gc_pdc_rotation_accounts, local.gc_pdc_enrolment_accounts)) }
+        }
       },
       {
         Sid      = "ManageRotationJournal"
