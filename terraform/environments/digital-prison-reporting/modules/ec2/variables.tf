@@ -108,7 +108,9 @@ variable "ec2_instance_type" {
 }
 
 variable "ami_image_id" {
-  type = string
+  type        = string
+  default     = ""
+  description = "AMI ID to use for the EC2 instance. Leave empty (default) to automatically resolve the latest Amazon Linux 2023 AMI from the AWS SSM public parameter store."
 }
 
 variable "subnet_ids" {
@@ -181,3 +183,9 @@ variable "scale_down" {
 #  description = "S3 policy ARN, to be attached to Ec2 Instance Profile"
 #  type        = string
 #}
+
+variable "patch_logs_s3_bucket" {
+  description = "S3 bucket name where SSM Patch Manager operation logs are written. Leave empty to skip S3 log output."
+  type        = string
+  default     = ""
+}

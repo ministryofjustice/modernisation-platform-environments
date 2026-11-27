@@ -310,3 +310,50 @@ resource "aws_iam_role_policy_attachment" "ec2-ssm" {
 #  roles      = [aws_iam_role.bastion-host-instance-role.name]
 #  policy_arn = var.s3_policy_arn
 #}
+
+# ---------------------------------------------------------------------------
+# SSM Maintenance Window IAM Role
+# ---------------------------------------------------------------------------
+# This role is assumed by the SSM service when it executes Maintenance Window
+# tasks (e.g. AWS-RunPatchBaseline) against target instances.
+resource "aws_iam_role" "ssm_maintenance_window_role" {
+  name        = "${var.name}-ssm-mw-role"
+  description = "IAM role assumed by SSM Maintenance Window to run patch tasks on bastion instances"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "AllowSSMMaintenanceWindowAssumeRole"
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "ssm.amazonaws.com" }
+    }]
+  })
+
+  tags = var.tags
+}
+
+# Attach the AWS-managed Maintenance Window role policy (SSM Run Command permissions)
+resource "aws_iam_role_policy_attachment" "ssm_mw_core" {
+  role       = aws_iam_role.ssm_maintenance_window_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonSSMMaintenanceWindowRole"
+}
+
+# Scoped PassRole inline policy — allows SSM only to pass the bastion instance role.
+# This is required for Maintenance Window tasks that need to act on behalf of the instance.
+resource "aws_iam_role_policy" "ssm_mw_passrole" {
+  name = "${var.name}-ssm-mw-passrole"
+  role = aws_iam_role.ssm_maintenance_window_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowPassRoleToBastionInstanceRole"
+        Effect = "Allow"
+        Action = "iam:PassRole"
+        Resource = aws_iam_role.bastion-host-instance-role.arn
+      }
+    ]
+  })
+}
