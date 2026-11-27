@@ -10,6 +10,7 @@ locals {
     test    = { day = "TUESDAY", time = "22:00" }
     stage   = { day = "THURSDAY", time = "22:00" }
     preprod = { day = "FRIDAY", time = "22:00" }
+    prod    = { day = "TUESDAY", time = "01:00" }
   }
 
   # Debug logging control per environment
@@ -19,6 +20,7 @@ locals {
     test    = true
     stage   = true
     preprod = true
+    prod    = true
   }
 }
 

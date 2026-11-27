@@ -137,8 +137,6 @@ run "central_metadata_without_activation" {
     condition = (
       !contains(keys(aws_secretsmanager_secret.gc_pdc_token), "disabled-development") &&
       length(terraform_data.gc_pdc_bootstrap) == 0 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
       length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
       length(module.grafana_pdc_token_rotator) == 0 &&
       length(aws_dynamodb_table.gc_pdc_rotation_state) == 0 &&
@@ -254,8 +252,6 @@ run "prepared_runtime_permissions" {
         )
       ]) &&
       length(terraform_data.gc_pdc_bootstrap) == 0 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
       toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"]) &&
       toset(keys(local.gc_pdc_rotation_triggers)) == toset(["sprinkler-development", "cooker-development"]) &&
       alltrue([for name, trigger in local.gc_pdc_rotation_triggers : (
@@ -358,8 +354,6 @@ run "development_first_issuance_accounts_use_readiness_enrolment" {
         local.gc_pdc_restarter_role_arns[name] == "arn:aws:iam::${local.all_account_ids[name]}:role/grafana-pdc-agent-restarter"
       )]) &&
       length(local.gc_pdc_restarter_role_arns) == 4 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
       length(aws_lambda_permission.gc_pdc_bootstrap) == 1 &&
       toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"])
     )
@@ -430,8 +424,7 @@ run "production_common_runtime_without_pdc_accounts" {
       length(aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri) == 0 &&
       length(grafana_cloud_private_data_source_connect_network.account) == 0 &&
       length(aws_kms_key.gc_pdc_token) == 0 && length(aws_secretsmanager_secret.gc_pdc_token) == 0 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 && length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
+      length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
       length(aws_lambda_permission.gc_pdc_bootstrap) == 0 && length(terraform_data.gc_pdc_bootstrap) == 0 &&
       length(local.gc_pdc_rotation_triggers) == 0 && length(local.gc_pdc_enrolment_accounts) == 0 &&
       length(aws_cloudwatch_event_rule.gc_pdc_enrolment) == 0 && length(aws_cloudwatch_event_target.gc_pdc_enrolment) == 0 &&
@@ -471,10 +464,9 @@ run "new_opt_in_bootstrap_and_tick" {
       aws_lambda_permission.gc_pdc_bootstrap["this"].action == "lambda:InvokeFunction" &&
       aws_lambda_permission.gc_pdc_bootstrap["this"].function_name == module.grafana_pdc_token_rotator["this"].lambda_function_arn &&
       aws_lambda_permission.gc_pdc_bootstrap["this"].principal == "arn:aws:iam::@MOCK_PLATFORM_ACCOUNT@:role/github-actions-apply" &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 && length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
       !contains(keys(aws_secretsmanager_secret_rotation.gc_pdc_token), "new-development")
     )
-    error_message = "New accounts get one bootstrap action, scoped access, no Terraform token/version and no premature schedule."
+    error_message = "New accounts get one bootstrap action, scoped access and no premature schedule."
   }
 
   assert {

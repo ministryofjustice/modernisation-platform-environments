@@ -47,22 +47,6 @@ resource "grafana_cloud_private_data_source_connect_network" "account" {
   stack_identifier = grafana_cloud_stack.observability_platform.id
 }
 
-resource "grafana_cloud_private_data_source_connect_network_token" "account" {
-  # Both legacy instances have exact handoffs below. Keep the destruction guard for unexpected state.
-  for_each = {}
-  provider = grafana.cloud
-
-  name           = "${local.gc_pdc_network_names[each.key]}-agent"
-  display_name   = "${each.key} (${grafana_cloud_stack.observability_platform.slug}) agents"
-  pdc_network_id = grafana_cloud_private_data_source_connect_network.account[each.key].pdc_network_id
-  region         = grafana_cloud_private_data_source_connect_network.account[each.key].region
-
-  lifecycle {
-    # Replacing this resource revokes the token before agents have read its replacement.
-    prevent_destroy = true
-  }
-}
-
 data "aws_iam_policy_document" "gc_pdc_token_kms" {
   for_each = local.gc_pdc_accounts
 
@@ -127,72 +111,8 @@ resource "aws_secretsmanager_secret" "gc_pdc_token" {
   tags       = local.gc_pdc_rotation_tags[each.key]
 
   lifecycle {
-    # Handoff removes the legacy token's indirect protection against destructive offboarding.
+    # Disabling an account must not destroy the secret its agents read their token from.
     prevent_destroy = true
-  }
-}
-
-resource "aws_secretsmanager_secret_version" "gc_pdc_token" {
-  for_each = {}
-
-  secret_id     = aws_secretsmanager_secret.gc_pdc_token[each.key].id
-  secret_string = grafana_cloud_private_data_source_connect_network_token.account[each.key].token
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-# Move each legacy instance separately: forgetting one must never revoke its working token.
-moved {
-  from = grafana_cloud_private_data_source_connect_network_token.account["sprinkler-development"]
-  to   = grafana_cloud_private_data_source_connect_network_token.pilot_handoff
-}
-
-removed {
-  from = grafana_cloud_private_data_source_connect_network_token.pilot_handoff
-
-  lifecycle {
-    destroy = false
-  }
-}
-
-moved {
-  from = aws_secretsmanager_secret_version.gc_pdc_token["sprinkler-development"]
-  to   = aws_secretsmanager_secret_version.pilot_handoff
-}
-
-removed {
-  from = aws_secretsmanager_secret_version.pilot_handoff
-
-  lifecycle {
-    destroy = false
-  }
-}
-
-moved {
-  from = grafana_cloud_private_data_source_connect_network_token.account["cooker-development"]
-  to   = grafana_cloud_private_data_source_connect_network_token.cooker_handoff
-}
-
-removed {
-  from = grafana_cloud_private_data_source_connect_network_token.cooker_handoff
-
-  lifecycle {
-    destroy = false
-  }
-}
-
-moved {
-  from = aws_secretsmanager_secret_version.gc_pdc_token["cooker-development"]
-  to   = aws_secretsmanager_secret_version.cooker_handoff
-}
-
-removed {
-  from = aws_secretsmanager_secret_version.cooker_handoff
-
-  lifecycle {
-    destroy = false
   }
 }
 

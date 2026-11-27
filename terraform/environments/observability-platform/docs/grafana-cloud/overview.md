@@ -139,9 +139,9 @@ and token secret ARN, keyed by account name.
 PDC agents are not deployed from this environment. The tenant module provides them,
 together with the networking for each shared VPC.
 
-Sprinkler development rotates automatically. Cooker development has a working
-token: the next reviewed handoff forgets its legacy token/version without
-revoking it and starts its own 90-day rotation. Neither account uses bootstrap.
+Sprinkler and Cooker development rotate on their own native 90-day schedules;
+Terraform forgot their original tokens and secret versions without revoking
+them. Neither account uses bootstrap.
 For a brand-new opt-in, the central apply must first issue `AWSCURRENT` through
 the bootstrap-capable Lambda; the tenant then deploys its existing agent module.
 No team member supplies a token. Development configures alpha.6 for
