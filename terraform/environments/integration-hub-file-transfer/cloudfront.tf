@@ -1,7 +1,7 @@
 module "cloudfront_web_app" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/cloudfront/aws"
-  version = "6.7.1"
+  version = "6.8.0"
 
   aliases               = [local.acm_domains.web_app]
   comment               = "Integration Hub File Transfer web app"
