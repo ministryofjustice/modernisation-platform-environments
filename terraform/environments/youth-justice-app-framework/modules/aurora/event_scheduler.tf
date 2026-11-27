@@ -26,7 +26,7 @@ resource "aws_iam_role_policy" "rds_scheduler" {
           "rds:StopDBCluster",
           "rds:DescribeDBClusters"
         ]
-        Resource = "arn:aws:rds:eu-west-2:${var.aws_account_id}:db:*"
+        Resource = "arn:aws:rds:eu-west-2:${var.aws_account_id}:cluster:*"
       }
     ]
   })
