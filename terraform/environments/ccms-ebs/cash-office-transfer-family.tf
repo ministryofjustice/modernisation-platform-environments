@@ -18,7 +18,7 @@ Until those bugs are addressed, the below resources are created manually:
 */
 
 module "transfer_family" {
-  count                         = (local.environment == "preproduction" || local.environment == "production")? 1 : 0
+  count                         = (local.environment == "test" || local.environment == "preproduction" || local.environment == "production") ? 1 : 0
   source                        = "./modules/transfer-family"
   aws_account_id                = data.aws_caller_identity.current.account_id
   app_name                      = local.application_name

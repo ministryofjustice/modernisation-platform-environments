@@ -1,13 +1,13 @@
 #--S3 Grants
-resource "aws_s3control_access_grants_instance" "this" {
-  identity_center_arn = var.aws_identity_centre_store_arn
-}
+# resource "aws_s3control_access_grants_instance" "this" {
+#   identity_center_arn = var.aws_identity_centre_store_arn
+# }
 
-resource "aws_s3control_access_grants_location" "this" {
-  depends_on     = [aws_s3control_access_grants_instance.this]
-  iam_role_arn   = aws_iam_role.s3.arn
-  location_scope = "s3://${var.bucket_name}"
-}
+# resource "aws_s3control_access_grants_location" "this" {
+#   depends_on     = [aws_s3control_access_grants_instance.this]
+#   iam_role_arn   = aws_iam_role.s3.arn
+#   location_scope = "s3://${var.bucket_name}"
+# }
 
 
 /* resource "aws_s3control_access_grant" "this" {
