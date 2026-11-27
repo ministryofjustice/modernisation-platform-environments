@@ -63,8 +63,15 @@ locals {
       }
     }
     production = {
-      pdc_token_rotator    = null
-      pdc_failure_alerts   = null
+      pdc_token_rotator = {
+        image_digest      = "sha256:e5f367b6af986020ff291b095f7ef0a44f56c7c7acd241fbaaae9484c81884c2" # v0.1.0-alpha.6
+        bootstrap_enabled = true
+      }
+      pdc_failure_alerts = {
+        slack_channel_id = "C06RA6C52TW"
+      }
+      # Phase 1: the common runtime only. Add the production tenants after both rotator
+      # credentials have been uploaded (docs/grafana-cloud/pdc-token-rotation.md).
       tenant_configuration = {}
     }
   }
