@@ -167,16 +167,16 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", label = "os" }
-          # "/dev/sdb" = { type = "gp3", label = "app" } # /u01
-          "/dev/sdc" = { type = "gp3", label = "app" }   # /u02
-          "/dev/sde" = { type = "gp3", label = "data" }  # DATA01
-          "/dev/sdf" = { type = "gp3", label = "data" }  # DATA02
-          "/dev/sdg" = { type = "gp3", label = "data" }  # DATA03
-          "/dev/sdh" = { type = "gp3", label = "data" }  # DATA04
-          "/dev/sdi" = { type = "gp3", label = "data" }  # DATA05
-          "/dev/sdj" = { type = "gp3", label = "flash" } # FLASH01
-          "/dev/sdk" = { type = "gp3", label = "flash" } # FLASH02
-          "/dev/sds" = { type = "gp3", label = "swap" }
+          "/dev/sdb"  = { type = "gp3", label = "app", snapshot_id = "snap-0f21ed23056396836" } # /u01
+          "/dev/sdc"  = { type = "gp3", label = "app" }                                         # /u02
+          "/dev/sde"  = { type = "gp3", label = "data" }                                        # DATA01
+          "/dev/sdf"  = { type = "gp3", label = "data" }                                        # DATA02
+          "/dev/sdg"  = { type = "gp3", label = "data" }                                        # DATA03
+          "/dev/sdh"  = { type = "gp3", label = "data" }                                        # DATA04
+          "/dev/sdi"  = { type = "gp3", label = "data" }                                        # DATA05
+          "/dev/sdj"  = { type = "gp3", label = "flash" }                                       # FLASH01
+          "/dev/sdk"  = { type = "gp3", label = "flash" }                                       # FLASH02
+          "/dev/sds"  = { type = "gp3", label = "swap" }
         }
         tags = merge(local.ec2_instances.oem.tags, {
           server-type = "base-ol85"
