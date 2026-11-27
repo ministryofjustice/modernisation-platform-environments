@@ -555,10 +555,12 @@ module "live_feed_daily_handover" {
 
     LOAD_MDSS_QUEUE_NAME = module.load_mdss_event_queue.sqs_queue.name
     LOAD_FMS_QUEUE_NAME  = module.load_fms_event_queue.sqs_queue.name
+    LOAD_GEMS_QUEUE_NAME = module.load_gems_event_queue.sqs_queue.name
 
     LOAD_MDSS_DLQ_NAME = module.load_mdss_event_queue.sqs_dlq.name
     CLEAN_DLT_DLQ_NAME = aws_sqs_queue.clean_dlt_load_dlq.name
     LOAD_FMS_DLQ_NAME  = module.load_fms_event_queue.sqs_dlq.name
+    LOAD_GEMS_DLQ_NAME = module.load_gems_event_queue.sqs_dlq.name
 
     PROCESS_LANDING_BUCKET_FILES_FMS_GENERAL_DLQ_NAME  = local.live_feed_dlq_names.process_landing_bucket_files_fms_general
     PROCESS_LANDING_BUCKET_FILES_FMS_HO_DLQ_NAME       = local.live_feed_dlq_names.process_landing_bucket_files_fms_ho
@@ -567,6 +569,8 @@ module "live_feed_daily_handover" {
     PROCESS_LANDING_BUCKET_FILES_MDSS_GENERAL_DLQ_NAME  = local.live_feed_dlq_names.process_landing_bucket_files_mdss_general
     PROCESS_LANDING_BUCKET_FILES_MDSS_HO_DLQ_NAME       = local.live_feed_dlq_names.process_landing_bucket_files_mdss_ho
     PROCESS_LANDING_BUCKET_FILES_MDSS_SPECIALS_DLQ_NAME = local.live_feed_dlq_names.process_landing_bucket_files_mdss_specials
+
+    PROCESS_LANDING_BUCKET_FILES_GEMS_GENERAL_DLQ_NAME  = local.live_feed_dlq_names.process_landing_bucket_files_gems_general
 
     SCAN_DLQ_NAME                   = local.live_feed_dlq_names.scan
     PROCESS_FMS_METADATA_DLQ_NAME   = local.live_feed_dlq_names.process_fms_metadata
@@ -594,6 +598,10 @@ module "live_feed_daily_handover" {
 
     FMS_DASHBOARD_NAME = (
       "fms-ops-${local.environment_shorthand}"
+    )
+
+    GEMS_DASHBOARD_NAME = (
+      "gems-ops-${local.environment_shorthand}"
     )
 
     LANDING_DASHBOARD_NAME = (
