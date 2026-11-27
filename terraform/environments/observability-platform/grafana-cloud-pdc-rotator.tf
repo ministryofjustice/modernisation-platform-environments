@@ -423,7 +423,7 @@ module "grafana_pdc_token_rotator" {
   for_each = local.gc_pdc_rotator_deployments
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.20.1"
+  version = "8.13.2"
 
   function_name = local.gc_pdc_rotator_role_name
   role_name     = local.gc_pdc_rotator_role_name
