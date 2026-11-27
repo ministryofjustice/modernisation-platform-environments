@@ -203,20 +203,20 @@ resource "aws_wafv2_web_acl_logging_configuration" "transfer_family_waf_logging"
   resource_arn            = aws_wafv2_web_acl.transfer_family[0].arn
 }
 
-resource "aws_transfer_web_app" "this" {
-  count = local.environment == "test" ? 1 : 0
+# resource "aws_transfer_web_app" "this" {
+#   count = local.environment == "test" ? 1 : 0
 
-  identity_provider_details {
-    identity_center_config {
-      instance_arn = tolist(data.aws_ssoadmin_instances.this[count.index].arns)[0]
-      role         = module.transfer_family[count.index].transfer_iam_role_arn
-    }
-  }
+#   identity_provider_details {
+#     identity_center_config {
+#       instance_arn = tolist(data.aws_ssoadmin_instances.this[count.index].arns)[0]
+#       role         = module.transfer_family[count.index].transfer_iam_role_arn
+#     }
+#   }
 
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-transfer-family-web-app", local.application_name, local.environment)) }
-  )
-}
+#   tags = merge(local.tags,
+#     { Name = lower(format("%s-%s-transfer-family-web-app", local.application_name, local.environment)) }
+#   )
+# }
 
 data "aws_ssoadmin_instances" "this" {
   count = local.environment == "test" ? 1 : 0
