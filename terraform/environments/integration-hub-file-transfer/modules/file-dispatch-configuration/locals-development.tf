@@ -37,5 +37,28 @@ locals {
         }
       }
     }
+
+    # Temporary dev-to-test push-to-sftp trial; delivers to the test environment's inbound Transfer server.
+    jelilat = {
+      "/push-to-sftp/" = {
+        action = {
+          name = "push-to-sftp"
+          push_to_sftp = {
+            hostname                = "sftp.test.file-transfer.service.justice.gov.uk"
+            port                    = 22
+            username                = "jelilat@development.file-transfer.service.justice.gov.uk"
+            destination_prefix      = ""
+            write_mode              = "direct"
+            host_public_keys        = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA50Zlk/twXrQJL/+boIvxSW69PKtrMli88LaQuJ6bTh"]
+            destination_cidr_blocks = ["13.41.214.181/32"]
+          }
+        }
+        notifications = {
+          email = null
+          slack = null
+          teams = null
+        }
+      }
+    }
   }
 }
