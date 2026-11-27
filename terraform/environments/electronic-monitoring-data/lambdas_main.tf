@@ -1084,7 +1084,7 @@ module "merge_ac_position" {
   handler                        = "merge_ac_position.handler"
   memory_size                    = 1024
   timeout                        = 900
-  reserved_concurrent_executions = 0
+  reserved_concurrent_executions = 1
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]

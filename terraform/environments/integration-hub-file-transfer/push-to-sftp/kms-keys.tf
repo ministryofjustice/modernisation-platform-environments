@@ -79,5 +79,34 @@ module "kms_credentials" {
   key_usage               = "ENCRYPT_DECRYPT"
   key_administrators      = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
 
+  key_statements = [
+    {
+      sid       = "AllowModernisationPlatformDeveloperDecryptPublicKey"
+      actions   = ["kms:Decrypt"]
+      resources = ["*"]
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      }]
+      condition = [
+        {
+          test     = "ArnLike"
+          variable = "aws:PrincipalArn"
+          values   = [local.modernisation_platform_developer_role_arn_pattern]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["secretsmanager.${data.aws_region.current.region}.amazonaws.com"]
+        },
+        {
+          test     = "ArnLike"
+          variable = "kms:EncryptionContext:SecretARN"
+          values   = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${local.sftp_key_secret_prefix}/*/public-??????"]
+        },
+      ]
+    },
+  ]
+
   tags = local.tags
 }

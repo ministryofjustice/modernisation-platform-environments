@@ -1,5 +1,5 @@
 data "aws_cloudwatch_event_bus" "file_transfer" {
-  name = local.parent_event_bus_name
+  name = local.application_name
 }
 
 module "eventbridge_push_to_sftp" {

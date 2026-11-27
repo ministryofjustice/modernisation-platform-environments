@@ -58,6 +58,7 @@ action = {
     port               = 22
     username           = "example"
     destination_prefix = "incoming/"
+    write_mode         = "posix" # optional: "posix" (default) or "direct"
     host_public_keys = [
       "ssh-ed25519 <verified-server-public-key-base64>",
     ]
@@ -67,6 +68,8 @@ action = {
 ```
 
 Replace the example CIDR with the recipient's approved IPv4 CIDRs and the host-key placeholder with the server public key verified through an independent channel. The port defaults to `22`. The destination prefix is relative to the SFTP account's starting directory and must be empty or end with `/`; a non-empty base directory must already exist.
+
+`write_mode` defaults to `"posix"`, which streams to a temporary `.mft-*.part` file, checks its remote size and atomically replaces the destination via `posix-rename@openssh.com`. Set `write_mode = "direct"` only for S3-backed AWS Transfer Family or write-only SFTP recipients that require sequential direct streaming to the final filename and do not support temporary-file rename.
 
 Keep the SSH client keypair in the delivery component's separate private/public Secrets Manager secrets, not in this action. The shared SFTP pipeline is always enabled, including when there are no configured entries; requests without an authorised entry are rejected. Complete recipient onboarding and interoperability checks before sending files through a configured route. See the
 [SFTP component](../../push-to-sftp/README.md) for deployment and credential handling.

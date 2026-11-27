@@ -280,7 +280,7 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
   }
 
   dynamic "queue" {
-    for_each = local.is-production ? {} : {
+    for_each = {
       person_record = "person_record/"
       cemo          = "cemo/"
     }
@@ -501,7 +501,7 @@ resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_position" 
 
 # target merge_ac_position
 resource "aws_cloudwatch_event_target" "merge_ac_position" {
-  count = 0
+  count = 1
   rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
   arn   = module.merge_ac_position[0].lambda_function_arn
 }

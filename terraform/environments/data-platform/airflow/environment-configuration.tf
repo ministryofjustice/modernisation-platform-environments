@@ -22,6 +22,20 @@ locals {
       airflow_celery_worker_autoscale = "7,1"
       airflow_dagbag_import_timeout   = 60
 
+      # >>> TEMPORARY (Airflow 3 asset partition demo): START
+      /* Airflow workflow access to the MWAA bucket
+         Prefix => workflow IAM role names. The roles are created by
+         ministryofjustice/analytical-platform-airflow in analytical-platform-data-production,
+         and must exist before this is applied (S3 and KMS reject unknown principals). */
+      mwaa_bucket_workflow_access = {
+        "asset-partition-demo" = [
+          "airflow-dp-test-data-platform-example-partition-lander",
+          "airflow-dp-test-data-platform-example-partition-producer",
+          "airflow-dp-test-data-platform-example-partition-hourly",
+          "airflow-dp-test-data-platform-example-partition-daily",
+        ]
+      }
+      # <<< TEMPORARY (Airflow 3 asset partition demo): END
     }
   }
 }
