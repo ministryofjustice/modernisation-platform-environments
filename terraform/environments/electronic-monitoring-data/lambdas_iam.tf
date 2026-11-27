@@ -1608,6 +1608,7 @@ data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
 
     actions = [
       "s3:GetObject",
+      "s3:ListBucket",
     ]
 
     resources = [
