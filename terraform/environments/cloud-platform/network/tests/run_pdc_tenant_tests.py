@@ -11,8 +11,8 @@ import tempfile
 NETWORK = Path(__file__).resolve().parents[1]
 FIXTURE = NETWORK / "tests" / "pdc-tenant"
 
-# Expected state of observability_platform.tf. Update these when enabling an account.
-ENABLED = {"cloud-platform-development"}
+# Expected state of observability_platform.tf: every workspace runs an agent, and only
+# cloud-platform-development uses the development stack.
 DEVELOPMENT_STACK = {"cloud-platform-development"}
 
 # Synthetic IDs from the fixture
@@ -27,12 +27,6 @@ MODULE = "module.observability_platform_tenant[0]."
 PDC = MODULE + "module.grafana_cloud[0]."
 AMAZON_MANAGED_GRAFANA = MODULE + "module.amazon_managed_grafana"
 TENANT_RESOURCES = 18
-
-# Test only: enable the tenant in the current workspace without changing its stack.
-FORCE_ENABLE = """locals {
-  pdc_tenant = merge(local.pdc_tenant_workspaces[terraform.workspace], { enabled = true })
-}
-"""
 
 
 def workspaces():
@@ -77,12 +71,6 @@ def primary_cidr(directory, environment, workspace):
     expression = "local.vpc_cidr[local.cp_vpc_name].primary\n"
     output = terraform(directory, environment | {"TF_WORKSPACE": workspace}, "console", "-no-color", stdin=expression)
     return json.loads(output.strip().splitlines()[-1])
-
-
-def check_disabled(workspace, changes):
-    if changes:
-        raise SystemExit(f"{workspace}: expected no changes, got {[change['address'] for change in changes]}.")
-    print(f"{workspace}: disabled, no changes.")
 
 
 def check_enabled(workspace, changes, stack, cidr):
@@ -183,18 +171,6 @@ def run():
         terraform(directory, environment, "workspace", "select", "-no-color", "default")
 
         for workspace in workspaces():
-            changes = plan(directory, environment, workspace)
-            if workspace in ENABLED:
-                stack = "development" if workspace in DEVELOPMENT_STACK else "production"
-                check_enabled(workspace, changes, stack, primary_cidr(directory, environment, workspace))
-            else:
-                check_disabled(workspace, changes)
-
-        # Never applied: prove a later enablement cannot point a production-stack account at development.
-        (directory / "pdc_tenant_override.tf").write_text(FORCE_ENABLE, encoding="utf-8")
-        for workspace in workspaces():
-            if workspace in ENABLED:
-                continue
             stack = "development" if workspace in DEVELOPMENT_STACK else "production"
             changes = plan(directory, environment, workspace)
             check_enabled(workspace, changes, stack, primary_cidr(directory, environment, workspace))

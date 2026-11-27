@@ -1,28 +1,28 @@
 locals {
   # Grafana Cloud stack for every CP3 network workspace. The Observability Platform account is derived from the stack,
   # so an account's token secret, restarter trust and stack always come from the same environment.
-  # Production-stack accounts stay disabled until Observability Platform production supports PDC; then enable one
-  # account per pull request, and never disable an enabled account (see ../README.md).
+  # Every account runs a PDC agent. Never change an enabled account's stack or disable it (see ../README.md).
   pdc_tenant_workspaces = {
     cloud-platform-development       = { stack = "development", enabled = true }
-    cloud-platform-preproduction     = { stack = "production", enabled = false }
-    cloud-platform-nonlive           = { stack = "production", enabled = false }
-    cloud-platform-live              = { stack = "production", enabled = false }
-    container-platform-octo-nonlive  = { stack = "production", enabled = false }
-    container-platform-octo-live     = { stack = "production", enabled = false }
-    container-platform-laa-nonlive   = { stack = "production", enabled = false }
-    container-platform-laa-live      = { stack = "production", enabled = false }
-    container-platform-hmpps-nonlive = { stack = "production", enabled = false }
-    container-platform-hmpps-live    = { stack = "production", enabled = false }
-    container-platform-cd-nonlive    = { stack = "production", enabled = false }
-    container-platform-cd-live       = { stack = "production", enabled = false }
+    cloud-platform-preproduction     = { stack = "production", enabled = true }
+    cloud-platform-nonlive           = { stack = "production", enabled = true }
+    cloud-platform-live              = { stack = "production", enabled = true }
+    container-platform-octo-nonlive  = { stack = "production", enabled = true }
+    container-platform-octo-live     = { stack = "production", enabled = true }
+    container-platform-laa-nonlive   = { stack = "production", enabled = true }
+    container-platform-laa-live      = { stack = "production", enabled = true }
+    container-platform-hmpps-nonlive = { stack = "production", enabled = true }
+    container-platform-hmpps-live    = { stack = "production", enabled = true }
+    container-platform-cd-nonlive    = { stack = "production", enabled = true }
+    container-platform-cd-live       = { stack = "production", enabled = true }
   }
 
   pdc_tenant = local.pdc_tenant_workspaces[terraform.workspace]
 }
 
-# Gate the whole tenant module: disabled workspaces must not create IAM roles either.
-# Each enabled account needs its central token secret bootstrapped before deployment.
+# Gate the whole tenant module: a disabled workspace must not create IAM roles either.
+# Each account needs its central token secret bootstrapped in its stack's Observability Platform account before
+# the agents are deployed. The production-stack accounts need Observability Platform production PDC applied first.
 module "observability_platform_tenant" {
   count = local.pdc_tenant.enabled ? 1 : 0
 

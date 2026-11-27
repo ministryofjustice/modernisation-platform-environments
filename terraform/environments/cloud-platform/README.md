@@ -80,16 +80,17 @@ cluster and service have fixed account-wide names.
 `local.pdc_tenant_workspaces` in
 [`network/observability_platform.tf`](network/observability_platform.tf) maps
 every workspace to its Grafana Cloud stack and whether the tenant is enabled.
-The OP account is derived from the stack (`observability-platform-<stack>`), so
-an account's token secret, KMS key, restarter-role trust and stack always come
-from the same OP environment.
+All twelve are enabled, so every CP3 account runs a PDC agent. The OP account
+is derived from the stack (`observability-platform-<stack>`), so an account's
+token secret, KMS key, restarter-role trust and stack always come from the same
+OP environment.
 
 | Workspace | Grafana Cloud stack | OP account | Tenant |
 | --- | --- | --- | --- |
 | `cloud-platform-development` | development | `observability-platform-development` | Enabled |
-| `cloud-platform-{preproduction,nonlive,live}` | production | `observability-platform-production` | Disabled |
-| `container-platform-{octo,laa,hmpps,cd}-nonlive` | production | `observability-platform-production` | Disabled |
-| `container-platform-{octo,laa,hmpps,cd}-live` | production | `observability-platform-production` | Disabled |
+| `cloud-platform-{preproduction,nonlive,live}` | production | `observability-platform-production` | Enabled |
+| `container-platform-{octo,laa,hmpps,cd}-nonlive` | production | `observability-platform-production` | Enabled |
+| `container-platform-{octo,laa,hmpps,cd}-live` | production | `observability-platform-production` | Enabled |
 
 CP3 uses Grafana Cloud only, so the tenant module (v3.2.0) runs with
 `enable_amazon_managed_grafana = false` and creates no Amazon Managed Grafana
@@ -97,18 +98,18 @@ CP3 uses Grafana Cloud only, so the tenant module (v3.2.0) runs with
 module's `grafana-cloud` role, which has CloudWatch, Amazon Managed Service for
 Prometheus query and X-Ray read access.
 
-The **whole module** is gated on `enabled`: disabled workspaces create no tenant
-IAM roles, policy attachments or PDC resources. An enabled account must match an
-account with `pdc_enabled = true` in the same stack's
+The **whole module** is gated on `enabled`: a disabled workspace would create no
+tenant IAM roles, policy attachments or PDC resources. Each account must match
+an account with `pdc_enabled = true` in the same stack's
 [OP tenant configuration](../observability-platform/grafana-cloud-tenant-environment-configurations.tf),
 which also creates its CloudWatch data source and its `grafana-cloud/pdc/<account ID>`
-token secret. Do not add CloudWatch data sources for disabled accounts: they
-would reference the missing `grafana-cloud` role.
+token secret. Do not add CloudWatch data sources for accounts without the
+tenant module: they would reference the missing `grafana-cloud` role.
 
 The module's `moved` block preserves existing resources in enabled workspaces
-when adding its count index. Never disable an enabled account or change its
-stack: either would destroy or replace its tenant resources. If a disabled
-workspace already has tenant resources in state, stop and reconcile its
+when adding its count index. Never disable an account or change its stack:
+either would destroy or replace its tenant resources. If a workspace already has
+tenant resources in state from another component, stop and reconcile their
 ownership before deployment rather than approving a destroy. Never import
 resources owned by another component.
 
@@ -125,27 +126,35 @@ PDC PrivateLink endpoints serve either stack.
 
 #### Rollout order
 
-`cloud-platform-development` on the development stack comes first. Enable a
-production-stack account only after **both**:
+`cloud-platform-development` uses the development stack, which OP already
+supports, so its apply only needs the OP development checks below. The eleven
+production-stack accounts are enabled in the same change and **must not be
+deployed until both of these hold**:
 
-1. **OP production is verified for that account.** OP production supports PDC
-   (rotator, enrolment, alerts and tenant configuration). The account has
-   `pdc_enabled = true` in the production tenant configuration. Using metadata
-   only (never retrieve the token), its bootstrap journal is `completed`, its
-   secret has a single version labelled only `AWSCURRENT`, and its enrolment
-   rule, target, Lambda permissions and delivery alarm exist.
-2. **The CP3 private-subnet preflight passes in that account.** From its
+1. **OP production PDC is applied for all eleven accounts.** OP production
+   supports PDC (rotator, enrolment, alerts and tenant configuration), and each
+   account has `pdc_enabled = true` in the production tenant configuration.
+   Using metadata only (never retrieve the token), each account's bootstrap
+   journal is `completed`, its secret has a single version labelled only
+   `AWSCURRENT`, and its enrolment rule, target, Lambda permissions and delivery
+   alarm exist.
+2. **The CP3 private-subnet preflight passes** in the accounts. From their
    private subnets, the hub DNS names resolve to the shared endpoints, TLS on
    443 and TCP on 22 connect, and the agent image can be pulled.
 
-Then enable **one account per pull request** by setting its `enabled = true`,
-without changing its stack. This matters most for the `container-platform-*`
-workspaces, whose network applies run on merge without an approval gate. The
-central token rotator has a reserved concurrency of one, so wait for each
-account's enrolment to reach `enrolled` (first rotation done, agents
-reconnected) before enabling the next.
+Planning does not depend on OP production: the tenant module only reads the
+account's own region, identity and private subnet, and builds the OP token
+secret ARN and restarter trust from the OP production account ID. The
+agents, however, cannot start without their token secrets, so **merging before
+OP production is applied leaves the agents failing and retrying**. This
+matters most for the `container-platform-*` workspaces, whose network applies
+run on merge without an approval gate. The central token rotator has a
+reserved concurrency of one, so expect the eleven enrolments to be serialised.
+Confirm OP production copes with that, and watch each account's
+enrolment reach `enrolled` (first rotation done, agents reconnected) rather
+than waiting for the one-day pending alert.
 
-Before changing the mapping, update `ENABLED` and `DEVELOPMENT_STACK` in
+If the mapping ever needs to change, update `DEVELOPMENT_STACK` in
 [`network/tests/run_pdc_tenant_tests.py`](network/tests/run_pdc_tenant_tests.py)
 and run it:
 
@@ -154,13 +163,10 @@ python3 terraform/environments/cloud-platform/network/tests/run_pdc_tenant_tests
 ```
 
 It plans the real gate in all twelve workspaces against a mocked AWS provider,
-without a backend or credentials. Enabled workspaces must plan exactly 18 tenant
-creates and no Amazon Managed Grafana resources, with their stack's OP account
-and stack ID, three private Fargate tasks and the VPC primary CIDR target.
-Disabled workspaces must have no changes. It then
-force-enables each disabled workspace, without ever applying, to prove its
-token secret, KMS access, restarter trust and stack all use its own stack's OP
-account.
+without a backend or credentials. Every workspace must plan exactly 18 tenant
+creates and no Amazon Managed Grafana resources, with its stack's OP account
+and stack ID (so its token secret, KMS access and restarter trust all use that
+account), three private Fargate tasks and the VPC primary CIDR target.
 
 #### Apply order
 
@@ -177,12 +183,13 @@ environment.
 | `container-platform-*` (from [`accounts.json`](accounts.json)) | `container-platform.yml`, on `main`, in parallel | `<account name>-network` | None |
 
 Outside development, each account's network job runs after its root job. An
-apply job only runs when its plan has changes. Any merge under
-`terraform/environments/cloud-platform/` can therefore apply network changes to
-every `container-platform-*` account immediately. The whole-module gate keeps
-this tenant rollout a no-op in every disabled network workspace.
+apply job only runs when its plan has changes. Pull requests only plan the
+preproduction, nonlive, live and `container-platform-*` accounts. Merging this
+change therefore applies the tenant module to all eleven production-stack
+accounts at once, and the eight `container-platform-*` applies run
+immediately with no approval gate.
 
-For each account:
+Before merging, for the eleven production-stack accounts:
 
 1. Confirm the shared endpoint hub from
    [ministryofjustice/modernisation-platform#14437](https://github.com/ministryofjustice/modernisation-platform/pull/14437)
@@ -193,23 +200,25 @@ For each account:
    `pdc-grafana-datasources.eu-west-2.vpce.grafana.net` must resolve to the hub
    endpoints and accept TCP 443 and 22 respectively. CP3 already associates
    the hub's Route 53 Profile and routes `10.20.240.0/20` through the Transit Gateway.
-2. Apply the OP change for the account's stack. Its apply bootstraps the
-   `grafana-cloud/pdc/<account ID>` secret in that stack's OP account through
+2. Apply the OP production change. Its apply bootstraps each
+   `grafana-cloud/pdc/<account ID>` secret in the production OP account through
    the central token rotator. Do not apply it while any existing account's
    rotation step is in flight. Using metadata only (never retrieve the token),
-   confirm that:
+   confirm for every account that:
    - its bootstrap journal is `completed`
    - its secret has a single version, labelled only `AWSCURRENT`
    - its enrolment rule, target, Lambda permissions and delivery alarm exist
 
    See the [PDC token lifecycle runbook](../observability-platform/docs/grafana-cloud/pdc-token-rotation.md).
-3. Deploy its agents: approve its `cloud-platform-*` network apply, or merge
-   its `container-platform-*` change. Confirm three running tasks and connected
-   agents in its Grafana PDC network. Wait for its enrolment to reach `enrolled`
-   (first rotation done, agents reconnected) before enabling the next account.
-   Check the agent logs and image retrieval if tasks do not start. Pending
-   enrolment alerts after one day, so do not leave bootstrapped accounts
-   without agents.
+3. Merge this change. The eight `container-platform-*` network applies run
+   immediately; approve each `cloud-platform-{preproduction,nonlive,live}`
+   network apply (`cloud-platform-development`'s apply is approved on the pull
+   request once its OP development checks hold). Confirm
+   three running tasks and connected agents in each account's Grafana PDC
+   network, and that each enrolment reaches `enrolled` (first rotation done,
+   agents reconnected). Check the agent logs and image retrieval if tasks do not
+   start. Pending enrolment alerts after one day, so do not leave bootstrapped
+   accounts without agents.
 
 ### **Restrictions on access:**
 
