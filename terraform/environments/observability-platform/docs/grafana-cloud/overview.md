@@ -139,15 +139,19 @@ and token secret ARN, keyed by account name.
 PDC agents are not deployed from this environment. The tenant module provides them,
 together with the networking for each shared VPC.
 
-Sprinkler development rotates automatically. Cooker development has a working
-token: the next reviewed handoff forgets its legacy token/version without
-revoking it and starts its own 90-day rotation. Neither account uses bootstrap.
+Sprinkler and Cooker development rotate on their own native 90-day schedules;
+Terraform forgot their original tokens and secret versions without revoking
+them. Neither account uses bootstrap.
 For a brand-new opt-in, the central apply must first issue `AWSCURRENT` through
 the bootstrap-capable Lambda; the tenant then deploys its existing agent module.
-No team member supplies a token. Development configures alpha.6 for Example:
-after bootstrap, an hourly readiness check enrols its secret in 90-day rotation
-only when stable ECS agents are connected to the expected Grafana network.
-Production has no opt-ins or enrolment ticks. See the [PDC rollout runbook](pdc-token-rotation.md).
+No team member supplies a token. Development configures alpha.6 for
+`example-development` and `cloud-platform-development`. After bootstrap,
+an hourly readiness check enrols each secret in 90-day rotation only when stable
+ECS agents are connected to that account's Grafana network. Cloud Platform
+preproduction, nonlive and live, and all eight Container Platform accounts,
+belong on the production Grafana Cloud stack, not development. See the
+[development offboarding and cleanup instructions](pdc-token-rotation.md#retire-the-three-cp3-accounts-from-development).
+Production runs the same rotator runtime for the Cloud Platform and Container Platform accounts, added in a second apply once its credentials exist: see the [production rollout](pdc-token-rotation.md#production-rollout-for-cloud-platform-and-container-platform).
 
 Grafana Cloud management API calls, browser access and alert notifications
 go over public HTTPS.
@@ -231,8 +235,10 @@ Terraform reconciliation; it does not create data sources or onboard accounts.
 Existing AWS tenant grants and sharing still apply, and configured tenant teams
 retain Query on the shared GitHub source. GitHub queries use the stack's shared
 GitHub App installation; Grafana permissions do not filter results by the
-signed-in user's GitHub repository access. Production currently has no onboarded
-AWS accounts; the two teams can query the GitHub source but no AWS sources.
+signed-in user's GitHub repository access. Production's onboarded AWS accounts are
+the Cloud Platform and Container Platform accounts in the `cloud-platform` tenant,
+which has no `github_team`: the `cloud-platform` team can query their data sources
+and the `modernisation-platform` team can query the GitHub source but no AWS sources.
 Managing the GitHub source's permissions removes its default Viewer and Editor
 grants in both stacks; Admins retain access.
 

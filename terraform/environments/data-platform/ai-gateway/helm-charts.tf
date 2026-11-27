@@ -38,7 +38,7 @@ resource "helm_release" "litellm_admin" {
         serviceAccountName     = kubernetes_service_account_v1.ai_gateway.metadata[0].name
         ingressHostname        = "admin.${local.environment_configuration.ai_gateway_hostname}"
         proxyHostname          = local.environment_configuration.ai_gateway_hostname
-        gatewayUrlEnabled      = contains(["development", "test"], local.environment)
+        gatewayUrlEnabled      = contains(["development", "test", "preproduction"], local.environment)
 
         # Database
         databaseSecret            = "aurora"

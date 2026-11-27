@@ -46,15 +46,29 @@ locals {
   application_name = "observability-platform"
   tags             = { application = "observability-platform" }
   gc_accounts      = var.use_environment_configuration ? module.checked_in_configuration.pdc_accounts : var.accounts
-  all_account_ids = {
-    sprinkler-development      = format("%012d", 1)
-    cooker-development         = format("%012d", 2)
-    disabled-development       = format("%012d", 3)
-    production-observability-a = format("%012d", 6)
-    production-observability-b = format("%012d", 7)
-    new-development            = format("%012d", 8)
-    example-development        = format("%012d", 9)
-  }
+  all_account_ids = merge({
+    sprinkler-development              = format("%012d", 1)
+    cooker-development                 = format("%012d", 2)
+    disabled-development               = format("%012d", 3)
+    observability-platform-development = format("%012d", 4)
+    production-observability-a         = format("%012d", 6)
+    production-observability-b         = format("%012d", 7)
+    new-development                    = format("%012d", 8)
+    example-development                = format("%012d", 9)
+    cloud-platform-development         = format("%012d", 10)
+    # The Cloud Platform and Container Platform accounts configured for production.
+    cloud-platform-preproduction     = format("%012d", 20)
+    cloud-platform-nonlive           = format("%012d", 21)
+    cloud-platform-live              = format("%012d", 22)
+    container-platform-octo-nonlive  = format("%012d", 23)
+    container-platform-octo-live     = format("%012d", 24)
+    container-platform-laa-nonlive   = format("%012d", 25)
+    container-platform-laa-live      = format("%012d", 26)
+    container-platform-hmpps-nonlive = format("%012d", 27)
+    container-platform-hmpps-live    = format("%012d", 28)
+    container-platform-cd-nonlive    = format("%012d", 29)
+    container-platform-cd-live       = format("%012d", 30)
+  }, { for i in range(211) : "scale-${i}" => format("%012d", 1000 + i) })
   environment_management = {
     account_ids = {
       core-shared-services-production = format("%012d", 5)

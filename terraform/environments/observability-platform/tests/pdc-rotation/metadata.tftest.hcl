@@ -19,6 +19,9 @@ mock_provider "aws" {
   mock_resource "aws_secretsmanager_secret" {
     defaults = { arn = "arn:aws:secretsmanager:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:secret:grafana-cloud/pdc/mock-ABCDEF" }
   }
+  mock_resource "aws_cloudwatch_event_rule" {
+    defaults = { arn = "arn:aws:events:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:rule/mock" }
+  }
   mock_resource "aws_kms_key" {
     defaults = { arn = "arn:aws:kms:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:key/12345678-1234-1234-1234-abcdefabcdef" }
   }
@@ -134,8 +137,6 @@ run "central_metadata_without_activation" {
     condition = (
       !contains(keys(aws_secretsmanager_secret.gc_pdc_token), "disabled-development") &&
       length(terraform_data.gc_pdc_bootstrap) == 0 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
       length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
       length(module.grafana_pdc_token_rotator) == 0 &&
       length(aws_dynamodb_table.gc_pdc_rotation_state) == 0 &&
@@ -146,6 +147,9 @@ run "central_metadata_without_activation" {
       length(grafana_cloud_access_policy.gc_pdc_rotator) == 0 &&
       length(grafana_cloud_stack_service_account.gc_pdc_rotator_query) == 0 &&
       length(grafana_data_source_permission_item.gc_pdc_rotator_query) == 0 &&
+      alltrue([for key in aws_kms_key.gc_pdc_token : alltrue([
+        for statement in jsondecode(key.policy).Statement : statement.Sid != "AllowRotatorForThisSecret"
+      ])]) &&
       length(aws_sns_topic.gc_pdc_failure_alerts) == 1 &&
       length(module.gc_pdc_failure_chatbot) == 1
     )
@@ -158,11 +162,11 @@ run "central_metadata_without_activation" {
       aws_sns_topic.gc_pdc_failure_alerts["this"].name == "grafana-pdc-rotation-failures-development" &&
       aws_sns_topic.gc_pdc_failure_alerts["this"].kms_master_key_id == aws_kms_key.gc_pdc_failure_alerts["this"].arn &&
       jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[0].Condition.StringEquals["aws:SourceAccount"] == data.aws_caller_identity.current.account_id &&
-      jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[0].Condition.ArnEquals["aws:SourceArn"] == [local.gc_pdc_failure_alarm_arn] &&
+      jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[0].Condition.ArnLike["aws:SourceArn"] == [local.gc_pdc_failure_alarm_arn] &&
       jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[1].Condition.StringEquals["aws:SourceAccount"] == data.aws_caller_identity.current.account_id &&
       jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[1].Condition.ArnEquals["aws:SourceArn"] == local.gc_pdc_failure_rule_arn &&
       one([for statement in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : statement if statement.Sid == "AllowCloudWatchAlarmToUseKey"]).Condition.StringEquals["aws:SourceAccount"] == data.aws_caller_identity.current.account_id &&
-      one([for statement in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : statement if statement.Sid == "AllowCloudWatchAlarmToUseKey"]).Condition.ArnEquals["aws:SourceArn"] == [local.gc_pdc_failure_alarm_arn] &&
+      one([for statement in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : statement if statement.Sid == "AllowCloudWatchAlarmToUseKey"]).Condition.ArnLike["aws:SourceArn"] == [local.gc_pdc_failure_alarm_arn] &&
       one([for statement in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : statement if statement.Sid == "AllowEventBridgeRuleToUseKey"]).Condition.StringEquals["aws:SourceAccount"] == data.aws_caller_identity.current.account_id &&
       one([for statement in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : statement if statement.Sid == "AllowEventBridgeRuleToUseKey"]).Condition.ArnEquals["aws:SourceArn"] == local.gc_pdc_failure_rule_arn
     )
@@ -182,10 +186,8 @@ run "prepared_runtime_permissions" {
 
   assert {
     condition = (
-      toset(one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "AssumeTenantRestarters"])) == toset([
-        "arn:aws:iam::${format("%012d", 1)}:role/grafana-pdc-agent-restarter",
-        "arn:aws:iam::${format("%012d", 2)}:role/grafana-pdc-agent-restarter",
-      ]) &&
+      one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "AssumeTenantRestarters"]) == ["arn:aws:iam::*:role/grafana-pdc-agent-restarter"] &&
+      toset(one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Condition.StringEquals["aws:ResourceAccount"] if s.Sid == "AssumeTenantRestarters"])) == toset([for id in [1, 2] : format("%012d", id)]) &&
       one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "ReadGrafanaCredential"]) == [aws_secretsmanager_secret.gc_pdc_rotator_credential["management-token"].arn] &&
       one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s if s.Sid == "DecryptGrafanaCredential"]) == {
         Sid      = "DecryptGrafanaCredential"
@@ -251,8 +253,6 @@ run "prepared_runtime_permissions" {
         )
       ]) &&
       length(terraform_data.gc_pdc_bootstrap) == 0 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
       toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"]) &&
       toset(keys(local.gc_pdc_rotation_triggers)) == toset(["sprinkler-development", "cooker-development"]) &&
       alltrue([for name, trigger in local.gc_pdc_rotation_triggers : (
@@ -331,7 +331,7 @@ run "new_account_without_capable_image_fails_closed" {
   expect_failures = [terraform_data.gc_pdc_bootstrap["new-development"]]
 }
 
-run "example_development_uses_readiness_enrolment" {
+run "development_first_issuance_accounts_use_readiness_enrolment" {
   command = plan
 
   variables {
@@ -342,19 +342,38 @@ run "example_development_uses_readiness_enrolment" {
     condition = (
       alltrue([for names in [
         keys(terraform_data.gc_pdc_bootstrap), keys(aws_cloudwatch_event_rule.gc_pdc_enrolment),
-        keys(aws_cloudwatch_event_target.gc_pdc_enrolment), keys(aws_lambda_permission.gc_pdc_enrolment_tick),
-        keys(aws_lambda_permission.gc_pdc_enrolment_rotation), keys(aws_cloudwatch_metric_alarm.gc_pdc_enrolment_delivery),
-      ] : toset(names) == toset(["example-development"])]) &&
-      aws_secretsmanager_secret.gc_pdc_token["example-development"].tags["pdc:bootstrap"] == "true" &&
-      aws_secretsmanager_secret.gc_pdc_token["example-development"].tags["pdc:rotation-interval-days"] == "90" &&
-      aws_secretsmanager_secret.gc_pdc_token["example-development"].tags["pdc:token-ttl-seconds"] == tostring(97 * 86400) &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
+        keys(aws_cloudwatch_event_target.gc_pdc_enrolment), keys(aws_cloudwatch_metric_alarm.gc_pdc_enrolment_delivery),
+        ] : toset(names) == toset([
+          "example-development",
+          "cloud-platform-development",
+      ])]) &&
+      alltrue([for name in keys(terraform_data.gc_pdc_bootstrap) : (
+        aws_secretsmanager_secret.gc_pdc_token[name].tags["pdc:bootstrap"] == "true" &&
+        aws_secretsmanager_secret.gc_pdc_token[name].tags["pdc:rotation-interval-days"] == "90" &&
+        aws_secretsmanager_secret.gc_pdc_token[name].tags["pdc:token-ttl-seconds"] == tostring(97 * 86400) &&
+        local.gc_pdc_restarter_role_arns[name] == "arn:aws:iam::${local.all_account_ids[name]}:role/grafana-pdc-agent-restarter"
+      )]) &&
+      length(local.gc_pdc_restarter_role_arns) == 4 &&
       length(aws_lambda_permission.gc_pdc_bootstrap) == 1 &&
-      toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"]) &&
-      local.gc_pdc_restarter_role_arns["example-development"] == "arn:aws:iam::${format("%012d", 9)}:role/grafana-pdc-agent-restarter"
+      length(aws_lambda_permission.gc_pdc_enrolment_tick) == 1 &&
+      length(aws_lambda_permission.gc_pdc_enrolment_rotation) == 1 &&
+      toset(keys(aws_secretsmanager_secret_rotation.gc_pdc_token)) == toset(["sprinkler-development", "cooker-development"])
     )
-    error_message = "Only Example gets first issuance and a readiness tick; the seeded development accounts keep their native Terraform schedules."
+    error_message = "Only Example and cloud-platform-development get first issuance and readiness ticks; Sprinkler and Cooker must keep their native Terraform schedules."
+  }
+
+  assert {
+    condition = alltrue([for names in [
+      keys(grafana_cloud_private_data_source_connect_network.account), keys(aws_secretsmanager_secret.gc_pdc_token),
+      keys(aws_kms_key.gc_pdc_token), keys(aws_kms_alias.gc_pdc_token), keys(aws_secretsmanager_secret_policy.gc_pdc_token),
+      keys(data.aws_iam_policy_document.gc_pdc_token_kms), keys(data.aws_iam_policy_document.gc_pdc_token_secret),
+      ] : toset(names) == toset([
+        "sprinkler-development",
+        "cooker-development",
+        "example-development",
+        "cloud-platform-development",
+    ])])
+    error_message = "Each opted-in account must have its own network, protected secret, KMS key and alias, and scoped policies."
   }
 }
 
@@ -407,8 +426,7 @@ run "production_common_runtime_without_pdc_accounts" {
       length(aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri) == 0 &&
       length(grafana_cloud_private_data_source_connect_network.account) == 0 &&
       length(aws_kms_key.gc_pdc_token) == 0 && length(aws_secretsmanager_secret.gc_pdc_token) == 0 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 && length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
+      length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
       length(aws_lambda_permission.gc_pdc_bootstrap) == 0 && length(terraform_data.gc_pdc_bootstrap) == 0 &&
       length(local.gc_pdc_rotation_triggers) == 0 && length(local.gc_pdc_enrolment_accounts) == 0 &&
       length(aws_cloudwatch_event_rule.gc_pdc_enrolment) == 0 && length(aws_cloudwatch_event_target.gc_pdc_enrolment) == 0 &&
@@ -441,17 +459,14 @@ run "new_opt_in_bootstrap_and_tick" {
       toset(keys(terraform_data.gc_pdc_bootstrap)) == toset(["new-development"]) &&
       aws_secretsmanager_secret.gc_pdc_token["new-development"].tags["pdc:bootstrap"] == "true" &&
       alltrue([for k in ["sprinkler-development", "cooker-development"] : !contains(keys(aws_secretsmanager_secret.gc_pdc_token[k].tags), "pdc:bootstrap")]) &&
-      contains(one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "RotatePdcSecrets"]), aws_secretsmanager_secret.gc_pdc_token["new-development"].arn) &&
-      toset(one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "AssumeTenantRestarters"])) == toset([
-        for id in [1, 2, 8] : "arn:aws:iam::${format("%012d", id)}:role/grafana-pdc-agent-restarter"
-      ]) &&
+      one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if s.Sid == "RotatePdcSecrets"]) == [local.gc_pdc_secret_arn_pattern] &&
+      toset(one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Condition.StringEquals["aws:ResourceAccount"] if s.Sid == "AssumeTenantRestarters"])) == toset([for id in [1, 2, 8] : format("%012d", id)]) &&
       aws_lambda_permission.gc_pdc_bootstrap["this"].action == "lambda:InvokeFunction" &&
       aws_lambda_permission.gc_pdc_bootstrap["this"].function_name == module.grafana_pdc_token_rotator["this"].lambda_function_arn &&
       aws_lambda_permission.gc_pdc_bootstrap["this"].principal == "arn:aws:iam::@MOCK_PLATFORM_ACCOUNT@:role/github-actions-apply" &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 && length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
       !contains(keys(aws_secretsmanager_secret_rotation.gc_pdc_token), "new-development")
     )
-    error_message = "New accounts get one bootstrap action, scoped access, no Terraform token/version and no premature schedule."
+    error_message = "New accounts get one bootstrap action, scoped access and no premature schedule."
   }
 
   assert {
@@ -473,13 +488,13 @@ run "new_opt_in_bootstrap_and_tick" {
         Step     = "enrolRotation"
         SecretId = aws_secretsmanager_secret.gc_pdc_token["new-development"].arn
       } &&
-      aws_lambda_permission.gc_pdc_enrolment_tick["new-development"].principal == "events.amazonaws.com" &&
-      aws_lambda_permission.gc_pdc_enrolment_tick["new-development"].source_arn == aws_cloudwatch_event_rule.gc_pdc_enrolment["new-development"].arn &&
-      aws_lambda_permission.gc_pdc_enrolment_rotation["new-development"].principal == "secretsmanager.amazonaws.com" &&
-      aws_lambda_permission.gc_pdc_enrolment_rotation["new-development"].source_arn == aws_secretsmanager_secret.gc_pdc_token["new-development"].arn &&
-      aws_lambda_permission.gc_pdc_enrolment_rotation["new-development"].source_account == data.aws_caller_identity.current.account_id &&
-      alltrue([for permission in [aws_lambda_permission.gc_pdc_enrolment_tick["new-development"], aws_lambda_permission.gc_pdc_enrolment_rotation["new-development"]] :
-        permission.action == "lambda:InvokeFunction" && permission.function_name == local.gc_pdc_function_arn
+      aws_lambda_permission.gc_pdc_enrolment_tick["this"].principal == "events.amazonaws.com" &&
+      aws_lambda_permission.gc_pdc_enrolment_tick["this"].source_arn == "arn:aws:events:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:rule/pdc-enrol-*" &&
+      aws_lambda_permission.gc_pdc_enrolment_rotation["this"].principal == "secretsmanager.amazonaws.com" &&
+      aws_lambda_permission.gc_pdc_enrolment_rotation["this"].source_arn == local.gc_pdc_secret_arn_pattern &&
+      alltrue([for permission in [aws_lambda_permission.gc_pdc_enrolment_tick["this"], aws_lambda_permission.gc_pdc_enrolment_rotation["this"]] :
+        permission.action == "lambda:InvokeFunction" && permission.function_name == local.gc_pdc_function_arn &&
+        permission.source_account == data.aws_caller_identity.current.account_id
       ])
     )
     error_message = "The hourly tick and both service permissions must address only the intended rule, tenant secret and unqualified rotator."
@@ -488,11 +503,17 @@ run "new_opt_in_bootstrap_and_tick" {
   assert {
     condition = (
       one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s if contains(s.Action, "secretsmanager:RotateSecret")]) == {
-        Sid       = "EnrolBootstrappedSecrets"
-        Effect    = "Allow"
-        Action    = ["secretsmanager:RotateSecret"]
-        Resource  = [aws_secretsmanager_secret.gc_pdc_token["new-development"].arn]
-        Condition = { ArnEquals = { "secretsmanager:RotationLambdaARN" = local.gc_pdc_function_arn } }
+        Sid      = "EnrolBootstrappedSecrets"
+        Effect   = "Allow"
+        Action   = ["secretsmanager:RotateSecret"]
+        Resource = [local.gc_pdc_secret_arn_pattern]
+        Condition = {
+          ArnEquals = { "secretsmanager:RotationLambdaARN" = local.gc_pdc_function_arn }
+          StringEquals = {
+            "secretsmanager:ResourceTag/pdc:rotator-stack-id" = grafana_cloud_stack.observability_platform.id
+            "secretsmanager:ResourceTag/pdc:bootstrap"        = "true"
+          }
+        }
       } &&
       one([for s in jsondecode(aws_iam_policy.gc_pdc_rotator["this"].policy).Statement : s.Resource if contains(s.Action, "lambda:InvokeFunction")]) == [local.gc_pdc_function_arn]
     )
@@ -504,9 +525,9 @@ run "new_opt_in_bootstrap_and_tick" {
       aws_cloudwatch_metric_alarm.gc_pdc_enrolment_delivery["new-development"].metric_name == "FailedInvocations" &&
       aws_cloudwatch_metric_alarm.gc_pdc_enrolment_delivery["new-development"].dimensions.RuleName == aws_cloudwatch_event_rule.gc_pdc_enrolment["new-development"].name &&
       aws_cloudwatch_metric_alarm.gc_pdc_enrolment_delivery["new-development"].alarm_actions == toset([aws_sns_topic.gc_pdc_failure_alerts["this"].arn]) &&
-      tolist(local.gc_pdc_failure_alarm_arns) == tolist([local.gc_pdc_failure_alarm_arn, "arn:aws:cloudwatch:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:alarm:${aws_cloudwatch_metric_alarm.gc_pdc_enrolment_delivery["new-development"].alarm_name}"]) &&
-      tolist(jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[0].Condition.ArnEquals["aws:SourceArn"]) == tolist(local.gc_pdc_failure_alarm_arns) &&
-      tolist(one([for s in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : s.Condition.ArnEquals["aws:SourceArn"] if s.Sid == "AllowCloudWatchAlarmToUseKey"])) == tolist(local.gc_pdc_failure_alarm_arns)
+      tolist(local.gc_pdc_failure_alarm_arns) == tolist([local.gc_pdc_failure_alarm_arn, "arn:aws:cloudwatch:eu-west-2:@MOCK_PLATFORM_ACCOUNT@:alarm:pdc-enrol-*-delivery-failed"]) &&
+      tolist(jsondecode(aws_sns_topic_policy.gc_pdc_failure_alerts["this"].policy).Statement[0].Condition.ArnLike["aws:SourceArn"]) == tolist(local.gc_pdc_failure_alarm_arns) &&
+      tolist(one([for s in jsondecode(aws_kms_key.gc_pdc_failure_alerts["this"].policy).Statement : s.Condition.ArnLike["aws:SourceArn"] if s.Sid == "AllowCloudWatchAlarmToUseKey"])) == tolist(local.gc_pdc_failure_alarm_arns)
     )
     error_message = "EventBridge delivery failures need a rule-specific alarm with permission to use the encrypted alerts topic."
   }

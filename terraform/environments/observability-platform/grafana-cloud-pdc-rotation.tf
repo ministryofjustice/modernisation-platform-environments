@@ -46,6 +46,9 @@ locals {
         "pdc:ecs-cluster"       = "grafana-pdc-agent"
         "pdc:ecs-service"       = "grafana-pdc-agent"
       },
+      length(local.gc_pdc_rotator_deployments) > 0 ? {
+        "pdc:rotator-stack-id" = grafana_cloud_stack.observability_platform.id
+      } : {},
       contains(keys(local.gc_pdc_bootstrap_accounts), account_name) ? {
         "pdc:bootstrap"              = "true"
         "pdc:rotation-interval-days" = tostring(local.pdc_rotation_interval_days)
