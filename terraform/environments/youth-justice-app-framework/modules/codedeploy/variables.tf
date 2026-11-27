@@ -29,6 +29,17 @@ variable "yjsm_hub_svc_alb_name" {
   type        = string
 }
 
+variable "yjsm_apps_alb_name" {
+  description = "The name of the yjsm apps (yjsm-ui, yjsm-hub, yjsm-hubadmin) ALB"
+  type        = string
+}
+
+variable "yjsm_apps_listener_ports" {
+  description = "Listener port on the yjsm apps ALB for each yjsm app, keyed by service name. Each app has its own listener, so a service in the services list with the ALB type set to its own name uses the listener for that name"
+  type        = map(number)
+  default     = {}
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)

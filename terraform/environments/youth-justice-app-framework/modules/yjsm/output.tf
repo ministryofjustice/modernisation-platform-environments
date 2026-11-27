@@ -24,3 +24,8 @@ output "private_key_pem" {
   value     = module.key_pair.private_key_pem
   sensitive = true
 }
+
+output "juniper_cug_prefix_list_id" {
+  description = "Managed prefix list ID for the YJB CUG range Juniper reaches yjsm on"
+  value       = aws_ec2_managed_prefix_list.custom_internal.id
+}

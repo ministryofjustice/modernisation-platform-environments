@@ -89,6 +89,7 @@ variable "ecs_services" {
     dependencies                   = optional(list(string), null)
     ecs_task_iam_role_name         = optional(string, null)
     load_balancer_target_group_arn = optional(string, null)
+    additional_security_group_ids  = optional(list(string), [])
     additional_container_definitions = optional(map(object({ #must define all the container def stuff again here otherwise terraform just wont pull it in and ignore it
       name          = string
       image         = string
@@ -228,6 +229,11 @@ variable "connectivity_alb_security_group_id" {
 
 variable "yjsm_hub_svc_alb_security_group_id" {
   description = "The security group ID for the yjsm hub svc ALB"
+  type        = string
+}
+
+variable "yjsm_apps_alb_security_group_id" {
+  description = "The security group ID for the yjsm apps (yjsm-ui, yjsm-hub, yjsm-hubadmin) ALB"
   type        = string
 }
 

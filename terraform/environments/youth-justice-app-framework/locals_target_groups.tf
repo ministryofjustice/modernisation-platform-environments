@@ -143,6 +143,28 @@ locals {
     },
     yjsm-hub-svc-target-group-2 = {
       name = "yjsm-hub-svc-target-group-2"
+    },
+    yjsm-ui-target-group-1 = {
+      name         = "yjsm-ui-target-group-1"
+      health_check = local.yjsm_ui_health_check
+    },
+    yjsm-ui-target-group-2 = {
+      name         = "yjsm-ui-target-group-2"
+      health_check = local.yjsm_ui_health_check
+    },
+    yjsm-hub-target-group-1 = {
+      name         = "yjsm-hub-target-group-1"
+      health_check = local.yjsm_hub_health_check
+    },
+    yjsm-hub-target-group-2 = {
+      name         = "yjsm-hub-target-group-2"
+      health_check = local.yjsm_hub_health_check
+    },
+    yjsm-hubadmin-target-group-1 = {
+      name = "yjsm-hubadmin-target-group-1"
+    },
+    yjsm-hubadmin-target-group-2 = {
+      name = "yjsm-hubadmin-target-group-2"
     }
   }
 }

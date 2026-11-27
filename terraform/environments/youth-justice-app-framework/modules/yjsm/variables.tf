@@ -74,6 +74,7 @@ variable "private_ip" {
 
 variable "private_ip_secondary" {
   description = "Secondary private IP for the instance"
+  type        = string
   default     = null
 }
 

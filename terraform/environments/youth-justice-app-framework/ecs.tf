@@ -44,6 +44,7 @@ module "ecs" {
   internal_alb_security_group_id     = module.internal_alb.alb_security_group_id
   connectivity_alb_security_group_id = module.connectivity_alb.alb_security_group_id
   yjsm_hub_svc_alb_security_group_id = local.application_data.accounts[local.environment].create_svc_pilot ? module.yjsm_hub_svc_alb[0].alb_security_group_id : null
+  yjsm_apps_alb_security_group_id    = module.yjsm_apps_alb.alb_security_group_id
   external_alb_arn                   = module.external_alb.alb_arn
   internal_alb_arn                   = module.internal_alb.alb_arn
   connectivity_alb_arn               = module.connectivity_alb.alb_arn
@@ -121,7 +122,7 @@ module "ecs" {
   ]
   list_of_target_group_arns = local.list_of_target_group_arns
 
-  depends_on = [module.internal_alb, module.external_alb, module.aurora, module.redshift]
+  depends_on = [module.internal_alb, module.external_alb, module.yjsm_apps_alb, module.aurora, module.redshift]
 }
 
 resource "aws_iam_policy" "rds-iam-auth" {

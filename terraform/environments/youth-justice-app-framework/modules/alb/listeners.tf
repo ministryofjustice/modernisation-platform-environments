@@ -25,7 +25,7 @@ resource "aws_lb_listener" "this" {
 
     content {
       order            = try(default_action.value.order, null)
-      target_group_arn = length(try(default_action.value.target_groups, [])) > 0 ? null : try(default_action.value.arn, aws_lb_target_group.this[default_action.value.target_group_key].arn, null)
+      target_group_arn = length(try(default_action.value.target_groups, [])) > 0 ? null : try(default_action.value.arn, aws_lb_target_group.this[default_action.value.target_group_key].arn, var.existing_target_groups[default_action.value.target_group_key], null)
       type             = "forward"
     }
   }
