@@ -58,7 +58,7 @@ resource "aws_acm_certificate_validation" "transfer_family" {
   count                   = local.cash_office_enabled ? 1 : 0
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.transfer_family[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.validation[count.index] : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
 }
 
 #--See member_locals.tf for the validation logic underpinning this resource
