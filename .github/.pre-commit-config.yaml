@@ -1,0 +1,29 @@
+---
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
+    hooks:
+      - id: check-json
+      - id: check-merge-conflict
+        description: Check for merge conflict markers
+      - id: check-yaml
+      - id: detect-private-key
+        description: Detect private keys in code
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+        description: Forces replacement of line endings with the UNIX 'lf' character
+      - id: trailing-whitespace
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e  # frozen: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/streetsidesoftware/cspell-cli
+    rev: 058f44e47719e80d8f1e597a235310b60e937860  # frozen: v10.2.0
+    hooks:
+      - id: cspell # Spell check changed files
+        args:
+          # - --config cspell.json
+          - --no-progress
