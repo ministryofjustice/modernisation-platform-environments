@@ -6,7 +6,7 @@ module "rds" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "6.13.1"
+  version = "7.2.2"
 
   identifier = local.component_name
 
