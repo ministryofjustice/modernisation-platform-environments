@@ -10,9 +10,9 @@ locals {
   # athena workgroup; must use managed query results so the role needs no s3 access
   airflow_pda_workgroup = "primary"
 
-  airflow_pda_source_database = "data_claims"
+  airflow_pda_source_database = "data-claims"
   airflow_pda_source_table    = "submission"
-  airflow_pda_target_database = "pda_raw"
+  airflow_pda_target_database = "pda-raw"
 }
 
 # trust: only the pda workflow's service account on the airflow compute cluster
