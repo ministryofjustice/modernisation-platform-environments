@@ -32,15 +32,15 @@ AFTER the manual creation of a webapp/S3 grant and the input of the webapps URL.
 above are addressed, they can be included in the above module.
 */
 
-resource "aws_route53_record" "transfer_family" {
-  count    = local.cash_office_enabled ? 1 : 0
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = local.application_data.accounts[local.environment].cash_office_upload_hostname
-  type     = "CNAME"
-  ttl      = 300
-  records  = [aws_cloudfront_distribution.transfer_family[0].domain_name]
-}
+# resource "aws_route53_record" "transfer_family" {
+#   count    = local.cash_office_enabled ? 1 : 0
+#   provider = aws.core-vpc
+#   zone_id  = data.aws_route53_zone.external.zone_id
+#   name     = local.application_data.accounts[local.environment].cash_office_upload_hostname
+#   type     = "CNAME"
+#   ttl      = 300
+#   records  = [aws_cloudfront_distribution.transfer_family[0].domain_name]
+# }
 
 #--Certs need to be created in us-east-1 as they are associated with Cloudfront
 resource "aws_acm_certificate" "transfer_family" {
