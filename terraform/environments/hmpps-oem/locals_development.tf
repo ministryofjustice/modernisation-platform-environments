@@ -161,9 +161,23 @@ locals {
       dev-backuprestoretest-c = merge(local.ec2_instances.oem, {
         cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.oem.config, {
-          ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-12-07T12-10-49.620Z"
-          availability_zone = "eu-west-2c"
+          ami_name                      = "hmpps_ol_8_5_oracledb_19c_release_2023-12-07T12-10-49.620Z"
+          availability_zone             = "eu-west-2c"
+          ebs_volumes_copy_all_from_ami = false
         })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", label = "os" }
+          # "/dev/sdb" = { type = "gp3", label = "app" } # /u01
+          "/dev/sdc" = { type = "gp3", label = "app" }   # /u02
+          "/dev/sde" = { type = "gp3", label = "data" }  # DATA01
+          "/dev/sdf" = { type = "gp3", label = "data" }  # DATA02
+          "/dev/sdg" = { type = "gp3", label = "data" }  # DATA03
+          "/dev/sdh" = { type = "gp3", label = "data" }  # DATA04
+          "/dev/sdi" = { type = "gp3", label = "data" }  # DATA05
+          "/dev/sdj" = { type = "gp3", label = "flash" } # FLASH01
+          "/dev/sdk" = { type = "gp3", label = "flash" } # FLASH02
+          "/dev/sds" = { type = "gp3", label = "swap" }
+        }
         tags = merge(local.ec2_instances.oem.tags, {
           server-type = "base-ol85"
         })
