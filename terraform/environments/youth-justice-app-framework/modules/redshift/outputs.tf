@@ -1,3 +1,8 @@
+output "workgroup_arn" {
+  description = "The ARN of the Redshift Serverless workgroup."
+  value       = aws_redshiftserverless_workgroup.default.arn
+}
+
 output "security_group_id" {
   description = "The ID of the Security Groups that is used to controll access to Redshift."
   value       = module.redshift_sg.security_group_id
