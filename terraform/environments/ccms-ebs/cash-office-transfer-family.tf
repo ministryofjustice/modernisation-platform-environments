@@ -58,11 +58,12 @@ resource "aws_acm_certificate_validation" "transfer_family" {
   count                   = local.cash_office_enabled ? 1 : 0
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.transfer_family[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.validation[count.index] : record.fqdn]
 }
 
 #--See member_locals.tf for the validation logic underpinning this resource
 resource "aws_route53_record" "validation" {
+  count           = local.cash_office_enabled ? 1 : 0
   provider        = aws.core-vpc
   for_each        = local.transfer_family_dvo_map
   allow_overwrite = true
@@ -208,7 +209,7 @@ resource "aws_transfer_web_app" "this" {
 
   identity_provider_details {
     identity_center_config {
-      instance_arn = tolist(data.aws_ssoadmin_instances.this[count.index].arns) [0]
+      instance_arn = tolist(data.aws_ssoadmin_instances.this[count.index].arns)[0]
       role         = module.transfer_family[count.index].transfer_iam_role_arn
     }
   }
@@ -223,7 +224,7 @@ data "aws_ssoadmin_instances" "this" {
 }
 
 data "aws_identitystore_group" "transfer_users" {
-  count = local.environment == "test" ? 1 : 0
+  count             = local.environment == "test" ? 1 : 0
   identity_store_id = data.aws_ssoadmin_instances.this[count.index].identity_store_ids[0]
 
   alternate_identifier {
