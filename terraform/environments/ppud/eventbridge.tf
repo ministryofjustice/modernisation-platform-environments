@@ -328,7 +328,7 @@ locals {
     start_malware_scanner2 = {
       environments = ["production"]
       schedule     = "cron(30 19 ? * 3#3 *)"
-      description  = "Trigger Lambda at 19:30 every 4th Tuesday of the month / Temporary amended from 3#4 to 3#3 for December patching." 
+      description  = "Trigger Lambda at 19:30 every 4th Tuesday of the month / Temporary amended from 3#4 to 3#3 for December patching."
       timezone     = "Europe/London"
     }
     stop_malware_scanner2 = {

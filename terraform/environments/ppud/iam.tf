@@ -180,7 +180,7 @@ resource "aws_iam_policy" "cloudtrail_searchevents" {
         "cloudtrail:GetTrail",
         "cloudtrail:GetTrailStatus",
         "cloudtrail:DescribeTrails"
-        ]
+      ]
       "Effect" : "Allow",
       "Resource" : [
         "*"
@@ -208,7 +208,7 @@ resource "aws_iam_policy" "config_searchresources" {
         "config:SelectAggregateResourceConfig",
         "config:ListAggregateDiscoveredResources",
         "config:GetAggregateResourceConfig"
-        ]
+      ]
       "Effect" : "Allow",
       "Resource" : [
         "*"
