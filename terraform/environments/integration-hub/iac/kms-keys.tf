@@ -2,7 +2,7 @@ module "pagerduty_state_kms" {
   count = local.is-production ? 1 : 0
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.2"
 
   aliases                 = ["s3/${local.pagerduty_state_bucket_name}"]
   description             = "KMS key for Integration Hub PagerDuty Terraform state"
@@ -54,7 +54,7 @@ module "pagerduty_api_key_kms" {
   count = local.is-production ? 1 : 0
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.2"
 
   aliases                 = ["secrets/${local.pagerduty_secret_name}"]
   description             = "KMS key for the Integration Hub PagerDuty API token"
