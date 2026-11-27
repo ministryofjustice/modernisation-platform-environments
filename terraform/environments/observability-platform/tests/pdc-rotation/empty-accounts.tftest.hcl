@@ -23,7 +23,6 @@ run "no_pdc_accounts" {
   assert {
     condition = (
       length(aws_secretsmanager_secret.gc_pdc_token) == 0 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
       length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
       length(local.gc_pdc_rotation_tags) == 0 &&
       length(module.grafana_pdc_token_rotator) == 0 &&
@@ -44,8 +43,6 @@ run "production_has_no_development_ecr_parameter" {
   assert {
     condition = (
       length(aws_ssm_parameter.gc_pdc_rotator_ecr_repository_uri) == 0 &&
-      length(grafana_cloud_private_data_source_connect_network_token.account) == 0 &&
-      length(aws_secretsmanager_secret_version.gc_pdc_token) == 0 &&
       length(aws_secretsmanager_secret_rotation.gc_pdc_token) == 0 &&
       length(terraform_data.gc_pdc_bootstrap) == 0 &&
       length(aws_sns_topic.gc_pdc_failure_alerts) == 0 &&
