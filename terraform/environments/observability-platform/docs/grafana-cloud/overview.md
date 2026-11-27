@@ -147,7 +147,7 @@ the bootstrap-capable Lambda; the tenant then deploys its existing agent module.
 No team member supplies a token. Development configures alpha.6 for Example:
 after bootstrap, an hourly readiness check enrols its secret in 90-day rotation
 only when stable ECS agents are connected to the expected Grafana network.
-Production has no opt-ins or enrolment ticks. See the [PDC rollout runbook](pdc-token-rotation.md).
+Production runs the same rotator runtime for the Cloud Platform and Container Platform accounts, added in a second apply once its credentials exist: see the [production rollout](pdc-token-rotation.md#production-rollout-for-cloud-platform-and-container-platform).
 
 Grafana Cloud management API calls, browser access and alert notifications
 go over public HTTPS.
