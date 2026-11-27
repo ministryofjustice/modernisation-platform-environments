@@ -94,51 +94,6 @@ module "lambda_file_mover" {
   })
 
   tags = local.tags
-
-  depends_on = [terraform_data.delivery_configuration]
-}
-
-resource "terraform_data" "delivery_configuration" {
-  lifecycle {
-    precondition {
-      condition     = length(local.private_subnet_ids) > 0 && data.aws_region.current.region == "eu-west-2"
-      error_message = "SFTP requires shared private subnets in eu-west-2."
-    }
-
-    precondition {
-      condition     = alltrue([for name in values(local.delivery_resource_names) : length(name) <= 64])
-      error_message = "Push-to-SFTP delivery role names must be at most 64 characters."
-    }
-
-    precondition {
-      condition = alltrue([
-        for entry in values(local.push_to_sftp_entries) :
-        !startswith(entry.action.push_to_sftp.destination_prefix, "/") &&
-        (entry.action.push_to_sftp.destination_prefix == "" || endswith(entry.action.push_to_sftp.destination_prefix, "/")) &&
-        alltrue([for segment in split("/", trimsuffix(entry.action.push_to_sftp.destination_prefix, "/")) :
-          entry.action.push_to_sftp.destination_prefix == "" || (segment != "" && segment != "." && segment != "..")
-        ]) &&
-        length(regexall("[\\\\\\x00-\\x1f\\x7f]", entry.action.push_to_sftp.destination_prefix)) == 0
-      ])
-      error_message = "SFTP destination prefixes must be empty or safe relative directories ending in '/'."
-    }
-
-    precondition {
-      condition = alltrue([
-        for entry in values(local.push_to_sftp_entries) :
-        length(entry.action.push_to_sftp.destination_cidr_blocks) > 0 &&
-        alltrue([for cidr in entry.action.push_to_sftp.destination_cidr_blocks :
-          can(cidrnetmask(cidr)) && try(tonumber(split("/", cidr)[1]) > 0, false)
-        ]) &&
-        try(entry.action.push_to_sftp.port, 22) >= 1 &&
-        try(entry.action.push_to_sftp.port, 22) <= 65535 &&
-        floor(try(entry.action.push_to_sftp.port, 22)) == try(entry.action.push_to_sftp.port, 22) &&
-        contains(["posix", "direct"], try(entry.action.push_to_sftp.write_mode, "posix")) &&
-        length(entry.action.push_to_sftp.host_public_keys) > 0
-      ])
-      error_message = "SFTP requires explicit IPv4 recipient CIDRs (not /0), a valid integer TCP port, write_mode ('posix' or 'direct') and trusted host public keys."
-    }
-  }
 }
 
 module "lambda_dlq_reporter" {

@@ -28,6 +28,17 @@ locals {
     }
   ]...)
 
+  push_to_sftp_destinations = [
+    for entry in values(local.entries) : merge(
+      {
+        port       = 22
+        write_mode = "posix"
+      },
+      entry.action.push_to_sftp,
+    )
+    if entry.action != null ? entry.action.name == "push-to-sftp" : false
+  ]
+
   pickup_entries = flatten([
     for identity, prefixes in local.file_dispatch_prefixes[var.environment] : [
       for source_prefix, configuration in prefixes : {
