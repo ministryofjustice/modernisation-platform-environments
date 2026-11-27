@@ -26,9 +26,12 @@ locals {
 module "observability_platform_tenant" {
   count = local.pdc_tenant.enabled ? 1 : 0
 
-  source = "github.com/ministryofjustice/terraform-aws-observability-platform-tenant?ref=03f883d6c4994539447243e3186f41e3922ab482" # v3.1.0
+  source = "github.com/ministryofjustice/terraform-aws-observability-platform-tenant?ref=019e7a949d889bd1e132bc508c2c6f59224a052e" # v3.2.0
 
   observability_platform_account_id = local.environment_management.account_ids["observability-platform-${local.pdc_tenant.stack}"]
+
+  # CP3 uses Grafana Cloud only. Its grafana-cloud role still gets CloudWatch, Amazon Managed Prometheus and X-Ray access.
+  enable_amazon_managed_grafana = false
 
   grafana_cloud = {
     stack = local.pdc_tenant.stack

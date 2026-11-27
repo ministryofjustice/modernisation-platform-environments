@@ -25,7 +25,8 @@ STACK_IDS = {"development": "1907843", "production": "1907875"}
 
 MODULE = "module.observability_platform_tenant[0]."
 PDC = MODULE + "module.grafana_cloud[0]."
-TENANT_RESOURCES = 20
+AMAZON_MANAGED_GRAFANA = MODULE + "module.amazon_managed_grafana"
+TENANT_RESOURCES = 18
 
 # Test only: enable the tenant in the current workspace without changing its stack.
 FORCE_ENABLE = """locals {
@@ -94,6 +95,8 @@ def check_enabled(workspace, changes, stack, cidr):
     for address, change in resources.items():
         if not address.startswith(MODULE) or change["change"]["actions"] != ["create"]:
             fail(f"unexpected {change['change']['actions']} of {address}.")
+        if address.startswith(AMAZON_MANAGED_GRAFANA):
+            fail(f"Amazon Managed Grafana must stay disabled, got {address}.")
 
     def after(address):
         if PDC + address not in resources:

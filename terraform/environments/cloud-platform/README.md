@@ -91,6 +91,12 @@ from the same OP environment.
 | `container-platform-{octo,laa,hmpps,cd}-nonlive` | production | `observability-platform-production` | Disabled |
 | `container-platform-{octo,laa,hmpps,cd}-live` | production | `observability-platform-production` | Disabled |
 
+CP3 uses Grafana Cloud only, so the tenant module (v3.2.0) runs with
+`enable_amazon_managed_grafana = false` and creates no Amazon Managed Grafana
+`observability-platform` role. Grafana Cloud reaches each account through the
+module's `grafana-cloud` role, which has CloudWatch, Amazon Managed Service for
+Prometheus query and X-Ray read access.
+
 The **whole module** is gated on `enabled`: disabled workspaces create no tenant
 IAM roles, policy attachments or PDC resources. An enabled account must match an
 account with `pdc_enabled = true` in the same stack's
@@ -148,9 +154,10 @@ python3 terraform/environments/cloud-platform/network/tests/run_pdc_tenant_tests
 ```
 
 It plans the real gate in all twelve workspaces against a mocked AWS provider,
-without a backend or credentials. Enabled workspaces must plan exactly 20 tenant
-creates, with their stack's OP account and stack ID, three private Fargate tasks
-and the VPC primary CIDR target. Disabled workspaces must have no changes. It then
+without a backend or credentials. Enabled workspaces must plan exactly 18 tenant
+creates and no Amazon Managed Grafana resources, with their stack's OP account
+and stack ID, three private Fargate tasks and the VPC primary CIDR target.
+Disabled workspaces must have no changes. It then
 force-enables each disabled workspace, without ever applying, to prove its
 token secret, KMS access, restarter trust and stack all use its own stack's OP
 account.
