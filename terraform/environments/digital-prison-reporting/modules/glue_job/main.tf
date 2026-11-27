@@ -99,13 +99,20 @@ data "aws_iam_policy_document" "extra-policy-document" {
   # https://docs.aws.amazon.com/glue/latest/dg/monitor-continuous-logging-enable.html#monitor-continuous-logging-encrypt-log-data
   statement {
     actions = [
-      "logs:PutLogEvents",
-      "logs:CreateLogStream",
       "logs:CreateLogGroup",
       "logs:AssociateKmsKey",
     ]
     resources = [
-      "arn:aws:logs:*:*:/aws-glue/*"
+      "arn:aws:logs:*:*:log-group:/aws-glue/*"
+    ]
+  }
+  statement {
+    actions = [
+      "logs:PutLogEvents",
+      "logs:CreateLogStream",
+    ]
+    resources = [
+      "arn:aws:logs:*:*:log-group:/aws-glue/*:*"
     ]
   }
   statement {
