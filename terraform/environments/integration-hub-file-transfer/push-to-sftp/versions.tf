@@ -16,6 +16,10 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
+    tls = {
+      version = "~> 4.1"
+      source  = "hashicorp/tls"
+    }
   }
   required_version = ">= 1.11, < 2.0"
 }

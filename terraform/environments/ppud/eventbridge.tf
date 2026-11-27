@@ -39,7 +39,7 @@ resource "aws_cloudwatch_event_rule" "ppud_malware_scan_completed" {
   for_each       = local.send_malware_scan_notification_envs
   name           = "ppud-malware-scan-completed-${each.value.env}"
   description    = "Capture malware scan completed events from EC2 instances"
-  event_bus_name = aws_cloudwatch_event_bus.ppud_malware_events.name
+  event_bus_name = aws_cloudwatch_event_bus.ppud_security.name
   event_pattern  = <<EOF
 {
   "source": ["ppud.malware"],
@@ -55,7 +55,7 @@ EOF
 resource "aws_cloudwatch_event_target" "trigger_lambda_malware_scan_completed" {
   for_each       = local.send_malware_scan_notification_envs
   rule           = aws_cloudwatch_event_rule.ppud_malware_scan_completed[each.key].name
-  event_bus_name = aws_cloudwatch_event_bus.ppud_malware_events.name
+  event_bus_name = aws_cloudwatch_event_bus.ppud_security.name
   target_id      = "send_malware_scan_notification_${each.value.env}"
   arn            = aws_lambda_function.lambda_functions[each.key].arn
 }
@@ -84,10 +84,11 @@ locals {
 
 # EventBridge Rules for Certificate Expiration
 resource "aws_cloudwatch_event_rule" "certificate_approaching_expiration" {
-  for_each      = local.certificate_expiration_envs
-  name          = "Certificate-Approaching-Expiration-${each.value.env}"
-  description   = "PPUD certificate is approaching expiration"
-  event_pattern = <<EOF
+  for_each       = local.certificate_expiration_envs
+  name           = "Certificate-Approaching-Expiration-${each.value.env}"
+  description    = "PPUD certificate is approaching expiration"
+  event_bus_name = aws_cloudwatch_event_bus.ppud_security.name
+  event_pattern  = <<EOF
 {
   "source": [ "aws.acm"],
   "detail-type": ["ACM Certificate Approaching Expiration"]
@@ -101,10 +102,11 @@ EOF
 
 # EventBridge Targets for Lambda
 resource "aws_cloudwatch_event_target" "trigger_lambda_certificate_approaching_expiration" {
-  for_each  = local.certificate_expiration_envs
-  rule      = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].name
-  target_id = "certificate_approaching_expiration_${each.value.env}"
-  arn       = aws_lambda_function.lambda_functions[each.key].arn
+  for_each       = local.certificate_expiration_envs
+  rule           = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].name
+  event_bus_name = aws_cloudwatch_event_bus.ppud_security.name
+  target_id      = "certificate_approaching_expiration_${each.value.env}"
+  arn            = aws_lambda_function.lambda_functions[each.key].arn
 }
 
 # Lambda Permission for EventBridge
@@ -131,10 +133,11 @@ locals {
 }
 
 resource "aws_cloudwatch_event_rule" "sync_ssm_to_waf" {
-  for_each      = local.sync_ssm_to_waf_envs
-  name          = "SSM-Parameter-Sync-to-IP-Set-${each.value.env}"
-  description   = "Triggers Lambda when SSM parameters change"
-  event_pattern = <<EOF
+  for_each       = local.sync_ssm_to_waf_envs
+  name           = "SSM-Parameter-Sync-to-IP-Set-${each.value.env}"
+  description    = "Triggers Lambda when SSM parameters change"
+  event_bus_name = aws_cloudwatch_event_bus.ppud_operations.name
+  event_pattern  = <<EOF
 {
   "source": ["aws.ssm"],
   "detail-type": ["Parameter Store Change"],
@@ -151,10 +154,11 @@ EOF
 
 # EventBridge Targets for Lambda
 resource "aws_cloudwatch_event_target" "trigger_lambda_sync_ssm_to_waf" {
-  for_each  = local.sync_ssm_to_waf_envs
-  rule      = aws_cloudwatch_event_rule.sync_ssm_to_waf[each.key].name
-  target_id = "sync_to_ssm_waf_${each.value.env}"
-  arn       = aws_lambda_function.lambda_functions[each.key].arn
+  for_each       = local.sync_ssm_to_waf_envs
+  rule           = aws_cloudwatch_event_rule.sync_ssm_to_waf[each.key].name
+  event_bus_name = aws_cloudwatch_event_bus.ppud_operations.name
+  target_id      = "sync_to_ssm_waf_${each.value.env}"
+  arn            = aws_lambda_function.lambda_functions[each.key].arn
 }
 
 # Lambda Permission for EventBridge
@@ -180,10 +184,11 @@ locals {
 }
 
 resource "aws_cloudwatch_event_rule" "ssm_patch_completion" {
-  for_each      = local.ssm_patch_notification_envs
-  name          = "SSM-Patch-Completion-${each.value.env}"
-  description   = "Triggers when SSM patch maintenance window completes"
-  event_pattern = <<EOF
+  for_each       = local.ssm_patch_notification_envs
+  name           = "SSM-Patch-Completion-${each.value.env}"
+  description    = "Triggers when SSM patch maintenance window completes"
+  event_bus_name = aws_cloudwatch_event_bus.ppud_operations.name
+  event_pattern  = <<EOF
 {
   "source": ["aws.ssm"],
   "detail-type": ["Maintenance Window Execution State-change Notification"],
@@ -199,10 +204,11 @@ EOF
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_ssm_patch_completion" {
-  for_each  = local.ssm_patch_notification_envs
-  rule      = aws_cloudwatch_event_rule.ssm_patch_completion[each.key].name
-  target_id = "ssm_patch_completion_${each.value.env}"
-  arn       = aws_lambda_function.lambda_functions[each.key].arn
+  for_each       = local.ssm_patch_notification_envs
+  rule           = aws_cloudwatch_event_rule.ssm_patch_completion[each.key].name
+  event_bus_name = aws_cloudwatch_event_bus.ppud_operations.name
+  target_id      = "ssm_patch_completion_${each.value.env}"
+  arn            = aws_lambda_function.lambda_functions[each.key].arn
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
@@ -219,9 +225,10 @@ resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
 ######################################################
 
 resource "aws_cloudwatch_event_rule" "s3_replication_failure" {
-  name          = "s3-replication-failure"
-  description   = "Capture S3 replication failure events"
-  event_pattern = <<EOF
+  name           = "s3-replication-failure"
+  description    = "Capture S3 replication failure events"
+  event_bus_name = aws_cloudwatch_event_bus.ppud_operations.name
+  event_pattern  = <<EOF
 {
   "source": ["aws.s3"],
   "detail-type": ["AWS API Call via CloudTrail"],
@@ -237,14 +244,16 @@ EOF
 }
 
 resource "aws_cloudwatch_event_target" "s3_replication_failure" {
-  rule      = aws_cloudwatch_event_rule.s3_replication_failure.name
-  target_id = "s3-replication-failure-logs"
-  arn       = aws_cloudwatch_log_group.s3_replication_failure.arn
+  rule           = aws_cloudwatch_event_rule.s3_replication_failure.name
+  event_bus_name = aws_cloudwatch_event_bus.ppud_operations.name
+  target_id      = "s3-replication-failure-logs"
+  arn            = aws_cloudwatch_log_group.s3_replication_failure.arn
 }
 
 resource "aws_cloudwatch_event_target" "s3_replication_failure_sns" {
-  rule      = aws_cloudwatch_event_rule.s3_replication_failure.name
-  target_id = "s3-replication-failure-sns"
+  rule           = aws_cloudwatch_event_rule.s3_replication_failure.name
+  event_bus_name = aws_cloudwatch_event_bus.ppud_operations.name
+  target_id      = "s3-replication-failure-sns"
   arn = (
     local.is-production ? aws_sns_topic.cw_alerts[0].arn :
     local.is-preproduction ? aws_sns_topic.cw_uat_alerts[0].arn :
@@ -318,14 +327,14 @@ locals {
     }
     start_malware_scanner2 = {
       environments = ["production"]
-      schedule     = "cron(30 19 ? * 2#4 *)"
-      description  = "Trigger Lambda at 19:30 every 4th Tuesday of the month / Temporary amended from 3#4 to 2#4 for December patching." 
+      schedule     = "cron(30 19 ? * 3#3 *)"
+      description  = "Trigger Lambda at 19:30 every 4th Tuesday of the month / Temporary amended from 3#4 to 3#3 for December patching."
       timezone     = "Europe/London"
     }
     stop_malware_scanner2 = {
       environments = ["production"]
-      schedule     = "cron(0 8 ? * 2#5 *)"
-      description  = "Trigger Lambda at 08:00 every 4th Wednesday of the month / Temporary amended to 2#5 for December patching - to be set at 3#5 afterwards"
+      schedule     = "cron(0 8 ? * 4#3 *)"
+      description  = "Trigger Lambda at 08:00 every 4th Wednesday of the month / Temporary amended to 4#3 for December patching - to be set at 4#4 afterwards"
       timezone     = "Europe/London"
     }
     disk_info_report = {

@@ -1,6 +1,5 @@
 locals {
-  pattern_name     = "${local.application_name}-${local.component_name}"
-  lambda_role_name = local.pattern_name
+  pattern_name = "${local.application_name}-${local.component_name}"
 
   dlq_arns = { for name, queue in module.sqs_push_to_sftp_dlq : name => queue.queue_arn }
 
@@ -21,16 +20,25 @@ locals {
   }]
 
   lambda_environment_variables = {
-    ACTION_NAME                     = "push-to-sftp"
-    AUTHORISED_DESTINATION_MAP      = jsonencode(local.sftp_destinations_by_secret)
-    CREDENTIAL_SECRET_MAP           = jsonencode(local.credential_arns_by_secret)
-    DELIVERY_ROLE_MAP               = jsonencode(local.delivery_role_arns_by_secret)
-    EVENT_BUS_NAME                  = data.aws_cloudwatch_event_bus.file_transfer.name
-    IDEMPOTENCY_EXPIRY_SECONDS      = tostring(7 * 24 * 60 * 60)
-    IDEMPOTENCY_TABLE               = module.dynamodb_idempotency.dynamodb_table_id
-    POWERTOOLS_LOG_LEVEL            = "INFO"
-    SOURCE_BUCKET                   = data.aws_s3_bucket.clean.id
-    SOURCE_PREFIX_MAP               = jsonencode(local.source_prefixes_by_secret)
+    ACTION_NAME                = "push-to-sftp"
+    AUTHORISED_DESTINATION_MAP = jsonencode(local.sftp_destinations_by_secret)
+    CREDENTIAL_SECRET_MAP = jsonencode({
+      for entry_id, secret_arn_prefix in local.push_to_sftp_secret_arn_prefixes :
+      secret_arn_prefix => module.secrets_private_key[entry_id].secret_arn
+    })
+    DELIVERY_ROLE_MAP = jsonencode({
+      for entry_id, secret_arn_prefix in local.push_to_sftp_secret_arn_prefixes :
+      secret_arn_prefix => module.iam_role_delivery[entry_id].arn
+    })
+    EVENT_BUS_NAME             = data.aws_cloudwatch_event_bus.file_transfer.name
+    IDEMPOTENCY_EXPIRY_SECONDS = tostring(7 * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE          = module.dynamodb_idempotency.dynamodb_table_id
+    POWERTOOLS_LOG_LEVEL       = "INFO"
+    SOURCE_BUCKET              = data.aws_s3_bucket.clean.id
+    SOURCE_PREFIX_MAP = jsonencode({
+      for entry_id, secret_arn_prefix in local.push_to_sftp_secret_arn_prefixes :
+      secret_arn_prefix => "${local.push_to_sftp_entries[entry_id].identity}${local.push_to_sftp_entries[entry_id].source_prefix}"
+    })
     SUPPORTED_REGION                = "eu-west-2"
     TERMINAL_OUTCOME_EXPIRY_SECONDS = tostring(7 * 24 * 60 * 60)
   }

@@ -26,7 +26,7 @@ output "pipeline" {
 }
 
 output "credential_secrets" {
-  description = "Metadata-only keypair containers; populate through approved operator tooling, never Terraform."
+  description = "Per-route SFTP client keypair secret ARNs (initial versions seeded via write-only ephemeral values)."
   value = {
     for entry_id in keys(local.push_to_sftp_entries) : entry_id => {
       private_key_arn = module.secrets_private_key[entry_id].secret_arn

@@ -73,6 +73,15 @@ None yet; the service is still under development.
 
 You must be a Ministry of Justice service. You may request access on behalf of a third party which needs to send files to you.
 
+### **Inbound SFTP/FTPS client requirements:**
+
+The AWS Transfer Family server is backed by Amazon S3 with upload-only permissions (`s3:ListBucket` and `s3:PutObject`). Sending clients must:
+
+- Stream files sequentially over a single connection directly to the final filename. Multi-connection/parallel-chunk uploads, random-access writes and append operations are not supported by S3-backed Transfer Family.
+- Disable temporary-file upload-and-rename staging (for example WinSCP's transfer-resume `.filepart` mode or `posix-rename@openssh.com`). Transfer Family does not support overwrite rename, upload-only users lack `s3:GetObject`/`s3:DeleteObject`, and closing a temporary file triggers immediate S3 `Object Created` ingestion before any rename.
+- Disable post-upload `SETSTAT` (`chmod`/`chmtime`) attribute updates unless `set_stat_option = "ENABLE_NO_OP"` is enabled on the Transfer Family server.
+- Note that if a client disconnects mid-upload without sending `CLOSE`, Transfer Family still commits the received bytes to S3 and logs `PARTIAL_CLOSE`; coordinate integrity checks (such as checksums or manifests) where truncated uploads must be detected.
+
 ### **How to resolve specific issues:**
 
 See the [service guidance](https://user-guide.integration-hub.service.justice.gov.uk/file-transfer-service/operations/) for file investigations, dead-letter queue recovery, file action dispatch and user authentication troubleshooting. Keep detailed guidance in the user guide rather than duplicating it here.

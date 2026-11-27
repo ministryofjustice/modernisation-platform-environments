@@ -42,8 +42,44 @@ def test_rejects_filesystem_path_escape(config, relative):
 
 def test_configuration_cannot_redirect_destination(config, destination):
     route = validate_route(action("group/integration-hub/example/test.csv"), config)
+    assert route["destination"]["write_mode"] == "posix"
     secret = {"action": {"name": "push-to-sftp", "push_to_sftp": destination}}
     validate_secret_configuration(json.dumps(secret), "push-to-sftp", route)
     secret["action"]["push_to_sftp"]["hostname"] = "other.example.com"
     with pytest.raises(InvalidMessage):
         validate_secret_configuration(json.dumps(secret), "push-to-sftp", route)
+
+
+def test_write_mode_validation_and_authorisation(destination):
+    direct_destination = {**destination, "write_mode": "direct"}
+    direct_config = WriterConfig(
+        "push-to-sftp", "clean-bucket", "eu-west-2", "actions", "bus",
+        {PREFIX: direct_destination}, {PREFIX: "group/integration-hub/example/"},
+        {PREFIX: "arn:aws:iam::123456789012:role/delivery"},
+        {PREFIX: "arn:aws:secretsmanager:eu-west-2:123456789012:secret:private-key-AbCdEf"},
+        604800, 604800, {"processing": "arn:aws:sqs:eu-west-2:123456789012:dlq"},
+    )
+    route = validate_route(action("group/integration-hub/example/test.csv"), direct_config)
+    assert route["destination"]["write_mode"] == "direct"
+
+    validate_secret_configuration(
+        json.dumps({"action": {"name": "push-to-sftp", "push_to_sftp": direct_destination}}),
+        "push-to-sftp",
+        route,
+    )
+    with pytest.raises(InvalidMessage):
+        validate_secret_configuration(
+            json.dumps({"action": {"name": "push-to-sftp", "push_to_sftp": destination}}),
+            "push-to-sftp",
+            route,
+        )
+
+    bad_config = WriterConfig(
+        "push-to-sftp", "clean-bucket", "eu-west-2", "actions", "bus",
+        {PREFIX: {**destination, "write_mode": "append"}}, {PREFIX: "group/integration-hub/example/"},
+        {PREFIX: "arn:aws:iam::123456789012:role/delivery"},
+        {PREFIX: "arn:aws:secretsmanager:eu-west-2:123456789012:secret:private-key-AbCdEf"},
+        604800, 604800, {"processing": "arn:aws:sqs:eu-west-2:123456789012:dlq"},
+    )
+    with pytest.raises(InvalidMessage):
+        validate_route(action("group/integration-hub/example/test.csv"), bad_config)

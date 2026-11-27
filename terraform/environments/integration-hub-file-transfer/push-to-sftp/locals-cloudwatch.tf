@@ -110,17 +110,11 @@ locals {
     }
   })
 
-  high_priority_alarm_names = toset(concat(
-    [for stage in keys(local.dlq_arns) : "${stage}-dlq-backlog"],
-    ["delivery-failed"],
-  ))
-
-  high_priority_alarm_actions = local.is-production ? [data.aws_sns_topic.pagerduty["high-priority"].arn] : [data.aws_sns_topic.pagerduty["low-priority"].arn]
-  low_priority_alarm_actions  = local.is-production ? [data.aws_sns_topic.pagerduty["low-priority"].arn] : []
-
   cloudwatch_alarm_actions = {
     for name in keys(local.cloudwatch_metric_alarms) : name => (
-      contains(local.high_priority_alarm_names, name) ? local.high_priority_alarm_actions : local.low_priority_alarm_actions
+      name == "delivery-failed" || endswith(name, "-dlq-backlog")
+      ? [data.aws_sns_topic.pagerduty[local.is-production ? "high-priority" : "low-priority"].arn]
+      : (local.is-production ? [data.aws_sns_topic.pagerduty["low-priority"].arn] : [])
     )
   }
 }
