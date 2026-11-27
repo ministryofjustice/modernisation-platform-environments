@@ -2,6 +2,7 @@
   {
     "name": "${adaptor_app_name}-container",
     "image": "${adaptor_ecr_repo}:${container_version}",
+    "memory": ${adaptor_container_memory},
     "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
