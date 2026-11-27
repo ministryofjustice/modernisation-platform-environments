@@ -39,16 +39,12 @@ locals {
     ])
   ])
 
-  # Hub clusters with AMP + ADOT switched on in code. Trialling on development
-  # first before rolling out to the other hub clusters.
-  hub_amp_enabled_workspaces = ["cloud-platform-development"]
-  hub_amp_enabled            = contains(local.hub_amp_enabled_workspaces, terraform.workspace)
-
   # Observability feature flags — resolved from variables (default false, opt-in via -var flags).
   # AMP + ADOT is on for BU clusters enabled in business-units.json (bu_amp_enabled),
-  # hub clusters listed in hub_amp_enabled_workspaces, and any cluster opted in via the variable.
+  # the cloud-platform-development hub cluster (trial before other hub clusters),
+  # and any cluster opted in via the variable.
   # AMG is managed by the root cloud-platform component, not this cluster
   # component.
-  enable_amp_adot                 = var.enable_amp_adot || local.bu_amp_enabled || local.hub_amp_enabled
+  enable_amp_adot                 = var.enable_amp_adot || local.bu_amp_enabled || terraform.workspace == "cloud-platform-development"
   enable_cloudwatch_observability = var.enable_cloudwatch_observability
 }
