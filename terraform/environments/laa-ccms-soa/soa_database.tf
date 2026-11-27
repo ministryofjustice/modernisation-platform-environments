@@ -78,7 +78,7 @@ resource "aws_db_instance" "soa_db" {
   iam_database_authentication_enabled   = false
   performance_insights_enabled          = local.environment == "preproduction" ? true : false
   performance_insights_retention_period = local.environment == "preproduction" ? 7 : null
-
+  apply_immediately                     = true
   vpc_security_group_ids = [
     aws_security_group.soa_db.id
   ]
