@@ -30,6 +30,11 @@ variable "short_env" {
   type        = string
   description = "Shortened environment name"
 }
+variable "monitor_clamav" {
+  type        = bool
+  description = "Whether to monitor clamav clamd executable or not"
+  default     = false
+}
 ###################
 variable "cpu_eval_periods" {
   type        = string
