@@ -7,7 +7,7 @@ data "aws_s3_bucket" "s3_access_logs" {
 # and are moved to archive/ or error/ by the Financial Transfers API.
 
 module "s3_bc_inbound" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.2.1"
 
   bucket_name        = local.bc_bucket_name
   versioning_enabled = true
