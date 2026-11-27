@@ -1,6 +1,6 @@
 locals {
   name      = "laa-data-factory"
-  databases = ["aws-athena-query-results", "raw", "processedraw", "staging", "intermediate", "datamarts", "derived"]
+  databases = ["aws-athena-query-results", "raw", "processedraw", "staging", "intermediate", "datamarts", "derived", "pda-raw"]
   environments = {
     development = {
       lakeformation_admins = [
