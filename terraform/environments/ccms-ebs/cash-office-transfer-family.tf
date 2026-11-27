@@ -17,14 +17,14 @@ Until those bugs are addressed, the below resources are created manually:
   This group is bound to the Entra group of the same name.
 */
 
-module "transfer_family" {
-  count                         = local.cash_office_enabled ? 1 : 0
-  source                        = "./modules/transfer-family"
-  aws_account_id                = data.aws_caller_identity.current.account_id
-  app_name                      = local.application_name
-  bucket_name                   = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
-  aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
-}
+# module "transfer_family" {
+#   count                         = local.cash_office_enabled ? 1 : 0
+#   source                        = "./modules/transfer-family"
+#   aws_account_id                = data.aws_caller_identity.current.account_id
+#   app_name                      = local.application_name
+#   bucket_name                   = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+#   aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
+# }
 
 /*
 The resources below here are not a good candidate for inclusion in a module as they require creation
