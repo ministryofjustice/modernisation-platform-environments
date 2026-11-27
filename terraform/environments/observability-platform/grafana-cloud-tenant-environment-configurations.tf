@@ -23,9 +23,9 @@ locals {
   environment_configuration_gc = local.environment_configurations_gc[local.environment]
   environment_configurations_gc = {
     development = {
-      # Deploy prerequisites only; Secrets Manager rotation remains disabled.
       pdc_token_rotator = {
-        image_digest = "sha256:7e357f00e83b9c88a320034e0ba7f5ac2cbc7887485b4e1554e1e457fe5d7f8f"
+        image_digest      = "sha256:e5f367b6af986020ff291b095f7ef0a44f56c7c7acd241fbaaae9484c81884c2" # v0.1.0-alpha.6
+        bootstrap_enabled = true
       }
       pdc_failure_alerts = {
         slack_channel_id = "C06ALD6LX55"
@@ -45,6 +45,10 @@ locals {
               xray        = { enabled = true }
             }
             "cooker-development" = {
+              pdc_enabled = true
+            }
+            # Bootstrap centrally before deploying the Example agents.
+            "example-development" = {
               pdc_enabled = true
             }
           }

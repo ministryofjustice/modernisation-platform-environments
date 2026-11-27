@@ -117,10 +117,9 @@ or if the workspace ID or region is malformed.
 `grafana-cloud-tenant-environment-configurations.tf` with `pdc_enabled = true`
 (opt-in, matching the tenant module's `grafana_cloud.pdc_agent.enabled`):
 
-- a PDC network and a PDC network token, named
-  `<stack slug>-<account name>` and `<stack slug>-<account name>-agent`
+- a PDC network named `<stack slug>-<account name>`
 - a customer managed KMS key, aliased `alias/grafana-cloud-pdc-<account name>`
-- a `grafana-cloud/pdc/<account ID>` secret holding the token, written by Terraform
+- a `grafana-cloud/pdc/<account ID>` secret; Terraform owns the metadata, not the token value
 
 Networks are per account, not per tenant. PDC load-balances across every agent in
 a network, so every agent must reach the same targets, and a tenant's accounts
@@ -140,10 +139,15 @@ and token secret ARN, keyed by account name.
 PDC agents are not deployed from this environment. The tenant module provides them,
 together with the networking for each shared VPC.
 
-Automatic rotation is not enabled yet. The secrets carry rotation metadata and
-the bootstrap token resources block destructive replacement. See the
-[rotation contract and non-destructive state handoff](pdc-token-rotation.md)
-before changing token ownership or enabling a rotator.
+Sprinkler development rotates automatically. Cooker development has a working
+token: the next reviewed handoff forgets its legacy token/version without
+revoking it and starts its own 90-day rotation. Neither account uses bootstrap.
+For a brand-new opt-in, the central apply must first issue `AWSCURRENT` through
+the bootstrap-capable Lambda; the tenant then deploys its existing agent module.
+No team member supplies a token. Development configures alpha.6 for Example:
+after bootstrap, an hourly readiness check enrols its secret in 90-day rotation
+only when stable ECS agents are connected to the expected Grafana network.
+Production has no opt-ins or enrolment ticks. See the [PDC rollout runbook](pdc-token-rotation.md).
 
 Grafana Cloud management API calls, browser access and alert notifications
 go over public HTTPS.

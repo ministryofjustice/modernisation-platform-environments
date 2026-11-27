@@ -540,6 +540,41 @@ models:
       location: "eu"
       generally_available: false
       environments_available: ["development", "production"]
+    gemini-4-neon:
+      model_id: "gemini-4-neon"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 4 Neon"
+      model_location: "European Union"
+      location: "eu"
+      force_vertex_location: true
+      generally_available: false
+      environments_available: ["development"]
+    gemini-4-carbon:
+      model_id: "gemini-4-carbon"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 4 Carbon"
+      model_location: "European Union"
+      location: "eu"
+      force_vertex_location: true
+      generally_available: false
+      environments_available: ["development"]
+    gemini-4-argon:
+      model_id: "gemini-4-argon"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 4 Argon"
+      model_location: "United Kingdom"
+      location: "europe-west2"
+      generally_available: false
+      environments_available: ["development"]
+    gemini-4-hydrogen:
+      model_id: "gemini-4-hydrogen"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 4 Hydrogen"
+      model_location: "European Union"
+      location: "eu"
+      force_vertex_location: true
+      generally_available: false
+      environments_available: ["development"]
   microsoft_foundry:
     # OpenAI
     gpt-5-4:

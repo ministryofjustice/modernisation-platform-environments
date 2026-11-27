@@ -38,11 +38,11 @@
       },
       "amp_enabled": {
         "live": false,
-        "nonlive": false
+        "nonlive": true
       },
       "grafana_enabled": {
         "live": false,
-        "nonlive": false
+        "nonlive": true
       }
     },
     "cd": {
