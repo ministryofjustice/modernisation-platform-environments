@@ -53,6 +53,55 @@ resource "aws_security_group" "tribunals_lb_sc" {
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
+  # Block malicious IPs - applied before allow rules
+  ingress {
+    description = "block malicious IP 159.26.119.67"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["159.26.119.67/32"]
+  }
+
+  ingress {
+    description = "block malicious IP 18.168.1.44"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["18.168.1.44/32"]
+  }
+
+  ingress {
+    description = "block malicious IP 52.56.214.195"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["52.56.214.195/32"]
+  }
+
+  ingress {
+    description = "block malicious IP 13.42.111.82"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["13.42.111.82/32"]
+  }
+
+  ingress {
+    description = "block malicious IP 35.177.145.184"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["35.177.145.184/32"]
+  }
+
+  ingress {
+    description = "block malicious IP 13.230.30.133"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["13.230.30.133/32"]
+  }
+
   ingress {
     description = "allow all traffic on HTTPS port 443"
     from_port   = 443
