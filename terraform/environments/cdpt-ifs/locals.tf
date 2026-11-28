@@ -21,6 +21,54 @@ locals {
   }))
 
   loadbalancer_ingress_rules = {
+    "block_malicious_ip_1" = {
+      description     = "block malicious IP 159.26.119.67"
+      from_port       = 0
+      to_port         = 65535
+      protocol        = "tcp"
+      cidr_blocks     = ["159.26.119.67/32"]
+      security_groups = []
+    }
+    "block_malicious_ip_2" = {
+      description     = "block malicious IP 18.168.1.44"
+      from_port       = 0
+      to_port         = 65535
+      protocol        = "tcp"
+      cidr_blocks     = ["18.168.1.44/32"]
+      security_groups = []
+    }
+    "block_malicious_ip_3" = {
+      description     = "block malicious IP 52.56.214.195"
+      from_port       = 0
+      to_port         = 65535
+      protocol        = "tcp"
+      cidr_blocks     = ["52.56.214.195/32"]
+      security_groups = []
+    }
+    "block_malicious_ip_4" = {
+      description     = "block malicious IP 13.42.111.82"
+      from_port       = 0
+      to_port         = 65535
+      protocol        = "tcp"
+      cidr_blocks     = ["13.42.111.82/32"]
+      security_groups = []
+    }
+    "block_malicious_ip_5" = {
+      description     = "block malicious IP 35.177.145.184"
+      from_port       = 0
+      to_port         = 65535
+      protocol        = "tcp"
+      cidr_blocks     = ["35.177.145.184/32"]
+      security_groups = []
+    }
+    "block_malicious_ip_6" = {
+      description     = "block malicious IP 13.230.30.133"
+      from_port       = 0
+      to_port         = 65535
+      protocol        = "tcp"
+      cidr_blocks     = ["13.230.30.133/32"]
+      security_groups = []
+    }
     "cluster_ec2_lb_ingress" = {
       description     = "allow access on HTTPS"
       from_port       = 443
