@@ -105,6 +105,49 @@ locals {
     public-lb = {
       description = "Security group for public load balancer"
       ingress = {
+        # Block malicious IPs first
+        block-malicious-ip-1 = {
+          description = "Block malicious IP 159.26.119.67"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["159.26.119.67/32"]
+        }
+        block-malicious-ip-2 = {
+          description = "Block malicious IP 18.168.1.44"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["18.168.1.44/32"]
+        }
+        block-malicious-ip-3 = {
+          description = "Block malicious IP 52.56.214.195"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["52.56.214.195/32"]
+        }
+        block-malicious-ip-4 = {
+          description = "Block malicious IP 13.42.111.82"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["13.42.111.82/32"]
+        }
+        block-malicious-ip-5 = {
+          description = "Block malicious IP 35.177.145.184"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["35.177.145.184/32"]
+        }
+        block-malicious-ip-6 = {
+          description = "Block malicious IP 13.230.30.133"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["13.230.30.133/32"]
+        }
         all-within-subnet = {
           description = "Allow all ingress to self"
           from_port   = 0
@@ -140,6 +183,49 @@ locals {
     public-lb-2 = {
       description = "Security group for public load balancer part 2"
       ingress = {
+        # Block malicious IPs first
+        block-malicious-ip-1 = {
+          description = "Block malicious IP 159.26.119.67"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["159.26.119.67/32"]
+        }
+        block-malicious-ip-2 = {
+          description = "Block malicious IP 18.168.1.44"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["18.168.1.44/32"]
+        }
+        block-malicious-ip-3 = {
+          description = "Block malicious IP 52.56.214.195"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["52.56.214.195/32"]
+        }
+        block-malicious-ip-4 = {
+          description = "Block malicious IP 13.42.111.82"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["13.42.111.82/32"]
+        }
+        block-malicious-ip-5 = {
+          description = "Block malicious IP 35.177.145.184"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["35.177.145.184/32"]
+        }
+        block-malicious-ip-6 = {
+          description = "Block malicious IP 13.230.30.133"
+          from_port   = 0
+          to_port     = 65535
+          protocol    = "tcp"
+          cidr_blocks = ["13.230.30.133/32"]
+        }
         all-within-subnet = {
           description = "Allow all ingress to self"
           from_port   = 0

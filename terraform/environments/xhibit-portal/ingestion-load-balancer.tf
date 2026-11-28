@@ -15,6 +15,72 @@ resource "aws_security_group" "ingestion_lb" {
 #   source_security_group_id = aws_security_group.ingestion_server.id
 # }
 
+resource "aws_security_group_rule" "ingestion_lb_block_malicious_ip_1" {
+  depends_on        = [aws_security_group.ingestion_lb]
+  security_group_id = aws_security_group.ingestion_lb.id
+  type              = "ingress"
+  description       = "block malicious IP 159.26.119.67"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "TCP"
+  cidr_blocks       = ["159.26.119.67/32"]
+}
+
+resource "aws_security_group_rule" "ingestion_lb_block_malicious_ip_2" {
+  depends_on        = [aws_security_group.ingestion_lb]
+  security_group_id = aws_security_group.ingestion_lb.id
+  type              = "ingress"
+  description       = "block malicious IP 18.168.1.44"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "TCP"
+  cidr_blocks       = ["18.168.1.44/32"]
+}
+
+resource "aws_security_group_rule" "ingestion_lb_block_malicious_ip_3" {
+  depends_on        = [aws_security_group.ingestion_lb]
+  security_group_id = aws_security_group.ingestion_lb.id
+  type              = "ingress"
+  description       = "block malicious IP 52.56.214.195"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "TCP"
+  cidr_blocks       = ["52.56.214.195/32"]
+}
+
+resource "aws_security_group_rule" "ingestion_lb_block_malicious_ip_4" {
+  depends_on        = [aws_security_group.ingestion_lb]
+  security_group_id = aws_security_group.ingestion_lb.id
+  type              = "ingress"
+  description       = "block malicious IP 13.42.111.82"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "TCP"
+  cidr_blocks       = ["13.42.111.82/32"]
+}
+
+resource "aws_security_group_rule" "ingestion_lb_block_malicious_ip_5" {
+  depends_on        = [aws_security_group.ingestion_lb]
+  security_group_id = aws_security_group.ingestion_lb.id
+  type              = "ingress"
+  description       = "block malicious IP 35.177.145.184"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "TCP"
+  cidr_blocks       = ["35.177.145.184/32"]
+}
+
+resource "aws_security_group_rule" "ingestion_lb_block_malicious_ip_6" {
+  depends_on        = [aws_security_group.ingestion_lb]
+  security_group_id = aws_security_group.ingestion_lb.id
+  type              = "ingress"
+  description       = "block malicious IP 13.230.30.133"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "TCP"
+  cidr_blocks       = ["13.230.30.133/32"]
+}
+
 resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   depends_on        = [aws_security_group.ingestion_lb]
   security_group_id = aws_security_group.ingestion_lb.id
