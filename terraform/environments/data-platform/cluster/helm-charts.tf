@@ -350,10 +350,9 @@ resource "helm_release" "external_dns" {
     templatefile(
       "${path.module}/configuration/helm/external-dns/values.yml.tftpl",
       {
-        domain_filters                = local.cluster_configuration.route53_zones
-        eks_role_arn                  = module.external_dns_iam_role.arn
-        enable_compatibility_settings = contains(["development", "test", "preproduction"], local.environment)
-        txt_owner_id                  = module.eks.cluster_name
+        domain_filters = local.cluster_configuration.route53_zones
+        eks_role_arn   = module.external_dns_iam_role.arn
+        txt_owner_id   = module.eks.cluster_name
       }
     )
   ]
